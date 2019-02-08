@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Marker interface for OutputStreams that can directly support 
+ * Marker interface for OutputStreams that can directly support
  * copying from an input stream.  OutputStreams that maintain their
  * own byte buffer or similar may be able to optimize the copy
  * instead of using the read/write into a temporary buffer that
@@ -32,5 +32,5 @@ import java.io.InputStream;
 public interface CopyingOutputStream {
 
     int copyFrom(InputStream in) throws IOException;
-    
+
 }

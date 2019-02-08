@@ -25,9 +25,9 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.message.Message;
 
 public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo> {
-    
+
     private Message message;
-    private ResourceComparator rc; 
+    private ResourceComparator rc;
 
     public ClassResourceInfoComparator(Message m) {
         this.message = m;
@@ -38,7 +38,7 @@ public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo
             }
         }
     }
-    
+
     public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
         int result = 0;
         if (rc != null) {
@@ -47,12 +47,12 @@ public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo
                 return result;
             }
         }
-        
+
         result = URITemplate.compareTemplates(
                cr1.getURITemplate(),
                cr2.getURITemplate());
         return result == 0 ? -1 : result;
     }
 }
-    
+
 

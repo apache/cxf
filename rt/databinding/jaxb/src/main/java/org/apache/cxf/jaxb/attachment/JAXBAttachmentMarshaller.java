@@ -45,23 +45,22 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         atts = attachments;
         isXop = attachments != null;
     }
-    
+
     public QName getLastMTOMElementName() {
         return lastElementName;
     }
 
     public String addMtomAttachment(byte[] data, int offset, int length, String mimeType, String elementNS,
                                     String elementLocalName) {
-        
+
         Attachment att = AttachmentUtil.createMtomAttachment(
                              isXop, mimeType, elementNS, data, offset, length, threshold);
         if (att != null) {
             atts.add(att);
             lastElementName = new QName(elementNS, elementLocalName);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public String addMtomAttachment(DataHandler handler, String elementNS, String elementLocalName) {
@@ -71,9 +70,8 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
             atts.add(att);
             lastElementName = new QName(elementNS, elementLocalName);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

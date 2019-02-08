@@ -29,15 +29,15 @@ import javax.wsdl.xml.WSDLWriter;
 
 /**
  * This class is a copy of the WSDLFactoryImpl from the wsdl4j implementation
- * It overwrites the newWSDLWriter method to return a WSDLCorbaWriter 
+ * It overwrites the newWSDLWriter method to return a WSDLCorbaWriter
  */
 public class WSDLCorbaFactoryImpl extends WSDLCorbaFactory {
     WSDLFactory factory;
-    
+
     public WSDLCorbaFactoryImpl() throws WSDLException {
         factory = WSDLFactory.newInstance();
     }
-    
+
     /**
      * Create a new instance of a Definition, with an instance of a
      * PopulatedExtensionRegistry as its ExtensionRegistry.

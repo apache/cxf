@@ -43,8 +43,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.JAXRSInvoker;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -62,16 +60,23 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         org.apache.cxf.endpoint.Server server;
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -79,7 +84,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             sf.setProvider(new PreMatchContainerRequestFilter());
             sf.setAddress("http://localhost:" + PORT + "/");
             sf.getServiceFactory().setDefaultModelClass(DefaultResource.class);
-            
+
             UserResource ur = new UserResource();
             ur.setPath("/default");
             UserOperation op = new UserOperation();
@@ -89,13 +94,13 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             Parameter param = new Parameter(ParameterType.PATH, "id");
             param.setJavaType(Long.class);
             op.setParameters(Collections.singletonList(param));
-            
+
             UserOperation op2 = new UserOperation();
             op2.setPath("echobook");
             op2.setName("echo");
             op2.setVerb("POST");
             op2.setParameters(Collections.singletonList(new Parameter(ParameterType.REQUEST_BODY, null)));
-            
+
             UserOperation op3 = new UserOperation();
             op3.setPath("echobookdefault");
             op3.setName("echoDefault");
@@ -103,16 +108,16 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             Parameter echoDefaultParam = new Parameter(ParameterType.REQUEST_BODY, null);
             echoDefaultParam.setJavaType(SAXSource.class);
             op3.setParameters(Collections.singletonList(echoDefaultParam));
-            
-            List<UserOperation> ops = new ArrayList<UserOperation>();
+
+            List<UserOperation> ops = new ArrayList<>();
             ops.add(op);
             ops.add(op2);
             ops.add(op3);
-            
+
             ur.setOperations(ops);
-            
+
             sf.setModelBeans(ur);
-            
+
             server = sf.create();
         }
 
@@ -134,7 +139,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -142,19 +147,19 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                    launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBookInvokeService() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/default/books/123",
                       "application/xml", 200, 123);
     }
-    
+
     @Test
     public void testGetBookInvokerOnly() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/default/books/999",
                       "application/xml", 200, 999);
     }
-    
+
     @Test
     public void testEchoBook() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/default/echobook");
@@ -162,7 +167,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         assertEquals("echo", b.getName());
         assertEquals(333L, b.getId());
     }
-    
+
     @Test
     public void testEchoBookDefault() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/default/echobookdefault");
@@ -170,38 +175,38 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
         assertEquals("echo", b.getName());
         assertEquals(444L, b.getId());
     }
-    
-    private void getAndCompare(String address, 
+
+    private void getAndCompare(String address,
                                String acceptType,
                                int expectedStatus,
                                long expectedId) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.setHeader("Accept", acceptType);
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            Book book = readBook(get.getResponseBodyAsStream());
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+            Book book = readBook(response.getEntity().getContent());
             assertEquals(expectedId, book.getId());
             assertEquals("CXF in Action", book.getName());
         } finally {
             get.releaseConnection();
         }
     }
-    
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
     }
-    
+
     @Path("/")
     public static class DefaultResource {
-        @Context 
+        @Context
         private Request request;
-        @Context 
+        @Context
         private UriInfo ui;
-        @Context 
+        @Context
         private HttpHeaders headers;
         private Map<String, Book> books = Collections.singletonMap("123", new Book("CXF in Action", 123L));
         @Path("{a:.*}")
@@ -211,15 +216,14 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 String id = ui.getPathParameters().getFirst("id");
                 Book book = books.get(id);
                 return Response.ok(book, headers.getAcceptableMediaTypes().get(0)).build();
-            } else {
-                throw new NotAllowedException("GET");
             }
+            throw new NotAllowedException("GET");
         }
         public Book echo(Book book) {
             return book;
         }
     }
-    
+
     public static class CustomModelInvoker extends JAXRSInvoker {
 
         @Override
@@ -230,7 +234,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             if ("default/books/999".equals(path)) {
                 Long bookId = (Long)params.get(0);
                 Book book = new Book("CXF in Action", bookId);
-                Response r = Response.ok(book, 
+                Response r = Response.ok(book,
                                          mc.getHttpHeaders().getAcceptableMediaTypes().get(0)).build();
                 return new MessageContentsList(r);
             } else if ("default/echobookdefault".equals(path)) {
@@ -240,7 +244,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             } else {
                 return super.invoke(exchange, request, resourceObject);
             }
-            
+
         }
     }
     @PreMatching
@@ -249,7 +253,7 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
             String path = context.getUriInfo().getPath();
             if (path.endsWith("123")) {
                 // Setting this property makes sense only if we have a user model,
-                // default service class, a number of method parameters described 
+                // default service class, a number of method parameters described
                 // in the model not matching a number of the matched method's parameters,
                 // and this method is actually expected to be invoked (testGetBookInvokeService)
                 // which is rare for a model-only case, typically a custom invoker would manage
@@ -257,6 +261,6 @@ public class JAXRSClientServerUserResourceDefaultTest extends AbstractBusClientS
                 JAXRSUtils.getCurrentMessage().put("org.apache.cxf.preferMethodParameters", true);
             }
         }
-        
+
     }
 }

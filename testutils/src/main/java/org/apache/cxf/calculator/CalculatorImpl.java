@@ -23,9 +23,9 @@ import javax.jws.WebService;
 
 import org.apache.cxf.calculator.types.CalculatorFault;
 
-@WebService(serviceName = "CalculatorService", 
-            portName = "CalculatorPort", 
-            targetNamespace = "http://apache.org/cxf/calculator", 
+@WebService(serviceName = "CalculatorService",
+            portName = "CalculatorPort",
+            targetNamespace = "http://apache.org/cxf/calculator",
             endpointInterface = "org.apache.cxf.calculator.CalculatorPortType",
             wsdlLocation = "testutils/calculator.wsdl")
 public class CalculatorImpl implements CalculatorPortType {

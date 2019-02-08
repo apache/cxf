@@ -20,6 +20,8 @@ package org.apache.cxf.ws.security.wss4j;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.dom.callback.DOMCallbackLookup;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
@@ -27,21 +29,22 @@ import org.apache.wss4j.dom.util.WSSecurityUtil;
  * This class uses a DOM-based approach to locate Elements that are referenced via an Id.
  */
 public class CXFCallbackLookup extends DOMCallbackLookup {
-    
+
     private Document doc;
     private Element soapBody;
-    
+
     public CXFCallbackLookup(Document doc, Element soapBody) {
         super(doc);
         this.doc = doc;
         this.soapBody = soapBody;
     }
-    
+
     /**
      * Get the SOAP Body
      */
     @Override
     public Element getSOAPBody() {
+        soapBody = (Element)DOMUtils.getDomElement(soapBody);
         if (soapBody != null) {
             return soapBody;
         }

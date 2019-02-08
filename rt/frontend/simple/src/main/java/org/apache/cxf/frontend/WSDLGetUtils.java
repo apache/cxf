@@ -53,7 +53,9 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.xml.sax.InputSource;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -95,7 +97,7 @@ public class WSDLGetUtils {
                             String base,
                             String ctxUri,
                             EndpointInfo endpointInfo) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("wsdl", "");
         getDocument(message, base,
                     params, ctxUri,
@@ -109,7 +111,7 @@ public class WSDLGetUtils {
                                                   String base,
                                                   String ctxUri,
                                                   EndpointInfo endpointInfo) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("wsdl", "");
         getDocument(message, base,
                     params, ctxUri,
@@ -118,7 +120,7 @@ public class WSDLGetUtils {
         Map<String, SchemaReference> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                                          .getProperty(SCHEMAS_KEY));
 
-        Map<String, String> schemas = new HashMap<String, String>();
+        Map<String, String> schemas = new HashMap<>();
         for (Map.Entry<String, SchemaReference> ent : mp.entrySet()) {
             params.clear();
             params.put("xsd", ent.getKey());
@@ -163,7 +165,8 @@ public class WSDLGetUtils {
         return doc;
     }
 
-    protected String mapUri(Bus bus, String base, Map<String, SchemaReference> smp, String loc, String xsd)
+    protected String mapUri(Bus bus, String base, Map<String, SchemaReference> smp, 
+                            String loc, String xsd, String resolvedXsd)
         throws UnsupportedEncodingException {
         String key = loc;
         try {
@@ -172,7 +175,8 @@ public class WSDLGetUtils {
                 // resolve requested location with relative import path
                 key = new URI(xsd).resolve(loc).toString();
 
-                if (!smp.containsKey(URLDecoder.decode(key, "utf-8"))) {
+                SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+                if (ref == null) {
                     // if the result is not known, check if we can resolve it into something known
                     String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key, base);
                     if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
@@ -187,6 +191,34 @@ public class WSDLGetUtils {
            //ignore
         }
         SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+        if (ref == null && resolvedXsd != null) {
+            try {
+                String key2 = new URI(resolvedXsd).resolve(loc).toString();
+                SchemaReference ref2 = smp.get(URLDecoder.decode(key2, "utf-8"));
+                if (ref2 == null) {
+                    // if the result is not known, check if we can resolve it into something known
+                    String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key2, base);
+                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
+                        // if it is resolvable, we can use it
+                        ref = smp.get(URLDecoder.decode(resolved, "utf-8"));
+                    }
+                } else {
+                    ref = smp.get(URLDecoder.decode(key2, "utf-8"));
+                }
+            } catch (URISyntaxException e) {
+                //ignore, ref can remain null
+            }
+            if (ref != null) {
+                // we are able to map this, but for some reason the default key passed in cannot
+                // be used for a direct lookup, we need to create a unique import key
+                int count = 1;
+                while (smp.containsKey("_import" + count + ".xsd")) {
+                    count++;
+                }
+                key = "_import" + count + ".xsd";
+                smp.put(key, ref);
+            }
+        }
         if (ref != null) {
             return base + "?xsd=" + key.replace(" ", "%20");
         }
@@ -218,7 +250,7 @@ public class WSDLGetUtils {
                                                               "http://www.w3.org/2001/XMLSchema", "import");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -229,7 +261,7 @@ public class WSDLGetUtils {
                                                               "include");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -239,7 +271,7 @@ public class WSDLGetUtils {
                                                               "redefine");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -264,7 +296,7 @@ public class WSDLGetUtils {
                     base), e);
         }
 
-        boolean rewriteAllSoapAddress = MessageUtils.isTrue(message.getContextualProperty(AUTO_REWRITE_ADDRESS_ALL));
+        boolean rewriteAllSoapAddress = MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS_ALL, false);
         if (rewriteAllSoapAddress) {
             List<Element> portList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                          "http://schemas.xmlsoap.org/wsdl/",
@@ -275,8 +307,7 @@ public class WSDLGetUtils {
                 rewriteAddressProtocolHostPort(base, el, basePath, "http://schemas.xmlsoap.org/wsdl/soap12/");
             }
         }
-        Object rewriteSoapAddress = message.getContextualProperty(AUTO_REWRITE_ADDRESS);
-        if (rewriteSoapAddress == null || MessageUtils.isTrue(rewriteSoapAddress) || rewriteAllSoapAddress) {
+        if (MessageUtils.getContextualBoolean(message, AUTO_REWRITE_ADDRESS, true) || rewriteAllSoapAddress) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
                                                               "service");
@@ -452,11 +483,10 @@ public class WSDLGetUtils {
             if (name == null) {
                 setSoapAddressLocationOn(ports.iterator().next(), publishingUrl);
                 break; // only update the first port since we don't target any specific port
-            } else {
-                for (Port port : ports) {
-                    if (name.getLocalPart().equals(port.getName())) {
-                        setSoapAddressLocationOn(port, publishingUrl);
-                    }
+            }
+            for (Port port : ports) {
+                if (name.getLocalPart().equals(port.getName())) {
+                    setSoapAddressLocationOn(port, publishingUrl);
                 }
             }
         }
@@ -534,8 +564,12 @@ public class WSDLGetUtils {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
+                        
                         doneSchemas.put(decodedStart, schemaReference);
                         doneSchemas.put(schemaReference.getReferencedSchema().getDocumentBaseURI(), schemaReference);
+                        if (!doneSchemas.containsKey(decodedOrigLocation)) {
+                            doneSchemas.put(decodedOrigLocation, schemaReference);
+                        }
                         try {
                             if (!(new URI(origLocation).isAbsolute()) && parentResolved != null) {
                                 resolvedSchemaLocation = resolveRelativePath(parentResolved, decodedOrigLocation);
@@ -565,12 +599,12 @@ public class WSDLGetUtils {
      * 1) get a valid relative location to use for recursion into the imported schema
      * 2) add an entry to the doneSchemas map using such a valid relative location, as that's
      *    what will be used later for import links
-     * 
+     *
      * The valid relative location for the imported schema is computed by first obtaining the
      * relative uri that maps the importing schema resolved location into the imported schema
      * resolved location, then such value is resolved on top of the valid relative location
      * that's saved in the doneSchemas map for the importing schema.
-     * 
+     *
      * @param doneSchemas
      * @param resolvedSchemaLocation
      * @param currentSchema
@@ -809,7 +843,7 @@ public class WSDLGetUtils {
      * @param message
      * @param base the request URL
      * @param endpointInfo information for a web service 'port' inside of a service
-     * @return  String or NULL if none found
+     * @return String or NULL if none found
      */
     protected String getPublishedEndpointURL(Message message,
                                              String base,

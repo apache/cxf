@@ -47,48 +47,48 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractServiceFactoryBean {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractServiceFactoryBean.class);
-    
+
     protected boolean dataBindingSet;
     protected List<String> schemaLocations;
 
     private Bus bus;
     private DataBinding dataBinding;
     private Service service;
-    private List<FactoryBeanListener> listeners = new ModCountCopyOnWriteArrayList<FactoryBeanListener>();
-    private Map<String, Object> sessionState = new HashMap<String, Object>();
-    
+    private List<FactoryBeanListener> listeners = new ModCountCopyOnWriteArrayList<>();
+    private Map<String, Object> sessionState = new HashMap<>();
+
     public abstract Service create();
-    
+
     /**
-     * Returns a map that is useful for ServiceFactoryBeanListener to store state across 
-     * events during processing.   
+     * Returns a map that is useful for ServiceFactoryBeanListener to store state across
+     * events during processing.
      */
     public Map<String, Object> getSessionState() {
         return sessionState;
     }
-    
+
     public void sendEvent(FactoryBeanListener.Event ev, Object ... args) {
         for (FactoryBeanListener l : listeners) {
             l.handleEvent(ev, this, args);
         }
     }
-    
+
     protected void initializeDefaultInterceptors() {
         service.getInInterceptors().add(new ServiceInvokerInterceptor());
         service.getInInterceptors().add(new OutgoingChainInterceptor());
         service.getInInterceptors().add(new OneWayProcessorInterceptor());
     }
-    
+
     protected void initializeDataBindings() {
         if (getDataBinding() instanceof AbstractDataBinding && schemaLocations != null) {
             fillDataBindingSchemas();
         }
         getDataBinding().initialize(getService());
-        
+
         service.setDataBinding(getDataBinding());
         sendEvent(FactoryBeanListener.Event.DATABINDING_INITIALIZED, dataBinding);
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -126,10 +126,10 @@ public abstract class AbstractServiceFactoryBean {
     protected void setService(Service service) {
         this.service = service;
     }
-    
+
     private void fillDataBindingSchemas() {
         ResourceManager rr = getBus().getExtension(ResourceManager.class);
-        List<DOMSource> schemas = new ArrayList<DOMSource>();
+        List<DOMSource> schemas = new ArrayList<>();
         for (String l : schemaLocations) {
             URL url = rr.resolveResource(l, URL.class);
             if (url == null) {
@@ -154,5 +154,5 @@ public abstract class AbstractServiceFactoryBean {
         }
         ((AbstractDataBinding)getDataBinding()).setSchemas(schemas);
     }
- 
+
 }

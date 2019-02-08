@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -39,9 +40,9 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 
-public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<SoapMessage> 
+public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<SoapMessage>
     implements SoapInterceptor {
-    
+
     public AbstractSoapInterceptor(String p) {
         super(p);
     }
@@ -49,7 +50,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
         super(i, p);
     }
 
-    
+
     public Set<URI> getRoles() {
         return Collections.emptySet();
     }
@@ -57,16 +58,27 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
     public Set<QName> getUnderstoodHeaders() {
         return Collections.emptySet();
     }
-    
+
     protected String getFaultCodePrefix(XMLStreamWriter writer, QName faultCode) throws XMLStreamException {
         String codeNs = faultCode.getNamespaceURI();
         String prefix = null;
         if (codeNs.length() > 0) {
-            prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
-        }        
+            prefix = faultCode.getPrefix();
+            if (!StringUtils.isEmpty(prefix)) {
+                String boundNS = writer.getNamespaceContext().getNamespaceURI(prefix);
+                if (StringUtils.isEmpty(boundNS)) {
+                    writer.writeNamespace(prefix, codeNs);
+                } else if (!codeNs.equals(boundNS)) {
+                    prefix = null;
+                }
+            }
+            if (StringUtils.isEmpty(prefix)) {
+                prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
+            }
+        }
         return prefix;
     }
-    
+
     protected void prepareStackTrace(SoapMessage message, SoapFault fault) throws Exception {
         boolean config = MessageUtils.getContextualBoolean(message, Message.FAULT_STACKTRACE_ENABLED, false);
         if (config && fault.getCause() != null) {
@@ -81,14 +93,14 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
                 }
                 throwable = throwable.getCause();
                 if (throwable != null) {
-                    sb.append("Caused by: " +  throwable.getClass().getCanonicalName() 
+                    sb.append("Caused by: " +  throwable.getClass().getCanonicalName()
                               + " : " + throwable.getMessage() + Message.EXCEPTION_CAUSE_SUFFIX);
                 }
             }
             Element detail = fault.getDetail();
             String soapNamespace = message.getVersion().getNamespace();
             if (detail == null) {
-                Document doc = DOMUtils.newDocument();
+                Document doc = DOMUtils.getEmptyDocument();
                 Element stackTrace = doc.createElementNS(
                     Fault.STACKTRACE_NAMESPACE, Fault.STACKTRACE);
                 stackTrace.setTextContent(sb.toString());
@@ -97,7 +109,7 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
                 fault.setDetail(detail);
                 detail.appendChild(stackTrace);
             } else {
-                Element stackTrace = 
+                Element stackTrace =
                     detail.getOwnerDocument().createElementNS(Fault.STACKTRACE_NAMESPACE,
                                                               Fault.STACKTRACE);
                 stackTrace.setTextContent(sb.toString());
@@ -112,18 +124,16 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
         }
         boolean config = MessageUtils.getContextualBoolean(message, Message.EXCEPTION_MESSAGE_CAUSE_ENABLED, false);
         if (fault.getMessage() != null) {
-            if (config && fault.getCause() != null 
+            if (config && fault.getCause() != null
                 && fault.getCause().getMessage() != null && !fault.getMessage().equals(fault.getCause().getMessage())) {
                 return fault.getMessage() + " Caused by: " + fault.getCause().getMessage();
-            } else {
-                return fault.getMessage();
             }
+            return fault.getMessage();
         } else if (config && fault.getCause() != null) {
             if (fault.getCause().getMessage() != null) {
                 return fault.getCause().getMessage();
-            } else {
-                return fault.getCause().toString();
             }
+            return fault.getCause().toString();
         } else {
             return "Fault occurred while processing.";
         }

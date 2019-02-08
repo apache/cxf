@@ -35,12 +35,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -68,7 +70,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 public abstract class AbstractCodegenMoho extends AbstractMojo {
-    
+
     /**
      * JVM/System property name holding the hostname of the http proxy.
      */
@@ -84,28 +86,28 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      * should not use the proxy configuration.
      */
     private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
-    
+
     /**
      * JVM/System property name holding the username of the http proxy.
      */
     private static final String HTTP_PROXY_USER = "http.proxyUser";
-    
+
     /**
      * JVM/System property name holding the password of the http proxy.
      */
     private static final String HTTP_PROXY_PASSWORD = "http.proxyPassword";
-    
+
 
     @Parameter(property = "project.build.outputDirectory", required = true)
     protected String classesDirectory;
-   
+
     /**
      * By default all maven dependencies of type "wsdl" are added to the effective wsdlOptions. Setting this
      * parameter to true disables this functionality
      */
     @Parameter(property = "cxf.disableDependencyScan", defaultValue = "false")
     protected boolean disableDependencyScan;
-    
+
     /**
      * Disables the scanning of the wsdlRoot/testWsdlRoot directories.
      * By default, we scan for *.wsdl (see include/exclude params as well) in the wsdlRoot
@@ -114,58 +116,61 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     @Parameter(property = "cxf.disableDirectoryScan", defaultValue = "false")
     protected boolean disableDirectoryScan;
-    
+
     /**
      * Allows running the JavaToWs in a separate process. Valid values are "false", "always", and "once" The
      * value of "true" is equal to "once"
      */
     @Parameter(defaultValue = "false")
     protected String fork;
-    
+
     /**
      * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
      * *.wsdl
      */
     @Parameter
-    protected String includes[];
+    protected String[] includes;
     /**
      * Directory in which the "DONE" markers are saved that
      */
     @Parameter(property = "cxf.markerDirectory", defaultValue = "${project.build.directory}/cxf-codegen-plugin-markers")
     protected File markerDirectory;
-    
+
     /**
      * The plugin dependencies, needed for the fork mode
      */
     @Parameter(required = true, readonly = true, property = "plugin.artifacts")
     protected List<Artifact> pluginArtifacts;
-    
+
     @Parameter(required = true, property = "project")
     protected MavenProject project;
-    
+
     /**
      * Use the compile classpath rather than the test classpath for execution useful if the test dependencies
      * clash with those of wsdl2java
      */
     @Parameter(property = "cxf.useCompileClasspath", defaultValue = "false")
     protected boolean useCompileClasspath;
-    
+
     /**
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
      */
     @Parameter
-    protected String excludes[];
-    
+    protected String[] excludes;
+
     @Parameter(property = "cxf.testWsdlRoot", defaultValue = "${basedir}/src/test/resources/wsdl")
     protected File testWsdlRoot;
-   
+
     @Parameter(property = "cxf.wsdlRoot", defaultValue = "${basedir}/src/main/resources/wsdl")
     protected File wsdlRoot;
-    
+
+    @Parameter(property = "cxf.skipGarbageCollection", defaultValue = "false")
+    protected boolean skipGarbageCollection;
+
     @Component
     protected BuildContext buildContext;
-    
-    
+
+
     /**
      * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
      */
@@ -189,19 +194,32 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
      */
     @Parameter(readonly = true, required = true, property = "session")
     private MavenSession mavenSession;
-    
+
     @Component
     private ProjectDependenciesResolver projectDependencyResolver;
-    
+
     @Component
     private RepositorySystem repositorySystem;
-    
+
 
     public AbstractCodegenMoho() {
         super();
     }
 
     public void execute() throws MojoExecutionException {
+        if (JavaUtils.isJava9Compatible()) {
+            fork = "true";
+            additionalJvmArgs = "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
+                    + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
+                    + "--add-opens java.base/java.security=ALL-UNNAMED "
+                    + "--add-opens java.base/java.net=ALL-UNNAMED "
+                    + "--add-opens java.base/java.lang=ALL-UNNAMED "
+                    + "--add-opens java.base/java.util=ALL-UNNAMED "
+                    + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED " 
+                    + (additionalJvmArgs == null ? "" : additionalJvmArgs); 
+        }
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         // add the generated source into compile source
         // do this step first to ensure the source folder will be added to the Eclipse classpath
         if (project != null && getGeneratedSourceRoot() != null) {
@@ -211,7 +229,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             project.addTestCompileSourceRoot(getGeneratedTestRoot().getAbsolutePath());
         }
         checkResources();
-        
+
         // if this is an m2e configuration build then return immediately without doing any work
         if (project != null && buildContext.isIncremental() && !buildContext.hasDelta(project.getBasedir())) {
             return;
@@ -228,7 +246,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 "*.wsdl"
             };
         }
-       
+
         markerDirectory.mkdirs();
 
         String originalProxyHost = SystemPropertyAction.getProperty(HTTP_PROXY_HOST);
@@ -236,21 +254,22 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String originalNonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
         String originalProxyUser = SystemPropertyAction.getProperty(HTTP_PROXY_USER);
         String originalProxyPassword = SystemPropertyAction.getProperty(HTTP_PROXY_PASSWORD);
-                
-        configureProxyServerSettings();
-
-        List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
-
-        if (effectiveWsdlOptions.size() == 0) {
-            getLog().info("Nothing to generate");
-            return;
-        }
-
-        ClassLoaderSwitcher classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
-        boolean result = true;
+        
 
         Bus bus = null;
+        ClassLoaderSwitcher classLoaderSwitcher = null;
         try {
+            configureProxyServerSettings();
+
+            List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
+
+            if (effectiveWsdlOptions.isEmpty()) {
+                getLog().info("Nothing to generate");
+                return;
+            }
+            classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
+            boolean result = true;
+    
             Set<URI> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
@@ -258,8 +277,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             } else {
                 for (GenericWsdlOption o : effectiveWsdlOptions) {
                     bus = generate(o, bus, cp);
-    
-                    File dirs[] = o.getDeleteDirs();
+
+                    File[] dirs = o.getDeleteDirs();
                     if (dirs != null) {
                         for (int idx = 0; idx < dirs.length; ++idx) {
                             result = result && deleteDir(dirs[idx]);
@@ -272,7 +291,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (bus != null) {
                 bus.shutdown(true);
             }
-            classLoaderSwitcher.restoreClassLoader();
+            if (classLoaderSwitcher != null) {
+                classLoaderSwitcher.restoreClassLoader();
+            }
             restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts,
                                 originalProxyUser, originalProxyPassword);
         }
@@ -285,7 +306,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (project != null && getGeneratedTestRoot() != null && getGeneratedTestRoot().exists()) {
             buildContext.refresh(getGeneratedTestRoot().getAbsoluteFile());
         }
-        System.gc();
+        if (!skipGarbageCollection) {
+            System.gc();
+        }
     }
 
     private void checkResources() {
@@ -295,13 +318,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
         File genroot = getGeneratedSourceRoot();
         if (genroot != null) {
-            
+
             List<Resource> resources = project.getBuild().getResources();
             for (Resource r : resources) {
                 File d = new File(root, r.getDirectory());
                 if (d.equals(genroot)) {
                     sourceRoot = r;
-                } 
+                }
             }
             Resource r2 = scanForResources(genroot, sourceRoot);
             if (r2 != sourceRoot) {
@@ -316,7 +339,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 File d = new File(root, r.getDirectory());
                 if (d.equals(genroot)) {
                     testRoot = r;
-                } 
+                }
             }
             Resource r2 = scanForResources(genroot, testRoot);
             if (r2 != testRoot) {
@@ -327,7 +350,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Resource scanForResources(File rootFile, Resource root) {
-        File files[] = rootFile.listFiles();
+        File[] files = rootFile.listFiles();
         if (files == null) {
             return root;
         }
@@ -381,13 +404,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             System.getProperties().remove(HTTP_PROXY_PASSWORD);
         }
         Proxy proxy = mavenSession.getSettings().getActiveProxy();
-        if (proxy != null && !StringUtils.isEmpty(proxy.getUsername()) 
+        if (proxy != null && !StringUtils.isEmpty(proxy.getUsername())
             && !StringUtils.isEmpty(proxy.getPassword())) {
             Authenticator.setDefault(null);
         }
     }
 
-    protected abstract Bus generate(GenericWsdlOption o, 
+    protected abstract Bus generate(GenericWsdlOption o,
                                     Bus bus, Set<URI> cp) throws MojoExecutionException;
 
     protected void addPluginArtifact(Set<URI> artifactsPath) {
@@ -428,48 +451,49 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
             if (proxy.getHost() == null) {
                 throw new MojoExecutionException("Proxy in settings.xml has no host");
-            } else {
-                if (proxy.getHost() != null) {
-                    System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
-                }
-                if (String.valueOf(proxy.getPort()) != null) {
-                    System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
-                }
-                if (proxy.getNonProxyHosts() != null) {
-                    System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
-                }
-                if (!StringUtils.isEmpty(proxy.getUsername()) 
-                    && !StringUtils.isEmpty(proxy.getPassword())) {
-                    final String authUser = proxy.getUsername();
-                    final String authPassword = proxy.getPassword();
-                    Authenticator.setDefault(new Authenticator() {
-                        public PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(authUser, authPassword.toCharArray());
-                        }
-                    });
+            }
+            if (proxy.getHost() != null) {
+                System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
+            }
+            if (String.valueOf(proxy.getPort()) != null) {
+                System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
+            }
+            if (proxy.getNonProxyHosts() != null) {
+                System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
+            }
+            if (!StringUtils.isEmpty(proxy.getUsername())
+                && !StringUtils.isEmpty(proxy.getPassword())) {
+                final String authUser = proxy.getUsername();
+                final String authPassword = proxy.getPassword();
+                Authenticator.setDefault(new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(authUser, authPassword.toCharArray());
+                    }
+                });
 
-                    System.setProperty(HTTP_PROXY_USER, authUser);
-                    System.setProperty(HTTP_PROXY_PORT, authPassword);
-                }
+                System.setProperty(HTTP_PROXY_USER, authUser);
+                System.setProperty(HTTP_PROXY_PORT, authPassword);
             }
 
         }
     }
-    
-    protected abstract List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions() 
+
+    protected abstract List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
         throws MojoExecutionException;
 
     /**
      * Recursively delete the given directory
-     * 
+     *
      * @param f
      * @return
      */
     protected boolean deleteDir(File f) {
         if (f.isDirectory()) {
-            File files[] = f.listFiles();
-            for (int idx = 0; idx < files.length; ++idx) {
-                deleteDir(files[idx]);
+            File[] files = f.listFiles();
+            if (files != null) {
+                for (int idx = 0; idx < files.length; ++idx) {
+                    deleteDir(files[idx]);
+                }
             }
         }
 
@@ -480,12 +504,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
         return true;
     }
-    
+
     protected abstract String getMarkerSuffix();
-    
+
     protected List<String> generateCommandLine(GenericWsdlOption wsdlOption)
         throws MojoExecutionException {
-        
+
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
@@ -493,11 +517,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         return wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI,
                                               getLog().isDebugEnabled());
     }
-    
+
     protected void forkOnce(Set<URI> classPath, List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
-        List<GenericWsdlOption> toDo = new LinkedList<GenericWsdlOption>();
-        List<List<String>> wargs = new LinkedList<List<String>>();
+        List<GenericWsdlOption> toDo = new LinkedList<>();
+        List<List<String>> wargs = new LinkedList<>();
         for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
             File outputDirFile = wsdlOption.getOutputDir();
             outputDirFile.mkdirs();
@@ -518,7 +542,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             return;
         }
 
-        Set<URI> artifactsPath = new LinkedHashSet<URI>();
+        Set<URI> artifactsPath = new LinkedHashSet<>();
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
@@ -530,11 +554,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         addPluginArtifact(artifactsPath);
         artifactsPath.addAll(classPath);
 
-        String args[] = createForkOnceArgs(wargs);
+        String[] args = createForkOnceArgs(wargs);
         runForked(artifactsPath, getForkClass().getName(), args);
 
         for (GenericWsdlOption wsdlOption : toDo) {
-            File dirs[] = wsdlOption.getDeleteDirs();
+            File[] dirs = wsdlOption.getDeleteDirs();
             if (dirs != null) {
                 for (int idx = 0; idx < dirs.length; ++idx) {
                     deleteDir(dirs[idx]);
@@ -551,11 +575,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             }
         }
     }
-    
+
     protected abstract Class<?> getForkClass();
-    
+
     protected File getDoneFile(URI basedir, URI wsdlURI, String mojo) {
-        String doneFileName = wsdlURI.toString();
+        String doneFileName = mojo + wsdlURI.toString();
 
 
         try {
@@ -564,8 +588,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             cript.update(doneFileName.getBytes("utf8"));
             doneFileName = new javax.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
         } catch (Exception e) {
-            //ignore,we'll try and fake it based on the wsdl
-            
+            //ignore, we'll try and fake it based on the wsdl
+
             // Strip the basedir from the doneFileName
             if (doneFileName.startsWith(basedir.toString())) {
                 doneFileName = doneFileName.substring(basedir.toString().length());
@@ -576,16 +600,16 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                 .replace(':', '_');
             doneFileName += ".DONE";
         }
-        
+
         return new File(markerDirectory, "." + doneFileName);
     }
 
     protected abstract File getGeneratedSourceRoot();
 
     protected abstract File getGeneratedTestRoot();
-    
-    protected void runForked(Set<URI> classPath, 
-                             String mainClassName, 
+
+    protected void runForked(Set<URI> classPath,
+                             String mainClassName,
                              String[] args) throws MojoExecutionException {
         getLog().info("Running code generation in fork mode...");
         getLog().debug("Running code generation in fork mode with args " + Arrays.asList(args));
@@ -629,7 +653,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             jar.createArchive();
 
             cmd.createArg().setValue("-jar");
-            
+
             String tmpFilePath = file.getAbsolutePath();
             if (tmpFilePath.contains(" ")) {
                 //ensure the path is in double quotation marks if the path contain space
@@ -662,7 +686,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
-        
+
 
         String cmdLine = CommandLineUtils.toString(cmd.getCommandline());
 
@@ -685,10 +709,10 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
 
     }
-    
+
     /**
      * Determine if code should be generated from the given wsdl
-     * 
+     *
      * @param wsdlOption
      * @param doneFile
      * @param wsdlURI
@@ -699,7 +723,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     protected void createMarkerFile(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI) throws IOException {
         doneFile.createNewFile();
     }
-   
+
     private String[] createForkOnceArgs(List<List<String>> wargs) throws MojoExecutionException {
         try {
             File f = FileUtils.createTempFile("cxf-w2j", "args");
@@ -719,11 +743,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new MojoExecutionException("Could not create argument file", ex);
         }
     }
-    
+
     /**
      * Try to find a file matching the wsdl path (either absolutely, relatively to the current dir or to
      * the project base dir)
-     * 
+     *
      * @return wsdl file
      */
     public File getWsdlFile(GenericWsdlOption option, File baseDir) {
@@ -747,18 +771,19 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
         return file;
     }
-    
+
     public URI getWsdlURI(GenericWsdlOption option, URI baseURI) throws MojoExecutionException {
         String wsdlLocation = option.getUri();
         if (wsdlLocation == null) {
             throw new MojoExecutionException("No wsdl available for base URI " + baseURI);
         }
         File wsdlFile = new File(wsdlLocation);
-        return wsdlFile.exists() ? wsdlFile.toURI() 
+        return wsdlFile.exists() ? wsdlFile.toURI()
             : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
     }
 
-    protected void downloadRemoteWsdls(List<GenericWsdlOption> effectiveWsdlOptions) 
+        
+    protected void downloadRemoteWsdls(List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
 
         for (GenericWsdlOption wsdlOption : effectiveWsdlOptions) {
@@ -768,7 +793,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             }
             Artifact wsdlArtifact = repositorySystem.createArtifactWithClassifier(wsdlA.getGroupId(),
                                                                         wsdlA.getArtifactId(),
-                                                                        wsdlA.getVersion(), 
+                                                                        wsdlA.getVersion(),
                                                                         wsdlA.getType(),
                                                                         wsdlA.getClassifier());
             wsdlArtifact = resolveRemoteWsdlArtifact(wsdlArtifact);
@@ -805,13 +830,13 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             throw new IOException(
                                   "The java executable '"
                                       + javaExe
-                                      + "' doesn't exist or is not a file." 
+                                      + "' doesn't exist or is not a file."
                                       + "Verify the <javaExecutable/> parameter or toolchain configuration.");
         }
         getLog().info("The java executable is " + javaExe.getAbsolutePath());
         return javaExe;
     }
-    
+
     private Artifact resolveRemoteWsdlArtifact(Artifact artifact) throws MojoExecutionException {
         Artifact remoteWsdl = resolveDependentWsdl(artifact);
         if (remoteWsdl == null) {
@@ -828,7 +853,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     private Artifact resolveDependentWsdl(Artifact artifact) {
-        Collection<String> scopes = new ArrayList<String>();
+        Collection<String> scopes = new ArrayList<>();
         scopes.add(Artifact.SCOPE_RUNTIME);
         Set<Artifact> artifactSet = null;
         try {
@@ -841,7 +866,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
     private Artifact resolveAttachedWsdl(Artifact artifact) {
         List<MavenProject> rProjects = mavenSession.getProjects();
-        List<Artifact> artifactList = new ArrayList<Artifact>();
+        List<Artifact> artifactList = new ArrayList<>();
         for (MavenProject rProject : rProjects) {
             List<Artifact> list = CastUtils.cast(rProject.getAttachedArtifacts());
             if (list != null) {
@@ -859,26 +884,45 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         request.setMirrors(mavenSession.getRequest().getMirrors());
         request.setProxies(mavenSession.getRequest().getProxies());
         request.setLocalRepository(mavenSession.getLocalRepository());
-        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());            
+        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());
         ArtifactResolutionResult result = repositorySystem.resolve(request);
-            
-        return result.getOriginatingArtifact();
+
+        Artifact resolvedArtifact = result.getOriginatingArtifact();
+        if (resolvedArtifact == null && !CollectionUtils.isEmpty(result.getArtifacts())) {
+            resolvedArtifact = result.getArtifacts().iterator().next();
+        }
+        return resolvedArtifact;
     }
 
     private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {
+        boolean artifactMatched = false;
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
-                if (targetArtifact.getGroupId().equals(pArtifact.getGroupId())
-                    && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
-                    && targetArtifact.getVersion().equals(pArtifact.getVersion())
-                    && "wsdl".equals(pArtifact.getType())) {
-                    getLog().info(String.format("%s resolved to %s", pArtifact.toString(), pArtifact
-                                      .getFile().getAbsolutePath()));
+                artifactMatched = isArtifactMatched(targetArtifact, pArtifact);
+                if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null 
+                        && targetArtifact.getClassifier().equals(pArtifact.getClassifier()) 
+                        && artifactMatched) {
+                    //handle multile classifiers
+                    return pArtifact;
+                } else if (artifactMatched && targetArtifact.getClassifier() == null) {
                     return pArtifact;
                 }
             }
         }
         return null;
     }
+    
+    private boolean isArtifactMatched(Artifact targetArtifact, Artifact pArtifact) {
+        return targetArtifact.getGroupId().equals(pArtifact.getGroupId())
+                && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
+                && targetArtifact.getVersion().equals(pArtifact.getVersion())
+                && ("wsdl".equals(pArtifact.getType()) 
+                || (
+                        targetArtifact.getClassifier() != null
+                                && pArtifact.getType() != null
+                                && (targetArtifact.getClassifier() + ".wsdl").equals(pArtifact.getType())
+                ));
+    }
 
 }
+

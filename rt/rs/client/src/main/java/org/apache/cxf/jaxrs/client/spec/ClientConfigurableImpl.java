@@ -20,32 +20,22 @@
 package org.apache.cxf.jaxrs.client.spec;
 
 import javax.ws.rs.RuntimeType;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
 
 import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
 
 public class ClientConfigurableImpl<C extends Configurable<C>> extends ConfigurableImpl<C> {
-    private static final Class<?>[] CLIENT_FILTER_INTERCEPTOR_CLASSES = 
-        new Class<?>[] {ClientRequestFilter.class,
-                        ClientResponseFilter.class,
-                        ReaderInterceptor.class,
-                        WriterInterceptor.class};
-    
-    
+
+
     public ClientConfigurableImpl(C configurable) {
         this(configurable, null);
     }
-    
+
     public ClientConfigurableImpl(C configurable, Configuration config) {
         super(configurable,
-              CLIENT_FILTER_INTERCEPTOR_CLASSES, 
               config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
-                  : new ConfigurationImpl(config, CLIENT_FILTER_INTERCEPTOR_CLASSES));
+                  : new ConfigurationImpl(config));
     }
 }

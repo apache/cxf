@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap.interceptor;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -40,7 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(Soap11FaultInInterceptor.class);
-    
+
     public Soap11FaultInInterceptor() {
         super(Phase.UNMARSHAL);
         addBefore(ClientFaultConverter.class.getName());
@@ -52,7 +53,7 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         message.setContent(Exception.class, unmarshalFault(message, reader));
     }
 
-    public static SoapFault unmarshalFault(SoapMessage message, 
+    public static SoapFault unmarshalFault(SoapMessage message,
                                            XMLStreamReader reader) {
         String exMessage = "";
         QName faultCode = null;
@@ -60,15 +61,15 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         Element detail = null;
         String lang = null;
         try {
-            while (reader.nextTag() == XMLStreamReader.START_ELEMENT) {
-                if (reader.getLocalName().equals("faultcode")) {
+            while (reader.nextTag() == XMLStreamConstants.START_ELEMENT) {
+                if ("faultcode".equals(reader.getLocalName())) {
                     faultCode = StaxUtils.readQName(reader);
-                } else if (reader.getLocalName().equals("faultstring")) {
+                } else if ("faultstring".equals(reader.getLocalName())) {
                     lang = reader.getAttributeValue("http://www.w3.org/XML/1998/namespace", "lang");
                     exMessage = reader.getElementText();
-                } else if (reader.getLocalName().equals("faultactor")) {
+                } else if ("faultactor".equals(reader.getLocalName())) {
                     role = reader.getElementText();
-                } else if (reader.getLocalName().equals("detail")) {
+                } else if ("detail".equals(reader.getLocalName())) {
                     //XMLStreamReader newReader = new DepthXMLStreamReader(reader);
                     detail = StaxUtils.read(reader).getDocumentElement();
                 }

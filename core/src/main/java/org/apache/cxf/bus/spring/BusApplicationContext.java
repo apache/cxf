@@ -60,24 +60,24 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class BusApplicationContext extends ClassPathXmlApplicationContext {
-    
+
     private static final String DEFAULT_CXF_CFG_FILE = "META-INF/cxf/cxf.xml";
     private static final String DEFAULT_CXF_EXT_CFG_FILE = "classpath*:META-INF/cxf/cxf.extension";
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusApplicationContext.class);
-    
+
     private NamespaceHandlerResolver nsHandlerResolver;
     private boolean includeDefaults;
     private String[] cfgFiles;
     private URL[] cfgFileURLs;
-    
+
     public BusApplicationContext(String cf, boolean include) {
         this(cf, include, null);
     }
     public BusApplicationContext(String[] cfs, boolean include) {
         this(cfs, include, null);
     }
-    
+
     public BusApplicationContext(URL url, boolean include) {
         this(url, include, null);
     }
@@ -88,14 +88,14 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
     public BusApplicationContext(String cf, boolean include, ApplicationContext parent) {
         this(new String[] {cf}, include, parent);
     }
-    
+
     public BusApplicationContext(URL url, boolean include, ApplicationContext parent) {
         this(new URL[] {url}, include, parent, null);
-    } 
+    }
     public BusApplicationContext(String[] cf, boolean include, ApplicationContext parent) {
         this(cf, include, parent, null);
     }
-    public BusApplicationContext(String[] cf, boolean include, 
+    public BusApplicationContext(String[] cf, boolean include,
                                  ApplicationContext parent, NamespaceHandlerResolver res) {
         super(new String[0], false, parent);
         cfgFiles = cf;
@@ -107,7 +107,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                     refresh();
                     return Boolean.TRUE;
                 }
-                
+
             });
         } catch (PrivilegedActionException e) {
             if (e.getException() instanceof RuntimeException) {
@@ -133,7 +133,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                     refresh();
                     return Boolean.TRUE;
                 }
-                
+
             });
         } catch (PrivilegedActionException e) {
             if (e.getException() instanceof RuntimeException) {
@@ -141,17 +141,17 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             }
             throw new Fault(e);
         }
-    } 
-    
+    }
+
     @Override
     protected Resource[] getConfigResources() {
-        List<Resource> resources = new ArrayList<Resource>();
-       
+        List<Resource> resources = new ArrayList<>();
+
         if (includeDefaults) {
             try {
                 PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(Thread
                     .currentThread().getContextClassLoader());
-                
+
                 Collections.addAll(resources, resolver.getResources(DEFAULT_CXF_CFG_FILE));
 
                 Resource[] exts = resolver.getResources(DEFAULT_CXF_EXT_CFG_FILE);
@@ -169,17 +169,17 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                 }
 
             } catch (IOException ex) {
-                // ignore  
-            }  
+                // ignore
+            }
         }
-        
+
         boolean usingDefault = false;
         if (null == cfgFiles) {
             String cfgFile = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_NAME);
             if (cfgFile != null) {
                 cfgFiles = new String[] {cfgFile};
             }
-        }        
+        }
         if (null == cfgFiles) {
             cfgFiles = new String[] {Configurer.DEFAULT_USER_CFG_FILE};
             usingDefault = true;
@@ -190,7 +190,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                 public Boolean run() {
                     return cpr != null && cpr.exists();
                 }
-                
+
             });
             if (exists) {
                 resources.add(cpr);
@@ -200,10 +200,10 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_LOADED", cfgFile);
                     String message = (new Message("USER_CFG_FILE_NOT_LOADED", LOG, cfgFile)).toString();
                     throw new ApplicationContextException(message);
-                } 
+                }
             }
         }
-            
+
         if (null != cfgFileURLs) {
             for (URL cfgFileURL : cfgFileURLs) {
                 UrlResource ur = new UrlResource(cfgFileURL);
@@ -213,8 +213,8 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_URL_NOT_FOUND_MSG", cfgFileURL);
                 }
             }
-        } 
-        
+        }
+
         String sysCfgFileUrl = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_URL);
         if (null != sysCfgFileUrl) {
             try {
@@ -223,16 +223,16 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
                     resources.add(ur);
                 } else {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_URL_NOT_FOUND_MSG", sysCfgFileUrl);
-                }            
-            } catch (MalformedURLException e) {            
+                }
+            } catch (MalformedURLException e) {
                 LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_URL_ERROR_MSG", sysCfgFileUrl);
             }
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Creating application context with resources: " + resources);
         }
-        
+
         if (0 == resources.size()) {
             return null;
         }
@@ -240,7 +240,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         res = resources.toArray(res);
         return res;
     }
-    
+
     public static Resource findResource(final String cfgFile) {
         try {
             return AccessController.doPrivileged(new PrivilegedAction<Resource>() {
@@ -279,7 +279,7 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             return null;
         }
     }
-    
+
     @Override
     protected void initBeanDefinitionReader(XmlBeanDefinitionReader reader) {
         // Spring always creates a new one of these, which takes a fair amount
@@ -289,16 +289,16 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             nsHandlerResolver = new DefaultNamespaceHandlerResolver();
         }
         reader.setNamespaceHandlerResolver(nsHandlerResolver);
-        
+
         String mode = getSpringValidationMode();
         if (null != mode) {
             reader.setValidationModeName(mode);
         }
-        reader.setNamespaceAware(true); 
-        
-        setEntityResolvers(reader);        
+        reader.setNamespaceAware(true);
+
+        setEntityResolvers(reader);
     }
-    
+
     static String getSpringValidationMode() {
         return AccessController.doPrivileged(new PrivilegedAction<String>() {
             public String run() {
@@ -310,8 +310,8 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             }
         });
     }
-        
-    
+
+
     void setEntityResolvers(XmlBeanDefinitionReader reader) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         reader.setEntityResolver(new BusEntityResolver(cl, new BeansDtdResolver(),
@@ -320,10 +320,10 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
     @Override
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
             // Create a new XmlBeanDefinitionReader for the given BeanFactory.
-        XmlBeanDefinitionReader beanDefinitionReader = 
+        XmlBeanDefinitionReader beanDefinitionReader =
             new ControlledValidationXmlBeanDefinitionReader(beanFactory);
         beanDefinitionReader.setNamespaceHandlerResolver(nsHandlerResolver);
-        
+
         // Configure the bean definition reader with this context's
         // resource loading environment.
         beanDefinitionReader.setResourceLoader(this);
@@ -334,5 +334,5 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
         initBeanDefinitionReader(beanDefinitionReader);
         loadBeanDefinitions(beanDefinitionReader);
     }
-    
+
 }

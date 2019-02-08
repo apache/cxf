@@ -44,11 +44,11 @@ public class WSDLValidator extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(ToolConstants.CFG_SCHEMA_URL);
         return set;
     }
-    
+
     public boolean executeForMaven() {
         super.execute(false);
         ToolContext env = getContext();
@@ -56,7 +56,7 @@ public class WSDLValidator extends AbstractCXFToolContainer {
         env.put(ToolConstants.CFG_VALIDATE_WSDL, "all");
         env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
-      
+
         WSDL11Validator wsdlValidator = new WSDL11Validator(null, env, getBus());
         return wsdlValidator.isValid();
     }
@@ -70,7 +70,7 @@ public class WSDLValidator extends AbstractCXFToolContainer {
                 env.put(ToolConstants.CFG_VALIDATE_WSDL, "all");
                 env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
-              
+
                 WSDL11Validator wsdlValidator = new WSDL11Validator(null, env, getBus());
                 if (wsdlValidator.isValid()) {
                     System.out.println("Passed Validation : Valid WSDL ");
@@ -84,7 +84,7 @@ public class WSDLValidator extends AbstractCXFToolContainer {
             err.println();
             if (isVerboseOn()) {
                 err.println("[+] Verbose turned on");
-                err.println();                
+                err.println();
                 ex.printStackTrace(err);
             }
         } catch (Exception ex) {
@@ -100,7 +100,7 @@ public class WSDLValidator extends AbstractCXFToolContainer {
 
     public static void main(String[] pargs) {
         CommandInterfaceUtils.commandCommonMain();
-        try { 
+        try {
             ToolRunner.runTool(WSDLValidator.class, WSDLValidator.class
                 .getResourceAsStream("wsdlvalidator.xml"), false, pargs);
         } catch (Exception ex) {

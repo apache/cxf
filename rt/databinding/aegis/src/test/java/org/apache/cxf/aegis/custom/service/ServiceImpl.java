@@ -30,7 +30,7 @@ public class ServiceImpl implements Service {
             throw new IllegalArgumentException("beanIds is null");
         }
 
-        Map<String, NoDefaultConstructorBean> map = new HashMap<String, NoDefaultConstructorBean>();
+        Map<String, NoDefaultConstructorBean> map = new HashMap<>();
 
         map.put("1", new NoDefaultConstructorBeanImpl("1", "name"));
         map.put("2", new NoDefaultConstructorBeanImpl("2", "name"));
@@ -43,24 +43,24 @@ public class ServiceImpl implements Service {
             throw new IllegalArgumentException("key is null");
         }
 
-        Collection<NoDefaultConstructorBean> collection = new ArrayList<NoDefaultConstructorBean>();
+        Collection<NoDefaultConstructorBean> collection = new ArrayList<>();
 
         collection.add(new NoDefaultConstructorBeanImpl("1", "name"));
 
         return collection;
     }
 
-    public Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> 
+    public Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>
     getByNames(Collection<NoDefaultConstructorBeanKey> keys) {
 
         if (keys == null) {
             throw new IllegalArgumentException("keys is null");
         }
 
-        Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map = 
-                new HashMap<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>();
+        Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map =
+                new HashMap<>();
 
-        Collection<NoDefaultConstructorBean> collection = new ArrayList<NoDefaultConstructorBean>();
+        Collection<NoDefaultConstructorBean> collection = new ArrayList<>();
 
         collection.add(new NoDefaultConstructorBeanImpl("1", "name"));
 

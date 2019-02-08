@@ -28,9 +28,9 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_xml_http.wrapped.GreeterImpl;
 
 
-public class Server extends AbstractBusTestServerBase {        
+public class Server extends AbstractBusTestServerBase {
     Endpoint ep;
-    
+
     protected void run() {
         setBus(BusFactory.getDefaultBus());
         Object implementor = new GreeterImpl();

@@ -33,6 +33,6 @@ public interface XKMSClientCache extends Closeable {
      * is no such XKMSCacheToken in the cache.
      */
     XKMSCacheToken get(String key);
-    
+
     void close();
 }

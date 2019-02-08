@@ -59,13 +59,14 @@ public class SAAJOutInterceptorTest extends TestBase {
     public void testHandleHeader() throws Exception {
         soapMessage = TestUtil.createEmptySoapMessage(Soap11.getInstance(), chain);
         soapMessage.setContent(OutputStream.class, new ByteArrayOutputStream());
-        
+
         SOAPMessage m = SAAJFactoryResolver.createMessageFactory(soapMessage.getVersion()).createMessage();
 
         InputStream ins = getClass().getResourceAsStream("../test-soap-header.xml");
         m.getSOAPPart().setContent(new StreamSource(ins));
-        
+
         Element el = DOMUtils.getFirstElement(m.getSOAPPart().getEnvelope().getHeader());
+        el = (Element)DOMUtils.getDomElement(el);
         List<Header> h = soapMessage.getHeaders();
         while (el != null) {
             h.add(new SoapHeader(DOMUtils.getElementQName(el), el));
@@ -75,6 +76,6 @@ public class SAAJOutInterceptorTest extends TestBase {
         W3CDOMStreamWriter writer = new SAAJStreamWriter(m.getSOAPPart());
         soapMessage.setContent(XMLStreamWriter.class, writer);
         soi.handleMessage(soapMessage);
-        
+
     }
 }

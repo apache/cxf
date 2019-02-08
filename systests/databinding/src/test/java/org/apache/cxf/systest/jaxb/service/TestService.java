@@ -31,8 +31,11 @@ public interface TestService {
     @WebMethod(operationName = "getWidgetById")
     Widget getWidgetById(@WebParam(name = "id")
                          long id);
-    
+
     @WebMethod
     void testExceptionMarshalling() throws TestServiceException;
+    
+    @WebMethod
+    String echo(String test) throws PropertyOrderException;
 
 }

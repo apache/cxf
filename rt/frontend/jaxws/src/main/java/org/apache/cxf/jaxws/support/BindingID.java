@@ -24,10 +24,10 @@ import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.SoapTransportFactory;
 
 public final class BindingID {
-           
+
     private BindingID() {
     }
-    
+
     public static String getJaxwsBindingID(String transportID) {
         if (SoapTransportFactory.SOAP_11_HTTP_BINDING.equals(transportID)) {
             return SOAPBinding.SOAP11HTTP_BINDING;
@@ -37,9 +37,9 @@ public final class BindingID {
             return transportID;
         }
     }
-        
+
     public static String getBindingID(String jaxwsBindingID) {
-        if (SOAPBinding.SOAP11HTTP_BINDING.equals(jaxwsBindingID) 
+        if (SOAPBinding.SOAP11HTTP_BINDING.equals(jaxwsBindingID)
                 || SOAPBinding.SOAP11HTTP_MTOM_BINDING.equals(jaxwsBindingID)) {
             return SoapBindingFactory.SOAP_11_BINDING;
         } else if (SOAPBinding.SOAP12HTTP_BINDING.equals(jaxwsBindingID)
@@ -47,7 +47,7 @@ public final class BindingID {
             return SoapBindingFactory.SOAP_12_BINDING;
         } else {
             return jaxwsBindingID;
-        } 
+        }
     }
-        
+
 }

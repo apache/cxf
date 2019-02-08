@@ -43,6 +43,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
@@ -68,7 +69,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.Observable;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
@@ -84,12 +84,12 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 
 /**
- * Logical Handler responsible for aggregating the Message Addressing 
+ * Logical Handler responsible for aggregating the Message Addressing
  * Properties for outgoing messages.
  */
 public class MAPAggregatorImpl extends MAPAggregator {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(MAPAggregator.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
 
@@ -106,19 +106,19 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 dest.shutdown();
             }
         }
-        
+
     };
 
-    
+
     /**
      * Constructor.
      */
     public MAPAggregatorImpl() {
         messageIdCache = new DefaultMessageIdCache();
     }
-    
 
-    
+
+
     public MAPAggregatorImpl(MAPAggregator mag) {
         this.addressingRequired = mag.isAddressingRequired();
         this.messageIdCache = mag.getMessageIdCache();
@@ -181,7 +181,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private boolean usingAddressing(Message message) {
         boolean ret = true;
         if (ContextUtils.isRequestor(message)) {
-            if (hasUsingAddressing(message) 
+            if (hasUsingAddressing(message)
                 || hasAddressingAssertion(message)
                 || hasUsingAddressingAssertion(message)) {
                 return true;
@@ -195,7 +195,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         }
         return ret;
     }
-      
+
    /**
     * Determine if the use of addressing is indicated by the presence of a
     * the usingAddressing attribute.
@@ -226,14 +226,14 @@ public class MAPAggregatorImpl extends MAPAggregator {
             } else {
                 ret = b.booleanValue();
             }
-        }    
+        }
         return ret;
     }
-    
+
     /**
      * Determine if the use of addressing is indicated by an Addressing assertion in the
      * alternative chosen for the current message.
-     * 
+     *
      * @param message the current message
      * @pre message is outbound
      * @pre requestor role
@@ -241,15 +241,15 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private boolean hasAddressingAssertion(Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
-            return false;            
+            return false;
         }
         return null != aim.get(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
     }
-    
+
     /**
      * Determine if the use of addressing is indicated by a UsingAddressing in the
      * alternative chosen for the current message.
-     * 
+     *
      * @param message the current message
      * @pre message is outbound
      * @pre requestor role
@@ -258,7 +258,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return false;
-            
+
         }
         if (null != aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME)) {
             return true;
@@ -269,7 +269,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         return null != aim.get(MetadataConstants.USING_ADDRESSING_2006_QNAME);
     }
 
-   
+
     private WSAddressingFeature getWSAddressingFeature(Message message) {
         if (message.getExchange() != null && message.getExchange().getEndpoint() != null) {
             Endpoint endpoint = message.getExchange().getEndpoint();
@@ -286,7 +286,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     /**
      * If the isRequestor(message) == true and isAddressRequired() == false
      * Assert all the wsa related assertion to true
-     * 
+     *
      * @param message the current message
      */
     private void assertAddressing(Message message) {
@@ -301,23 +301,21 @@ public class MAPAggregatorImpl extends MAPAggregator {
 
         for (QName type : types) {
             assertAssertion(aim, type);
+            // ADDRESSING_ASSERTION is normalized, so check only the default namespace
             if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
                 assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
                 assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-            } else if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705)) {
-                assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-                assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
             }
         }
     }
 
     /**
-     * Asserts all Addressing assertions for the current message, regardless their nested 
+     * Asserts all Addressing assertions for the current message, regardless their nested
      * Policies.
      * @param message the current message
      */
-    private void assertAddressing(Message message, 
-                                  EndpointReferenceType replyTo, 
+    private void assertAddressing(Message message,
+                                  EndpointReferenceType replyTo,
                                   EndpointReferenceType faultTo) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
@@ -330,28 +328,23 @@ public class MAPAggregatorImpl extends MAPAggregator {
         boolean anonFault = ContextUtils.isGenericAddress(faultTo);
         boolean onlyAnonymous = anonReply && anonFault;
         boolean hasAnonymous = anonReply || anonFault;
-        
+
         QName[] types = new QName[] {
             MetadataConstants.ADDRESSING_ASSERTION_QNAME,
             MetadataConstants.USING_ADDRESSING_2004_QNAME,
             MetadataConstants.USING_ADDRESSING_2005_QNAME,
             MetadataConstants.USING_ADDRESSING_2006_QNAME
         };
-        
+
         for (QName type : types) {
             assertAssertion(aim, type);
+            // ADDRESSING_ASSERTION is normalized, so check only the default namespace
             if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
                 if (onlyAnonymous) {
                     assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
                 } else if (!hasAnonymous) {
                     assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-                }        
-            } else if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705)) {
-                if (onlyAnonymous) {
-                    assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-                } else if (!hasAnonymous) {
-                    assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
-                }        
+                }
             }
         }
         if (!MessageUtils.isRequestor(message) && !MessageUtils.isOutbound(message)) {
@@ -364,11 +357,11 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 = aim.getAssertionInfo(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
             Collection<AssertionInfo> aicAnon2
                 = aim.getAssertionInfo(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-            boolean hasAnon = (aicAnon != null && !aicAnon.isEmpty()) 
+            boolean hasAnon = (aicAnon != null && !aicAnon.isEmpty())
                         || (aicAnon2 != null && !aicAnon2.isEmpty());
-            boolean hasNonAnon = (aicNonAnon != null && !aicNonAnon.isEmpty()) 
+            boolean hasNonAnon = (aicNonAnon != null && !aicNonAnon.isEmpty())
                         || (aicNonAnon2 != null && !aicNonAnon2.isEmpty());
-                
+
             if (hasAnonymous && hasNonAnon && !hasAnon) {
                 message.put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
                 if (isSOAP12(message)) {
@@ -397,7 +390,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                     new QName(Names.WSA_NAMESPACE_NAME, "OnlyAnonymousAddressSupported"));
             }
         }
-        
+
     }
 
     private void assertAssertion(AssertionInfoMap aim, QName type) {
@@ -416,9 +409,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (exts != null) {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
-                ExtensibilityElement ext = 
+                ExtensibilityElement ext =
                     extensionElements.next();
-                found = Names.WSAW_USING_ADDRESSING_QNAME.equals(ext.getElementType());    
+                found = Names.WSAW_USING_ADDRESSING_QNAME.equals(ext.getElementType());
             }
         }
         return found;
@@ -429,20 +422,24 @@ public class MAPAggregatorImpl extends MAPAggregator {
      *
      * @param message the current message
      * @param isFault true if a fault is being mediated
-     * @return true if processing should continue on dispatch path 
+     * @return true if processing should continue on dispatch path
      */
-    protected boolean mediate(Message message, boolean isFault) {    
+    protected boolean mediate(Message message, boolean isFault) {
         boolean continueProcessing = true;
         if (ContextUtils.isOutbound(message)) {
             if (usingAddressing(message)) {
                 // request/response MAPs must be aggregated
                 aggregate(message, isFault);
             }
-            AddressingProperties theMaps = 
+            AddressingProperties theMaps =
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
+
+            if (isAddressingRequired() && ContextUtils.isRequestor(message)) {
+                theMaps.setRequired(true);
+            }
             if (null != theMaps) {
-                if (ContextUtils.isRequestor(message)) {            
-                    assertAddressing(message, 
+                if (ContextUtils.isRequestor(message)) {
+                    assertAddressing(message,
                                      theMaps.getReplyTo(),
                                      theMaps.getFaultTo());
                 } else {
@@ -452,10 +449,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
         } else if (!ContextUtils.isRequestor(message)) {
             //responder validates incoming MAPs
             AddressingProperties maps = getMAPs(message, false, false);
-            //check responses          
+            //check responses
             if (maps != null) {
                 checkAddressingResponses(maps.getReplyTo(), maps.getFaultTo());
-                assertAddressing(message, 
+                assertAddressing(message,
                                  maps.getReplyTo(),
                                  maps.getFaultTo());
             }
@@ -465,9 +462,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
             continueProcessing = validateIncomingMAPs(maps, message);
             if (maps != null) {
-                AddressingProperties theMaps = 
+                AddressingProperties theMaps =
                     ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
-                if (null != theMaps) {            
+                if (null != theMaps) {
                     assertAddressing(message, theMaps.getReplyTo(), theMaps.getFaultTo());
                 }
 
@@ -476,7 +473,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     InternalContextUtils.rebaseResponse(maps.getReplyTo(),
                                                 maps,
                                                 message);
-                } 
+                }
                 if (!isOneway) {
                     if (ContextUtils.isNoneAddress(maps.getReplyTo())) {
                         LOG.warning("Detected NONE value in ReplyTo WSA header for request-respone MEP");
@@ -492,7 +489,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 // any faults thrown from here on can be correlated with this message
                 message.put(FaultMode.class, FaultMode.LOGICAL_RUNTIME_FAULT);
             } else {
-                // validation failure => dispatch is aborted, response MAPs 
+                // validation failure => dispatch is aborted, response MAPs
                 // must be aggregated
                 //isFault = true;
                 //aggregate(message, isFault);
@@ -508,9 +505,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                               ContextUtils.retrieveMAPFaultName(message)));
             }
         } else {
-            AddressingProperties theMaps = 
+            AddressingProperties theMaps =
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
-            if (null != theMaps) {            
+            if (null != theMaps) {
                 assertAddressing(message, theMaps.getReplyTo(), theMaps.getFaultTo());
             }
             // If the wsa policy is enabled , but the client sets the
@@ -523,16 +520,16 @@ public class MAPAggregatorImpl extends MAPAggregator {
             //CXF-3060 :If wsa policy is not enforced, AddressingProperties map is null and
             // AddressingFeature.isRequired, requestor checks inbound message and throw exception
             if (null == theMaps
-                && !ContextUtils.isOutbound(message) 
+                && !ContextUtils.isOutbound(message)
                 && ContextUtils.isRequestor(message)
                 && getWSAddressingFeature(message) != null
                 && getWSAddressingFeature(message).isAddressingRequired()) {
                 boolean missingWsaHeader = false;
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                if (aim == null || aim.size() == 0) {
+                if (aim == null || aim.isEmpty()) {
                     missingWsaHeader = true;
                 }
-                if (aim != null && aim.size() > 0) {
+                if (aim != null && !aim.isEmpty()) {
                     missingWsaHeader = true;
                     QName[] types = new QName[] {
                         MetadataConstants.ADDRESSING_ASSERTION_QNAME,
@@ -554,15 +551,15 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                                   Names.HEADER_REQUIRED_NAME));
                 }
             }
-            if (MessageUtils.isPartialResponse(message) 
+            if (MessageUtils.isPartialResponse(message)
                 && message.getExchange().getOutMessage() != null) {
                 // marked as a partial response, let's see if it really is
                 MessageInfo min = message.get(MessageInfo.class);
                 MessageInfo mout = message.getExchange().getOutMessage().get(MessageInfo.class);
-                if (min != null && mout != null 
+                if (min != null && mout != null
                     && min.getOperation() == mout.getOperation()
                     && message.getContent(List.class) != null) {
-                    // the in and out messages are on the same operation 
+                    // the in and out messages are on the same operation
                     // and we were able to get a response for it.
                     message.remove(Message.PARTIAL_RESPONSE_MESSAGE);
                 }
@@ -583,8 +580,8 @@ public class MAPAggregatorImpl extends MAPAggregator {
             && isAnonymous) {
             passed = true;
         } else if (WSAddressingFeature.AddressingResponses.NON_ANONYMOUS == addressingResponses
-                   && (!anonReply && (faultTo.getAddress() != null && !anonFault) 
-                       || !anonReply && faultTo.getAddress() == null)) {
+                   && (!anonReply && (!anonFault && faultTo.getAddress() != null)
+                       || !anonReply && faultTo == null)) {
             passed = true;
         }
         if (!passed) {
@@ -593,7 +590,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 ? Names.ONLY_ANONYMOUS_ADDRESS_SUPPORTED_QNAME
                 : Names.ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME;
             throw new SoapFault(reason, detail);
-        }            
+        }
     }
     /**
      * Perform MAP aggregation.
@@ -606,7 +603,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
 
         AddressingProperties maps = assembleGeneric(message);
         addRoleSpecific(maps, message, isRequestor, isFault);
-        // outbound property always used to store MAPs, as this handler 
+        // outbound property always used to store MAPs, as this handler
         // aggregates only when either:
         // a) message really is outbound
         // b) message is currently inbound, but we are about to abort dispatch
@@ -638,10 +635,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 maps.setAction(ContextUtils.getAttributedURI(getActionUri(message, true)));
             }
         }
-
         return maps;
     }
-    
+
     private String getActionFromInputMessage(final OperationInfo operation) {
         MessageInfo inputMessage = operation.getInput();
 
@@ -653,7 +649,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         }
         return null;
     }
-    
+
     private String getActionFromOutputMessage(final OperationInfo operation) {
         MessageInfo outputMessage = operation.getOutput();
         if (outputMessage != null && outputMessage.getExtensionAttributes() != null) {
@@ -670,7 +666,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             return false;
         }
         String faultInfoName = faultInfo.getName().getLocalPart();
-        return faultInfoName.equals(faultName) 
+        return faultInfoName.equals(faultName)
             || faultInfoName.equals(StringUtils.uncapitalize(faultName));
     }
 
@@ -691,7 +687,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     }
                     return addPath(addPath(addPath(getActionBaseUri(operation),
                                                    operation.getName().getLocalPart()),
-                                           "Fault"), 
+                                           "Fault"),
                                    faultInfo.getFaultName().getLocalPart());
                 }
             }
@@ -712,7 +708,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 return t.name();
             }
         }
-        return cause.getClass().getSimpleName();    
+        return cause.getClass().getSimpleName();
     }
 
     protected String getActionUri(Message message, boolean checkMessage) {
@@ -724,7 +720,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         if (op.isUnwrapped()) {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
-        
+
         String actionUri = null;
         if (checkMessage) {
             actionUri = (String) message.get(ContextUtils.ACTION);
@@ -736,7 +732,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             return actionUri;
         }
         String opNamespace = getActionBaseUri(op);
-        
+
         boolean inbound = !ContextUtils.isOutbound(message);
         boolean requestor = ContextUtils.isRequestor(message);
         boolean inMsg = requestor ^ inbound;
@@ -748,8 +744,8 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (StringUtils.isEmpty(explicitAction)) {
                 SoapOperationInfo soi = InternalContextUtils.getSoapOperationInfo(bop);
                 explicitAction = soi == null ? null : soi.getAction();
-            }            
-            
+            }
+
             if (!StringUtils.isEmpty(explicitAction)) {
                 actionUri = explicitAction;
             } else if (null == op.getInputName()) {
@@ -788,27 +784,27 @@ public class MAPAggregatorImpl extends MAPAggregator {
         buffer.append(path);
         return buffer.toString();
     }
-    
+
     /**
      * Add MAPs which are specific to the requestor or responder role.
      *
      * @param maps the MAPs being assembled
      * @param message the current message
-     * @param isRequestor true iff the current messaging role is that of 
-     * requestor 
+     * @param isRequestor true iff the current messaging role is that of
+     * requestor
      * @param isFault true if a fault is being mediated
      */
-    private void addRoleSpecific(AddressingProperties maps, 
+    private void addRoleSpecific(AddressingProperties maps,
                                  Message message,
                                  boolean isRequestor,
                                  boolean isFault) {
         if (isRequestor) {
             Exchange exchange = message.getExchange();
-            
+
             // add request-specific MAPs
             boolean isOneway = exchange.isOneWay();
             boolean isOutbound = ContextUtils.isOutbound(message);
-            
+
             // To
             if (maps.getTo() == null) {
                 Conduit conduit = null;
@@ -819,7 +815,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 EndpointReferenceType reference = conduit != null
                                                   ? conduit.getTarget()
                                                   : ContextUtils.getNoneEndpointReference();
-                if (conduit != null && !StringUtils.isEmpty(s) 
+                if (conduit != null && !StringUtils.isEmpty(s)
                     && !reference.getAddress().getValue().equals(s)) {
                     EndpointReferenceType ref = new EndpointReferenceType();
                     AttributedURIType tp = new AttributedURIType();
@@ -840,7 +836,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             if (ContextUtils.isGenericAddress(replyTo)) {
                 replyTo = getReplyTo(message, replyTo);
                 if (replyTo == null || (isOneway
-                    && (replyTo == null 
+                    && (replyTo == null
                         || replyTo.getAddress() == null
                         || !Names.WSA_NONE_ADDRESS.equals(
                                 replyTo.getAddress().getValue())))) {
@@ -888,10 +884,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 maps.setAction(ContextUtils.getAttributedURI(
                     Names.WSA_DEFAULT_FAULT_ACTION));
             }
- 
+
             if (isFault
                 && !ContextUtils.isGenericAddress(inMAPs.getFaultTo())) {
-                
+
                 Message m = message.getExchange().getInFaultMessage();
                 if (m == null) {
                     m = message;
@@ -899,15 +895,15 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 InternalContextUtils.rebaseResponse(inMAPs.getFaultTo(),
                                             inMAPs,
                                             m);
-                
-                Destination destination = InternalContextUtils.createDecoupledDestination(m.getExchange(), 
+
+                Destination destination = InternalContextUtils.createDecoupledDestination(m.getExchange(),
                                                                                           inMAPs.getFaultTo());
                 m.getExchange().setDestination(destination);
             }
         }
     }
 
-    private EndpointReferenceType getReplyTo(Message message, 
+    private EndpointReferenceType getReplyTo(Message message,
                                              EndpointReferenceType originalReplyTo) {
         Exchange exchange = message.getExchange();
         Endpoint info = exchange.getEndpoint();
@@ -925,9 +921,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
             }
             if (dest != null) {
                 // if the decoupled endpoint context prop is set and the address is relative, return the absolute url.
-                final String replyTo = dest.getAddress().getAddress().getValue();  
+                final String replyTo = dest.getAddress().getAddress().getValue();
                 if (replyTo.startsWith("/")) {
-                    String debase = 
+                    String debase =
                         (String)message.getContextualProperty(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY);
                     if (debase != null) {
                         return EndpointReferenceUtils.getEndpointReference(debase + replyTo);
@@ -943,7 +939,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
         String replyToAddress = (String)message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
         if (replyToAddress != null) {
             return setUpDecoupledDestination(message.getExchange().getBus(),
-                                             replyToAddress, 
+                                             replyToAddress,
                                              message);
         }
         return null;
@@ -951,7 +947,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
     /**
      * Set up the decoupled Destination if necessary.
      */
-    private Destination setUpDecoupledDestination(Bus bus, String replyToAddress, Message message) {        
+    private Destination setUpDecoupledDestination(Bus bus, String replyToAddress, Message message) {
         EndpointReferenceType reference =
             EndpointReferenceUtils.getEndpointReference(replyToAddress);
         if (reference != null) {
@@ -963,7 +959,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 return dest;
             } catch (Exception e) {
                 // REVISIT move message to localizable Messages.properties
-                LOG.log(Level.WARNING, 
+                LOG.log(Level.WARNING,
                         "decoupled endpoint creation failed: ", e);
             }
         }
@@ -982,7 +978,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             factoryManager.getDestinationFactoryForUri(address);
         if (factory != null) {
             Endpoint ep = message.getExchange().getEndpoint();
-            
+
             EndpointInfo ei = new EndpointInfo();
             ei.setName(new QName(ep.getEndpointInfo().getName().getNamespaceURI(),
                                  ep.getEndpointInfo().getName().getLocalPart() + ".decoupled"));
@@ -990,7 +986,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             destination = factory.getDestination(ei, bus);
             Conduit conduit = ContextUtils.getConduit(null, message);
             if (conduit != null) {
-                MessageObserver ob = ((Observable)conduit).getMessageObserver();
+                MessageObserver ob = conduit.getMessageObserver();
                 ob = new InterposedMessageObserver(bus, ob);
                 destination.setMessageObserver(ob);
             }
@@ -1004,10 +1000,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
             bus = b;
             observer = o;
         }
-        
+
         /**
          * Called for an incoming message.
-         * 
+         *
          * @param inMessage
          */
         public void onMessage(Message inMessage) {
@@ -1036,7 +1032,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 e.printStackTrace();
             }
         }
-        
+
         private void updateResponseCode(Message message) {
             Object o = message.get("HTTP.RESPONSE");
             if (o != null) {
@@ -1047,11 +1043,11 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     //ignore
                 }
             }
-            
+
         }
-        
+
     }
-    
+
     /**
      * Get the starting point MAPs (either empty or those set explicitly
      * by the application on the binding provider request context).
@@ -1068,7 +1064,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                              boolean isOutbound) {
 
         AddressingProperties maps = null;
-        maps = ContextUtils.retrieveMAPs(message, 
+        maps = ContextUtils.retrieveMAPs(message,
                                          isProviderContext,
                                          isOutbound);
         LOG.log(Level.FINE, "MAPs retrieved from message {0}", maps);
@@ -1083,6 +1079,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private void setupNamespace(AddressingProperties maps, Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
+            String ns = (String)message.getContextualProperty(MAPAggregator.ADDRESSING_NAMESPACE);
+            if (ns != null) {
+                maps.exposeAs(ns);
+            }
             return;
         }
         Collection<AssertionInfo> aic = aim.getAssertionInfo(MetadataConstants.USING_ADDRESSING_2004_QNAME);
@@ -1090,7 +1090,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
             maps.exposeAs(Names200408.WSA_NAMESPACE_NAME);
         }
     }
-    
+
     /**
      * Validate incoming MAPs
      * @param maps the incoming MAPs
@@ -1101,12 +1101,12 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private boolean validateIncomingMAPs(AddressingProperties maps,
                                          Message message) {
         boolean valid = true;
-        
+
         if (maps != null) {
             //WSAB spec, section 4.2 validation (SOAPAction must match action
             String sa = SoapActionInInterceptor.getSoapAction(message);
             String s1 = this.getActionUri(message, false);
-            
+
             if (maps.getAction() == null || maps.getAction().getValue() == null) {
                 String reason =
                     BUNDLE.getString("MISSING_ACTION_MESSAGE");
@@ -1116,9 +1116,9 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 ContextUtils.storeMAPFaultReason(reason, message);
                 valid = false;
             }
-            
-            if (!StringUtils.isEmpty(sa) && valid 
-                && !MessageUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
+
+            if (!StringUtils.isEmpty(sa) && valid
+                && !PropertyUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
                 }
@@ -1128,7 +1128,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     //don't match, must send fault back....
                     String reason =
                         BUNDLE.getString("INVALID_ADDRESSING_PROPERTY_MESSAGE");
-    
+
                     ContextUtils.storeMAPFaultName(Names.ACTION_MISMATCH_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(reason, message);
@@ -1140,22 +1140,22 @@ public class MAPAggregatorImpl extends MAPAggregator {
                     //if java first, it's likely to have "Request", if wsdl first,
                     //it will depend if the wsdl:input has a name or not. Thus, we'll
                     //check both plain and with the "Request" trailer
-                    
+
                     //doesn't match what's in the wsdl/annotations
                     String reason =
                         BundleUtils.getFormattedString(BUNDLE,
                                 "ACTION_NOT_SUPPORTED_MSG", action);
-                    
+
                     ContextUtils.storeMAPFaultName(Names.ACTION_NOT_SUPPORTED_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(reason, message);
                     valid = false;
                 }
             }
-            
+
             AttributedURIType messageID = maps.getMessageID();
-            
-            if (!message.getExchange().isOneWay() 
+
+            if (!message.getExchange().isOneWay()
                     && (messageID == null || messageID.getValue() == null)
                     && valid) {
                 String reason =
@@ -1164,10 +1164,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 ContextUtils.storeMAPFaultName(Names.HEADER_REQUIRED_NAME,
                                                message);
                 ContextUtils.storeMAPFaultReason(reason, message);
-                
+
                 valid = false;
             }
-        
+
             // Always cache message IDs, even when the message is not valid for some
             // other reason.
             if (!allowDuplicates && messageID != null && messageID.getValue() != null
@@ -1176,19 +1176,19 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 LOG.log(Level.WARNING,
                         "DUPLICATE_MESSAGE_ID_MSG",
                         messageID.getValue());
-                
+
                 // Only throw the fault if something else has not already marked the
                 // message as invalid.
                 if (valid) {
                     String reason =
                         BUNDLE.getString("DUPLICATE_MESSAGE_ID_MSG");
-                    String l7dReason = 
+                    String l7dReason =
                         MessageFormat.format(reason, messageID.getValue());
                     ContextUtils.storeMAPFaultName(Names.DUPLICATE_MESSAGE_ID_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(l7dReason, message);
                 }
-                
+
                 valid = false;
             }
         } else if (usingAddressingAdvisory) {
@@ -1200,11 +1200,11 @@ public class MAPAggregatorImpl extends MAPAggregator {
             ContextUtils.storeMAPFaultReason(reason, message);
             valid = false;
         }
-        
+
         if (Names.INVALID_CARDINALITY_NAME.equals(ContextUtils.retrieveMAPFaultName(message))) {
             valid = false;
         }
-        
+
         return valid;
     }
 
@@ -1213,10 +1213,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
      * @param message the current message
      * @param maps the incoming MAPs
      */
-    private void checkReplyTo(Message message, AddressingProperties maps) {              
+    private void checkReplyTo(Message message, AddressingProperties maps) {
         // if ReplyTo address is none then 202 response status is expected
         // However returning a fault is more appropriate for request-response MEP
-        if (!message.getExchange().isOneWay() 
+        if (!message.getExchange().isOneWay()
             && !MessageUtils.isPartialResponse(message)
             && ContextUtils.isNoneAddress(maps.getReplyTo())) {
             String reason = MessageFormat.format(BUNDLE.getString("REPLYTO_NOT_SUPPORTED_MSG"),
@@ -1226,7 +1226,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                                           Names.WSA_NONE_ADDRESS));
         }
     }
-    
+
     private boolean isSOAP12(Message message) {
         if (message.getExchange().getBinding() instanceof SoapBinding) {
             SoapBinding binding = (SoapBinding)message.getExchange().getBinding();

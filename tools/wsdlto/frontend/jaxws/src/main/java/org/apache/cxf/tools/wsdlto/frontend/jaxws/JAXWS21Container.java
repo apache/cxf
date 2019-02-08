@@ -25,7 +25,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
 /**
- * 
+ *
  */
 public class JAXWS21Container extends JAXWSContainer {
     public JAXWS21Container(ToolSpec toolspec) throws Exception {
@@ -45,7 +45,7 @@ public class JAXWS21Container extends JAXWSContainer {
             env.put(ToolConstants.CFG_XJC_ARGS, o);
         } else {
             String[] xjcArgs = (String[])o;
-            String tmp[] = new String[xjcArgs.length + 2];
+            String[] tmp = new String[xjcArgs.length + 2];
             System.arraycopy(xjcArgs, 0, tmp, 0, xjcArgs.length);
             tmp[xjcArgs.length] = "-target";
             tmp[xjcArgs.length + 1] = "2.1";

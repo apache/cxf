@@ -38,7 +38,7 @@ public abstract class TypesVisitorBase implements ASTVisitor {
 
     XmlSchemaType schemaType;
     CorbaTypeImpl corbaType;
-    
+
     public TypesVisitorBase(XmlSchemaCollection xmlSchemas,
                             XmlSchema xmlSchema,
                             TypeMappingType typeMapRef) {
@@ -68,7 +68,7 @@ public abstract class TypesVisitorBase implements ASTVisitor {
     public QName getSchemaTypeName() {
         return schemaType.getQName();
     }
-    
+
     public QName getCorbaTypeName() {
         return corbaType.getQName();
     }

@@ -19,7 +19,8 @@
 package org.apache.cxf.bus.osgi;
 
 import java.util.Dictionary;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.cxf.Bus;
@@ -27,6 +28,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerImpl;
 import org.apache.cxf.buslifecycle.BusCreationListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.ClientLifeCycleListener;
@@ -47,21 +49,21 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public static final String CONTEXT_SYMBOLIC_NAME_PROPERTY = "cxf.context.symbolicname";
     public static final String CONTEXT_VERSION_PROPERTY = "cxf.context.version";
     public static final String CONTEXT_NAME_PROPERTY = "cxf.bus.id";
-    
+
     private static final String SERVICE_PROPERTY_PRIVATE = "org.apache.cxf.bus.private.extension";
     private static final String SERVICE_PROPERTY_RESTRICTED = "org.apache.cxf.bus.restricted.extension";
     private static final String BUS_EXTENSION_BUNDLES_EXCLUDES = "bus.extension.bundles.excludes";
     Bus bus;
-    ServiceRegistration service;
+    ServiceRegistration<?> service;
     BundleContext defaultContext;
     private Pattern extensionBundlesExcludesPattern;
 
     public OSGIBusListener(Bus b) {
         this(b, null);
     }
-    public OSGIBusListener(Bus b, Object args[]) {
+    public OSGIBusListener(Bus b, Object[] args) {
         bus = b;
-        if (args != null && args.length > 0 
+        if (args != null && args.length > 0
             && args[0] instanceof BundleContext) {
             defaultContext = (BundleContext)args[0];
         }
@@ -86,11 +88,11 @@ public class OSGIBusListener implements BusLifeCycleListener {
         final ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
         if (cbl instanceof ExtensionManagerImpl) {
             // wire in the OSGi things
-            bus.setExtension(new OSGiBeanLocator(cbl, defaultContext), 
+            bus.setExtension(new OSGiBeanLocator(cbl, defaultContext),
                              ConfiguredBeanLocator.class);
         }
     }
-    
+
     public void initComplete() {
         ManagedWorkQueueList wqList = bus.getExtension(ManagedWorkQueueList.class);
         if (wqList != null) {
@@ -99,7 +101,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         }
         registerBusAsService();
     }
-    
+
 
     public void preShutdown() {
     }
@@ -110,23 +112,23 @@ public class OSGIBusListener implements BusLifeCycleListener {
             service = null;
         }
     }
-    
-    private static ServiceReference[] getServiceReferences(BundleContext context, Class<?> serviceClass) {
-        ServiceReference[] refs = null;
+
+    private static ServiceReference<?>[] getServiceReferences(BundleContext context, Class<?> serviceClass) {
+        ServiceReference<?>[] refs = null;
         try {
             refs = context.getServiceReferences(serviceClass.getName(), null);
         } catch (InvalidSyntaxException e) {
             // ignore
         }
         if (refs == null) {
-            refs = new ServiceReference[]{};
+            refs = new ServiceReference<?>[]{};
         }
         return refs;
     }
 
     private void sendBusCreatedToBusCreationListeners() {
-        ServiceReference refs[] = getServiceReferences(defaultContext, BusCreationListener.class);
-        for (ServiceReference ref : refs) {
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, BusCreationListener.class);
+        for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 BusCreationListener listener = (BusCreationListener)defaultContext.getService(ref);
                 listener.busCreated(bus);
@@ -135,9 +137,9 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
 
     private void registerServerLifecycleListeners() {
-        ServiceReference refs[] = getServiceReferences(defaultContext, ServerLifeCycleListener.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, ServerLifeCycleListener.class);
         ServerLifeCycleManager clcm = bus.getExtension(ServerLifeCycleManager.class);
-        for (ServiceReference ref : refs) {
+        for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 ServerLifeCycleListener listener = (ServerLifeCycleListener)defaultContext.getService(ref);
                 clcm.registerListener(listener);
@@ -145,19 +147,19 @@ public class OSGIBusListener implements BusLifeCycleListener {
         }
     }
     private void registerClientLifeCycleListeners() {
-        ServiceReference refs[] = getServiceReferences(defaultContext, ClientLifeCycleListener.class);
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, ClientLifeCycleListener.class);
         ClientLifeCycleManager clcm = bus.getExtension(ClientLifeCycleManager.class);
-        for (ServiceReference ref : refs) {
+        for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 ClientLifeCycleListener listener = (ClientLifeCycleListener)defaultContext.getService(ref);
                 clcm.registerListener(listener);
             }
         }
     }
-    
+
     private void registerBusFeatures() {
-        ServiceReference refs[] = getServiceReferences(defaultContext, Feature.class);
-        for (ServiceReference ref : refs) {
+        ServiceReference<?>[] refs = getServiceReferences(defaultContext, Feature.class);
+        for (ServiceReference<?> ref : refs) {
             if (!isPrivate(ref) && !isExcluded(ref)) {
                 Feature feature = (Feature)defaultContext.getService(ref);
                 bus.getFeatures().add(feature);
@@ -165,7 +167,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         }
     }
 
-    private boolean isPrivate(ServiceReference ref) {
+    private boolean isPrivate(ServiceReference<?> ref) {
         Object o = ref.getProperty(SERVICE_PROPERTY_PRIVATE);
         Boolean pvt = Boolean.FALSE;
         if (o == null) {
@@ -178,7 +180,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         return pvt.booleanValue();
     }
 
-    private boolean isExcluded(ServiceReference ref) {
+    private boolean isExcluded(ServiceReference<?> ref) {
         String o = (String)ref.getProperty(SERVICE_PROPERTY_RESTRICTED);
         if (!StringUtils.isEmpty(o)) {
             // if the service's restricted-regex is set, the service is excluded when the app not matching that regex
@@ -192,7 +194,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
             }
         }
         // if the excludes-regex is set, the service is excluded when matching that regex.
-        return extensionBundlesExcludesPattern != null 
+        return extensionBundlesExcludesPattern != null
             && extensionBundlesExcludesPattern.matcher(ref.getBundle().getSymbolicName()).matches();
     }
 
@@ -207,12 +209,12 @@ public class OSGIBusListener implements BusLifeCycleListener {
     private void registerBusAsService() {
         BundleContext context = bus.getExtension(BundleContext.class);
         if (context != null) {
-            Properties props = new Properties();
+            Map<String, Object> props = new HashMap<>();
             props.put(CONTEXT_SYMBOLIC_NAME_PROPERTY, context.getBundle().getSymbolicName());
             props.put(CONTEXT_VERSION_PROPERTY, getBundleVersion(context.getBundle()));
             props.put(CONTEXT_NAME_PROPERTY, bus.getId());
 
-            service = context.registerService(Bus.class.getName(), bus, props);
+            service = context.registerService(Bus.class.getName(), bus, CollectionUtils.toDictionary(props));
         }
     }
 

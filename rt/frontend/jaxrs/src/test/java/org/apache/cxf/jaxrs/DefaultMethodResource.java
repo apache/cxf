@@ -30,15 +30,15 @@ public class DefaultMethodResource {
     @Path("all")
     @DefaultMethod
     public Response all() {
-        return null;    
+        return null;
     }
     @Path("all")
     @GET
     public Response getAll() {
-        return null;    
+        return null;
     }
     @GET
     public Response get() {
-        return null;    
+        return null;
     }
 }

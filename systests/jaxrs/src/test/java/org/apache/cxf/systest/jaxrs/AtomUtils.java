@@ -30,11 +30,11 @@ import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 
 public final class AtomUtils {
-    
+
     private AtomUtils() {
-        
+
     }
-    
+
     public static Entry createBookEntry(Book b) throws Exception {
         return createBookEntry(Abdera.getNewFactory(), b, null);
     }
@@ -43,23 +43,23 @@ public final class AtomUtils {
     }
     public static Entry createBookEntry(Book b, String baseUri) throws Exception {
         return createBookEntry(Abdera.getNewFactory(), b, baseUri);
-    }    
+    }
     public static Entry createBookEntry(Factory factory, Book b, String baseUri) throws Exception {
         JAXBContext jc = JAXBContext.newInstance(Book.class);
-        
+
         Entry e = factory.newEntry();
         if (baseUri != null) {
             e.setBaseUri(baseUri);
         }
         e.setTitle(b.getName());
         e.setId(Long.toString(b.getId()));
-        
-        
+
+
         StringWriter writer = new StringWriter();
         jc.createMarshaller().marshal(b, writer);
 
         e.setContent(writer.toString(), Content.Type.XML);
-        
+
         return e;
     }
 

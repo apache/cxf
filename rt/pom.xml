@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>wsdl</module>
@@ -39,7 +39,6 @@
         <module>ws</module>
         <module>rs</module>
         <module>management</module>
-        <module>management-web</module>
         <module>javascript</module>
         <module>security</module>
         <module>security-saml</module>

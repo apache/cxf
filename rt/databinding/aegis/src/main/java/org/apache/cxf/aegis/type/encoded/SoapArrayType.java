@@ -89,7 +89,7 @@ public class SoapArrayType extends AegisType {
 
             // if it is a partially transmitted array offset the array values
             if (arrayTypeInfo.getOffset() > 0) {
-                List<Object> list = new ArrayList<Object>(values.size() + arrayTypeInfo.getOffset());
+                List<Object> list = new ArrayList<>(values.size() + arrayTypeInfo.getOffset());
                 list.addAll(Collections.nCopies(arrayTypeInfo.getOffset(), null));
                 list.addAll(values);
                 values = list;
@@ -123,7 +123,7 @@ public class SoapArrayType extends AegisType {
             ArrayTypeInfo arrayTypeInfo,
             int maxSize) throws DatabindingException {
 
-        List<Object> values = new ArrayList<Object>();
+        List<Object> values = new ArrayList<>();
 
         Boolean sparse = null;
         while (reader.hasMoreElementReaders()) {
@@ -143,7 +143,7 @@ public class SoapArrayType extends AegisType {
                 compType = arrayTypeInfo.getType();
             }
             // check for an xsi:type override
-            compType = TypeUtil.getReadType(creader.getXMLStreamReader(), 
+            compType = TypeUtil.getReadType(creader.getXMLStreamReader(),
                                             context.getGlobalContext(), compType);
 
             // wrap type with soap ref to handle hrefs
@@ -195,8 +195,8 @@ public class SoapArrayType extends AegisType {
             List<String> tokens = CastUtils.cast(Collections.list(new StringTokenizer(positionString,
                     "[],",
                     true)));
-            if (tokens.size() == 2 + dimensions.size() + dimensions.size() - 1 && tokens.get(0).equals("[")
-                    && tokens.get(tokens.size() - 1).equals("]")) {
+            if (tokens.size() == 2 + dimensions.size() + dimensions.size() - 1 && "[".equals(tokens.get(0))
+                    && "]".equals(tokens.get(tokens.size() - 1))) {
 
                 // strip off leading [ and trailing ]
                 tokens = tokens.subList(1, tokens.size() - 1);
@@ -208,7 +208,7 @@ public class SoapArrayType extends AegisType {
 
                     index[i] = Integer.parseInt(tokens.get(tokenId));
 
-                    if (tokenId + 1 < tokens.size() && !tokens.get(tokenId + 1).equals(",")) {
+                    if (tokenId + 1 < tokens.size() && !",".equals(tokens.get(tokenId + 1))) {
                         throw new IllegalStateException(
                                 "Expected a comma but got " + tokens.get(tokenId + 1));
                     }
@@ -277,7 +277,7 @@ public class SoapArrayType extends AegisType {
     public void writeObject(Object values,
             MessageWriter writer,
             Context context) throws DatabindingException {
-        
+
         if (values == null) {
             return;
         }
@@ -302,7 +302,7 @@ public class SoapArrayType extends AegisType {
                 getDimensions() - 1,
                 Array.getLength(values));
         // ensure that the writer writes out this prefix...
-        writer.getPrefixForNamespace(arrayTypeInfo.getTypeName().getNamespaceURI(), 
+        writer.getPrefixForNamespace(arrayTypeInfo.getTypeName().getNamespaceURI(),
                                      arrayTypeInfo.getTypeName().getPrefix());
         arrayTypeInfo.writeAttribute(writer);
 
@@ -372,7 +372,7 @@ public class SoapArrayType extends AegisType {
 
     @Override
     public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         deps.add(getComponentType());
 

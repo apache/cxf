@@ -39,9 +39,9 @@ import org.apache.cxf.jca.cxf.CXFManagedConnection;
 
 
 public class InvocationHandlerFactory {
-    
+
     public static final String JCA_HANDLERS_RESOURCE = "META-INF/cxf-jca-handlers.properties";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(InvocationHandlerFactory.class);
 
     final Class<?>[] handlerChainTypes;
@@ -112,9 +112,9 @@ public class InvocationHandlerFactory {
                                                        getResources(JCA_HANDLERS_RESOURCE);
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
-            loadProperties(handlersMap, url);            
+            loadProperties(handlersMap, url);
         }
-        
+
         Class<?>[] handlers = new Class[handlersMap.size()];
         String[] handlerClasses = new String[handlersMap.size()];
         handlersMap.values().toArray(handlerClasses);
@@ -124,11 +124,11 @@ public class InvocationHandlerFactory {
         }
         return handlers;
     }
-    
-    
+
+
     private void loadProperties(Map<Long, String> handlersMap, URL url) throws IOException {
         Properties p = new Properties();
-        p.load(url.openStream());       
+        p.load(url.openStream());
         Iterator<Object> keys = p.keySet().iterator();
         while (keys.hasNext()) {
             String key = (String)keys.next();

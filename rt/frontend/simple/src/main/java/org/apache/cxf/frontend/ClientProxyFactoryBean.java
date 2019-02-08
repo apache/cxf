@@ -19,6 +19,8 @@
 package org.apache.cxf.frontend;
 
 import java.io.Closeable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +67,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     private String password;
     private Map<String, Object> properties;
     private Bus bus;
-    private List<Feature> features = new ArrayList<Feature>();
+    private List<Feature> features = new ArrayList<>();
     private DataBinding dataBinding;
 
     public ClientProxyFactoryBean() {
@@ -106,7 +108,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         }
         configured = true;
     }
-    
+
     protected String getConfiguredName() {
         QName name = getEndpointName();
         if (name == null) {
@@ -131,29 +133,29 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
                 }
             }
             configureObject();
-            
+
             if (properties == null) {
-                properties = new HashMap<String, Object>();
+                properties = new HashMap<>();
             }
-    
+
             if (username != null) {
                 AuthorizationPolicy authPolicy = new AuthorizationPolicy();
                 authPolicy.setUserName(username);
                 authPolicy.setPassword(password);
                 properties.put(AuthorizationPolicy.class.getName(), authPolicy);
             }
-    
+
             initFeatures();
             clientFactoryBean.setProperties(properties);
-    
+
             if (bus != null) {
                 clientFactoryBean.setBus(bus);
             }
-    
+
             if (dataBinding != null) {
                 clientFactoryBean.setDataBinding(dataBinding);
             }
-    
+
             Client c = clientFactoryBean.create();
             if (getInInterceptors() != null) {
                 c.getInInterceptors().addAll(getInInterceptors());
@@ -167,15 +169,14 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
             if (getOutFaultInterceptors() != null) {
                 c.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
             }
-    
+
             ClientProxy handler = clientClientProxy(c);
-    
-            Class<?> classes[] = getImplementingClasses();
-            
-            Object obj = ProxyHelper.getProxy(clientFactoryBean.getServiceClass().getClassLoader(),
+
+            Class<?>[] classes = getImplementingClasses();
+            Object obj = ProxyHelper.getProxy(getClassLoader(clientFactoryBean.getServiceClass()),
                                               classes,
                                               handler);
-    
+
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
                                                classes, handler, obj);
             return obj;
@@ -186,9 +187,21 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         }
     }
 
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+
     protected Class<?>[] getImplementingClasses() {
         Class<?> cls = clientFactoryBean.getServiceClass();
-        return new Class[] {cls, Closeable.class, Client.class};
+        return new Class[] {Closeable.class, Client.class, cls};
     }
 
     protected ClientProxy clientClientProxy(Client c) {

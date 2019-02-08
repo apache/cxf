@@ -23,6 +23,8 @@ package demo.soap_header.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.ext.logging.LoggingFeature;
+
 public class Server {
 
     protected Server() throws Exception {
@@ -30,10 +32,10 @@ public class Server {
 
         Object implementor = new HeaderTesterImpl();
         String address = "http://localhost:9000/headers";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(address, implementor, new LoggingFeature());
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

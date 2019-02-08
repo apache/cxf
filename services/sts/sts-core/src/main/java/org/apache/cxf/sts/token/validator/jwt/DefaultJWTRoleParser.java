@@ -33,7 +33,7 @@ import org.apache.cxf.sts.token.validator.DefaultSubjectRoleParser;
  * A default implementation to extract roles from a JWT token
  */
 public class DefaultJWTRoleParser extends DefaultSubjectRoleParser implements JWTRoleParser {
-    
+
     private boolean useJaasSubject = true;
     private String roleClaim;
 
@@ -50,7 +50,7 @@ public class DefaultJWTRoleParser extends DefaultSubjectRoleParser implements JW
         if (subject != null && useJaasSubject) {
             return super.parseRolesFromSubject(principal, subject);
         }
-        
+
         Set<Principal> roles = null;
         if (roleClaim != null && token != null && token.getClaims().containsProperty(roleClaim)) {
             roles = new HashSet<>();
@@ -61,10 +61,10 @@ public class DefaultJWTRoleParser extends DefaultSubjectRoleParser implements JW
         } else {
             roles = Collections.emptySet();
         }
-        
+
         return roles;
     }
-    
+
     public boolean isUseJaasSubject() {
         return useJaasSubject;
     }
@@ -85,5 +85,5 @@ public class DefaultJWTRoleParser extends DefaultSubjectRoleParser implements JW
     public void setRoleClaim(String roleClaim) {
         this.roleClaim = roleClaim;
     }
-    
+
 }

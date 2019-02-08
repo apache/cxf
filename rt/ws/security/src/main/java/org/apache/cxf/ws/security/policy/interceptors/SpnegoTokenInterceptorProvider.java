@@ -38,7 +38,7 @@ import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 /**
- * 
+ *
  */
 public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
@@ -46,31 +46,34 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
 
     public SpnegoTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.SPNEGO_CONTEXT_TOKEN, SP12Constants.SPNEGO_CONTEXT_TOKEN));
-        this.getOutInterceptors().add(new SpnegoContextTokenOutInterceptor());
-        this.getOutFaultInterceptors().add(new SpnegoContextTokenOutInterceptor());
-        this.getInInterceptors().add(new SpnegoContextTokenInInterceptor());
-        this.getInFaultInterceptors().add(new SpnegoContextTokenInInterceptor());
+        SpnegoContextTokenOutInterceptor outInterceptor = new SpnegoContextTokenOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        SpnegoContextTokenInInterceptor inInterceptor = new SpnegoContextTokenInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
     }
-    
+
     static String setupClient(STSClient client, SoapMessage message, AssertionInfoMap aim) {
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
-        
+
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
         p.addPolicyComponent(ea);
         All all = new All();
         all.addPolicyComponent(NegotiationUtils.getAddressingPolicy(aim, false));
         ea.addPolicyComponent(all);
-        
+
         client.setPolicy(p);
         client.setSoap11(message.getVersion() == Soap11.getInstance());
         client.setSpnego(true);
-        
+
         WSSConfig config = WSSConfig.getNewInstance();
         String context = config.getIdAllocator().createSecureId("_", null);
         client.setContext(context);
-        
+
         String s = message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
         client.setLocation(s);
         AlgorithmSuite suite = NegotiationUtils.getAlgorithmSuite(aim);
@@ -81,13 +84,13 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 client.setKeySize(x);
             }
         }
-        
+
         Map<String, Object> ctx = client.getRequestContext();
         mapSecurityProps(message, ctx);
-        
+
         return s;
     }
-    
+
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             Object v = message.getContextualProperty(s);
@@ -96,6 +99,6 @@ public class SpnegoTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
         }
     }
-    
+
 
 }

@@ -33,7 +33,7 @@ public interface ClaimsParser {
 
     /**
      * This method indicates the claims dialect this Parser can handle.
-     * 
+     *
      * @return Name of supported Dialect
      */
     String getSupportedDialect();

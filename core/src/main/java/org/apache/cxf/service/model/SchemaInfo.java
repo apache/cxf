@@ -75,7 +75,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     }
 
     public synchronized void setElement(Element el) {
-        cachedElement = new SoftReference<Element>(el);
+        cachedElement = new SoftReference<>(el);
     }
 
     /**
@@ -110,9 +110,9 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
                 throw new RuntimeException("Error serializing Xml Schema", e);
             }
             element = serializedSchema.getDocumentElement();
-            cachedElement = new SoftReference<Element>(element);
+            cachedElement = new SoftReference<>(element);
         }
-        // XXX A problem can occur with the ibm jdk when the XmlSchema
+        // A problem can occur with the ibm jdk when the XmlSchema
         // object is serialized. The xmlns declaration gets incorrectly
         // set to the same value as the targetNamespace attribute.
         // The aegis databinding tests demonstrate this particularly.

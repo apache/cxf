@@ -25,20 +25,20 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * 
+ *
  */
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class MtoMParameterBeanWithDataHandler {
     private String ordinary;
     private DataHandler notXml10;
-    
+
     public String getOrdinary() {
         return ordinary;
     }
     public void setOrdinary(String ordinary) {
         this.ordinary = ordinary;
     }
-    
+
     @XmlMimeType("text/plain;charset=utf-8")
     public DataHandler getNotXml10() {
         return notXml10;

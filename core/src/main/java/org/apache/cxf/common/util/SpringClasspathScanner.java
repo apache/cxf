@@ -39,7 +39,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.ClassUtils;
 
 class SpringClasspathScanner extends ClasspathScanner {
-    
+
     private static final Boolean IN_OSGI;
     static {
         IN_OSGI = isSpringInOsgi();
@@ -55,57 +55,57 @@ class SpringClasspathScanner extends ClasspathScanner {
             return true;
         } catch (Throwable ex) {
             return false;
-        }    
+        }
     }
-    
+
     protected Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClassesInternal(
-        Collection< String > basePackages, 
+        Collection< String > basePackages,
         List<Class< ? extends Annotation > > annotations,
-        ClassLoader loader) 
+        ClassLoader loader)
         throws IOException, ClassNotFoundException {
-    
+
         ResourcePatternResolver resolver = getResolver(loader);
         MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
-        
-        final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
-            new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
-        final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces = 
-            new HashMap< Class< ? extends Annotation >, Collection< String > >();
-        final Map<String, String[]> nonMatchingClasses = new HashMap<String, String[]>();
-        
+
+        final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
+            new HashMap<>();
+        final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces =
+            new HashMap<>();
+        final Map<String, String[]> nonMatchingClasses = new HashMap<>();
+
         for (Class< ? extends Annotation > annotation: annotations) {
             classes.put(annotation, new HashSet< Class < ? > >());
             matchingInterfaces.put(annotation, new HashSet< String >());
         }
-        
+
         if (basePackages == null || basePackages.isEmpty()) {
             return classes;
         }
-        
+
         for (final String basePackage: basePackages) {
             final boolean scanAllPackages = basePackage.equals(WILDCARD);
-            final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                + (scanAllPackages ? "" : basePackage.contains(WILDCARD) ? basePackage 
-                    : ClassUtils.convertClassNameToResourcePath(basePackage)) + ALL_CLASS_FILES;
-            
-            final Resource[] resources = resolver.getResources(packageSearchPath);    
-            
-            
+            final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                + (scanAllPackages ? "" : ClassUtils.convertClassNameToResourcePath(basePackage))
+                + ALL_CLASS_FILES;
+
+            final Resource[] resources = resolver.getResources(packageSearchPath);
+
+
             for (final Resource resource: resources) {
                 final MetadataReader reader = factory.getMetadataReader(resource);
                 final AnnotationMetadata metadata = reader.getAnnotationMetadata();
-                
+
                 if (scanAllPackages && shouldSkip(metadata.getClassName())) {
                     continue;
                 }
-                
+
                 for (Class< ? extends Annotation > annotation: annotations) {
                     boolean concreteClass = !metadata.isInterface() && !metadata.isAbstract();
                     if (metadata.isAnnotated(annotation.getName())) {
                         if (concreteClass) {
                             classes.get(annotation).add(loadClass(metadata.getClassName(), loader));
                         } else {
-                            matchingInterfaces.get(annotation).add(metadata.getClassName());    
+                            matchingInterfaces.get(annotation).add(metadata.getClassName());
                         }
                     } else if (concreteClass && metadata.getInterfaceNames().length > 0) {
                         nonMatchingClasses.put(metadata.getClassName(), metadata.getInterfaceNames());
@@ -125,7 +125,7 @@ class SpringClasspathScanner extends ClasspathScanner {
                 }
             }
         }
-        
+
         for (Map.Entry<Class<? extends Annotation>, Collection<String>> e : matchingInterfaces.entrySet()) {
             if (classes.get(e.getKey()).isEmpty()) {
                 for (String intName : e.getValue()) {
@@ -133,69 +133,68 @@ class SpringClasspathScanner extends ClasspathScanner {
                 }
             }
         }
-        
+
         return classes;
     }
-    
-    protected List<URL> findResourcesInternal(Collection<String> basePackages, 
+
+    protected List<URL> findResourcesInternal(Collection<String> basePackages,
                                               String extension,
-                                              ClassLoader loader) 
+                                              ClassLoader loader)
         throws IOException {
-        final List<URL> resourceURLs = new ArrayList<URL>();
+        final List<URL> resourceURLs = new ArrayList<>();
         if (basePackages == null || basePackages.isEmpty()) {
             return resourceURLs;
         }
         ResourcePatternResolver resolver = getResolver(loader);
-        
+
         for (final String basePackage: basePackages) {
             final boolean scanAllPackages = basePackage.equals(WILDCARD);
-            
+
             String theBasePackage = basePackage;
             if (theBasePackage.startsWith(CLASSPATH_URL_SCHEME)) {
                 theBasePackage = theBasePackage.substring(CLASSPATH_URL_SCHEME.length());
             }
-            
-            final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX 
-                + (scanAllPackages ? "" : basePackage.contains(WILDCARD) ? basePackage 
+
+            final String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                + (scanAllPackages ? "" : basePackage.contains(WILDCARD) ? basePackage
                     : ClassUtils.convertClassNameToResourcePath(theBasePackage)) + ALL_FILES + "." + extension;
-            
-            final Resource[] resources = resolver.getResources(packageSearchPath);                        
+
+            final Resource[] resources = resolver.getResources(packageSearchPath);
             for (final Resource resource: resources) {
                 resourceURLs.add(resource.getURL());
-            }                        
+            }
         }
-        
+
         return resourceURLs;
     }
-    
+
     private ResourcePatternResolver getResolver(ClassLoader loader) {
         ResourcePatternResolver resolver = null;
         if (IN_OSGI) {
             resolver = SpringOsgiUtil.getResolver(loader);
-        } 
+        }
         if (resolver == null) {
-            resolver = loader != null 
+            resolver = loader != null
                 ? new PathMatchingResourcePatternResolver(loader) : new PathMatchingResourcePatternResolver();
         }
         return resolver;
     }
-       
+
     private boolean shouldSkip(final String classname) {
         for (String packageToSkip: PACKAGES_TO_SKIP) {
             if (classname.startsWith(packageToSkip)) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
-    private Class<?> loadClass(String className, ClassLoader loader) 
+
+    private Class<?> loadClass(String className, ClassLoader loader)
         throws ClassNotFoundException {
         if (loader == null) {
             return ClassLoaderUtils.loadClass(className, getClass());
-        } else {
-            return loader.loadClass(className);
         }
+        return loader.loadClass(className);
     }
 }

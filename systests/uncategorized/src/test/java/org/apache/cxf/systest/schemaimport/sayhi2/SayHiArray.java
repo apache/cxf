@@ -20,6 +20,7 @@ package org.apache.cxf.systest.schemaimport.sayhi2;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
@@ -32,7 +33,7 @@ public class SayHiArray {
 
     public List<String> getArg0() {
         if (arg0 == null) {
-            arg0 = new ArrayList<String>();
+            arg0 = new ArrayList<>();
         }
         return this.arg0;
     }

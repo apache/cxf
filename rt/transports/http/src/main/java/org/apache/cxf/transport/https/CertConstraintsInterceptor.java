@@ -31,31 +31,31 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.transport.http.MessageTrustDecider;
-import org.apache.cxf.transport.http.UntrustedURLConnectionIOException; 
+import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
 
 /**
  * An interceptor that enforces certificate constraints logic at the TLS layer.
  */
 public final class CertConstraintsInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final CertConstraintsInterceptor INSTANCE = new CertConstraintsInterceptor();
-    
+
     static final Logger LOG = LogUtils.getL7dLogger(CertConstraintsInterceptor.class);
-    
+
     private CertConstraintsInterceptor() {
         super(Phase.PRE_STREAM);
     }
 
     public void handleMessage(Message message) throws Fault {
-        final CertConstraints certConstraints 
+        final CertConstraints certConstraints
             = (CertConstraints)message.getContextualProperty(CertConstraints.class.getName());
         if (certConstraints == null) {
             return;
         }
-        
+
         if (isRequestor(message)) {
             try {
                 String scheme = (String)message.get("http.scheme");
-                
+
                 if ("https".equals(scheme)) {
                     final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
                     MessageTrustDecider trust = new HttpsMessageTrustDecider(certConstraints, orig);
@@ -76,19 +76,17 @@ public final class CertConstraintsInterceptor extends AbstractPhaseInterceptor<M
                     throw new UntrustedURLConnectionIOException(
                         "No client certificates were found"
                     );
-                } else {
-                    X509Certificate[] x509Certs = (X509Certificate[])certs;
-                    if (!certConstraints.matches(x509Certs[0])) {
-                        throw new UntrustedURLConnectionIOException(
-                            "The client certificate does not match the defined cert constraints"
-                        );
-                    }
+                }
+                X509Certificate[] x509Certs = (X509Certificate[])certs;
+                if (!certConstraints.matches(x509Certs[0])) {
+                    throw new UntrustedURLConnectionIOException(
+                        "The client certificate does not match the defined cert constraints"
+                    );
                 }
             } catch (UntrustedURLConnectionIOException ex) {
                 throw new Fault(ex);
             }
         }
     }
- 
+
 }
-        

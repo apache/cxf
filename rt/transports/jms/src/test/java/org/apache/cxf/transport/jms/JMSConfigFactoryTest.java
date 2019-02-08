@@ -30,6 +30,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.MyBeanLocator;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
     @Test
     public void testUsernameAndPassword() throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
-        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
+        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         Assert.assertEquals("User name does not match.", "testUser", config.getUserName());
         Assert.assertEquals("Password does not match.", "testPassword", config.getPassword());
     }
@@ -63,7 +64,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         TransactionManager tm = jmsConfig.getTransactionManager();
         Assert.assertEquals(tmExpected, tm);
     }
-    
+
     private void tmByClass(Bus bus, TransactionManager tmExpected) {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
@@ -74,17 +75,24 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
 
     @Test
     public void testTransactionManagerFromJndi() throws XAException, NamingException {
-        JMSEndpoint endpoint = 
+        JMSEndpoint endpoint =
             new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=java:/comp/TransactionManager");
         Assert.assertEquals("java:/comp/TransactionManager", endpoint.getJndiTransactionManagerName());
         // TODO Check JNDI lookup
     }
-    
+
     @Test
     public void testConcurrentConsumers() {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?concurrentConsumers=4");
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
         Assert.assertEquals(4, jmsConfig.getConcurrentConsumers());
 
+    }
+
+    @Test
+    public void testMessageSelectorIsSet() {
+        EndpointInfo ei = setupServiceInfo("HelloWorldSelectorService", "HelloWorldPort");
+        JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
+        Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());
     }
 }

@@ -26,10 +26,10 @@ import java.util.Map;
  * A variation on HashMap which allows lookup by Class, via the string
  * returned by {@link Class#getName()}.
  */
-public class StringMapImpl 
-    extends HashMap<String, Object> 
+public class StringMapImpl
+    extends HashMap<String, Object>
     implements StringMap {
-    
+
     private static final long serialVersionUID = -4590903451121887L;
 
     public StringMapImpl() {
@@ -37,7 +37,7 @@ public class StringMapImpl
     public StringMapImpl(Map<String, Object> i) {
         super(i);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> key) {
         return (T)get(key.getName());
@@ -45,5 +45,9 @@ public class StringMapImpl
 
     public <T> void put(Class<T> key, T value) {
         put(key.getName(), value);
+    }
+
+    public <T> T remove(Class<T> key) {
+        return key.cast(remove(key.getName()));
     }
 }

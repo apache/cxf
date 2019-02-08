@@ -43,19 +43,19 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public abstract class AbstractInvoker implements Invoker {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractInvoker.class);
-    
+
     public Object invoke(Exchange exchange, Object o) {
 
         final Object serviceObject = getServiceObject(exchange);
         try {
 
             BindingOperationInfo bop = exchange.getBindingOperationInfo();
-            MethodDispatcher md = (MethodDispatcher) 
+            MethodDispatcher md = (MethodDispatcher)
                 exchange.getService().get(MethodDispatcher.class.getName());
             Method m = bop == null ? null : md.getMethod(bop);
             if (m == null && bop == null) {
                 LOG.severe(new Message("MISSING_BINDING_OPERATION", LOG).toString());
-                throw new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
+                throw new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
                                              "No binding operation info", "unknown method", "unknown"));
             }
             List<Object> params = null;
@@ -64,13 +64,13 @@ public abstract class AbstractInvoker implements Invoker {
             } else if (o != null) {
                 params = new MessageContentsList(o);
             }
-            
+
             m = adjustMethodAndParams(m, exchange, params, serviceObject.getClass());
-            
+
             //Method m = (Method)bop.getOperationInfo().getProperty(Method.class.getName());
             m = matchMethod(m, serviceObject);
-            
-            
+
+
             return invoke(exchange, serviceObject, m, params);
         } finally {
             releaseServiceObject(exchange, serviceObject);
@@ -94,35 +94,35 @@ public abstract class AbstractInvoker implements Invoker {
             }
 
             res = performInvocation(exchange, serviceObject, m, paramArray);
-            
+
             if (exchange.isOneWay()) {
                 return null;
             }
-            
+
             return new MessageContentsList(res);
         } catch (InvocationTargetException e) {
-            
+
             Throwable t = e.getCause();
-            
+
             if (t == null) {
                 t = e;
             }
-            
+
             checkSuspendedInvocation(exchange, serviceObject, m, params, t);
-            
+
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
-            
-            
+
+
             for (Class<?> cl : m.getExceptionTypes()) {
                 if (cl.isInstance(t)) {
-                    exchange.getInMessage().put(FaultMode.class, 
-                                                FaultMode.CHECKED_APPLICATION_FAULT);                    
+                    exchange.getInMessage().put(FaultMode.class,
+                                                FaultMode.CHECKED_APPLICATION_FAULT);
                 }
             }
-            
+
             if (t instanceof Fault) {
-                exchange.getInMessage().put(FaultMode.class, 
-                                            FaultMode.CHECKED_APPLICATION_FAULT);                    
+                exchange.getInMessage().put(FaultMode.class,
+                                            FaultMode.CHECKED_APPLICATION_FAULT);
                 throw (Fault)t;
             }
             throw createFault(t, m, params, true);
@@ -138,42 +138,41 @@ public abstract class AbstractInvoker implements Invoker {
             checkSuspendedInvocation(exchange, serviceObject, m, params, e);
             exchange.getInMessage().put(FaultMode.class, FaultMode.UNCHECKED_APPLICATION_FAULT);
             throw createFault(e, m, params, false);
-        } 
+        }
     }
-    
+
     protected void checkSuspendedInvocation(Exchange exchange,
-                                            Object serviceObject, 
-                                            Method m, 
-                                            List<Object> params, 
+                                            Object serviceObject,
+                                            Method m,
+                                            List<Object> params,
                                             Throwable t) {
         if (t instanceof SuspendedInvocationException) {
-            
+
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "SUSPENDED_INVOCATION_EXCEPTION", 
+                LOG.log(Level.FINE, "SUSPENDED_INVOCATION_EXCEPTION",
                         new Object[]{serviceObject, m.toString(), params});
             }
             throw (SuspendedInvocationException)t;
         }
     }
-    
+
     protected Fault createFault(Throwable ex, Method m, List<Object> params, boolean checked) {
-        
+
         if (checked) {
             return new Fault(ex);
-        } else {
-            String message = (ex == null) ? "" : ex.getMessage(); 
-            String method = (m == null) ? "<null>" : m.toString(); 
-            return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
-                                         message, method, params),
-                                         ex); 
         }
+        String message = (ex == null) ? "" : ex.getMessage();
+        String method = (m == null) ? "<null>" : m.toString();
+        return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
+                                     message, method, params),
+                                     ex);
     }
-    
+
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
                                        Object[] paramArray) throws Exception {
         paramArray = insertExchange(m, paramArray, exchange);
         if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "INVOKING_METHOD", new Object[] {serviceObject, 
+            LOG.log(Level.FINER, "INVOKING_METHOD", new Object[] {serviceObject,
                                                                   m,
                                                                   Arrays.asList(paramArray)});
         }
@@ -199,11 +198,11 @@ public abstract class AbstractInvoker implements Invoker {
         }
         return newParams;
     }
-    
+
     /**
      * Creates and returns a service object depending on the scope.
      */
-    public abstract Object getServiceObject(final Exchange context);
+    public abstract Object getServiceObject(Exchange context);
 
     /**
      * Called when the invoker is done with the object.   Default implementation
@@ -219,7 +218,7 @@ public abstract class AbstractInvoker implements Invoker {
      * targetObject to avoid the IllegalArgumentException when invoking the
      * method on the target object. The methodToMatch will be returned if the
      * targetObject doesn't have a similar method.
-     * 
+     *
      * @param methodToMatch The method to be used when finding a matching method
      *            in targetObject
      * @param targetObject The object to search in for the method.
@@ -242,7 +241,7 @@ public abstract class AbstractInvoker implements Invoker {
 
     /**
      * Return whether the given object is a J2SE dynamic proxy.
-     * 
+     *
      * @param object the object to check
      * @see java.lang.reflect.Proxy#isProxyClass
      */
@@ -256,7 +255,7 @@ public abstract class AbstractInvoker implements Invoker {
      * one. E.g. the method may be IFoo.bar() and the target class may be
      * DefaultFoo. In this case, the method may be DefaultFoo.bar(). This
      * enables attributes on that method to be found.
-     * 
+     *
      * @param method method to be invoked, which may come from an interface
      * @param targetClass target class for the current invocation. May be
      *            <code>null</code> or may not even implement the method.

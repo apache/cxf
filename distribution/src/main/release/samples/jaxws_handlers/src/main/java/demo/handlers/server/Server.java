@@ -32,11 +32,11 @@ public class Server {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
-        System.out.println("Server ready..."); 
-        
-        Thread.sleep(5 * 60 * 1000); 
+        System.out.println("Server ready...");
+
+        Thread.sleep(5 * 60 * 1000);
         System.out.println("Server exiting");
         System.exit(0);
     }

@@ -24,39 +24,55 @@ import java.io.IOException;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationCallback;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
- * 
+ *
  */
 public class Servlet3ContinuationProvider implements ContinuationProvider {
+    static final boolean IS_31;
+    static {
+        boolean is31 = false;
+        try {
+            ClassLoaderUtils.loadClass("javax.servlet.WriteListener", HttpServletRequest.class);
+            is31 = true;
+        } catch (Throwable t) {
+            is31 = false;
+        }
+        IS_31 = is31;
+    }
+    
     HttpServletRequest req;
-    HttpServletResponse resp; 
+    HttpServletResponse resp;
     Message inMessage;
     Servlet3Continuation continuation;
-    
+
     public Servlet3ContinuationProvider(HttpServletRequest req,
-                                        HttpServletResponse resp, 
+                                        HttpServletResponse resp,
                                         Message inMessage) {
         this.inMessage = inMessage;
         this.req = req;
         this.resp = resp;
     }
-    
+
     public void complete() {
         if (continuation != null) {
             continuation.reset();
             continuation = null;
         }
     }
-    
+
 
     /** {@inheritDoc}*/
     public Continuation getContinuation() {
@@ -65,13 +81,13 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         if (continuation == null) {
-            continuation = new Servlet3Continuation();
+            continuation = IS_31 ? new Servlet31Continuation() : new Servlet3Continuation();
         } else {
             continuation.startAsyncAgain();
         }
         return continuation;
     }
-    
+
     public class Servlet3Continuation implements Continuation, AsyncListener {
         private static final String BLOCK_RESTART = "org.apache.cxf.continuation.block.restart";
         AsyncContext context;
@@ -79,15 +95,17 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         volatile boolean isResumed;
         volatile boolean isPending;
         volatile boolean isComplete;
+        volatile boolean isTimeout;
         volatile Object obj;
         private ContinuationCallback callback;
         private boolean blockRestart;
+        
         public Servlet3Continuation() {
             req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
                              inMessage.getExchange().getInMessage());
             callback = inMessage.getExchange().get(ContinuationCallback.class);
             blockRestart = PropertyUtils.isTrue(inMessage.getContextualProperty(BLOCK_RESTART));
-            context = req.startAsync(req, resp);
+            context = req.startAsync();
             context.addListener(this);
         }
 
@@ -100,11 +118,11 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                 context = req.startAsync();
                 context.addListener(this);
                 isComplete = false;
-            } catch (IllegalStateException ex) { 
+            } catch (IllegalStateException ex) {
                 context = old;
             }
         }
-        
+
         public boolean suspend(long timeout) {
             if (isPending && timeout != 0) {
                 long currentTimeout = context.getTimeout();
@@ -114,11 +132,14 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             }
             isNew = false;
             isResumed = false;
-            
+
             context.setTimeout(timeout);
-            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
-            
+
+            updateMessageForSuspend();
             return true;
+        }
+        protected void updateMessageForSuspend() {
+            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
         }
         public void redispatch() {
             if (!isComplete) {
@@ -135,20 +156,20 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             isComplete = true;
             try {
                 context.complete();
-            } catch (IllegalStateException ex) { 
+            } catch (IllegalStateException ex) {
                 // ignore
             }
             isPending = false;
             isResumed = false;
             isNew = false;
-            
+            isTimeout = false;
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
                 Throwable cause = isCausedByIO(ex);
-                
+
                 if (cause != null && isClientDisconnected(cause)) {
-                    callback.onDisconnect();    
+                    callback.onDisconnect();
                 }
             }
         }
@@ -184,6 +205,8 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                     callback.onError(ex);
                 }
             }
+            isResumed = false;
+            isPending = false;
         }
         public void onError(AsyncEvent event) throws IOException {
             if (callback != null) {
@@ -194,26 +217,65 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
             resume();
+            isTimeout = true;
         }
-        
+
         private Throwable isCausedByIO(final Exception ex) {
             Throwable cause = ex;
-            
+
             while (cause != null && !(cause instanceof IOException)) {
                 cause = cause.getCause();
             }
-            
+
             return cause;
         }
-        
+
         private boolean isClientDisconnected(Throwable ex) {
             String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
             if (exName != null) {
                 return exName.equals(IOException.class.getName()) || exName.equals(ex.getClass().getName());
+            }
+            return false;
+        }
+
+        @Override
+        public boolean isReadyForWrite() {
+            return true;
+        }
+
+        protected ServletOutputStream getOutputStream() {
+            try {
+                return resp.getOutputStream();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public boolean isTimeout() {
+            return isTimeout;
+        }
+    }
+    public class Servlet31Continuation extends Servlet3Continuation {
+        public Servlet31Continuation() {
+        }
+
+        @Override
+        protected void updateMessageForSuspend() {
+            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
+            if (currentMessage.get(WriteListener.class) != null) {
+                // CXF Continuation WriteListener will likely need to be introduced
+                // for NIO supported with non-Servlet specific mechanisms
+                getOutputStream().setWriteListener(currentMessage.get(WriteListener.class));
+                currentMessage.getInterceptorChain().suspend();
             } else {
-                return false;
+                inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
             }
         }
         
+        @Override
+        public boolean isReadyForWrite() {
+            return getOutputStream().isReady();
+        }
     }
 }

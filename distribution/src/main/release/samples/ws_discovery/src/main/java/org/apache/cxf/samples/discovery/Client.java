@@ -37,16 +37,16 @@ public final class Client {
 
         //Use WS-Discovery to find references to services that implement the Greeter portType
         WSDiscoveryClient client = new WSDiscoveryClient();
-        List<EndpointReference> references 
+        List<EndpointReference> references
             = client.probe(new QName("http://cxf.apache.org/hello_world/discovery", "Greeter"));
         client.close();
-        
+
         GreeterService service = new GreeterService();
         //loop through all of them and have them greet me.
         for (EndpointReference ref : references) {
             Greeter g = service.getPort(ref, Greeter.class);
             System.out.println(g.greetMe("World"));
-        }       
+        }
     }
 
 }

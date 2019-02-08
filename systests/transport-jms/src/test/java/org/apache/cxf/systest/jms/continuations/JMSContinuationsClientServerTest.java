@@ -25,17 +25,18 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSContinuationsClientServerTest extends AbstractVmJMSTest {
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startBusAndJMS(JMSContinuationsClientServerTest.class);
         publish("jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply",
-                new GreeterImplWithContinuationsJMS());        
+                new GreeterImplWithContinuationsJMS());
     }
 
     @Test
@@ -48,5 +49,5 @@ public class JMSContinuationsClientServerTest extends AbstractVmJMSTest {
         HelloWorldPortType greeter = markForClose(service.getPort(portName, HelloWorldPortType.class, cff));
         Assert.assertEquals("Hi Fred Ruby", greeter.greetMe("Fred"));
     }
-        
+
 }

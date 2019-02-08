@@ -26,7 +26,7 @@ import org.apache.cxf.systest.jaxws.base.WrapperString;
 public class TestServiceImpl implements TestService {
     @Override
     public List<WrapperString> getList() {
-        List<WrapperString> list = new ArrayList<WrapperString>();
+        List<WrapperString> list = new ArrayList<>();
 
         list.add(new WrapperString("Test"));
         list.add(new WrapperString("Test 2"));

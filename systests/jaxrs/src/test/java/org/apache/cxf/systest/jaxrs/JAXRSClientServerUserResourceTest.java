@@ -27,8 +27,6 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -37,21 +35,28 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         org.apache.cxf.endpoint.Server server;
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setAddress("http://localhost:" + PORT + "/");
-            
+
             UserResource ur = new UserResource();
             ur.setName(BookStoreNoAnnotations.class.getName());
             ur.setPath("/bookstoreNoAnnotations");
@@ -60,18 +65,18 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             op.setName("getBook");
             op.setVerb("GET");
             op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
-            
+
             UserOperation op2 = new UserOperation();
             op2.setPath("/books/{id}/chapter");
             op2.setName("getBookChapter");
             op2.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
-            
-            List<UserOperation> ops = new ArrayList<UserOperation>();
+
+            List<UserOperation> ops = new ArrayList<>();
             ops.add(op);
             ops.add(op2);
-            
+
             ur.setOperations(ops);
-            
+
             UserResource ur2 = new UserResource();
             ur2.setName(ChapterNoAnnotations.class.getName());
             UserOperation op3 = new UserOperation();
@@ -79,9 +84,9 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             op3.setName("getItself");
             op3.setVerb("GET");
             ur2.setOperations(Collections.singletonList(op3));
-            
+
             sf.setModelBeans(ur, ur2);
-            
+
             String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
             sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
             sf.setServiceBean(new BookStoreNoAnnotationsImpl());
@@ -106,7 +111,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -114,68 +119,68 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
                    launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetBookInterface123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore2/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetChapter() throws Exception {
-        
+
         getAndCompareChapter("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123/chapter",
                       "application/xml", 200);
     }
-    
-    private void getAndCompare(String address, 
+
+    private void getAndCompare(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.addHeader("Accept", acceptType);
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            Book book = readBook(get.getResponseBodyAsStream());
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+            Book book = readBook(response.getEntity().getContent());
             assertEquals(123, book.getId());
             assertEquals("CXF in Action", book.getName());
         } finally {
             get.releaseConnection();
         }
     }
-    
-    private void getAndCompareChapter(String address, 
+
+    private void getAndCompareChapter(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.addHeader("Accept", acceptType);
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            Chapter c = readChapter(get.getResponseBodyAsStream());
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+            Chapter c = readChapter(response.getEntity().getContent());
             assertEquals(1, c.getId());
             assertEquals("chapter 1", c.getTitle());
         } finally {
             get.releaseConnection();
         }
     }
-    
-    
-    
+
+
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
     }
-    
+
     private Chapter readChapter(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Chapter.class});
         Unmarshaller u = c.createUnmarshaller();

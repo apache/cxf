@@ -36,6 +36,7 @@ import java.util.Map;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -46,6 +47,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 import javax.xml.ws.spi.http.HttpContext;
 import javax.xml.ws.spi.http.HttpExchange;
@@ -55,7 +57,7 @@ import javax.xml.ws.spi.http.HttpExchange;
  * coming from the HttpExchange and HttpContext instances provided
  * by the underlying container.
  * Note: many methods' implementation still TODO.
- * 
+ *
  */
 class HttpServletRequestAdapter implements HttpServletRequest {
 
@@ -104,7 +106,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         }
         return servletInputStreamAdapter;
     }
-    
+
     public String getLocalAddr() {
         InetSocketAddress isa = exchange.getLocalAddress();
         if (isa != null) {
@@ -272,7 +274,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     public long getDateHeader(String name) {
         String s = this.getHeader(name);
-        return s != null ? Long.valueOf(s) : 0;
+        return s != null ? Long.parseLong(s) : 0;
     }
 
     public String getHeader(String name) {
@@ -290,7 +292,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     public int getIntHeader(String name) {
         String s = this.getHeader(name);
-        return s != null ? Integer.valueOf(s) : 0;
+        return s != null ? Integer.parseInt(s) : 0;
     }
 
     public String getMethod() {
@@ -397,11 +399,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     public void logout() throws ServletException {
         throw new UnsupportedOperationException();
     }
-    
-    private class ServletInputStreamAdapter extends ServletInputStream {
-        
+
+    private static class ServletInputStreamAdapter extends ServletInputStream {
+
         private InputStream delegate;
-        
+
         ServletInputStreamAdapter(InputStream delegate) {
             this.delegate = delegate;
         }
@@ -410,5 +412,36 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         public int read() throws IOException {
             return delegate.read();
         }
+
+        @Override
+        public boolean isFinished() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isReady() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setReadListener(ReadListener arg0) {
+            throw new UnsupportedOperationException();
+
+        }
+    }
+
+    @Override
+    public long getContentLengthLong() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String changeSessionId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> cls) throws IOException, ServletException {
+        throw new UnsupportedOperationException();
     }
 }

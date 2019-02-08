@@ -28,25 +28,25 @@ import org.apache.cxf.message.Message;
 
 public final class PropertyHolderFactory {
     private PropertyHolderFactory() {
-        
+
     }
-    
+
     public static PropertyHolder getPropertyHolder(Message m) {
         return m.containsKey("HTTP.REQUEST") ? new ServletRequestPropertyHolder(m) : new MessagePropertyHolder(m);
     }
-    
-    public interface PropertyHolder { 
+
+    public interface PropertyHolder {
         Object getProperty(String name);
         void removeProperty(String name);
         void setProperty(String name, Object value);
         Collection<String> getPropertyNames();
     }
-    
+
     private static class MessagePropertyHolder implements PropertyHolder {
         private static final String PROPERTY_KEY = "jaxrs.filter.properties";
         private Message m;
         private Map<String, Object> props;
-        
+
         MessagePropertyHolder(Message m) {
             this.m = m;
             this.props = CastUtils.cast((Map<?, ?>)m.getExchange().get(PROPERTY_KEY));
@@ -57,26 +57,26 @@ public final class PropertyHolderFactory {
 
         public void removeProperty(String name) {
             if (props != null) {
-                props.remove(name);    
+                props.remove(name);
             }
         }
 
 
         public void setProperty(String name, Object value) {
             if (props == null) {
-                props = new HashMap<String, Object>();
+                props = new HashMap<>();
                 m.getExchange().put(PROPERTY_KEY, props);
-            }    
+            }
             if (value == null) {
                 removeProperty(name);
             } else {
                 props.put(name, value);
             }
-            
+
         }
 
         public Collection<String> getPropertyNames() {
-            return props == null ? Collections.<String>emptyList() 
+            return props == null ? Collections.<String>emptyList()
                 : Collections.unmodifiableSet(props.keySet());
         }
     }

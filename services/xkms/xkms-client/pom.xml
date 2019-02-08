@@ -27,9 +27,12 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.xkms.client</cxf.module.name>
+    </properties>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
         <testResources>
@@ -54,7 +57,8 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            javax.xml.ws, <!-- To workaround issue with BindingProvider interface not visible -->
+                            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}", <!-- To workaround issue with BindingProvider interface not visible -->
+                            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
                             *
                         </Import-Package>
                         <Export-Package>
@@ -99,7 +103,13 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-dom</artifactId>
-            <version>${cxf.wss4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>keys</classifier>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

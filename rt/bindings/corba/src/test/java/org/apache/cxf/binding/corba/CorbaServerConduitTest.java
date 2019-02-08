@@ -38,12 +38,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.ORB;
@@ -51,11 +45,21 @@ import org.omg.CORBA.ServerRequest;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaServerConduitTest extends Assert {
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaServerConduitTest {
     protected EndpointInfo endpointInfo;
-    protected EndpointReferenceType target;    
+    protected EndpointReferenceType target;
     protected MessageObserver observer;
-        
+
     IMocksControl control;
     ORB orb;
     Bus bus;
@@ -70,20 +74,20 @@ public class CorbaServerConduitTest extends Assert {
     @Before
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
-     
-        bus = BusFactory.getDefaultBus(); 
-     
+
+        bus = BusFactory.getDefaultBus();
+
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
         orbConfig = new OrbConfig();
         targetObject = EasyMock.createMock(org.omg.CORBA.Object.class);
     }
-    
+
     @After
-    public void tearDown() {        
+    public void tearDown() {
         bus.shutdown(true);
         if (orb != null) {
             try {
@@ -91,17 +95,17 @@ public class CorbaServerConduitTest extends Assert {
             } catch (Exception ex) {
                 // Do nothing.  Throw an Exception?
             }
-        } 
+        }
     }
-    
+
     @Test
     public void testCorbaServerConduit() throws Exception {
-        CorbaServerConduit conduit = setupCorbaServerConduit(false);        
-        assertTrue("conduit should not be null", conduit != null);
+        CorbaServerConduit conduit = setupCorbaServerConduit(false);
+        assertNotNull("conduit should not be null", conduit);
     }
-    
+
     @Test
-    public void testPrepare() throws Exception {       
+    public void testPrepare() throws Exception {
         setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
                          "/wsdl_corbabinding/simpleIdl.wsdl", "SimpleCORBAService",
                          "SimpleCORBAPort");
@@ -116,22 +120,22 @@ public class CorbaServerConduitTest extends Assert {
         try {
             conduit.prepare(message);
         } catch (Exception ex) {
-            ex.printStackTrace();            
+            ex.printStackTrace();
         }
         OutputStream os = message.getContent(OutputStream.class);
-        assertTrue("OutputStream should not be null", os != null);        
+        assertNotNull("OutputStream should not be null", os);
         ORB orb2 = (ORB)message.get("orb");
-        assertTrue("Orb should not be null", orb2 != null);
+        assertNotNull("Orb should not be null", orb2);
         Object obj = message.get("endpoint");
-        assertTrue("EndpointReferenceType should not be null", obj != null);
-        
-        assertTrue("passed in targetObject is used",  
+        assertNotNull("EndpointReferenceType should not be null", obj);
+
+        assertTrue("passed in targetObject is used",
                 targetObject.equals(message.get(CorbaConstants.CORBA_ENDPOINT_OBJECT)));
-        
+
         destination.shutdown();
     }
-       
-    
+
+
     @Test
     public void testGetTargetReference() throws Exception {
         setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
@@ -145,13 +149,13 @@ public class CorbaServerConduitTest extends Assert {
                                                             null,
                                                             orbConfig,
                                                             corbaTypeMap);
-        
+
         EndpointReferenceType t = null;
         EndpointReferenceType ref = conduit.getTargetReference(t);
-        assertTrue("ref should not be null", ref != null);
+        assertNotNull("ref should not be null", ref);
         destination.shutdown();
     }
-    
+
     @Test
     public void testGetAddress() throws Exception  {
         setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
@@ -167,87 +171,87 @@ public class CorbaServerConduitTest extends Assert {
                                                             orbConfig,
                                                             corbaTypeMap);
         String address = conduit.getAddress();
-        assertTrue("address should not be null", address != null);
-        assertEquals(address, "corbaloc::localhost:40000/Simple");        
+        assertNotNull("address should not be null", address);
+        assertEquals(address, "corbaloc::localhost:40000/Simple");
     }
-    
+
     @Test
-    public void testClose() throws Exception {   
-        
-        Method m = CorbaServerConduit.class.getDeclaredMethod("buildRequestResult", 
+    public void testClose() throws Exception {
+
+        Method m = CorbaServerConduit.class.getDeclaredMethod("buildRequestResult",
             new Class[] {CorbaMessage.class});
         CorbaServerConduit conduit = EasyMock.createMockBuilder(CorbaServerConduit.class)
             .addMockedMethod(m)
             .createMock();
-        
-        CorbaMessage msg = control.createMock(CorbaMessage.class);        
+
+        CorbaMessage msg = control.createMock(CorbaMessage.class);
         conduit.buildRequestResult(msg);
         EasyMock.expectLastCall();
         OutputStream stream = control.createMock(OutputStream.class);
         EasyMock.expect(msg.getContent(OutputStream.class)).andReturn(stream);
         stream.close();
         EasyMock.expectLastCall();
-        
+
         control.replay();
         conduit.close(msg);
         control.verify();
-    }        
-                
+    }
+
     @Test
     public void testBuildRequestResult() {
-        NVList list = orb.create_list(0);        
-        CorbaServerConduit conduit = setupCorbaServerConduit(false);  
+        NVList list = orb.create_list(0);
+        CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
-        Exchange exchange = control.createMock(Exchange.class);        
+        Exchange exchange = control.createMock(Exchange.class);
         ServerRequest request = control.createMock(ServerRequest.class);
-        
+
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
-                
+
         EasyMock.expect(exchange.isOneWay()).andReturn(false);
         CorbaMessage inMsg = EasyMock.createMock(CorbaMessage.class);
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.getInMessage()).andReturn(inMsg);
-                
+
         EasyMock.expect(inMsg.getList()).andReturn(list);
-        EasyMock.expect(msg.getStreamableException()).andReturn(null);                        
+        EasyMock.expect(msg.getStreamableException()).andReturn(null);
         EasyMock.expect(msg.getStreamableArguments()).andReturn(null);
         EasyMock.expect(msg.getStreamableReturn()).andReturn(null);
-        
+
         control.replay();
         conduit.buildRequestResult(msg);
-        control.verify();        
+        control.verify();
     }
-    
+
     @Test
     public void testBuildRequestResultException() {
-        NVList list = orb.create_list(0);        
-        CorbaServerConduit conduit = setupCorbaServerConduit(false);  
+        NVList list = orb.create_list(0);
+        CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
-        Exchange exchange = control.createMock(Exchange.class);        
+        Exchange exchange = control.createMock(Exchange.class);
         ServerRequest request = control.createMock(ServerRequest.class);
-        
+
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
-                
+
         EasyMock.expect(exchange.isOneWay()).andReturn(false);
         CorbaMessage inMsg = EasyMock.createMock(CorbaMessage.class);
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
-        EasyMock.expect(exchange.getInMessage()).andReturn(inMsg);                
+        EasyMock.expect(exchange.getInMessage()).andReturn(inMsg);
 
-        EasyMock.expect(inMsg.getList()).andReturn(list);        
+        EasyMock.expect(inMsg.getList()).andReturn(list);
         QName objName = new QName("object");
         QName objIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "short", CorbaConstants.NP_WSDL_CORBA);
         TypeCode objTypeCode = orb.get_primitive_tc(TCKind.tk_short);
         CorbaPrimitiveHandler obj = new CorbaPrimitiveHandler(objName, objIdlType, objTypeCode, null);
-        CorbaStreamable exception = new CorbaStreamableImpl(obj, objName);       
+        CorbaStreamable exception = new CorbaStreamableImpl(obj, objName);
 
         EasyMock.expect(msg.getStreamableException()).andReturn(exception);
         EasyMock.expect(msg.getStreamableException()).andReturn(exception);
-               
+
         control.replay();
         conduit.buildRequestResult(msg);
-        control.verify();        
+        control.verify();
     }
 
     @Test
@@ -257,77 +261,78 @@ public class CorbaServerConduitTest extends Assert {
         QName objIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "short", CorbaConstants.NP_WSDL_CORBA);
         TypeCode objTypeCode = orb.get_primitive_tc(TCKind.tk_short);
         CorbaPrimitiveHandler obj = new CorbaPrimitiveHandler(objName, objIdlType, objTypeCode, null);
-        CorbaStreamable arg = new CorbaStreamableImpl(obj, objName);        
+        CorbaStreamable arg = new CorbaStreamableImpl(obj, objName);
         arguments[0] = arg;
-        arguments[0].setMode(org.omg.CORBA.ARG_OUT.value);        
-        
-        NVList nvlist = orb.create_list(2);    
+        arguments[0].setMode(org.omg.CORBA.ARG_OUT.value);
+
+        NVList nvlist = orb.create_list(2);
         Any value = orb.create_any();
         value.insert_Streamable(arguments[0]);
         nvlist.add_value(arguments[0].getName(), value, arguments[0].getMode());
-        
-        CorbaServerConduit conduit = setupCorbaServerConduit(false);  
+
+        CorbaServerConduit conduit = setupCorbaServerConduit(false);
         CorbaMessage msg = control.createMock(CorbaMessage.class);
-        Exchange exchange = control.createMock(Exchange.class);        
+        Exchange exchange = control.createMock(Exchange.class);
         ServerRequest request = control.createMock(ServerRequest.class);
-        
+
         EasyMock.expect(msg.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.get(ServerRequest.class)).andReturn(request);
-                
-        EasyMock.expect(exchange.isOneWay()).andReturn(false);        
-        EasyMock.expect(msg.getExchange()).andReturn(exchange);        
+
+        EasyMock.expect(exchange.isOneWay()).andReturn(false);
+        EasyMock.expect(msg.getExchange()).andReturn(exchange);
         Message message = new MessageImpl();
         CorbaMessage corbaMessage = new CorbaMessage(message);
         corbaMessage.setList(nvlist);
-        
-        EasyMock.expect(exchange.getInMessage()).andReturn(corbaMessage);                
+
+        EasyMock.expect(exchange.getInMessage()).andReturn(corbaMessage);
         EasyMock.expect(msg.getStreamableException()).andReturn(null);
-        EasyMock.expect(msg.getStreamableArguments()).andReturn(arguments);        
+        EasyMock.expect(msg.getStreamableArguments()).andReturn(arguments);
         EasyMock.expect(msg.getStreamableReturn()).andReturn(arg);
-               
+
         control.replay();
         conduit.buildRequestResult(msg);
-        control.verify();        
+        control.verify();
     }
-    
+
+    @Test
     public void testGetTarget()  {
         CorbaServerConduit conduit = setupCorbaServerConduit(false);
         EndpointReferenceType endpoint = conduit.getTarget();
-        assertTrue("EndpointReferenceType should not be null", endpoint != null);
+        assertNotNull("EndpointReferenceType should not be null", endpoint);
     }
-    
-           
+
+
     protected CorbaServerConduit setupCorbaServerConduit(boolean send) {
-        target = EasyMock.createMock(EndpointReferenceType.class);                   
+        target = EasyMock.createMock(EndpointReferenceType.class);
         endpointInfo = EasyMock.createMock(EndpointInfo.class);
-        CorbaServerConduit corbaServerConduit = 
-            new CorbaServerConduit(endpointInfo, target, targetObject, 
+        CorbaServerConduit corbaServerConduit =
+            new CorbaServerConduit(endpointInfo, target, targetObject,
                                    null, orbConfig, corbaTypeMap);
-        
+
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {
-                public void onMessage(Message m) {                    
+                public void onMessage(Message m) {
                     inMessage = m;
                 }
             };
             corbaServerConduit.setMessageObserver(observer);
         }
-        
-        return corbaServerConduit;        
+
+        return corbaServerConduit;
     }
-    
-    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {        
+
+    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
         WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl.toString(), new QName(ns, serviceName));
 
-        Service service = f.create();        
+        Service service = f.create();
         endpointInfo = service.getEndpointInfo(new QName(ns, portName));
-   
+
     }
 
-    
-       
-           
+
+
+
 }

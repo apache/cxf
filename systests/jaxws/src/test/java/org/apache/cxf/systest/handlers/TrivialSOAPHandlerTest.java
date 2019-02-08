@@ -33,35 +33,39 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the use of a SOAPHandler which does not use the underlying SOAP message but simply
  * returns true instead.
  */
 public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
-    static String address =  "http://localhost:"
-        + TestUtil.getPortNumber(Server.class) 
-        + "/SoapContext/GreeterPort"; 
-    
+    static String address = "http://localhost:"
+        + TestUtil.getPortNumber(Server.class)
+        + "/SoapContext/GreeterPort";
+
     public static class Server extends AbstractBusTestServerBase {
-        
-        protected void run()  {            
+
+        protected void run()  {
             Object implementor = new TrivialSOAPHandlerAnnotatedGreeterImpl();
             Endpoint.publish(address, implementor);
         }
-        
+
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
 
     @BeforeClass
@@ -69,7 +73,7 @@ public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
     }
-    
+
     @Test
     public void testInvocation() throws Exception {
 
@@ -79,7 +83,7 @@ public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
         try {
             Greeter greeter = service.getGreeterPort();
             setAddress(greeter, address);
-            
+
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);
             assertEquals("BONJOUR", greeting);

@@ -26,9 +26,9 @@ import org.apache.ws.commons.schema.constants.Constants;
  * Basic type conversion functionality for writing messages.
  */
 public abstract class AbstractMessageWriter implements MessageWriter {
-    
+
     private boolean xsiTypeWritten;
-    
+
     public AbstractMessageWriter() {
     }
 
@@ -68,7 +68,7 @@ public abstract class AbstractMessageWriter implements MessageWriter {
     public void writeValueAsInt(Integer i) {
         writeValue(i.toString());
     }
-    
+
     public void writeValueAsByte(Byte b) {
         writeValue(b.toString());
     }

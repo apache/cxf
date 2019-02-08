@@ -40,7 +40,7 @@ public class StringTextProvider extends AbstractConfigurableProvider
         return String.class == type;
     }
 
-    public String readFrom(Class<String> type, Type genType, Annotation[] anns, MediaType mt, 
+    public String readFrom(Class<String> type, Type genType, Annotation[] anns, MediaType mt,
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         return IOUtils.toString(is, HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name()));
     }
@@ -53,7 +53,7 @@ public class StringTextProvider extends AbstractConfigurableProvider
         return String.class == type;
     }
 
-    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns, 
+    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns,
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());

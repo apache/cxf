@@ -30,10 +30,10 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")
 public class SecureBookStore {
-    
+
     public SecureBookStore() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
@@ -42,7 +42,7 @@ public class SecureBookStore {
     public Book addBook(Book book) {
         return book;
     }
-    
+
 }
 
 

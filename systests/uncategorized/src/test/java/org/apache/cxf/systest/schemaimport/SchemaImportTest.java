@@ -27,8 +27,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SchemaImportTest extends AbstractBusClientServerTestBase {
-    public static final String PORT =  Server.PORT;
+    public static final String PORT = Server.PORT;
 
     @BeforeClass
     public static void startservers() throws Exception {
@@ -104,8 +107,8 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
 
         }
     }
-    
-    
+
+
     @Test
     public void testSchemaInclude() throws Exception {
         String schemaURL = "http://localhost:" + PORT + "/schemainclude/service?xsd=d1/d1/test.xsd";

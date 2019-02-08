@@ -34,15 +34,15 @@ import org.omg.CORBA.ORB;
 public final class CorbaBindingHelper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaBindingHelper.class);
-    private static Map<String, ORB> orbList = new HashMap<String, ORB>();
-    private static Map<String, Integer> orbUseCount = new HashMap<String, Integer>();
+    private static Map<String, ORB> orbList = new HashMap<>();
+    private static Map<String, Integer> orbUseCount = new HashMap<>();
     private static ORB defaultORB;
-    
+
     private CorbaBindingHelper() {
         //utility class
     }
-    
-    public static synchronized ORB getDefaultORB(OrbConfig config) {        
+
+    public static synchronized ORB getDefaultORB(OrbConfig config) {
         if (defaultORB == null) {
             Properties props = System.getProperties();
             Properties configSpecifiedOrbProperties = config.getOrbProperties();
@@ -54,7 +54,7 @@ public final class CorbaBindingHelper {
                 props.put("org.omg.CORBA.ORBSingletonClass", config.getOrbSingletonClass());
             }
             List<String> orbArgs = config.getOrbArgs();
-            defaultORB = ORB.init(orbArgs.toArray(new String[orbArgs.size()]), props);
+            defaultORB = ORB.init(orbArgs.toArray(new String[0]), props);
             if (defaultORB == null) {
                 LOG.severe("Could not create instance of the ORB");
                 throw new CorbaBindingException("Could not create instance of the ORB");
@@ -62,9 +62,9 @@ public final class CorbaBindingHelper {
         }
         return defaultORB;
     }
-    
-    public static synchronized ORB getAddressSpecificORB(String address, 
-                                                         Properties props, 
+
+    public static synchronized ORB getAddressSpecificORB(String address,
+                                                         Properties props,
                                                          List<String> orbArgs) {
         ORB orb = orbList.get(getORBNameFromAddress(address));
         if (orb == null) {
@@ -73,11 +73,11 @@ public final class CorbaBindingHelper {
         return orb;
     }
 
-    private static ORB createAddressSpecificORB(String address, 
-                                                Properties props, 
+    private static ORB createAddressSpecificORB(String address,
+                                                Properties props,
                                                 List<String> orbArgs) {
         ORB orb = null;
-        
+
         URI addressURI = null;
         try {
             addressURI = new URI(address);
@@ -87,7 +87,7 @@ public final class CorbaBindingHelper {
 
         String scheme = addressURI.getScheme();
         // A corbaloc address gives us host and port information to use when setting up the
-        // endpoint for the ORB.  Other types of references will just create ORBs on the 
+        // endpoint for the ORB.  Other types of references will just create ORBs on the
         // host and port used when no preference has been specified.
         if ("corbaloc".equals(scheme)) {
             String schemeSpecificPart = addressURI.getSchemeSpecificPart();
@@ -103,16 +103,16 @@ public final class CorbaBindingHelper {
             index = corbaAddr.indexOf(':', oldIndex + 1);
             String host = corbaAddr.substring(oldIndex + 1, index);
             String port = corbaAddr.substring(index + 1);
-            
+
             props.put("yoko.orb.oa.endpoint", new String(protocol + " --host " + host + " --port " + port));
-            // WHAT to do for non-yoko orb? 
+            // WHAT to do for non-yoko orb?
         } else if ("corbaname".equals(scheme)) {
             String schemeSpecificPart = addressURI.getSchemeSpecificPart();
             if (schemeSpecificPart.startsWith(":")) {
                 schemeSpecificPart = schemeSpecificPart.substring(1);
             }
             int idx = schemeSpecificPart.indexOf(':');
-            
+
             props.put("org.omg.CORBA.ORBInitialHost", schemeSpecificPart.substring(0, idx));
             props.put("org.omg.CORBA.ORBInitialPort", schemeSpecificPart.substring(idx + 1));
         } else if ("file".equals(scheme)
@@ -123,24 +123,24 @@ public final class CorbaBindingHelper {
         } else {
             throw new CorbaBindingException("Unsupported address scheme type " + scheme);
         }
-        orb = ORB.init(orbArgs.toArray(new String[orbArgs.size()]), props);
+        orb = ORB.init(orbArgs.toArray(new String[0]), props);
         orbList.put(getORBNameFromAddress(address), orb);
 
         return orb;
     }
-    
 
-    
+
+
     private static String getORBNameFromAddress(String address) {
         String name = null;
-       
+
         URI addressURI = null;
         try {
             addressURI = new URI(address);
         } catch (URISyntaxException ex) {
             throw new CorbaBindingException("Unable to locate ORB with address " + address);
         }
-        
+
         String scheme = addressURI.getScheme();
         if ("corbaloc".equals(scheme) || "corbaname".equals(scheme)) {
             String schemeSpecificPart = addressURI.getSchemeSpecificPart();
@@ -149,14 +149,14 @@ public final class CorbaBindingHelper {
             }
             int keyIndex = schemeSpecificPart.indexOf('/');
             if (keyIndex != -1) {
-                name = schemeSpecificPart.substring(0, keyIndex);        
+                name = schemeSpecificPart.substring(0, keyIndex);
             } else {
                 name = schemeSpecificPart;
             }
             if (addressURI.getRawQuery() != null) {
                 name += addressURI.getRawQuery();
             }
-        } else if ("IOR".equals(scheme) || "ior".equals(scheme)) {        
+        } else if ("IOR".equals(scheme) || "ior".equals(scheme)) {
             name = addressURI.toString();
         } else if ("file".equals(scheme) || "relfile".equals(scheme)) {
             name = addressURI.getPath();
@@ -207,5 +207,5 @@ public final class CorbaBindingHelper {
             orbUseCount.put(getORBNameFromAddress(address), count);
         }
     }
-    
+
 }

@@ -28,6 +28,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
@@ -36,9 +37,14 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This is a test for various Required/Signed/Encrypted Parts/Elements.
@@ -47,16 +53,16 @@ import org.junit.runners.Parameterized.Parameters;
 public class PartsTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     final TestParam test;
-    
+
     public PartsTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -72,23 +78,23 @@ public class PartsTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+    public static Collection<TestParam> data() {
+
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testSOAPFaultError() throws Exception {
 
@@ -96,34 +102,34 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // This should fail, as the service requires a (bad) header
         QName portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort2");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             String error = "RequiredParts: No header element";
-            assertTrue(ex.getMessage().contains(error) 
+            assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("ToTo must be present"));
         }
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRequiredParts() throws Exception {
 
@@ -131,32 +137,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
@@ -168,7 +174,7 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRequiredElements() throws Exception {
 
@@ -176,32 +182,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires a (bad) header
         portQName = new QName(NAMESPACE, "DoubleItRequiredElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a required header which isn't present");
@@ -210,11 +216,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("ToTo must be present"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedParts() throws Exception {
 
@@ -222,32 +228,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedPartsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the Body must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't signed");
@@ -256,16 +262,16 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("Body must be signed"));
         }
-        
+
         // This should fail, as the service requires that the To header must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedPartsPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
@@ -274,11 +280,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be signed"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedElements() throws Exception {
 
@@ -286,32 +292,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the To header must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't signed");
@@ -320,11 +326,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be signed"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedParts() throws Exception {
 
@@ -332,32 +338,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPartsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the Body must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedPartsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a body which isn't encrypted");
@@ -366,16 +372,16 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("Body must be encrypted"));
         }
-        
+
         // This should fail, as the service requires that the To header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedPartsPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
@@ -384,11 +390,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be encrypted"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedElements() throws Exception {
 
@@ -396,32 +402,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
@@ -430,14 +436,14 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be encrypted"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testMultipleEncryptedElements() throws Exception {
-        
+
         if (test.isStreaming() || STAX_PORT.equals(test.getPort())) {
             return;
         }
@@ -446,32 +452,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort3");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
@@ -480,11 +486,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be encrypted"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testContentEncryptedElements() throws Exception {
 
@@ -492,32 +498,32 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         // This should fail, as the service requires that the header must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItContentEncryptedElementsPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a header which isn't encrypted");
@@ -526,11 +532,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("To must be encrypted"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedAttachments() throws Exception {
 
@@ -538,34 +544,34 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort");
         DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             enableStreaming(port);
         }
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         // This should fail, as the service requires that the Attachments must be signed
         portQName = new QName(NAMESPACE, "DoubleItSignedAttachmentsPort2");
         port = service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             enableStreaming(port);
         }
-        
+
         try {
             doubleIt = new DoubleIt3();
             doubleIt.setNumberToDouble(25);
@@ -575,11 +581,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             String error = "SignedParts";
             assertTrue(ex.getMessage().contains(error));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedAttachments() throws Exception {
 
@@ -587,34 +593,34 @@ public class PartsTest extends AbstractBusClientServerTestBase {
         URL busFile = PartsTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = PartsTest.class.getResource("DoubleItParts.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort");
         DoubleItSwaPortType port = service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             enableStreaming(port);
         }
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         // This should fail, as the service requires that the Attachments must be encrypted
         portQName = new QName(NAMESPACE, "DoubleItEncryptedAttachmentsPort2");
         port = service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             enableStreaming(port);
         }
-        
+
         try {
             doubleIt = new DoubleIt3();
             doubleIt.setNumberToDouble(25);
@@ -624,11 +630,11 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             String error = "EncryptedParts";
             assertTrue(ex.getMessage().contains(error));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     static void enableStreaming(DoubleItSwaPortType port) {
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -637,5 +643,5 @@ public class PartsTest extends AbstractBusClientServerTestBase {
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
     }
-  
+
 }

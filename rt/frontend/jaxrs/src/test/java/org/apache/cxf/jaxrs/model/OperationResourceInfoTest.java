@@ -31,13 +31,14 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class OperationResourceInfoTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class OperationResourceInfoTest {
+
     @Produces("text/xml")
     @Consumes("application/xml")
     static class TestClass {
@@ -49,94 +50,94 @@ public class OperationResourceInfoTest extends Assert {
         public void doThat() {
             // empty
         };
-        
+
     }
-    
+
     @Test
     public void testConsumeTypes() throws Exception {
         OperationResourceInfo ori1 = new OperationResourceInfo(
-                                 TestClass.class.getMethod("doIt", new Class[]{}), 
+                                 TestClass.class.getMethod("doIt", new Class[]{}),
                                  new ClassResourceInfo(TestClass.class));
-        
+
         List<MediaType> ctypes = ori1.getConsumeTypes();
         assertEquals("Single media type expected", 1, ctypes.size());
-        assertEquals("Class resource consume type should be used", 
+        assertEquals("Class resource consume type should be used",
                    "application/xml", ctypes.get(0).toString());
-        
+
         OperationResourceInfo ori2 = new OperationResourceInfo(
-                                 TestClass.class.getMethod("doThat", new Class[]{}), 
+                                 TestClass.class.getMethod("doThat", new Class[]{}),
                                  new ClassResourceInfo(TestClass.class));
         ctypes = ori2.getConsumeTypes();
         assertEquals("Single media type expected", 1, ctypes.size());
-        assertEquals("Method consume type should be used", 
+        assertEquals("Method consume type should be used",
                    "application/atom+xml", ctypes.get(0).toString());
     }
-    
+
     @Test
     public void testProduceTypes() throws Exception {
-        
+
         OperationResourceInfo ori1 = new OperationResourceInfo(
-                                       TestClass.class.getMethod("doIt", new Class[]{}), 
+                                       TestClass.class.getMethod("doIt", new Class[]{}),
                                        new ClassResourceInfo(TestClass.class));
-        
+
         List<MediaType> ctypes = ori1.getProduceTypes();
         assertEquals("Single media type expected", 1, ctypes.size());
-        assertEquals("Method produce type should be used", 
+        assertEquals("Method produce type should be used",
                    "text/plain", ctypes.get(0).toString());
-        
+
         OperationResourceInfo ori2 = new OperationResourceInfo(
-                                 TestClass.class.getMethod("doThat", new Class[]{}), 
+                                 TestClass.class.getMethod("doThat", new Class[]{}),
                                  new ClassResourceInfo(TestClass.class));
         ctypes = ori2.getProduceTypes();
         assertEquals("Single media type expected", 1, ctypes.size());
-        assertEquals("Class resource produce type should be used", 
+        assertEquals("Class resource produce type should be used",
                      "text/xml", ctypes.get(0).toString());
     }
 
     @Test
     public void testComparator1() throws Exception {
         OperationResourceInfo ori1 = new OperationResourceInfo(
-                                                               TestClass.class.getMethod("doIt", new Class[]{}), 
+                                                               TestClass.class.getMethod("doIt", new Class[]{}),
                                                                new ClassResourceInfo(TestClass.class));
         ori1.setURITemplate(new URITemplate("/"));
-        
+
         OperationResourceInfo ori2 = new OperationResourceInfo(
-                                                               TestClass.class.getMethod("doThat", new Class[]{}), 
+                                                               TestClass.class.getMethod("doThat", new Class[]{}),
                                                                new ClassResourceInfo(TestClass.class));
-        
+
         ori2.setURITemplate(new URITemplate("/"));
-        
+
         OperationResourceInfoComparator cmp = new OperationResourceInfoComparator(null, null);
-        
-        
+
+
         int result = cmp.compare(ori1,  ori2);
         assertEquals(0, result);
     }
-    
+
     @Test
     public void testComparator2() throws Exception {
         Message m = createMessage();
-        
+
         OperationResourceInfo ori1 = new OperationResourceInfo(
-                                                               TestClass.class.getMethod("doIt", new Class[]{}), 
+                                                               TestClass.class.getMethod("doIt", new Class[]{}),
                                                                new ClassResourceInfo(TestClass.class));
         ori1.setURITemplate(new URITemplate("/"));
-        
+
         OperationResourceInfo ori2 = new OperationResourceInfo(
-                                                               TestClass.class.getMethod("doThat", new Class[]{}), 
+                                                               TestClass.class.getMethod("doThat", new Class[]{}),
                                                                new ClassResourceInfo(TestClass.class));
-        
+
         ori2.setURITemplate(new URITemplate("/"));
-        
+
         OperationResourceInfoComparator cmp = new OperationResourceInfoComparator(m, "POST", false,
             MediaType.WILDCARD_TYPE, Collections.singletonList(MediaType.WILDCARD_TYPE));
-        
-        
+
+
         int result = cmp.compare(ori1,  ori2);
         assertEquals(0, result);
     }
-    
-    
+
+
     private Message createMessage() {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();

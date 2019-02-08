@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
  *
  * The default behavior of this expects the following pattern:
  * <ol>
- * <li>ClientCallback cb = new ClientCallback();</li>
+ * <li>ClientCallback cb = new ClientCallback();<>
  * <li>client.invoke(cb, "someMethod", ....);</li>
  * <li>cb.wait();</li>
  * <li>// CXF calls notify on the callback object when the operation is complete.</li>

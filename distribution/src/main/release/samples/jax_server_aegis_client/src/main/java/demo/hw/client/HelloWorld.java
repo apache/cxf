@@ -22,7 +22,7 @@ package demo.hw.client;
  * A 'clean' copy of the SEI that does not have any annotations.
  */
 public interface HelloWorld {
-    
+
     String sayHi(String text);
 
 }

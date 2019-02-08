@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>3.3.1-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>http://cxf.apache.org</url>
@@ -30,6 +30,8 @@
         <!-- don't deploy the samples, kind of pointless -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
+        <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
     </properties>
     <dependencies>
         <dependency>
@@ -40,88 +42,108 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-features-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <modules>
-        <module>in_jvm_transport</module>
-        <module>js_browser_client_simple</module>
-        <module>js_browser_client_java_first</module>
-        <module>java_first_jaxws_factory_bean</module>
-        <module>java_first_jms</module>
-        <module>jax_rs/content_negotiation</module>
-        <module>jax_rs/basic_https</module>
-        <module>jax_rs/basic</module>
-        <module>jax_rs/websocket</module>
-        <module>jax_rs/search</module>
-        <module>jax_rs/description_swagger</module>
-        <module>jax_rs/description_swagger2</module>
-        <module>jax_rs/description_swagger2_web</module>
-        <module>jax_rs/description_swagger2_osgi</module>
-        <module>jax_rs/basic_oidc</module>
-        <module>jax_rs/big_query</module>
-        <module>callback</module>
-        <module>wsdl_first_pure_xml</module>
-        <module>jaxws_dispatch_provider</module>
-        <module>wsdl_first_xmlbeans</module>
-        <module>wsdl_first_soap12</module>
-        <module>wsdl_first_dynamic_client</module>
-        <module>jms_queue</module>
-        <module>jms_spring_config</module>
-        <module>restful_dispatch</module>
-        <module>wsdl_first</module>
-        <module>aegis_standalone</module>
-        <module>java_first_jaxws</module>
-        <module>ws_rm</module>
-        <module>configuration_interceptor</module>
-        <module>java_first_spring_support</module>
-        <module>ruby_spring_support</module>
-        <module>groovy_spring_support</module>
-        <module>js_provider</module>
-        <module>ws_security/ut</module>
-        <module>ws_security/sign_enc</module>
-        <module>ws_security/sign_enc_policy</module>
-        <module>ws_security/ut_policy</module>
-        <module>mtom</module>
-        <module>jaxws_async</module>
-        <module>java_first_pojo</module>
-        <module>ws_policy</module>
-        <module>js_client</module>
-        <module>wsdl_first_https</module>
-        <module>ws_addressing</module>
-        <module>soap_header</module>
-        <module>jms_spec_demo</module>
-        <module>wsdl_first_xml_wrapped</module>
         <module>aegis</module>
-        <module>jax_server_aegis_client</module>
-        <module>jaxws_handlers</module>
-        <module>wsdl_first_rpclit</module>
-        <module>jms_pubsub</module>
-        <module>jax_rs/spring_security</module>
-        <module>logbrowser</module>
-        <module>logbrowser-blueprint</module>
-        <module>ws_notification</module>
-        <module>sts</module>
+        <module>aegis_standalone</module>
+        <module>callback</module>
+        <module>clustering/failover_jaxws_osgi</module>
+        <module>clustering/failover_server</module>
+        <module>configuration_interceptor</module>
         <module>corba/bank</module>
         <module>corba/bank_ws_addressing</module>
         <module>corba/hello_world</module>
-        <module>oauth/server</module>
-        <module>oauth/client</module>
+        <module>groovy_spring_support</module>
+        <module>in_jvm_transport</module>
+        <module>java_first_jaxws</module>
+        <module>java_first_jaxws_factory_bean</module>
+        <module>java_first_jms</module>
+        <module>java_first_pojo</module>
+        <module>java_first_spring_support</module>
+        <module>jax_rs/basic</module>
+        <module>jax_rs/basic_https</module>
+        <module>jax_rs/basic_oidc</module>
+        <module>jax_rs/big_query</module>
+        <module>jax_rs/content_negotiation</module>
+        <module>jax_rs/description_openapi_v3</module>
+        <module>jax_rs/description_openapi_v3_osgi</module>
+        <module>jax_rs/description_openapi_v3_web</module>
+        <module>jax_rs/description_openapi_v3_spring</module>
+        <module>jax_rs/description_swagger2</module>
+        <module>jax_rs/description_swagger2_osgi</module>
+        <module>jax_rs/description_swagger2_spring</module>
+        <module>jax_rs/description_swagger2_web</module>
         <module>jax_rs/minimal_osgi</module>
+        <module>jax_rs/odata</module>
+        <module>jax_rs/search</module>
+        <module>jax_rs/spark</module>
+        <module>jax_rs/spring_boot</module>
+        <module>jax_rs/spring_boot_scan/application</module>
+        <module>jax_rs/spring_boot_scan/client</module>
+        <module>jax_rs/spring_boot_scan/eureka-registry</module>
+        <module>jax_rs/spring_security</module>
+        <module>jax_rs/sse_cdi</module>
+        <module>jax_rs/sse_client</module>
+        <module>jax_rs/sse_osgi</module>
+        <module>jax_rs/sse_spring</module>
+        <module>jax_rs/sse_tomcat</module>
+        <module>jax_rs/tracing_brave</module>
+        <module>jax_rs/tracing_brave_osgi</module>
+        <module>jax_rs/tracing_opentracing</module>
+        <module>jax_rs/tracing_opentracing_camel</module>
+        <module>jax_rs/tracing_opentracing_osgi</module>
+        <module>jax_rs/websocket</module>
+        <module>jax_rs/websocket_osgi</module>
+        <module>jax_rs/websocket_web</module>
+        <module>jax_server_aegis_client</module>
+        <module>jaxws_async</module>
+        <module>jaxws_dispatch_provider</module>
+        <module>jaxws_handlers</module>
+        <module>jaxws_spring_boot</module>
+        <module>jaxws_tracing_brave_osgi</module>
+        <module>jms_pubsub</module>
+        <module>jms_queue</module>
+        <module>jms_spec_demo</module>
+        <module>jms_spring_config</module>
+        <module>js_browser_client_java_first</module>
+        <module>js_browser_client_simple</module>
+        <module>js_client</module>
+        <module>js_provider</module>
+        <module>mtom</module>
+        <module>oauth/client</module>
+        <module>oauth/server</module>
+        <module>restful_dispatch</module>
+        <module>ruby_spring_support</module>
+        <module>soap_header</module>
+        <module>sts</module>
+        <module>throttling</module>
+        <module>ws_addressing</module>
         <module>ws_discovery</module>
         <module>ws_eventing</module>
-        <module>throttling</module>
-        <module>jax_rs/tracing_htrace</module>
-        
-        <!--
-         These are removed from the build as they currently don't inherit the parent from 
-         this pom and thus have problems with deploys 
-        <module>jaxws_spring_boot</module>
-        <module>jax_rs/jaxrs_spring_boot</module>
-        -->
+        <module>ws_notification</module>
+        <module>ws_policy</module>
+        <module>ws_rm</module>
+        <module>ws_security/sign_enc</module>
+        <module>ws_security/sign_enc_policy</module>
+        <module>ws_security/ut</module>
+        <module>ws_security/ut_policy</module>
+        <module>wsdl_first</module>
+        <module>wsdl_first_dynamic_client</module>
+        <module>wsdl_first_https</module>
+        <module>wsdl_first_pure_xml</module>
+        <module>wsdl_first_rpclit</module>
+        <module>wsdl_first_soap12</module>
+        <module>wsdl_first_xml_wrapped</module>
     </modules>
     <dependencyManagement>
         <dependencies>
             <!-- 
-            Pull in the cxf-parents as import scope to re-use the dependenecyManagement 
+            Pull in the cxf-parents as import scope to re-use the dependencyManagement
             sections of those poms.   Those sections define the versions of various third
             party deps that CXF used to build with and test with and we would like
             to make sure the same versions are used for the samples
@@ -149,7 +171,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.8.0</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -159,6 +181,11 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.5.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -193,6 +220,62 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
+        <profile>
+	    <id>java9-plus</id>
+	    <properties>
+                <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
+	    </properties>
+	    <activation>
+        	<jdk>[9,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                    <version>${cxf.jaxb.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                    <version>1.3.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.xml.ws</groupId>
+                    <artifactId>jaxws-api</artifactId>
+                    <version>2.3.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>javax.activation-api</artifactId>
+                    <version>1.2.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+                    <version>1.1.3</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.messaging.saaj</groupId>
+                    <artifactId>saaj-impl</artifactId>
+                    <version>1.4.0-b03</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jta_1.1_spec</artifactId>
+                    <version>1.1.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                    <version>${cxf.jaxb.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-xjc</artifactId>
+                    <version>${cxf.jaxb.version}</version>
+                </dependency>
+            </dependencies>
+	</profile>
     </profiles>
     <!--
      we turn off the deploy in the properties above, but deploy plugin will

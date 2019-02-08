@@ -23,18 +23,18 @@ import java.io.Serializable;
 import java.security.cert.X509Certificate;
 
 public class XKMSCacheToken implements Serializable {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7097585680022947024L;
     private X509Certificate x509Certificate;
     private boolean xkmsValidated;
-    
+
     public XKMSCacheToken() {
-        // 
+        //
     }
-    
+
     public XKMSCacheToken(X509Certificate x509Certificate) {
         this.x509Certificate = x509Certificate;
     }

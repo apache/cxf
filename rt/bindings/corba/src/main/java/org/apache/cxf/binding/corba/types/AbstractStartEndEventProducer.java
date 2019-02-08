@@ -22,20 +22,19 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 import org.apache.cxf.service.model.ServiceInfo;
-
 import org.omg.CORBA.ORB;
 
 public abstract class AbstractStartEndEventProducer implements
         CorbaTypeEventProducer {
 
     protected int state;
-    protected final int[] states = {XMLStreamReader.START_ELEMENT, 0, XMLStreamReader.END_ELEMENT};
-    
+    protected final int[] states = {XMLStreamConstants.START_ELEMENT, 0, XMLStreamConstants.END_ELEMENT};
+
     protected CorbaTypeEventProducer currentEventProducer;
     protected QName name;
     protected Iterator<CorbaObjectHandler> iterator;
@@ -63,9 +62,9 @@ public abstract class AbstractStartEndEventProducer implements
         return state < states.length;
     }
 
-    public int next() { 
+    public int next() {
         int event = states[state];
-        if (event != 0) {      
+        if (event != 0) {
             state++;
         } else if (currentEventProducer != null && currentEventProducer.hasNext()) {
             event = currentEventProducer.next();

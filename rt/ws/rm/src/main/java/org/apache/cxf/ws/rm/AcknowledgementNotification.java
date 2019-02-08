@@ -28,7 +28,7 @@ public class AcknowledgementNotification extends Notification {
     private static final long serialVersionUID = 7809325584426123035L;
     private final String sequenceId;
     private final long messageNumber;
-    
+
     public AcknowledgementNotification(Object source, long seq, String sid, long msgnum) {
         super(ManagedRMEndpoint.ACKNOWLEDGEMENT_NOTIFICATION, source, seq);
         sequenceId = sid;

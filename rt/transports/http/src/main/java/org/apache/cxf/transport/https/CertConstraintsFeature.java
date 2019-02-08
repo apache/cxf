@@ -57,11 +57,11 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 @NoJSR250Annotations
 public class CertConstraintsFeature extends AbstractFeature {
     CertificateConstraintsType contraints;
-    
-    
+
+
     public CertConstraintsFeature() {
     }
-    
+
     @Override
     public void initialize(Server server, Bus bus) {
         if (contraints == null) {
@@ -71,7 +71,7 @@ public class CertConstraintsFeature extends AbstractFeature {
         CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
         server.getEndpoint().put(CertConstraints.class.getName(), c);
     }
-    
+
     @Override
     public void initialize(Client client, Bus bus) {
         if (contraints == null) {
@@ -81,7 +81,7 @@ public class CertConstraintsFeature extends AbstractFeature {
         CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
         client.getEndpoint().put(CertConstraints.class.getName(), c);
     }
-       
+
     @Override
     public void initialize(Bus bus) {
         if (contraints == null) {
@@ -91,7 +91,7 @@ public class CertConstraintsFeature extends AbstractFeature {
         CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
         bus.setProperty(CertConstraints.class.getName(), c);
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         if (contraints == null) {
@@ -100,11 +100,11 @@ public class CertConstraintsFeature extends AbstractFeature {
         provider.getInInterceptors().add(CertConstraintsInterceptor.INSTANCE);
         provider.getInFaultInterceptors().add(CertConstraintsInterceptor.INSTANCE);
     }
-    
+
     public void setCertificateConstraints(CertificateConstraintsType c) {
         contraints = c;
     }
-    
+
     public CertificateConstraintsType getCertificateConstraints() {
         return contraints;
     }

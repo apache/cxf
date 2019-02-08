@@ -27,6 +27,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
@@ -41,7 +42,6 @@ import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
@@ -55,30 +55,30 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String cryptoAlias = "alice";
     private String cryptoPassword = "password";
     private String cryptoPropertiesFile = "alice.properties";
-    private String signatureAlgorithm = WSConstants.RSA_SHA1;
-    private String digestAlgorithm = WSConstants.SHA1;
-    
+    private String signatureAlgorithm = WSS4JConstants.RSA_SHA1;
+    private String digestAlgorithm = WSS4JConstants.SHA1;
+
     public SamlCallbackHandler() {
         //
     }
-    
+
     public SamlCallbackHandler(boolean saml2) {
         this.saml2 = saml2;
     }
-    
+
     public SamlCallbackHandler(boolean saml2, boolean signAssertion) {
         this.saml2 = saml2;
         this.signAssertion = signAssertion;
     }
-    
+
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
     }
-    
+
     public void setKeyInfoIdentifier(CERT_IDENTIFIER keyInfoIdentifier) {
         this.keyInfoIdentifier = keyInfoIdentifier;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -98,7 +98,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 if (!saml2 && SAML2Constants.CONF_SENDER_VOUCHES.equals(confirmationMethod)) {
                     confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
                 }
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
@@ -112,10 +112,10 @@ public class SamlCallbackHandler implements CallbackHandler {
                     }
                 }
                 callback.setSubject(subjectBean);
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
-                
+
                 AttributeBean attributeBean = new AttributeBean();
                 if (saml2) {
                     attributeBean.setQualifiedName("subject-role");
@@ -128,7 +128,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 callback.setSignatureAlgorithm(signatureAlgorithm);
                 callback.setSignatureDigestAlgorithm(digestAlgorithm);
-                
+
                 try {
                     Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
                     callback.setIssuerCrypto(crypto);
@@ -141,14 +141,14 @@ public class SamlCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     protected KeyInfoBean createKeyInfo() throws Exception {
-        Crypto crypto = 
+        Crypto crypto =
             CryptoFactory.getInstance(cryptoPropertiesFile);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(cryptoAlias);
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        
+
         KeyInfoBean keyInfo = new KeyInfoBean();
         keyInfo.setCertIdentifer(keyInfoIdentifier);
         if (keyInfoIdentifier == CERT_IDENTIFIER.X509_CERT) {
@@ -156,7 +156,7 @@ public class SamlCallbackHandler implements CallbackHandler {
         } else if (keyInfoIdentifier == CERT_IDENTIFIER.KEY_VALUE) {
             keyInfo.setPublicKey(certs[0].getPublicKey());
         }
-        
+
         return keyInfo;
     }
 
@@ -215,5 +215,5 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setDigestAlgorithm(String digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
-    
+
 }

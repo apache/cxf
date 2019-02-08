@@ -31,26 +31,26 @@ import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 public class JaxwsServiceBuilder extends AbstractServiceFactory {
 
     final JaxWsServiceFactoryBean serviceFactory;
-    
+
     public JaxwsServiceBuilder() {
         super();
         serviceFactory = new JaxWsServiceFactoryBean();
         //As this is a javatowsdl tool, explictly populate service model from class
         serviceFactory.setPopulateFromClass(true);
-        
+
         setServiceFactory(serviceFactory);
         setBindingConfig(new JaxWsSoapBindingConfiguration(serviceFactory));
     }
-    
-    
-    
+
+
+
     public File getOutputFile() {
         JaxWsImplementorInfo jaxwsImpl = serviceFactory.getJaxWsImplementorInfo();
         String wsdlLocation = jaxwsImpl.getWsdlLocation();
         if (!StringUtils.isEmpty(wsdlLocation)) {
             try {
                 URI uri = new URI(wsdlLocation);
-                if ("file".equals(uri.getScheme()) 
+                if ("file".equals(uri.getScheme())
                     || StringUtils.isEmpty(uri.getScheme())) {
                     File f = new File(uri);
                     if (f.exists()) {
@@ -60,7 +60,7 @@ public class JaxwsServiceBuilder extends AbstractServiceFactory {
             } catch (Exception e) {
                 //ignore
             }
-            
+
             File f = new File(wsdlLocation);
             if (f.exists()) {
                 return f;
@@ -68,7 +68,7 @@ public class JaxwsServiceBuilder extends AbstractServiceFactory {
         }
         return super.getOutputFile();
     }
-    
-   
-    
+
+
+
 }

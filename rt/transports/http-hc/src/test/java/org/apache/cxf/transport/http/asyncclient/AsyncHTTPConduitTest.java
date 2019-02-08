@@ -20,9 +20,11 @@
 package org.apache.cxf.transport.http.asyncclient;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
@@ -48,36 +50,39 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(AsyncHTTPConduitTest.class);
     public static final String PORT_INV = allocatePort(AsyncHTTPConduitTest.class, 2);
-    
+    public static final String FILL_BUFFER = "FillBuffer";
+
     static Endpoint ep;
     static String request;
     static Greeter g;
-    
+
     @BeforeClass
     public static void start() throws Exception {
         Bus b = createStaticBus();
         b.setProperty(AsyncHTTPConduit.USE_ASYNC, AsyncHTTPConduitFactory.UseAsyncPolicy.ALWAYS);
         b.setProperty("org.apache.cxf.transport.http.async.MAX_CONNECTIONS", 501);
-        
+
         BusFactory.setThreadDefaultBus(b);
-        
+
         AsyncHTTPConduitFactory hcf = (AsyncHTTPConduitFactory)b.getExtension(HTTPConduitFactory.class);
         assertEquals(501, hcf.maxConnections);
-        
+
         ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                               new org.apache.hello_world_soap_http.GreeterImpl() {
                 public String greetMeLater(long cnt) {
-                    //use the continuations so the async client can 
+                    //use the continuations so the async client can
                     //have a ton of connections, use less threads
                     //
                     //mimic a slow server by delaying somewhere between
-                    //1 and 2 seconds, with a preference of delaying the earlier 
-                    //requests longer to create a sort of backlog/contention 
+                    //1 and 2 seconds, with a preference of delaying the earlier
+                    //requests longer to create a sort of backlog/contention
                     //with the later requests
                     ContinuationProvider p = (ContinuationProvider)
                         getContext().getMessageContext().get(ContinuationProvider.class.getName());
@@ -93,16 +98,20 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                     return "Hello, finally! " + cnt;
                 }
                 public String greetMe(String me) {
-                    return "Hello " + me;
+                    if (me.equals(FILL_BUFFER)) {
+                        return String.join("", Collections.nCopies(16093, " "));
+                    } else {
+                        return "Hello " + me;
+                    }
                 }
             });
-        
+
         StringBuilder builder = new StringBuilder("NaNaNa");
         for (int x = 0; x < 50; x++) {
             builder.append(" NaNaNa ");
         }
         request = builder.toString();
-        
+
         URL wsdl = AsyncHTTPConduitTest.class.getResource("/wsdl/hello_world_services.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -112,13 +121,27 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         g = service.getSoapPort();
         assertNotNull("Port is null", g);
     }
-    
+
     @AfterClass
     public static void stop() throws Exception {
         ((java.io.Closeable)g).close();
         ep.stop();
         ep = null;
     }
+
+    @Test
+    public void testResponseSameBufferSize() throws Exception {
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        c.getClient().setReceiveTimeout(12000);
+        try {
+            g.greetMe(FILL_BUFFER);
+            g.greetMe("Hello");
+        } catch (Exception ex) {
+            fail();
+        }
+    }
+
     @Test
     public void testTimeout() throws Exception {
         updateAddressPort(g, PORT);
@@ -126,6 +149,20 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         c.getClient().setReceiveTimeout(3000);
         try {
             assertEquals("Hello " + request, g.greetMeLater(-5000));
+            fail();
+        } catch (Exception ex) {
+            //expected!!!
+        }
+    }
+
+    @Test
+    public void testTimeoutAsync() throws Exception {
+        updateAddressPort(g, PORT);
+        HTTPConduit c = (HTTPConduit)ClientProxy.getClient(g).getConduit();
+        c.getClient().setReceiveTimeout(3000);
+        try {
+            Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-5000L);
+            future.get();
             fail();
         } catch (Exception ex) {
             //expected!!!
@@ -141,10 +178,10 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected
         }
     }
-    
+
     @Test
     public void testInovationWithHCAddress() throws Exception {
-        String address =  "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -152,10 +189,10 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testInvocationWithTransportId() throws Exception {
-        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -181,23 +218,39 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             public void handleResponse(Response<GreetMeResponse> res) {
                 try {
                     res.get().getResponseType();
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    // TODO Auto-generated catch block
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
         }).get();
         assertEquals("Hello " + request, resp.getResponseType());
-        
+
         g.greetMeLaterAsync(1000, new AsyncHandler<GreetMeLaterResponse>() {
             public void handleResponse(Response<GreetMeLaterResponse> res) {
             }
         }).get();
     }
-        
+
+    @Test
+    public void testCallAsyncCallbackInvokedOnlyOnce() throws Exception {
+        // This test is especially targeted for RHEL 6.8
+        updateAddressPort(g, PORT_INV);
+        int repeat = 100;
+        final AtomicInteger count = new AtomicInteger(0);
+        for (int i = 0; i < repeat; i++) {
+            try {
+                g.greetMeAsync(request, new AsyncHandler<GreetMeResponse>() {
+                    public void handleResponse(Response<GreetMeResponse> res) {
+                        count.incrementAndGet();
+                    }
+                }).get();
+            } catch (Exception e) {
+            }
+        }
+        Thread.sleep(1000);
+        assertEquals("Callback should be invoked only once per request", repeat, count.intValue());
+    }
+
     @Test
     @Ignore("peformance test")
     public void testCalls() throws Exception {
@@ -233,7 +286,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello " + builder.toString(), value);
         */
     }
-    
+
     @Test
     @Ignore("peformance test")
     public void testCallsAsync() throws Exception {
@@ -242,10 +295,10 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         final int warmupIter = 5000;
         final int runIter = 5000;
         final CountDownLatch wlatch = new CountDownLatch(warmupIter);
-        final boolean wdone[] = new boolean[warmupIter];
-        
+        final boolean[] wdone = new boolean[warmupIter];
+
         @SuppressWarnings("unchecked")
-        AsyncHandler<GreetMeLaterResponse> whandler[] = new AsyncHandler[warmupIter]; 
+        AsyncHandler<GreetMeLaterResponse>[] whandler = new AsyncHandler[warmupIter];
         for (int x = 0; x < warmupIter; x++) {
             final int c = x;
             whandler[x] = new AsyncHandler<GreetMeLaterResponse>() {
@@ -256,11 +309,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                         if (c != Integer.parseInt(s)) {
                             System.out.println("Problem " + c + " != " + s);
                         }
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        // TODO Auto-generated catch block
+                    } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
                     wdone[c] = true;
@@ -268,7 +317,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                 }
             };
         }
-        
+
         //warmup
         long start = System.currentTimeMillis();
         for (int x = 0; x < warmupIter; x++) {
@@ -281,7 +330,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //System.out.println();
         }
         wlatch.await(30, TimeUnit.SECONDS);
-        
+
         long end = System.currentTimeMillis();
         System.out.println("Warmup Total: " + (end - start) + " " + wlatch.getCount());
         for (int x = 0; x < warmupIter; x++) {
@@ -299,7 +348,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
                 rlatch.countDown();
             }
         };
-        
+
         start = System.currentTimeMillis();
         for (int x = 0; x < runIter; x++) {
             //builder.append("a");
@@ -312,7 +361,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         }
         rlatch.await(30, TimeUnit.SECONDS);
         end = System.currentTimeMillis();
-        
+
         System.out.println("Total: " + (end - start) + " " + rlatch.getCount());
     }
 

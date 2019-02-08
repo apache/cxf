@@ -23,7 +23,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,13 +40,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
              parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface DocLitBareCodeFirstService {
 
-    @WebMethod(operationName = "greetMe") 
-    @WebResult(targetNamespace = "http://namespace/result", name = "GreetMeBareResponse") 
+    @WebMethod(operationName = "greetMe")
+    @WebResult(targetNamespace = "http://namespace/result", name = "GreetMeBareResponse")
     GreetMeResponse greetMe(
-                  @WebParam(targetNamespace = "http://namespace/request") 
-                  GreetMeRequest gmr); 
-    
-    
+                  @WebParam(targetNamespace = "http://namespace/request")
+                  GreetMeRequest gmr);
+
+
     @XmlList
     @WebResult(name = "Items", targetNamespace = "http://namespace/result", partName = "parameter")
     @WebMethod
@@ -55,23 +54,23 @@ public interface DocLitBareCodeFirstService {
         @WebParam(partName = "parameter", name = "SayTestRequest", targetNamespace = "http://www.tum.de/test")
         SayTestRequest parameter
     );
-    
-    
-    @XmlAccessorType(XmlAccessType.FIELD) 
-    @XmlType(name = "SayTestRequest", 
-             namespace = "http://cxf.apache.org/test/request/bare", 
-             propOrder = { "name" }) 
+
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "SayTestRequest",
+             namespace = "http://cxf.apache.org/test/request/bare",
+             propOrder = { "name" })
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
-                    name = "SayTestObject") 
+                    name = "SayTestObject")
     class SayTestRequest  {
         String name;
-        
+
         public SayTestRequest() {
         }
         public SayTestRequest(String n) {
             name = n;
         }
-        
+
         public void setName(String n) {
             name = n;
         }
@@ -79,18 +78,18 @@ public interface DocLitBareCodeFirstService {
             return name;
         }
     }
-    @XmlAccessorType(XmlAccessType.FIELD) 
-    @XmlType(name = "GreetMeRequest", 
-             namespace = "http://cxf.apache.org/test/request/bare", 
-             propOrder = { "name" }) 
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "GreetMeRequest",
+             namespace = "http://cxf.apache.org/test/request/bare",
+             propOrder = { "name" })
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
-                    name = "GreetMeObject") 
+                    name = "GreetMeObject")
     class GreetMeRequest  {
         String name;
-        
+
         public GreetMeRequest() {
         }
-        
+
         public void setName(String n) {
             name = n;
         }
@@ -99,18 +98,18 @@ public interface DocLitBareCodeFirstService {
         }
     }
 
-    @XmlAccessorType(XmlAccessType.FIELD) 
-    @XmlType(name = "GreetMeResponse", 
-             namespace = "http://cxf.apache.org/test/request/bare", 
-             propOrder = { "name" }) 
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "GreetMeResponse",
+             namespace = "http://cxf.apache.org/test/request/bare",
+             propOrder = { "name" })
     @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
-                    name = "GreetMeResponseObject")    
+                    name = "GreetMeResponseObject")
     class GreetMeResponse  {
         String name;
-        
+
         public GreetMeResponse() {
         }
-        
+
         public void setName(String n) {
             name = n;
         }
@@ -122,10 +121,10 @@ public interface DocLitBareCodeFirstService {
                targetNamespace = "http://namespace/result", partName = "parameter")
     @WebMethod
     GMonthTest echoGMonthTest(
-        @WebParam(name = "GMonthRequest", targetNamespace = "http://namespace/result", 
-                  partName = "parameter")                              
+        @WebParam(name = "GMonthRequest", targetNamespace = "http://namespace/result",
+                  partName = "parameter")
         GMonthTest input);
-    
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "GMonthTest", propOrder = { "value" })
     class GMonthTest {
@@ -133,8 +132,8 @@ public interface DocLitBareCodeFirstService {
         @XmlSchemaType(name = "gMonth")
         protected XMLGregorianCalendar value;
 
-        public XMLGregorianCalendar getValue() { 
-            return value; 
+        public XMLGregorianCalendar getValue() {
+            return value;
         }
 
         public void setValue(XMLGregorianCalendar value) {

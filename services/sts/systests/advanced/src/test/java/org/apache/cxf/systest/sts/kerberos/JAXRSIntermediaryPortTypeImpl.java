@@ -36,29 +36,29 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class JAXRSIntermediaryPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     public int doubleIt(int numberToDouble) {
         URL wsdl = JAXRSIntermediaryPortTypeImpl.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         try {
             updateAddressPort(transportPort, KerberosDelegationTokenTest.PORT);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         // Retrieve delegated credential + set it on the outbound message
-        SecurityContext securityContext = 
+        SecurityContext securityContext =
             PhaseInterceptorChain.getCurrentMessage().get(SecurityContext.class);
         if (securityContext instanceof KerberosSecurityContext) {
             KerberosSecurityContext ksc = (KerberosSecurityContext)securityContext;
@@ -70,8 +70,8 @@ public class JAXRSIntermediaryPortTypeImpl extends AbstractBusClientServerTestBa
                 e.printStackTrace();
             }
         }
-        
+
         return transportPort.doubleIt(numberToDouble);
     }
-    
+
 }

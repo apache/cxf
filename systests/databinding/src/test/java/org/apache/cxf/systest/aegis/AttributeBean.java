@@ -45,6 +45,6 @@ public class AttributeBean {
     public void setAttrExplicitString(String attrExplicitString) {
         this.attrExplicitString = attrExplicitString;
     }
-    
+
 
 }

@@ -22,14 +22,15 @@ package org.apache.cxf.bus.managers;
 import org.apache.cxf.endpoint.DummyServer;
 import org.apache.cxf.endpoint.Server;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ServerRegistryImpTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class ServerRegistryImpTest {
+
     @Test
     public void testServerRegistryPreShutdown() {
-        ServerRegistryImpl serverRegistryImpl = new ServerRegistryImpl();        
+        ServerRegistryImpl serverRegistryImpl = new ServerRegistryImpl();
         Server server = new DummyServer(serverRegistryImpl);
         server.start();
         assertEquals("The serverList should have one service", serverRegistryImpl.serversList.size(), 1);
@@ -37,8 +38,8 @@ public class ServerRegistryImpTest extends Assert {
         assertEquals("The serverList should be clear ", serverRegistryImpl.serversList.size(), 0);
         serverRegistryImpl.postShutdown();
         assertEquals("The serverList should be clear ", serverRegistryImpl.serversList.size(), 0);
-    }    
-    
-    
+    }
+
+
 
 }

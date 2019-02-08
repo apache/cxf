@@ -20,17 +20,18 @@
 package org.apache.cxf.aegis;
 
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 /**
- * 
+ *
  */
-public class AegisElementDataWriter extends AbstractAegisIoImpl 
+public class AegisElementDataWriter extends AbstractAegisIoImpl
        implements AegisWriter<Element> {
-    
+
     protected AegisXMLStreamDataWriter writer;
 
     public AegisElementDataWriter(AegisContext globalContext) {
@@ -48,6 +49,6 @@ public class AegisElementDataWriter extends AbstractAegisIoImpl
                       java.lang.reflect.Type objectType) throws Exception {
         W3CDOMStreamWriter swriter = new W3CDOMStreamWriter(output);
         writer.write(obj, elementName, optional, swriter, objectType);
-        
+
     }
 }

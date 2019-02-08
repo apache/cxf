@@ -75,12 +75,16 @@ import org.apache.type_test.types3.OccuringStruct;
 import org.apache.type_test.types3.OccuringStruct1;
 import org.apache.type_test.types3.OccuringStruct2;
 
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
- 
+
     protected boolean equals(ChoiceOfChoice x, ChoiceOfChoice y) {
         if (x.getVarInt() != null && y.getVarInt() != null) {
             return x.getVarInt().equals(y.getVarInt());
@@ -107,8 +111,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarFloat(3.14f);
         yOrig.setVarString("y456");
 
-        Holder<ChoiceOfChoice> y = new Holder<ChoiceOfChoice>(yOrig);
-        Holder<ChoiceOfChoice> z = new Holder<ChoiceOfChoice>();
+        Holder<ChoiceOfChoice> y = new Holder<>(yOrig);
+        Holder<ChoiceOfChoice> z = new Holder<>();
 
         ChoiceOfChoice ret;
         if (testDocLiteral) {
@@ -128,12 +132,12 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     protected boolean equals(ChoiceOfSeq x, ChoiceOfSeq y) {
-        if (x.getVarFloat() != null && x.getVarInt() != null 
+        if (x.getVarFloat() != null && x.getVarInt() != null
             && y.getVarFloat() != null && y.getVarInt() != null) {
             return x.getVarInt().equals(y.getVarInt())
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
         }
-        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null 
+        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null
             && x.getVarString() != null && y.getVarString() != null) {
             return x.getVarOtherInt().equals(y.getVarOtherInt())
                 && x.getVarString().equals(y.getVarString());
@@ -154,8 +158,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarOtherInt(456);
         yOrig.setVarString("y456");
 
-        Holder<ChoiceOfSeq> y = new Holder<ChoiceOfSeq>(yOrig);
-        Holder<ChoiceOfSeq> z = new Holder<ChoiceOfSeq>();
+        Holder<ChoiceOfSeq> y = new Holder<>(yOrig);
+        Holder<ChoiceOfSeq> z = new Holder<>();
 
         ChoiceOfSeq ret;
         if (testDocLiteral) {
@@ -211,8 +215,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setAttrString1("DerivedAttr1-y");
         yOrig.setAttrString2("DerivedAttr2-y");
 
-        Holder<DerivedStructBaseStruct> y = new Holder<DerivedStructBaseStruct>(yOrig);
-        Holder<DerivedStructBaseStruct> z = new Holder<DerivedStructBaseStruct>();
+        Holder<DerivedStructBaseStruct> y = new Holder<>(yOrig);
+        Holder<DerivedStructBaseStruct> z = new Holder<>();
         DerivedStructBaseStruct ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedStructBaseStruct(x, y, z);
@@ -229,7 +233,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue("testDerivedStructBaseStruct(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     protected boolean equals(DerivedStructBaseChoice x, DerivedStructBaseChoice y) {
         return equals((SimpleChoice)x, (SimpleChoice)y)
             && (Float.compare(x.getVarFloatExt(), y.getVarFloatExt()) == 0)
@@ -258,8 +262,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarStringExt("DerivedStruct-y");
         yOrig.setAttrString("DerivedAttr-y");
 
-        Holder<DerivedStructBaseChoice> y = new Holder<DerivedStructBaseChoice>(yOrig);
-        Holder<DerivedStructBaseChoice> z = new Holder<DerivedStructBaseChoice>();
+        Holder<DerivedStructBaseChoice> y = new Holder<>(yOrig);
+        Holder<DerivedStructBaseChoice> z = new Holder<>();
         DerivedStructBaseChoice ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedStructBaseChoice(x, y, z);
@@ -313,8 +317,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarFloatExt(1.414f);
         yOrig.setAttrString("DerivedAttr-y");
 
-        Holder<DerivedChoiceBaseStruct> y = new Holder<DerivedChoiceBaseStruct>(yOrig);
-        Holder<DerivedChoiceBaseStruct> z = new Holder<DerivedChoiceBaseStruct>();
+        Holder<DerivedChoiceBaseStruct> y = new Holder<>(yOrig);
+        Holder<DerivedChoiceBaseStruct> z = new Holder<>();
         DerivedChoiceBaseStruct ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedChoiceBaseStruct(x, y, z);
@@ -331,7 +335,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue("testDerivedChoiceBaseStruct(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedChoiceBaseArray
 
     protected boolean equals(DerivedChoiceBaseArray x, DerivedChoiceBaseArray y) {
@@ -364,8 +368,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarFloatExt(1.414f);
         yOrig.setAttrStringExt("DerivedAttr-y");
 
-        Holder<DerivedChoiceBaseArray> y = new Holder<DerivedChoiceBaseArray>(yOrig);
-        Holder<DerivedChoiceBaseArray> z = new Holder<DerivedChoiceBaseArray>();
+        Holder<DerivedChoiceBaseArray> y = new Holder<>(yOrig);
+        Holder<DerivedChoiceBaseArray> z = new Holder<>();
         DerivedChoiceBaseArray ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedChoiceBaseArray(x, y, z);
@@ -385,7 +389,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types1.DerivedChoiceBaseChoice
-    
+
     protected boolean equals(DerivedChoiceBaseChoice x, DerivedChoiceBaseChoice y) {
         boolean isEquals = x.getAttrString().equals(y.getAttrString());
         if (x.getVarStringExt() != null && y.getVarStringExt() != null) {
@@ -416,8 +420,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarFloatExt(1.414f);
         yOrig.setAttrString("DerivedAttr-y");
 
-        Holder<DerivedChoiceBaseChoice> y = new Holder<DerivedChoiceBaseChoice>(yOrig);
-        Holder<DerivedChoiceBaseChoice> z = new Holder<DerivedChoiceBaseChoice>();
+        Holder<DerivedChoiceBaseChoice> y = new Holder<>(yOrig);
+        Holder<DerivedChoiceBaseChoice> z = new Holder<>();
         DerivedChoiceBaseChoice ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedChoiceBaseChoice(x, y, z);
@@ -459,8 +463,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarString("BaseStruct-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
 
-        Holder<DerivedNoContent> y = new Holder<DerivedNoContent>(yOrig);
-        Holder<DerivedNoContent> z = new Holder<DerivedNoContent>();
+        Holder<DerivedNoContent> y = new Holder<>(yOrig);
+        Holder<DerivedNoContent> z = new Holder<>();
         DerivedNoContent ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedNoContent(x, y, z);
@@ -503,8 +507,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarStringExt("DerivedStruct-y");
         yOrig.setAttrString("DerivedAttr-y");
 
-        Holder<DerivedStructBaseEmpty> y = new Holder<DerivedStructBaseEmpty>(yOrig);
-        Holder<DerivedStructBaseEmpty> z = new Holder<DerivedStructBaseEmpty>();
+        Holder<DerivedStructBaseEmpty> y = new Holder<>(yOrig);
+        Holder<DerivedStructBaseEmpty> z = new Holder<>();
         DerivedStructBaseEmpty ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedStructBaseEmpty(x, y, z);
@@ -531,8 +535,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         }
         DerivedEmptyBaseEmptyAll x = new DerivedEmptyBaseEmptyAll();
         DerivedEmptyBaseEmptyAll yOrig = new DerivedEmptyBaseEmptyAll();
-        Holder<DerivedEmptyBaseEmptyAll> y = new Holder<DerivedEmptyBaseEmptyAll>(yOrig);
-        Holder<DerivedEmptyBaseEmptyAll> z = new Holder<DerivedEmptyBaseEmptyAll>();
+        Holder<DerivedEmptyBaseEmptyAll> y = new Holder<>(yOrig);
+        Holder<DerivedEmptyBaseEmptyAll> z = new Holder<>();
         DerivedEmptyBaseEmptyAll ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedEmptyBaseEmptyAll(x, y, z);
@@ -545,7 +549,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
-        
+
         assertTrue(y.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(z.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(ret instanceof DerivedEmptyBaseEmptyAll);
@@ -560,8 +564,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         }
         DerivedEmptyBaseEmptyChoice x = new DerivedEmptyBaseEmptyChoice();
         DerivedEmptyBaseEmptyChoice yOrig = new DerivedEmptyBaseEmptyChoice();
-        Holder<DerivedEmptyBaseEmptyChoice> y = new Holder<DerivedEmptyBaseEmptyChoice>(yOrig);
-        Holder<DerivedEmptyBaseEmptyChoice> z = new Holder<DerivedEmptyBaseEmptyChoice>();
+        Holder<DerivedEmptyBaseEmptyChoice> y = new Holder<>(yOrig);
+        Holder<DerivedEmptyBaseEmptyChoice> z = new Holder<>();
         DerivedEmptyBaseEmptyChoice ret;
         if (testDocLiteral) {
             ret = docClient.testDerivedEmptyBaseEmptyChoice(x, y, z);
@@ -574,7 +578,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
-        
+
         assertTrue(y.value instanceof DerivedEmptyBaseEmptyChoice);
         assertTrue(z.value instanceof DerivedEmptyBaseEmptyChoice);
         assertTrue(ret instanceof DerivedEmptyBaseEmptyChoice);
@@ -585,10 +589,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     protected boolean equals(RestrictedChoiceBaseChoice x, RestrictedChoiceBaseChoice y) {
         if (x.getVarFloat() != null && y.getVarFloat() != null) {
             return x.getVarFloat().compareTo(y.getVarFloat()) == 0;
-        } else {
-            return x.getVarInt() != null && y.getVarInt() != null
-                && x.getVarInt().compareTo(y.getVarInt()) == 0;
         }
+        return x.getVarInt() != null && y.getVarInt() != null
+            && x.getVarInt().compareTo(y.getVarInt()) == 0;
     }
 
     @Test
@@ -602,8 +605,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         RestrictedChoiceBaseChoice yOrig = new RestrictedChoiceBaseChoice();
         yOrig.setVarFloat(-9.14f);
 
-        Holder<RestrictedChoiceBaseChoice> y = new Holder<RestrictedChoiceBaseChoice>(yOrig);
-        Holder<RestrictedChoiceBaseChoice> z = new Holder<RestrictedChoiceBaseChoice>();
+        Holder<RestrictedChoiceBaseChoice> y = new Holder<>(yOrig);
+        Holder<RestrictedChoiceBaseChoice> z = new Holder<>();
 
         RestrictedChoiceBaseChoice ret;
         if (testDocLiteral) {
@@ -643,8 +646,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setAttrInt(new BigInteger("456"));
         yOrig.setAttrString("x456");
 
-        Holder<ComplexTypeWithAttributeGroup> y = new Holder<ComplexTypeWithAttributeGroup>(yOrig);
-        Holder<ComplexTypeWithAttributeGroup> z = new Holder<ComplexTypeWithAttributeGroup>();
+        Holder<ComplexTypeWithAttributeGroup> y = new Holder<>(yOrig);
+        Holder<ComplexTypeWithAttributeGroup> z = new Holder<>();
         ComplexTypeWithAttributeGroup ret;
         if (testDocLiteral) {
             ret = docClient.testComplexTypeWithAttributeGroup(x, y, z);
@@ -679,14 +682,14 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         ComplexTypeWithAttributeGroup1 x = new ComplexTypeWithAttributeGroup1();
         x.setAttrInt(new BigInteger("123"));
         x.setAttrString("x123");
-        x.setAttrFloat(new Float(3.14f));
+        x.setAttrFloat(Float.valueOf(3.14f));
         ComplexTypeWithAttributeGroup1 yOrig = new ComplexTypeWithAttributeGroup1();
         yOrig.setAttrInt(new BigInteger("456"));
         yOrig.setAttrString("x456");
-        yOrig.setAttrFloat(new Float(6.28f));
+        yOrig.setAttrFloat(Float.valueOf(6.28f));
 
-        Holder<ComplexTypeWithAttributeGroup1> y = new Holder<ComplexTypeWithAttributeGroup1>(yOrig);
-        Holder<ComplexTypeWithAttributeGroup1> z = new Holder<ComplexTypeWithAttributeGroup1>();
+        Holder<ComplexTypeWithAttributeGroup1> y = new Holder<>(yOrig);
+        Holder<ComplexTypeWithAttributeGroup1> z = new Holder<>();
         ComplexTypeWithAttributeGroup1 ret;
         if (testDocLiteral) {
             ret = docClient.testComplexTypeWithAttributeGroup1(x, y, z);
@@ -720,9 +723,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         SequenceWithGroupSeq x = new SequenceWithGroupSeq();
-        x.setVarInt(100);         
+        x.setVarInt(100);
         x.setVarString("hello");
-        x.setVarFloat(1.1f); 
+        x.setVarFloat(1.1f);
         x.setVarOtherInt(11);
         x.setVarOtherString("world");
         x.setVarOtherFloat(10.1f);
@@ -734,8 +737,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarOtherString("hello");
         yOrig.setVarOtherFloat(1.1f);
 
-        Holder<SequenceWithGroupSeq> y = new Holder<SequenceWithGroupSeq>(yOrig);
-        Holder<SequenceWithGroupSeq> z = new Holder<SequenceWithGroupSeq>();
+        Holder<SequenceWithGroupSeq> y = new Holder<>(yOrig);
+        Holder<SequenceWithGroupSeq> z = new Holder<>();
 
         SequenceWithGroupSeq ret;
         if (testDocLiteral) {
@@ -799,8 +802,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarOtherFloat(2.2f);
         yOrig.setVarString("world");
 
-        Holder<SequenceWithGroupChoice> y = new Holder<SequenceWithGroupChoice>(yOrig);
-        Holder<SequenceWithGroupChoice> z = new Holder<SequenceWithGroupChoice>();
+        Holder<SequenceWithGroupChoice> y = new Holder<>(yOrig);
+        Holder<SequenceWithGroupChoice> z = new Holder<>();
 
         SequenceWithGroupChoice ret;
         if (testDocLiteral) {
@@ -858,8 +861,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarFloat(10.1f);
         yOrig.setVarOtherString("world");
 
-        Holder<SequenceWithGroups> y = new Holder<SequenceWithGroups>(yOrig);
-        Holder<SequenceWithGroups> z = new Holder<SequenceWithGroups>();
+        Holder<SequenceWithGroups> y = new Holder<>(yOrig);
+        Holder<SequenceWithGroups> z = new Holder<>();
 
         SequenceWithGroups ret;
         if (testDocLiteral) {
@@ -898,8 +901,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.getBatchElementsSeq().add(200);
         yOrig.getBatchElementsSeq().add("world");
 
-        Holder<SequenceWithOccuringGroup> y = new Holder<SequenceWithOccuringGroup>(yOrig);
-        Holder<SequenceWithOccuringGroup> z = new Holder<SequenceWithOccuringGroup>();
+        Holder<SequenceWithOccuringGroup> y = new Holder<>(yOrig);
+        Holder<SequenceWithOccuringGroup> z = new Holder<>();
 
         SequenceWithOccuringGroup ret;
         if (testDocLiteral) {
@@ -921,7 +924,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.GroupDirectlyInComplexType
 
     protected boolean equals(GroupDirectlyInComplexType x, GroupDirectlyInComplexType y) {
-        return x.getVarInt() == y.getVarInt() 
+        return x.getVarInt() == y.getVarInt()
             && x.getVarString().equals(y.getVarString())
             && Float.compare(x.getVarFloat(), y.getVarFloat()) == 0
             && x.getAttr1().equals(y.getAttr1());
@@ -935,15 +938,15 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarInt(100);
         x.setVarString("hello");
         x.setVarFloat(1.1f);
-        x.setAttr1(new Integer(1));
+        x.setAttr1(Integer.valueOf(1));
         GroupDirectlyInComplexType yOrig = new GroupDirectlyInComplexType();
         yOrig.setVarInt(11);
         yOrig.setVarString("world");
         yOrig.setVarFloat(10.1f);
-        yOrig.setAttr1(new Integer(2)); 
+        yOrig.setAttr1(Integer.valueOf(2));
 
-        Holder<GroupDirectlyInComplexType> y = new Holder<GroupDirectlyInComplexType>(yOrig);
-        Holder<GroupDirectlyInComplexType> z = new Holder<GroupDirectlyInComplexType>();
+        Holder<GroupDirectlyInComplexType> y = new Holder<>(yOrig);
+        Holder<GroupDirectlyInComplexType> z = new Holder<>();
 
         GroupDirectlyInComplexType ret;
         if (testDocLiteral) {
@@ -981,8 +984,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setAttrInt(new BigInteger("456"));
         yOrig.setAttrString("x456");
 
-        Holder<ComplexTypeWithAttributes> y = new Holder<ComplexTypeWithAttributes>(yOrig);
-        Holder<ComplexTypeWithAttributes> z = new Holder<ComplexTypeWithAttributes>();
+        Holder<ComplexTypeWithAttributes> y = new Holder<>(yOrig);
+        Holder<ComplexTypeWithAttributes> z = new Holder<>();
         ComplexTypeWithAttributes ret;
         if (testDocLiteral) {
             ret = docClient.testComplexTypeWithAttributes(x, y, z);
@@ -1004,27 +1007,27 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.StructWithAny
 
     public void assertEqualsStructWithAny(StructWithAny a, StructWithAny b) throws Exception {
-        assertEquals("StructWithAny names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
+        Assert.assertEquals("StructWithAny names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
         assertEquals(a.getAny(), b.getAny());
     }
-    
+
     public void assertEquals(Element elA, Element elB) throws Exception {
         if (elA instanceof SOAPElement && elB instanceof SOAPElement) {
             SOAPElement soapA = (SOAPElement)elA;
             SOAPElement soapB = (SOAPElement)elB;
-            assertEquals("StructWithAny soap element names don't match",
+            Assert.assertEquals("StructWithAny soap element names don't match",
                 soapA.getElementName(), soapB.getElementName());
-            assertEquals("StructWithAny soap element text nodes don't match",
+            Assert.assertEquals("StructWithAny soap element text nodes don't match",
                 soapA.getValue(), soapB.getValue());
-            
+
             Iterator<?> itExp = soapA.getChildElements();
             Iterator<?> itGen = soapB.getChildElements();
             while (itExp.hasNext()) {
                 if (!itGen.hasNext()) {
                     fail("Incorrect number of child elements inside any");
                 }
-                Object objA = itExp.next();         
+                Object objA = itExp.next();
                 Object objB = itGen.next();
                 if (objA instanceof SOAPElement) {
                     if (objB instanceof SOAPElement) {
@@ -1061,8 +1064,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         swa.setAny(x);
         yOrig.setAny(x2);
 
-        Holder<StructWithAny> y = new Holder<StructWithAny>(yOrig);
-        Holder<StructWithAny> z = new Holder<StructWithAny>();
+        Holder<StructWithAny> y = new Holder<>(yOrig);
+        Holder<StructWithAny> z = new Holder<>();
 
         StructWithAny ret;
         if (testDocLiteral) {
@@ -1111,8 +1114,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         swa.setAny(x);
         yOrig.setAny(x2);
 
-        Holder<StructWithAny> y = new Holder<StructWithAny>(yOrig);
-        Holder<StructWithAny> z = new Holder<StructWithAny>();
+        Holder<StructWithAny> y = new Holder<>(yOrig);
+        Holder<StructWithAny> z = new Holder<>();
         StructWithAny ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAny(swa, y, z);
@@ -1129,7 +1132,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     // StructWithInvalidAny
-    // XXX - no exception thrown
     @Test
     public void testStructWithInvalidAny() throws Exception {
         if (!shouldRunTest("StructWithInvalidAny")) {
@@ -1153,8 +1155,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         swa.setAny(x);
         yOrig.setAny(x2);
 
-        Holder<StructWithAny> y = new Holder<StructWithAny>(yOrig);
-        Holder<StructWithAny> z = new Holder<StructWithAny>();
+        Holder<StructWithAny> y = new Holder<>(yOrig);
+        Holder<StructWithAny> z = new Holder<>();
 
         try {
             if (testDocLiteral) {
@@ -1173,13 +1175,13 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.StructWithAnyArray
 
     public void assertEqualsStructWithAnyArray(StructWithAnyArray a, StructWithAnyArray b) throws Exception {
-        assertEquals("StructWithAny names don't match", a.getName(), b.getName());
-        assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
+        Assert.assertEquals("StructWithAny names don't match", a.getName(), b.getName());
+        Assert.assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
 
         List<Element> ae = a.getAny();
         List<Element> be = b.getAny();
-        
-        assertEquals("StructWithAny soap element lengths don't match", ae.size(), be.size());
+
+        Assert.assertEquals("StructWithAny soap element lengths don't match", ae.size(), be.size());
         for (int i = 0; i < ae.size(); i++) {
             assertEquals(ae.get(i), be.get(i));
         }
@@ -1210,8 +1212,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         swa.getAny().add(x);
         yOrig.getAny().add(x2);
 
-        Holder<StructWithAnyArray> y = new Holder<StructWithAnyArray>(yOrig);
-        Holder<StructWithAnyArray> z = new Holder<StructWithAnyArray>();
+        Holder<StructWithAnyArray> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArray> z = new Holder<>();
 
         StructWithAnyArray ret;
         if (testDocLiteral) {
@@ -1229,7 +1231,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     // StructWithInvalidAnyArray
-    // XXX - no exception thrown
     @Test
     public void testStructWithInvalidAnyArray() throws Exception {
         if (!shouldRunTest("StructWithInvalidAnyArray")) {
@@ -1253,8 +1254,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         swa.getAny().add(x);
         yOrig.getAny().add(x2);
 
-        Holder<StructWithAnyArray> y = new Holder<StructWithAnyArray>(yOrig);
-        Holder<StructWithAnyArray> z = new Holder<StructWithAnyArray>();
+        Holder<StructWithAnyArray> y = new Holder<>(yOrig);
+        Holder<StructWithAnyArray> z = new Holder<>();
 
         try {
             if (testDocLiteral) {
@@ -1269,24 +1270,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             // Expected
             fail("testStructWithInvalidAnyArray(): caught expected exception - woot.");
         }
-    }
-
-    @Test
-    @Ignore
-    public void testStructWithAnyStrict() throws Exception {
-        if (!shouldRunTest("StructWithAnyStrict")) {
-            return;
-        }
-        // XXX - only added to the soap typetest
-    }
-
-    @Test
-    @Ignore
-    public void testStructWithAnyArrayLax() throws Exception {
-        if (!shouldRunTest("StructWithAnyArrayLax")) {
-            return;
-        }
-        // XXX - only added to the soap typetest
     }
 
     //org.apache.type_test.types2.IDTypeAttribute
@@ -1308,8 +1291,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         IDTypeAttribute yOrig = new IDTypeAttribute();
         yOrig.setId("x456");
 
-        Holder<IDTypeAttribute> y = new Holder<IDTypeAttribute>(yOrig);
-        Holder<IDTypeAttribute> z = new Holder<IDTypeAttribute>();
+        Holder<IDTypeAttribute> y = new Holder<>(yOrig);
+        Holder<IDTypeAttribute> z = new Holder<>();
         //IDTypeAttribute ret;
         if (testDocLiteral) {
             /*ret =*/ docClient.testIDTypeAttribute(x, y, z);
@@ -1352,9 +1335,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOriginal.getValue().add(new BigInteger("3200"));
 
         Holder<MultipleOccursSequenceInSequence> y =
-            new Holder<MultipleOccursSequenceInSequence>(yOriginal);
+            new Holder<>(yOriginal);
         Holder<MultipleOccursSequenceInSequence> z =
-            new Holder<MultipleOccursSequenceInSequence>();
+            new Holder<>();
 
         MultipleOccursSequenceInSequence ret;
         if (testDocLiteral) {
@@ -1373,9 +1356,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
- 
+
     //org.apache.type_test.types2.StructWithBinary;
-    
+
     protected boolean equals(StructWithBinary x, StructWithBinary y) {
         return Arrays.equals(x.getBase64(), y.getBase64())
             && Arrays.equals(x.getHex(), y.getHex());
@@ -1393,8 +1376,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOriginal.setBase64("base64Binary_y".getBytes());
         yOriginal.setHex("hexBinary_y".getBytes());
 
-        Holder<StructWithBinary> y = new Holder<StructWithBinary>(yOriginal);
-        Holder<StructWithBinary> z = new Holder<StructWithBinary>();
+        Holder<StructWithBinary> y = new Holder<>(yOriginal);
+        Holder<StructWithBinary> z = new Holder<>();
 
         StructWithBinary ret;
         if (testDocLiteral) {
@@ -1419,10 +1402,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     protected boolean equals(ChoiceWithBinary x, ChoiceWithBinary y) {
         if (x.getBase64() != null && y.getBase64() != null) {
             return Arrays.equals(x.getBase64(), y.getBase64());
-        } else {
-            return x.getHex() != null && y.getHex() != null
-                && Arrays.equals(x.getHex(), y.getHex());
         }
+        return x.getHex() != null && y.getHex() != null
+            && Arrays.equals(x.getHex(), y.getHex());
     }
 
     @Test
@@ -1436,8 +1418,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         ChoiceWithBinary yOriginal = new ChoiceWithBinary();
         yOriginal.setHex("hexBinary_y".getBytes());
 
-        Holder<ChoiceWithBinary> y = new Holder<ChoiceWithBinary>(yOriginal);
-        Holder<ChoiceWithBinary> z = new Holder<ChoiceWithBinary>();
+        Holder<ChoiceWithBinary> y = new Holder<>(yOriginal);
+        Holder<ChoiceWithBinary> z = new Holder<>();
 
         ChoiceWithBinary ret;
         if (testDocLiteral) {
@@ -1481,7 +1463,6 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         return false;
     }
 
-    // XXX - Generated code flattens nested choice
     @Test
     public void testChoiceWithGroupChoice() throws Exception {
         if (!shouldRunTest("ChoiceWithGroupChoice")) {
@@ -1492,8 +1473,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         ChoiceWithGroupChoice yOrig = new ChoiceWithGroupChoice();
         yOrig.setVarOtherString("world");
 
-        Holder<ChoiceWithGroupChoice> y = new Holder<ChoiceWithGroupChoice>(yOrig);
-        Holder<ChoiceWithGroupChoice> z = new Holder<ChoiceWithGroupChoice>();
+        Holder<ChoiceWithGroupChoice> y = new Holder<>(yOrig);
+        Holder<ChoiceWithGroupChoice> z = new Holder<>();
 
         ChoiceWithGroupChoice ret;
         if (testDocLiteral) {
@@ -1512,7 +1493,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types2.ChoiceWithGroupSeq;
 
     protected boolean equals(ChoiceWithGroupSeq x, ChoiceWithGroupSeq y) {
@@ -1538,8 +1519,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         }
         return false;
     }
-    
-    // XXX - Generated code flattens nested structs
+
     @Test
     public void testChoiceWithGroupSeq() throws Exception {
         if (!shouldRunTest("ChoiceWithGroupSeq")) {
@@ -1554,8 +1534,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarOtherString("world");
         yOrig.setVarOtherFloat(10.1f);
 
-        Holder<ChoiceWithGroupSeq> y = new Holder<ChoiceWithGroupSeq>(yOrig);
-        Holder<ChoiceWithGroupSeq> z = new Holder<ChoiceWithGroupSeq>();
+        Holder<ChoiceWithGroupSeq> y = new Holder<>(yOrig);
+        Holder<ChoiceWithGroupSeq> z = new Holder<>();
 
         ChoiceWithGroupSeq ret;
         if (testDocLiteral) {
@@ -1574,30 +1554,28 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types2.ChoiceWithGroups;
 
     protected boolean equals(ChoiceWithGroups x, ChoiceWithGroups y) {
         if (x.getVarInt() != null && x.getVarString() != null
             && x.getVarFloat() != null) {
-            return x.getVarInt().compareTo(y.getVarInt()) == 0 
+            return x.getVarInt().compareTo(y.getVarInt()) == 0
                 && x.getVarString().equals(y.getVarString())
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
-        } else {
-            if (x.getVarOtherFloat() != null && y.getVarOtherFloat() != null) {
-                return x.getVarOtherFloat().compareTo(y.getVarOtherFloat()) == 0;
-            }
-            if (x.getVarOtherInt() != null && y.getVarOtherInt() != null) {
-                return x.getVarOtherInt().compareTo(y.getVarOtherInt()) == 0;
-            }
-            if (x.getVarOtherString() != null && y.getVarOtherString() != null) {
-                return x.getVarOtherString().equals(y.getVarOtherString());
-            }
-            return false;
         }
+        if (x.getVarOtherFloat() != null && y.getVarOtherFloat() != null) {
+            return x.getVarOtherFloat().compareTo(y.getVarOtherFloat()) == 0;
+        }
+        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null) {
+            return x.getVarOtherInt().compareTo(y.getVarOtherInt()) == 0;
+        }
+        if (x.getVarOtherString() != null && y.getVarOtherString() != null) {
+            return x.getVarOtherString().equals(y.getVarOtherString());
+        }
+        return false;
     }
-    
-    // XXX - Generated code flattens nested structs
+
     @Test
     public void testChoiceWithGroups() throws Exception {
         if (!shouldRunTest("ChoiceWithGroups")) {
@@ -1610,8 +1588,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         ChoiceWithGroups yOrig = new ChoiceWithGroups();
         yOrig.setVarOtherString("world");
 
-        Holder<ChoiceWithGroups> y = new Holder<ChoiceWithGroups>(yOrig);
-        Holder<ChoiceWithGroups> z = new Holder<ChoiceWithGroups>();
+        Holder<ChoiceWithGroups> y = new Holder<>(yOrig);
+        Holder<ChoiceWithGroups> z = new Holder<>();
 
         ChoiceWithGroups ret;
         if (testDocLiteral) {
@@ -1650,8 +1628,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         y1.setValue("base64b".getBytes());
         y1.setId(2);
 
-        Holder<ExtBase64Binary> y1Holder = new Holder<ExtBase64Binary>(y1);
-        Holder<ExtBase64Binary> z1 = new Holder<ExtBase64Binary>();
+        Holder<ExtBase64Binary> y1Holder = new Holder<>(y1);
+        Holder<ExtBase64Binary> z1 = new Holder<>();
         ExtBase64Binary ret;
         if (testDocLiteral) {
             ret = docClient.testExtBase64Binary(x1, y1Holder, z1);
@@ -1727,12 +1705,12 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarString("hello");
         x.setVarInt(1000);
         x.setAtString("hello attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         y.setVarString("there");
         y.setVarInt(1001);
         y.setAtString("there attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -1742,8 +1720,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yAttrMap.put(yAt3Name, "three");
         yAttrMap.put(yAt4Name, "four");
 
-        Holder<StructWithAnyAttribute> yh = new Holder<StructWithAnyAttribute>(y);
-        Holder<StructWithAnyAttribute> zh = new Holder<StructWithAnyAttribute>();
+        Holder<StructWithAnyAttribute> yh = new Holder<>(y);
+        Holder<StructWithAnyAttribute> zh = new Holder<>();
         StructWithAnyAttribute ret;
         if (testDocLiteral) {
             ret = docClient.testStructWithAnyAttribute(x, yh, zh);
@@ -1789,7 +1767,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             || !equalsNilable(x.getAtInt(), y.getAtInt())) {
             fail("grrr");
             return false;
-        } 
+        }
         return equalsQNameStringPairs(x.getOtherAttributes(), y.getOtherAttributes());
     }
 
@@ -1808,11 +1786,11 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
         x.setVarString("hello");
         x.setAtString("hello attribute");
-        x.setAtInt(new Integer(2000));
+        x.setAtInt(Integer.valueOf(2000));
 
         y.setVarInt(1001);
         y.setAtString("there attribute");
-        y.setAtInt(new Integer(2002));
+        y.setAtInt(Integer.valueOf(2002));
 
         Map<QName, String> xAttrMap = x.getOtherAttributes();
         xAttrMap.put(xAt1Name, "one");
@@ -1822,8 +1800,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yAttrMap.put(yAt3Name, "three");
         yAttrMap.put(yAt4Name, "four");
 
-        Holder<ChoiceWithAnyAttribute> yh = new Holder<ChoiceWithAnyAttribute>(y);
-        Holder<ChoiceWithAnyAttribute> zh = new Holder<ChoiceWithAnyAttribute>();
+        Holder<ChoiceWithAnyAttribute> yh = new Holder<>(y);
+        Holder<ChoiceWithAnyAttribute> zh = new Holder<>();
         ChoiceWithAnyAttribute ret;
         if (testDocLiteral) {
             ret = docClient.testChoiceWithAnyAttribute(x, yh, zh);
@@ -1890,24 +1868,24 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         OccuringStruct x = new OccuringStruct();
-        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString(); 
+        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString();
         theList.add(1.14f);
-        theList.add(new Integer(0));
+        theList.add(Integer.valueOf(0));
         theList.add("x1");
         theList.add(11.14f);
-        theList.add(new Integer(1));
+        theList.add(Integer.valueOf(1));
         theList.add("x2");
         x.setVarAttrib("x_attr");
 
         OccuringStruct yOriginal = new OccuringStruct();
         theList = yOriginal.getVarFloatAndVarIntAndVarString();
         theList.add(3.14f);
-        theList.add(new Integer(42));
+        theList.add(Integer.valueOf(42));
         theList.add("y");
         yOriginal.setVarAttrib("y_attr");
 
-        Holder<OccuringStruct> y = new Holder<OccuringStruct>(yOriginal);
-        Holder<OccuringStruct> z = new Holder<OccuringStruct>();
+        Holder<OccuringStruct> y = new Holder<>(yOriginal);
+        Holder<OccuringStruct> z = new Holder<>();
 
         OccuringStruct ret;
         if (testDocLiteral) {
@@ -1928,7 +1906,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringStruct1;
-    
+
     protected boolean equals(OccuringStruct1 x, OccuringStruct1 y) {
         return equalsFloatIntStringList(x.getVarFloatAndVarIntAndVarString(),
                                         y.getVarFloatAndVarIntAndVarString());
@@ -1939,7 +1917,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         OccuringStruct1 x = new OccuringStruct1();
-        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString(); 
+        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString();
         theList.add(1.1f);
         theList.add(2);
         theList.add("xX");
@@ -1950,8 +1928,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         theList.add(22);
         theList.add("yY");
 
-        Holder<OccuringStruct1> y = new Holder<OccuringStruct1>(yOriginal);
-        Holder<OccuringStruct1> z = new Holder<OccuringStruct1>();
+        Holder<OccuringStruct1> y = new Holder<>(yOriginal);
+        Holder<OccuringStruct1> z = new Holder<>();
 
         OccuringStruct1 ret;
         if (testDocLiteral) {
@@ -1972,7 +1950,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringStruct2;
-    
+
     protected boolean equals(OccuringStruct2 x, OccuringStruct2 y) {
         if (Float.compare(x.getVarFloat(), y.getVarFloat()) != 0) {
             return false;
@@ -2026,8 +2004,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         theList.add(2);
         theList.add("anvil");
 
-        Holder<OccuringStruct2> y = new Holder<OccuringStruct2>(yOriginal);
-        Holder<OccuringStruct2> z = new Holder<OccuringStruct2>();
+        Holder<OccuringStruct2> y = new Holder<>(yOriginal);
+        Holder<OccuringStruct2> z = new Holder<>();
 
         OccuringStruct2 ret;
         if (testDocLiteral) {
@@ -2077,8 +2055,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         theList.add(42);
         yOriginal.setVarAttrib("y_attr");
 
-        Holder<OccuringChoice> y = new Holder<OccuringChoice>(yOriginal);
-        Holder<OccuringChoice> z = new Holder<OccuringChoice>();
+        Holder<OccuringChoice> y = new Holder<>(yOriginal);
+        Holder<OccuringChoice> z = new Holder<>();
 
         OccuringChoice ret;
         if (testDocLiteral) {
@@ -2100,8 +2078,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         theList.add(52);
         theList.add(4.14f);
 
-        y = new Holder<OccuringChoice>(yOriginal);
-        z = new Holder<OccuringChoice>();
+        y = new Holder<>(yOriginal);
+        z = new Holder<>();
 
         if (testDocLiteral) {
             ret = docClient.testOccuringChoice(x, y, z);
@@ -2121,7 +2099,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringChoice1;
-    
+
     @SuppressWarnings("rawtypes")
     protected boolean equals(OccuringChoice1 x, OccuringChoice1 y) {
         List<Comparable> xList = x.getVarFloatOrVarInt();
@@ -2157,14 +2135,14 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         @SuppressWarnings("rawtypes")
         List<Comparable> theList = x.getVarFloatOrVarInt();
         theList.add(0);
-        theList.add(new Float(1.14f));
+        theList.add(Float.valueOf(1.14f));
         theList.add(1);
-        theList.add(new Float(11.14f));
+        theList.add(Float.valueOf(11.14f));
         // leave y empty
         OccuringChoice1 yOriginal = new OccuringChoice1();
 
-        Holder<OccuringChoice1> y = new Holder<OccuringChoice1>(yOriginal);
-        Holder<OccuringChoice1> z = new Holder<OccuringChoice1>();
+        Holder<OccuringChoice1> y = new Holder<>(yOriginal);
+        Holder<OccuringChoice1> z = new Holder<>();
 
         OccuringChoice1 ret;
         if (testDocLiteral) {
@@ -2202,8 +2180,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x.setVarString("x1");
         OccuringChoice2 yOriginal = new OccuringChoice2();
         yOriginal.setVarString("y1");
-        Holder<OccuringChoice2> y = new Holder<OccuringChoice2>(yOriginal);
-        Holder<OccuringChoice2> z = new Holder<OccuringChoice2>();
+        Holder<OccuringChoice2> y = new Holder<>(yOriginal);
+        Holder<OccuringChoice2> z = new Holder<>();
         OccuringChoice2 ret;
         if (testDocLiteral) {
             ret = docClient.testOccuringChoice2(x, y, z);
@@ -2225,8 +2203,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         x = new OccuringChoice2();
         yOriginal = new OccuringChoice2();
         yOriginal.setVarString("y1");
-        y = new Holder<OccuringChoice2>(yOriginal);
-        z = new Holder<OccuringChoice2>();
+        y = new Holder<>(yOriginal);
+        z = new Holder<>();
         if (testDocLiteral) {
             ret = docClient.testOccuringChoice2(x, y, z);
         } else if (testXMLBinding) {
@@ -2253,8 +2231,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             List<Short> x = Arrays.asList((short)10, (short)100);
             List<Short> yOrig = Arrays.asList((short)1000, (short)10);
 
-            Holder<List<Short>> y = new Holder<List<Short>>(yOrig);
-            Holder<List<Short>> z = new Holder<List<Short>>();
+            Holder<List<Short>> y = new Holder<>(yOrig);
+            Holder<List<Short>> z = new Holder<>();
 
             List<Short> ret = testDocLiteral ? docClient.testAnonEnumList(x, y, z) : xmlClient
                 .testAnonEnumList(x, y, z);
@@ -2267,8 +2245,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             Short[] x = {(short)10, (short)100};
             Short[] yOrig = {(short)1000, (short)10};
 
-            Holder<Short[]> y = new Holder<Short[]>(yOrig);
-            Holder<Short[]> z = new Holder<Short[]>();
+            Holder<Short[]> y = new Holder<>(yOrig);
+            Holder<Short[]> z = new Holder<>();
 
             Short[] ret = rpcClient.testAnonEnumList(x, y, z);
 
@@ -2277,11 +2255,11 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue(ret.length == 2);
             if (!perfTestOnly) {
                 for (int i = 0; i < 2; i++) {
-                    assertEquals("testAnonEnumList(): Incorrect value for inout param", x[i].shortValue(),
+                    Assert.assertEquals("testAnonEnumList(): Incorrect value for inout param", x[i].shortValue(),
                                  y.value[i].shortValue());
-                    assertEquals("testAnonEnumList(): Incorrect value for out param", yOrig[i].shortValue(),
+                    Assert.assertEquals("testAnonEnumList(): Incorrect value for out param", yOrig[i].shortValue(),
                                  z.value[i].shortValue());
-                    assertEquals("testAnonEnumList(): Incorrect return value", x[i].shortValue(), ret[i]
+                    Assert.assertEquals("testAnonEnumList(): Incorrect return value", x[i].shortValue(), ret[i]
                         .shortValue());
                 }
             }
@@ -2296,8 +2274,8 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         String x = "5";
         String yOrig = "n/a";
 
-        Holder<String> y = new Holder<String>(yOrig);
-        Holder<String> z = new Holder<String>();
+        Holder<String> y = new Holder<>(yOrig);
+        Holder<String> z = new Holder<>();
         String ret;
         if (testDocLiteral) {
             ret = docClient.testUnionWithAnonEnum(x, y, z);
@@ -2306,9 +2284,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         } else {
             ret = rpcClient.testUnionWithAnonEnum(x, y, z);
         }
-        assertEquals("testUnionWithAnonEnum(): Incorrect value for inout param", x, y.value);
-        assertEquals("testUnionWithAnonEnum(): Incorrect value for out param", yOrig, z.value);
-        assertEquals("testUnionWithAnonEnum(): Incorrect return value", x, ret);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect value for inout param", x, y.value);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect value for out param", yOrig, z.value);
+        Assert.assertEquals("testUnionWithAnonEnum(): Incorrect return value", x, ret);
     }
-    
+
 }

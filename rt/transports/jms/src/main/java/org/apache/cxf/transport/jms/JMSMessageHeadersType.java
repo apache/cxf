@@ -19,42 +19,69 @@
 package org.apache.cxf.transport.jms;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
-//CHECKSTYLE:OFF
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.Topic;
+
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 public class JMSMessageHeadersType {
-    protected List<JMSPropertyType> property;
-    protected String jmsCorrelationID;
-    protected Integer jmsDeliveryMode;
-    protected Long jmsExpiration;
-    protected String jmsMessageID;
-    protected Integer jmsPriority;
-    protected Boolean jmsRedelivered;
-    protected String jmsReplyTo;
-    protected Long jmsTimeStamp;
-    protected String jmsType;
-    protected Long timeToLive;
-    protected String soapjmsTargetService;
-    protected String soapjmsBindingVersion;
-    protected String soapjmsContentType;
-    protected String soapjmsContentEncoding;
-    protected String soapjmssoapAction;
-    protected Boolean soapjmsIsFault;
-    protected String soapjmsRequestURI;
+    private Map<String, Object> properties;
+    private String jmsCorrelationID;
+    private Integer jmsDeliveryMode;
+    private Long jmsExpiration;
+    private String jmsMessageID;
+    private Integer jmsPriority;
+    private Boolean jmsRedelivered;
+    private String jmsReplyTo;
+    private Long jmsTimeStamp;
+    private String jmsType;
+    private Long timeToLive;
+    private String soapjmsTargetService;
+    private String soapjmsBindingVersion;
+    private String soapjmsContentType;
+    private String soapjmsContentEncoding;
+    private String soapjmssoapAction;
+    private Boolean soapjmsIsFault;
+    private String soapjmsRequestURI;
 
+    public JMSMessageHeadersType() {
+        this.properties = new HashMap<>();
+    }
+
+    @Deprecated
     public List<JMSPropertyType> getProperty() {
-        if (property == null) {
-            property = new ArrayList<JMSPropertyType>();
+        List<JMSPropertyType> props = new ArrayList<>();
+        for (Entry<String, Object> entry : properties.entrySet()) {
+            JMSPropertyType prop = new JMSPropertyType();
+            prop.setName(entry.getKey());
+            prop.setValue(entry.getValue());
+            props.add(prop);
         }
-        return this.property;
+        return Collections.unmodifiableList(props);
     }
 
-    public boolean isSetProperty() {
-        return ((this.property != null) && (!this.property.isEmpty()));
+    public void putProperty(String key, Object value) {
+        properties.put(key, value);
     }
 
-    public void unsetProperty() {
-        this.property = null;
+    public Object getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public Set<String> getPropertyKeys() {
+        return properties.keySet();
     }
 
     public String getJMSCorrelationID() {
@@ -66,7 +93,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSCorrelationID() {
-        return (this.jmsCorrelationID != null);
+        return this.jmsCorrelationID != null;
     }
 
     public String getJMSMessageID() {
@@ -78,7 +105,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSMessageID() {
-        return (this.jmsMessageID != null);
+        return this.jmsMessageID != null;
     }
 
     public String getJMSReplyTo() {
@@ -90,7 +117,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSReplyTo() {
-        return (this.jmsReplyTo != null);
+        return this.jmsReplyTo != null;
     }
 
     public String getJMSType() {
@@ -102,7 +129,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSType() {
-        return (this.jmsType != null);
+        return this.jmsType != null;
     }
 
     public String getSOAPJMSTargetService() {
@@ -114,7 +141,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSTargetService() {
-        return (this.soapjmsTargetService != null);
+        return this.soapjmsTargetService != null;
     }
 
     public String getSOAPJMSBindingVersion() {
@@ -126,7 +153,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSBindingVersion() {
-        return (this.soapjmsBindingVersion != null);
+        return this.soapjmsBindingVersion != null;
     }
 
     public String getSOAPJMSContentType() {
@@ -138,7 +165,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSContentType() {
-        return (this.soapjmsContentType != null);
+        return this.soapjmsContentType != null;
     }
 
     public String getSOAPJMSContentEncoding() {
@@ -150,7 +177,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSContentEncoding() {
-        return (this.soapjmsContentEncoding != null);
+        return this.soapjmsContentEncoding != null;
     }
 
     public String getSOAPJMSSOAPAction() {
@@ -162,7 +189,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSSOAPAction() {
-        return (this.soapjmssoapAction != null);
+        return this.soapjmssoapAction != null;
     }
 
     public String getSOAPJMSRequestURI() {
@@ -174,7 +201,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSRequestURI() {
-        return (this.soapjmsRequestURI != null);
+        return this.soapjmsRequestURI != null;
     }
 
     public void setJMSDeliveryMode(int value) {
@@ -186,7 +213,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSDeliveryMode() {
-        return (this.jmsDeliveryMode != null);
+        return this.jmsDeliveryMode != null;
     }
 
     public int getJMSDeliveryMode() {
@@ -202,7 +229,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSExpiration() {
-        return (this.jmsExpiration != null);
+        return this.jmsExpiration != null;
     }
 
     public long getJMSExpiration() {
@@ -218,7 +245,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSPriority() {
-        return (this.jmsPriority != null);
+        return this.jmsPriority != null;
     }
 
     public int getJMSPriority() {
@@ -234,7 +261,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSRedelivered() {
-        return (this.jmsRedelivered != null);
+        return this.jmsRedelivered != null;
     }
 
     public boolean isJMSRedelivered() {
@@ -250,7 +277,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetJMSTimeStamp() {
-        return (this.jmsTimeStamp != null);
+        return this.jmsTimeStamp != null;
     }
 
     public long getJMSTimeStamp() {
@@ -266,7 +293,7 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetTimeToLive() {
-        return (this.timeToLive != null);
+        return this.timeToLive != null;
     }
 
     public long getTimeToLive() {
@@ -282,12 +309,133 @@ public class JMSMessageHeadersType {
     }
 
     public boolean isSetSOAPJMSIsFault() {
-        return (this.soapjmsIsFault != null);
+        return this.soapjmsIsFault != null;
     }
 
     public boolean isSOAPJMSIsFault() {
         return soapjmsIsFault;
     }
 
+    public String getContentType() {
+        String contentType = getSOAPJMSContentType();
+        if (contentType == null) {
+            contentType = (String)getProperty(JMSSpecConstants.CONTENTTYPE_FIELD);
+        }
+        if (contentType == null) {
+            contentType = (String)getProperty(JMSConstants.RS_CONTENT_TYPE);
+        }
+        if (contentType == null) {
+            contentType = (String)getProperty(org.apache.cxf.message.Message.CONTENT_TYPE);
+        }
+        return contentType;
+    }
+
+    public static JMSMessageHeadersType from(Message message) throws JMSException {
+        JMSMessageHeadersType messageHeaders = new JMSMessageHeadersType();
+        messageHeaders.read(message);
+        return messageHeaders;
+    }
+
+    private void read(Message message) throws JMSException {
+        setJMSCorrelationID(message.getJMSCorrelationID());
+        setJMSDeliveryMode(Integer.valueOf(message.getJMSDeliveryMode()));
+        setJMSExpiration(Long.valueOf(message.getJMSExpiration()));
+        setJMSMessageID(message.getJMSMessageID());
+        setJMSPriority(Integer.valueOf(message.getJMSPriority()));
+        setJMSRedelivered(Boolean.valueOf(message.getJMSRedelivered()));
+        setJMSTimeStamp(Long.valueOf(message.getJMSTimestamp()));
+        setJMSType(message.getJMSType());
+        setSOAPJMSTargetService(message.getStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD));
+        setSOAPJMSBindingVersion(message.getStringProperty(JMSSpecConstants.BINDINGVERSION_FIELD));
+        setSOAPJMSContentType(message.getStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD));
+        setSOAPJMSContentEncoding(message.getStringProperty(JMSSpecConstants.CONTENTENCODING_FIELD));
+        setSOAPJMSSOAPAction(message.getStringProperty(JMSSpecConstants.SOAPACTION_FIELD));
+        if (message.propertyExists(JMSSpecConstants.ISFAULT_FIELD)) {
+            setSOAPJMSIsFault(message.getBooleanProperty(JMSSpecConstants.ISFAULT_FIELD));
+        }
+        setSOAPJMSRequestURI(message.getStringProperty(JMSSpecConstants.REQUESTURI_FIELD));
+
+        setJMSReplyTo(getDestName(message));
+        readProperties(message);
+    }
+
+    private String getDestName(Message message) throws JMSException {
+        Destination replyTo = message.getJMSReplyTo();
+        if (replyTo instanceof Queue) {
+            return ((Queue)replyTo).getQueueName();
+        } else if (replyTo instanceof Topic) {
+            return ((Topic)replyTo).getTopicName();
+        }
+        return null;
+    }
+
+    private void readProperties(Message message) throws JMSException {
+        Enumeration<String> enm = CastUtils.cast(message.getPropertyNames());
+        while (enm.hasMoreElements()) {
+            String name = enm.nextElement();
+            String val = message.getStringProperty(name);
+            String unescapedName = name.replace("__", ".");
+            putProperty(unescapedName, val);
+        }
+    }
+
+    public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
+        String name = origName.replace(".", "__");
+        if (value == null) {
+            jmsMessage.setStringProperty(name, null);
+            return;
+        }
+        Class<?> cls = value.getClass();
+        if (cls == String.class) {
+            jmsMessage.setStringProperty(name, (String)value);
+        } else if (cls == Integer.TYPE || cls == Integer.class) {
+            jmsMessage.setIntProperty(name, (Integer)value);
+        } else if (cls == Double.TYPE || cls == Double.class) {
+            jmsMessage.setDoubleProperty(name, (Double)value);
+        } else if (cls == Float.TYPE || cls == Float.class) {
+            jmsMessage.setFloatProperty(name, (Float)value);
+        } else if (cls == Long.TYPE || cls == Long.class) {
+            jmsMessage.setLongProperty(name, (Long)value);
+        } else if (cls == Boolean.TYPE || cls == Boolean.class) {
+            jmsMessage.setBooleanProperty(name, (Boolean)value);
+        } else if (cls == Short.TYPE || cls == Short.class) {
+            jmsMessage.setShortProperty(name, (Short)value);
+        } else if (cls == Byte.TYPE || cls == Byte.class) {
+            jmsMessage.setShortProperty(name, (Byte)value);
+        } else {
+            jmsMessage.setObjectProperty(name, value);
+        }
+    }
+
+    /**
+     * @param jmsMessage
+     * @param messageProperties
+     */
+    public void writeTo(Message jmsMessage)
+        throws JMSException {
+
+        setProp(jmsMessage, JMSSpecConstants.TARGETSERVICE_FIELD, soapjmsTargetService);
+        setProp(jmsMessage, JMSSpecConstants.BINDINGVERSION_FIELD, soapjmsBindingVersion);
+        setProp(jmsMessage, JMSSpecConstants.CONTENTTYPE_FIELD, soapjmsContentType);
+        setProp(jmsMessage, JMSSpecConstants.CONTENTENCODING_FIELD, soapjmsContentEncoding);
+        setProp(jmsMessage, JMSSpecConstants.SOAPACTION_FIELD, soapjmssoapAction);
+        setProp(jmsMessage, JMSSpecConstants.REQUESTURI_FIELD, soapjmsRequestURI);
+
+        if (isSetSOAPJMSIsFault()) {
+            jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, isSOAPJMSIsFault());
+        }
+
+        for (Entry<String, Object> entry : properties.entrySet()) {
+            writeProp(jmsMessage, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void setProp(Message jmsMessage, String name, String value) throws JMSException {
+        if (value != null) {
+            jmsMessage.setStringProperty(name, value);
+        }
+    }
+
+
+
 }
-//CHECKSTYLE:ON

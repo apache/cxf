@@ -56,5 +56,5 @@ public class XmlEncInInterceptor extends AbstractXmlEncInHandler implements Phas
         return Phase.UNMARSHAL;
     }
 
-    
+
 }

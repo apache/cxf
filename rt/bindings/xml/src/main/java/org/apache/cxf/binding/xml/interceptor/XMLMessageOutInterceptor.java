@@ -68,7 +68,7 @@ public class XMLMessageOutInterceptor extends AbstractOutDatabindingInterceptor 
             rootInModel = xmf.getRootNode();
         }
         final int mpn = mi.getMessagePartsNumber();
-        if (boi.isUnwrapped() 
+        if (boi.isUnwrapped()
             || mpn == 1) {
             // wrapper out interceptor created the wrapper
             // or if bare-one-param

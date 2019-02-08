@@ -43,9 +43,9 @@ public final class CorbaObjectReferenceHelper {
     public static final String WSDLI_NAMESPACE_URI = "http://www.w3.org/2006/01/wsdl-instance";
     public static final String ADDRESSING_NAMESPACE_URI = "http://www.w3.org/2005/08/addressing";
     public static final String ADDRESSING_WSDL_NAMESPACE_URI = "http://www.w3.org/2006/05/addressing/wsdl";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaObjectReferenceHelper.class);
-    
+
     private CorbaObjectReferenceHelper() {
         //utility class
     }
@@ -53,7 +53,7 @@ public final class CorbaObjectReferenceHelper {
     public static String getWSDLLocation(Definition wsdlDef) {
         return wsdlDef.getDocumentBaseURI();
     }
-    
+
     public static QName getServiceName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting service name for an object reference");
         Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
@@ -67,7 +67,7 @@ public final class CorbaObjectReferenceHelper {
         }
         return null;
     }
-    
+
     public static String getEndpointName(Binding binding, Definition wsdlDef) {
         LOG.log(Level.FINE, "Getting endpoint name for an object reference");
         Collection<Service> services = CastUtils.cast(wsdlDef.getServices().values());
@@ -81,7 +81,7 @@ public final class CorbaObjectReferenceHelper {
         }
         return null;
     }
-    
+
     public static Binding getDefaultBinding(Object obj, Definition wsdlDef) {
         LOG.log(Level.FINEST, "Getting binding for a default object reference");
         Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
@@ -104,13 +104,13 @@ public final class CorbaObjectReferenceHelper {
     }
 
     public static EprMetaData getBindingForTypeId(String repId, Definition wsdlDef) {
-        LOG.log(Level.FINE, "RepositoryId " + repId 
+        LOG.log(Level.FINE, "RepositoryId " + repId
                 + ", wsdl namespace " + wsdlDef.getTargetNamespace());
         EprMetaData ret = new EprMetaData();
         Collection<Binding> bindings = CastUtils.cast(wsdlDef.getBindings().values());
         for (Binding b : bindings) {
             List<?> extElements = b.getExtensibilityElements();
-            
+
             // Get the list of all extensibility elements
             for (Iterator<?> extIter = extElements.iterator(); extIter.hasNext();) {
                 java.lang.Object element = extIter.next();
@@ -126,7 +126,7 @@ public final class CorbaObjectReferenceHelper {
                 }
             }
         }
-        
+
         if (!ret.isValid()) {
             // recursivly check imports
             Iterator<?> importLists = wsdlDef.getImports().values().iterator();
@@ -135,7 +135,7 @@ public final class CorbaObjectReferenceHelper {
                 for (java.lang.Object imp : imports) {
                     if (imp instanceof Import) {
                         Definition importDef = ((Import)imp).getDefinition();
-                        LOG.log(Level.INFO, "Following import " + importDef.getDocumentBaseURI()); 
+                        LOG.log(Level.INFO, "Following import " + importDef.getDocumentBaseURI());
                         ret = getBindingForTypeId(repId, importDef);
                         if (ret.isValid()) {
                             return ret;
@@ -147,9 +147,9 @@ public final class CorbaObjectReferenceHelper {
         return ret;
     }
 
-    public static String extractTypeIdFromIOR(String url) {        
+    public static String extractTypeIdFromIOR(String url) {
         String ret = "";
-        byte data[] = DatatypeConverter.parseHexBinary(url.substring(4));
+        byte[] data = DatatypeConverter.parseHexBinary(url.substring(4));
         if (data.length > 0) {
             // parse out type_id from IOR CDR encapsulation
             boolean bigIndian = !(data[0] > 0);
@@ -173,14 +173,13 @@ public final class CorbaObjectReferenceHelper {
         if (bigEndian) {
             int partial = ((data[index] << 24) & 0xff000000)
                 | ((data[index + 1] << 16) & 0x00ff0000);
-            return partial | ((data[index + 2] << 8) & 0x0000ff00) 
+            return partial | ((data[index + 2] << 8) & 0x0000ff00)
                 | ((data[index + 3]) & 0x000000ff);
-        } else {
-            int partial = ((data[index]) & 0x000000ff)
-                | ((data[index + 1] << 8) & 0x0000ff00);
-            return partial | ((data[index + 2] << 16) & 0x00ff0000) 
-                | ((data[index + 3] << 24) & 0xff000000);
         }
+        int partial = ((data[index]) & 0x000000ff)
+            | ((data[index + 1] << 8) & 0x0000ff00);
+        return partial | ((data[index + 2] << 16) & 0x00ff0000)
+            | ((data[index + 3] << 24) & 0xff000000);
     }
 
     public static void populateEprInfo(EprMetaData info) {
@@ -200,7 +199,7 @@ public final class CorbaObjectReferenceHelper {
                 }
             }
         }
-        
+
         if (info.getServiceQName() == null) {
             Iterator<?> importLists = wsdlDef.getImports().values().iterator();
             while (info.getServiceQName() == null && importLists.hasNext()) {

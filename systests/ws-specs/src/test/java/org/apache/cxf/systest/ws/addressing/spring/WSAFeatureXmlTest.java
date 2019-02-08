@@ -39,7 +39,11 @@ import org.apache.cxf.ws.addressing.impl.DefaultMessageIdCache;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class WSAFeatureXmlTest extends AbstractCXFTest {
     static final String PORT = TestUtil.getPortNumber(WSAFeatureXmlTest.class);
@@ -52,40 +56,40 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
     @Test
     public void testServerFactory() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
-     
-        assert bus != null;
+
+        assertNotNull(bus != null);
         sf.setServiceBean(new GreeterImpl());
         sf.setAddress("http://localhost:" + PORT + "/test");
         sf.setStart(false);
-        
+
         Configurer c = getBus().getExtension(Configurer.class);
         c.configureBean("server", sf);
-        
+
         Server server = sf.create();
-        
+
         Endpoint endpoint = server.getEndpoint();
         checkAddressInterceptors(endpoint.getInInterceptors());
     }
-    
+
     @Test
     public void testClientProxyFactory() {
-      
-        JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean(); 
-        cf.setAddress("http://localhost:" + PORT + "/test");        
+
+        JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean();
+        cf.setAddress("http://localhost:" + PORT + "/test");
         cf.setServiceClass(Greeter.class);
         cf.setBus(getBus());
         Configurer c = getBus().getExtension(Configurer.class);
         c.configureBean("client.proxyFactory", cf);
         Greeter greeter = (Greeter) cf.create();
-        Client client = ClientProxy.getClient(greeter);        
+        Client client = ClientProxy.getClient(greeter);
         checkAddressInterceptors(client.getInInterceptors());
     }
-    
+
     private void checkAddressInterceptors(List<Interceptor<? extends Message>> interceptors) {
         boolean hasAg = false;
         boolean hasCodec = false;
         Object cache = null;
-        
+
         for (Interceptor<? extends Message> i : interceptors) {
             if (i instanceof MAPAggregator) {
                 hasAg = true;
@@ -94,12 +98,12 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
                 hasCodec = true;
             }
         }
-        
+
         assertTrue(cache instanceof TestCache);
         assertTrue(hasAg);
         assertTrue(hasCodec);
     }
-    
+
     public static class TestCache extends DefaultMessageIdCache {
     }
 }

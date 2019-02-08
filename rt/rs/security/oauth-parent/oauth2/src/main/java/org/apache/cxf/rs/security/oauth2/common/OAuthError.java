@@ -22,25 +22,25 @@ package org.apache.cxf.rs.security.oauth2.common;
  * Captures OAuth2 error properties
  */
 public class OAuthError {
-    
+
     private String error;
     private String errorDescription;
     private String errorUri;
     private String state;
-    
+
     public OAuthError() {
-        
+
     }
-    
+
     public OAuthError(String error) {
         this.error = error;
     }
-    
+
     public OAuthError(String error, String descr) {
         this.error = error;
         this.errorDescription = descr;
     }
-    
+
     /**
      * Sets the error such as "invalid_grant", etc
      * @param error the error
@@ -48,15 +48,15 @@ public class OAuthError {
     public void setError(String error) {
         this.error = error;
     }
-    
+
     /**
-     * Gets the error 
+     * Gets the error
      * @return error
      */
     public String getError() {
         return error;
     }
-    
+
     /**
      * Sets the error description
      * @param errorDescription error description
@@ -64,7 +64,7 @@ public class OAuthError {
     public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
     }
-    
+
     /**
      * Gets the error description
      * @return error description
@@ -72,35 +72,35 @@ public class OAuthError {
     public String getErrorDescription() {
         return errorDescription;
     }
-    
+
     /**
-     * Sets the optional link to the page 
+     * Sets the optional link to the page
      * describing the error in detail
      * @param errorUri error page URI
      */
     public void setErrorUri(String errorUri) {
         this.errorUri = errorUri;
     }
-    
+
     /**
-     * Gets the optional link to the page 
+     * Gets the optional link to the page
      * describing the error in detail
      * @param errorUri error page URI
      */
     public String getErrorUri() {
         return errorUri;
     }
-    
+
     /**
      * Sets the client state token which needs to be returned
-     * to the client alongside the error information 
+     * to the client alongside the error information
      * if it was provided during the client request
      * @param state the client state token
      */
     public void setState(String state) {
         this.state = state;
     }
-    
+
     /**
      * Gets the client state token
      * @return the state

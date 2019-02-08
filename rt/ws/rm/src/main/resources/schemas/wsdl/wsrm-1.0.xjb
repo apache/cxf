@@ -22,6 +22,7 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
   jaxb:extensionBindingPrefixes="xjc">
+  
     <jaxb:bindings schemaLocation="http://schemas.xmlsoap.org/ws/2004/08/addressing" node="/xs:schema">
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.ws.addressing.v200408"/>
@@ -31,7 +32,7 @@
         <jaxb:schemaBindings>
             <jaxb:package name="org.apache.cxf.ws.rm.v200502"/>
         </jaxb:schemaBindings>
-        <jaxb:globalBindings generateIsSetMethod="true"/>
+        <jaxb:globalBindings generateIsSetMethod="true" collectionType="java.util.concurrent.CopyOnWriteArrayList"/>
     </jaxb:bindings>
     <jaxb:bindings schemaLocation="wsrm-1.0.xsd" node="//xs:element[@name='Nack']">
         <jaxb:property>

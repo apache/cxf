@@ -20,7 +20,7 @@
 package org.apache.cxf.javascript.fortest.aegis;
 
 /**
- * 
+ *
  */
 public class BeanWithAnyTypeArray {
     private String string;

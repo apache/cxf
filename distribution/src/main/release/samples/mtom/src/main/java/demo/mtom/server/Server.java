@@ -30,11 +30,11 @@ public class Server {
         Object implementor = new TestMtomPortTypeImpl();
         String address = "http://localhost:9000/mime-test";
         Endpoint ep = Endpoint.publish(address, implementor);
-        Binding binding = ep.getBinding();        
-        ((SOAPBinding)binding).setMTOMEnabled(true);        
+        Binding binding = ep.getBinding();
+        ((SOAPBinding)binding).setMTOMEnabled(true);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

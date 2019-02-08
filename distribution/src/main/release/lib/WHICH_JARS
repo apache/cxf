@@ -37,6 +37,7 @@ For Java2WSDL and WSDL2Java:
 - commons-collections.jar
 - commons-lang.jar
 - cxf-rt-wsdl.jar
+- cxf-rt-tools*.jar
 - cxf-xjc*.jar (optional, these are xjc extensions for providing enhanced
         JAXB code generation)
 
@@ -71,39 +72,27 @@ For standalone HTTP support use Jetty:
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
 - cxf-rt-transports-http-jetty.jar
 
-For standalone HTTP support use Netty:
-- geronimo-servlet.jar
-- netty-*.jar
-- cxf-rt-transports-http-netty.jar
- 
 For Aegis support:
-- jdom.jar (optional, if you want to map xsd:anyType to JDOM)
 - cxf-rt-databinding-aegis.jar
-
-For XmlBeans databinding support:
-- xmlbeans.jar
-- cxf-rt-databinding-xmlbeans.jar
 
 For WS-Security support:
 - wss4j-*.jar
 - xmlsec.jar
 - ehcache-core.jar
 - jasypt.jar
+- cxf-rt-security.jar
 - cxf-rt-ws-security.jar
+- bcprov-jdk15on.jar (optional)
 
 For SAML support in WS-Security
-- joda-time.jar 
-- opensaml.jar
-- openws.jar
-- xmltooling.jar
-- xalan.jar
+- joda-time.jar
+- cryptacular.jar
+- java-support.jar
+- opensaml*.jar
+- commons-code.jar
+- cxf-rt-security-saml.jar
 
 For JAX-RS support:
-- abdera*  (optional: for AtomPub support, but also needed for the 
-            Management log browser console)
-- commons-codec.jar (Needed for Abdera)
-- jaxen.jar (Needed for Abdera)
-- axiom* (Needed for Abdera)
 - javax.ws.rs-api.jar
 - jettison.jar (Needed for JSON services only)
 - oauth*.jar (Needed for OAuth support)
@@ -130,12 +119,14 @@ For the Async HTTP client transport
 
 For CORBA support:
 - antlr.jar
+- cxf-rt-bindings-corba.jar
 
 For JavaScript functionality:
 - js.jar
+- cxf-rt-javascript
+- cxf-rt-frontend-js
 
 For schema validation with the Aegis data binding.
-
  - msv-core.jar
  - xsdlib.jar
  - isorelax.jar

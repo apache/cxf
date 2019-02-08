@@ -47,5 +47,5 @@ public abstract class Apple implements Fruit {
 
     public abstract String getType();
 
-    
+
 }

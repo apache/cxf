@@ -20,11 +20,11 @@
 package org.apache.cxf.jaxws.service;
 
 /**
- * 
+ *
  */
 public class Entity<T> {
     T ent;
-    
+
     public T getEnt() {
         return ent;
     }

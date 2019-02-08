@@ -27,7 +27,7 @@ public class JavaCodeBlock {
     /**
      * Describe expressions here.
      */
-    private List<JavaExpression> expressions = new ArrayList<JavaExpression>();
+    private List<JavaExpression> expressions = new ArrayList<>();
 
     /**
      * Get the <code>Expressions</code> value.

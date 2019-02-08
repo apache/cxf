@@ -27,13 +27,13 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
 
 /**
- * 
+ *
  */
 public final class ForkOnceWSDL2Java {
     private ForkOnceWSDL2Java() {
         //utility
     }
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         File file = new File(args[0]);
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line = reader.readLine();
@@ -43,13 +43,13 @@ public final class ForkOnceWSDL2Java {
                 reader.close();
                 return;
             }
-            String wargs[] = new String[i];
+            String[] wargs = new String[i];
             for (int x = 0; x < i; x++) {
                 wargs[x] = reader.readLine();
             }
-            
+
             new WSDLToJava(wargs).run(new ToolContext());
-            
+
             line = reader.readLine();
         }
         reader.close();

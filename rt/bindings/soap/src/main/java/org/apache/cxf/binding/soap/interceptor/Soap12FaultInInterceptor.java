@@ -51,7 +51,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(Soap12FaultInInterceptor.class);
-    
+
     public Soap12FaultInInterceptor() {
         super(Phase.UNMARSHAL);
         addBefore(ClientFaultConverter.class.getName());
@@ -66,7 +66,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         message.setContent(Exception.class, unmarshalFault(message, reader));
     }
 
-    public static SoapFault unmarshalFault(SoapMessage message, 
+    public static SoapFault unmarshalFault(SoapMessage message,
                                            XMLStreamReader reader) {
         String exMessage = null;
         QName faultCode = null;
@@ -76,13 +76,13 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         Element detail = null;
         String lang = null;
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
-        XPathUtils xu = new XPathUtils(ns);        
+        XPathUtils xu = new XPathUtils(ns);
         try {
             Node mainNode = message.getContent(Node.class);
             Node fault = null;
-            
+
             if (reader instanceof W3CDOMStreamReader) {
                 W3CDOMStreamReader dr = (W3CDOMStreamReader)reader;
                 fault = dr.getCurrentElement();
@@ -100,47 +100,48 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
             } else {
                 fault = StaxUtils.read(new FragmentStreamReader(reader));
             }
-            Element el = (Element)xu.getValue("//s:Fault/s:Code/s:Value", 
-                                      fault, 
+            fault = DOMUtils.getDomElement(fault);
+            Element el = (Element)xu.getValue("//s:Fault/s:Code/s:Value",
+                                      fault,
                                       XPathConstants.NODE);
             if (el != null) {
                 faultCode = DOMUtils.createQName(el.getTextContent(), el);
             }
             
-            el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode", 
-                                      fault, 
+            el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode",
+                                      fault,
                                       XPathConstants.NODE);
             if (el != null) {
-                subCodes = new LinkedList<QName>();
+                subCodes = new LinkedList<>();
                 NodeList vlist = el.getElementsByTagNameNS(Soap12.SOAP_NAMESPACE, "Value");
                 for (int i = 0; i < vlist.getLength(); i++) {
                     Node v = vlist.item(i);
                     subCodes.add(DOMUtils.createQName(v.getTextContent(), v));
                 }
             }
-            
-            exMessage = (String) xu.getValue("//s:Fault/s:Reason/s:Text/text()", 
+
+            exMessage = (String) xu.getValue("//s:Fault/s:Reason/s:Text/text()",
                                              fault,
                                              XPathConstants.STRING);
-            
-            lang = (String) xu.getValue("//s:Fault/s:Reason/s:Text/@xml:lang", 
+
+            lang = (String) xu.getValue("//s:Fault/s:Reason/s:Text/@xml:lang",
                                              fault,
                                              XPathConstants.STRING);
-            
+
             Node detailNode = (Node) xu.getValue("//s:Fault/s:Detail",
                                                  fault,
                                                  XPathConstants.NODE);
             if (detailNode != null) {
                 detail = (Element) detailNode;
             }
-            
-            role = (String) xu.getValue("//s:Fault/s:Role/text()", 
+
+            role = (String) xu.getValue("//s:Fault/s:Role/text()",
                                         fault,
                                         XPathConstants.STRING);
 
-            node = (String) xu.getValue("//s:Fault/s:Node/text()", 
+            node = (String) xu.getValue("//s:Fault/s:Node/text()",
                                         fault,
-                                        XPathConstants.STRING);                       
+                                        XPathConstants.STRING);
         } catch (XMLStreamException e) {
             throw new SoapFault("Could not parse message.",
                                 e,
@@ -151,7 +152,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
             faultCode = Soap12.getInstance().getReceiver();
             exMessage = new Message("INVALID_FAULT", LOG).toString();
         }
-        
+
         SoapFault fault = new SoapFault(exMessage, faultCode);
         fault.setSubCodes(subCodes);
         fault.setDetail(detail);

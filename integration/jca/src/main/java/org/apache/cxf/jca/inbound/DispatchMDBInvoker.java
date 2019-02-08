@@ -30,15 +30,15 @@ import org.apache.cxf.message.Exchange;
 /**
  * DispatchMDBInvoker is executed in the context of a Message Driven Bean
  * that dispatches calls to the target Session Bean where the service logic is
- * implemented.  The target must be a Stateless Session Bean.  Since 
- * DispatchMDBInvoker makes EJB local invocation to the target bean, the 
+ * implemented.  The target must be a Stateless Session Bean.  Since
+ * DispatchMDBInvoker makes EJB local invocation to the target bean, the
  * Message Driven Bean must be configured to include a local reference to
  * the target bean in the deployment descriptor.  The advantage of using
- * DispatchMDBInvoker is that no modification to the resource adapter's 
+ * DispatchMDBInvoker is that no modification to the resource adapter's
  * deployment descriptor (ra.xml) is required to add or remove inbound endpoints.
  */
 public class DispatchMDBInvoker extends MDBInvoker {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchMDBInvoker.class);
 
     private String targetJndiName;
@@ -50,29 +50,29 @@ public class DispatchMDBInvoker extends MDBInvoker {
         super(factory);
         this.targetJndiName = targetJndiName;
     }
-    
+
     @Override
     public Object getServiceObject(Exchange context) {
         MessageEndpoint ep = null;
         MessageEndpoint epFromMessage = null;
-        
+
         if (context != null) {
             epFromMessage = context.getInMessage().getContent(MessageEndpoint.class);
         }
-         
+
         if (epFromMessage == null) {
             ep = getMessageEndpoint();
         } else {
             ep = epFromMessage;
         }
-        
+
         Object target = null;
 
         if (ep == null) {
             LOG.log(Level.SEVERE, "Failed to obtain MessageEndpoint");
             return null;
         }
-        
+
         try {
             target = ((DispatchMDBMessageListener)ep)
                 .lookupTargetObject(targetJndiName);

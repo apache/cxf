@@ -1,0 +1,120 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.cxf.jaxrs.reactor.client;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.RxInvoker;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+public interface ReactorInvoker extends RxInvoker<Mono<?>> {
+    @Override
+    Mono<Response> get();
+
+    @Override
+    <T> Mono<T> get(Class<T> responseType);
+
+    <T> Flux<T> getFlux(Class<T> responseType);
+
+    @Override
+    <T> Mono<T> get(GenericType<T> responseType);
+
+    @Override
+    Mono<Response> put(Entity<?> entity);
+
+    @Override
+    <T> Mono<T> put(Entity<?> entity, Class<T> clazz);
+
+    <T> Flux<T> putFlux(Entity<?> entity, Class<T> responseType);
+
+    @Override
+    <T> Mono<T> put(Entity<?> entity, GenericType<T> type);
+
+    @Override
+    Mono<Response> post(Entity<?> entity);
+
+    @Override
+    <T> Mono<T> post(Entity<?> entity, Class<T> clazz);
+
+    <T> Flux<T> postFlux(Entity<?> entity, Class<T> clazz);
+
+    @Override
+    <T> Mono<T> post(Entity<?> entity, GenericType<T> type);
+
+    @Override
+    Mono<Response> delete();
+
+    @Override
+    <T> Mono<T> delete(Class<T> responseType);
+
+    <T> Flux<T> deleteFlux(Class<T> responseType);
+
+    @Override
+    <T> Mono<T> delete(GenericType<T> responseType);
+
+    @Override
+    Mono<Response> head();
+
+    @Override
+    Mono<Response> options();
+
+    @Override
+    <T> Mono<T> options(Class<T> responseType);
+
+    <T> Flux<T> optionsFlux(Class<T> responseType);
+
+    @Override
+    <T> Mono<T> options(GenericType<T> responseType);
+
+    @Override
+    Mono<Response> trace();
+
+    @Override
+    <T> Mono<T> trace(Class<T> responseType);
+
+    <T> Flux<T> traceFlux(Class<T> responseType);
+
+    @Override
+    <T> Mono<T> trace(GenericType<T> responseType);
+
+    @Override
+    Mono<Response> method(String name);
+
+    @Override
+    <T> Mono<T> method(String name, Class<T> responseType);
+
+    @Override
+    <T> Mono<T> method(String name, GenericType<T> responseType);
+
+    @Override
+    Mono<Response> method(String name, Entity<?> entity);
+
+    @Override
+    <T> Mono<T> method(String name, Entity<?> entity, Class<T> responseType);
+
+    @Override
+    <T> Mono<T> method(String name, Entity<?> entity, GenericType<T> responseType);
+
+    <T> Flux<T> flux(String name, Class<T> responseType);
+
+    <T> Flux<T> flux(String name, Entity<?> entity, Class<T> responseType);
+}

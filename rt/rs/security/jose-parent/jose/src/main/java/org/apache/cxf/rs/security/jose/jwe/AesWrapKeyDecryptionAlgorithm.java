@@ -25,23 +25,23 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
-    public AesWrapKeyDecryptionAlgorithm(String encodedKey) {    
+    public AesWrapKeyDecryptionAlgorithm(String encodedKey) {
         this(encodedKey, KeyAlgorithm.A128KW);
     }
-    public AesWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {    
+    public AesWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {
         this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
-    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
+    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey) {
         this(secretKey, KeyAlgorithm.A128KW);
     }
-    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {    
-        this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES_WRAP_ALGO_JAVA), 
+    public AesWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {
+        this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES_WRAP_ALGO_JAVA),
              supportedAlgo);
     }
     public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey) {
         this(secretKey, null);
     }
-    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey, KeyAlgorithm supportedAlgo) {    
+    public AesWrapKeyDecryptionAlgorithm(SecretKey secretKey, KeyAlgorithm supportedAlgo) {
         super(secretKey, supportedAlgo);
     }
     @Override
@@ -51,9 +51,9 @@ public class AesWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm
             reportInvalidKeyAlgorithm(keyAlgo);
         }
     }
-    
+
     protected boolean isValidAlgorithmFamily(String keyAlgo) {
         return AlgorithmUtils.isAesKeyWrap(keyAlgo);
     }
-    
+
 }

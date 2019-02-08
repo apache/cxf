@@ -41,14 +41,17 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class HttpConduitConfigurationTest extends Assert {
+public class HttpConduitConfigurationTest {
     private static EndpointInfo ei;
     private Bus bus;
 
@@ -58,20 +61,20 @@ public class HttpConduitConfigurationTest extends Assert {
         ei.setName(new QName("http://apache.org/hello_world", "HelloWorld"));
         ei.setAddress("https://localhost:8443/nopath");
     }
-    
+
     @After
     public void tearDown() {
         bus.shutdown(true);
         BusFactory.setDefaultBus(null);
     }
-    
+
     @Test
     public void testConduitBean() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         bus = factory.createBus("org/apache/cxf/transport/http/spring/conduit-bean.xml");
         HTTPTransportFactory atf = new HTTPTransportFactory();
         HTTPConduit conduit = (HTTPConduit)atf.getConduit(ei, bus);
-        
+
         verifyConduit(conduit);
     }
 
@@ -94,33 +97,33 @@ public class HttpConduitConfigurationTest extends Assert {
         assertNotNull(tlscps);
         assertTrue(tlscps.isDisableCNCheck());
         assertEquals(3600000, tlscps.getSslCacheTimeout());
-        
+
         KeyManager[] kms = tlscps.getKeyManagers();
         assertTrue(kms != null && kms.length == 1);
         assertTrue(kms[0] instanceof X509KeyManager);
-        
-        TrustManager[] tms = tlscps.getTrustManagers(); 
+
+        TrustManager[] tms = tlscps.getTrustManagers();
         assertTrue(tms != null && tms.length == 1);
         assertTrue(tms[0] instanceof X509TrustManager);
-        
+
         FiltersType csfs = tlscps.getCipherSuitesFilter();
         assertNotNull(csfs);
-        assertEquals(5, csfs.getInclude().size());
+        assertEquals(1, csfs.getInclude().size());
         assertEquals(1, csfs.getExclude().size());
         HTTPClientPolicy clientPolicy = conduit.getClient();
         assertEquals(10240, clientPolicy.getChunkLength());
     }
 
-    
+
     public static final class ManagersFactory {
-    
+
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
             KeyStoreType kst = new KeyStoreType();
             kst.setResource("org/apache/cxf/transport/https/resources/Bethal.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             kmt.setKeyStore(kst);
             kmt.setKeyPassword("password");
             try {
@@ -129,17 +132,17 @@ public class HttpConduitConfigurationTest extends Assert {
                 throw new RuntimeException("failed to retrieve key managers", e);
             }
         }
-    
+
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
             kst.setResource("org/apache/cxf/transport/https/resources/Gordy.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             tmt.setKeyStore(kst);
             try {
-                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+                return TLSParameterJaxBUtils.getTrustManagers(tmt, false);
             } catch (Exception e) {
                 throw new RuntimeException("failed to retrieve trust managers", e);
             }

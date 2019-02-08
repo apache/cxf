@@ -27,10 +27,10 @@ import org.apache.cxf.message.Message;
 public interface ContinuationProviderFactory {
 
     /**
-     * If this factory can support the given req/resp and 
+     * If this factory can support the given req/resp and
      * provide a ContinuationProvider, it should create one
      * and return it.
-     * 
+     *
      * @param inMessage
      * @param req
      * @param resp
@@ -46,5 +46,5 @@ public interface ContinuationProviderFactory {
      * @return
      */
     Message retrieveFromContinuation(HttpServletRequest req);
-    
+
 }

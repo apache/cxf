@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
@@ -38,24 +39,29 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "security.username" property. The client then invokes on the service 
- * provider using the returned token from the STS. 
+ * by parsing the SecurityConstants.USERNAME property. The client then invokes on the service
+ * provider using the returned token from the STS.
  */
 public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -64,14 +70,11 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
             // set this to false to fork
             launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-x509.xml");
+        assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -83,27 +86,27 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
      */
     @org.junit.Test
     public void testUsernameOnBehalfOfCaching() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort2");
-        
+
         //
         // Proxy no. 1
-        // 
-        DoubleItPortType port = 
+        //
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
-        
+
         TokenStore tokenStore = new MemoryTokenStore();
         ((BindingProvider)port).getRequestContext().put(
             TokenStore.class.getName(), tokenStore
@@ -111,31 +114,31 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
 
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         doubleIt(port, 25);
-        
+
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)port;
         clearSTSClient(p);
-        
+
         // This invocation should be successful as the token is cached
         doubleIt(port, 25);
-        
+
         ((java.io.Closeable)port).close();
-        // 
+        //
         // Proxy no. 2
         //
-        DoubleItPortType port2 = 
+        DoubleItPortType port2 =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port2, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port2, STSPORT2);
-        
+
         // Change the STSClient so that it can no longer find the STS
         p = (BindingProvider)port2;
         clearSTSClient(p);
-        
+
         // This should fail as the cache is not being used
         try {
             doubleIt(port2, 40);
@@ -143,14 +146,14 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Set the cache correctly
         p.getRequestContext().put(TokenStore.class.getName(), tokenStore);
-        
+
         // Make another invocation - this should succeed as the token is cached
-        p.getRequestContext().put("security.username", "alice");
+        p.getRequestContext().put(SecurityConstants.USERNAME, "alice");
         doubleIt(port2, 40);
-        
+
         // Reset the cache - this invocation should fail
         p.getRequestContext().put(TokenStore.class.getName(), new MemoryTokenStore());
         p.getRequestContext().put(SecurityConstants.TOKEN, new SecurityToken());
@@ -160,52 +163,52 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port2).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * Test caching the issued token when the STSClient is deployed in an intermediary
      */
     @org.junit.Test
     public void testDifferentUsersCaching() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort3");
-        
-        DoubleItPortType port = 
+
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
-        
+
         // Disable storing tokens per-proxy
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
-        
+
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         doubleIt(port, 25);
-        
+
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "bob"
+            SecurityConstants.USERNAME, "bob"
         );
         doubleIt(port, 30);
-        
+
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "eve"
+            SecurityConstants.USERNAME, "eve"
         );
         try {
             doubleIt(port, 30);
@@ -213,24 +216,24 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             //
         }
-        
+
         // Change the STSClient so that it can no longer find the STS
         BindingProvider p = (BindingProvider)port;
         clearSTSClient(p);
-        
+
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         doubleIt(port, 25);
-        
+
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "bob"
+            SecurityConstants.USERNAME, "bob"
         );
         doubleIt(port, 30);
-        
+
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "eve2"
+            SecurityConstants.USERNAME, "eve2"
         );
         try {
             doubleIt(port, 30);
@@ -238,11 +241,11 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             //
         }
-        
+
         // Reset the cache - this invocation should fail
         p.getRequestContext().put(TokenStore.class.getName(), new MemoryTokenStore());
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         try {
             doubleIt(port, 30);
@@ -250,89 +253,89 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             //
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * Test caching the issued token when the STSClient is deployed in an intermediary
      */
     @org.junit.Test
     public void testAppliesToCaching() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort4");
-        
-        DoubleItPortType port = 
+
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-       
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
-        
+
         // Disable storing tokens per-proxy
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
-        
+
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         BindingProvider p = (BindingProvider)port;
         p.getRequestContext().put(
-            SecurityConstants.STS_APPLIES_TO, 
+            SecurityConstants.STS_APPLIES_TO,
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew"
         );
         doubleIt(port, 25);
-        
+
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "bob"
+            SecurityConstants.USERNAME, "bob"
         );
         p.getRequestContext().put(
-            SecurityConstants.STS_APPLIES_TO, 
+            SecurityConstants.STS_APPLIES_TO,
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
         doubleIt(port, 25);
-        
+
         // Change the STSClient so that it can no longer find the STS
         clearSTSClient(p);
-        
+
         // Make a successful invocation - should work as token is cached
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         p.getRequestContext().put(
-            SecurityConstants.STS_APPLIES_TO, 
+            SecurityConstants.STS_APPLIES_TO,
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew"
         );
         doubleIt(port, 25);
-        
+
         // Make a successful invocation - should work as token is cached
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "bob"
+            SecurityConstants.USERNAME, "bob"
         );
         p.getRequestContext().put(
-            SecurityConstants.STS_APPLIES_TO, 
+            SecurityConstants.STS_APPLIES_TO,
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
         doubleIt(port, 25);
-        
+
         // Change appliesTo - should fail
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         p.getRequestContext().put(
-            SecurityConstants.STS_APPLIES_TO, 
+            SecurityConstants.STS_APPLIES_TO,
             "http://localhost:" + PORT + "/doubleit/services/doubleitasymmetricnew2"
         );
         try {
@@ -341,42 +344,42 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             //
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * Test caching the issued token when the STSClient is deployed in an intermediary
      */
     @org.junit.Test
     public void testNoAppliesToCaching() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameOnBehalfOfCachingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = UsernameOnBehalfOfCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort5");
-        
-        DoubleItPortType port = 
+
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-         
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
-        
+
         // Disable storing tokens per-proxy
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, "false"
         );
-        
+
         // Make a successful invocation
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         // Disable appliesTo
         BindingProvider p = (BindingProvider)port;
@@ -386,16 +389,16 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         }
         stsClient.setEnableAppliesTo(false);
         doubleIt(port, 25);
-        
+
         // Change the STSClient so that it can no longer find the STS
         clearSTSClient(p);
-        
+
         // This should work
         doubleIt(port, 25);
-        
+
         // Bob should fail
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "bob"
+            SecurityConstants.USERNAME, "bob"
         );
         try {
             doubleIt(port, 30);
@@ -403,11 +406,11 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         } catch (Exception ex) {
             //
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     private void clearSTSClient(BindingProvider p) throws BusException, EndpointException {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
         if (stsClient == null) {
@@ -417,7 +420,7 @@ public class UsernameOnBehalfOfCachingTest extends AbstractBusClientServerTestBa
         stsClient.setWsdlLocation(null);
         stsClient.setLocation(null);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(2 * numToDouble, resp);

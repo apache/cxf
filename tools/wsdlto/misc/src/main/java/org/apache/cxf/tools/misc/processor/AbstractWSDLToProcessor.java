@@ -59,8 +59,8 @@ public class AbstractWSDLToProcessor implements Processor {
 
     protected ClassCollector classColletor;
     private Map<String, WSDLExtensibilityPlugin> wsdlPlugins
-        = new HashMap<String, WSDLExtensibilityPlugin>();
-    
+        = new HashMap<>();
+
 
 
     protected Writer getOutputWriter(String newNameExt) throws ToolException {
@@ -122,13 +122,13 @@ public class AbstractWSDLToProcessor implements Processor {
         }
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         mgr.removeDefinition(wsdlDefinition);
-        
+
         wsdlFactory = mgr.getWSDLFactory();
         extReg = mgr.getExtensionRegistry();
         wsdlPlugins = builder.getWSDLPlugins();
     }
 
-    
+
     public WSDLExtensibilityPlugin getWSDLPlugin(final String key, final Class<?> clz) {
         StringBuilder sb = new StringBuilder();
         sb.append(key);
@@ -140,7 +140,7 @@ public class AbstractWSDLToProcessor implements Processor {
         }
         return plugin;
     }
-    
+
 
     protected void init() throws ToolException {
 
@@ -199,7 +199,7 @@ public class AbstractWSDLToProcessor implements Processor {
             System.err.println("Parsing schema warning " + exception.toString());
         }
     }
-    
+
     public boolean validate(final Definition def, ToolContext context, Bus bus) throws ToolException {
         return new WSDL11Validator(def, context, bus).isValid();
     }

@@ -19,47 +19,64 @@
 
 package org.apache.cxf.clustering.circuitbreaker;
 
+
 import org.apache.cxf.clustering.CircuitBreakerTargetSelector;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
-
-import static org.apache.cxf.clustering.CircuitBreakerTargetSelector.DEFAULT_THESHOLD;
-import static org.apache.cxf.clustering.CircuitBreakerTargetSelector.DEFAULT_TIMEOUT;
 
 public class CircuitBreakerFailoverFeature extends FailoverFeature {
     private int threshold;
     private long timeout;
     private FailoverTargetSelector targetSelector;
-    
+
     public CircuitBreakerFailoverFeature() {
-        this(DEFAULT_THESHOLD, DEFAULT_TIMEOUT);
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
+             CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);
     }
-    
+
+    public CircuitBreakerFailoverFeature(String clientBootstrapAddress) {
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
+             CircuitBreakerTargetSelector.DEFAULT_TIMEOUT,
+             clientBootstrapAddress);
+    }
+
     public CircuitBreakerFailoverFeature(int threshold, long timeout) {
         this.threshold = threshold;
         this.timeout = timeout;
     }
-    
+
+    public CircuitBreakerFailoverFeature(int threshold, long timeout, String clientBootstrapAddress) {
+        super(clientBootstrapAddress);
+        this.threshold = threshold;
+        this.timeout = timeout;
+    }
+
     @Override
     public FailoverTargetSelector getTargetSelector() {
         if (this.targetSelector == null) {
-            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout);
+            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout,
+                                                                   super.getClientBootstrapAddress());
         }
         return this.targetSelector;
     }
-    
+
+    @Override
+    public void setTargetSelector(FailoverTargetSelector targetSelector) {
+        this.targetSelector = targetSelector;
+    }
+
     public int getThreshold() {
         return threshold;
     }
-    
+
     public long getTimeout() {
         return timeout;
     }
-    
+
     public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
-    
+
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }

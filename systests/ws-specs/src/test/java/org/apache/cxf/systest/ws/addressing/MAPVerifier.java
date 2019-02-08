@@ -41,16 +41,16 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  */
 public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     VerificationCache verificationCache;
-    List<String> expectedExposedAs = new ArrayList<String>();
+    List<String> expectedExposedAs = new ArrayList<>();
     private Map<String, Object> mapProperties;
 
     public MAPVerifier() {
         super(Phase.POST_LOGICAL);
-        mapProperties = new HashMap<String, Object>();
-        mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
-        mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
+        mapProperties = new HashMap<>();
+        mapProperties.put(MAPTestBase.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
+        mapProperties.put(MAPTestBase.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }
-    
+
     public void handleMessage(Message message) {
         verify(message);
     }
@@ -61,11 +61,11 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
 
     private void verify(Message message) {
         boolean isOutbound = ContextUtils.isOutbound(message);
-        String mapProperty = 
-            (String)mapProperties.get(isOutbound 
-                                      ? MAPTest.OUTBOUND_KEY
-                                      : MAPTest.INBOUND_KEY);
-        AddressingProperties maps = 
+        String mapProperty =
+            (String)mapProperties.get(isOutbound
+                                      ? MAPTestBase.OUTBOUND_KEY
+                                      : MAPTestBase.INBOUND_KEY);
+        AddressingProperties maps =
             (AddressingProperties)message.get(mapProperty);
         if (maps == null) {
             return;
@@ -89,22 +89,22 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
                 exposeAs = null;
             }
         }
-        verificationCache.put(MAPTest.verifyMAPs(maps, this));
+        verificationCache.put(MAPTestBase.verifyMAPs(maps, this));
     }
-    
+
     private String getExpectedExposeAs(boolean remove) {
         int size = expectedExposedAs.size();
-        return  size == 0 
+        return size == 0
                 ? null
                 : remove
                   ? expectedExposedAs.remove(size - 1)
                   : expectedExposedAs.get(size - 1);
     }
-    
+
     public void setVerificationCache(VerificationCache cache) {
         verificationCache = cache;
     }
-    
+
     public void addToExpectedExposedAs(String str) {
         expectedExposedAs.add(str);
     }

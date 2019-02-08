@@ -19,7 +19,6 @@
 
 package demo.handlers.common;
 
-import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -60,7 +59,7 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
                 JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
                 Object payload = msg.getPayload(jaxbContext);
                 if (payload instanceof JAXBElement) {
-                    payload = ((JAXBElement)payload).getValue();
+                    payload = ((JAXBElement<?>)payload).getValue();
                 }
 
                 if (payload instanceof AddNumbers) {
@@ -77,20 +76,20 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
                         //System.out.printf("SmallNumberHandler addNumbers(%d, %d) == %d\n", a, b, answer);
                         // ok, we've done the calculation, so build the
                         // response and set it as the payload of the message
-                        
+
                         AddNumbersResponse resp = new AddNumbersResponse();
                         resp.setReturn(answer);
                         msg.setPayload(new ObjectFactory().createAddNumbersResponse(resp),
                                        jaxbContext);
-                        
-                        Source src = msg.getPayload();                                             
+
+                        Source src = msg.getPayload();
                         msg.setPayload(src);
-                        
+
                         payload = msg.getPayload(jaxbContext);
                         if (payload instanceof JAXBElement) {
-                            payload = ((JAXBElement)payload).getValue();
+                            payload = ((JAXBElement<?>)payload).getValue();
                         }
-                        
+
                         AddNumbersResponse resp2 = (AddNumbersResponse)payload;
                         if (resp2 == resp) {
                             throw new WebServiceException("Shouldn't be the same object");
@@ -119,10 +118,6 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
 
     public void close(MessageContext ctx) {
         System.out.println("LogicalHandler close called");
-    }
-
-    public void init(Map config) {
-        System.out.println("LogicalHandler init called");
     }
 
     public void destroy() {

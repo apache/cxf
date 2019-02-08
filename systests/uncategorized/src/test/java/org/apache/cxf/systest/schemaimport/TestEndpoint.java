@@ -22,5 +22,5 @@ import javax.jws.WebService;
 
 @WebService(name = "TestEndpoint", targetNamespace = "http://cxf.apache.org/schemaimport")
 public interface TestEndpoint {
-    String echo(final String message);
+    String echo(String message);
 }

@@ -32,7 +32,7 @@ import org.example.contract.doubleit.DoubleItPortType;
  * A utility class for security tests
  */
 public final class SecurityTestUtil {
-    
+
     private static final boolean UNRESTRICTED_POLICIES_INSTALLED;
     static {
         boolean ok = false;
@@ -53,11 +53,11 @@ public final class SecurityTestUtil {
         }
         UNRESTRICTED_POLICIES_INSTALLED = ok;
     }
-    
+
     private SecurityTestUtil() {
         // complete
     }
-    
+
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
@@ -74,18 +74,22 @@ public final class SecurityTestUtil {
             }
         }
     }
-    
+
     public static boolean checkUnrestrictedPoliciesInstalled() {
         return UNRESTRICTED_POLICIES_INSTALLED;
     }
-    
+
     public static void enableStreaming(DoubleItPortType port) {
-        ((BindingProvider)port).getRequestContext().put(
+        enableStreaming((BindingProvider)port);
+    }
+
+    public static void enableStreaming(BindingProvider bindingProvider) {
+        bindingProvider.getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
-        ((BindingProvider)port).getResponseContext().put(
+        bindingProvider.getResponseContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
     }
-    
+
 }

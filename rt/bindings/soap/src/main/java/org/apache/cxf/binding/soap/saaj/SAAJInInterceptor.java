@@ -81,13 +81,12 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 @NoJSR250Annotations
 public class SAAJInInterceptor extends AbstractSoapInterceptor {
     public static final SAAJInInterceptor INSTANCE = new SAAJInInterceptor();
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJInInterceptor.class);
     private static final String BODY_FILLED_IN = SAAJInInterceptor.class.getName() + ".BODY_DONE";
 
     private SAAJPreInInterceptor preInterceptor = SAAJPreInInterceptor.INSTANCE;
-    private List<PhaseInterceptor<? extends Message>> extras 
-        = new ArrayList<PhaseInterceptor<? extends Message>>(1);
+    private List<PhaseInterceptor<? extends Message>> extras = new ArrayList<>(1);
     public SAAJInInterceptor() {
         super(Phase.PRE_PROTOCOL);
         extras.add(preInterceptor);
@@ -95,7 +94,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
     public SAAJInInterceptor(String phase) {
         super(phase);
     }
-    
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return extras;
     }
@@ -107,10 +106,10 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
      */
     public static class SAAJPreInInterceptor extends AbstractSoapInterceptor {
         public static final SAAJPreInInterceptor INSTANCE = new SAAJPreInInterceptor();
-        
+
         private MessageFactory factory11;
         private MessageFactory factory12;
-        
+
         public SAAJPreInInterceptor() {
             super(Phase.READ);
             addBefore(ReadHeadersInterceptor.class.getName());
@@ -134,7 +133,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 MessageFactory factory = getFactory(message);
                 SOAPMessage soapMessage = factory.createMessage();
                 message.setContent(SOAPMessage.class, soapMessage);
-                
+
                 SOAPPart part = soapMessage.getSOAPPart();
                 message.setContent(Node.class, part);
                 message.put(W3CDOMStreamWriter.class, new SAAJStreamWriter(part));
@@ -148,9 +147,9 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
         }
         public synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
             if (message.getVersion() instanceof Soap11) {
-                if (factory11 == null) { 
+                if (factory11 == null) {
                     factory11 = SAAJFactoryResolver.createMessageFactory(message.getVersion());
-                } 
+                }
                 return factory11;
             }
             if (message.getVersion() instanceof Soap12) {
@@ -162,9 +161,9 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             return SAAJFactoryResolver.createMessageFactory(null);
         }
     }
-    
-    
-    
+
+
+
     @SuppressWarnings("unchecked")
     public void handleMessage(SoapMessage message) throws Fault {
         if (isGET(message)) {
@@ -193,6 +192,10 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 StaxUtils.copy(node, new SAAJStreamWriter(part));
             } else {
                 SOAPEnvelope env = soapMessage.getSOAPPart().getEnvelope();
+                if (node == null) {
+                    adjustPrefixes(env, (String)message.get(ReadHeadersInterceptor.ENVELOPE_PREFIX),
+                                   (String)message.get(ReadHeadersInterceptor.BODY_PREFIX));
+                }
                 List<XMLEvent> events = (List<XMLEvent>)message.get(ReadHeadersInterceptor.ENVELOPE_EVENTS);
                 applyEvents(events, env);
                 SOAPBody body = soapMessage.getSOAPBody();
@@ -224,7 +227,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                     soapMessage.addAttachmentPart(ap);
                 }
             }
-            
+
             //replace header element if necessary
             if (message.hasHeaders()) {
                 replaceHeaders(soapMessage, message);
@@ -233,21 +236,21 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             if (soapMessage.getSOAPPart().getEnvelope().getHeader() == null) {
                 soapMessage.getSOAPPart().getEnvelope().addHeader();
             }
-            
+
             //If we have an xmlReader that already is counting the attributes and such
             //then we don't want to rely on the system level defaults in StaxUtils.copy
             //CXF-6173
             boolean secureReader = StaxUtils.isSecureReader(xmlReader, message);
-            StaxUtils.copy(xmlReader, 
-                           new SAAJStreamWriter(soapMessage.getSOAPPart(), 
+            StaxUtils.copy(xmlReader,
+                           new SAAJStreamWriter(soapMessage.getSOAPPart(),
                                                 soapMessage.getSOAPPart().getEnvelope().getBody()),
-                           true, 
+                           true,
                            !secureReader);
             DOMSource bodySource = new DOMSource(soapMessage.getSOAPPart().getEnvelope().getBody());
             xmlReader = StaxUtils.createXMLStreamReader(bodySource);
             xmlReader.nextTag();
             xmlReader.nextTag(); // move past body tag
-            message.setContent(XMLStreamReader.class, xmlReader);           
+            message.setContent(XMLStreamReader.class, xmlReader);
         } catch (SOAPException soape) {
             throw new SoapFault(new org.apache.cxf.common.i18n.Message(
                     "SOAPHANDLERINTERCEPTOR_EXCEPTION", BUNDLE), soape,
@@ -257,6 +260,12 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                     "SOAPHANDLERINTERCEPTOR_EXCEPTION", BUNDLE), e, message
                     .getVersion().getSender());
         }
+    }
+
+    private static void adjustPrefixes(SOAPEnvelope env, String envPrefix, String bodyPrefix) throws SOAPException {
+        SAAJUtils.adjustPrefix(env, envPrefix);
+        SAAJUtils.adjustPrefix(env.getBody(), bodyPrefix);
+        SAAJUtils.adjustPrefix(env.getHeader(), envPrefix);
     }
 
     private static void applyEvents(List<XMLEvent> events, SOAPElement el) throws SOAPException {
@@ -277,13 +286,15 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             return;
         }
         Element elem = DOMUtils.getFirstElement(header);
+        elem = (Element)DOMUtils.getDomElement(elem);
+        
         while (elem != null) {
             Bus b = message.getExchange() == null ? null : message.getExchange().getBus();
-            HeaderProcessor p =  null;
+            HeaderProcessor p = null;
             if (b != null && b.getExtension(HeaderManager.class) != null) {
                 p = b.getExtension(HeaderManager.class).getHeaderProcessor(elem.getNamespaceURI());
             }
-                
+
             Object obj;
             DataBinding dataBinding = null;
             if (p == null || p.getDataBinding() == null) {
@@ -292,28 +303,26 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
                 dataBinding = p.getDataBinding();
                 obj = p.getDataBinding().createReader(Node.class).read(elem);
             }
-            //TODO - add the interceptors
-                
             SoapHeader shead = new SoapHeader(new QName(elem.getNamespaceURI(),
                                                         elem.getLocalName()),
                                                obj,
                                                dataBinding);
             shead.setDirection(SoapHeader.Direction.DIRECTION_IN);
-                
+
             String mu = elem.getAttributeNS(message.getVersion().getNamespace(),
                     message.getVersion().getAttrNameMustUnderstand());
             String act = elem.getAttributeNS(message.getVersion().getNamespace(),
                     message.getVersion().getAttrNameRole());
-                
+
             shead.setActor(act);
             shead.setMustUnderstand(Boolean.valueOf(mu) || "1".equals(mu));
             Header oldHdr = message.getHeader(
                     new QName(elem.getNamespaceURI(), elem.getLocalName()));
             if (oldHdr != null) {
                 message.getHeaders().remove(oldHdr);
-            } 
-            message.getHeaders().add(shead);                        
-            
+            }
+            message.getHeaders().add(shead);
+
             elem = DOMUtils.getNextElement(elem);
         }
     }

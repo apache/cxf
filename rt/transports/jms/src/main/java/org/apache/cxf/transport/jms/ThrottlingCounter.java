@@ -25,7 +25,7 @@ import org.apache.cxf.transport.jms.util.JMSListenerContainer;
 
 /**
  * Counter that throttles a jms listener on a high and low water mark.
- * 
+ *
  * When the counter reaches the high watermark the listener will be stopped.
  * When the counter reaches the low watermark the listener will be started.
  */
@@ -35,26 +35,26 @@ public class ThrottlingCounter implements Counter {
     private final int lowWatermark;
     private final int highWatermark;
     private JMSListenerContainer listenerContainer;
-    
+
     public ThrottlingCounter(int lowWatermark, int highWatermark) {
         this.counter = new AtomicInteger();
-        this.lowWatermark =  lowWatermark;
+        this.lowWatermark = lowWatermark;
         this.highWatermark = highWatermark;
     }
-    
+
     public void setListenerContainer(JMSListenerContainer listenerContainer) {
         this.listenerContainer = listenerContainer;
     }
 
     public final int incrementAndGet() {
         int curCounter = counter.incrementAndGet();
-        if (listenerContainer != null && highWatermark >= 0 
+        if (listenerContainer != null && highWatermark >= 0
             && curCounter >= highWatermark && listenerContainer.isRunning()) {
             listenerContainer.stop();
         }
         return curCounter;
     }
-    
+
     public final int decrementAndGet() {
         int curCounter = counter.decrementAndGet();
         if (listenerContainer != null && curCounter <= lowWatermark && !listenerContainer.isRunning()) {

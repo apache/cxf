@@ -26,7 +26,7 @@ import org.apache.cxf.common.i18n.UncheckedException;
 
 /**
  * This exception is thrown for problems processing WSDL
- * structures. 
+ * structures.
  */
 public class WSDLRuntimeException extends UncheckedException {
 
@@ -43,7 +43,7 @@ public class WSDLRuntimeException extends UncheckedException {
     public WSDLRuntimeException(Throwable cause) {
         super(cause);
     }
-    
+
     public WSDLRuntimeException(Logger log, String msg, Object ... params) {
         super(log, msg, params);
     }

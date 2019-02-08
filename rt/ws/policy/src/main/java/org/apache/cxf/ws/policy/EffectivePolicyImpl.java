@@ -46,32 +46,32 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyContainingAssertion;
 
 /**
- * 
+ *
  */
 public class EffectivePolicyImpl implements EffectivePolicy {
-    
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(EffectivePolicyImpl.class); 
+
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(EffectivePolicyImpl.class);
     private static final Logger LOG = LogUtils.getL7dLogger(EffectivePolicyImpl.class);
-    
-    protected Policy policy;     
+
+    protected Policy policy;
     protected Collection<Assertion> chosenAlternative;
     protected List<Interceptor<? extends org.apache.cxf.message.Message>> interceptors;
-    
+
     public EffectivePolicyImpl() {
     }
-    
+
     public Policy getPolicy() {
-        return policy;        
+        return policy;
     }
-    
+
     public List<Interceptor<? extends org.apache.cxf.message.Message>> getInterceptors() {
         return interceptors;
     }
-    
+
     public Collection<Assertion> getChosenAlternative() {
         return chosenAlternative;
     }
-    
+
     public void initialise(EndpointPolicy epi, PolicyEngine engine, boolean inbound, Message m) {
         initialise(epi, engine, inbound, false, m);
     }
@@ -82,35 +82,35 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (chosenAlternative == null) {
             chooseAlternative(engine, null, m);
         }
-        initialiseInterceptors(engine, inbound, fault, m);  
+        initialiseInterceptors(engine, inbound, fault, m);
     }
-    
-    public void initialise(EndpointInfo ei, 
-                    BindingOperationInfo boi, 
-                    PolicyEngine engine, 
+
+    public void initialise(EndpointInfo ei,
+                    BindingOperationInfo boi,
+                    PolicyEngine engine,
                     Assertor assertor,
                     boolean requestor,
                     boolean request,
                     Message m) {
         initialisePolicy(ei, boi, engine, requestor, request, assertor, m);
         chooseAlternative(engine, assertor, m);
-        initialiseInterceptors(engine, false, m);  
+        initialiseInterceptors(engine, false, m);
     }
-    
-    public void initialise(EndpointInfo ei, 
-                    BindingOperationInfo boi, 
-                    PolicyEngine engine, 
+
+    public void initialise(EndpointInfo ei,
+                    BindingOperationInfo boi,
+                    PolicyEngine engine,
                     Assertor assertor,
                     List<List<Assertion>> incoming,
                     Message m) {
         initialisePolicy(ei, boi, engine, false, false, assertor, m);
         chooseAlternative(engine, assertor, incoming, m);
-        initialiseInterceptors(engine, false, m);  
+        initialiseInterceptors(engine, false, m);
     }
-    
-    public void initialise(EndpointInfo ei, 
-                    BindingOperationInfo boi, 
-                    PolicyEngine engine, 
+
+    public void initialise(EndpointInfo ei,
+                    BindingOperationInfo boi,
+                    PolicyEngine engine,
                     boolean requestor, boolean request,
                     Message m) {
         Assertor assertor = initialisePolicy(ei, boi, engine, requestor, request, null, m);
@@ -123,18 +123,18 @@ public class EffectivePolicyImpl implements EffectivePolicy {
             this.setChosenAlternative(alternative);
         }
     }
-    
-    public void initialise(EndpointInfo ei, 
-                    BindingOperationInfo boi, 
-                    BindingFaultInfo bfi, 
-                    PolicyEngine engine, 
+
+    public void initialise(EndpointInfo ei,
+                    BindingOperationInfo boi,
+                    BindingFaultInfo bfi,
+                    PolicyEngine engine,
                     Assertor assertor,
                     Message m) {
         initialisePolicy(ei, boi, bfi, engine, m);
         chooseAlternative(engine, assertor, m);
-        initialiseInterceptors(engine, false, m);  
+        initialiseInterceptors(engine, false, m);
     }
-    
+
     private <T> T getAssertorAs(Assertor as, Class<T> t) {
         if (t.isInstance(as)) {
             return t.cast(as);
@@ -147,17 +147,17 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         return null;
     }
     Assertor initialisePolicy(EndpointInfo ei,
-                          BindingOperationInfo boi,  
-                          PolicyEngine engine, 
+                          BindingOperationInfo boi,
+                          PolicyEngine engine,
                           boolean requestor,
                           boolean request,
                           Assertor assertor,
                           Message m) {
-        
+
         if (boi.isUnwrapped()) {
             boi = boi.getUnwrappedOperation();
         }
-        
+
         BindingMessageInfo bmi = request ? boi.getInput() : boi.getOutput();
         EndpointPolicy ep;
         if (requestor) {
@@ -169,7 +169,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (ep instanceof EndpointPolicyImpl) {
             assertor = ((EndpointPolicyImpl)ep).getAssertor();
         }
-        
+
         policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi, m));
         if (null != bmi) {
             policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedMessagePolicy(bmi, m));
@@ -177,10 +177,10 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         policy = policy.normalize(engine.getRegistry(), true);
         return assertor;
     }
-    
+
     void initialisePolicy(EndpointInfo ei, BindingOperationInfo boi,
                           BindingFaultInfo bfi, PolicyEngine engine, Message m) {
-        policy = engine.getServerEndpointPolicy(ei, (Destination)null, m).getPolicy();         
+        policy = engine.getServerEndpointPolicy(ei, (Destination)null, m).getPolicy();
         policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedOperationPolicy(boi, m));
         if (bfi != null) {
             policy = policy.merge(((PolicyEngineImpl)engine).getAggregatedFaultPolicy(bfi, m));
@@ -197,37 +197,36 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null == alternative) {
             PolicyUtils.logPolicy(LOG, Level.FINE, "No alternative supported.", getPolicy());
             throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
-        } else {
-            setChosenAlternative(alternative);
-        }   
+        }
+        setChosenAlternative(alternative);
     }
 
     void initialiseInterceptors(PolicyEngine engine, Message m) {
         initialiseInterceptors(engine, false, m);
     }
-    
+
     void initialiseInterceptors(PolicyEngine engine, boolean useIn, Message m) {
         initialiseInterceptors(engine, useIn, false, m);
     }
 
     void initialiseInterceptors(PolicyEngine engine, boolean useIn, boolean fault, Message m) {
         if (((PolicyEngineImpl)engine).getBus() != null) {
-            PolicyInterceptorProviderRegistry reg 
+            PolicyInterceptorProviderRegistry reg
                 = ((PolicyEngineImpl)engine).getBus().getExtension(PolicyInterceptorProviderRegistry.class);
-            Set<Interceptor<? extends org.apache.cxf.message.Message>> out 
-                = new LinkedHashSet<Interceptor<? extends org.apache.cxf.message.Message>>();
+            Set<Interceptor<? extends org.apache.cxf.message.Message>> out
+                = new LinkedHashSet<>();
             for (Assertion a : getChosenAlternative()) {
                 initialiseInterceptors(reg, engine, out, a, useIn, fault, m);
-            }        
+            }
             setInterceptors(new ArrayList<Interceptor<? extends  org.apache.cxf.message.Message>>(out));
         }
     }
-    
-    
+
+
     protected Collection<Assertion> getSupportedAlternatives(PolicyEngine engine,
-                                                             Policy p, 
+                                                             Policy p,
                                                              Message m) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
 
         for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
@@ -243,7 +242,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                                 boolean useIn, boolean fault,
                                 Message m) {
         QName qn = a.getName();
-        
+
         List<Interceptor<? extends org.apache.cxf.message.Message>> i = null;
         if (useIn && !fault) {
             i = reg.getInInterceptorsForAssertion(qn);
@@ -265,19 +264,19 @@ public class EffectivePolicyImpl implements EffectivePolicy {
             }
         }
     }
-    
+
     // for tests
-    
+
     void setPolicy(Policy ep) {
         policy = ep;
     }
-    
+
     void setChosenAlternative(Collection<Assertion> c) {
         chosenAlternative = c;
     }
-    
+
     void setInterceptors(List<Interceptor<? extends org.apache.cxf.message.Message>> out) {
         interceptors = out;
     }
-   
+
 }

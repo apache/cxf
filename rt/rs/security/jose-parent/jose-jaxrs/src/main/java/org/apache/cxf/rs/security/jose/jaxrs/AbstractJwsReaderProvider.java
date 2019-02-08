@@ -18,14 +18,22 @@
  */
 package org.apache.cxf.rs.security.jose.jaxrs;
 
+import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsReaderProvider {
+    private Set<String> protectedHttpHeaders;
+    private boolean validateHttpHeaders;
+    
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
+    private boolean checkEmptyStream;
     
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
@@ -34,17 +42,41 @@ public class AbstractJwsReaderProvider {
     protected JwsSignatureVerifier getInitializedSigVerifier(JwsHeaders headers) {
         JoseUtils.traceHeaders(headers);
         if (sigVerifier != null) {
-            return sigVerifier;    
-        } 
+            return sigVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(headers, true);
     }
-    
+
     public String getDefaultMediaType() {
         return defaultMediaType;
     }
 
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
+    }
+
+    public void setValidateHttpHeaders(boolean validateHttpHeaders) {
+        this.validateHttpHeaders = validateHttpHeaders;
+    }
+    public boolean isValidateHttpHeaders() {
+        return validateHttpHeaders;
+    }
+    
+    protected void validateHttpHeadersIfNeeded(MultivaluedMap<String, String> httpHeaders, JwsHeaders jwsHeaders) {
+        JoseJaxrsUtils.validateHttpHeaders(httpHeaders, 
+                                           jwsHeaders, 
+                                           protectedHttpHeaders);
+    }
+    public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
+        this.protectedHttpHeaders = protectedHttpHeaders;
+    }
+
+    public boolean isCheckEmptyStream() {
+        return checkEmptyStream;
+    }
+
+    public void setCheckEmptyStream(boolean checkEmptyStream) {
+        this.checkEmptyStream = checkEmptyStream;
     }
     
 }

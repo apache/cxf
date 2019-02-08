@@ -42,7 +42,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.mapper.InterfaceMapper;
 
 public class PortTypeProcessor extends AbstractProcessor {
-    private List<QName> operationMap = new ArrayList<QName>();
+    private List<QName> operationMap = new ArrayList<>();
 
     public PortTypeProcessor(ToolContext c) {
         super(c);
@@ -66,10 +66,10 @@ public class PortTypeProcessor extends AbstractProcessor {
             } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
                 intf.setPackageName(jaxwsBinding.getPackage());
             }
-            
-            if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+
+            if (infBinding != null && !infBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().isEmpty()) {
                 intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
             }
 
@@ -78,7 +78,7 @@ public class PortTypeProcessor extends AbstractProcessor {
                 && infBinding.getJaxwsClass() != null
                 && infBinding.getJaxwsClass().getClassName() != null) {
                 name = infBinding.getJaxwsClass().getClassName();
-                
+
                 if (name.contains(".")) {
                     intf.setPackageName(name.substring(0, name.lastIndexOf('.')));
                     name = name.substring(name.lastIndexOf('.') + 1);
@@ -106,11 +106,11 @@ public class PortTypeProcessor extends AbstractProcessor {
             collector.addSeiClassName(intf.getPackageName(),
                                       intf.getName(),
                                       intf.getPackageName() + "." + intf.getName());
-        
+
             interfaceInfo.setProperty("JavaInterface", intf);
-            
+
             if (context.containsKey(ToolConstants.CFG_SEI_SUPER)) {
-                String supers[] = context.getArray(ToolConstants.CFG_SEI_SUPER);
+                String[] supers = context.getArray(ToolConstants.CFG_SEI_SUPER);
                 for (String s : supers) {
                     intf.addSuperInterface(s);
                 }
@@ -118,7 +118,7 @@ public class PortTypeProcessor extends AbstractProcessor {
         }
         return intf;
     }
-    
+
     public void processClassNames(ServiceInfo serviceInfo) throws ToolException {
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         if (interfaceInfo == null) {
@@ -163,9 +163,8 @@ public class PortTypeProcessor extends AbstractProcessor {
     private boolean isOverloading(QName operationName) {
         if (operationMap.contains(operationName)) {
             return true;
-        } else {
-            operationMap.add(operationName);
         }
+        operationMap.add(operationName);
         return false;
     }
 

@@ -20,7 +20,7 @@
 package org.apache.cxf.transport.websocket;
 
 /**
- * 
+ *
  */
 public final class WebSocketConstants {
     public static final String DEFAULT_REQUEST_ID_KEY = "requestId";

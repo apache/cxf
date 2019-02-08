@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.aegis;
 
 /**
- * 
+ *
  */
 public class Team {
     private String name;
@@ -32,7 +32,7 @@ public class Team {
         this.name = name;
         this.city = city;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -45,5 +45,5 @@ public class Team {
     public void setCity(String city) {
         this.city = city;
     }
-    
+
 }

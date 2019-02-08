@@ -24,9 +24,9 @@ import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.SOAPBinding;
 
 @WebService(
-    name = "AddNumbers", 
-    portName = "AddNumbersPort", 
-    targetNamespace = "http://foobar.org/", 
+    name = "AddNumbers",
+    portName = "AddNumbersPort",
+    targetNamespace = "http://foobar.org/",
     serviceName = "AddNumbersService"
 )
 @BindingType(value = SOAPBinding.SOAP11HTTP_BINDING)

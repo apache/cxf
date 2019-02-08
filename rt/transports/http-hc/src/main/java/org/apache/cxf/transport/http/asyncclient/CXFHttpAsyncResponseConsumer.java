@@ -34,11 +34,11 @@ public class CXFHttpAsyncResponseConsumer implements HttpAsyncResponseConsumer<B
     private final SharedInputBuffer buf;
     private final AsyncWrappedOutputStream outstream;
     private final CXFResponseCallback responseCallback;
-    
+
     private volatile boolean completed;
     private volatile Exception exception;
     private volatile HttpResponse response;
-    
+
     public CXFHttpAsyncResponseConsumer(
             final AsyncWrappedOutputStream asyncWrappedOutputStream,
             final SharedInputBuffer buf,

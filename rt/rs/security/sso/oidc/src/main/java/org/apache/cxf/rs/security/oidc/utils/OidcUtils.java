@@ -19,45 +19,97 @@
 package org.apache.cxf.rs.security.oidc.utils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import org.apache.cxf.rs.security.jose.jws.JwsException;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+import org.apache.cxf.rs.security.oidc.common.AbstractUserInfo;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
-import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
+
+    public static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
+    public static final String ID_TOKEN_AT_RESPONSE_TYPE = "id_token token";
+    public static final String CODE_AT_RESPONSE_TYPE = "code token";
+    public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
+    public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
+
     public static final String ID_TOKEN = "id_token";
     public static final String OPENID_SCOPE = "openid";
     public static final String PROFILE_SCOPE = "profile";
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
     public static final String PHONE_SCOPE = "phone";
-    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM, 
-                                                                    UserInfo.PROFILE_CLAIM);
-    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM, 
-                                                                  UserInfo.EMAIL_VERIFIED_CLAIM);
-    public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
-    public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
+
+    public static final List<String> PROFILE_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.NAME_CLAIM,
+                                                   AbstractUserInfo.FAMILY_NAME_CLAIM,
+                                                   AbstractUserInfo.GIVEN_NAME_CLAIM,
+                                                   AbstractUserInfo.MIDDLE_NAME_CLAIM,
+                                                   AbstractUserInfo.NICKNAME_CLAIM,
+                                                   AbstractUserInfo.PREFERRED_USERNAME_CLAIM,
+                                                   AbstractUserInfo.PROFILE_CLAIM,
+                                                   AbstractUserInfo.PICTURE_CLAIM,
+                                                   AbstractUserInfo.WEBSITE_CLAIM,
+                                                   AbstractUserInfo.GENDER_CLAIM,
+                                                   AbstractUserInfo.BIRTHDATE_CLAIM,
+                                                   AbstractUserInfo.ZONEINFO_CLAIM,
+                                                   AbstractUserInfo.LOCALE_CLAIM,
+                                                   AbstractUserInfo.UPDATED_AT_CLAIM));
+    public static final List<String> EMAIL_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.EMAIL_CLAIM,
+                                                   AbstractUserInfo.EMAIL_VERIFIED_CLAIM));
+    public static final List<String> ADDRESS_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.ADDRESS_CLAIM));
+    public static final List<String> PHONE_CLAIMS =
+        Collections.unmodifiableList(Arrays.asList(AbstractUserInfo.PHONE_CLAIM));
+
+    public static final String CLAIMS_PARAM = "claims";
+    public static final String CLAIM_NAMES_PROPERTY = "_claim_names";
+    public static final String CLAIM_SOURCES_PROPERTY = "_claim_sources";
+    public static final String JWT_CLAIM_SOURCE_PROPERTY = "JWT";
+    public static final String ENDPOINT_CLAIM_SOURCE_PROPERTY = "endpoint";
+    public static final String TOKEN_CLAIM_SOURCE_PROPERTY = "access_token";
+
+    public static final String PROMPT_PARAMETER = "prompt";
+    public static final String PROMPT_NONE_VALUE = "none";
+    public static final String PROMPT_CONSENT_VALUE = "consent";
+    public static final String CONSENT_REQUIRED_ERROR = "consent_required";
+
     private static final Map<String, List<String>> SCOPES_MAP;
     static {
-        SCOPES_MAP = new HashMap<String, List<String>>();
+        SCOPES_MAP = new HashMap<>();
         SCOPES_MAP.put(PHONE_SCOPE, PHONE_CLAIMS);
         SCOPES_MAP.put(EMAIL_SCOPE, EMAIL_CLAIMS);
         SCOPES_MAP.put(ADDRESS_SCOPE, ADDRESS_CLAIMS);
         SCOPES_MAP.put(PROFILE_SCOPE, PROFILE_CLAIMS);
     }
-    
+
     private OidcUtils() {
-        
+
     }
+    public static List<String> getPromptValues(MultivaluedMap<String, String> params) {
+        String prompt = params.getFirst(PROMPT_PARAMETER);
+        if (prompt != null) {
+            return Arrays.asList(prompt.trim().split(" "));
+        }
+        return Collections.emptyList();
+    }
+
     public static String getOpenIdScope() {
         return OPENID_SCOPE;
     }
@@ -76,26 +128,31 @@ public final class OidcUtils {
     public static String getAllScopes() {
         return getScope(OPENID_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
     }
-    public static List<String> getScopeProperties(String scope) {
-        return SCOPES_MAP.get(scope);
-    }
-    
-    private static String getScope(String... scopes) {
-        StringBuilder sb = new StringBuilder();
-        for (String scope : scopes) {
-            if (sb.length() > 0) {
-                sb.append(" ");
+
+    public static List<String> getScopeClaims(String... scope) {
+        List<String> claims = new ArrayList<>();
+        if (scope != null) {
+            for (String s : scope) {
+                if (SCOPES_MAP.containsKey(s)) {
+                    claims.addAll(SCOPES_MAP.get(s));
+                }
             }
-            sb.append(scope);
         }
-        return sb.toString();
+        return claims;
+    }
+
+    private static String getScope(String... scopes) {
+        return String.join(" ", scopes);
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt) {
         validateAccessTokenHash(at, jwt, true);
     }
     public static void validateAccessTokenHash(ClientAccessToken at, JwtToken jwt, boolean required) {
+        validateAccessTokenHash(at.getTokenKey(), jwt, required);
+    }
+    public static void validateAccessTokenHash(String accessToken, JwtToken jwt, boolean required) {
         if (required) {
-            validateHash(at.getTokenKey(),
+            validateHash(accessToken,
                          (String)jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM),
                          jwt.getJwsHeaders().getSignatureAlgorithm());
         }
@@ -113,27 +170,36 @@ public final class OidcUtils {
     private static void validateHash(String value, String theHash, SignatureAlgorithm joseAlgo) {
         String hash = calculateHash(value, joseAlgo);
         if (!hash.equals(theHash)) {
-            throw new SecurityException("Invalid hash");
+            throw new OAuthServiceException("Invalid hash");
         }
     }
-    public static String calculateAccessTokenHash(String value, SignatureAlgorithm joseAlgo) {
-        return calculateHash(value, joseAlgo);
+    public static String calculateAccessTokenHash(String value, SignatureAlgorithm sigAlgo) {
+        return calculateHash(value, sigAlgo);
     }
-    public static String calculateAuthorizationCodeHash(String value, SignatureAlgorithm joseAlgo) {
-        return calculateHash(value, joseAlgo);
+    public static String calculateAuthorizationCodeHash(String value, SignatureAlgorithm sigAlgo) {
+        return calculateHash(value, sigAlgo);
     }
-    public static String calculateHash(String value, SignatureAlgorithm joseAlgo) {
-        //TODO: map from the JOSE alg to a signature alg, 
-        // for example, RS256 -> SHA-256 
-        // and calculate the chunk size based on the algo key size
-        // for example SHA-256 -> 256/8 = 32 and 32/2 = 16 bytes
+    private static String calculateHash(String value, SignatureAlgorithm sigAlgo) {
+        if (sigAlgo == SignatureAlgorithm.NONE) {
+            throw new JwsException(JwsException.Error.INVALID_ALGORITHM);
+        }
+        String algoShaSizeString = sigAlgo.getJwaName().substring(2);
+        String javaShaAlgo = "SHA-" + algoShaSizeString;
+        int algoShaSize = Integer.parseInt(algoShaSizeString);
+        int valueHashSize = (algoShaSize / 8) / 2;
         try {
             byte[] atBytes = StringUtils.toBytesASCII(value);
-            byte[] digest = MessageDigestUtils.createDigest(atBytes,  MessageDigestUtils.ALGO_SHA_256);
-            return Base64UrlUtility.encodeChunk(digest, 0, 16);
+            byte[] digest = MessageDigestUtils.createDigest(atBytes,  javaShaAlgo);
+            return Base64UrlUtility.encodeChunk(digest, 0, valueHashSize);
         } catch (NoSuchAlgorithmException ex) {
-            throw new SecurityException(ex);
+            throw new OAuthServiceException(ex);
         }
     }
-    
+    public static void setStateClaimsProperty(OAuthRedirectionState state,
+                                              MultivaluedMap<String, String> params) {
+        String claims = params.getFirst(OidcUtils.CLAIMS_PARAM);
+        if (claims != null) {
+            state.getExtraProperties().put(OidcUtils.CLAIMS_PARAM, claims);
+        }
+    }
 }

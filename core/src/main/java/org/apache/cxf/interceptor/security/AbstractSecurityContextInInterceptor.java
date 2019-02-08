@@ -19,7 +19,6 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -34,55 +33,55 @@ import org.apache.cxf.security.SecurityContext;
 
 public abstract class AbstractSecurityContextInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractSecurityContextInInterceptor.class);
-    
+
     public AbstractSecurityContextInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         SecurityToken token = message.get(SecurityToken.class);
         if (token == null) {
             reportSecurityException("Security Token is not available on the current message");
         }
-        
+
         SecurityContext context = message.get(SecurityContext.class);
         if (context == null || context.getUserPrincipal() == null) {
             reportSecurityException("User Principal is not available on the current message");
         }
-        
+
         Subject subject = null;
         try {
             subject = createSubject(token);
         } catch (Exception ex) {
-            reportSecurityException("Failed Authentication : Subject has not been created, " 
-                                    + ex.getMessage()); 
+            reportSecurityException("Failed Authentication : Subject has not been created, "
+                                    + ex.getMessage());
         }
-        if (subject == null || subject.getPrincipals().size() == 0) {
+        if (subject == null || subject.getPrincipals().isEmpty()) {
             reportSecurityException("Failed Authentication : Invalid Subject");
         }
-        
-        Principal principal = getPrincipal(context.getUserPrincipal(), subject);        
+
+        Principal principal = getPrincipal(context.getUserPrincipal(), subject);
         SecurityContext sc = createSecurityContext(principal, subject);
         message.put(SecurityContext.class, sc);
     }
-    
+
     protected Principal getPrincipal(Principal originalPrincipal, Subject subject) {
         Principal[] ps = subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]);
-        if (ps != null && ps.length > 0 && !(ps[0] instanceof Group)) {
+        if (ps != null && ps.length > 0 
+            && !DefaultSecurityContext.isGroupPrincipal(ps[0])) {
             return ps[0];
-        } else {
-            return originalPrincipal;
         }
+        return originalPrincipal;
     }
-    
+
     protected SecurityContext createSecurityContext(Principal p, Subject subject) {
         return new DefaultSecurityContext(p, subject);
     }
-    
+
     protected abstract Subject createSubject(SecurityToken token);
-    
+
     protected void reportSecurityException(String errorMessage) {
         LOG.severe(errorMessage);
         throw new SecurityException(errorMessage);

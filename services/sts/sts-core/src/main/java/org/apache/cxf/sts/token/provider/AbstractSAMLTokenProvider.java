@@ -38,11 +38,11 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
  * Some abstract functionality for creating a SAML token
  */
 public abstract class AbstractSAMLTokenProvider {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSAMLTokenProvider.class);
-    
+
     protected void signToken(
-        SamlAssertionWrapper assertion, 
+        SamlAssertionWrapper assertion,
         RealmProperties samlRealm,
         STSPropertiesMBean stsProperties,
         KeyRequirements keyRequirements
@@ -74,7 +74,7 @@ public abstract class AbstractSAMLTokenProvider {
             // If none then default to what is configured
             signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
         } else {
-            List<String> supportedAlgorithms = 
+            List<String> supportedAlgorithms =
                 signatureProperties.getAcceptedSignatureAlgorithms();
             if (!supportedAlgorithms.contains(signatureAlgorithm)) {
                 signatureAlgorithm = signatureProperties.getSignatureAlgorithm();
@@ -90,7 +90,7 @@ public abstract class AbstractSAMLTokenProvider {
             // If none then default to what is configured
             c14nAlgorithm = signatureProperties.getC14nAlgorithm();
         } else {
-            List<String> supportedAlgorithms = 
+            List<String> supportedAlgorithms =
                 signatureProperties.getAcceptedC14nAlgorithms();
             if (!supportedAlgorithms.contains(c14nAlgorithm)) {
                 c14nAlgorithm = signatureProperties.getC14nAlgorithm();
@@ -108,10 +108,13 @@ public abstract class AbstractSAMLTokenProvider {
             }
         }
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
-        LOG.fine("Creating SAML Token");
-        callbackHandler.handle(cb);
-        String password = cb[0].getPassword();
+        String password = null;
+        if (callbackHandler != null) {
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            LOG.fine("Creating SAML Token");
+            callbackHandler.handle(cb);
+            password = cb[0].getPassword();
+        }
 
         LOG.fine("Signing SAML Token");
         boolean useKeyValue = signatureProperties.isUseKeyValue();
@@ -120,6 +123,6 @@ public abstract class AbstractSAMLTokenProvider {
             signatureProperties.getDigestAlgorithm()
         );
     }
-    
-    
+
+
 }

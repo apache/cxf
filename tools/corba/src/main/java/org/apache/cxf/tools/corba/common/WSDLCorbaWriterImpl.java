@@ -42,16 +42,16 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
  /*
-  * This class is extending the wsdl4j RI class to print out the 
+  * This class is extending the wsdl4j RI class to print out the
   * extensibility elements at the top of a generated wsdl file.
-  * 
+  *
   */
 public class WSDLCorbaWriterImpl implements WSDLWriter {
 
     public static final int DEFAULT_INDENT_LEVEL = 2;
-    
+
     final WSDLWriter wrapped;
-    
+
     public WSDLCorbaWriterImpl(WSDLWriter orig) {
         wrapped = orig;
     }
@@ -89,7 +89,7 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
             }
             child = DOMUtils.getNextElement(child);
         }
-        
+
         return doc;
     }
 
@@ -103,7 +103,7 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
         if (l == null) {
             return;
         }
-        
+
         for (ExtensibilityElement e : l) {
             if (e instanceof Schema) {
                 Schema sc = (Schema)e;
@@ -122,12 +122,12 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
                     fixSchema(sc, pfx);
                 }
             }
-        }        
+        }
     }
 
 
     private void fixSchema(Schema sc, String pfx) throws ParserConfigurationException {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(sc.getElementType().getNamespaceURI(),
                             pfx + ":" + sc.getElementType().getLocalPart());
         sc.setElement(el);
@@ -147,13 +147,13 @@ public class WSDLCorbaWriterImpl implements WSDLWriter {
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
-    }    
+    }
     public void writeWSDL(Definition wsdlDef, OutputStream sink) throws WSDLException {
         try {
             StaxUtils.writeTo(getDocument(wsdlDef), sink, 2);
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
-    }        
-    
+    }
+
 }

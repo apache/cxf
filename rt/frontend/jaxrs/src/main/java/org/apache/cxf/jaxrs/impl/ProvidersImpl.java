@@ -39,7 +39,7 @@ public class ProvidersImpl implements Providers {
     public ProvidersImpl(Message m) {
         this.m = m;
     }
-    
+
     public <T> MessageBodyReader<T> getMessageBodyReader(
          Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return ProviderFactory.getInstance(m).createMessageBodyReader(

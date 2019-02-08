@@ -27,21 +27,21 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 
 /**
- * 
+ *
  */
 public class TestAssertion implements PolicyAssertion {
-    
+
     private QName name;
     private boolean optional;
-    
+
     public TestAssertion() {
         this(null);
     }
-    
+
     public TestAssertion(QName n) {
         name = n;
     }
-    
+
     public QName getName() {
         return name;
     }
@@ -66,7 +66,6 @@ public class TestAssertion implements PolicyAssertion {
     }
 
     public boolean isAsserted(AssertionInfoMap aim) {
-        // TODO Auto-generated method stub
         return false;
     }
 

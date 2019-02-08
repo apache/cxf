@@ -22,46 +22,48 @@ package org.apache.cxf.systest.jaxrs.security;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerSecuritySpringNoAnnotations.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerSecuritySpringNoAnnotations.class, true));
     }
-    
+
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "ba", 401);
     }
-    
+
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
-    
+
+
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
-    
-      
+
+
 }

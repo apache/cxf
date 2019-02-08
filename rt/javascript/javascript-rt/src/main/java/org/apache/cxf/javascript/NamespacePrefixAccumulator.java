@@ -38,23 +38,23 @@ public class NamespacePrefixAccumulator {
 
     public NamespacePrefixAccumulator(SchemaCollection schemaCollection) {
         attributes = new StringBuilder();
-        prefixes = new HashSet<String>();
-        fallbackNamespacePrefixMap = new HashMap<String, String>();
+        prefixes = new HashSet<>();
+        fallbackNamespacePrefixMap = new HashMap<>();
         nsCounter = 0;
         this.schemaCollection = schemaCollection;
     }
-    
+
     public void collect(String prefix, String uri) {
         if (!("".equals(uri)) && !prefixes.contains(prefix)) {
             attributes.append("xmlns:" + prefix + "='" + uri + "' ");
             prefixes.add(prefix);
         }
     }
-    
+
     public String getAttributes() {
         return attributes.toString();
     }
-    
+
     private String getPrefix(String namespaceURI) {
         if ("".equals(namespaceURI)) {
             throw new RuntimeException("Prefix requested for default namespace.");
@@ -72,7 +72,7 @@ public class NamespacePrefixAccumulator {
         }
         return schemaPrefix;
     }
-    
+
     /**
      * This function obtains a name, perhaps namespace-qualified, for an element.
      * @param elementQName the element.
@@ -81,7 +81,7 @@ public class NamespacePrefixAccumulator {
      */
     public String xmlElementString(QName elementQName, boolean qualified) {
         if (qualified) {
-            // What if there were a prefix in the element's qname? This is not apparently 
+            // What if there were a prefix in the element's qname? This is not apparently
             // something that happens in this environment.
             String prefix = getPrefix(elementQName.getNamespaceURI());
             collect(prefix, elementQName.getNamespaceURI());
@@ -89,7 +89,7 @@ public class NamespacePrefixAccumulator {
         }
         return elementQName.getLocalPart(); // use the non-qualified name.
     }
-    
+
     /**
      * Obtain a suitable name for use in Javascript for an attribute. This function
      * is purely a tribute to the awful modularity of XmlSchema.
@@ -99,7 +99,7 @@ public class NamespacePrefixAccumulator {
      */
     public String xmlAttributeString(XmlSchemaAttribute attribute, boolean qualified) {
         if (qualified) {
-            // What if there were a prefix in the element's qname? This is not apparently 
+            // What if there were a prefix in the element's qname? This is not apparently
             // something that happens in this environment.
             String prefix = getPrefix(attribute.getQName().getNamespaceURI());
             collect(prefix, attribute.getQName().getNamespaceURI());
@@ -107,7 +107,7 @@ public class NamespacePrefixAccumulator {
         }
         return attribute.getName(); // use the non-qualified name.
     }
-    
+
     public String xmlElementString(QName name) { // used with part concrete names
         if ("".equals(name.getNamespaceURI())) {
             return name.getLocalPart();

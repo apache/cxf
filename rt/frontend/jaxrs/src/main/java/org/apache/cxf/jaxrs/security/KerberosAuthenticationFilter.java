@@ -40,12 +40,12 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.SimpleSecurityContext;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
@@ -56,64 +56,63 @@ import org.ietf.jgss.Oid;
 public class KerberosAuthenticationFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(KerberosAuthenticationFilter.class);
-    
+
     private static final String NEGOTIATE_SCHEME = "Negotiate";
     private static final String PROPERTY_USE_KERBEROS_OID = "auth.spnego.useKerberosOid";
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
     private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
-    
+
     private MessageContext messageContext;
     private CallbackHandler callbackHandler;
     private Configuration loginConfig;
     private String loginContextName = "";
     private String servicePrincipalName;
     private String realm;
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
-        
+
         List<String> authHeaders = messageContext.getHttpHeaders()
             .getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeaders == null || authHeaders.size() != 1) {
             LOG.fine("No Authorization header is available");
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
-        String[] authPair = StringUtils.split(authHeaders.get(0), " ");
+        String[] authPair = authHeaders.get(0).split(" ");
         if (authPair.length != 2 || !NEGOTIATE_SCHEME.equalsIgnoreCase(authPair[0])) {
             LOG.fine("Negotiate Authorization scheme is expected");
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
-                
+
         byte[] serviceTicket = getServiceTicket(authPair[1]);
-        
+
         try {
             Subject serviceSubject = loginAndGetSubject();
-            
+
             GSSContext gssContext = createGSSContext();
 
             Subject.doAs(serviceSubject, new ValidateServiceTicketAction(gssContext, serviceTicket));
-            
+
             GSSName srcName = gssContext.getSrcName();
             if (srcName == null) {
                 throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
             }
-            
+
             String complexUserName = srcName.toString();
-            
+
             String simpleUserName = complexUserName;
             int index = simpleUserName.lastIndexOf('@');
             if (index > 0) {
                 simpleUserName = simpleUserName.substring(0, index);
             }
+            Message m = JAXRSUtils.getCurrentMessage();
+            m.put(SecurityContext.class, createSecurityContext(simpleUserName, complexUserName, gssContext));
+
             if (!gssContext.getCredDelegState()) {
                 gssContext.dispose();
                 gssContext = null;
             }
-            Message m = JAXRSUtils.getCurrentMessage();
-            m.put(SecurityContext.class, 
-                new KerberosSecurityContext(new KerberosPrincipal(simpleUserName,
-                                                                  complexUserName),
-                                            gssContext));
-            
+
         } catch (LoginException e) {
             LOG.fine("Unsuccessful JAAS login for the service principal: " + e.getMessage());
             throw ExceptionUtils.toNotAuthorizedException(e, getFaultResponse());
@@ -126,28 +125,33 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         }
     }
 
+    protected SecurityContext createSecurityContext(String simpleUserName, String complexUserName,
+                                                    GSSContext gssContext) {
+        return new KerberosSecurityContext(new KerberosPrincipal(simpleUserName, complexUserName), gssContext);
+    }
+
     protected GSSContext createGSSContext() throws GSSException {
-        boolean useKerberosOid = MessageUtils.isTrue(
+        boolean useKerberosOid = PropertyUtils.isTrue(
             messageContext.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
         Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 
         GSSManager gssManager = GSSManager.getInstance();
-        
+
         String spn = getCompleteServicePrincipalName();
         GSSName gssService = gssManager.createName(spn, null);
-        
-        return gssManager.createContext(gssService.canonicalize(oid), 
+
+        return gssManager.createContext(gssService.canonicalize(oid),
                    oid, null, GSSContext.DEFAULT_LIFETIME);
     }
-    
+
     protected Subject loginAndGetSubject() throws LoginException {
-        
+
         // The login without a callback can work if
         // - Kerberos keytabs are used with a principal name set in the JAAS config
         // - Kerberos is integrated into the OS logon process
         //   meaning that a process which runs this code has the
-        //   user identity  
-        
+        //   user identity
+
         LoginContext lc = null;
         if (!StringUtils.isEmpty(loginContextName) || loginConfig != null) {
             lc = new LoginContext(loginContextName, null, callbackHandler, loginConfig);
@@ -158,7 +162,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         lc.login();
         return lc.getSubject();
     }
-    
+
     private byte[] getServiceTicket(String encodedServiceTicket) {
         try {
             return Base64Utility.decode(encodedServiceTicket);
@@ -166,27 +170,27 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             throw ExceptionUtils.toNotAuthorizedException(null, getFaultResponse());
         }
     }
-    
+
     private static Response getFaultResponse() {
         return JAXRSUtils.toResponseBuilder(401).header(HttpHeaders.WWW_AUTHENTICATE, NEGOTIATE_SCHEME).build();
     }
-    
+
     protected String getCompleteServicePrincipalName() {
-        String name = servicePrincipalName == null 
+        String name = servicePrincipalName == null
             ? "HTTP/" + messageContext.getUriInfo().getBaseUri().getHost() : servicePrincipalName;
-        if (realm != null) {            
+        if (realm != null) {
             name += "@" + realm;
         }
         return name;
-            
-            
+
+
     }
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         this.messageContext = context;
     }
-    
+
     public void setLoginContextName(String contextName) {
         this.loginContextName = contextName;
     }
@@ -203,7 +207,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
         this.callbackHandler = callbackHandler;
     }
 
-    private final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
+    private static final class ValidateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
         private final GSSContext context;
         private final byte[] token;
 
@@ -216,7 +220,7 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             return context.acceptSecContext(token, 0, token.length);
         }
     }
-    
+
     public static class KerberosPrincipal extends SimplePrincipal {
         private static final long serialVersionUID = 1L;
         private String complexName;
@@ -224,12 +228,12 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             super(simpleName);
             this.complexName = complexName;
         }
-        
+
         public String getKerberosName() {
             return complexName;
         }
     }
-    
+
     public static class KerberosSecurityContext extends SimpleSecurityContext {
         private GSSContext context;
         public KerberosSecurityContext(KerberosPrincipal principal,
@@ -237,12 +241,12 @@ public class KerberosAuthenticationFilter implements ContainerRequestFilter {
             super(principal);
             this.context = context;
         }
-        
+
         public GSSContext getGSSContext() {
             return context;
         }
     }
-    
-    
+
+
 
 }

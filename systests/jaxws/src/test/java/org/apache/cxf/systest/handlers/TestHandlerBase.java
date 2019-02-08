@@ -35,7 +35,7 @@ import org.apache.handler_test.PingException;
  * Describe class TestHandlerBase here.
  */
 public abstract class TestHandlerBase {
-   
+
     private static final Logger LOG = LogUtils.getLogger(TestHandlerBase.class);
 
     private static int sid;
@@ -47,20 +47,20 @@ public abstract class TestHandlerBase {
     private int invokeOrderOfHandleFault;
     private int invokeOrderOfClose;
 
-    private Map<String, Integer> methodCallCount = new HashMap<String, Integer>();
+    private Map<String, Integer> methodCallCount = new HashMap<>();
     private final int id;
     private final boolean isServerSideHandler;
 
     public TestHandlerBase(boolean serverSide) {
-        id = ++sid; 
+        id = ++sid;
         isServerSideHandler = serverSide;
     }
 
-    protected void methodCalled(String methodName) { 
+    protected void methodCalled(String methodName) {
         int val = 0;
-        if (methodCallCount.keySet().contains(methodName)) { 
+        if (methodCallCount.keySet().contains(methodName)) {
             val = methodCallCount.get(methodName);
-        } 
+        }
         if ("handleMessage".equals(methodName)) {
             invokeOrderOfHandleMessage = ++sinvokedOrder;
         } else if ("handleFault".equals(methodName)) {
@@ -69,26 +69,26 @@ public abstract class TestHandlerBase {
             invokeOrderOfClose = ++sinvokedOrder;
         }
 
-        val++; 
+        val++;
         methodCallCount.put(methodName, val);
-    } 
+    }
 
     public int getInvokeOrderOfHandleMessage() {
         return invokeOrderOfHandleMessage;
     }
-    
+
     public int getInvokeOrderOfHandleFault() {
         return invokeOrderOfHandleFault;
     }
-    
+
     public int getInvokeOrderOfClose() {
         return invokeOrderOfClose;
-    }  
-    
-    public int getId() {
-        return id; 
     }
-    
+
+    public int getId() {
+        return id;
+    }
+
     public abstract String getHandlerId();
 
     public boolean isCloseInvoked() {
@@ -111,7 +111,7 @@ public abstract class TestHandlerBase {
     public int getCloseInvoked() {
         return getMethodCallCount("close");
     }
-    
+
     public boolean isHandleMessageInvoked() {
         return methodCallCount.containsKey("handleMessage");
     }
@@ -119,27 +119,27 @@ public abstract class TestHandlerBase {
     public int getHandleMessageInvoked() {
         return getMethodCallCount("handleMessage");
     }
-    
+
     public boolean isInitInvoked() {
         return methodCallCount.containsKey("init");
     }
-    
+
     public boolean isPostConstructInvoked() {
         return methodCallCount.containsKey("doPostConstruct");
-    }    
-    
-    public void setHandleMessageRet(boolean ret) { 
-        handleMessageRet = ret; 
     }
 
-    public boolean getHandleMessageRet() { 
-        return handleMessageRet; 
+    public void setHandleMessageRet(boolean ret) {
+        handleMessageRet = ret;
     }
-    
+
+    public boolean getHandleMessageRet() {
+        return handleMessageRet;
+    }
+
     public boolean isServerSideHandler() {
-        return isServerSideHandler; 
-    } 
-    
+        return isServerSideHandler;
+    }
+
     public void verifyJAXWSProperties(MessageContext ctx) throws PingException {
         if (isServerSideHandler() && isOutbound(ctx)) {
             /*
@@ -148,55 +148,55 @@ public abstract class TestHandlerBase {
                 throw new PingException("WSDL_OPERATION not found");
             }
             URI wsdlDescription = (URI)ctx.get(MessageContext.WSDL_DESCRIPTION);
-            if (!wsdlDescription.toString().equals("http://localhost:9005/HandlerTest/SoapPort?wsdl")) {
+            if (!"http://localhost:9005/HandlerTest/SoapPort?wsdl".equals(wsdlDescription.toString())) {
                 throw new PingException("WSDL_DESCRIPTION not found");
             }
             QName wsdlPort = (QName)ctx.get(MessageContext.WSDL_PORT);
-            if (!wsdlPort.getLocalPart().equals("SoapPort")) {
+            if (!"SoapPort".equals(wsdlPort.getLocalPart())) {
                 throw new PingException("WSDL_PORT not found");
-            }       
+            }
             QName wsdlInterface = (QName)ctx.get(MessageContext.WSDL_INTERFACE);
-            if (!wsdlInterface.getLocalPart().equals("HandlerTest")) {
+            if (!"HandlerTest".equals(wsdlInterface.getLocalPart())) {
                 throw new PingException("WSDL_INTERFACE not found");
-            }      
+            }
             QName wsdlService = (QName)ctx.get(MessageContext.WSDL_SERVICE);
-            if (!wsdlService.getLocalPart().equals("HandlerTestService")) {
+            if (!"HandlerTestService".equals(wsdlService.getLocalPart())) {
                 throw new PingException("WSDL_SERVICE not found");
             }
             */
         }
     }
 
-    protected void printHandlerInfo(String methodName, boolean outbound) { 
+    protected void printHandlerInfo(String methodName, boolean outbound) {
         String info = getHandlerId() + " "
             + (outbound ? "outbound" : "inbound") + " "
             + methodName + "   " + Thread.currentThread().getName();
         LOG.info(info);
-    } 
+    }
 
 
-    protected List<String> getHandlerInfoList(MessageContext ctx) { 
-        List<String> handlerInfoList = null; 
-        if (ctx.containsKey("handler.info")) { 
-            handlerInfoList = CastUtils.cast((List<?>)ctx.get("handler.info")); 
+    protected List<String> getHandlerInfoList(MessageContext ctx) {
+        List<String> handlerInfoList = null;
+        if (ctx.containsKey("handler.info")) {
+            handlerInfoList = CastUtils.cast((List<?>)ctx.get("handler.info"));
         } else {
-            handlerInfoList = new ArrayList<String>();
+            handlerInfoList = new ArrayList<>();
             ctx.put("handler.info", handlerInfoList);
             ctx.setScope("handler.info", MessageContext.Scope.APPLICATION);
         }
         return handlerInfoList;
     }
-    
+
     protected boolean isOutbound(MessageContext ctx) {
         return (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
     }
 
-    private int getMethodCallCount(String methodName) { 
+    private int getMethodCallCount(String methodName) {
         int ret = 0;
         if (methodCallCount.containsKey(methodName)) {
-            ret = methodCallCount.get(methodName);             
+            ret = methodCallCount.get(methodName);
         }
         return ret;
-    } 
-    
+    }
+
 }

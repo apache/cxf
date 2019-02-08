@@ -43,24 +43,28 @@ import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.lucene.search.ScoreDoc;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JAXRSClientServerTikaTest.class);
-    
+
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-            
-            final Map< String, Object > properties = new HashMap< String, Object >();        
+
+            final Map< String, Object > properties = new HashMap<>();
             properties.put("search.query.parameter.name", "$filter");
             properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
             properties.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy/MM/dd");
-            
+
             sf.setResourceClasses(BookCatalog.class);
             sf.setResourceProvider(BookCatalog.class, new SingletonResourceProvider(new BookCatalog()));
             sf.setAddress("http://localhost:" + PORT + "/");
@@ -68,7 +72,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             sf.setProvider(new MultipartProvider());
             sf.setProvider(new SearchContextProvider());
             sf.setProvider(new JacksonJsonProvider());
-            
+
             sf.create();
         }
 
@@ -84,7 +88,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -92,49 +96,49 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Before
     public void setUp() {
-        createWebClient("/catalog").delete();        
+        createWebClient("/catalog").delete();
     }
-    
+
     @Test
     public void testUploadIndexAndSearchPdfFile() {
         final WebClient wc = createWebClient("/catalog").type(MediaType.MULTIPART_FORM_DATA);
-        
+
         final ContentDisposition disposition = new ContentDisposition("attachment;filename=testPDF.pdf");
-        final Attachment attachment = new Attachment("root", 
+        final Attachment attachment = new Attachment("root",
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
-        
-        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16T09:00:00");        
+
+        final Collection<ScoreDoc> hits = search("modified=le=2007-09-16T09:00:00");
         assertEquals(hits.size(), 1);
     }
-    
+
     @Test
     public void testUploadIndexAndSearchPdfFileUsingUserDefinedDatePattern() {
         final WebClient wc = createWebClient("/catalog").type(MediaType.MULTIPART_FORM_DATA);
-        
+
         final ContentDisposition disposition = new ContentDisposition("attachment;filename=testPDF.pdf");
-        final Attachment attachment = new Attachment("root", 
+        final Attachment attachment = new Attachment("root",
             getClass().getResourceAsStream("/files/testPDF.pdf"), disposition);
         wc.post(new MultipartBody(attachment));
-        
+
         // Use user-defined date pattern
-        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");        
+        final Collection<ScoreDoc> hits = search("modified=le=2007/09/16");
         assertEquals(hits.size(), 1);
     }
 
     @SuppressWarnings("unchecked")
     private Collection<ScoreDoc> search(final String expression) {
-        return (Collection<ScoreDoc>)createWebClient("/catalog")
+        return createWebClient("/catalog")
             .accept(MediaType.APPLICATION_JSON)
             .query("$filter", expression)
             .get(Collection.class);
     }
-    
+
     private WebClient createWebClient(final String url) {
-        WebClient wc = WebClient.create("http://localhost:" + PORT + url, 
+        WebClient wc = WebClient.create("http://localhost:" + PORT + url,
             Arrays.asList(new MultipartProvider(), new JacksonJsonProvider()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;

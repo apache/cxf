@@ -33,26 +33,19 @@ import org.w3c.dom.Node;
 public class W3CNamespaceContext implements NamespaceContext {
     private Element currentNode;
     private NamespaceContext outNamespaceContext;
-    
+
     public W3CNamespaceContext() {
     }
     public W3CNamespaceContext(Element el) {
         currentNode = el;
     }
-    
+
     public void setOutNamespaceContext(NamespaceContext context) {
         outNamespaceContext = context;
     }
-    
+
     public String getNamespaceURI(String prefix) {
-        String name = prefix;
-        if (name.length() == 0) {
-            name = "xmlns";
-        } else {
-            name = "xmlns:" + prefix;
-        }
-        
-        return getNamespaceURI(currentNode, name);
+        return getNamespaceURI(currentNode, !prefix.isEmpty() ? "xmlns:" + prefix : "xmlns");
     }
 
     private String getNamespaceURI(Element e, String name) {
@@ -66,7 +59,7 @@ public class W3CNamespaceContext implements NamespaceContext {
                 return result;
             }
         }
-        
+
         Attr attr = e.getAttributeNode(name);
         if (attr == null) {
             Node n = e.getParentNode();
@@ -95,7 +88,7 @@ public class W3CNamespaceContext implements NamespaceContext {
                 return result;
             }
         }
-        
+
         NamedNodeMap attributes = e.getAttributes();
         if (attributes != null) {
             for (int i = 0; i < attributes.getLength(); i++) {
@@ -106,9 +99,8 @@ public class W3CNamespaceContext implements NamespaceContext {
                     String name = a.getLocalName();
                     if ("xmlns".equals(name)) {
                         return "";
-                    } else {
-                        return name;
                     }
+                    return name;
                 }
             }
         }
@@ -122,13 +114,13 @@ public class W3CNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String uri) {
-        List<String> prefixes = new ArrayList<String>();
+        List<String> prefixes = new ArrayList<>();
 
         String prefix = getPrefix(uri);
         if (prefix != null) {
             prefixes.add(prefix);
         }
-        
+
         return prefixes.iterator();
     }
 

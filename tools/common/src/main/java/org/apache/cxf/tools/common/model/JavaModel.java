@@ -26,13 +26,13 @@ public class JavaModel {
     private final Map<String, JavaInterface> interfaces;
     private final Map<String, JavaExceptionClass> exceptionClasses;
     private final Map<String, JavaServiceClass> serviceClasses;
-    
+
     private String location;
 
     public JavaModel() {
-        interfaces = new LinkedHashMap<String, JavaInterface>();
-        exceptionClasses = new LinkedHashMap<String, JavaExceptionClass>();
-        serviceClasses = new LinkedHashMap<String, JavaServiceClass>();
+        interfaces = new LinkedHashMap<>();
+        exceptionClasses = new LinkedHashMap<>();
+        serviceClasses = new LinkedHashMap<>();
     }
 
     public void addInterface(String name, JavaInterface i) {
@@ -47,7 +47,7 @@ public class JavaModel {
     public void addExceptionClass(String name, JavaExceptionClass ex) {
         this.exceptionClasses.put(name, ex);
     }
-    
+
     public Map<String, JavaExceptionClass> getExceptionClasses() {
         return this.exceptionClasses;
     }
@@ -55,7 +55,7 @@ public class JavaModel {
     public void addServiceClass(String name, JavaServiceClass service) {
         this.serviceClasses.put(name, service);
     }
-    
+
     public Map<String, JavaServiceClass> getServiceClasses() {
         return this.serviceClasses;
     }

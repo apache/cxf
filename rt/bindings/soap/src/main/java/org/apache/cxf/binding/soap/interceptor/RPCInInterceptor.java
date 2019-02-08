@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -54,7 +55,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
     private static final QName SOAP12_RESULT = new QName("http://www.w3.org/2003/05/soap-rpc",
                                                          "result");
     private static final Logger LOG = LogUtils.getL7dLogger(RPCInInterceptor.class);
-    
+
     public RPCInInterceptor() {
         super(Phase.UNMARSHAL);
     }
@@ -75,8 +76,8 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                         body = info.getOutput().getExtensor(SoapBody.class);
                     } else {
                         body = info.getInput().getExtensor(SoapBody.class);
-                    }        
-                    if (body != null 
+                    }
+                    if (body != null
                         && opName.getNamespaceURI().equals(body.getNamespaceURI())) {
                         return info;
                     }
@@ -107,9 +108,8 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                 // it's doc-lit-bare
                 new BareInInterceptor().handleMessage(message);
                 return;
-            } else {
-                setMessage(message, operation);
             }
+            setMessage(message, operation);
         } else {
             operation = message.getExchange().getBindingOperationInfo();
         }
@@ -122,11 +122,11 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             msg = operation.getOperationInfo().getOutput();
         }
         message.put(MessageInfo.class, msg);
-        
+
         MessageContentsList parameters = new MessageContentsList();
 
         StaxUtils.nextEvent(xmlReader);
-        
+
         boolean hasNext = true;
         Iterator<MessagePartInfo> itr = msg.getMessageParts().iterator();
         while (itr.hasNext()) {
@@ -140,7 +140,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                 if (qn.equals(SOAP12_RESULT)) {
                     //just ignore this.   The parts should work correctly.
                     try {
-                        while (xmlReader.getEventType() != XMLStreamReader.END_ELEMENT) {
+                        while (xmlReader.getEventType() != XMLStreamConstants.END_ELEMENT) {
                             xmlReader.next();
                         }
                         xmlReader.next();
@@ -150,8 +150,8 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                     StaxUtils.toNextElement(xmlReader);
                     qn = xmlReader.getName();
                 }
-                
-                
+
+
                 // WSI-BP states that RPC/Lit part accessors should be completely unqualified
                 // However, older toolkits (Axis 1.x) are qualifying them.   We'll go
                 // ahead and just match on the localpart.   The RPCOutInterceptor
@@ -186,9 +186,9 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
         message.setContent(List.class, parameters);
     }
 
-    
-    
-    private void setMessage(Message message, 
+
+
+    private void setMessage(Message message,
                              BindingOperationInfo operation) {
         Exchange ex = message.getExchange();
         ex.put(BindingOperationInfo.class, operation);
@@ -208,7 +208,7 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
         QName portQName = endpointInfo.getName();
         message.put(Message.WSDL_PORT, portQName);
 
-        
+
         URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
         if (wsdlDescription == null) {
             String address = endpointInfo.getAddress();
@@ -220,8 +220,8 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
             endpointInfo.setProperty("URI", wsdlDescription);
         }
         message.put(Message.WSDL_DESCRIPTION, wsdlDescription);
-        
+
         // configure endpoint and operation level schema validation
-        setOperationSchemaValidation(message);        
-    }    
+        setOperationSchemaValidation(message);
+    }
 }

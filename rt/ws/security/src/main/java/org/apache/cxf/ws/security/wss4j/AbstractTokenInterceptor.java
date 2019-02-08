@@ -49,6 +49,7 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SPConstants;
@@ -60,7 +61,7 @@ import org.apache.wss4j.policy.model.AbstractToken;
  */
 public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSoapInterceptor.class);
-    private static final Set<QName> HEADERS = 
+    private static final Set<QName> HEADERS =
         Collections.singleton(new QName(WSConstants.WSSE_NS, "Security"));
 
     /**
@@ -72,22 +73,22 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
         addAfter(PolicyBasedWSS4JStaxInInterceptor.class.getName());
     }
-    
+
     public Set<QName> getUnderstoodHeaders() {
         return HEADERS;
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
 
-        boolean enableStax = 
-            MessageUtils.isTrue(message.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        boolean enableStax =
+            MessageUtils.getContextualBoolean(message, SecurityConstants.ENABLE_STREAMING_SECURITY, false);
         if (enableStax) {
             return;
         }
-        
+
         boolean isReq = MessageUtils.isRequestor(message);
         boolean isOut = MessageUtils.isOutbound(message);
-        
+
         if (isReq != isOut) {
             //outbound on server side and inbound on client side doesn't need
             //any specific token stuff, assert policies and return
@@ -108,40 +109,40 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             processToken(message);
         }
     }
-    
+
     protected abstract void processToken(SoapMessage message);
-    
+
     protected abstract void addToken(SoapMessage message);
-    
+
     protected abstract AbstractToken assertTokens(SoapMessage message);
-    
+
     protected AbstractToken assertTokens(SoapMessage message, String localname, boolean signed) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, localname);
         AbstractToken tok = null;
         for (AssertionInfo ai : ais) {
             tok = (AbstractToken)ai.getAssertion();
-            ai.setAsserted(true);                
+            ai.setAsserted(true);
         }
-        
+
         PolicyUtils.assertPolicy(aim, SPConstants.SUPPORTING_TOKENS);
-        
+
         if (signed || isTLSInUse(message)) {
             PolicyUtils.assertPolicy(aim, SPConstants.SIGNED_SUPPORTING_TOKENS);
         }
         return tok;
     }
-    
+
     protected boolean isTLSInUse(SoapMessage message) {
         // See whether TLS is in use or not
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         return tlsInfo != null;
     }
-    
+
     protected TokenStore getTokenStore(SoapMessage message) {
         EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = 
+            TokenStore tokenStore =
                 (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
@@ -149,29 +150,29 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             return tokenStore;
         }
     }
-    
+
     protected Header findSecurityHeader(SoapMessage message, boolean create) {
         for (Header h : message.getHeaders()) {
             QName n = h.getName();
-            if (n.getLocalPart().equals("Security")
-                && (n.getNamespaceURI().equals(WSConstants.WSSE_NS) 
-                    || n.getNamespaceURI().equals(WSConstants.WSSE11_NS))) {
+            if ("Security".equals(n.getLocalPart())
+                && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
+                    || n.getNamespaceURI().equals(WSS4JConstants.WSSE11_NS))) {
                 return h;
             }
         }
         if (!create) {
             return null;
         }
-        Document doc = DOMUtils.createDocument();
-        Element el = doc.createElementNS(WSConstants.WSSE_NS, "wsse:Security");
-        el.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsse", WSConstants.WSSE_NS);
-        SoapHeader sh = new SoapHeader(new QName(WSConstants.WSSE_NS, "Security"), el);
+        Document doc = DOMUtils.getEmptyDocument();
+        Element el = doc.createElementNS(WSS4JConstants.WSSE_NS, "wsse:Security");
+        el.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsse", WSS4JConstants.WSSE_NS);
+        SoapHeader sh = new SoapHeader(new QName(WSS4JConstants.WSSE_NS, "Security"), el);
         sh.setMustUnderstand(true);
         message.getHeaders().add(sh);
         return sh;
     }
-    
-    protected String getPassword(String userName, AbstractToken info, 
+
+    protected String getPassword(String userName, AbstractToken info,
                                  int usage, SoapMessage message) {
         //Then try to get the password from the given callback handler
         CallbackHandler handler = null;
@@ -186,18 +187,18 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             policyNotAsserted(info, "No callback handler and no password available", message);
             return null;
         }
-            
+
         WSPasswordCallback[] cb = {new WSPasswordCallback(userName, usage)};
         try {
             handler.handle(cb);
         } catch (Exception e) {
             policyNotAsserted(info, e, message);
         }
-        
+
         //get the password
         return cb[0].getPassword();
     }
-    
+
     protected void policyNotAsserted(AbstractToken assertion, String reason, SoapMessage message) {
         if (assertion == null) {
             return;
@@ -216,7 +217,7 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
             throw new PolicyException(new Message(reason, LOG));
         }
     }
-    
+
     protected void policyNotAsserted(AbstractToken assertion, Exception reason, SoapMessage message) {
         if (assertion == null) {
             return;
@@ -232,6 +233,6 @@ public abstract class AbstractTokenInterceptor extends AbstractSoapInterceptor {
         }
         throw new PolicyException(reason);
     }
-    
+
 
 }

@@ -30,14 +30,14 @@ import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
-    
-    private List<String> encodings = new ArrayList<String>();
-    private List<Locale> languages = new ArrayList<Locale>();
-    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
-    private List<Variant> variants = new ArrayList<Variant>();
-    
+
+    private List<String> encodings = new ArrayList<>();
+    private List<Locale> languages = new ArrayList<>();
+    private List<MediaType> mediaTypes = new ArrayList<>();
+    private List<Variant> variants = new ArrayList<>();
+
     public VariantListBuilderImpl() {
-        
+
     }
 
     @Override
@@ -49,7 +49,8 @@ public class VariantListBuilderImpl extends VariantListBuilder {
 
     @Override
     public List<Variant> build() {
-        List<Variant> vs = new ArrayList<Variant>(variants);
+        addVariants();
+        List<Variant> vs = new ArrayList<>(variants);
         reset();
         return vs;
     }
@@ -70,30 +71,30 @@ public class VariantListBuilderImpl extends VariantListBuilder {
         variants.clear();
         resetMeta();
     }
-    
+
     private void resetMeta() {
         mediaTypes.clear();
         languages.clear();
         encodings.clear();
     }
-    
+
     private void addVariants() {
-        if (mediaTypes.size() > 0) {
+        if (!mediaTypes.isEmpty()) {
             handleMediaTypes();
-        } else if (languages.size() > 0) {
+        } else if (!languages.isEmpty()) {
             handleLanguages(null);
-        } else if (encodings.size() > 0) {
+        } else if (!encodings.isEmpty()) {
             for (String enc : encodings) {
                 variants.add(new Variant(null, (Locale)null, enc));
             }
-        } 
+        }
     }
-    
+
     private void handleMediaTypes() {
         for (MediaType type : mediaTypes) {
-            if (languages.size() > 0) {
+            if (!languages.isEmpty()) {
                 handleLanguages(type);
-            } else if (encodings.size() > 0) {
+            } else if (!encodings.isEmpty()) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, (Locale)null, enc));
                 }
@@ -102,13 +103,13 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             }
         }
     }
-    
+
     private void handleLanguages(MediaType type) {
         for (Locale lang : languages) {
-            if (encodings.size() > 0) {
+            if (!encodings.isEmpty()) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, lang, enc));
-                }    
+                }
             } else {
                 variants.add(new Variant(type, lang, null));
             }

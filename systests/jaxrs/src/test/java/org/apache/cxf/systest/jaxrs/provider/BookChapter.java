@@ -22,15 +22,15 @@ package org.apache.cxf.systest.jaxrs.provider;
 public class BookChapter {
     private String title;
     private long id;
-    
+
     public BookChapter() {
     }
-    
+
     public BookChapter(long id, String title) {
         this.id = id;
         this.title = title;
     }
-    
+
     public void setTitle(String n) {
         title = n;
     }
@@ -38,7 +38,7 @@ public class BookChapter {
     public String getTitle() {
         return title;
     }
-    
+
     public void setId(long i) {
         id = i;
     }

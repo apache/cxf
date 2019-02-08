@@ -21,5 +21,5 @@ package org.apache.cxf.tools.fortest.simple;
 public interface Hello {
     String sayHello();
     void ping();
-    String echo(String text);    
+    String echo(String text);
 }

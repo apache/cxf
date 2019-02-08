@@ -25,14 +25,15 @@ import javax.jws.WebService;
 
 import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
+import org.apache.cxf.rt.security.SecurityConstants;
 
 @WebService(name = "HelloPolicyService", serviceName = "HelloPolicyService")
 @EndpointProperties(value = {
-        @EndpointProperty(key = "security.callback-handler", 
+        @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
         value = "org.apache.cxf.systest.ws.policy.handler.CommonPasswordCallback"),
         @EndpointProperty(key = "ws-security.is-bsp-compliant", value = "false"),
-        @EndpointProperty(key = "security.signature.properties", value = "alice.properties"),
-        @EndpointProperty(key = "security.signature.username", value = "alice")
+        @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "alice.properties"),
+        @EndpointProperty(key = SecurityConstants.SIGNATURE_USERNAME, value = "alice")
         })
 @HandlerChain(file = "handlers.xml")
 public class HelloServiceImpl implements HelloService {

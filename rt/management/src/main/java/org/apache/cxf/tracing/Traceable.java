@@ -19,5 +19,5 @@
 package org.apache.cxf.tracing;
 
 public interface Traceable<T> {
-    T call(final TracerContext context) throws Exception;
+    T call(TracerContext context) throws Exception;
 }

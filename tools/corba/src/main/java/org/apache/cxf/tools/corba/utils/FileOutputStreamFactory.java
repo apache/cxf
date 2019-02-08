@@ -21,9 +21,10 @@ package org.apache.cxf.tools.corba.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,13 +36,13 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
     FileOutputStreamFactory parent;
 
     public FileOutputStreamFactory() {
-        fileNames = new LinkedList<String>();
+        fileNames = new LinkedList<>();
     }
 
 
-    public FileOutputStreamFactory(String dir) {        
+    public FileOutputStreamFactory(String dir) {
         this(dir, null);
-        fileNames = new LinkedList<String>();
+        fileNames = new LinkedList<>();
     }
 
 
@@ -52,7 +53,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
             dirName = "";
         }
 
-        if ((!"".equals(dirName)) 
+        if ((!"".equals(dirName))
             && (!".".equals(dirName))) {
             if (!dirName.endsWith(File.separator)) {
                 dirName += File.separator;
@@ -83,7 +84,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
     private String getClassDirectory(String packageName) {
         String result = convertPackageNameToDirectory(packageName);
-        
+
         if (!".".equals(dirName)) {
             result = dirName + result;
         }
@@ -144,7 +145,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
         if (!".".equals(dirName)) {
             dname = dirName + packageDirName;
         }
-        
+
         if ((!"".equals(dname)) && (!".".equals(dname))) {
             File file = new File(dname);
             file.mkdirs();
@@ -152,7 +153,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
         addFileName(packageDirName + name);
 
-        return new FileOutputStream(dname + name);
+        return Files.newOutputStream(Paths.get(dname + name));
     }
 
 
@@ -166,7 +167,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
             dname = dirName + name;
         }
 
-        return new FileOutputStream(dname);
+        return  Files.newOutputStream(Paths.get(dname));
     }
 
 

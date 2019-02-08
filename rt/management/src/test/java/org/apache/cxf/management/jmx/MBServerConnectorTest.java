@@ -26,27 +26,28 @@ import javax.management.MBeanServerFactory;
 
 import org.apache.cxf.testutil.common.TestUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 
 
-public class MBServerConnectorTest extends Assert {
+
+public class MBServerConnectorTest {
     private static final String PORT = TestUtil.getPortNumber(MBServerConnectorTest.class);
 
     @Test
     public void testMBServerConnector() {
-        MBServerConnectorFactory mcf;    
-        MBeanServer mbs;        
-        mbs = MBeanServerFactory.createMBeanServer("test");            
+        MBServerConnectorFactory mcf;
+        MBeanServer mbs;
+        mbs = MBeanServerFactory.createMBeanServer("test");
         mcf = MBServerConnectorFactory.getInstance();
         mcf.setMBeanServer(mbs);
         mcf.setThreaded(true);
         mcf.setDaemon(true);
         mcf.setServiceUrl("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         try {
-            mcf.createConnector(); 
-            Thread.sleep(1000);           
+            mcf.createConnector();
+            Thread.sleep(1000);
             mcf.destroy();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -32,13 +32,12 @@ final class SecurityActions {
         SecurityManager sm = System.getSecurityManager();
         if (sm == null) {
             return file.exists();
-        } else {
-            sm.checkPermission(permission);
-            return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-                public Boolean run() {
-                    return file.exists();
-                }
-            });
         }
+        sm.checkPermission(permission);
+        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+            public Boolean run() {
+                return file.exists();
+            }
+        });
     }
 }

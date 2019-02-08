@@ -26,11 +26,15 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AuthorizationUtilsTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class AuthorizationUtilsTest {
+
     @Test
     public void testThrowAuthorizationFailureSingleChallenge() {
         try {
@@ -44,10 +48,10 @@ public class AuthorizationUtilsTest extends Assert {
             assertEquals("Basic", value.toString());
         }
     }
-    
+
     @Test
     public void testThrowAuthorizationFailureManyChallenges() {
-        Set<String> challenges = new LinkedHashSet<String>();
+        Set<String> challenges = new LinkedHashSet<>();
         challenges.add("Basic");
         challenges.add("Bearer");
         try {
@@ -72,6 +76,22 @@ public class AuthorizationUtilsTest extends Assert {
             assertEquals(401, r.getStatus());
             Object value = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
             assertNull(value);
+        }
+    }
+
+    @Test
+    public void testThrowAuthorizationFailureWithCause() {
+        try {
+            AuthorizationUtils.throwAuthorizationFailure(Collections.singleton("Basic"),
+                                                         null, new RuntimeException("expired token"));
+            fail("WebApplicationException expected");
+        } catch (WebApplicationException ex) {
+            Response r = ex.getResponse();
+            assertEquals("expired token", r.getEntity());
+            assertEquals(401, r.getStatus());
+            Object value = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
+            assertNotNull(value);
+            assertEquals("Basic", value.toString());
         }
     }
 }

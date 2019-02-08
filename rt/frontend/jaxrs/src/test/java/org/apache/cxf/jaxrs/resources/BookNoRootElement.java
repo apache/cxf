@@ -24,15 +24,15 @@ package org.apache.cxf.jaxrs.resources;
 public class BookNoRootElement {
     private String name;
     private long id;
-    
+
     public BookNoRootElement() {
     }
-    
+
     public BookNoRootElement(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -40,12 +40,12 @@ public class BookNoRootElement {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
 }

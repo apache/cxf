@@ -47,9 +47,9 @@ import org.apache.cxf.message.Message;
 
 public class SOAPMessageContextImpl extends WrappedMessageContext implements SOAPMessageContext {
     private static final SAAJInInterceptor SAAJ_IN = new SAAJInInterceptor();
-    
-    private Set<String> roles = new HashSet<String>();
-    
+
+    private Set<String> roles = new HashSet<>();
+
     public SOAPMessageContextImpl(Message m) {
         super(m, Scope.HANDLER);
         roles.add(getWrappedSoapMessage().getVersion().getNextRole());
@@ -70,14 +70,14 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
         } else {
             message = getWrappedMessage().getContent(SOAPMessage.class);
         }
-        
+
         //Only happens to non-Dispatch/Provider case.
         if (null == message) {
             Boolean outboundProperty = (Boolean)get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
             if (outboundProperty == null || !outboundProperty) {
                 //No SOAPMessage exists yet, so lets create one
                 SAAJ_IN.handleMessage(getWrappedSoapMessage());
-                message = getWrappedSoapMessage().getContent(SOAPMessage.class);           
+                message = getWrappedSoapMessage().getContent(SOAPMessage.class);
             }
         }
         return message;
@@ -91,22 +91,20 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
             if (header == null || !header.hasChildNodes()) {
                 return new Object[0];
             }
-            List<Object> ret = new ArrayList<Object>();
+            List<Object> ret = new ArrayList<>();
             Iterator<SOAPHeaderElement> it = CastUtils.cast(header.examineAllHeaderElements());
             while (it.hasNext()) {
                 SOAPHeaderElement she = it.next();
                 if ((allRoles
-                    || roles.contains(she.getActor())) 
+                    || roles.contains(she.getActor()))
                     && name.equals(she.getElementQName())) {
                     ret.add(JAXBUtils.unmarshall(context, she));
                 }
             }
-            return ret.toArray(new Object[ret.size()]);
-        } catch (SOAPException e) {
+            return ret.toArray(new Object[0]);
+        } catch (SOAPException | JAXBException e) {
             throw new WebServiceException(e);
-        } catch (JAXBException e) {
-            throw new WebServiceException(e);
-        } 
+        }
     }
 
     public Set<String> getRoles() {
@@ -116,7 +114,7 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
     private SoapMessage getWrappedSoapMessage() {
         return (SoapMessage)getWrappedMessage();
     }
-    
+
     public Object get(Object key) {
         Object o = super.get(key);
         if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
@@ -136,5 +134,5 @@ public class SOAPMessageContextImpl extends WrappedMessageContext implements SOA
         }
         return o;
     }
-   
+
 }

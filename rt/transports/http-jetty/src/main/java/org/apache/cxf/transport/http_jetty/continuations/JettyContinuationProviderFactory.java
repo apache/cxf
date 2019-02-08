@@ -33,17 +33,17 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.ContinuationProviderFactory;
 
 /**
- * 
+ *
  */
 public class JettyContinuationProviderFactory implements ContinuationProviderFactory {
 
-    final boolean disableJettyContinuations 
-        = Boolean.getBoolean("org.apache.cxf.transport.http_jetty.continuations.disable"); 
-    
+    final boolean disableJettyContinuations
+        = Boolean.getBoolean("org.apache.cxf.transport.http_jetty.continuations.disable");
+
     public JettyContinuationProviderFactory() {
     }
-    
-    public ContinuationProvider createContinuationProvider(Message inMessage, 
+
+    public ContinuationProvider createContinuationProvider(Message inMessage,
                                                            HttpServletRequest req,
                                                            HttpServletResponse resp) {
         if (!disableJettyContinuations) {
@@ -54,7 +54,7 @@ public class JettyContinuationProviderFactory implements ContinuationProviderFac
             if (!r2.getClass().getName().contains("jetty")) {
                 return null;
             }
-    
+
             try {
                 Method m = r2.getClass().getMethod("isAsyncSupported");
                 Object o = ReflectionUtil.setAccessible(m).invoke(r2);

@@ -27,9 +27,19 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.testutils</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.soap;version="${cxf.osgi.saaj.version}",
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}",
+            javax.activation;version="${cxf.osgi.javax.activation.version}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -51,6 +61,10 @@
             <artifactId>activemq-broker</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.javamail</groupId>
+            <artifactId>geronimo-javamail_1.4_mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -129,6 +143,7 @@
                                 <mkdir dir="${generated.src.test}/org/apache/cxf/systest/type_test" />
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_impl_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestImpl.java" />
                                 <xslt style="${test.resources.dir}/wsdl/type_test/type_test_tester_java.xsl" in="${test.resources.dir}/wsdl/type_test/type_test.xsd" out="${generated.src.test}/org/apache/cxf/systest/type_test/TypeTestTester.java" />
+                                <xslt style="${test.resources.dir}/wsdl/type_test/validation.xsl" in="${generated.resources.test}/wsdl/type_test/type_test_1.xsd" out="${generated.resources.test}/wsdl/type_test/type_test_1_validation.xsd" />
                             </tasks>
                         </configuration>
                         <goals>
@@ -182,7 +197,7 @@
                                     <xjcarg>-Xbug986</xjcarg>
                                 </xjcargs>
                                 <!--extraargs>
-                                    <extraarg>-verbose</extraarg>
+                                    <extraarg>${cxf.test.keep}</extraarg>
                                 </extraargs-->
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
@@ -240,6 +255,7 @@
                                     </dependencies>
                                 </wsdlOption>
                             </wsdlOptions>
+                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -266,6 +282,8 @@
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
+                            <fork>${xf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                         </configuration>
                         <goals>
                             <goal>xsdtojava</goal>
@@ -277,6 +295,43 @@
                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
                     </extensions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>key-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>keys</classifier>
+                            <classesDirectory>${basedir}/src/test/resources</classesDirectory>
+                            <includes>
+                                <include>**/*.*</include>
+                            </includes>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.key</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Automatic-Module-Name>${cxf.module.name}.tests</Automatic-Module-Name>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>

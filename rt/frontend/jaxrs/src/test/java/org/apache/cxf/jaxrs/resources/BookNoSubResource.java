@@ -32,11 +32,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BookNoSubResource {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
-    
+    private Map<Long, Chapter> chapters = new HashMap<>();
+
     public BookNoSubResource() {
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -44,18 +44,18 @@ public class BookNoSubResource {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
     @Path("chapters/{chapterid}/")
     @GET
     public Chapter getChapter(@PathParam("id")int chapterid) {
-        return chapters.get(new Long(chapterid));
-    }   
+        return chapters.get(Long.valueOf(chapterid));
+    }
 
 }

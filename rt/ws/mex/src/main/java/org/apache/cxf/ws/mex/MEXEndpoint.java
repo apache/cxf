@@ -43,28 +43,28 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
     org.apache.cxf.ws.mex.model._2004_09.ObjectFactory.class })
 public class MEXEndpoint implements MetadataExchange {
     Server server;
-    
+
     public MEXEndpoint(EndpointImpl server) {
         this(server.getServer());
     }
-    
+
     public MEXEndpoint(Server server) {
         this.server = server;
     }
-    
+
     private String getAddressingNamespace() {
         return PhaseInterceptorChain.getCurrentMessage()
                 .get(AddressingProperties.class).getNamespaceURI();
     }
-   
-    
+
+
     public org.apache.cxf.ws.mex.model._2004_09.Metadata get2004() {
-        org.apache.cxf.ws.mex.model._2004_09.Metadata metadata 
+        org.apache.cxf.ws.mex.model._2004_09.Metadata metadata
             = new org.apache.cxf.ws.mex.model._2004_09.Metadata();
-        
+
         List<Element> wsdls = MEXUtils.getWSDLs(server);
         for (Element el : wsdls) {
-            org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
+            org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect
                 = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
             sect.setAny(el);
             sect.setIdentifier(el.getAttribute("targetNamespace"));
@@ -85,14 +85,14 @@ public class MEXEndpoint implements MetadataExchange {
         Map<String, String> policies = MEXUtils.getPolicyLocations(server);
         if (policies != null && !policies.isEmpty()) {
             for (Map.Entry<String, String>  s : policies.entrySet()) {
-                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
+                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
                 sect.setDialect("http://schemas.xmlsoap.org/ws/2004/09/policy");
                 sect.setIdentifier(s.getKey());
-                org.apache.cxf.ws.mex.model._2004_09.MetadataReference ref 
+                org.apache.cxf.ws.mex.model._2004_09.MetadataReference ref
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataReference();
-                
-                Element el = DOMUtils.createDocument().createElementNS(getAddressingNamespace(), 
+
+                Element el = DOMUtils.getEmptyDocument().createElementNS(getAddressingNamespace(),
                                                                "wsa:Address");
                 el.setTextContent(s.getValue());
                 ref.getAny().add(el);
@@ -100,11 +100,11 @@ public class MEXEndpoint implements MetadataExchange {
                 metadata.getMetadataSection().add(sect);
             }
         }
-        
+
         return metadata;
     }
-    
-    
+
+
     public org.apache.cxf.ws.mex.model._2004_09.Metadata getMetadata(
         org.apache.cxf.ws.mex.model._2004_09.GetMetadata body
     ) {
@@ -112,20 +112,20 @@ public class MEXEndpoint implements MetadataExchange {
         String id = body.getIdentifier();
         org.apache.cxf.ws.mex.model._2004_09.Metadata metadata
             = new org.apache.cxf.ws.mex.model._2004_09.Metadata();
-        
+
         if ("http://schemas.xmlsoap.org/wsdl/".equals(dialect)) {
             List<Element> wsdls = MEXUtils.getWSDLs(server);
             for (Element el : wsdls) {
-                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
+                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
                 sect.setAny(el);
                 sect.setDialect("http://schemas.xmlsoap.org/wsdl/");
                 metadata.getMetadataSection().add(sect);
-            }  
+            }
         } else if ("http://www.w3.org/2001/XMLSchema".equals(dialect)) {
             List<Element> schemas = MEXUtils.getSchemas(server, id);
             for (Element el : schemas) {
-                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
+                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
                 sect.setAny(el);
                 sect.setDialect("http://www.w3.org/2001/XMLSchema");
@@ -135,7 +135,7 @@ public class MEXEndpoint implements MetadataExchange {
         } else if ("http://schemas.xmlsoap.org/ws/2004/09/policy".equals(dialect)) {
             List<Element> policies = MEXUtils.getPolicies(server, id);
             for (Element el : policies) {
-                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect 
+                org.apache.cxf.ws.mex.model._2004_09.MetadataSection sect
                     = new org.apache.cxf.ws.mex.model._2004_09.MetadataSection();
                 sect.setAny(el);
                 sect.setDialect("http://schemas.xmlsoap.org/ws/2004/09/policy");

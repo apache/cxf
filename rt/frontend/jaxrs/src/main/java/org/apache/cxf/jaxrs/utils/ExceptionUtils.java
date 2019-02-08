@@ -33,51 +33,49 @@ import org.apache.cxf.message.MessageUtils;
 public final class ExceptionUtils {
     private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String  SUPPORT_WAE_SPEC_OPTIMIZATION = "support.wae.spec.optimization";
-    
-    private ExceptionUtils() {        
+
+    private ExceptionUtils() {
     }
-    
-    public static String getStackTrace(Throwable ex) { 
+
+    public static String getStackTrace(Throwable ex) {
         StringWriter sw = new StringWriter();
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-    
+
     public static Class<?> getWebApplicationExceptionClass(Response exResponse,
                                                            Class<?> defaultExceptionType) {
         return SpecExceptions.getWebApplicationExceptionClass(exResponse, defaultExceptionType);
     }
-    
-     
+
+
     public static boolean propogateException(Message m) {
-        
+
         Object value = m.getContextualProperty(PROPAGATE_EXCEPTION);
-        
+
         if (value == null) {
             return true;
         }
 
         return Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString());
     }
-    
-    
+
+
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message currentMessage) {
         if (ex == null || currentMessage == null) {
             return null;
         }
         Message inMessage = currentMessage.getExchange().getInMessage();
         Response response = null;
-        if (ex.getClass() == WebApplicationException.class) {
+        if (ex instanceof WebApplicationException) {
             WebApplicationException webEx = (WebApplicationException)ex;
-            if (webEx.getResponse().hasEntity() 
-                && webEx.getCause() == null) {
-                Object prop = inMessage.getContextualProperty(SUPPORT_WAE_SPEC_OPTIMIZATION);
-                if (prop == null || MessageUtils.isTrue(prop)) {
-                    response = webEx.getResponse();
-                }
+            if (webEx.getResponse().hasEntity()
+                && webEx.getCause() == null
+                && MessageUtils.getContextualBoolean(inMessage, SUPPORT_WAE_SPEC_OPTIMIZATION, true)) {
+                response = webEx.getResponse();
             }
         }
-        
+
         if (response == null) {
             ExceptionMapper<T>  mapper =
                 ServerProviderFactory.getInstance(inMessage).createExceptionMapper(ex.getClass(), inMessage);
@@ -91,76 +89,83 @@ public final class ExceptionUtils {
                 }
             }
         }
+        if (response == null) {
+            Throwable unwrappedException = ex.getCause();
+            if (unwrappedException instanceof WebApplicationException) {
+                WebApplicationException webEx = (WebApplicationException)unwrappedException;
+                response = webEx.getResponse();
+            }
+        }
         JAXRSUtils.setMessageContentType(currentMessage, response);
         return response;
     }
-    
+
     public static WebApplicationException toWebApplicationException(Throwable cause, Response response) {
         return new WebApplicationException(cause, response);
     }
-    
-    //TODO: we can simply use the reflection, investigate 
-    
+
+    //TODO: we can simply use the reflection, investigate
+
     public static WebApplicationException toInternalServerErrorException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toInternalServerErrorException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toBadRequestException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toBadRequestException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toNotFoundException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toNotFoundException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toNotAuthorizedException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toNotAuthorizedException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toForbiddenException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toForbiddenException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toNotAcceptableException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toNotAcceptableException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toNotSupportedException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toNotSupportedException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }
-    
+
     public static WebApplicationException toHttpException(Throwable cause, Response response) {
         try {
             return SpecExceptions.toHttpException(cause, response);
-        } catch (NoClassDefFoundError ex) { 
+        } catch (NoClassDefFoundError ex) {
             return toWebApplicationException(ex, response);
         }
     }

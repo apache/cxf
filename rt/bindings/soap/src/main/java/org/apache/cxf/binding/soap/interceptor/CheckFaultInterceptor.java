@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -33,7 +34,7 @@ import org.apache.cxf.phase.Phase;
 
 public class CheckFaultInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(CheckFaultInterceptor.class);
-    
+
     public CheckFaultInterceptor() {
         this(Phase.POST_PROTOCOL);
     }
@@ -49,8 +50,8 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
         try {
             // advance to first tag.
             int x = xmlReader.getEventType();
-            while (x != XMLStreamReader.START_ELEMENT
-                && x != XMLStreamReader.END_ELEMENT
+            while (x != XMLStreamConstants.START_ELEMENT
+                && x != XMLStreamConstants.END_ELEMENT
                 && xmlReader.hasNext()) {
                 x = xmlReader.next();
             }
@@ -59,7 +60,7 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
                 return;
             }
         } catch (XMLStreamException e) {
-            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e,
                                 message.getVersion().getSender());
         }
         if (message.getVersion().getFault().equals(xmlReader.getName()) && isRequestor(message)) {

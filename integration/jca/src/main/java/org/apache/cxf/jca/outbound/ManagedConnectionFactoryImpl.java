@@ -19,8 +19,8 @@
 package org.apache.cxf.jca.outbound;
 
 import java.io.PrintWriter;
-
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,29 +35,28 @@ import javax.resource.spi.ResourceAdapterAssociation;
 import javax.resource.spi.work.WorkManager;
 import javax.security.auth.Subject;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 import org.apache.cxf.jca.cxf.ResourceAdapterImpl;
 
-public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory, 
+public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
     ResourceAdapterAssociation {
 
     private static final long serialVersionUID = -5294527634981120642L;
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedConnectionFactoryImpl.class);
-    
+
     private String busConfigURL;
     private PrintWriter printWriter;
     private ResourceAdapter resourceAdapter;
-    
-    private ConnectionManager defaultConnectionManager = 
+
+    private ConnectionManager defaultConnectionManager =
         new DefaultConnectionManager();
 
     static {
         // first use of log, default init if necessary
         LoggerHelper.init();
     }
-   
+
     /* --------------------------------------------------------------------
      *                           Bean Properties
      */
@@ -68,8 +67,8 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
     public String getBusConfigURL() {
         return busConfigURL;
     }
-    
-  
+
+
     /* --------------------------------------------------------------------
      *                    ManagedConnectionFactory methods
      */
@@ -79,17 +78,17 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         }
         return new ConnectionFactoryImpl(this, defaultConnectionManager);
     }
-    
-    public Object createConnectionFactory(ConnectionManager connMgr) 
+
+    public Object createConnectionFactory(ConnectionManager connMgr)
         throws ResourceException {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("Create connection factory by app server connMgr " + connMgr);
         }
-        return new ConnectionFactoryImpl(this, 
+        return new ConnectionFactoryImpl(this,
                 connMgr == null ? defaultConnectionManager : connMgr);
     }
 
-    public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo connReqInfo) 
+    public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo connReqInfo)
         throws ResourceException {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("Create managed connection subject=" + subject + "connReqInfo="
@@ -97,7 +96,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         }
         return new ManagedConnectionImpl(this, connReqInfo, subject);
     }
-    
+
     // hashCode method is required by JCA 1.5 because on properties
     public int hashCode() {
         int retval = 0;
@@ -105,10 +104,10 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         if (busConfigURL != null) {
             retval += busConfigURL.hashCode();
         }
-        
+
         return retval;
     }
-    
+
     // equals method is required by JCA 1.5 because on properties
     public boolean equals(Object o) {
         if (o != null && !this.getClass().isAssignableFrom(o.getClass())) {
@@ -118,12 +117,12 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         if (!(o instanceof ManagedConnectionFactoryImpl)) {
             return false;
         }
-        
+
         ManagedConnectionFactoryImpl that = (ManagedConnectionFactoryImpl)o;
-       
-        return ObjectUtils.equals(that.getBusConfigURL(), busConfigURL);
+
+        return Objects.equals(that.getBusConfigURL(), busConfigURL);
     }
-    
+
     public PrintWriter getLogWriter() throws ResourceException {
         return printWriter;
     }
@@ -136,8 +135,8 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         printWriter = aPrintWriter;
         LoggerHelper.initializeLoggingOnWriter(printWriter);
     }
-    
-    public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set mcs, Subject subject, 
+
+    public ManagedConnection matchManagedConnections(@SuppressWarnings("rawtypes") Set mcs, Subject subject,
             ConnectionRequestInfo reqInfo) throws ResourceException {
 
         if (LOG.isLoggable(Level.FINER)) {
@@ -153,18 +152,18 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
             if (!(obj instanceof ManagedConnectionImpl)) {
                 continue;
             }
-            
+
             ManagedConnectionImpl mc = (ManagedConnectionImpl)obj;
-             
-            if (!ObjectUtils.equals(busConfigURL,
+
+            if (!Objects.equals(busConfigURL,
                     mc.getManagedConnectionFactoryImpl().getBusConfigURL())) {
                 continue;
             }
-            
-            if (!ObjectUtils.equals(reqInfo, mc.getRequestInfo())) {
+
+            if (!Objects.equals(reqInfo, mc.getRequestInfo())) {
                 continue;
             }
-            
+
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.finer("found matched connection " + mc);
             }
@@ -172,7 +171,7 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         }
         return null;
     }
-    
+
     /* --------------------------------------------------------------------
      *                      ResourceAdapterAssociation methods
      */
@@ -191,9 +190,8 @@ public class ManagedConnectionFactoryImpl implements ManagedConnectionFactory,
         if (resourceAdapter instanceof ResourceAdapterImpl) {
             return ((ResourceAdapterImpl)resourceAdapter).getBootstrapContext()
                 .getWorkManager();
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

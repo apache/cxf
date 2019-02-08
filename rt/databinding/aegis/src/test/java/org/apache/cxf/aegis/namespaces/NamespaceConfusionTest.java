@@ -41,15 +41,18 @@ import org.apache.cxf.service.Service;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-/** 
- * Regression test for CXF-959. This is a point test for consistent 
- * use of namespace prefixes in generated WSDL/XMLSchema. This test could 
+
+/**
+ * Regression test for CXF-959. This is a point test for consistent
+ * use of namespace prefixes in generated WSDL/XMLSchema. This test could
  * be made into a more comprehensive functional test by exercising
  * cases such as multiple schema.
  */
 public class NamespaceConfusionTest extends AbstractAegisTest {
-    
+
     private TypeMapping tm;
     private Service service;
     private AegisDatabinding databinding;
@@ -57,15 +60,15 @@ public class NamespaceConfusionTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        
+
         Server s = createService(NameServiceImpl.class);
         service = s.getEndpoint().getService();
         databinding = (AegisDatabinding)service.getDataBinding();
         tm = databinding.getAegisContext().getTypeMapping();
     }
-    
-    private String getNamespaceForPrefix(Element rootElement, 
-                                         Element typeElement, 
+
+    private String getNamespaceForPrefix(Element rootElement,
+                                         Element typeElement,
                                          String prefix) throws Exception {
         Element schemaElement = (Element)assertValid("ancestor::xsd:schema", typeElement).item(0);
 
@@ -94,20 +97,20 @@ public class NamespaceConfusionTest extends AbstractAegisTest {
         return null;
     }
 
-    
+
     @Test
     public void testNameNamespace() throws Exception {
-        
+
         org.w3c.dom.Document doc = getWSDLDocument("NameServiceImpl");
         Element rootElement = doc.getDocumentElement();
 
         Definition def = getWSDLDefinition("NameServiceImpl");
         StringWriter sink = new StringWriter();
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
-        NodeList aonNodes = 
+        NodeList aonNodes =
             assertValid("//xsd:complexType[@name='ArrayOfName']/xsd:sequence/xsd:element", doc);
         Element arrayOfNameElement = (Element)aonNodes.item(0);
-        
+
         String typename = arrayOfNameElement.getAttribute("type");
         String prefix = typename.split(":")[0];
 
@@ -116,10 +119,10 @@ public class NamespaceConfusionTest extends AbstractAegisTest {
         AegisType nameType = tm.getTypeCreator().createType(Name.class);
         QName tmQname = nameType.getSchemaType();
         assertEquals(tmQname.getNamespaceURI(), uri);
-        
+
     }
-    
-    
-    
+
+
+
 
 }

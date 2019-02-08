@@ -25,11 +25,11 @@ import java.util.Set;
 /**
  * Utility class loader that can be used to create proxies in cases where
  * the the client classes are not visible to the loader of the
- * service class.    
+ * service class.
  */
 public class ProxyClassLoader extends ClassLoader {
-    private final Class<?> classes[];
-    private final Set<ClassLoader> loaders = new HashSet<ClassLoader>();
+    private final Class<?>[] classes;
+    private final Set<ClassLoader> loaders = new HashSet<>();
     private boolean checkSystem;
 
     public ProxyClassLoader(ClassLoader parent) {
@@ -61,24 +61,20 @@ public class ProxyClassLoader extends ClassLoader {
         for (ClassLoader loader : loaders) {
             try {
                 return loader.loadClass(name);
-            } catch (ClassNotFoundException cnfe) {
-                // Try next
-            } catch (NoClassDefFoundError cnfe) {
+            } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
                 // Try next
             }
         }
         if (checkSystem) {
             try {
                 return getSystemClassLoader().loadClass(name);
-            } catch (ClassNotFoundException cnfe) {
-                // Try next
-            } catch (NoClassDefFoundError cnfe) {
+            } catch (ClassNotFoundException | NoClassDefFoundError cnfe) {
                 // Try next
             }
         }
         throw new ClassNotFoundException(name);
     }
-    
+
     public URL findResource(String name) {
         for (ClassLoader loader : loaders) {
             URL url = loader.getResource(name);

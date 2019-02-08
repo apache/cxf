@@ -26,7 +26,7 @@ public final class IdlModule extends IdlScopeBase {
     private IdlModule(IdlScopeBase parent, String name) {
         super(parent, name);
     }
-    
+
     public static IdlModule create(IdlScopeBase parent, String name) {
         return new IdlModule(parent, name);
     }
@@ -41,5 +41,5 @@ public final class IdlModule extends IdlScopeBase {
             pw.println(indent() + "};");
         }
     }
-    
+
 }

@@ -33,17 +33,17 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
     private static final Logger LOG = LogUtils.getL7dLogger(OSGiBeanLocator.class);
     private static final String COMPATIBLE_LOCATOR_PROP = "org.apache.cxf.bus.osgi.locator";
     private static final String COMPATIBLE_LOCATOR_PROP_CHECK = COMPATIBLE_LOCATOR_PROP + ".check";
-    
+
     final ConfiguredBeanLocator cbl;
     final BundleContext context;
-    private boolean checkCompatibleLocators; 
-    
+    private boolean checkCompatibleLocators;
+
     public OSGiBeanLocator(ConfiguredBeanLocator c, BundleContext ctx) {
         cbl = c;
         context = ctx;
-        
+
         Object checkProp = context.getProperty(COMPATIBLE_LOCATOR_PROP_CHECK);
-        checkCompatibleLocators = checkProp == null || PropertyUtils.isTrue(checkProp);  
+        checkCompatibleLocators = checkProp == null || PropertyUtils.isTrue(checkProp);
     }
     public <T> T getBeanOfType(String name, Class<T> type) {
         return cbl.getBeanOfType(name, type);
@@ -53,19 +53,18 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
         Collection<? extends T> ret = cbl.getBeansOfType(type);
         if (ret == null || ret.isEmpty()) {
             return getBeansFromOsgiService(type);
-        } else {
-            return ret;
         }
+        return ret;
     }
 
     private <T> List<T> getBeansFromOsgiService(Class<T> type) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         try {
-            ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+            ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
             if (refs != null) {
-                for (ServiceReference r : refs) {
-                    if (type == ClassLoader.class 
-                        && checkCompatibleLocators 
+                for (ServiceReference<?> r : refs) {
+                    if (type == ClassLoader.class
+                        && checkCompatibleLocators
                         && !PropertyUtils.isTrue(r.getProperty(COMPATIBLE_LOCATOR_PROP))) {
                         continue;
                     }
@@ -74,19 +73,19 @@ public class OSGiBeanLocator implements ConfiguredBeanLocator {
             }
         } catch (Exception ex) {
             //ignore, just don't support the OSGi services
-            LOG.info("Tried to find the Bean with type:" + type 
-                + " from OSGi services and get error: " + ex);  
+            LOG.info("Tried to find the Bean with type:" + type
+                + " from OSGi services and get error: " + ex);
         }
         return list;
     }
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         return cbl.loadBeansOfType(type, listener);
-    
+
     }
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
         return cbl.hasConfiguredPropertyValue(beanName, propertyName, value);
     }
-    
+
     public List<String> getBeanNamesOfType(Class<?> type) {
         return cbl.getBeanNamesOfType(type);
     }

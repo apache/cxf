@@ -21,6 +21,7 @@ package org.apache.cxf.endpoint;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -78,7 +80,7 @@ public class ClientImpl
     public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
     /**
      * When a synchronous request/response invoke is done using an asynchronous transport mechanism,
-     * this is the timeout used for waiting for the response.  Default is 60 seconds. 
+     * this is the timeout used for waiting for the response.  Default is 60 seconds.
      */
     public static final String SYNC_TIMEOUT = "cxf.synchronous.timeout";
 
@@ -94,12 +96,13 @@ public class ClientImpl
     protected PhaseChainCache outboundChainCache = new PhaseChainCache();
     protected PhaseChainCache inboundChainCache = new PhaseChainCache();
 
-    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
-    protected Map<Thread, EchoContext> requestContext 
+    protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<>(8, 0.75f, 4);
+    protected Thread latestContextThread;
+    protected Map<Thread, EchoContext> requestContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, EchoContext>());
 
-    protected Map<Thread, Map<String, Object>> responseContext 
-        = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
+    protected Map<Thread, ResponseContext> responseContext
+        = Collections.synchronizedMap(new WeakHashMap<Thread, ResponseContext>());
 
     protected Executor executor;
 
@@ -108,7 +111,7 @@ public class ClientImpl
     }
 
     public ClientImpl(Bus b, Endpoint e, Conduit c) {
-       this(b, e, new PreexistingConduitSelector(c));
+        this(b, e, new PreexistingConduitSelector(c));
     }
 
     public ClientImpl(Bus b, Endpoint e, ConduitSelector sc) {
@@ -117,7 +120,7 @@ public class ClientImpl
         getConduitSelector(sc).setEndpoint(e);
         notifyLifecycleManager();
     }
-    
+
     /**
      * Create a Client that uses a specific EndpointImpl.
      * @param bus
@@ -142,7 +145,7 @@ public class ClientImpl
         }
         notifyLifecycleManager();
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -151,11 +154,13 @@ public class ClientImpl
         if (bus == null) {
             return;
         }
-        for (Closeable c : getEndpoint().getCleanupHooks()) {
-            try {
-                c.close();
-            } catch (IOException e) {
-                //ignore
+        if (getEndpoint() != null) {
+            for (Closeable c : getEndpoint().getCleanupHooks()) {
+                try {
+                    c.close();
+                } catch (IOException e) {
+                    //ignore
+                }
             }
         }
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
@@ -174,7 +179,7 @@ public class ClientImpl
                 getConduit().close();
             }
         }
-        
+
         bus = null;
         conduitSelector = null;
         outFaultObserver = null;
@@ -186,7 +191,7 @@ public class ClientImpl
         requestContext = null;
         responseContext.clear();
         responseContext = null;
-        executor = null;            
+        executor = null;
     }
 
     private void notifyLifecycleManager() {
@@ -197,63 +202,94 @@ public class ClientImpl
     }
 
     private EndpointInfo findEndpoint(Service svc, QName port) {
-        EndpointInfo epfo;
         if (port != null) {
-            epfo = svc.getEndpointInfo(port);
+            EndpointInfo epfo = svc.getEndpointInfo(port);
             if (epfo == null) {
                 throw new IllegalArgumentException("The service " + svc.getName()
                                                    + " does not have an endpoint " + port + ".");
             }
-        } else {
-            epfo = null;
-            for (ServiceInfo svcfo : svc.getServiceInfos()) {
-                for (EndpointInfo e : svcfo.getEndpoints()) {
-                    BindingInfo bfo = e.getBinding();
-                    String bid = bfo.getBindingId();
-                    if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)
-                        || "http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
-                        for (Object o : bfo.getExtensors().get()) {
-                            try {
-                                String s = (String)o.getClass().getMethod("getTransportURI").invoke(o);
-                                if (s != null && s.endsWith("http")) {
-                                    return e;
-                                }
-                            } catch (Throwable t) {
-                                //ignore
+            return epfo;
+        }
+        
+        for (ServiceInfo svcfo : svc.getServiceInfos()) {
+            for (EndpointInfo e : svcfo.getEndpoints()) {
+                BindingInfo bfo = e.getBinding();
+                String bid = bfo.getBindingId();
+                if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)
+                    || "http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
+                    for (Object o : bfo.getExtensors().get()) {
+                        try {
+                            String s = (String)o.getClass().getMethod("getTransportURI").invoke(o);
+                            if (s != null && s.endsWith("http")) {
+                                return e;
                             }
+                        } catch (Throwable t) {
+                            //ignore
                         }
                     }
                 }
             }
-            if (epfo == null) {
-                throw new UnsupportedOperationException(
-                     "Only document-style SOAP 1.1 and 1.2 http are supported "
-                     + "for auto-selection of endpoint; none were found.");
-            }
         }
-        return epfo;
+        throw new UnsupportedOperationException(
+             "Only document-style SOAP 1.1 and 1.2 http are supported "
+             + "for auto-selection of endpoint; none were found.");
     }
 
     public Endpoint getEndpoint() {
         return getConduitSelector().getEndpoint();
     }
 
+    public void releaseThreadContexts() {
+        final Thread t = Thread.currentThread();
+        requestContext.remove(t);
+        responseContext.remove(t);
+    }
+
+    public Contexts getContexts() {
+        return new Contexts() {
+            @Override
+            public void close() throws Exception {
+                releaseThreadContexts();
+            }
+            @Override
+            public Map<String, Object> getRequestContext() {
+                return ClientImpl.this.getRequestContext();
+            }
+            @Override
+            public Map<String, Object> getResponseContext() {
+                return ClientImpl.this.getResponseContext();
+            }
+        };
+    }
 
     public Map<String, Object> getRequestContext() {
         if (isThreadLocalRequestContext()) {
-            if (!requestContext.containsKey(Thread.currentThread())) {
-                requestContext.put(Thread.currentThread(), new EchoContext(currentRequestContext));
+            final Thread t = Thread.currentThread();
+            if (!requestContext.containsKey(t)) {
+                EchoContext freshRequestContext = new EchoContext(currentRequestContext);
+                requestContext.put(t, freshRequestContext);
             }
-            return requestContext.get(Thread.currentThread());
+            latestContextThread = t;
+            return requestContext.get(t);
         }
         return currentRequestContext;
     }
     public Map<String, Object> getResponseContext() {
         if (!responseContext.containsKey(Thread.currentThread())) {
-            responseContext.put(Thread.currentThread(), new HashMap<String, Object>());
+            final Thread t = Thread.currentThread();
+            responseContext.put(t, new ResponseContext(responseContext));
         }
         return responseContext.get(Thread.currentThread());
-
+    }
+    protected Map<String, Object> setResponseContext(Map<String, Object> ctx) {
+        if (ctx instanceof ResponseContext) {
+            ResponseContext c = (ResponseContext)ctx;
+            responseContext.put(Thread.currentThread(), c);
+            return c;
+        }
+        ResponseContext c = new ResponseContext(ctx, responseContext);
+        responseContext.put(Thread.currentThread(), c);
+        return c;
     }
     public boolean isThreadLocalRequestContext() {
         Object o = currentRequestContext.get(THREAD_LOCAL_REQUEST_CONTEXT);
@@ -315,32 +351,13 @@ public class ClientImpl
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params,
                            Exchange exchange) throws Exception {
-        Map<String, Object> context = new HashMap<String, Object>();
-        Map<String, Object> resp = new HashMap<String, Object>();
-        Map<String, Object> req = new HashMap<String, Object>(getRequestContext());
-        context.put(RESPONSE_CONTEXT, resp);
-        context.put(REQUEST_CONTEXT, req);
-        try {
-            return invoke(oi, params, context, exchange);
-        } finally {
-            if (responseContext != null) {
-                responseContext.put(Thread.currentThread(), resp);
-            }
-        }
+        Map<String, Object> context = new HashMap<>();
+        return invoke(oi, params, context, exchange);
     }
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params,
                            Map<String, Object> context) throws Exception {
-        try {
-            return invoke(oi, params, context, (Exchange)null);
-        } finally {
-            if (context != null) {
-                Map<String, Object> resp = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
-                if (resp != null && responseContext != null) {
-                    responseContext.put(Thread.currentThread(), resp);
-                }
-            }
-        }
+        return invoke(oi, params, context, (Exchange)null);
     }
 
     public void invoke(ClientCallback callback,
@@ -393,14 +410,14 @@ public class ClientImpl
                        Object... params) throws Exception {
         invoke(callback, oi, params, null, null);
     }
-    
+
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object[] params,
                        Map<String, Object> context) throws Exception {
         invoke(callback, oi, params, context, null);
     }
-    
+
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object[] params,
@@ -430,6 +447,7 @@ public class ClientImpl
                               Exchange exchange) throws Exception {
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
+        Map<String, Object> resContext = null;
         try {
             ClassLoader loader = bus.getExtension(ClassLoader.class);
             if (loader != null) {
@@ -444,29 +462,28 @@ public class ClientImpl
                 LOG.fine("Invoke, operation info: " + oi + ", params: " + Arrays.toString(params));
             }
             Message message = endpoint.getBinding().createMessage();
-            
+
             // Make sure INVOCATION CONTEXT, REQUEST_CONTEXT and RESPONSE_CONTEXT are present
             // on message
             Map<String, Object> reqContext = null;
-            Map<String, Object> resContext = null;
             if (context == null) {
-                context = new HashMap<String, Object>();
+                context = new HashMap<>();
             }
             reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
             resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
-            if (reqContext == null) { 
-                reqContext = new HashMap<String, Object>(getRequestContext());
+            if (reqContext == null) {
+                reqContext = new HashMap<>(getRequestContext());
                 context.put(REQUEST_CONTEXT, reqContext);
             }
             if (resContext == null) {
-                resContext = new HashMap<String, Object>();
+                resContext = new ResponseContext(responseContext);
                 context.put(RESPONSE_CONTEXT, resContext);
             }
-            
+
             message.put(Message.INVOCATION_CONTEXT, context);
             setContext(reqContext, message);
             exchange.putAll(reqContext);
-            
+
             setParameters(params, message);
 
             if (null != oi) {
@@ -475,7 +492,7 @@ public class ClientImpl
 
             exchange.setOutMessage(message);
             exchange.put(ClientCallback.class, callback);
-            
+
             setOutMessageProperties(message, oi);
             setExchangeProperties(exchange, endpoint, oi);
 
@@ -516,13 +533,13 @@ public class ClientImpl
                 enrichFault(fault);
                 throw fault;
             }
-            
+
             if (callback != null) {
                 return null;
-            } else {
-                return processResult(message, exchange, oi, resContext);
             }
+            return processResult(message, exchange, oi, resContext);
         } finally {
+            setResponseContext(resContext);
             if (origLoader != null) {
                 origLoader.reset();
             }
@@ -534,13 +551,8 @@ public class ClientImpl
 
     private void completeExchange(Exchange exchange) {
         getConduitSelector().complete(exchange);
-        Message outMessage = exchange.getOutMessage();
-        if (outMessage != null && outMessage.get("transport.retransmit.url") != null) {
-            //FIXME: target address has been updated at the transport level, 
-            //       update the the current client accordingly
-        }
     }
-    
+
     /**
      * TODO This is SOAP specific code and should not be in cxf core
      * @param fault
@@ -551,19 +563,19 @@ public class ClientImpl
             String soap11NS = "http://schemas.xmlsoap.org/soap/envelope/";
             String soap12NS = "http://www.w3.org/2003/05/soap-envelope";
             QName faultCode = fault.getFaultCode();
-            //for SoapFault, if it's underlying cause is IOException, 
-            //it means something like server is down or can't create 
+            //for SoapFault, if it's underlying cause is IOException,
+            //it means something like server is down or can't create
             //connection, according to soap spec we should set fault as
             //Server Fault
             if (faultCode.getNamespaceURI().equals(
                     soap11NS)
-                    && faultCode.getLocalPart().equals("Client")) {
+                    && "Client".equals(faultCode.getLocalPart())) {
                 faultCode = new QName(soap11NS, "Server");
                 fault.setFaultCode(faultCode);
             }
             if (faultCode.getNamespaceURI().equals(
                     soap12NS)
-                    && faultCode.getLocalPart().equals("Sender")) {
+                    && "Sender".equals(faultCode.getLocalPart())) {
                 faultCode = new QName(soap12NS, "Receiver");
                 fault.setFaultCode(faultCode);
             }
@@ -594,10 +606,10 @@ public class ClientImpl
             }
             throw ex;
         }
-        
-        //REVISIT 
+
+        //REVISIT
         // - use a protocol neutral no-content marker instead of 202?
-        // - move the decoupled destination property name into api 
+        // - move the decoupled destination property name into api
         Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
         if (null != responseCode && 202 == responseCode) {
             Endpoint ep = exchange.getEndpoint();
@@ -626,7 +638,7 @@ public class ClientImpl
                 resContext.putAll(inMsg);
                 // remove the recursive reference if present
                 resContext.remove(Message.INVOCATION_CONTEXT);
-                responseContext.put(Thread.currentThread(), resContext);
+                setResponseContext(resContext);
             }
             resList = CastUtils.cast(inMsg.getContent(List.class));
         }
@@ -638,6 +650,19 @@ public class ClientImpl
             throw ex;
         }
 
+        if (resList == null   
+            && oi != null && !oi.getOperationInfo().isOneWay()) {
+            
+            BindingOperationInfo boi = oi;
+            if (boi.isUnwrapped()) {
+                boi = boi.getWrappedOperation();
+            }
+            if (!boi.getOutput().getMessageParts().isEmpty()) {
+                //we were supposed to get some output, but didn't.
+                throw new IllegalEmptyResponseException("Response message did not contain proper response data."
+                    + " Expected: " + boi.getOutput().getMessageParts().get(0).getConcreteName());
+            }
+        }
         if (resList != null) {
             return resList.toArray();
         }
@@ -737,7 +762,7 @@ public class ClientImpl
         if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
             InterceptorProvider p = (InterceptorProvider)endpoint.getService().getDataBinding();
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Interceptors contributed by databinging: " + p.getInInterceptors());
+                LOG.fine("Interceptors contributed by databinding: " + p.getInInterceptors());
             }
             chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4,
                                           p.getInInterceptors());
@@ -749,7 +774,7 @@ public class ClientImpl
         chain.setFaultObserver(outFaultObserver);
         modifyChain(chain, message, true);
         modifyChain(chain, message.getExchange().getOutMessage(), true);
-        
+
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         // execute chain
         ClientCallback callback = message.getExchange().get(ClientCallback.class);
@@ -763,9 +788,9 @@ public class ClientImpl
             }
 
             String startingAfterInterceptorID = (String) message.get(
-                PhaseInterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
+                InterceptorChain.STARTING_AFTER_INTERCEPTOR_ID);
             String startingInterceptorID = (String) message.get(
-                PhaseInterceptorChain.STARTING_AT_INTERCEPTOR_ID);
+                InterceptorChain.STARTING_AT_INTERCEPTOR_ID);
             if (startingAfterInterceptorID != null) {
                 chain.doInterceptStartingAfter(message, startingAfterInterceptorID);
             } else if (startingInterceptorID != null) {
@@ -779,7 +804,7 @@ public class ClientImpl
                     try {
                         chain.doIntercept(message);
                     } catch (Throwable error) {
-                        //so that asyn callback handler get chance to 
+                        //so that asyn callback handler get chance to
                         //handle non-runtime exceptions
                         message.getExchange().setInMessage(message);
                         Map<String, Object> resCtx = CastUtils
@@ -789,20 +814,28 @@ public class ClientImpl
                         resCtx = CastUtils.cast((Map<?, ?>) resCtx
                                 .get(RESPONSE_CONTEXT));
                         if (resCtx != null) {
-                            responseContext.put(Thread.currentThread(), resCtx);
+                            setResponseContext(resCtx);
                         }
-                        callback.handleException(resCtx, error);
-
+                        // remove callback so that it won't be invoked twice
+                        callback = message.getExchange().remove(ClientCallback.class);
+                        if (callback != null) {
+                            callback.handleException(resCtx, error);
+                        }
                     }
                 } else {
                     chain.doIntercept(message);
                 }
-                 
+
             }
 
             callback = message.getExchange().get(ClientCallback.class);
+            if (callback == null || isPartialResponse(message)) {
+                return;
+            }
 
-            if (callback != null && !isPartialResponse(message)) {
+            // remove callback so that it won't be invoked twice
+            callback = message.getExchange().remove(ClientCallback.class);
+            if (callback != null) {
                 message.getExchange().setInMessage(message);
                 Map<String, Object> resCtx = CastUtils.cast((Map<?, ?>)message
                                                                 .getExchange()
@@ -810,10 +843,10 @@ public class ClientImpl
                                                                 .get(Message.INVOCATION_CONTEXT));
                 resCtx = CastUtils.cast((Map<?, ?>)resCtx.get(RESPONSE_CONTEXT));
                 if (resCtx != null && responseContext != null) {
-                    responseContext.put(Thread.currentThread(), resCtx);
+                    setResponseContext(resCtx);
                 }
                 try {
-                    Object obj[] = processResult(message, message.getExchange(),
+                    Object[] obj = processResult(message, message.getExchange(),
                                                  null, resCtx);
 
                     callback.handleResponse(resCtx, obj);
@@ -826,7 +859,7 @@ public class ClientImpl
                 BusFactory.setThreadDefaultBus(origBus);
             }
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message) 
+                if (!isPartialResponse(message)
                     || message.getContent(Exception.class) != null) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
@@ -879,7 +912,7 @@ public class ClientImpl
                 public void onMessage(final Message message) {
                     if (!message.getExchange()
                         .containsKey(Executor.class.getName() + ".USING_SPECIFIED")) {
-                        
+
                         executor.execute(new Runnable() {
                             public void run() {
                                 ClientImpl.this.onMessage(message);
@@ -960,7 +993,7 @@ public class ClientImpl
         if (ctx == null) {
             return;
         }
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)ctx.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
@@ -972,7 +1005,7 @@ public class ClientImpl
             }
         }
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)ctx.get(key));
         if (is != null) {
             chain.add(is);
@@ -1012,39 +1045,119 @@ public class ClientImpl
         return Boolean.TRUE.equals(in.get(Message.PARTIAL_RESPONSE_MESSAGE));
     }
 
+    @Override
+    public void close() throws Exception {
+        destroy();
+    }
 
-    /*
-     * modification are echoed back to the shared map
-     */
-    public static class EchoContext extends HashMap<String, Object> {
-        private static final long serialVersionUID = 5199023273052841289L;
-        final Map<String, Object> shared;
+
+    public class EchoContext extends ConcurrentHashMap<String, Object> {
+        private static final long serialVersionUID = 1L;
         public EchoContext(Map<String, Object> sharedMap) {
-            super(sharedMap);
-            shared = sharedMap;
-        }
-
-        public Object put(String key, Object value) {
-            shared.put(key, value);
-            return super.put(key, value);
-        }
-
-        public void putAll(Map<? extends String, ? extends Object> t) {
-            shared.putAll(t);
-            super.putAll(t);
-        }
-
-        public Object remove(Object key) {
-            shared.remove(key);
-            return super.remove(key);
+            super(8, 0.75f, 4);
+            putAll(sharedMap);
         }
 
         public void reload() {
             super.clear();
-            super.putAll(shared);
+            super.putAll(requestContext.get(latestContextThread));
+        }
+        
+        @Override
+        public void clear() {
+            super.clear();
+            try {
+                for (Map.Entry<Thread, EchoContext> ent : requestContext.entrySet()) {
+                    if (ent.getValue() == this) {
+                        requestContext.remove(ent.getKey());
+                        return;
+                    }
+                }
+            } catch (Throwable t) {
+                //ignore
+            }
         }
     }
 
+    /**
+     * Class to handle the response contexts.   The clear is overloaded to remove
+     * this context from the threadLocal caches in the ClientImpl
+     */
+    static class ResponseContext implements Map<String, Object>, Serializable {
+        private static final long serialVersionUID = 2L;
+        final Map<String, Object> wrapped;
+        final Map<Thread, ResponseContext> responseContext;
+        
+        ResponseContext(Map<String, Object> origMap, Map<Thread, ResponseContext> rc) {
+            wrapped = origMap;
+            responseContext = rc;
+        }
+
+        ResponseContext(Map<Thread, ResponseContext> rc) {
+            wrapped = new HashMap<>();
+            responseContext = rc;
+        }
+
+        @Override
+        public void clear() {
+            wrapped.clear();
+            try {
+                for (Map.Entry<Thread, ResponseContext> ent : responseContext.entrySet()) {
+                    if (ent.getValue() == this) {
+                        responseContext.remove(ent.getKey());
+                        return;
+                    }
+                }
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+
+        @Override
+        public int size() {
+            return wrapped.size();
+        }
+        @Override
+        public boolean isEmpty() {
+            return wrapped.isEmpty();
+        }
+        @Override
+        public boolean containsKey(Object key) {
+            return wrapped.containsKey(key);
+        }
+        @Override
+        public boolean containsValue(Object value) {
+            return wrapped.containsKey(value);
+        }
+        @Override
+        public Object get(Object key) {
+            return wrapped.get(key);
+        }
+        @Override
+        public Object put(String key, Object value) {
+            return wrapped.put(key, value);
+        }
+        @Override
+        public Object remove(Object key) {
+            return wrapped.remove(key);
+        }
+        @Override
+        public void putAll(Map<? extends String, ? extends Object> m) {
+            wrapped.putAll(m);
+        }
+        @Override
+        public Set<String> keySet() {
+            return wrapped.keySet();
+        }
+        @Override
+        public Collection<Object> values() {
+            return wrapped.values();
+        }
+        @Override
+        public Set<Entry<String, Object>> entrySet() {
+            return wrapped.entrySet();
+        }
+    }
 
     public void setExecutor(Executor executor) {
         if (!SynchronousExecutor.isA(executor)) {
@@ -1052,5 +1165,25 @@ public class ClientImpl
         }
     }
 
+    
+    public class IllegalEmptyResponseException extends IllegalStateException {
+        private static final long serialVersionUID = 1L;
+
+        public IllegalEmptyResponseException() {
+            super();
+        }
+
+        public IllegalEmptyResponseException(String message) {
+            super(message);
+        }
+
+        public IllegalEmptyResponseException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public IllegalEmptyResponseException(Throwable cause) {
+            super(cause);
+        }
+    }
 
 }

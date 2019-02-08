@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oidc.rp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -27,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -34,10 +36,11 @@ import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
-    private String tokenFormParameter = "id_token"; 
+    private String tokenFormParameter = "id_token";
     private IdTokenReader idTokenReader;
     private Consumer consumer;
-    
+    private String roleClaim;
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         MultivaluedMap<String, String> form = toFormData(requestContext);
@@ -46,18 +49,22 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
             requestContext.abortWith(Response.status(401).build());
             return;
         }
-        
+
         IdToken idToken = idTokenReader.getIdToken(idTokenParamValue, consumer);
         JAXRSUtils.getCurrentMessage().setContent(IdToken.class, idToken);
-        requestContext.setSecurityContext(new OidcSecurityContext(idToken));
-        
+
+        OidcSecurityContext oidcSecCtx = new OidcSecurityContext(idToken);
+        oidcSecCtx.setRoleClaim(roleClaim);
+        requestContext.setSecurityContext(oidcSecCtx);
     }
+
     private MultivaluedMap<String, String> toFormData(ContainerRequestContext rc) {
-        MultivaluedMap<String, String> requestState = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> requestState = new MetadataMap<>();
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
-            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
+            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body,
                                             StandardCharsets.UTF_8.name(), false);
+            rc.setEntityStream(new ByteArrayInputStream(StringUtils.toBytesUTF8(body)));
         }
         return requestState;
     }
@@ -70,5 +77,9 @@ public class OidcIdTokenRequestFilter implements ContainerRequestFilter {
 
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
+    }
+
+    public void setRoleClaim(String roleClaim) {
+        this.roleClaim = roleClaim;
     }
 }

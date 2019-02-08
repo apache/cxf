@@ -21,11 +21,14 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.reflect.Method;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WrapperUtilTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WrapperUtilTest {
     String pkgName = "org.apache.cxf.tools.fortest.classnoanno.docwrapped";
     Class<?> stockClass;
     Method method;

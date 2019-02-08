@@ -42,9 +42,9 @@ public class NettyHttpClientRequest {
         this.uri = requestUri;
         this.method = method;
     }
-    
+
     public void createRequest(ByteBuf content) {
-        this.request  = 
+        this.request  =
             new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
                                        HttpMethod.valueOf(method),
                                        uri.getPath().toString(), content);
@@ -57,7 +57,7 @@ public class NettyHttpClientRequest {
     public HttpRequest getRequest() {
         return request;
     }
-    
+
     public HttpResponse getResponse() {
         return response;
     }

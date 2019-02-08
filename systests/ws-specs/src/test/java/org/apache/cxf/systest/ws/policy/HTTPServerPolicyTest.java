@@ -29,16 +29,20 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to determine the behaviour of the HTTP client
@@ -57,7 +61,7 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/http-server.xml");
             setBus(bus);
@@ -65,56 +69,56 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
             implementor.setThrowAlways(true);
             ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort", implementor);
 
-            LOG.info("Published greeter endpoint."); 
-            
+            LOG.info("Published greeter endpoint.");
+
             LoggingInInterceptor in = new LoggingInInterceptor();
             LoggingOutInterceptor out = new LoggingOutInterceptor();
-            
+
             bus.getInInterceptors().add(in);
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
         }
-        
+
         public void tearDown() {
             ep.stop();
         }
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
-         
+
     @Test
-    public void testUsingHTTPServerPolicies() throws Exception {        
-        
+    public void testUsingHTTPServerPolicies() throws Exception {
+
         // use a plain client
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus();
-        
+
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
-        
+
         updateAddressPort(greeter, PORT);
         LoggingInInterceptor in = new LoggingInInterceptor();
         LoggingOutInterceptor out = new LoggingOutInterceptor();
-        
+
         bus.getInInterceptors().add(in);
         bus.getOutInterceptors().add(out);
-        
+
         LOG.fine("Created greeter client.");
 
         // sayHi - this operation has message policies that are incompatible with
@@ -126,17 +130,17 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException wse) {
             SoapFault sf = (SoapFault)wse.getCause();
             assertEquals("Server", sf.getFaultCode().getLocalPart());
-            
+
             String text = sf.getMessage();
             assertTrue(text.contains("{http://cxf.apache.org/transports/http/configuration}server"));
-            
+
             // assertEquals("INCOMPATIBLE_HTTPSERVERPOLICY_ASSERTIONS", ex.getCode());
         }
-        
+
         // greetMe - no operation or message specific policies
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
-     
+        assertEquals("CXF", greeter.greetMe("cxf"));
+
         // pingMe - policy attached to binding operation fault should have no effect
 
         try {

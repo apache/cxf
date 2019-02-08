@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -35,8 +36,8 @@ import org.apache.cxf.transport.Conduit;
 public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MessageSenderInterceptor.class);
     private MessageSenderEndingInterceptor ending = new MessageSenderEndingInterceptor();
-    
-    
+
+
     public MessageSenderInterceptor() {
         super(Phase.PREPARE_SEND);
     }
@@ -46,12 +47,12 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             getConduit(message).prepare(message);
         } catch (IOException ex) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), ex);
-        }    
-        
+        }
+
         // Add a final interceptor to close the conduit
         message.getInterceptorChain().add(ending);
     }
-    
+
     public static class MessageSenderEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public MessageSenderEndingInterceptor() {
             super(Phase.PREPARE_SEND_ENDING);
@@ -60,13 +61,15 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
         public void handleMessage(Message message) throws Fault {
             try {
                 getConduit(message).close(message);
+            } catch (SocketTimeoutException e) {
+                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_RECEIVE", BUNDLE), e);
             } catch (IOException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), e);
             }
         }
     }
-    
-    public static Conduit getConduit(Message message) {
+
+    public static Conduit getConduit(Message message) throws IOException {
         Exchange exchange = message.getExchange();
         Conduit conduit = exchange.getConduit(message);
         if (conduit == null

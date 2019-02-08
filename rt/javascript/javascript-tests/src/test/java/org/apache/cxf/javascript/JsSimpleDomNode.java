@@ -54,11 +54,7 @@ public class JsSimpleDomNode extends ScriptableObject {
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsSimpleDomNode.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -83,10 +79,10 @@ public class JsSimpleDomNode extends ScriptableObject {
 
     public Object jsGet_firstChild() {
         establishChildren();
-        if (children.size() > 0)
+        if (!children.isEmpty()) {
             return children.get(0);
-        else
-            return null;
+        }
+        return null;
     }
 
     public Object jsGet_nextSibling() {
@@ -118,10 +114,9 @@ public class JsSimpleDomNode extends ScriptableObject {
     public Object jsGet_documentElement() {
         if (9 /* Document */!= wrappedNode.getNodeType()) {
             return null;
-        } else {
-            establishChildren();
-            return children.get(0); // it is, after all, just a convenience feature.
         }
+        establishChildren();
+        return children.get(0); // it is, after all, just a convenience feature.
     }
 
     public Object[] jsGet_childNodes() {
@@ -139,10 +134,9 @@ public class JsSimpleDomNode extends ScriptableObject {
         Node attrNode = attributes.getNamedItemNS(namespaceURI, localName);
         if (attrNode == null) {
             return null;
-        } else {
-            Attr attribute = (Attr)attrNode;
-            return attribute.getValue();
         }
+        Attr attribute = (Attr)attrNode;
+        return attribute.getValue();
     }
 
     public String jsFunction_getAttribute(String localName) {
@@ -150,10 +144,9 @@ public class JsSimpleDomNode extends ScriptableObject {
         Node attrNode = attributes.getNamedItem(localName);
         if (attrNode == null) {
             return null;
-        } else {
-            Attr attribute = (Attr)attrNode;
-            return attribute.getValue();
         }
+        Attr attribute = (Attr)attrNode;
+        return attribute.getValue();
     }
 
     // CHECKSTYLE:ON
@@ -187,7 +180,7 @@ public class JsSimpleDomNode extends ScriptableObject {
     private void establishChildren() {
         if (!childrenWrapped) {
             if (wrappedNode.hasChildNodes()) {
-                children = new ArrayList<JsSimpleDomNode>();
+                children = new ArrayList<>();
                 Node node = wrappedNode.getFirstChild();
                 int x = 0;
                 while (node != null) {
@@ -203,7 +196,7 @@ public class JsSimpleDomNode extends ScriptableObject {
                     x++;
                 }
             } else {
-                children = new ArrayList<JsSimpleDomNode>();
+                children = new ArrayList<>();
             }
             childrenWrapped = true;
         }

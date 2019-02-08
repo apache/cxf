@@ -27,15 +27,24 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>client</module>
         <module>http-sci</module>
         <module>description</module>
+        <module>description-swagger</module>
         <module>extensions/json-basic</module>
         <module>extensions/providers</module>
         <module>extensions/search</module>
+        <module>extensions/rx</module>
+        <module>extensions/rx2</module>
+        <module>extensions/reactor</module>
+        <module>extensions/reactivestreams</module>
         <module>security</module>
+        <module>sse</module>
+        <module>description-openapi-v3</module>
+        <module>description-swagger-ui</module>
+        <module>microprofile-client</module>
     </modules>
 </project>

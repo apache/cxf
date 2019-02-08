@@ -38,6 +38,10 @@ import org.apache.ws.commons.schema.constants.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class EnumTypeTest extends AbstractAegisTest {
     private DefaultTypeMapping tm;
 
@@ -48,7 +52,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         public String toString() {
             return name() + "*";
         }
-        
+
     };
 
     @Before
@@ -60,7 +64,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
     }
-    
+
     @Test
     public void testType() throws Exception {
         EnumType type = new EnumType();
@@ -72,7 +76,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         Element element = writeObjectToElement(type, SmallEnum.VALUE1, getContext());
 
         assertEquals("VALUE1", element.getTextContent());
-        
+
         XMLStreamReader xreader = StaxUtils.createXMLStreamReader(element);
         ElementReader reader = new ElementReader(xreader);
         Object value = type.readObject(reader, getContext());
@@ -156,6 +160,39 @@ public class EnumTypeTest extends AbstractAegisTest {
         assertTrue(value instanceof EnumBean);
         EnumBean bean = (EnumBean)value;
         assertNull(bean.getCurrency());
+    }
+    
+    /**
+     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+     */
+    @Test
+    public void testTypeWithJaxbAnnotations() throws Exception {
+        AegisType type = tm.getTypeCreator().createType(JaxbTestEnum.class);
+
+        Element element = writeObjectToElement(type, JaxbTestEnum.VALUE1, getContext());
+
+        assertEquals("Value1", element.getTextContent());
+        XMLStreamReader xreader = StaxUtils.createXMLStreamReader(element);
+        ElementReader reader = new ElementReader(xreader);
+        Object value = type.readObject(reader, getContext());
+        assertEquals(JaxbTestEnum.VALUE1, value);
+    }
+    
+    /**
+     * {@link https://issues.apache.org/jira/browse/CXF-7188}
+    */
+    @Test
+    public void testWsdlFromJaxbAnnotations() throws Exception {
+        AegisType type = tm.getTypeCreator().createType(JaxbTestEnum.class);
+        XmlSchema schema = newXmlSchema("urn:test");
+        type.writeSchema(schema);
+
+        XmlSchemaSerializer ser = new XmlSchemaSerializer();
+        Document doc = ser.serializeSchema(schema, false)[0];
+        addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
+        assertValid("//xsd:simpleType[@name='bar']/xsd:restriction[@base='xsd:string']", doc);
+        assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='Value1']", doc);
+        assertValid("//xsd:restriction[@base='xsd:string']/xsd:enumeration[@value='VALUE2']", doc);
     }
 
     public static class EnumBean {

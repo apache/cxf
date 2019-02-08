@@ -32,6 +32,9 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 
 public class DateTimezoneTest extends AbstractAegisTest {
@@ -47,76 +50,74 @@ public class DateTimezoneTest extends AbstractAegisTest {
         context.initialize();
         mapping = context.getTypeMapping();
     }
-    
+
     @Test
     public void testTimezoneLessCalendar() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(CalendarBean.class, "urn:Bean");
         mapping.register(Calendar.class, Constants.XSD_DATETIME, new TimezoneLessDateType());
-        mapping.register(Calendar.class, Constants.XSD_DATE, new TimezoneLessDateType());        
+        mapping.register(Calendar.class, Constants.XSD_DATE, new TimezoneLessDateType());
         info.setTypeMapping(mapping);
-  
+
         BeanType type = new BeanType(info);
         type.setTypeClass(CalendarBean.class);
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:Bean", "bean"));
-  
+
         CalendarBean bean = new CalendarBean();
         bean.setCalendar(Calendar.getInstance());
         // Test writing
         Element element = writeObjectToElement(type, bean, getContext());
-  
+
         assertTimezoneLessString(element.getTextContent());
     }
-    
+
     @Test
     public void testTimezoneLessDate() throws Exception {
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
         mapping.register(Date.class, Constants.XSD_DATETIME, new TimezoneLessDateType());
-        mapping.register(Date.class, Constants.XSD_DATE, new TimezoneLessDateType());        
+        mapping.register(Date.class, Constants.XSD_DATE, new TimezoneLessDateType());
         info.setTypeMapping(mapping);
-  
+
         BeanType type = new BeanType(info);
         type.setTypeClass(DateBean.class);
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:Bean", "bean"));
-  
+
         DateBean bean = new DateBean();
         bean.setDate(Calendar.getInstance().getTime());
         // Test writing
         Element element = writeObjectToElement(type, bean, getContext());
         assertTimezoneLessString(element.getTextContent());
-        
+
     }
-    
+
     private void assertTimezoneLessString(String dateString) {
         assertTrue(dateString.length() <= 10);
         assertFalse(dateString.contains("+"));
         assertFalse(dateString.contains("Z"));
     }
-    
-    //TODO add tests with Timezones
-    
+
     public static class CalendarBean {
         private Calendar calendar;
-    
+
         public Calendar getCalendar() {
             return calendar;
         }
-    
+
         public void setCalendar(Calendar calendar) {
             this.calendar = calendar;
         }
     }
-    
+
     public static class DateBean {
         private Date date;
-  
+
         public Date getDate() {
             return date;
         }
-  
+
         public void setDate(Date date) {
             this.date = date;
         }
-    }    
+    }
 }

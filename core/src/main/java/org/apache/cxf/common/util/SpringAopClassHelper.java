@@ -26,14 +26,14 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.util.ClassUtils;
 
 /**
- * 
+ *
  */
 class SpringAopClassHelper extends ClassHelper {
     SpringAopClassHelper() throws Exception {
         Class.forName("org.springframework.aop.support.AopUtils");
         Class.forName("org.springframework.aop.framework.Advised");
     }
-    
+
     protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
         if (ClassUtils.isCglibProxyClass(cls)) {
             return getRealClassFromClassInternal(cls.getSuperclass());
@@ -46,7 +46,7 @@ class SpringAopClassHelper extends ClassHelper {
 
                 Advised advised = (Advised)o;
                 Object target = advised.getTargetSource().getTarget();
-                //could be a proxy of a proxy.....   
+                //could be a proxy of a proxy.....
                 return getRealObjectInternal(target);
             } catch (Exception ex) {
                 // ignore
@@ -60,33 +60,33 @@ class SpringAopClassHelper extends ClassHelper {
             Advised advised = (Advised)o;
             try {
                 TargetSource targetSource = advised.getTargetSource();
-                
+
                 Object target = null;
-                
+
                 try {
                     target = targetSource.getTarget();
                 } catch (BeanCreationException ex) {
-                    // some scopes such as 'request' may not 
+                    // some scopes such as 'request' may not
                     // be active on the current thread yet
                     return getRealClassFromClassInternal(targetSource.getTargetClass());
                 }
-                
+
                 if (target == null) {
                     Class<?> targetClass = AopUtils.getTargetClass(o);
                     if (targetClass != null) {
                         return getRealClassFromClassInternal(targetClass);
                     }
                 } else {
-                    return getRealClassInternal(target); 
+                    return getRealClassInternal(target);
                 }
             } catch (Exception ex) {
                 // ignore
             }
-            
+
         } else if (ClassUtils.isCglibProxyClass(o.getClass())) {
             return getRealClassFromClassInternal(AopUtils.getTargetClass(o));
         }
         return o.getClass();
     }
-    
+
 }

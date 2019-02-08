@@ -71,17 +71,20 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class SOAPHandlerInterceptorTest extends Assert {
+public class SOAPHandlerInterceptorTest {
 
     @Before
     public void setUp() {
@@ -96,7 +99,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPBodyOutBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 Boolean outboundProperty = (Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
@@ -133,7 +136,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         // This is to set direction to outbound
         expect(exchange.getOutMessage()).andReturn(message).anyTimes();
         CachedStream originalEmptyOs = new CachedStream();
-        
+
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(originalEmptyOs);
         message.setContent(XMLStreamWriter.class, writer);
 
@@ -146,12 +149,12 @@ public class SOAPHandlerInterceptorTest extends Assert {
                     XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
                     SoapVersion soapVersion = Soap11.getInstance();
                     writer.setPrefix("soap", soapVersion.getNamespace());
-                    writer.writeStartElement("soap", 
+                    writer.writeStartElement("soap",
                                           soapVersion.getEnvelope().getLocalPart(),
                                           soapVersion.getNamespace());
                     writer.writeNamespace("soap", soapVersion.getNamespace());
                     writer.writeEndElement();
-                    
+
                     writer.flush();
                 } catch (Exception e) {
                     // do nothing
@@ -159,17 +162,17 @@ public class SOAPHandlerInterceptorTest extends Assert {
             }
 
         });
-        
+
         chain.add(new SOAPHandlerInterceptor(binding));
         message.setInterceptorChain(chain);
         control.replay();
 
         chain.doIntercept(message);
-        
+
         control.verify();
 
         writer.flush();
-        
+
         // Verify SOAPMessage
         SOAPMessage resultedMessage = message.getContent(SOAPMessage.class);
         assertNotNull(resultedMessage);
@@ -180,10 +183,10 @@ public class SOAPHandlerInterceptorTest extends Assert {
         Iterator<?> outIt = bodyElementNew
             .getChildElements(new QName("http://apache.org/hello_world_rpclit/types", "out"));
         Element outElement = (SOAPElement)outIt.next();
-        assertNotNull(outElement);        
-        Element elem3Element = 
-            DOMUtils.findAllElementsByTagNameNS(outElement, 
-                                                "http://apache.org/hello_world_rpclit/types", 
+        assertNotNull(outElement);
+        Element elem3Element =
+            DOMUtils.findAllElementsByTagNameNS(outElement,
+                                                "http://apache.org/hello_world_rpclit/types",
                                                 "elem3").get(0);
         assertEquals("100", elem3Element.getTextContent());
     }
@@ -191,7 +194,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPHeaderInBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -202,12 +205,12 @@ public class SOAPHandlerInterceptorTest extends Assert {
                         SOAPHeader soapHeader = message.getSOAPHeader();
                         Element headerElementNew = (Element)soapHeader.getFirstChild();
 
-                        SoapVersion soapVersion = Soap11.getInstance();                        
-                        Attr attr = 
-                            headerElementNew.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(), 
-                                                                                  "SOAP-ENV:mustUnderstand"); 
+                        SoapVersion soapVersion = Soap11.getInstance();
+                        Attr attr =
+                            headerElementNew.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(),
+                                                                                  "SOAP-ENV:mustUnderstand");
                         attr.setValue("false");
-                        headerElementNew.setAttributeNodeNS(attr);          
+                        headerElementNew.setAttributeNodeNS(attr);
                     }
                 } catch (Exception e) {
                     throw new Fault(e);
@@ -235,19 +238,19 @@ public class SOAPHandlerInterceptorTest extends Assert {
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
         // This is to set direction to inbound
         expect(exchange.getOutMessage()).andReturn(null);
-        
+
         SoapMessage message = new SoapMessage(new MessageImpl());
         message.setExchange(exchange);
         XMLStreamReader reader = preparemXMLStreamReader("resources/greetMeRpcLitReq.xml");
         message.setContent(XMLStreamReader.class, reader);
         Object[] headerInfo = prepareSOAPHeader();
-        
+
         message.setContent(Node.class, headerInfo[0]);
-        
+
         Node node = ((Element) headerInfo[1]).getFirstChild();
-        
+
         message.getHeaders().add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
-        
+
         control.replay();
 
         SOAPHandlerInterceptor li = new SOAPHandlerInterceptor(binding);
@@ -255,10 +258,10 @@ public class SOAPHandlerInterceptorTest extends Assert {
         control.verify();
 
         // Verify SOAPMessage header
-        SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);       
+        SOAPMessage soapMessageNew = message.getContent(SOAPMessage.class);
 
         Element headerElementNew = DOMUtils.getFirstElement(soapMessageNew.getSOAPHeader());
-        
+
         SoapVersion soapVersion = Soap11.getInstance();
         assertEquals("false", headerElementNew.getAttributeNS(soapVersion.getNamespace(), "mustUnderstand"));
 
@@ -266,7 +269,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
         QName qn = xmlReader.getName();
         assertEquals("sendReceiveData", qn.getLocalPart());
-        
+
         // Verify Header Element
         Iterator<Header> iter = message.getHeaders().iterator();
         Element requiredHeader = null;
@@ -274,14 +277,14 @@ public class SOAPHandlerInterceptorTest extends Assert {
             Header localHdr = iter.next();
             if (localHdr.getObject() instanceof Element) {
                 Element elem = (Element) localHdr.getObject();
-                if (elem.getNamespaceURI().equals("http://apache.org/hello_world_rpclit/types")
-                        && elem.getLocalName().equals("header1")) {
+                if ("http://apache.org/hello_world_rpclit/types".equals(elem.getNamespaceURI())
+                        && "header1".equals(elem.getLocalName())) {
                     requiredHeader = (Element) localHdr.getObject();
-                    break;                
+                    break;
                 }
             }
         }
-        
+
         assertNotNull("Should have found header1", requiredHeader);
         assertEquals("false", requiredHeader.getAttributeNS(soapVersion.getNamespace(), "mustUnderstand"));
     }
@@ -289,7 +292,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testChangeSOAPHeaderOutBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -297,16 +300,16 @@ public class SOAPHandlerInterceptorTest extends Assert {
                     if (outboundProperty.booleanValue()) {
                         // change mustUnderstand to false
                         SOAPMessage message = smc.getMessage();
-                         
+
                         SOAPHeader soapHeader = message.getSOAPHeader();
                         Iterator<?> it = soapHeader.getChildElements(new QName(
                             "http://apache.org/hello_world_rpclit/types", "header1"));
                         SOAPHeaderElement headerElementNew = (SOAPHeaderElement)it.next();
 
                         SoapVersion soapVersion = Soap11.getInstance();
-                        Attr attr = 
-                            headerElementNew.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(), 
-                                                                                  "SOAP-ENV:mustUnderstand"); 
+                        Attr attr =
+                            headerElementNew.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(),
+                                                                                  "SOAP-ENV:mustUnderstand");
                         attr.setValue("false");
                         headerElementNew.setAttributeNodeNS(attr);
                     }
@@ -347,19 +350,19 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
             public void handleMessage(SoapMessage message) throws Fault {
                 try {
-                    XMLStreamWriter writer = message.getContent(XMLStreamWriter.class); 
+                    XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
                     SoapVersion soapVersion = Soap11.getInstance();
                     writer.setPrefix("soap", soapVersion.getNamespace());
-                    writer.writeStartElement("soap", 
+                    writer.writeStartElement("soap",
                                           soapVersion.getEnvelope().getLocalPart(),
                                           soapVersion.getNamespace());
                     writer.writeNamespace("soap", soapVersion.getNamespace());
-                    
+
                     Object[] headerInfo = prepareSOAPHeader();
                     StaxUtils.writeElement((Element) headerInfo[1], writer, true, false);
-                    
+
                     writer.writeEndElement();
-                    
+
                     writer.flush();
                 } catch (Exception e) {
                     // do nothing
@@ -372,7 +375,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         control.replay();
 
         chain.doIntercept(message);
-        
+
         control.verify();
 
         // Verify SOAPMessage header
@@ -391,7 +394,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testGetSOAPMessageInBound() throws Exception {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 try {
@@ -450,7 +453,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
     @Test
     public void testGetUnderstoodHeadersReturnsNull() {
         @SuppressWarnings("rawtypes")
-        List<Handler> list = new ArrayList<Handler>();
+        List<Handler> list = new ArrayList<>();
         list.add(new SOAPHandler<SOAPMessageContext>() {
             public boolean handleMessage(SOAPMessageContext smc) {
                 return true;
@@ -475,7 +478,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         SoapMessage message = control.createMock(SoapMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
         expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(message.keySet()).andReturn(new HashSet<String>());
+        expect(message.keySet()).andReturn(new HashSet<>());
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);
         control.replay();
 
@@ -522,26 +525,26 @@ public class SOAPHandlerInterceptorTest extends Assert {
         SoapVersion soapVersion = Soap11.getInstance();
         Element envElement = doc.createElementNS(soapVersion.getEnvelope().getNamespaceURI(),
                                                  soapVersion.getEnvelope().getLocalPart());
-        
-        Element headerElement = doc.createElementNS(soapVersion.getNamespace(), 
+
+        Element headerElement = doc.createElementNS(soapVersion.getNamespace(),
                                                     soapVersion.getHeader().getLocalPart());
-        
+
         Element bodyElement = doc.createElementNS(soapVersion.getBody().getNamespaceURI(),
                                                   soapVersion.getBody().getLocalPart());
-        
+
         Element childElement = doc.createElementNS("http://apache.org/hello_world_rpclit/types",
                                                    "ns2:header1");
-        Attr attr = 
-            childElement.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(), 
-                                                                  "SOAP-ENV:mustUnderstand"); 
+        Attr attr =
+            childElement.getOwnerDocument().createAttributeNS(soapVersion.getNamespace(),
+                                                                  "SOAP-ENV:mustUnderstand");
         attr.setValue("true");
-        childElement.setAttributeNodeNS(attr);  
-        
+        childElement.setAttributeNodeNS(attr);
+
         headerElement.appendChild(childElement);
         envElement.appendChild(headerElement);
         envElement.appendChild(bodyElement);
         doc.appendChild(envElement);
-        
+
         return new Object[] {doc, headerElement};
     }
 

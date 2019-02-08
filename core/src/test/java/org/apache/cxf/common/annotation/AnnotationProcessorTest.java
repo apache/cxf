@@ -26,91 +26,94 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
 
-public class AnnotationProcessorTest extends Assert {
 
-    AnnotatedGreeterImpl greeterImpl = new AnnotatedGreeterImpl(); 
-    AnnotationProcessor processor = new AnnotationProcessor(greeterImpl); 
-    List<Class<? extends Annotation>> expectedAnnotations = new ArrayList<Class<? extends Annotation>>(); 
+public class AnnotationProcessorTest {
+
+    AnnotatedGreeterImpl greeterImpl = new AnnotatedGreeterImpl();
+    AnnotationProcessor processor = new AnnotationProcessor(greeterImpl);
+    List<Class<? extends Annotation>> expectedAnnotations = new ArrayList<>();
 
     AnnotationVisitor visitor = EasyMock.createMock(AnnotationVisitor.class);
-    
+
     @Before
-    public void setUp() { 
-        EasyMock.checkOrder(visitor, false); 
-    } 
+    public void setUp() {
+        EasyMock.checkOrder(visitor, false);
+    }
 
     @Test
-    public void testVisitClass() { 
+    public void testVisitClass() {
 
         expectedAnnotations.add(WebService.class);
 
         prepareCommonExpectations(visitor);
-        visitor.visitClass(EasyMock.eq(AnnotatedGreeterImpl.class), 
+        visitor.visitClass(EasyMock.eq(AnnotatedGreeterImpl.class),
                            EasyMock.isA(WebService.class));
 
         runProcessor(visitor);
-    } 
+    }
 
     @Test
-    public void testVisitField() throws Exception { 
+    public void testVisitField() throws Exception {
 
-        Field expectedField = AnnotatedGreeterImpl.class.getDeclaredField("foo"); 
+        Field expectedField = AnnotatedGreeterImpl.class.getDeclaredField("foo");
 
         expectedAnnotations.add(Resource.class);
         prepareCommonExpectations(visitor);
-        visitor.visitField(EasyMock.eq(expectedField), 
+        visitor.visitField(EasyMock.eq(expectedField),
                            EasyMock.isA(Resource.class));
         visitor.visitMethod((Method)EasyMock.anyObject(), (Annotation)EasyMock.anyObject());
 
         runProcessor(visitor);
-        
-    } 
+
+    }
 
     @Test
     public void testVisitMethod() throws Exception {
 
-        Field expectedField = AnnotatedGreeterImpl.class.getDeclaredField("foo"); 
-        Method expectedMethod1 = AnnotatedGreeterImpl.class.getDeclaredMethod("sayHi"); 
-        Method expectedMethod2 = AnnotatedGreeterImpl.class.getDeclaredMethod("sayHi", String.class); 
-        Method expectedMethod3 = AnnotatedGreeterImpl.class.getDeclaredMethod("greetMe", String.class); 
-        Method expectedMethod4 = 
-            AnnotatedGreeterImpl.class.getDeclaredMethod("setContext", WebServiceContext.class); 
+        Field expectedField = AnnotatedGreeterImpl.class.getDeclaredField("foo");
+        Method expectedMethod1 = AnnotatedGreeterImpl.class.getDeclaredMethod("sayHi");
+        Method expectedMethod2 = AnnotatedGreeterImpl.class.getDeclaredMethod("sayHi", String.class);
+        Method expectedMethod3 = AnnotatedGreeterImpl.class.getDeclaredMethod("greetMe", String.class);
+        Method expectedMethod4 =
+            AnnotatedGreeterImpl.class.getDeclaredMethod("setContext", WebServiceContext.class);
         Method expectedMethod5 = AnnotatedGreeterImpl.class.getDeclaredMethod("greetMeOneWay", String.class);
 
         expectedAnnotations.add(WebMethod.class);
-        expectedAnnotations.add(Resource.class); 
+        expectedAnnotations.add(Resource.class);
 
         prepareCommonExpectations(visitor);
-        visitor.visitField(EasyMock.eq(expectedField), 
+        visitor.visitField(EasyMock.eq(expectedField),
                            EasyMock.isA(Resource.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod1), 
+        visitor.visitMethod(EasyMock.eq(expectedMethod1),
                            EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod2), 
+        visitor.visitMethod(EasyMock.eq(expectedMethod2),
                            EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod3), 
+        visitor.visitMethod(EasyMock.eq(expectedMethod3),
                            EasyMock.isA(WebMethod.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod4), 
+        visitor.visitMethod(EasyMock.eq(expectedMethod4),
                            EasyMock.isA(Resource.class));
-        visitor.visitMethod(EasyMock.eq(expectedMethod5), 
+        visitor.visitMethod(EasyMock.eq(expectedMethod5),
                             EasyMock.isA(WebMethod.class));
         runProcessor(visitor);
     }
 
     @Test
-    public void testProcessorInvalidConstructorArgs() { 
-        
+    public void testProcessorInvalidConstructorArgs() {
+
         try {
-            new AnnotationProcessor(null); 
+            new AnnotationProcessor(null);
             fail("did not get expected argument");
         } catch (IllegalArgumentException e) {
             // happy
@@ -119,7 +122,7 @@ public class AnnotationProcessorTest extends Assert {
     }
 
     @Test
-    public void testProcessorInvalidAcceptArg() { 
+    public void testProcessorInvalidAcceptArg() {
 
         try {
             processor.accept(null);
@@ -128,7 +131,7 @@ public class AnnotationProcessorTest extends Assert {
             // happy
         }
 
-    } 
+    }
 
 
     private void prepareCommonExpectations(AnnotationVisitor v) {
@@ -137,10 +140,9 @@ public class AnnotationProcessorTest extends Assert {
         v.setTarget(greeterImpl);
     }
 
-    private void runProcessor(AnnotationVisitor v) { 
-        EasyMock.replay(v); 
+    private void runProcessor(AnnotationVisitor v) {
+        EasyMock.replay(v);
         processor.accept(v);
-        EasyMock.verify(v); 
-    } 
+        EasyMock.verify(v);
+    }
 }
-

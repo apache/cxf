@@ -38,19 +38,19 @@ import org.apache.cxf.tools.misc.processor.WSDLToXMLProcessor;
 
 public class WSDLToXML extends AbstractCXFToolContainer {
 
-    static final String TOOL_NAME = "wsdl2xml";    
+    static final String TOOL_NAME = "wsdl2xml";
     static final String BINDING_NAME_POSFIX = "_XMLBinding";
     static final String SERVICE_NAME_POSFIX = "_XMLService";
     static final String PORT_NAME_POSFIX = "_XMLPort";
-    
+
     public WSDLToXML(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
-    
+
     private Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
-    
+
     public void execute(boolean exitOnFinish) {
         WSDLToXMLProcessor processor = new WSDLToXMLProcessor();
         try {
@@ -63,9 +63,9 @@ public class WSDLToXML extends AbstractCXFToolContainer {
                 }
                 env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
-                validate(env);       
+                validate(env);
                 setEnvParamDefValues(env);
-                
+
                 processor.setEnvironment(env);
                 processor.process();
             }
@@ -99,7 +99,7 @@ public class WSDLToXML extends AbstractCXFToolContainer {
         }
         if (!env.optionSet(ToolConstants.CFG_PORT)) {
             env.put(ToolConstants.CFG_PORT, env.get(ToolConstants.CFG_PORTTYPE) + PORT_NAME_POSFIX);
-        }        
+        }
     }
 
     private void validate(ToolContext env) throws ToolException {

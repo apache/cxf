@@ -31,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class JweJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonProducer.class);
@@ -41,7 +42,7 @@ public class JweJsonProducer {
     private byte[] aad;
     private boolean canBeFlat;
     public JweJsonProducer(JweHeaders protectedHeader, byte[] content) {
-        this(protectedHeader, content, false);    
+        this(protectedHeader, content, false);
     }
     public JweJsonProducer(JweHeaders protectedHeader, byte[] content, boolean canBeFlat) {
         this(protectedHeader, content, null, canBeFlat);
@@ -52,28 +53,33 @@ public class JweJsonProducer {
         this.aad = aad;
         this.canBeFlat = canBeFlat;
     }
-    public JweJsonProducer(JweHeaders protectedHeader, 
-                           JweHeaders unprotectedHeader, 
-                           byte[] content, 
+    public JweJsonProducer(JweHeaders protectedHeader,
+                           JweHeaders unprotectedHeader,
+                           byte[] content,
                            byte[] aad,
                            boolean canBeFlat) {
         this(protectedHeader, content, aad, canBeFlat);
         this.unprotectedHeader = unprotectedHeader;
     }
+    public JweJsonProducer(JweHeaders protectedHeader,
+                           JweHeaders unprotectedHeader,
+                           byte[] content) {
+        this(protectedHeader, unprotectedHeader, content, null, false);
+    }
     public String encryptWith(JweEncryptionProvider encryptor) {
         return encryptWith(Collections.singletonList(encryptor), null);
     }
     public String encryptWith(JweEncryptionProvider encryptor, JweHeaders recipientUnprotected) {
-        return encryptWith(Collections.singletonList(encryptor), 
+        return encryptWith(Collections.singletonList(encryptor),
                            Collections.singletonList(recipientUnprotected));
     }
     public String encryptWith(List<JweEncryptionProvider> encryptors) {
         return encryptWith(encryptors, null);
     }
-    public String encryptWith(List<JweEncryptionProvider> encryptors, 
+    public String encryptWith(List<JweEncryptionProvider> encryptors,
                               List<JweHeaders> recipientUnprotected) {
         checkAndGetContentAlgorithm(encryptors);
-        if (recipientUnprotected != null 
+        if (recipientUnprotected != null
             && recipientUnprotected.size() != encryptors.size()) {
             throw new IllegalArgumentException();
         }
@@ -82,7 +88,7 @@ public class JweJsonProducer {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
         }
         if (unprotectedHeader != null) {
-            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                      unprotectedHeader.asMap().keySet())) {
                 LOG.warning("Protected and unprotected headers have duplicate values");
                 throw new JweException(JweException.Error.INVALID_JSON_JWE);
@@ -90,34 +96,35 @@ public class JweJsonProducer {
             checkCriticalHeaders(unprotectedHeader);
             unionHeaders.asMap().putAll(unprotectedHeader.asMap());
         }
-        
-        List<JweJsonEncryptionEntry> entries = new ArrayList<JweJsonEncryptionEntry>(encryptors.size());
-        Map<String, Object> jweJsonMap = new LinkedHashMap<String, Object>();
+
+        List<JweJsonEncryptionEntry> entries = new ArrayList<>(encryptors.size());
+        Map<String, Object> jweJsonMap = new LinkedHashMap<>();
         byte[] cipherText = null;
         byte[] authTag = null;
         byte[] iv = null;
         for (int i = 0; i < encryptors.size(); i++) {
             JweEncryptionProvider encryptor = encryptors.get(i);
-            JweHeaders perRecipientUnprotected = 
+            JweHeaders perRecipientUnprotected =
                 recipientUnprotected == null ? null : recipientUnprotected.get(i);
             JweHeaders jsonHeaders = null;
-            if (perRecipientUnprotected != null) {
+            if (perRecipientUnprotected != null && !perRecipientUnprotected.asMap().isEmpty()) {
                 checkCriticalHeaders(perRecipientUnprotected);
-                if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+                if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                           perRecipientUnprotected.asMap().keySet())) {
                     LOG.warning("union and recipient unprotected headers have duplicate values");
                     throw new JweException(JweException.Error.INVALID_JSON_JWE);
                 }
-                jsonHeaders = new JweHeaders(unionHeaders.asMap());
+                jsonHeaders = new JweHeaders(new LinkedHashMap<String, Object>(unionHeaders.asMap()));
                 jsonHeaders.asMap().putAll(perRecipientUnprotected.asMap());
-            } else {  
+            } else {
                 jsonHeaders = unionHeaders;
             }
             jsonHeaders.setProtectedHeaders(protectedHeader);
-            
+
             JweEncryptionInput input = createEncryptionInput(jsonHeaders);
-            if (i > 0) {    
+            if (i > 0) {
                 input.setContent(null);
+                input.setContentEncryptionRequired(false);
             }
             JweEncryptionOutput state = encryptor.getEncryptionOutput(input);
             byte[] currentCipherText = state.getEncryptedContent();
@@ -131,19 +138,21 @@ public class JweJsonProducer {
             }
             if (iv == null) {
                 iv = currentIv;
-            } 
-            
-            byte[] encryptedCek = state.getContentEncryptionKey(); 
-            if (encryptedCek.length == 0 && encryptor.getKeyAlgorithm() != null) {
+            }
+
+            byte[] encryptedCek = state.getEncryptedContentEncryptionKey();
+            if (encryptedCek.length == 0
+                && encryptor.getKeyAlgorithm() != null
+                && !KeyAlgorithm.DIRECT.equals(encryptor.getKeyAlgorithm())) {
                 LOG.warning("Unexpected key encryption algorithm");
                 throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
-            String encodedCek = encryptedCek.length == 0 ? null : Base64UrlUtility.encode(encryptedCek);    
+            String encodedCek = encryptedCek.length == 0 ? null : Base64UrlUtility.encode(encryptedCek);
             entries.add(new JweJsonEncryptionEntry(perRecipientUnprotected, encodedCek));
-            
+
         }
         if (protectedHeader != null) {
-            jweJsonMap.put("protected", 
+            jweJsonMap.put("protected",
                         Base64UrlUtility.encode(writer.toJson(protectedHeader)));
         }
         if (unprotectedHeader != null) {
@@ -151,7 +160,7 @@ public class JweJsonProducer {
         }
         if (entries.size() == 1 && canBeFlat) {
             JweHeaders unprotectedEntryHeader = entries.get(0).getUnprotectedHeader();
-            if (unprotectedEntryHeader != null) {
+            if (unprotectedEntryHeader != null && !unprotectedEntryHeader.asMap().isEmpty()) {
                 jweJsonMap.put("header", unprotectedEntryHeader);
             }
             String encryptedKey = entries.get(0).getEncodedEncryptedKey();
@@ -173,7 +182,7 @@ public class JweJsonProducer {
         return new JweEncryptionInput(jsonHeaders, content, aad);
     }
     private String checkAndGetContentAlgorithm(List<JweEncryptionProvider> encryptors) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (JweEncryptionProvider encryptor : encryptors) {
             set.add(encryptor.getContentAlgorithm().getJwaName());
         }

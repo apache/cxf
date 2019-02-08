@@ -26,19 +26,22 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     private SimpleSubjectCreatingInterceptor wsIn;
@@ -55,7 +58,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
         Service service = server.getEndpoint().getService();
-        
+
         service.getInInterceptors().add(new SAAJInInterceptor());
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new SAAJOutInterceptor());
@@ -63,35 +66,35 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
 
         wsIn = new SimpleSubjectCreatingInterceptor();
         wsIn.setSupportDigestPasswords(digest);
-        wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
-        
+        wsIn.setProperty(ConfigurationConstants.SIG_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        wsIn.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
+
         service.getInInterceptors().add(wsIn);
-         
+
         SimpleAuthorizingInterceptor sai = new SimpleAuthorizingInterceptor();
         sai.setMethodRolesMap(Collections.singletonMap("echo", expectedRoles));
         service.getInInterceptors().add(sai);
-        
-        
+
+
         wsOut = new WSS4JOutInterceptor();
-        wsOut.setProperty(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
-        wsOut.setProperty(WSHandlerConstants.USER, "myalias");
+        wsOut.setProperty(ConfigurationConstants.SIG_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
+        wsOut.setProperty(ConfigurationConstants.USER, "myalias");
         if (digest) {
             wsOut.setProperty("password", "myAliasPassword");
         } else {
-            wsOut.setProperty(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
+            wsOut.setProperty(ConfigurationConstants.PASSWORD_TYPE, WSS4JConstants.PW_TEXT);
         }
-        
+
         if (encryptUsernameTokenOnly) {
-            wsOut.setProperty(WSHandlerConstants.ENCRYPTION_USER, "myalias");
+            wsOut.setProperty(ConfigurationConstants.ENCRYPTION_USER, "myalias");
             wsOut.setProperty(
-                WSHandlerConstants.ENCRYPTION_PARTS, 
-                "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
+                ConfigurationConstants.ENCRYPTION_PARTS,
+                "{Content}{" + WSS4JConstants.WSSE_NS + "}UsernameToken"
             );
         }
-        wsOut.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
+        wsOut.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
         service.getOutInterceptors().add(wsOut);
 
         // Create the client
@@ -99,14 +102,14 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         echo = (Echo)proxyFac.create();
 
         ((BindingProvider)echo).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
 
-        
+
         client = ClientProxy.getClient(echo);
-        
+
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getInInterceptors().add(wsIn);
         client.getInInterceptors().add(new SAAJInInterceptor());
@@ -115,29 +118,29 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         client.getOutInterceptors().add(new SAAJOutInterceptor());
     }
 
-    
+
     @Test
     public void testDigestPasswordAuthorized() throws Exception {
         setUpService("developers", true, false);
-        String actions = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " "
-                         + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN;
+        String actions = ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE + " "
+                         + ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.USERNAME_TOKEN;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testDigestPasswordUnauthorized() throws Exception {
         setUpService("managers", true, false);
-        String actions = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " "
-                         + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN;
+        String actions = ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE + " "
+                         + ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.USERNAME_TOKEN;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         try {
             echo.echo("test");
@@ -146,36 +149,36 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
             assertEquals("Unauthorized", ex.getMessage());
         }
     }
-    
+
     @Test
     public void testEncryptedDigestPasswordAuthorized() throws Exception {
         setUpService("developers", true, true);
-        String actions = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT;
+        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testClearPasswordAuthorized() throws Exception {
         setUpService("developers", false, false);
-        String actions = WSHandlerConstants.USERNAME_TOKEN;
+        String actions = ConfigurationConstants.USERNAME_TOKEN;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testEncyptedClearPasswordAuthorized() throws Exception {
         setUpService("developers", false, true);
-        String actions = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT;
+        String actions = ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT;
 
-        wsIn.setProperty(WSHandlerConstants.ACTION, actions);
-        wsOut.setProperty(WSHandlerConstants.ACTION, actions);
+        wsIn.setProperty(ConfigurationConstants.ACTION, actions);
+        wsOut.setProperty(ConfigurationConstants.ACTION, actions);
 
         assertEquals("test", echo.echo("test"));
     }

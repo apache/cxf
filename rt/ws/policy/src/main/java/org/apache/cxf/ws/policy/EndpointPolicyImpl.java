@@ -42,34 +42,34 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyContainingAssertion;
 
 /**
- * 
+ *
  */
 public class EndpointPolicyImpl implements EndpointPolicy {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(EndpointPolicyImpl.class);
-    
+
     private Policy policy;
     private Collection<Assertion> chosenAlternative;
-    
+
     private volatile Collection<Assertion> vocabulary;
     private Collection<Assertion> faultVocabulary;
     private volatile List<Interceptor<? extends Message>> interceptors;
     private List<Interceptor<? extends Message>> faultInterceptors;
-    
+
     private EndpointInfo ei;
     private PolicyEngineImpl engine;
     private boolean requestor;
     private Assertor assertor;
-        
+
     public EndpointPolicyImpl() {
-        
+
     }
     public EndpointPolicyImpl(Policy p) {
         policy = p;
     }
-    
+
     public EndpointPolicyImpl(EndpointInfo ei,
-                              PolicyEngineImpl engine, 
+                              PolicyEngineImpl engine,
                               boolean requestor,
                               Assertor assertor) {
         this.ei = ei;
@@ -77,20 +77,20 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         this.requestor = requestor;
         this.assertor = assertor;
     }
-        
+
     public Policy getPolicy() {
-        return policy;        
+        return policy;
     }
-    
+
     public Assertor getAssertor() {
         return assertor;
     }
-    
+
     public EndpointPolicy updatePolicy(Policy p, Message msg) {
         EndpointPolicyImpl epi = createEndpointPolicy();
-        
+
         if (!PolicyUtils.isEmptyPolicy(p)) {
-            Policy normalizedPolicy 
+            Policy normalizedPolicy
                 = p.normalize(engine == null ? null : engine.getRegistry(), true);
             epi.setPolicy(getPolicy().merge(normalizedPolicy));
         } else {
@@ -98,54 +98,54 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             clonedPolicy.addPolicyComponents(getPolicy().getPolicyComponents());
             epi.setPolicy(clonedPolicy);
         }
-        
+
         epi.checkExactlyOnes();
         epi.finalizeConfig(msg);
         return epi;
     }
-    
+
     public Collection<Assertion> getChosenAlternative() {
         return chosenAlternative;
     }
-    
+
     public Collection<Assertion> getVocabulary(Message m) {
         if (vocabulary == null) {
             initializeVocabulary(m);
         }
         return vocabulary;
     }
-    
+
     public Collection<Assertion> getFaultVocabulary(Message m) {
         if (vocabulary == null) {
             initializeVocabulary(m);
         }
         return faultVocabulary;
-    }    
-    
+    }
+
     public List<Interceptor<? extends Message>> getInterceptors(Message m) {
         if (interceptors == null) {
             initializeInterceptors(m);
         }
         return interceptors;
     }
-    
+
     public List<Interceptor<? extends Message>> getFaultInterceptors(Message m) {
         if (interceptors == null) {
             initializeInterceptors(m);
         }
         return faultInterceptors;
     }
-    
+
     public void initialize(Message m) {
         initializePolicy(m);
         checkExactlyOnes();
         finalizeConfig(m);
     }
-    
+
     void finalizeConfig(Message m) {
         chooseAlternative(m);
     }
-   
+
     void initializePolicy(Message m) {
         if (engine != null) {
             policy = engine.getAggregatedServicePolicy(ei.getService(), m);
@@ -170,13 +170,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
         if (null == alternative) {
             throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
-        } else {
-            setChosenAlternative(alternative);
         }
+        setChosenAlternative(alternative);
     }
-    
+
     protected Collection<Assertion> getSupportedAlternatives(Message msg) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
 
         for (Iterator<List<Assertion>> it = policy.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
@@ -186,7 +185,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
         return alternatives;
     }
-    
+
     private void addAll(Collection<Assertion> target, Collection<Assertion> l1) {
         for (Assertion l : l1) {
             if (!target.contains(l)) {
@@ -194,32 +193,32 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             }
         }
     }
-    
+
     synchronized void initializeVocabulary(Message m) {
         if (vocabulary != null) {
             return;
         }
 
-        List<Assertion> v = new ArrayList<Assertion>();
+        List<Assertion> v = new ArrayList<>();
         List<Assertion> fv = null;
         if (requestor) {
-            fv = new ArrayList<Assertion>();
+            fv = new ArrayList<>();
         }
-       
+
         // vocabulary of alternative chosen for endpoint
-        if (getChosenAlternative() != null) { 
+        if (getChosenAlternative() != null) {
             for (Assertion a : getChosenAlternative()) {
                 if (a.isOptional()) {
                     continue;
                 }
-                v.add(a);            
+                v.add(a);
                 if (null != fv) {
                     fv.add(a);
                 }
             }
         }
-   
-        // add assertions for specific inbound (in case of a server endpoint) or outbound 
+
+        // add assertions for specific inbound (in case of a server endpoint) or outbound
         // (in case of a client endpoint) messages
         for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
             EffectivePolicy p = null;
@@ -256,7 +255,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     Collection<Assertion> getSupportedAlternatives(Policy p, Message msg) {
-        Collection<Assertion> alternatives = new ArrayList<Assertion>();
+        Collection<Assertion> alternatives = new ArrayList<>();
         for (Iterator<List<Assertion>> it = p.getAlternatives(); it.hasNext();) {
             List<Assertion> alternative = it.next();
             if (engine.supportsAlternative(alternative, null, msg)) {
@@ -267,10 +266,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     void initializeInterceptors(PolicyInterceptorProviderRegistry reg,
-                                Set<Interceptor<? extends Message>> out, Assertion a, 
+                                Set<Interceptor<? extends Message>> out, Assertion a,
                                 boolean fault, Message msg) {
         QName qn = a.getName();
-        List<Interceptor<? extends org.apache.cxf.message.Message>> i 
+        List<Interceptor<? extends org.apache.cxf.message.Message>> i
             = fault ? reg.getInFaultInterceptorsForAssertion(qn)
             : reg.getInInterceptorsForAssertion(qn);
         out.addAll(i);
@@ -293,10 +292,10 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             || engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class) == null) {
             return;
         }
-        PolicyInterceptorProviderRegistry reg 
+        PolicyInterceptorProviderRegistry reg
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
-        
-        Set<Interceptor<? extends Message>> out = new LinkedHashSet<Interceptor<? extends Message>>();
+
+        Set<Interceptor<? extends Message>> out = new LinkedHashSet<>();
         if (getChosenAlternative() != null) {
             for (Assertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, false, m);
@@ -305,12 +304,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
 
         List<Interceptor<? extends Message>> tmp = null;
         if (requestor) {
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<>(out);
             out.clear();
             for (Assertion a : getChosenAlternative()) {
-                initializeInterceptors(reg, out, a, true, m);                
+                initializeInterceptors(reg, out, a, true, m);
             }
-            faultInterceptors = new ArrayList<Interceptor<? extends Message>>(out);
+            faultInterceptors = new ArrayList<>(out);
         } else if (ei != null && ei.getBinding() != null) {
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
                 EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi, m);
@@ -325,46 +324,46 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                     }
                 }
             }
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);
+            tmp = new ArrayList<>(out);
         } else {
-            tmp = new ArrayList<Interceptor<? extends Message>>(out);            
+            tmp = new ArrayList<>(out);
         }
         interceptors = tmp;
     }
-    
+
     // for test
-    
+
     void setPolicy(Policy ep) {
         policy = ep;
     }
-    
+
     void setChosenAlternative(Collection<Assertion> c) {
         chosenAlternative = c;
     }
-    
+
     void setVocabulary(Collection<Assertion> v) {
         vocabulary = v;
     }
-    
+
     void setFaultVocabulary(Collection<Assertion> v) {
         faultVocabulary = v;
     }
-    
+
     void setInterceptors(List<Interceptor<? extends Message>> in) {
         interceptors = in;
     }
-    
+
     void setFaultInterceptors(List<Interceptor<? extends Message>> inFault) {
         faultInterceptors = inFault;
     }
-    
+
     protected EndpointPolicyImpl createEndpointPolicy() {
         return new EndpointPolicyImpl(this.ei,
                                       this.engine,
                                       this.requestor,
                                       this.assertor);
     }
-    
+
     void checkExactlyOnes() {
         // Policy has been normalized and merged by now but unfortunately
         // ExactlyOnce have not been normalized properly by Neethi, for ex
@@ -377,18 +376,18 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         // <Policy>
         // <ExactlyOne><All><A></All><All><B></All></ExactlyOne>
         // </Policy>
-                
+
         List<?> assertions = policy.getPolicyComponents();
         if (assertions.size() <= 1) {
             return;
         }
-        
+
         Policy p = new Policy();
         ExactlyOne alternatives = new ExactlyOne();
         p.addPolicyComponent(alternatives);
         for (Object a : assertions) {
             alternatives.addPolicyComponents(((ExactlyOne)a).getPolicyComponents());
         }
-        setPolicy(p);        
+        setPolicy(p);
     }
 }

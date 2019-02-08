@@ -19,40 +19,41 @@
 
 package org.apache.cxf.systest.http;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.littleshoot.proxy.ActivityTrackerAdapter;
+import org.littleshoot.proxy.FlowContext;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.ProxyAuthenticator;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
-import org.jboss.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpRequest;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import org.littleshoot.proxy.DefaultHttpProxyServer;
-import org.littleshoot.proxy.HttpFilter;
-import org.littleshoot.proxy.HttpRequestFilter;
-import org.littleshoot.proxy.ProxyAuthorizationHandler;
-
+import static org.junit.Assert.assertEquals;
 
 /**
- * 
+ *
  */
 public class HTTPProxyAuthConduitTest extends HTTPConduitTest {
     static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPProxyAuthConduitTest.class));
-    static DefaultHttpProxyServer proxy;
+    static HttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
-    
-    static class CountingFilter implements HttpRequestFilter {
+
+    static class CountingFilter extends ActivityTrackerAdapter {
         AtomicInteger count = new AtomicInteger();
-        public void filter(HttpRequest httpRequest) {
+        public void requestReceivedFromClient(FlowContext flowContext,
+                                              HttpRequest httpRequest) {
             count.incrementAndGet();
         }
-        
+
         public void reset() {
             count.set(0);
         }
@@ -60,32 +61,38 @@ public class HTTPProxyAuthConduitTest extends HTTPConduitTest {
             return count.get();
         }
     }
-    
     public HTTPProxyAuthConduitTest() {
     }
 
-    
+
     @AfterClass
     public static void stopProxy() {
         proxy.stop();
         proxy = null;
     }
-    
+
     @BeforeClass
     public static void startProxy() {
-        proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
-        proxy.addProxyAuthenticationHandler(new ProxyAuthorizationHandler() {
-            public boolean authenticate(String userName, String password) {
-                return "password".equals(password) && "CXF".equals(userName);
-            }
-        });
-        proxy.start();
+        proxy = DefaultHttpProxyServer.bootstrap()
+            .withPort(PROXY_PORT)
+            .withProxyAuthenticator(new ProxyAuthenticator() {
+                @Override
+                public boolean authenticate(String userName, String password) {
+                    return "password".equals(password) && "CXF".equals(userName);
+                }
+                @Override
+                public String getRealm() {
+                    return null;
+                }
+            })
+            .plusActivityTracker(requestFilter)
+            .start();
     }
     @Before
     public void resetCount() {
         requestFilter.reset();
     }
-    
+
     public void configureProxy(Client client) {
         HTTPConduit cond = (HTTPConduit)client.getConduit();
         HTTPClientPolicy pol = cond.getClient();
@@ -100,12 +107,12 @@ public class HTTPProxyAuthConduitTest extends HTTPConduitTest {
         auth.setPassword("password");
         cond.setProxyAuthorization(auth);
     }
-    
+
     public void resetProxyCount() {
         requestFilter.reset();
     }
     public void assertProxyRequestCount(int i) {
         assertEquals("Unexpected request count", i, requestFilter.getCount());
     }
-    
+
 }

@@ -23,25 +23,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class TextExtensionFragmentParserTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class TextExtensionFragmentParserTest {
 
     @Test
     public void testGetExtensions() throws IOException {
         InputStream is = TextExtensionFragmentParserTest.class.getResourceAsStream("extension2.txt");
         List<Extension> extensions = new TextExtensionFragmentParser(null).getExtensions(is);
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
-        
+
         Extension e = extensions.get(0);
-        assertTrue("Extension is deferred.", !e.isDeferred());
-        assertEquals("Unexpected class name.", 
+        assertFalse("Extension is deferred.", e.isDeferred());
+        assertEquals("Unexpected class name.",
                      "org.apache.cxf.foo.FooImpl", e.getClassname());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());
         e = extensions.get(1);
         assertTrue("Extension is not deferred.", e.isDeferred());
-        assertEquals("Unexpected implementation class name.", 
+        assertEquals("Unexpected implementation class name.",
                      "java.lang.Boolean", e.getClassname());
         assertNull("Interface should be null", e.getInterfaceName());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());

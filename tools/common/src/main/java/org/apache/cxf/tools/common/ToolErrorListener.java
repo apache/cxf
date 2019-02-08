@@ -26,18 +26,18 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * 
+ *
  */
 public class ToolErrorListener {
     private static final Logger LOG = LogUtils.getL7dLogger(ToolErrorListener.class);
-    
-    class ErrorInfo {
+
+    static class ErrorInfo {
         String file;
         int line;
         int col;
         Throwable cause;
         String message;
-        
+
         ErrorInfo(String f, int l, int c, String m, Throwable t) {
             file = f;
             line = l;
@@ -46,8 +46,8 @@ public class ToolErrorListener {
             cause = t;
         }
     }
-    List<ErrorInfo> errors = new LinkedList<ErrorInfo>();
-    
+    List<ErrorInfo> errors = new LinkedList<>();
+
     public void addError(String file, int line, int column, String message) {
         addError(file, line, column, message, null);
     }
@@ -60,7 +60,7 @@ public class ToolErrorListener {
     }
     public void addWarning(String file, int line, int column, String message, Throwable t) {
         if (file != null) {
-            message = file + " [" + line + "," + column + "]: " + message; 
+            message = file + " [" + line + "," + column + "]: " + message;
         }
         LOG.warning(message);
     }

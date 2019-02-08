@@ -29,21 +29,21 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class Server extends AbstractBusTestServerBase {
-    public static final String PORT = TestUtil.getPortNumber(Server.class); 
+    public static final String PORT = TestUtil.getPortNumber(Server.class);
 
     protected void run() {
         Object implementor = new HWSourcePayloadProvider();
         String address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8";
         Endpoint ep = Endpoint.create(implementor);
         ep.publish(address);
-        
-        Map<String, Object> map = new HashMap<String, Object>();
+
+        Map<String, Object> map = new HashMap<>();
         map.put(SourceDataBinding.PREFERRED_FORMAT, "dom");
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-dom";
         ep = Endpoint.create(implementor);
         ep.setProperties(map);
         ep.publish(address);
-        
+
         map.put(SourceDataBinding.PREFERRED_FORMAT, "sax");
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-sax";
         ep = Endpoint.create(implementor);
@@ -68,7 +68,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.setProperties(map);
         ep.publish(address);
 
-               
+
         implementor = new HWSoapMessageProvider();
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit1";
         Endpoint.publish(address, implementor);
@@ -76,7 +76,7 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new HWDOMSourceMessageProvider();
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit2";
         Endpoint.publish(address, implementor);
-        
+
         implementor = new HWDOMSourcePayloadProvider();
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit3";
         Endpoint.publish(address, implementor);
@@ -96,7 +96,7 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new HWStreamSourcePayloadProvider();
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit7";
         Endpoint.publish(address, implementor);
-    
+
     }
 
     public static void main(String[] args) {

@@ -28,7 +28,7 @@ import javax.jws.WebService;
 import org.apache.cxf.systest.aegis.bean.Item;
 
 /**
- * 
+ *
  */
 @WebService(name = "AegisJaxWs", targetNamespace = "http://test.cxf.apache.org")
 public interface AegisJaxWs {
@@ -47,17 +47,17 @@ public interface AegisJaxWs {
     Item getItemByKey(@WebParam(name = "key1")
                       String key1, @WebParam(name = "key2")
                       String key2);
-    
+
     @WebMethod
     Integer getSimpleValue(@WebParam(name = "a")Integer a, @WebParam(name = "b")String b);
-    
+
     //try comment this method
     @WebMethod
     java.util.List<String> getStringList();
-    
+
     @WebMethod
     java.util.List<String> echoBigList(@WebParam(name = "foo") java.util.List<String> l);
-    
+
     @WebMethod
     byte[] export(java.util.List<java.lang.Integer> integers);
 }

@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 
 public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
     private Log logger;
-    
+
     public InHeaderResponseT inHeader(InHeaderT in, HeaderInfo header) {
         getLogger().debug("Server: inHeader called");
         assertEquals(HeaderTesterUtil.IN_REQUEST_TYPE, in.getRequestType());
@@ -55,37 +55,37 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
         inHeaderResponse.setResponseType(HeaderTesterUtil.OUT_RESPONSE_TYPE);
         return inHeaderResponse;
     }
-    
+
     public InoutHeaderResponseT inoutHeader(InoutHeaderT in, Holder<HeaderInfo> header) {
         getLogger().debug("Server: inoutHeader called");
         assertEquals(HeaderTesterUtil.INOUT_REQUEST_TYPE_IN, in.getRequestType());
         assertEquals(HeaderTesterUtil.INOUT_MESSAGE_IN, header.value.getMessage());
         assertEquals(HeaderTesterUtil.INOUT_ORIGINATOR_IN, header.value.getOriginator());
-        
+
         HeaderInfo out = new HeaderInfo();
         out.setMessage(HeaderTesterUtil.INOUT_MESSAGE_OUT);
         out.setOriginator(HeaderTesterUtil.INOUT_ORIGINATOR_OUT);
         header.value = out;
-        
+
         InoutHeaderResponseT inoutHeaderResponse = new InoutHeaderResponseT();
         inoutHeaderResponse.setResponseType(HeaderTesterUtil.INOUT_REQUEST_TYPE_OUT);
         return inoutHeaderResponse;
     }
-    
+
     public void outHeader(OutHeaderT in, Holder<OutHeaderResponseT> out, Holder<HeaderInfo> header) {
         getLogger().debug("Server: outHeader called");
         assertEquals(HeaderTesterUtil.OUT_REQUEST_TYPE, in.getRequestType());
-        
+
         HeaderInfo outHeader = new HeaderInfo();
         outHeader.setMessage(HeaderTesterUtil.OUT_MESSAGE_OUT);
         outHeader.setOriginator(HeaderTesterUtil.OUT_ORIGINATOR_OUT);
         header.value = outHeader;
-        
+
         OutHeaderResponseT resp = new OutHeaderResponseT();
         resp.setResponseType(HeaderTesterUtil.OUT_RESPONSE_TYPE);
         out.value = resp;
     }
-    
+
     public PingMeResponseT pingMe(PingMeT in) throws PingMeFault {
         String msgType = in.getFaultType();
         getLogger().debug("Server: in pingMe:" + msgType);
@@ -101,16 +101,16 @@ public class BaseHeaderTesterRpcLitImpl implements HeaderTester {
                                         new Object[]{"FAULT TEST"}));
         } else if ("RUNTIME".equals(msgType)) {
             throw new IllegalArgumentException(HeaderTesterUtil.EX_STRING);
-        } 
-        
+        }
+
         return new PingMeResponseT();
     }
-    
+
     public void init(Log log) {
         logger = log;
     }
-    
+
     protected Log getLogger() {
         return logger;
-    }    
+    }
 }

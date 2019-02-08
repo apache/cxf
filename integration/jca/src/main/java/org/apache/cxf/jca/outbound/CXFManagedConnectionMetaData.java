@@ -40,7 +40,7 @@ public class CXFManagedConnectionMetaData implements ManagedConnectionMetaData {
         return "Apache CXF";
     }
 
- 
+
     public String getEISProductVersion() throws ResourceException {
         return "2.0";
     }
@@ -52,7 +52,7 @@ public class CXFManagedConnectionMetaData implements ManagedConnectionMetaData {
         return -1;
     }
 
- 
+
     public String getUserName() throws ResourceException {
         return userName;
     }

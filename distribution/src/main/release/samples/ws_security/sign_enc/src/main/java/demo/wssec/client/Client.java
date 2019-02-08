@@ -40,7 +40,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
  */
 public final class Client {
 
-    private static final String WSSE_NS 
+    private static final String WSSE_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private static final String WSU_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
@@ -48,7 +48,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();
@@ -56,7 +56,7 @@ public final class Client {
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
-            Map<String, Object> outProps = new HashMap<String, Object>();
+            Map<String, Object> outProps = new HashMap<>();
             outProps.put("action", "UsernameToken Timestamp Signature Encrypt");
 
             outProps.put("passwordType", "PasswordDigest");
@@ -80,12 +80,12 @@ public final class Client {
                          + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                          + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
 
-            outProps.put("encryptionKeyTransportAlgorithm", 
+            outProps.put("encryptionKeyTransportAlgorithm",
                          "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
 
-            Map<String, Object> inProps = new HashMap<String, Object>();
+            Map<String, Object> inProps = new HashMap<>();
 
             inProps.put("action", "UsernameToken Timestamp Signature Encrypt");
             inProps.put("passwordType", "PasswordText");
@@ -97,7 +97,7 @@ public final class Client {
             inProps.put("signaturePropFile", "etc/Client_Encrypt.properties");
             inProps.put("signatureKeyIdentifier", "DirectReference");
 
-            inProps.put("encryptionKeyTransportAlgorithm", 
+            inProps.put("encryptionKeyTransportAlgorithm",
                          "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
             inProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
@@ -115,7 +115,7 @@ public final class Client {
             client.getInInterceptors().add(new WSS4JInInterceptor(inProps));
             client.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
             client.getInInterceptors().add(coverageChecker);
-            
+
 
             String[] names = new String[] {"Anne", "Bill", "Chris", "Sachin Tendulkar"};
             // make a sequence of 4 invocations

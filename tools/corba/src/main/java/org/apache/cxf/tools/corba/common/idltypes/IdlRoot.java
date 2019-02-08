@@ -32,8 +32,8 @@ public final class IdlRoot extends IdlScopeBase {
 
     private IdlRoot() {
         super(null, "");
-        primitiveTypes = new HashMap<String, IdlType>();
-        includeList = new ArrayList<String>();
+        primitiveTypes = new HashMap<>();
+        includeList = new ArrayList<>();
 
         for (short i = IdlPrimitive.MINIMUM; i <= IdlPrimitive.MAXIMUM; ++i) {
             IdlPrimitive prim = IdlPrimitive.create(this, i);
@@ -43,7 +43,7 @@ public final class IdlRoot extends IdlScopeBase {
         primitiveTypes.put("string", IdlString.create());
         primitiveTypes.put("wstring", IdlWString.create());
     }
-    
+
     public static IdlRoot create() {
         return new IdlRoot();
     }
@@ -80,12 +80,12 @@ public final class IdlRoot extends IdlScopeBase {
             pw.println("#include " + s);
         }
 
-        if (includeList.size() > 0) {
+        if (!includeList.isEmpty()) {
             pw.println();
         }
 
         super.writeFwd(pw);
         super.write(pw);
     }
-    
+
 }

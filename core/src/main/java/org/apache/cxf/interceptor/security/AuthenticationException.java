@@ -23,7 +23,7 @@ public class AuthenticationException extends SecurityException {
 
     public AuthenticationException() {
     }
-    
+
     public AuthenticationException(String reason) {
         super(reason);
     }

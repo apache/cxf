@@ -27,19 +27,19 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
     private static final QName BOOK_QNAME = new QName("http://superbooks", "thebook");
     private static final QName CHAPTER_QNAME = new QName("http://superbooks", "thechapter");
-    
+
     public Book createBook() {
         return new Book();
     }
     public Chapter createChapter() {
         return new Chapter();
     }
-    
+
     @XmlElementDecl(namespace = "http://superbooks", name = "thebook")
     public JAXBElement<Book> createBook(Book value) {
         return new JAXBElement<Book>(BOOK_QNAME, Book.class, null, value);
     }
-    
+
     @XmlElementDecl(namespace = "http://superbooks", name = "thechapter")
     public JAXBElement<Chapter> createChapter(Chapter value) {
         return new JAXBElement<Chapter>(CHAPTER_QNAME, Chapter.class, null, value);

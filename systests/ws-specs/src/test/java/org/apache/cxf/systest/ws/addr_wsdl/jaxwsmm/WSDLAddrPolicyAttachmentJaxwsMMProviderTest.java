@@ -22,8 +22,11 @@ package org.apache.cxf.systest.ws.addr_wsdl.jaxwsmm;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
+import messaging.AsyncMessaging;
+import messaging.AsyncMessagingService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -41,8 +44,7 @@ import org.apache.cxf.ws.policy.PolicyOutInterceptor;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import messaging.AsyncMessaging;
-import messaging.AsyncMessagingService;
+import static org.junit.Assert.assertTrue;
 
 public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -50,7 +52,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);
 
-    private static final String ADDRESS = "http://localhost:" 
+    private static final String ADDRESS = "http://localhost:"
             + PORT + "/AsyncMessagingServiceProvider";
     private static final String WSDL_ADDRESS = ADDRESS + "?wsdl";
     private static final QName ENDPOINT_NAME = new QName("http://messaging/", "AsyncMessagingService");

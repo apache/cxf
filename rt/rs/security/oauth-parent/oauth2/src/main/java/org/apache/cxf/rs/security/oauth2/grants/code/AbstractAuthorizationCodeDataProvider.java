@@ -27,16 +27,16 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 
 /**
- * Abstract AuthorizationCodeDataProvider implementation 
+ * Abstract AuthorizationCodeDataProvider implementation
  */
-public abstract class AbstractAuthorizationCodeDataProvider 
+public abstract class AbstractAuthorizationCodeDataProvider
     extends AbstractOAuthDataProvider implements AuthorizationCodeDataProvider {
 
     private long grantLifetime = 3600L;
-    
+
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = 
+        ServerAuthorizationCodeGrant grant =
             new ServerAuthorizationCodeGrant(reg.getClient(), getCode(reg), getGrantLifetime(), getIssuedAt());
         grant.setApprovedScopes(getApprovedScopes(reg));
         grant.setAudience(reg.getAudience());
@@ -49,7 +49,7 @@ public abstract class AbstractAuthorizationCodeDataProvider
     protected List<String> getApprovedScopes(AuthorizationCodeRegistration reg) {
         return reg.getApprovedScope();
     }
-    
+
     protected String getCode(AuthorizationCodeRegistration reg) {
         return OAuthUtils.generateRandomTokenKey();
     }

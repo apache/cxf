@@ -26,7 +26,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +43,8 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -68,16 +68,18 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some tests for STSClient configuration.
  */
-public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {    
+public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-   
-    private static final String STS_SERVICE_NAME = 
+
+    private static final String STS_SERVICE_NAME =
         "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService";
-    private static final String TOKEN_TYPE_SAML_2_0 = 
+    private static final String TOKEN_TYPE_SAML_2_0 =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
 
     private static final String SERVICE_ENDPOINT_ASSYMETRIC =
@@ -89,23 +91,24 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     private static final String SERVICE_ENDPOINT_TRANSPORT =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
     private static final String STS_TRANSPORT_WSDL_LOCATION_RELATIVE = "/SecurityTokenService/Transport?wsdl";
-    private static final String STS_TRANSPORT_ENDPOINT_NAME = 
+    private static final String STS_TRANSPORT_ENDPOINT_NAME =
         "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port";
 
-    private static final String CLIENTSTORE = "/clientstore.jks";
+    private static final String CLIENTSTORE = "/keys/clientstore.jks";
     private static final String KEYSTORE_PASS = "cspass";
     private static final String KEY_PASS = "ckpass";
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-transport.xml");
+        assertTrue(launchServer(stsServer));
+
+        stsServer = new STSServer();
+        stsServer.setContext("cxf-x509.xml");
+        assertTrue(launchServer(stsServer));
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -114,12 +117,12 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSTSAsymmetricBinding() throws Exception {
-        Bus bus = BusFactory.getThreadDefaultBus();        
+        Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientAsymmeticBinding(bus);
-        
+
         MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_ASSYMETRIC);
         STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
-        
+
         SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
@@ -128,16 +131,16 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     public void testSTSTransportBinding() throws Exception {
         // Setup HttpsURLConnection to get STS WSDL
         configureDefaultHttpsConnection();
-        
-        Bus bus = BusFactory.getThreadDefaultBus();  
+
+        Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientTransportBinding(bus);
-        
+
         TLSClientParameters tlsParams = prepareTLSParams();
         ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
-        
-        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);       
+
+        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);
         STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
-        
+
         SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
@@ -156,7 +159,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         props.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
         props.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
@@ -181,7 +184,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.USERNAME, "alice");
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         stsClient.setProperties(props);
@@ -192,7 +195,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         MessageImpl message = new MessageImpl();
         message.put(SecurityConstants.STS_CLIENT, stsClient);
         message.put(Message.ENDPOINT_ADDRESS, serviceAddress);
-        
+
         Exchange exchange = new ExchangeImpl();
         ServiceInfo si = new ServiceInfo();
         Service s = new ServiceImpl(si);
@@ -219,11 +222,11 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         KeyStore keyStore = loadClientKeystore();
         trustManagerFactory.init(keyStore);
         TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-        SSLContext sc = SSLContext.getInstance("SSL");
+        SSLContext sc = SSLContext.getInstance("TLS");
         sc.init(null, trustManagers, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        
-        // Needed to prevent test failure using IBM JDK 
+
+        // Needed to prevent test failure using IBM JDK
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             System.setProperty("https.protocols", "TLSv1");
         }
@@ -265,7 +268,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(token);
         Assert.assertEquals(TOKEN_TYPE_SAML_2_0, token.getTokenType());
         Assert.assertNotNull(token.getId());
-        Assert.assertTrue(token.getExpires().after(new Date()));
+        assertTrue(token.getExpires().isAfter(Instant.now()));
         Assert.assertEquals("Assertion", token.getToken().getLocalName());
     }
 

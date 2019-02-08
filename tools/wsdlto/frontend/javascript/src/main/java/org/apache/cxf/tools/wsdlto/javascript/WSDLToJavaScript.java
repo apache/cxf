@@ -38,7 +38,7 @@ public class WSDLToJavaScript {
     public WSDLToJavaScript() {
         args = new String[0];
     }
-    public WSDLToJavaScript(String pargs[]) {
+    public WSDLToJavaScript(String[] pargs) {
         args = pargs;
     }
 
@@ -88,7 +88,7 @@ public class WSDLToJavaScript {
     }
 
     public static void main(String[] pargs) {
-        
+
         CommandInterfaceUtils.commandCommonMain();
 
         WSDLToJavaScript w2j = new WSDLToJavaScript(pargs);

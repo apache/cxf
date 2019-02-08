@@ -20,11 +20,10 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 import java.net.URL;
-import java.security.Security;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,62 +39,53 @@ import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.AfterClass;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some tests for various properties of JWT tokens.
  */
 public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwtProperties.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerJwtProperties.class, true));
-        registerBouncyCastleIfNeeded();
     }
-    
-    private static void registerBouncyCastleIfNeeded() throws Exception {
-        // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());    
-    }
-    
-    @AfterClass
-    public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
-    }
-    
+
     @org.junit.Test
     public void testExpiredToken() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         claims.setAudiences(toList(address));
-        
+
         // Set the expiry date to be yesterday
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        
+        claims.setExpiryTime(now.minusDays(1L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -103,35 +93,34 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testFutureToken() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setAudiences(toList(address));
-        
+
         // Set the issued date to be in the future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusDays(1L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -139,35 +128,34 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testNearFutureTokenFailure() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setAudiences(toList(address));
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusSeconds(30L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -175,35 +163,34 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testNearFutureTokenSuccess() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwtnearfuture/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setAudiences(toList(address));
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusSeconds(30L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -211,36 +198,35 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testNotBeforeFailure() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setAudiences(toList(address));
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setNotBefore(now.plusSeconds(30L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -248,36 +234,35 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testNotBeforeSuccess() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwtnearfuture/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setAudiences(toList(address));
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setNotBefore(now.plusSeconds(30L).toEpochSecond());
+
         JwtToken token = new JwtToken(claims);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -285,29 +270,30 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testSetClaimsDirectly() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         claims.setAudiences(toList(address));
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -315,30 +301,31 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testBadAudience() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
         claims.setAudiences(toList(badAddress));
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -346,63 +333,29 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testNoAudience() throws Exception {
 
         URL busFile = JWTPropertiesTest.class.getResource("client.xml");
 
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("rs.security.signature.algorithm", "none");
-        properties.put(JwtConstants.JWT_CLAIMS, claims);
-        WebClient.getConfig(client).getRequestContext().putAll(properties);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
 
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testMultipleAudiences() throws Exception {
-
-        URL busFile = JWTPropertiesTest.class.getResource("client.xml");
-
-        List<Object> providers = new ArrayList<Object>();
-        providers.add(new JacksonJsonProvider());
-        providers.add(new JwtAuthenticationClientFilter());
-
-        String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
-        WebClient client = 
-            WebClient.create(address, providers, busFile.toString());
-        client.type("application/json").accept("application/json");
-        
-        // Create the JWT Token
-        JwtClaims claims = new JwtClaims();
-        claims.setSubject("alice");
-        claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        
-        String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
-        List<String> audiences = new ArrayList<String>();
-        audiences.add(address);
-        audiences.add(badAddress);
-        claims.setAudiences(audiences);
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -410,9 +363,45 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
+    @org.junit.Test
+    public void testMultipleAudiences() throws Exception {
+
+        URL busFile = JWTPropertiesTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        providers.add(new JwtAuthenticationClientFilter());
+
+        String address = "https://localhost:" + PORT + "/unsignedjwt/bookstore/books";
+        WebClient client =
+            WebClient.create(address, providers, busFile.toString());
+        client.type("application/json").accept("application/json");
+
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+
+        String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
+        List<String> audiences = new ArrayList<>();
+        audiences.add(address);
+        audiences.add(badAddress);
+        claims.setAudiences(audiences);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.algorithm", "none");
+        properties.put(JwtConstants.JWT_CLAIMS, claims);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+    }
+
     private List<String> toList(String address) {
         return Collections.singletonList(address);
     }
-    
+
 }

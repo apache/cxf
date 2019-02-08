@@ -26,6 +26,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSServletFilterTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerServletFilter.PORT;
 
@@ -36,13 +39,13 @@ public class JAXRSServletFilterTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerServletFilter.class, true));
         createStaticBus();
     }
-    
-    
+
+
     @Test
     public void testServletConfigInitParam() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/filter/resources/servlet/config/query?name=a"; 
+            "http://localhost:" + PORT + "/webapp/filter/resources/servlet/config/query?name=a";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/plain");

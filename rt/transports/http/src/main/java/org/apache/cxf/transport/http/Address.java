@@ -32,27 +32,27 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
  * A convenient class for storing URI and URL representation of an address and avoid useless conversions.
  * A proxy for the current address is also lazily resolved and stored; most of the times, that proxy can
  * be used to prevent the HttpURLConnection from computing the proxy when the connection is opened.
- * 
+ *
  * The class is thread-safe.
  */
 @NoJSR250Annotations
-public final class Address {  
+public final class Address {
 
     private final String str;
     private final URI uri;
     private volatile URL url;
     private volatile Proxy defaultProxy;
-    
+
     public Address(String str) throws URISyntaxException {
         this.str = str;
         this.uri = new URI(str);
     }
-    
+
     public Address(String str, URI uri) {
         this.str = str;
         this.uri = uri;
     }
-    
+
     public URL getURL() throws MalformedURLException {
         if (url == null) {
             synchronized (this) {
@@ -63,15 +63,15 @@ public final class Address {
         }
         return url;
     }
-    
+
     public URI getURI() {
         return uri;
     }
-    
+
     public String getString() {
         return str;
     }
-    
+
     public Proxy getDefaultProxy() {
         if (defaultProxy == null) {
             synchronized (this) {
@@ -95,7 +95,7 @@ public final class Address {
             return Proxy.NO_PROXY;
         }
         //detect usage of user-defined proxy and avoid optimizations in that case
-        if (!sel.getClass().getName().equals("sun.net.spi.DefaultProxySelector")) {
+        if (!"sun.net.spi.DefaultProxySelector".equals(sel.getClass().getName())) {
             return null;
         }
         Iterator<Proxy> it = sel.select(uri).iterator();

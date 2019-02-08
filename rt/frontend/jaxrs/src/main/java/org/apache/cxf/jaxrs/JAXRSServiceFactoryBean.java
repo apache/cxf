@@ -22,10 +22,11 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
 import javax.xml.namespace.QName;
@@ -49,17 +50,17 @@ import org.apache.cxf.service.invoker.Invoker;
  * Builds a JAX-RS service model from resource classes.
  */
 public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
-    
-    protected List<ClassResourceInfo> classResourceInfos = 
-        new ArrayList<ClassResourceInfo>();
-    
+
+    protected List<ClassResourceInfo> classResourceInfos =
+        new ArrayList<>();
+
     private Invoker invoker;
     private Executor executor;
     private boolean enableStatic;
     private QName serviceName;
 
     private Class<?> defaultModelClass;
-    
+
     public JAXRSServiceFactoryBean() {
     }
 
@@ -73,19 +74,19 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             super.setBus(bus);
         }
     }
-    
+
     public void setServiceName(QName name) {
         this.serviceName = name;
     }
-    
+
     public QName getServiceName() {
         return serviceName;
     }
-    
+
     public void setEnableStaticResolution(boolean staticResolution) {
         this.enableStatic = staticResolution;
     }
-    
+
     @Override
     public Service create() {
         sendEvent(Event.START_CREATE);
@@ -129,21 +130,17 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     public List<Class<?>> getResourceClasses() {
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
-        for (ClassResourceInfo cri : classResourceInfos) {
-            resourceClasses.add(cri.getResourceClass());
-        }
-        return resourceClasses;
+        return classResourceInfos.stream().map(ClassResourceInfo::getResourceClass).collect(Collectors.toList());
     }
 
     public List<ClassResourceInfo> getClassResourceInfo() {
         return Collections.unmodifiableList(classResourceInfos);
     }
-    
+
     List<ClassResourceInfo> getRealClassResourceInfo() {
         return classResourceInfos;
     }
-    
+
     public void setResourceClass(Class<?> cls) {
         if (getCreatedFromModel(cls) == null) {
             classResourceInfos.clear();
@@ -151,10 +148,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             createResourceInfo(cls, isRoot);
         }
     }
-    
+
     public void setResourceClasses(List<Class<?>> classes) {
         for (Class<?> resourceClass : classes) {
-            
+
             ClassResourceInfo cri = getCreatedFromModel(resourceClass);
             if (cri != null) {
                 if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
@@ -164,18 +161,18 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
                 continue;
             }
-            
+
             createResourceInfo(resourceClass, true);
         }
     }
-    
+
     public void setUserResources(List<UserResource> resources) {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (UserResource ur : resources) {
             if (ur.getPath() != null) {
-                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, 
-                                                                              defaultModelClass, 
-                                                                              true, 
+                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur,
+                                                                              defaultModelClass,
+                                                                              true,
                                                                               enableStatic,
                                                                               getBus());
                 if (cri != null) {
@@ -184,7 +181,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
     }
-    
+
     public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> ...sClasses) {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (Class<?> sClass : sClasses) {
@@ -195,17 +192,13 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
     }
-    
+
     private Map<String, UserResource> userResourcesAsMap(List<UserResource> resources) {
-        Map<String, UserResource> map = new HashMap<String, UserResource>();
-        for (UserResource ur : resources) {
-            map.put(ur.getName(), ur);
-        }
-        return map;
+        return resources.stream().collect(Collectors.toMap(UserResource::getName, Function.identity()));
     }
-    
+
     protected ClassResourceInfo createResourceInfo(Class<?> cls, boolean isRoot) {
-        ClassResourceInfo classResourceInfo = 
+        ClassResourceInfo classResourceInfo =
             ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic, getBus());
         if (classResourceInfo != null) {
             classResourceInfos.add(classResourceInfo);
@@ -216,12 +209,12 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     public void setResourceClasses(Class<?>... classes) {
         setResourceClasses(Arrays.asList(classes));
     }
-    
+
     public void setResourceClassesFromBeans(List<Object> beans) {
         for (Object bean : beans) {
-            
+
             Class<?> realClass = ClassHelper.getRealClass(getBus(), bean);
-            
+
             ClassResourceInfo cri = getCreatedFromModel(realClass);
             if (cri != null) {
                 if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
@@ -232,7 +225,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
                 cri.setResourceProvider(new SingletonResourceProvider(bean));
                 continue;
             }
-            
+
             cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic,
                                                         getBus());
             if (cri != null) {
@@ -242,21 +235,21 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             }
         }
     }
-    
+
     private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
         sendEvent(Event.CREATE_FROM_CLASS, realClass);
 
         for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.isCreatedFromModel() 
+            if (cri.isCreatedFromModel()
                 && cri.isRoot() && cri.getServiceClass().isAssignableFrom(realClass)) {
                 return cri;
             }
         }
         return null;
     }
-    
+
     protected void initializeServiceModel() {
-        
+
         JAXRSServiceImpl service = new JAXRSServiceImpl(classResourceInfos, serviceName);
 
         setService(service);

@@ -25,11 +25,11 @@ import java.util.List;
 public interface BookStoreNoAnnotationsInterface {
 
     Book getBook(Long id) throws BookNotFoundFault;
-    
+
     List<Book> getBooks(List<Book> thebooks);
-        
+
     void pingBookStore();
-    
+
     ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault;
-    
+
 }

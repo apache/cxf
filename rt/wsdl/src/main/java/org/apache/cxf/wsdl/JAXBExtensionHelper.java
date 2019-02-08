@@ -62,6 +62,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
@@ -86,7 +87,7 @@ import org.apache.cxf.staxutils.transform.OutTransformWriter;
  * JAXBExtensionHelper
  */
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
-    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<Class<?>, Integer>();
+    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<>();
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
     private static final int DEFAULT_INDENT_LEVEL = 2;
 
@@ -99,21 +100,21 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private JAXBContext unmarshalContext;
     private Set<Class<?>> classes;
 
-      
+
     public JAXBExtensionHelper(Class<?> cls,
                                String ns) {
         typeClass = cls;
         namespace = ns;
         extensionClass = cls;
     }
-    
+
     void setJaxbNamespace(String ns) {
         jaxbNamespace = ns;
     }
     void setExtensionClass(Class<?> cls) {
         extensionClass = cls;
     }
-    
+
     private int getIndentLevel(Class<?> parent) {
         Integer result = WSDL_INDENT_MAP.get(parent);
         if (result == null) {
@@ -135,25 +136,25 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         WSDL_INDENT_MAP.put(Service.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
         WSDL_INDENT_MAP.put(Types.class, Integer.valueOf(DEFAULT_INDENT_LEVEL * 2));
     }
-    
-    
+
+
     public static void addExtensions(ExtensionRegistry registry, String parentType, String elementType)
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends ExtensibilityElement> elementTypeClass = 
+        Class<? extends ExtensibilityElement> elementTypeClass =
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
                 .asSubclass(ExtensibilityElement.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
     public static void addExtensions(ExtensionRegistry registry,
-                                     String parentType, 
+                                     String parentType,
                                      String elementType,
                                      String namespace)
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends ExtensibilityElement> elementTypeClass = 
+        Class<? extends ExtensibilityElement> elementTypeClass =
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
                 .asSubclass(ExtensibilityElement.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, namespace);
@@ -175,18 +176,18 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                      Class<?> cls,
                                      String namespace,
                                      ClassLoader loader) throws JAXBException {
-        
+
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
         boolean found = false;
         Class<?> extCls = cls;
         try {
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(cls) + ".ObjectFactory",
                                                    true, loader);
-            Method methods[] = ReflectionUtil.getDeclaredMethods(objectFactory);
+            Method[] methods = ReflectionUtil.getDeclaredMethods(objectFactory);
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(cls)) {
-                    
+
                     XmlElementDecl elementDecl = method.getAnnotation(XmlElementDecl.class);
                     if (null != elementDecl) {
                         String name = elementDecl.name();
@@ -199,17 +200,17 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                             extCls = createExtensionClass(cls, elementType, loader);
                             helper.setExtensionClass(extCls);
                         }
-                        registry.registerDeserializer(parentType, elementType, helper); 
-                        registry.registerSerializer(parentType, elementType, helper);                         
+                        registry.registerDeserializer(parentType, elementType, helper);
+                        registry.registerSerializer(parentType, elementType, helper);
                         registry.mapExtensionTypes(parentType, elementType, extCls);
                         found = true;
-                    }                    
+                    }
                 }
-            }        
-            
+            }
+
         } catch (ClassNotFoundException ex) {
             //ignore
-        }        
+        }
         if (!found) {
             //not in object factory or no object factory, try other annotations
             XmlRootElement elAnnot = cls.getAnnotation(XmlRootElement.class);
@@ -236,17 +237,17 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                         extCls = createExtensionClass(cls, elementType, loader);
                         helper.setExtensionClass(extCls);
                     }
-                    registry.registerDeserializer(parentType, elementType, helper); 
-                    registry.registerSerializer(parentType, elementType, helper);                         
+                    registry.registerDeserializer(parentType, elementType, helper);
+                    registry.registerSerializer(parentType, elementType, helper);
                     registry.mapExtensionTypes(parentType, elementType, extCls);
 
                     found = true;
                 }
             }
         }
-        
+
         if (!found) {
-            LOG.log(Level.WARNING, "EXTENSION_NOT_REGISTERED", 
+            LOG.log(Level.WARNING, "EXTENSION_NOT_REGISTERED",
                     new Object[] {cls.getName(), parentType.getName()});
         }
     }
@@ -254,7 +255,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private synchronized Unmarshaller createUnmarshaller() throws JAXBException {
         if (unmarshalContext == null || classes == null) {
             try {
-                CachedContextAndSchemas ccs 
+                CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(extensionClass);
                 classes = ccs.getClasses();
                 unmarshalContext = ccs.getContext();
@@ -267,7 +268,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private synchronized Marshaller createMarshaller() throws JAXBException {
         if (marshalContext == null || classes == null) {
             try {
-                CachedContextAndSchemas ccs 
+                CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(typeClass);
                 classes = ccs.getClasses();
                 marshalContext = ccs.getContext();
@@ -277,7 +278,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         }
         return marshalContext.createMarshaller();
     }
-    
+
     /* (non-Javadoc)
      * @see javax.wsdl.extensions.ExtensionSerializer#marshall(java.lang.Class,
      *  javax.xml.namespace.QName, javax.wsdl.extensions.ExtensibilityElement,
@@ -286,33 +287,32 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     public void marshall(@SuppressWarnings("rawtypes") Class parent, QName qname,
                          ExtensibilityElement obj, PrintWriter pw,
                          final Definition wsdl, ExtensionRegistry registry) throws WSDLException {
-        // TODO Auto-generated method stub
         try {
             Marshaller u = createMarshaller();
             u.setProperty("jaxb.encoding", StandardCharsets.UTF_8.name());
             u.setProperty("jaxb.fragment", Boolean.TRUE);
             u.setProperty("jaxb.formatted.output", Boolean.TRUE);
-            
+
             Object mObj = obj;
-            
+
             Class<?> objectFactory = Class.forName(PackageUtils.getPackageName(typeClass) + ".ObjectFactory",
                                                    true,
                                                    obj.getClass().getClassLoader());
-            Method methods[] = objectFactory.getDeclaredMethods();
+            Method[] methods = objectFactory.getDeclaredMethods();
             for (Method method : methods) {
                 if (method.getParameterTypes().length == 1
                     && method.getParameterTypes()[0].equals(typeClass)) {
-                    
+
                     mObj = method.invoke(objectFactory.newInstance(), new Object[] {obj});
                 }
             }
-            
+
             javax.xml.stream.XMLOutputFactory fact = javax.xml.stream.XMLOutputFactory.newInstance();
             XMLStreamWriter writer =
                 new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), 2, getIndentLevel(parent));
-            
+
             if (namespace != null && !namespace.equals(jaxbNamespace)) {
-                Map<String, String> outMap = new HashMap<String, String>();
+                Map<String, String> outMap = new HashMap<>();
                 outMap.put("{" + jaxbNamespace + "}*", "{" + namespace + "}*");
                 writer = new OutTransformWriter(writer,
                                                 outMap,
@@ -321,14 +321,14 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                                 false,
                                                 "");
             }
-            Map<String, String> nspref = new HashMap<String, String>();
+            Map<String, String> nspref = new HashMap<>();
             for (Object ent : wsdl.getNamespaces().entrySet()) {
                 Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
                 nspref.put((String)entry.getValue(), (String)entry.getKey());
             }
             JAXBUtils.setNamespaceMapper(nspref, u);
             u.marshal(mObj, writer);
-            writer.flush();            
+            writer.flush();
         } catch (Exception ex) {
             throw new WSDLException(WSDLException.PARSER_ERROR,
                                     "",
@@ -343,14 +343,14 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
      *   javax.wsdl.Definition,
      *   javax.wsdl.extensions.ExtensionRegistry)
      */
-    public ExtensibilityElement unmarshall(@SuppressWarnings("rawtypes") Class parent, 
+    public ExtensibilityElement unmarshall(@SuppressWarnings("rawtypes") Class parent,
                                            QName qname, Element element, Definition wsdl,
                                            ExtensionRegistry registry) throws WSDLException {
         XMLStreamReader reader = null;
         Unmarshaller u = null;
         try {
             u = createUnmarshaller();
-        
+
             Object o = null;
             if (namespace == null) {
                 o = u.unmarshal(element, extensionClass);
@@ -359,12 +359,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 reader = new MappingReaderDelegate(reader);
                 o = u.unmarshal(reader, extensionClass);
             }
-            if (o instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)o;
-                o = el.getValue();
+            if (o != null) {
+                o = ((JAXBElement<?>)o).getValue();
             }
-            
-            ExtensibilityElement el = o instanceof ExtensibilityElement ? (ExtensibilityElement)o 
+
+            ExtensibilityElement el = o instanceof ExtensibilityElement ? (ExtensibilityElement)o
                 : new JAXBExtensibilityElement(o);
             el.setElementType(qname);
             return el;
@@ -381,12 +380,12 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             JAXBUtils.closeUnmarshaller(u);
         }
     }
-    
+
     class MappingReaderDelegate extends StreamReaderDelegate {
         MappingReaderDelegate(XMLStreamReader reader) {
             super(reader);
         }
-        
+
         @Override
         public NamespaceContext getNamespaceContext() {
             final NamespaceContext ctx = super.getNamespaceContext();
@@ -395,7 +394,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     String ns = ctx.getNamespaceURI(prefix);
                     if (namespace.equals(ns)) {
                         ns = jaxbNamespace;
-                    }                        
+                    }
                     return ns;
                 }
 
@@ -421,8 +420,8 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             String ns = super.getNamespaceURI(index);
             if (namespace.equals(ns)) {
                 ns = jaxbNamespace;
-            }                        
-            return ns;                     
+            }
+            return ns;
         }
 
         @Override
@@ -430,7 +429,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             String ns = super.getNamespaceURI(prefix);
             if (namespace.equals(ns)) {
                 ns = jaxbNamespace;
-            }                        
+            }
             return ns;
         }
 
@@ -448,40 +447,40 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             String ns = super.getNamespaceURI();
             if (namespace.equals(ns)) {
                 ns = jaxbNamespace;
-            }                        
-            return ns; 
+            }
+            return ns;
         }
-        
+
     };
-    
+
     //CHECKSTYLE:OFF - very complicated ASM code
     private static Class<?> createExtensionClass(Class<?> cls, QName qname, ClassLoader loader) {
-        
+
         String className = ASMHelper.periodToSlashes(cls.getName());
         ASMHelper helper = new ASMHelper();
         Class<?> extClass = helper.findClass(className + "Extensibility", loader);
         if (extClass != null) {
             return extClass;
         }
-        
+
         ClassWriter cw = helper.createClassWriter();
         FieldVisitor fv;
         MethodVisitor mv;
         AnnotationVisitor av0;
-        
-        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER + Opcodes.ACC_SYNTHETIC, 
-                 className + "Extensibility", null, 
-                 className, 
+
+        cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER + Opcodes.ACC_SYNTHETIC,
+                 className + "Extensibility", null,
+                 className,
                  new String[] {"javax/wsdl/extensions/ExtensibilityElement"});
 
         cw.visitSource(cls.getSimpleName() + "Extensibility.java", null);
-        
+
         fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC,
                            "WSDL_REQUIRED", "Ljavax/xml/namespace/QName;", null, null);
-        fv.visitEnd();        
+        fv.visitEnd();
         fv = cw.visitField(0, "qn", "Ljavax/xml/namespace/QName;", null, null);
         fv.visitEnd();
-        
+
 
         boolean hasAttributes = false;
         try {
@@ -490,7 +489,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 hasAttributes = true;
             }
         } catch (Throwable t) {
-            //ignore 
+            //ignore
         }
         if (hasAttributes) {
             mv = cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
@@ -511,7 +510,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             fv = cw.visitField(Opcodes.ACC_PRIVATE, "required", "Ljava/lang/Boolean;", null, null);
             fv.visitEnd();
         }
-        
+
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
@@ -525,10 +524,10 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitTypeInsn(Opcodes.NEW, "javax/xml/namespace/QName");
         mv.visitInsn(Opcodes.DUP);
-        
+
         mv.visitLdcInsn(qname.getNamespaceURI());
         mv.visitLdcInsn(qname.getLocalPart());
-        
+
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "javax/xml/namespace/QName",
                            "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
         mv.visitFieldInsn(Opcodes.PUTFIELD, className + "Extensibility",
@@ -539,7 +538,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         mv.visitInsn(Opcodes.RETURN);
         Label l3 = helper.createLabel();
         mv.visitLabel(l3);
-       
+
         mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l3, 0);
         mv.visitMaxs(5, 1);
         mv.visitEnd();
@@ -601,7 +600,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             l3 = helper.createLabel();
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_APPEND,1, new Object[] {"java/lang/String"}, 0, null);
+            mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Ljava/lang/String;)Ljava/lang/Boolean;", false);
             mv.visitLabel(l3);
@@ -613,9 +612,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLocalVariable("s", "Ljava/lang/String;", null, l1, l4, 1);
             mv.visitMaxs(2, 2);
             mv.visitEnd();
-            
-            
-            
+
+
+
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setRequired", "(Ljava/lang/Boolean;)V", null, null);
             mv.visitCode();
             l0 = helper.createLabel();
@@ -656,7 +655,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             mv.visitLocalVariable("this", "L" + className + "Extensibility;", null, l0, l5, 0);
             mv.visitLocalVariable("b", "Ljava/lang/Boolean;", null, l0, l5, 1);
             mv.visitMaxs(3, 2);
-            mv.visitEnd();            
+            mv.visitEnd();
         } else {
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getRequired", "()Ljava/lang/Boolean;", null, null);
             mv.visitCode();
@@ -696,6 +695,6 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
 
         byte[] bytes = cw.toByteArray();
         return helper.loadClass(className + "Extensibility", loader, bytes);
-    }    
+    }
 
 }

@@ -39,11 +39,11 @@ public class BeanGenerator extends AbstractGenerator<File> {
     public void setCompileToDir(File f) {
         compileToDir = f;
     }
-    
+
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo service) {
         return null;
     }
-    
+
     public File generate(final File sourcedir) {
         File dir = getOutputBase();
         if (dir == null) {
@@ -65,35 +65,33 @@ public class BeanGenerator extends AbstractGenerator<File> {
         VelocityGenerator generator = new VelocityGenerator(false);
         generator.setBaseDir(dir.toString());
 
-        List<File> generatedFiles = new ArrayList<File>();
+        List<File> generatedFiles = new ArrayList<>();
         try {
             for (JavaClass wrapperClass : wrapperClasses) {
                 generator.setCommonAttributes();
                 generator.setAttributes("bean", wrapperClass);
-            
+
                 File file = generator.parseOutputName(wrapperClass.getPackageName(),
                                                       wrapperClass.getName());
                 generatedFiles.add(file);
-            
+
                 generator.doWrite(TEMPLATE, new FileWriterUtil(file.getParent(), getOutputStreamCreator())
                     .getWriter(file, (String)getToolContext().get(ToolConstants.CFG_ENCODING)));
-            
+
                 generator.clearAttributes();
             }
-        
+
                 //compile the classes
-            Compiler compiler = new Compiler();
+            Compiler compiler = (Compiler)getToolContext().get(ToolConstants.COMPILER);
+            if (compiler == null) {
+                compiler = new Compiler();
+            }
             compiler.setOutputDir(compileToDir);
-            List<String> files = new ArrayList<String>(generatedFiles.size());
+            List<String> files = new ArrayList<>(generatedFiles.size());
             for (File file : generatedFiles) {
                 files.add(file.getAbsolutePath());
             }
-            if (!compiler.compileFiles(files.toArray(new String[files.size()]))) {
-                // TODO - compile issue
-            }
-
-            
-            
+            compiler.compileFiles(files.toArray(new String[0]));
         } catch (Exception e) {
             e.printStackTrace();
         }

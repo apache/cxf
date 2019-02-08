@@ -21,14 +21,13 @@ package org.apache.cxf.binding.corba.types;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-//import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 public class SkipStartEndEventProducer implements CorbaTypeEventProducer {
 
     private final CorbaTypeEventProducer eventProducer;
-    private QName name;   
+    private QName name;
     private int peekedEvent;
     private boolean hasNext = true;
 
@@ -48,7 +47,7 @@ public class SkipStartEndEventProducer implements CorbaTypeEventProducer {
         return name;
     }
 
-    public String getText() {    
+    public String getText() {
         return eventProducer.getText();
     }
 

@@ -49,19 +49,26 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.util.PolicyComparator;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class Wsdl11AttachmentPolicyProviderTest extends Assert {
+public class Wsdl11AttachmentPolicyProviderTest {
 
     private static final String NAMESPACE_URI = "http://apache.org/cxf/calculator";
     private static final QName OPERATION_NAME = new QName(NAMESPACE_URI, "add");
@@ -70,15 +77,15 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
     private Wsdl11AttachmentPolicyProvider app;
     private Bus bus;
     private IMocksControl control = EasyMock.createNiceControl();
-    
-   
-    
+
+
+
     @BeforeClass
     public static void oneTimeSetUp() throws Exception {
-        
+
         IMocksControl control = EasyMock.createNiceControl();
         Bus bus = control.createMock(Bus.class);
-        WSDLManager manager = new WSDLManagerImpl();       
+        WSDLManager manager = new WSDLManagerImpl();
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andReturn(dfm).anyTimes();
@@ -87,13 +94,13 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bfm).anyTimes();
         EasyMock.expect(bfm.getBindingFactory(EasyMock.isA(String.class))).andReturn(null).anyTimes();
         control.replay();
-        
+
         int n = 19;
         services = new ServiceInfo[n];
         endpoints = new EndpointInfo[n];
         for (int i = 0; i < n; i++) {
             String resourceName = "/attachment/wsdl11/test" + i + ".wsdl";
-            URL url = Wsdl11AttachmentPolicyProviderTest.class.getResource(resourceName);       
+            URL url = Wsdl11AttachmentPolicyProviderTest.class.getResource(resourceName);
             try {
                 services[i] = builder.buildServices(manager.getDefinition(url.toString())).get(0);
             } catch (WSDLException ex) {
@@ -104,66 +111,66 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
             endpoints[i] = services[i].getEndpoints().iterator().next();
             assertNotNull(endpoints[i]);
         }
-        
+
         control.verify();
 
     }
-    
+
     @AfterClass
     public static void oneTimeTearDown() {
         endpoints = null;
         services = null;
-        
+
     }
-    
+
     @Before
-    public void setUp() {   
+    public void setUp() {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         bus.getExtension(ConfiguredBeanLocator.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         abr.setIgnoreUnknownAssertions(false);
-        
-        
+
+
         PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
         abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "A"), ab);
         abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
         abr.registerBuilder(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
-        
+
         PolicyBuilderImpl pb = new PolicyBuilderImpl();
         bus.getExtension(PolicyBuilder.class);
         EasyMock.expectLastCall().andReturn(pb).anyTimes();
         bus.getExtension(PolicyEngine.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
-        
+
         pb.setAssertionBuilderRegistry(abr);
         app = new Wsdl11AttachmentPolicyProvider();
         app.setBuilder(pb);
         app.setRegistry(new PolicyRegistryImpl());
         control.replay();
-        
+
     }
-    
-    
+
+
     @After
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testElementPolicies() throws WSDLException {
-    
+
         Policy p;
-        
-        // no extensions       
+
+        // no extensions
         p = app.getElementPolicy(services[0]);
         assertTrue(p == null || p.isEmpty());
-        
+
         // extensions not of type Policy or PolicyReference
         p = app.getElementPolicy(services[1]);
         assertTrue(p == null || p.isEmpty());
-        
+
         // one extension of type Policy, without assertion builder
         try {
             p = app.getElementPolicy(services[2]);
@@ -171,39 +178,39 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         } catch (PolicyException ex) {
             // expected
         }
-        
+
         // one extension of type Policy
         p = app.getElementPolicy(services[3]);
         assertNotNull(p);
-        assertTrue(!p.isEmpty());
+        assertFalse(p.isEmpty());
         verifyAssertionsOnly(p, 2);
-        
+
         // two extensions of type Policy
         p = app.getElementPolicy(services[4]);
         assertNotNull(p);
-        assertTrue(!p.isEmpty());
+        assertFalse(p.isEmpty());
         verifyAssertionsOnly(p, 3);
-        
+
         EndpointInfo ei = new EndpointInfo();
-        assertTrue(app.getElementPolicy(ei) == null);
+        assertNull(app.getElementPolicy(ei));
     }
-    
+
     @Test
     public void testEffectiveServicePolicies() throws WSDLException {
-        
+
         Policy p;
         Policy ep;
-        
-        // no extensions        
+
+        // no extensions
         ep = app.getEffectivePolicy(services[0], null);
         assertTrue(ep == null || ep.isEmpty());
         p = app.getElementPolicy(services[0]);
         assertTrue(p == null || p.isEmpty());
-        
+
         // extensions not of type Policy or PolicyReference
         ep = app.getEffectivePolicy(services[1], null);
         assertTrue(ep == null || ep.isEmpty());
-        
+
         // one extension of type Policy, without assertion builder
         try {
             ep = app.getEffectivePolicy(services[2], null);
@@ -211,19 +218,19 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         } catch (PolicyException ex) {
             // expected
         }
-        
+
         // one extension of type Policy
         ep = app.getEffectivePolicy(services[3], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 2);
         p = app.getElementPolicy(services[3]);
         assertTrue(PolicyComparator.compare(p, ep));
-        
+
         // two extensions of type Policy
         ep = app.getEffectivePolicy(services[4], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
         p = app.getElementPolicy(services[4]);
         assertTrue(PolicyComparator.compare(p, ep));
@@ -233,157 +240,157 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
     public void testEffectiveEndpointPolicies() {
         Policy ep;
         Policy p;
-        
+
         // port has no extensions
         // porttype has no extensions
         // binding has no extensions
         ep = app.getEffectivePolicy(endpoints[0], null);
         assertTrue(ep == null || ep.isEmpty());
-        
-        // port has one extension of type Policy        
+
+        // port has one extension of type Policy
         // binding has no extensions
         // porttype has no extensions
         ep = app.getEffectivePolicy(endpoints[5], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         p = app.getElementPolicy(endpoints[5]);
         assertTrue(PolicyComparator.compare(p, ep));
-        
+
         // port has no extensions
         // binding has one extension of type Policy
         // porttype has no extensions
         ep = app.getEffectivePolicy(endpoints[6], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         p = app.getElementPolicy(endpoints[6].getBinding());
         assertTrue(PolicyComparator.compare(p, ep));
-        
+
         // port has no extensions
         // binding has no extensions
         // porttype has one extension of type Policy
         ep = app.getEffectivePolicy(endpoints[7], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
         p = app.getElementPolicy(endpoints[7].getInterface());
-        assertTrue(PolicyComparator.compare(p, ep));        
-        
+        assertTrue(PolicyComparator.compare(p, ep));
+
         // port has one extension of type Policy
         // porttype has one extension of type Policy
         // binding has one extension of type Policy
         ep = app.getEffectivePolicy(endpoints[8], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
-        
+
         // port has no extensions
         // binding has no extensions
         // porttype has no extension elements but one extension attribute of type PolicyURIs
         // consisting of two references (one local, one external)
-        
+
         ep = app.getEffectivePolicy(endpoints[18], null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
-        verifyAssertionsOnly(ep, 2);       
+        assertFalse(ep.isEmpty());
+        verifyAssertionsOnly(ep, 2);
     }
-    
+
     @Test
     public void testEffectiveBindingOperationPolicies() {
         Policy ep;
-        
+
         // operation has no extensions
         // binding operation has no extensions
         ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[0]), null);
         assertTrue(ep == null || ep.isEmpty());
-        
+
         // operation has no extensions
         // binding operation has one extension of type Policy
         ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[9]), null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
-        
+
         // operation has one extension of type Policy
         // binding operation has no extensions
         ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[10]), null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 2);
-        
+
         // operation has one extension of type Policy
         // binding operation one extension of type Policy
         ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[11]), null);
         assertNotNull(ep);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 3);
     }
-    
+
     @Test
     public void testEffectiveMessagePolicies() {
         Policy ep;
-        
+
         // binding operation message has no extensions
         // operation message has no extensions
         // message has no extensions
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[0], true), null);
         assertTrue(ep == null || ep.isEmpty());
-        
+
         // binding operation message has one extension of type Policy
         // operation message has no extensions
         // message has no extensions
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[12], true), null);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
-        
+
         // binding operation message has no extensions
         // operation message has one extension of type Policy
-        // message has no extensions  
+        // message has no extensions
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[13], true), null);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
-        
+
         // binding operation message has no extensions
         // operation message has no extensions
         // message has one extension of type Policy
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[14], true), null);
-        assertTrue(!ep.isEmpty());
+        assertFalse(ep.isEmpty());
         verifyAssertionsOnly(ep, 1);
-        
+
         // binding operation message has one extension of type Policy
         // operation message has one extension of type Policy
         // message has one extension of type Policy
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[15], true), null);
-        assertTrue(!ep.isEmpty());
-        verifyAssertionsOnly(ep, 3);      
+        assertFalse(ep.isEmpty());
+        verifyAssertionsOnly(ep, 3);
     }
-    
+
     @Test
     public void testResolveLocal() {
-        
+
         Policy ep;
-        
+
         // service has one extension of type PolicyReference, reference can be resolved locally
         ep = app.getElementPolicy(services[16]);
         assertNotNull(ep);
         verifyAssertionsOnly(ep, 2);
-        
+
         // port has one extension of type PolicyReference, reference cannot be resolved locally
         try {
             app.getElementPolicy(endpoints[16]);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
-        }        
+        }
     }
-    
+
     @Test
     public void testResolveExternal() {
         // service has one extension of type PolicyReference, reference is external
         Policy p = app.getElementPolicy(services[17]);
         verifyAssertionsOnly(p, 2);
-        
+
         // port has one extension of type PolicyReference, reference cannot be resolved because
         // referenced document does not contain policy with the required if
         try {
@@ -391,8 +398,8 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
-        } 
-        
+        }
+
         // binding has one extension of type PolicyReference, reference cannot be resolved because
         // referenced document cannot be found
         try {
@@ -400,10 +407,10 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
-        } 
+        }
     }
-    
-    
+
+
     private void verifyAssertionsOnly(Policy p, int expectedAssertions) {
         List<PolicyComponent> pcs;
         pcs = CastUtils.cast(p.getAssertions(), PolicyComponent.class);
@@ -412,15 +419,15 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
             assertEquals(Constants.TYPE_ASSERTION, pcs.get(i).getType());
         }
     }
-    
+
     private BindingOperationInfo getBindingOperationInfo(EndpointInfo ei) {
-        return ei.getBinding().getOperation(OPERATION_NAME);        
+        return ei.getBinding().getOperation(OPERATION_NAME);
     }
-    
+
     private BindingMessageInfo getBindingMessageInfo(EndpointInfo ei, boolean in) {
         return in ? ei.getBinding().getOperation(OPERATION_NAME).getInput()
             : ei.getBinding().getOperation(OPERATION_NAME).getOutput();
     }
-    
-    
+
+
 }

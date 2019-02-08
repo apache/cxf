@@ -20,13 +20,20 @@
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.reflect.Method;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.tools.common.model.JavaClass;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class WrapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class WrapperTest {
     @Test
     public void testGetWrapperBeanClassFromQName() {
         QName qname = new QName("http://cxf.apache.org", "sayHi");
@@ -65,13 +72,13 @@ public class WrapperTest extends Assert {
         assertEquals("GetPriceResponse", jClass.getName());
         assertEquals(pkgName + ".jaxws", jClass.getPackageName());
     }
-    
+
     @Test
     public void testIsWrapperBeanClassNotExist() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.classnoanno.docwrapped";
         Class<?> stockClass = Class.forName(pkgName + ".Stock");
         Method method = stockClass.getMethod("getPrice", String.class);
-        
+
         Wrapper wrapper = new RequestWrapper();
         wrapper.setMethod(method);
         assertTrue(wrapper.isWrapperAbsent());
@@ -79,7 +86,7 @@ public class WrapperTest extends Assert {
         assertFalse(wrapper.isWrapperBeanClassNotExist());
         assertEquals(pkgName + ".jaxws", wrapper.getJavaClass().getPackageName());
         assertEquals("GetPrice", wrapper.getJavaClass().getName());
-        
+
         pkgName = "org.apache.cxf.tools.fortest.withannotation.doc";
         stockClass = Class.forName(pkgName + ".Stock");
         method = stockClass.getMethod("getPrice", String.class);

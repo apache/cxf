@@ -30,10 +30,11 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class Stax2DOMTest extends Assert {
+import static org.junit.Assert.assertTrue;
+
+public class Stax2DOMTest {
 
     @Test
     public void testGetDocument() throws Exception {
@@ -74,7 +75,7 @@ public class Stax2DOMTest extends Assert {
         if (!deleted) {
             tempFile.deleteOnExit();
         }
-        Assert.assertTrue(
+        assertTrue(
                 "Stax2DOM left the input stream open, file cannot be deleted: "
                         + tempFile, deleted);
     }
@@ -83,9 +84,9 @@ public class Stax2DOMTest extends Assert {
         File wsdlFile = new File(getClass().getResource(
                 "/validator_wsdl/jms_test.wsdl").toURI());
         File tempFile = File.createTempFile("Stax2DOMTest", ".wsdl");
-        FileOutputStream output = new FileOutputStream(tempFile);
-        IOUtils.copyAndCloseInput(new FileInputStream(wsdlFile), output);
-        output.close();
+        try (FileOutputStream output = new FileOutputStream(tempFile)) {
+            IOUtils.copyAndCloseInput(new FileInputStream(wsdlFile), output);
+        }
         return tempFile;
     }
 

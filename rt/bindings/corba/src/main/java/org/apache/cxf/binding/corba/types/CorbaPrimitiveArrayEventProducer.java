@@ -22,7 +22,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.omg.CORBA.ORB;
 
 public class CorbaPrimitiveArrayEventProducer extends AbstractNoStartEndEventProducer {
-    
+
     // No start and end elements for the array
     public CorbaPrimitiveArrayEventProducer(CorbaObjectHandler h,
                                                ServiceInfo service,

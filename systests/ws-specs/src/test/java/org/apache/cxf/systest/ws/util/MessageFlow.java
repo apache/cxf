@@ -33,34 +33,40 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.RMConstants;
 
-import org.junit.Assert;
 
-public class MessageFlow extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MessageFlow {
+
     private final String addressingNamespace;
     private final String rmNamespace;
     private List<byte[]> inStreams;
     private List<byte[]> outStreams;
     private List<Document> outboundMessages;
     private List<Document> inboundMessages;
-      
+
     public MessageFlow(List<byte[]> out, List<byte[]> in, String addrns, String rmns) throws Exception {
         addressingNamespace = addrns;
         rmNamespace = rmns;
-        inboundMessages = new ArrayList<Document>();
-        outboundMessages = new ArrayList<Document>();
+        inboundMessages = new ArrayList<>();
+        outboundMessages = new ArrayList<>();
         reset(out, in);
     }
-    
+
     public MessageFlow(List<byte[]> out, List<byte[]> in) throws Exception {
         this(out, in, Names.WSA_NAMESPACE_NAME, null);
     }
-    
+
     public void clear() throws Exception {
         inStreams.clear();
         outStreams.clear();
     }
-    
+
     public final void reset(List<byte[]> out, List<byte[]> in) throws Exception {
         for (int i = 0; i < inboundMessages.size(); i++) {
             in.remove(0);
@@ -85,11 +91,11 @@ public class MessageFlow extends Assert {
             outboundMessages.add(document);
         }
     }
-    
+
     public Document getMessage(int i, boolean outbound) {
         return outbound ? outboundMessages.get(i) : inboundMessages.get(i);
     }
-    
+
     public void verifyActions(String[] expectedActions, boolean outbound) throws Exception {
 
         assertEquals(expectedActions.length, outbound ? outboundMessages.size() : inboundMessages.size());
@@ -126,7 +132,7 @@ public class MessageFlow extends Assert {
             fail("Inbound messages do not contain all expected actions.");
         }
     }
-    
+
     public boolean checkActions(String[] expectedActions, boolean outbound) throws Exception {
 
         if (expectedActions.length != (outbound ? outboundMessages.size() : inboundMessages.size())) {
@@ -162,7 +168,7 @@ public class MessageFlow extends Assert {
                 }
             } else {
                 if (expectedAction.equals(action)) {
-                    count++;                    
+                    count++;
                 }
             }
         }
@@ -174,7 +180,7 @@ public class MessageFlow extends Assert {
             assertTrue("unexpected count for action: " + expectedAction + ": " + count,
                        expectedCount <= count);
         }
-        
+
     }
 
     public void verifyMessageNumbers(String[] expectedMessageNumbers, boolean outbound) throws Exception {
@@ -185,7 +191,7 @@ public class MessageFlow extends Assert {
                                      boolean outbound,
                                      boolean exact) throws Exception {
 
-        int actualMessageCount = 
+        int actualMessageCount =
             outbound ? outboundMessages.size() : inboundMessages.size();
         if (exact) {
             assertEquals(expectedMessageNumbers.length, actualMessageCount);
@@ -203,7 +209,7 @@ public class MessageFlow extends Assert {
                 } else {
                     assertEquals((outbound ? "Outbound" : "Inbound") + " message " + i
                         + " does not contain expected message number "
-                                 + expectedMessageNumbers[i], expectedMessageNumbers[i], 
+                                 + expectedMessageNumbers[i], expectedMessageNumbers[i],
                                  getMessageNumber(e));
                 }
             }
@@ -223,7 +229,7 @@ public class MessageFlow extends Assert {
                     } else {
                         if (messageNumber.equals(expectedMessageNumbers[j]) && !matches[j]) {
                             matches[j] = true;
-                            break;                                
+                            break;
                         }
                     }
                 }
@@ -243,7 +249,7 @@ public class MessageFlow extends Assert {
     public void verifyLastMessage(boolean[] expectedLastMessages,
                                   boolean outbound,
                                   boolean exact) throws Exception {
-        
+
         int actualMessageCount =
             outbound ? outboundMessages.size() : inboundMessages.size();
         if (exact) {
@@ -251,47 +257,47 @@ public class MessageFlow extends Assert {
         } else {
             assertTrue(expectedLastMessages.length <= actualMessageCount);
         }
-        
-        for (int i = 0; i < expectedLastMessages.length; i++) { 
+
+        for (int i = 0; i < expectedLastMessages.length; i++) {
             boolean lastMessage;
             Element e = outbound ? getSequence(outboundMessages.get(i))
                 : getSequence(inboundMessages.get(i));
             lastMessage = null == e ? false : getLastMessage(e);
-            assertEquals("Outbound message " + i 
+            assertEquals("Outbound message " + i
                          + (expectedLastMessages[i] ? " does not contain expected last message element."
                              : " contains last message element."),
-                         expectedLastMessages[i], lastMessage);  
-        
+                         expectedLastMessages[i], lastMessage);
+
         }
     }
-    
+
     public void verifyAcknowledgements(boolean[] expectedAcks, boolean outbound) throws Exception {
         assertEquals(expectedAcks.length, outbound ? outboundMessages.size()
             : inboundMessages.size());
-        
+
         for (int i = 0; i < expectedAcks.length; i++) {
-            boolean ack = outbound ? (null != getAcknowledgment(outboundMessages.get(i))) 
+            boolean ack = outbound ? (null != getAcknowledgment(outboundMessages.get(i)))
                 : (null != getAcknowledgment(inboundMessages.get(i)));
-            
+
             if (expectedAcks[i]) {
-                assertTrue((outbound ? "Outbound" : "Inbound") + " message " + i 
+                assertTrue((outbound ? "Outbound" : "Inbound") + " message " + i
                            + " does not contain expected acknowledgement", ack);
             } else {
-                assertFalse((outbound ? "Outbound" : "Inbound") + " message " + i 
+                assertFalse((outbound ? "Outbound" : "Inbound") + " message " + i
                            + " contains unexpected acknowledgement", ack);
             }
         }
     }
-    
+
     public void verifyAcknowledgements(int expectedAcks,
                                        boolean outbound,
                                        boolean exact) throws Exception {
-        
-        int actualMessageCount = 
+
+        int actualMessageCount =
             outbound ? outboundMessages.size() : inboundMessages.size();
         int ackCount = 0;
         for (int i = 0; i < actualMessageCount; i++) {
-            boolean ack = outbound ? (null != getAcknowledgment(outboundMessages.get(i))) 
+            boolean ack = outbound ? (null != getAcknowledgment(outboundMessages.get(i)))
                 : (null != getAcknowledgment(inboundMessages.get(i)));
             if (ack) {
                 ackCount++;
@@ -318,26 +324,26 @@ public class MessageFlow extends Assert {
         }
         assertTrue("expected AckRequested", found);
     }
-    
+
     public void verifySequenceFault(QName code, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
-        assert null != getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME);
+        assertNotNull(getRMHeaderElement(d, RMConstants.SEQUENCE_FAULT_NAME));
     }
-    
+
     public void verifyHeader(QName name, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
         assertNotNull((outbound ? "Outbound" : "Inbound")
             + " message " + index + " does not have " + name + "header.",
             getHeaderElement(d, name.getNamespaceURI(), name.getLocalPart()));
     }
-    
+
     public void verifyNoHeader(QName name, boolean outbound, int index) throws Exception {
         Document d = outbound ? outboundMessages.get(index) : inboundMessages.get(index);
         assertNull((outbound ? "Outbound" : "Inbound")
             + " message " + index + " has " + name + "header.",
             getHeaderElement(d, name.getNamespaceURI(), name.getLocalPart()));
     }
-   
+
     protected String getAction(Document document) throws Exception {
         Element e = getHeaderElement(document, addressingNamespace, "Action");
         if (null != e) {
@@ -356,22 +362,22 @@ public class MessageFlow extends Assert {
                 return getText(nd);
             }
         }
-        return null;    
+        return null;
     }
 
     private boolean getLastMessage(Element element) throws Exception {
-        for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
+        for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType() && "LastMessage".equals(nd.getLocalName())) {
                 return true;
             }
-        } 
+        }
         return false;
     }
 
     protected Element getAcknowledgment(Document document) throws Exception {
         return getRMHeaderElement(document, RMConstants.SEQUENCE_ACK_NAME);
     }
-    
+
     private Element getAckRequested(Document document) throws Exception {
         return getRMHeaderElement(document, RMConstants.ACK_REQUESTED_NAME);
     }
@@ -393,10 +399,10 @@ public class MessageFlow extends Assert {
         if (null == headerElement) {
             return null;
         }
-        for (Node nd = headerElement.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
+        for (Node nd = headerElement.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE != nd.getNodeType()) {
                 continue;
-            } 
+            }
             Element element = (Element)nd;
             String ns = element.getNamespaceURI();
             String ln = element.getLocalName();
@@ -407,12 +413,12 @@ public class MessageFlow extends Assert {
         }
         return null;
     }
-    
-    
+
+
     public void verifyMessages(int nExpected, boolean outbound) {
         verifyMessages(nExpected, outbound, true);
     }
-    
+
     public void verifyMessages(int nExpected, boolean outbound, boolean exact) {
         if (outbound) {
             if (exact) {
@@ -424,15 +430,15 @@ public class MessageFlow extends Assert {
             }
         } else {
             if (exact) {
-                assertEquals("Unexpected number of inbound messages" + dump(inStreams), 
+                assertEquals("Unexpected number of inbound messages" + dump(inStreams),
                              nExpected, inboundMessages.size());
             } else {
                 assertTrue("Unexpected number of inbound messages: " + dump(inStreams),
-                           nExpected <= inboundMessages.size());                
+                           nExpected <= inboundMessages.size());
             }
         }
     }
-    
+
     public void verifyAcknowledgementRange(long lower, long upper) throws Exception {
         long currentLower = 0;
         long currentUpper = 0;
@@ -448,23 +454,23 @@ public class MessageFlow extends Assert {
                 }
             }
         }
-        assertEquals("Unexpected acknowledgement lower range", 
+        assertEquals("Unexpected acknowledgement lower range",
                      lower, currentLower);
-        assertEquals("Unexpected acknowledgement upper range", 
+        assertEquals("Unexpected acknowledgement upper range",
                      upper, currentUpper);
     }
-    
+
 
     // note that this method picks the first match and returns
     public static Element getNamedElement(Element element, String lcname) throws Exception {
-        for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) { 
+        for (Node nd = element.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType() && lcname.equals(nd.getLocalName())) {
                 return (Element)nd;
             }
-        } 
+        }
         return null;
     }
-    
+
     public void purgePartialResponses() throws Exception {
         for (int i = inboundMessages.size() - 1; i >= 0; i--) {
             if (isPartialResponse(inboundMessages.get(i))) {
@@ -472,21 +478,21 @@ public class MessageFlow extends Assert {
             }
         }
     }
-    
+
     public void purge() {
         inboundMessages.clear();
         outboundMessages.clear();
         inStreams.clear();
         outStreams.clear();
     }
-    
+
     public void verifyPartialResponses(int nExpected) throws Exception {
         verifyPartialResponses(nExpected, null);
     }
 
     public void verifyPartialResponses(int nExpected, boolean[] piggybackedAcks) throws Exception {
         int npr = 0;
-        for (int i =  0; i < inboundMessages.size(); i++) {
+        for (int i = 0; i < inboundMessages.size(); i++) {
             if (isPartialResponse(inboundMessages.get(i))) {
                 if (piggybackedAcks != null) {
                     Element ack = getAcknowledgment(inboundMessages.get(i));
@@ -496,17 +502,17 @@ public class MessageFlow extends Assert {
                         assertNull("Partial response " + npr + " has unexpected acknowledgement.", ack);
                     }
                 }
-                npr++;   
+                npr++;
             }
         }
         assertEquals("Inbound messages did not contain expected number of partial responses.",
                      nExpected, npr);
     }
-    
+
     public boolean isPartialResponse(Document d) throws Exception {
         return null == getAction(d) && emptyBody(d);
     }
-    
+
     public boolean emptyBody(Document d) throws Exception {
         Element envelopeElement = d.getDocumentElement();
         Element bodyElement = null;
@@ -518,8 +524,8 @@ public class MessageFlow extends Assert {
         }
         return !(null != bodyElement && bodyElement.hasChildNodes());
     }
-    
-    private String dump(List<byte[]> streams) {
+
+    String dump(List<byte[]> streams) {
         StringBuilder buf = new StringBuilder();
         try {
             buf.append(System.getProperty("line.separator"));
@@ -533,10 +539,10 @@ public class MessageFlow extends Assert {
         } catch (Exception ex) {
             return "";
         }
-        
+
         return buf.toString();
     }
-    
+
     public static String getText(Node node) {
         for (Node nd = node.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.TEXT_NODE == nd.getNodeType()) {
@@ -549,5 +555,5 @@ public class MessageFlow extends Assert {
     protected QName getNodeName(Node nd) {
         return new QName(nd.getNamespaceURI(), nd.getLocalName());
     }
-    
+
 }

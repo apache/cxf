@@ -45,35 +45,38 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
-import org.easymock.IMocksControl;
 
-import org.junit.Assert;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class SoapBindingFactoryTest extends Assert {
+public class SoapBindingFactoryTest {
     IMocksControl control;
-    
+
     @Before
     public void setUp() {
         control = createNiceControl();
     }
-    
-    private Bus getMockBus() {        
-        return control.createMock(Bus.class);        
+
+    private Bus getMockBus() {
+        return control.createMock(Bus.class);
     }
-    
+
     private BindingFactoryManager getBindingFactoryManager(String ns, Bus bus) throws BusException {
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
         BindingFactoryManager bfm = new BindingFactoryManagerImpl();
         bfm.registerBindingFactory(ns, bindingFactory);
         return bfm;
     }
-    
+
     @Test
     public void testNoBodyParts() throws Exception {
         Definition d = createDefinition("/wsdl_soap/no_body_parts.wsdl");
@@ -83,15 +86,15 @@ public class SoapBindingFactoryTest extends Assert {
 
         bus.getExtension(BindingFactoryManager.class);
         expectLastCall().andReturn(bfm).anyTimes();
-        
+
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        
+
         control.replay();
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
         ServiceInfo serviceInfo = builder
-            .buildServices(d, new QName("urn:org:apache:cxf:no_body_parts/wsdl", 
+            .buildServices(d, new QName("urn:org:apache:cxf:no_body_parts/wsdl",
                                         "NoBodyParts"))
             .get(0);
 
@@ -123,7 +126,7 @@ public class SoapBindingFactoryTest extends Assert {
     }
 
     @Test
-    public void testFactory() throws Exception {        
+    public void testFactory() throws Exception {
         Definition d = createDefinition("/wsdl_soap/hello_world.wsdl");
 
         Bus bus = getMockBus();
@@ -132,10 +135,10 @@ public class SoapBindingFactoryTest extends Assert {
 
         bus.getExtension(BindingFactoryManager.class);
         expectLastCall().andReturn(bfm).anyTimes();
-        
+
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        
+
         control.replay();
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
@@ -167,10 +170,10 @@ public class SoapBindingFactoryTest extends Assert {
         assertNotNull(parts);
         assertEquals(1, parts.size());
     }
-    
-    
+
+
     @Test
-    public void testSoap12Factory() throws Exception {        
+    public void testSoap12Factory() throws Exception {
         Definition d = createDefinition("/wsdl_soap/hello_world_soap12.wsdl");
 
         Bus bus = getMockBus();
@@ -178,10 +181,10 @@ public class SoapBindingFactoryTest extends Assert {
         BindingFactoryManager bfm = getBindingFactoryManager(WSDLConstants.NS_SOAP12, bus);
 
         expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bfm);
-        
+
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        
+
         control.replay();
 
         WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
@@ -212,7 +215,7 @@ public class SoapBindingFactoryTest extends Assert {
         List<MessagePartInfo> parts = bodyInfo.getParts();
         assertNotNull(parts);
         assertEquals(1, parts.size());
-        
+
         boi = sbi.getOperation(new QName("http://apache.org/hello_world_soap12_http", "pingMe"));
         sboi = boi.getExtensor(SoapOperationInfo.class);
         assertNotNull(sboi);
@@ -220,11 +223,11 @@ public class SoapBindingFactoryTest extends Assert {
         assertEquals("", sboi.getAction());
         Collection<BindingFaultInfo> faults = boi.getFaults();
         assertEquals(1, faults.size());
-        BindingFaultInfo faultInfo = boi.getFault(new QName("http://apache.org/hello_world_soap12_http", 
+        BindingFaultInfo faultInfo = boi.getFault(new QName("http://apache.org/hello_world_soap12_http",
                                                             "pingMeFault"));
         assertNotNull(faultInfo);
     }
-    
+
 
     public Definition createDefinition(String wsdlURL) throws Exception {
         URL resource = getClass().getResource(wsdlURL);

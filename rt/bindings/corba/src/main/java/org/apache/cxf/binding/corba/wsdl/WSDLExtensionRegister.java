@@ -28,18 +28,18 @@ import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
-public final class WSDLExtensionRegister implements WSDLExtensionLoader { 
+public final class WSDLExtensionRegister implements WSDLExtensionLoader {
     private static final String YOKO_NAMESPACE = "http://schemas.apache.org/yoko/bindings/corba";
-    
+
     public WSDLExtensionRegister(Bus b) {
         WSDLManager manager = b.getExtension(WSDLManager.class);
         registerCXFExtensors(manager);
         registerYokoCompatibleExtensors(manager);
     }
-    
+
     void registerCXFExtensors(WSDLManager manager) {
         createExtensor(manager, javax.wsdl.Binding.class,
                              org.apache.cxf.binding.corba.wsdl.BindingType.class);
@@ -69,14 +69,14 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
                                 Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
-                                              parentType, 
+                                              parentType,
                                               elementType,
                                               null,
                                               this.getClass().getClassLoader());
         } catch (JAXBException e) {
             //ignore, won't support CORBA
         }
-        
+
     }
 
     private void createCompatExtensor(WSDLManager manager,
@@ -84,13 +84,13 @@ public final class WSDLExtensionRegister implements WSDLExtensionLoader {
                                       Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
-                                              parentType, 
+                                              parentType,
                                               elementType,
                                               YOKO_NAMESPACE);
         } catch (JAXBException e) {
             //ignore, just won't support the yoko extensors
         }
-        
+
     }
 
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 /**
- * 
+ *
  */
 package org.apache.cxf.aegis.type.basic;
 
@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class InterfaceInvocationHandler implements InvocationHandler {
-    private Map<Object, Object> attributes = new HashMap<Object, Object>();
+    private Map<Object, Object> attributes = new HashMap<>();
 
     InterfaceInvocationHandler() {
     }
@@ -68,8 +68,8 @@ class InterfaceInvocationHandler implements InvocationHandler {
 
         if (methodName.startsWith("get") && methodName.length() > 3) {
             return true;
-        } 
-            
+        }
+
         return methodName.length() > 2 && methodName.startsWith("is");
         /*
          * // should "hasXXX()" be considered a getter method? else if
@@ -103,7 +103,7 @@ class InterfaceInvocationHandler implements InvocationHandler {
         } else {
             throw new IllegalAccessError(methodName + " is not a valid getter method.");
         }
-        
+
         Object prop = readProperty(attrName);
         if (prop == null && method.getReturnType().isPrimitive()) {
             if (method.getReturnType() == int.class) {
@@ -145,13 +145,11 @@ class InterfaceInvocationHandler implements InvocationHandler {
             if (!Character.isUpperCase(methodName.charAt(firstCharacter + 1))) {
                 return Character.toLowerCase(methodName.charAt(firstCharacter))
                        + methodName.substring(firstCharacter + 1);
-            } else {
-                return methodName.substring(3);
             }
-        } else {
-            return Character.toLowerCase(methodName.charAt(firstCharacter))
-                   + methodName.substring(firstCharacter + 1);
+            return methodName.substring(3);
         }
+        return Character.toLowerCase(methodName.charAt(firstCharacter))
+               + methodName.substring(firstCharacter + 1);
     }
 
     protected Integer proxyHashCode(Object proxy) {

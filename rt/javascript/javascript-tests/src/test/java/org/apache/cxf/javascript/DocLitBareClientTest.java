@@ -29,15 +29,19 @@ import org.apache.cxf.javascript.fortest.SimpleDocLitBareImpl;
 import org.apache.cxf.javascript.fortest.TestBean1;
 import org.apache.cxf.javascript.fortest.TestBean2;
 import org.apache.cxf.testutil.common.TestUtil;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.springframework.context.support.GenericApplicationContext;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /*
- * We end up here with a part with isElement == true, a non-array element, 
+ * We end up here with a part with isElement == true, a non-array element,
  * but a complex type for an array of the element.
  */
 
@@ -54,16 +58,16 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Override
     protected String[] getConfigLocations() {
         TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:DocLitBareClientTestBeans.xml"};
     }
-    
+
     @Before
     public void before() throws Exception {
-        setupRhino("dlb-service-endpoint", 
+        setupRhino("dlb-service-endpoint",
                    "/org/apache/cxf/javascript/DocLitBareTests.js",
                    SchemaValidationType.BOTH);
         implementor = (SimpleDocLitBareImpl)rawImplementor;
@@ -71,8 +75,8 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
     }
 
     private Void beanFunctionCaller(Context context) {
-        
-        TestBean1 b1 = new TestBean1(); 
+
+        TestBean1 b1 = new TestBean1();
         b1.stringItem = "strung";
         TestBean1[] beans = new TestBean1[3];
         beans[0] = new TestBean1();
@@ -84,18 +88,18 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         beans[2].optionalIntArrayItem = new int[2];
         beans[2].optionalIntArrayItem[0] = 4;
         beans[2].optionalIntArrayItem[1] = 6;
-        
+
         Object[] jsBeans = new Object[3];
         jsBeans[0] = testBean1ToJS(testUtilities, context, beans[0]);
         jsBeans[1] = null;
         jsBeans[2] = testBean1ToJS(testUtilities, context, beans[2]);
-        
+
         Scriptable jsBean1 = testBean1ToJS(testUtilities, context, b1);
         Scriptable jsBeanArray = context.newArray(testUtilities.getRhinoScope(), jsBeans);
-        
+
         LOG.info("About to call beanFunctionTest " + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("beanFunctionTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("beanFunctionTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            jsBean1,
                                            jsBeanArray);
@@ -113,23 +117,23 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         SimpleDocLitBareImpl impl = (SimpleDocLitBareImpl)rawImplementor;
         TestBean1 b1returned = impl.getLastBean1();
         assertEquals(b1, b1returned);
-        // commented out until 
+        // commented out until
         //TestBean1[] beansReturned = impl.getLastBean1Array();
         //assertArrayEquals(beans, beansReturned);
         return null;
     }
-    
+
     private Void compliantCaller(Context context) {
-        TestBean1 b1 = new TestBean1(); 
+        TestBean1 b1 = new TestBean1();
         b1.stringItem = "strung";
 
         b1.beanTwoNotRequiredItem = new TestBean2("bean2");
-        
+
         Scriptable jsBean1 = testBean1ToJS(testUtilities, context, b1);
-        
+
         LOG.info("About to call compliant" + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("compliantTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("compliantTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            jsBean1);
         boolean notified = notifier.waitForJavascript(1000 * 10);
@@ -144,11 +148,11 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         assertEquals("strung", response);
         return null;
     }
-    
+
     private Void actionMethodCaller(Context context) {
         LOG.info("About to call actionMethod" + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("actionMethodTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("actionMethodTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            "wrong");
         boolean notified = notifier.waitForJavascript(1000 * 10);
@@ -163,22 +167,22 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         assertEquals("wrong", response);
         return null;
     }
-    
+
     private Void onewayCaller(Context context) {
         LOG.info("About to call onewayMethod" + getAddress());
         implementor.prepareToWaitForOneWay();
-        testUtilities.rhinoCall("onewayTest",  
+        testUtilities.rhinoCall("onewayTest",
                                 testUtilities.javaToJS(getAddress()),
                                 "corrigan");
         implementor.waitForOneWay();
         assertEquals("corrigan", implementor.getLastString());
         return null;
     }
-    
+
     private Void compliantNoArgsCaller(Context context) {
         LOG.info("About to call compliantNoArgs " + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("compliantNoArgsTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("compliantNoArgsTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()));
 
         boolean notified = notifier.waitForJavascript(1000 * 10);
@@ -194,7 +198,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         assertEquals("horsefeathers", item);
         return null;
     }
-    
+
     @Test
     public void callFunctionWithBeans() {
         LOG.info("about to call beanFunctionTest");
@@ -244,10 +248,10 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
             }
         });
     }
-    
+
     private Void portObjectCaller(Context context) {
         LOG.info("About to call portObjectTest " + getAddress());
-        Notifier notifier = 
+        Notifier notifier =
             testUtilities.rhinoCallConvert("portObjectTest", Notifier.class);
 
         boolean notified = notifier.waitForJavascript(1000 * 10);
@@ -263,7 +267,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         assertEquals("horsefeathers", item);
         return null;
     }
-    
+
     @Test
     public void callPortObject() {
         LOG.info("about to call portObject");
@@ -275,12 +279,12 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
     }
 
     public static Scriptable testBean1ToJS(JavascriptTestUtilities testUtilities,
-                                           Context context, 
+                                           Context context,
                                            TestBean1 b1) {
         if (b1 == null) {
             return null; // black is always in fashion. (Really, we can be called with a null).
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns_testBean1");
         testUtilities.rhinoCallMethod(rv, "setStringItem", testUtilities.javaToJS(b1.stringItem));
         testUtilities.rhinoCallMethod(rv, "setIntItem", testUtilities.javaToJS(b1.intItem));
@@ -292,9 +296,9 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         testUtilities.rhinoCallMethod(rv, "setDoubleItem", testUtilities.javaToJS(b1.doubleItem));
         testUtilities.rhinoCallMethod(rv, "setBeanTwoItem", testBean2ToJS(testUtilities,
                                                                           context, b1.beanTwoItem));
-        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem", 
+        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem",
                                       testBean2ToJS(testUtilities, context, b1.beanTwoNotRequiredItem));
-        return rv; 
+        return rv;
     }
 
     public static Object testBean2ToJS(JavascriptTestUtilities testUtilities,
@@ -302,7 +306,7 @@ public class DocLitBareClientTest extends JavascriptRhinoTest {
         if (beanTwoItem == null) {
             return null;
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns3_testBean2");
         testUtilities.rhinoCallMethod(rv, "setStringItem", beanTwoItem.stringItem);
         return rv;

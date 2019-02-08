@@ -42,30 +42,30 @@ import org.apache.neethi.Assertion;
 public class PolicyLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getLogger(PolicyLoggingInterceptor.class);
-    
+
     private Bus bus;
-    
+
     PolicyLoggingInterceptor(boolean o) {
         super(o ? Phase.POST_STREAM : Phase.POST_INVOKE);
     }
-    
+
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         EndpointInfo ei = message.getExchange().getEndpoint().getEndpointInfo();
         BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
         LOG.fine("Getting effective server request policy for endpoint " + ei
                  + " and binding operation " + boi);
-        EffectivePolicy ep = 
-            bus.getExtension(PolicyEngine.class).getEffectiveServerRequestPolicy(ei, boi, message);                
+        EffectivePolicy ep =
+            bus.getExtension(PolicyEngine.class).getEffectiveServerRequestPolicy(ei, boi, message);
         for (Iterator<List<Assertion>> it = ep.getPolicy().getAlternatives(); it.hasNext();) {
             Collection<Assertion> as = it.next();
             LOG.fine("Checking alternative with " + as.size() + " assertions.");
             for (Assertion a : as) {
                 LOG.fine("Assertion: " + a.getClass().getName());
-                HTTPServerPolicy p = (JaxbAssertion.cast(a, HTTPServerPolicy.class)).getData(); 
+                HTTPServerPolicy p = (JaxbAssertion.cast(a, HTTPServerPolicy.class)).getData();
                 LOG.fine("server policy: " + ServerPolicyCalculator.toString(p));
             }
         }

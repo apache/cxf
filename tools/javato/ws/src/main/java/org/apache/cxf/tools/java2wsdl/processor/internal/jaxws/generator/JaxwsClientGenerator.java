@@ -38,7 +38,7 @@ public class JaxwsClientGenerator extends AbstractJaxwsGenerator {
     public boolean passthrough() {
         return !env.optionSet(ToolConstants.CFG_CLIENT);
     }
-    
+
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
         JavaModel javaModel = env.get(JavaModel.class);

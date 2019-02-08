@@ -33,7 +33,7 @@ public class ColocInFaultObserver extends InFaultChainInitiatorObserver {
     private SortedSet<Phase> list;
     public ColocInFaultObserver(Bus bus) {
         super(bus);
-        list = new TreeSet<Phase>(bus.getExtension(PhaseManager.class).getInPhases());
+        list = new TreeSet<>(bus.getExtension(PhaseManager.class).getInPhases());
         ColocUtil.setPhases(list, Phase.PRE_LOGICAL, Phase.PRE_INVOKE);
     }
 

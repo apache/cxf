@@ -40,6 +40,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.DataWriter;
@@ -66,11 +67,11 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 public class SoapOutInterceptor extends AbstractSoapInterceptor {
     public static final String WROTE_ENVELOPE_START = "wrote.envelope.start";
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SoapOutInterceptor.class);
-    
+
     private Bus bus;
-    
+
     public SoapOutInterceptor(Bus b) {
         super(Phase.WRITE);
         bus = b;
@@ -79,13 +80,13 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         super(phase);
         bus = b;
     }
-    
+
     public void handleMessage(SoapMessage message) {
         // Yes this is ugly, but it avoids us from having to implement any kind of caching strategy
-        boolean wroteStart = MessageUtils.isTrue(message.get(WROTE_ENVELOPE_START));
+        boolean wroteStart = PropertyUtils.isTrue(message.get(WROTE_ENVELOPE_START));
         if (!wroteStart) {
             writeSoapEnvelopeStart(message);
-            
+
             OutputStream os = message.getContent(OutputStream.class);
             // Unless we're caching the whole message in memory skip the envelope writing
             // if there's a fault later.
@@ -94,13 +95,17 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             }
         }
 
+        String cte = (String)message.get("soap.attachement.content.transfer.encoding");
+        if (cte != null) {
+            message.put(Message.CONTENT_TRANSFER_ENCODING, cte);
+        }
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(new SoapOutEndingInterceptor());
     }
-    
+
     private void writeSoapEnvelopeStart(final SoapMessage message) {
         final SoapVersion soapVersion = message.getVersion();
-        try {            
+        try {
             XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
             String soapPrefix = xtw.getPrefix(soapVersion.getNamespace());
             if (StringUtils.isEmpty(soapPrefix)) {
@@ -114,7 +119,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     }
                 }
                 xtw.setPrefix(soapPrefix, soapVersion.getNamespace());
-                xtw.writeStartElement(soapPrefix, 
+                xtw.writeStartElement(soapPrefix,
                                       soapVersion.getEnvelope().getLocalPart(),
                                       soapVersion.getNamespace());
                 xtw.writeNamespace(soapPrefix, soapVersion.getNamespace());
@@ -122,10 +127,10 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     if (!soapVersion.getNamespace().equals(entry.getValue())) {
                         xtw.writeNamespace(entry.getKey(), entry.getValue());
                     }
-                }                
+                }
             } else {
                 xtw.setPrefix(soapPrefix, soapVersion.getNamespace());
-                xtw.writeStartElement(soapPrefix, 
+                xtw.writeStartElement(soapPrefix,
                                       soapVersion.getEnvelope().getLocalPart(),
                                       soapVersion.getNamespace());
                 String s2 = xtw.getPrefix(soapVersion.getNamespace());
@@ -138,9 +143,9 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             boolean preexistingHeaders = message.hasHeaders();
 
             if (preexistingHeaders) {
-                xtw.writeStartElement(soapPrefix, 
+                xtw.writeStartElement(soapPrefix,
                                       soapVersion.getHeader().getLocalPart(),
-                                      soapVersion.getNamespace());   
+                                      soapVersion.getNamespace());
                 List<Header> hdrList = message.getHeaders();
                 for (Header header : hdrList) {
                     XMLStreamWriter writer = xtw;
@@ -179,17 +184,17 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 xtw.writeEndElement();
             }
 
-            xtw.writeStartElement(soapPrefix, 
+            xtw.writeStartElement(soapPrefix,
                                   soapVersion.getBody().getLocalPart(),
                                   soapVersion.getNamespace());
-            
+
             // Interceptors followed such as Wrapped/RPC/Doc Interceptor will write SOAP body
         } catch (XMLStreamException e) {
             throw new SoapFault(
                 new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), e, soapVersion.getSender());
         }
     }
-    
+
     private boolean handleHeaderPart(boolean preexistingHeaders, SoapMessage message, String soapPrefix) {
         //add MessagePart to soapHeader if necessary
         boolean endedHeader = false;
@@ -198,8 +203,8 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         if (bop == null) {
             return endedHeader;
         }
-        
-        XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);        
+
+        XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
         boolean startedHeader = false;
         BindingOperationInfo unwrappedOp = bop;
         if (bop.isUnwrapped()) {
@@ -208,11 +213,11 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         boolean client = isRequestor(message);
         BindingMessageInfo bmi = client ? unwrappedOp.getInput() : unwrappedOp.getOutput();
         BindingMessageInfo wrappedBmi = client ? bop.getInput() : bop.getOutput();
-        
+
         if (bmi == null) {
             return endedHeader;
         }
-        
+
         if (wrappedBmi.getMessageInfo().getMessagePartsNumber() > 0) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
             if (objs == null) {
@@ -222,8 +227,8 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             List<SoapHeaderInfo> headers = bmi.getExtensors(SoapHeaderInfo.class);
             if (headers == null) {
                 return endedHeader;
-            }            
-            
+            }
+
 
             for (SoapHeaderInfo header : headers) {
                 MessagePartInfo part = header.getPart();
@@ -241,11 +246,11 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 objs.remove(part);
                 if (!(startedHeader || preexistingHeaders)) {
                     try {
-                        xtw.writeStartElement(soapPrefix, 
+                        xtw.writeStartElement(soapPrefix,
                                               soapVersion.getHeader().getLocalPart(),
                                               soapVersion.getNamespace());
                     } catch (XMLStreamException e) {
-                        throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), 
+                        throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE),
                             e, soapVersion.getSender());
                     }
                     startedHeader = true;
@@ -253,20 +258,20 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 DataWriter<XMLStreamWriter> dataWriter = getDataWriter(message);
                 dataWriter.write(arg, header.getPart(), xtw);
             }
-            
+
             if (startedHeader || preexistingHeaders) {
                 try {
                     xtw.writeEndElement();
                     endedHeader = true;
                 } catch (XMLStreamException e) {
-                    throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), 
+                    throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE),
                         e, soapVersion.getSender());
                 }
             }
         }
         return endedHeader;
-    }       
-    
+    }
+
     protected DataWriter<XMLStreamWriter> getDataWriter(Message message) {
         Service service = ServiceModelUtil.getService(message.getExchange());
         DataWriter<XMLStreamWriter> dataWriter = service.getDataBinding().createWriter(XMLStreamWriter.class);
@@ -285,7 +290,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             writer.setSchema(schema);
         }
     }
-        
+
     public class SoapOutEndingInterceptor extends AbstractSoapInterceptor {
         public SoapOutEndingInterceptor() {
             super(SoapOutEndingInterceptor.class.getName(), Phase.WRITE_ENDING);
@@ -296,16 +301,16 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
                 if (xtw != null) {
                     // Write body end
-                    xtw.writeEndElement();            
+                    xtw.writeEndElement();
                     // Write Envelope end element
                     xtw.writeEndElement();
                     xtw.writeEndDocument();
-                    
+
                     xtw.flush();
                 }
             } catch (XMLStreamException e) {
                 if (e.getCause() instanceof EOFException) {
-                    //Nothing we can do about this, some clients will close the connection early if 
+                    //Nothing we can do about this, some clients will close the connection early if
                     //they fully parse everything they need
                 } else {
                     SoapVersion soapVersion = message.getVersion();
@@ -315,14 +320,14 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             }
         }
     }
-    
+
     public static class SOAPHeaderWriter extends DelegatingXMLStreamWriter {
         final SoapHeader soapHeader;
         final SoapVersion soapVersion;
         final String soapPrefix;
         boolean firstDone;
-        
-        
+
+
         public SOAPHeaderWriter(XMLStreamWriter writer,
                                 SoapHeader header,
                                 SoapVersion version,
@@ -332,7 +337,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             soapVersion = version;
             soapPrefix = pfx;
         }
-        
+
         public void writeAttribute(String prefix, String uri, String local, String value)
             throws XMLStreamException {
             if (soapVersion.getNamespace().equals(uri)
@@ -350,7 +355,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             }
             super.writeAttribute(uri, local, value);
         }
-        
+
         private void writeSoapAttributes() throws XMLStreamException {
             if (!firstDone) {
                 firstDone = true;
@@ -362,11 +367,11 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 }
                 boolean mu = soapHeader.isMustUnderstand();
                 if (mu) {
-                    String mul = soapVersion.getAttrValueMustUnderstand(mu); 
+                    String mul = soapVersion.getAttrValueMustUnderstand(mu);
                     super.writeAttribute(soapPrefix,
                                    soapVersion.getNamespace(),
                                    soapVersion.getAttrNameMustUnderstand(),
-                                   mul);                                        
+                                   mul);
                 }
             }
         }
@@ -384,7 +389,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             super.writeStartElement(arg0);
             writeSoapAttributes();
         }
-        
-        
+
+
     };
 }

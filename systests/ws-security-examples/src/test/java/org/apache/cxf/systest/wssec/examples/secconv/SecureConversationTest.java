@@ -27,14 +27,18 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * A set of tests for SecureConversation using policies defined in the OASIS spec:
@@ -44,12 +48,12 @@ import org.junit.runners.Parameterized.Parameters;
 public class SecureConversationTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public SecureConversationTest(TestParam type) {
         this.test = type;
     }
@@ -69,14 +73,14 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
-                                                {new TestParam(PORT, true)},
-                                                {new TestParam(STAX_PORT, false)},
-                                                {new TestParam(STAX_PORT, true)},
+    public static Collection<TestParam> data() {
+
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false),
+                                              new TestParam(PORT, true),
+                                              new TestParam(STAX_PORT, false),
+                                              new TestParam(STAX_PORT, true),
         });
     }
 
@@ -85,7 +89,7 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     /**
      * 2.4.1 (WSS 1.0) Secure Conversation bootstrapped by Mutual
      * Authentication with X.509 Certificates
@@ -97,24 +101,24 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         URL busFile = SecureConversationTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecureConversationTest.class.getResource("DoubleItSecConv.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSecureConversationPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(samlPort);
         }
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
 }

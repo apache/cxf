@@ -35,9 +35,9 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface DataBinding {
     Class<? extends org.apache.cxf.databinding.DataBinding> value();
-    
+
     /**
-     * Bean reference to lookup in configuration.  Bean must be castable 
+     * Bean reference to lookup in configuration.  Bean must be castable
      * to the Class set above
      * @return The id of the bean reference
      */

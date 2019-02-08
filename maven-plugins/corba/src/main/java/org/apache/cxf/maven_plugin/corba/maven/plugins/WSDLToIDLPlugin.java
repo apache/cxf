@@ -46,22 +46,22 @@ import org.apache.maven.project.MavenProject;
 public class WSDLToIDLPlugin extends AbstractMojo {
 
     /**
-     * @parameter  expression="${project.build.directory}/generated/src/main/java"
+     * @parameter expression="${project.build.directory}/generated/src/main/java"
      * @required
      */
     File outputDir;
-    
+
     /**
      * @parameter
      */
-    WsdltoidlOption wsdltoidlOptions[];
-    
+    WsdltoidlOption[] wsdltoidlOptions;
+
     /**
      * @parameter expression="${project}"
      * @required
      */
     MavenProject project;
-    
+
     /**
      * Use the compile classpath rather than the test classpath for execution
      * useful if the test dependencies clash with those of wsdl2java
@@ -70,6 +70,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
     boolean useCompileClasspath;
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         if (outputDir == null) {
             throw new MojoExecutionException("The outputDir must be specified");
         }
@@ -81,8 +82,8 @@ public class WSDLToIDLPlugin extends AbstractMojo {
         }
 
         outputDir.mkdirs();
-        
-        List<URL> urlList = new ArrayList<URL>();
+
+        List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
 
         try {
@@ -110,36 +111,36 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                 //ignore
             }
         }
-        
+
         ClassLoader origContext = Thread.currentThread().getContextClassLoader();
         ClassLoader loader = ClassLoaderUtils.getURLClassLoader(urlList, origContext);
         String newCp = buf.toString();
 
         //with some VM's, creating an XML parser (which we will do to parse wsdls)
-        //will set some system properties that then interferes with mavens 
+        //will set some system properties that then interferes with mavens
         //dependency resolution.  (OSX is the major culprit here)
         //We'll save the props and then set them back later.
-        Map<Object, Object> origProps = new HashMap<Object, Object>(System.getProperties());
-        
+        Map<Object, Object> origProps = new HashMap<>(System.getProperties());
+
         String cp = System.getProperty("java.class.path");
-        
+
         try {
             Thread.currentThread().setContextClassLoader(loader);
             System.setProperty("java.class.path", newCp);
-        
+
             for (int x = 0; x < wsdltoidlOptions.length; x++) {
                 File file = new File(wsdltoidlOptions[x].getWSDL());
                 File doneFile = new File(outputDir, "." + file.getName() + ".DONE");
-    
+
                 boolean doWork = file.lastModified() > doneFile.lastModified();
                 if (!doneFile.exists()) {
                     doWork = true;
                 } else if (file.lastModified() > doneFile.lastModified()) {
                     doWork = true;
                 }
-    
+
                 if (doWork) {
-                    List<String> list = new ArrayList<String>();
+                    List<String> list = new ArrayList<>();
                     list.add("-d");
                     list.add(outputDir.getAbsolutePath());
                     if (wsdltoidlOptions[x].isCorbaEnabled()) {
@@ -151,9 +152,9 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                     if (wsdltoidlOptions[x].getExtraargs() != null) {
                         list.addAll(wsdltoidlOptions[x].getExtraargs());
                     }
-                    list.add(wsdltoidlOptions[x].getWSDL());            
+                    list.add(wsdltoidlOptions[x].getWSDL());
                     try {
-                        WSDLToIDL.run(list.toArray(new String[list.size()]));
+                        WSDLToIDL.run(list.toArray(new String[0]));
                         doneFile.delete();
                         doneFile.createNewFile();
                     } catch (Throwable e) {
@@ -172,8 +173,8 @@ public class WSDLToIDLPlugin extends AbstractMojo {
             if (cp != null) {
                 System.setProperty("java.class.path", cp);
             }
-            
-            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
+
+            Map<Object, Object> newProps = new HashMap<>(System.getProperties());
             for (Object o : newProps.keySet()) {
                 if (!origProps.containsKey(o)) {
                     System.clearProperty(o.toString());

@@ -67,14 +67,14 @@ public class NettyHttpServerEngineFactoryHolder {
         try {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
 
-            NettyHttpServerEngineFactoryConfigType config 
+            NettyHttpServerEngineFactoryConfigType config
                 = (NettyHttpServerEngineFactoryConfigType) getJaxbObject(element,
                     NettyHttpServerEngineFactoryConfigType.class);
 
             factory = new NettyHttpServerEngineFactory();
 
-            Map<String, ThreadingParameters> threadingParametersMap 
-                = new TreeMap<String, ThreadingParameters>();
+            Map<String, ThreadingParameters> threadingParametersMap
+                = new TreeMap<>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
                 for (ThreadingParametersIdentifiedType threads : config.getIdentifiedThreadingParameters()) {
@@ -88,12 +88,12 @@ public class NettyHttpServerEngineFactoryHolder {
             }
 
             //SSL
-            Map<String, TLSServerParameters> sslMap = new TreeMap<String, TLSServerParameters>();
+            Map<String, TLSServerParameters> sslMap = new TreeMap<>();
             if (config.getIdentifiedTLSServerParameters() != null) {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {
                     try {
-                        TLSServerParameters parameter 
+                        TLSServerParameters parameter
                             = new TLSServerParametersConfig(t.getTlsServerParameters());
                         sslMap.put(t.getId(), parameter);
                     } catch (Exception e) {
@@ -104,10 +104,10 @@ public class NettyHttpServerEngineFactoryHolder {
             }
             //Engines
 
-            List<NettyHttpServerEngine> engineList = new ArrayList<NettyHttpServerEngine>();
+            List<NettyHttpServerEngine> engineList = new ArrayList<>();
             for (NettyHttpServerEngineConfigType engine : config.getEngine()) {
                 NettyHttpServerEngine eng = new NettyHttpServerEngine();
-               
+
                 if (engine.getHost() != null && !StringUtils.isEmpty(engine.getHost())) {
                     eng.setHost(engine.getHost());
                 }
@@ -140,7 +140,7 @@ public class NettyHttpServerEngineFactoryHolder {
                         parameter = new TLSServerParametersConfig(engine.getTlsServerParameters());
                         eng.setTlsServerParameters(parameter);
                     } catch (Exception e) {
-                        throw new RuntimeException("Could not configure TLS for engine on  " 
+                        throw new RuntimeException("Could not configure TLS for engine on  "
                             + eng.getHost() + ":" + eng.getPort(), e);
                     }
                 }
@@ -188,11 +188,11 @@ public class NettyHttpServerEngineFactoryHolder {
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
             try {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
+                Set<Class<?>> tmp = new HashSet<>();
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }
-                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
+                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls),
                                             cls == null ? getClass().getClassLoader() : cls.getClassLoader());
                 if (cls != null) {
                     boolean hasOf = false;
@@ -206,7 +206,7 @@ public class NettyHttpServerEngineFactoryHolder {
                     }
                 }
                 JAXBContextCache.scanPackages(tmp);
-                JAXBContextCache.CachedContextAndSchemas ccs 
+                JAXBContextCache.CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
                 jaxbClasses = ccs.getClasses();
                 jaxbContext = ccs.getContext();

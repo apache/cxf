@@ -21,12 +21,14 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class InterfaceInfoTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class InterfaceInfoTest {
+
     private InterfaceInfo interfaceInfo;
 
     @Before
@@ -34,7 +36,7 @@ public class InterfaceInfoTest extends Assert {
         interfaceInfo = new InterfaceInfo(new ServiceInfo(), new QName(
             "http://apache.org/hello_world_soap_http", "interfaceTest"));
     }
-    
+
     @Test
     public void testName() throws Exception {
         assertEquals(interfaceInfo.getName().getLocalPart(), "interfaceTest");
@@ -47,7 +49,7 @@ public class InterfaceInfoTest extends Assert {
         assertEquals(interfaceInfo.getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http1");
     }
- 
+
     @Test
     public void testOperation() throws Exception {
         QName name = new QName("urn:test:ns", "sayHi");
@@ -59,7 +61,7 @@ public class InterfaceInfoTest extends Assert {
         try {
             interfaceInfo.addOperation(name);
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), 
+            assertEquals(e.getMessage(),
                 "An operation with name [{urn:test:ns}sayHi] already exists in this service");
             duplicatedOperationName = true;
         }
@@ -78,5 +80,5 @@ public class InterfaceInfoTest extends Assert {
             fail("should get NullPointerException");
         }
     }
-    
+
 }

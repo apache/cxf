@@ -34,9 +34,9 @@ public class RequestAssertionConsumerService extends AbstractRequestAssertionCon
     public Response processSamlResponse(@FormParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                         @FormParam(SSOConstants.RELAY_STATE) String relayState) {
         return doProcessSamlResponse(encodedSamlResponse, relayState, true);
-        
+
     }
-    
+
     @GET
     public Response getSamlResponse(@QueryParam(SSOConstants.SAML_RESPONSE) String encodedSamlResponse,
                                     @QueryParam(SSOConstants.RELAY_STATE) String relayState) {

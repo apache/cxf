@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.cxf.common.util.SystemPropertyAction;
+
 public final class JavaUtils {
 
     /** Use this character as suffix */
@@ -35,7 +37,7 @@ public final class JavaUtils {
      * literal values, but for the purposes of this array, they can be treated
      * as literals.
      */
-    private static final Set<String> KEYWORDS = new HashSet<String>(Arrays.asList(
+    private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList(
         "abstract", "assert", "boolean", "break", "byte", "case", "catch",
         "char", "class", "const", "continue", "default", "do", "double",
         "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto",
@@ -46,16 +48,40 @@ public final class JavaUtils {
         "void", "volatile", "while"
     ));
 
+    private static boolean isJava11Compatible;
+    private static boolean isJava9Compatible;
+    private static boolean isJava8Before161;
+
+    static {
+        String version = SystemPropertyAction.getProperty("java.version");
+        try {
+            isJava8Before161 = version != null && version.startsWith("1.8.0_")
+                && Integer.parseInt(version.substring(6)) < 161;
+        } catch (NumberFormatException ex) {
+            isJava8Before161 = false;
+        }
+
+        if (version.indexOf('.') > 0) {
+            version = version.substring(0, version.indexOf('.'));
+        }            
+        if (version.indexOf("-") > 0) {
+            version = version.substring(0, version.indexOf("-"));
+        }
+
+        setJava9Compatible(Integer.valueOf(version) >= 9);
+        setJava11Compatible(Integer.valueOf(version) >= 11);
+    }
+
     private JavaUtils() {
     }
-    
+
     /**
      * checks if the input string is a valid java keyword.
-     * 
+     *
      * @return boolean true/false
      */
     public static boolean isJavaKeyword(String keyword) {
-        return KEYWORDS.contains(keyword); 
+        return KEYWORDS.contains(keyword);
     }
 
     /**
@@ -64,6 +90,26 @@ public final class JavaUtils {
      */
     public static String makeNonJavaKeyword(String keyword) {
         return KEYWORD_PREFIX + keyword;
+    }
+
+    public static boolean isJava9Compatible() {
+        return isJava9Compatible;
+    }
+    
+    public static boolean isJava11Compatible() {
+        return isJava11Compatible;
+    }
+
+    private static void setJava9Compatible(boolean java9Compatible) {
+        JavaUtils.isJava9Compatible = java9Compatible;
+    }
+    
+    private static void setJava11Compatible(boolean java11Compatible) {
+        JavaUtils.isJava11Compatible = java11Compatible;
+    }
+
+    public static boolean isJava8Before161() {
+        return isJava8Before161;
     }
 
 }

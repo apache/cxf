@@ -37,23 +37,23 @@ import org.apache.xml.security.utils.EncryptionConstants;
 
 public final class EncryptionUtils {
     private EncryptionUtils() {
-        
+
     }
-    
+
     public static Cipher initCipherWithCert(String keyEncAlgo, int mode, X509Certificate cert)
         throws WSSecurityException {
         return initCipherWithCert(keyEncAlgo, null, mode, cert);
     }
-    
+
     public static Cipher initCipherWithCert(
-        String keyEncAlgo, 
+        String keyEncAlgo,
         String digestAlg,
-        int mode, 
+        int mode,
         X509Certificate cert
     ) throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
-            OAEPParameterSpec oaepParameters = 
+            OAEPParameterSpec oaepParameters =
                 constructOAEPParameters(
                     keyEncAlgo, digestAlg, null, null
                 );
@@ -69,17 +69,17 @@ public final class EncryptionUtils {
         }
         return cipher;
     }
-    
+
     public static Cipher initCipherWithKey(String keyEncAlgo, int mode, Key key)
         throws WSSecurityException {
         return initCipherWithKey(keyEncAlgo, null, mode, key);
     }
-    
+
     public static Cipher initCipherWithKey(String keyEncAlgo, String digestAlgo, int mode, Key key)
         throws WSSecurityException {
         Cipher cipher = KeyUtils.getCipherInstance(keyEncAlgo);
         try {
-            OAEPParameterSpec oaepParameters = 
+            OAEPParameterSpec oaepParameters =
                 constructOAEPParameters(
                     keyEncAlgo, digestAlgo, null, null
                 );
@@ -95,7 +95,7 @@ public final class EncryptionUtils {
         }
         return cipher;
     }
-    
+
     /**
      * Construct an OAEPParameterSpec object from the given parameters
      */
@@ -107,17 +107,17 @@ public final class EncryptionUtils {
     ) {
         if (XMLCipher.RSA_OAEP.equals(encryptionAlgorithm)
             || XMLCipher.RSA_OAEP_11.equals(encryptionAlgorithm)) {
-            
+
             String jceDigestAlgorithm = "SHA-1";
             if (digestAlgorithm != null) {
                 jceDigestAlgorithm = JCEMapper.translateURItoJCEID(digestAlgorithm);
             }
-            
+
             PSource.PSpecified pSource = PSource.PSpecified.DEFAULT;
             if (oaepParams != null) {
                 pSource = new PSource.PSpecified(oaepParams);
             }
-            
+
             MGF1ParameterSpec mgfParameterSpec = new MGF1ParameterSpec("SHA-1");
             if (XMLCipher.RSA_OAEP_11.equals(encryptionAlgorithm)) {
                 if (EncryptionConstants.MGF1_SHA256.equals(mgfAlgorithm)) {
@@ -130,11 +130,11 @@ public final class EncryptionUtils {
             }
             return new OAEPParameterSpec(jceDigestAlgorithm, "MGF1", mgfParameterSpec, pSource);
         }
-        
+
         return null;
     }
-    
-    public static XMLCipher initXMLCipher(String symEncAlgo, int mode, Key key) 
+
+    public static XMLCipher initXMLCipher(String symEncAlgo, int mode, Key key)
         throws WSSecurityException {
         try {
             XMLCipher cipher = XMLCipher.getInstance(symEncAlgo);
@@ -145,6 +145,6 @@ public final class EncryptionUtils {
             throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_ALGORITHM, ex);
         }
     }
-    
+
 }
 

@@ -22,7 +22,7 @@ package org.apache.cxf.systest.ws.policy;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(name = "JavaFirstAttachmentPolicyService", 
+@WebService(name = "JavaFirstAttachmentPolicyService",
             targetNamespace = "http://www.example.org/contract/JavaFirstAttachmentPolicyService")
 public interface JavaFirstAttachmentPolicyService {
     @WebMethod(operationName = "doOperationLevelPolicy")
@@ -33,7 +33,7 @@ public interface JavaFirstAttachmentPolicyService {
 
     @WebMethod(operationName = "doOutputMessagePolicy")
     void doOutputMessagePolicy();
-    
+
     @WebMethod(operationName = "doNoPolicy")
-    void doNoPolicy();    
+    void doNoPolicy();
 }

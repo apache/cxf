@@ -27,7 +27,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
@@ -54,117 +53,121 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for validating JWTTokens in different realms
  */
-public class JWTTokenValidatorRealmTest extends org.junit.Assert {
+public class JWTTokenValidatorRealmTest {
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     @org.junit.Test
     public void testRealmA() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
         ((JWTTokenProvider)jwtTokenProvider).setRealmMap(getRealms());
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
         providerParameters.setRealm("A");
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         // Validate the token - no realm is returned
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
-        
+
         // Now set the JWTRealmCodec implementation on the Validator
         ((JWTTokenValidator)jwtTokenValidator).setRealmCodec(new IssuerJWTRealmCodec());
-        
+
         validatorResponse = jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(validatorResponse.getTokenRealm().equals("A"));
-        
+        assertTrue("A".equals(validatorResponse.getTokenRealm()));
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
     }
-    
+
     @org.junit.Test
     public void testRealmB() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
         ((JWTTokenProvider)jwtTokenProvider).setRealmMap(getRealms());
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
         providerParameters.setRealm("B");
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         // Validate the token - no realm is returned
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
         assertNull(validatorResponse.getTokenRealm());
-        
+
         // Now set the JWTRealmCodec implementation on the Validator
         ((JWTTokenValidator)jwtTokenValidator).setRealmCodec(new IssuerJWTRealmCodec());
-        
+
         validatorResponse = jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(validatorResponse.getTokenRealm().equals("B"));
-        
+        assertTrue("B".equals(validatorResponse.getTokenRealm()));
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
     }
-    
+
     private Map<String, RealmProperties> getRealms() {
         // Create Realms
-        Map<String, RealmProperties> realms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> realms = new HashMap<>();
         RealmProperties realm = new RealmProperties();
         realm.setIssuer("A-Issuer");
         realms.put("A", realm);
@@ -173,28 +176,27 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         realms.put("B", realm);
         return realms;
     }
-    
+
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(JWTTokenProvider.JWT_TOKEN_TYPE);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -203,32 +205,31 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
         stsProperties.setEncryptionCrypto(crypto);
         stsProperties.setEncryptionUsername("myservicekey");
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        
+
         return parameters;
     }
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(STSConstants.STATUS);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -240,33 +241,33 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
+
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;
     }
-    
+
     /**
      * This class returns a realm associated with a JWTToken depending on the issuer.
      */
     private static class IssuerJWTRealmCodec implements JWTRealmCodec {
-        
+
         public String getRealmFromToken(JwtToken token) {
             if ("A-Issuer".equals(token.getClaim(JwtConstants.CLAIM_ISSUER))) {
                 return "A";
@@ -275,6 +276,6 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
             }
             return null;
         }
-        
+
     }
 }

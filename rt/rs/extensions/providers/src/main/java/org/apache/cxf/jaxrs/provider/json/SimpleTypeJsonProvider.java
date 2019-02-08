@@ -45,13 +45,13 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Produces("application/json")
 @Consumes("application/json")
-public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider 
+public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
 
     @Context
     private Providers providers;
     private boolean supportSimpleTypesOnly;
-    private PrimitiveTextProvider<T> primitiveHelper = new PrimitiveTextProvider<T>();
+    private PrimitiveTextProvider<T> primitiveHelper = new PrimitiveTextProvider<>();
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return !supportSimpleTypesOnly || primitiveHelper.isReadable(type, genericType, annotations, mediaType);
@@ -68,13 +68,13 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
         throws IOException, WebApplicationException {
         if (!supportSimpleTypesOnly && !InjectionUtils.isPrimitive(type)) {
             @SuppressWarnings("unchecked")
-            MessageBodyWriter<T> next = 
+            MessageBodyWriter<T> next =
                 (MessageBodyWriter<T>)providers.getMessageBodyWriter(type, genericType, annotations, mediaType);
             JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
             try {
                 next.writeTo(t, type, genericType, annotations, mediaType, headers, os);
             } finally {
-                JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null); 
+                JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null);
             }
         } else {
             os.write(StringUtils.toBytesASCII("{\"" + type.getSimpleName().toLowerCase() + "\":"));
@@ -87,7 +87,7 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
 
     private void writeQuote(OutputStream os, Class<?> type) throws IOException {
         if (type == String.class) {
-            os.write(StringUtils.toBytesASCII("\""));        
+            os.write(StringUtils.toBytesASCII("\""));
         }
     }
     public void setSupportSimpleTypesOnly(boolean supportSimpleTypesOnly) {
@@ -104,24 +104,23 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
                       MultivaluedMap<String, String> headers, InputStream is)
         throws IOException, WebApplicationException {
         if (!supportSimpleTypesOnly && !InjectionUtils.isPrimitive(type)) {
-            MessageBodyReader<T> next = 
-                (MessageBodyReader<T>)providers.getMessageBodyReader(type, genericType, annotations, mediaType);
+            MessageBodyReader<T> next =
+                providers.getMessageBodyReader(type, genericType, annotations, mediaType);
             JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
             try {
                 return next.readFrom(type, genericType, annotations, mediaType, headers, is);
             } finally {
-                JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null); 
+                JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null);
             }
-        } else {
-            String data = IOUtils.toString(is).trim();
-            int index = data.indexOf(':');
-            data = data.substring(index + 1, data.length() - 1).trim();
-            if (data.startsWith("\"")) {
-                data = data.substring(1, data.length() - 1);
-            }
-            return primitiveHelper.readFrom(type, genericType, annotations, mediaType, headers, 
-                                            new ByteArrayInputStream(StringUtils.toBytesUTF8(data)));
         }
+        String data = IOUtils.toString(is).trim();
+        int index = data.indexOf(':');
+        data = data.substring(index + 1, data.length() - 1).trim();
+        if (data.startsWith("\"")) {
+            data = data.substring(1, data.length() - 1);
+        }
+        return primitiveHelper.readFrom(type, genericType, annotations, mediaType, headers,
+                                        new ByteArrayInputStream(StringUtils.toBytesUTF8(data)));
     }
 
 }

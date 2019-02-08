@@ -34,9 +34,9 @@ public class JsServiceFactoryBean {
     private Bus bus;
 
     public JsServiceFactoryBean() {
-        providerFactory = new ProviderFactory(); 
+        providerFactory = new ProviderFactory();
     }
-    
+
     public Bus getBus() {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
@@ -47,31 +47,31 @@ public class JsServiceFactoryBean {
     public void setBus(Bus bus) {
         this.bus = bus;
     }
-    
+
     public void setAddress(String addr) {
         address = addr;
     }
-    
+
     public String getAddress() {
         return address;
     }
-    
+
     public void setIsBaseAddr(boolean isBase) {
         isBaseAddr = isBase;
     }
-    
+
     public boolean getIsBaseAddr() {
         return isBaseAddr;
     }
-    
+
     public void setJs(String file) {
         js = file;
     }
-    
+
     public String getJs() {
         return js;
     }
-    
+
     public void create() throws Exception {
         BusFactory.setDefaultBus(bus);
         String jsFileString = getClass().getResource(js).toURI().getPath();

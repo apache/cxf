@@ -27,9 +27,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for myComplexStruct complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="myComplexStruct">
  *   &lt;complexContent>
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "myComplexStruct", propOrder = {"elem1", "elem2", "elem3" })
@@ -59,11 +59,11 @@ public class MyComplexStruct {
 
     /**
      * Gets the value of the elem1 property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getElem1() {
         return elem1;
@@ -71,11 +71,11 @@ public class MyComplexStruct {
 
     /**
      * Sets the value of the elem1 property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setElem1(String value) {
         this.elem1 = value;
@@ -83,11 +83,11 @@ public class MyComplexStruct {
 
     /**
      * Gets the value of the elem2 property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getElem2() {
         return elem2;
@@ -95,11 +95,11 @@ public class MyComplexStruct {
 
     /**
      * Sets the value of the elem2 property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setElem2(String value) {
         this.elem2 = value;
@@ -107,7 +107,7 @@ public class MyComplexStruct {
 
     /**
      * Gets the value of the elem3 property.
-     * 
+     *
      */
     public int getElem3() {
         return elem3;
@@ -115,7 +115,7 @@ public class MyComplexStruct {
 
     /**
      * Sets the value of the elem3 property.
-     * 
+     *
      */
     public void setElem3(int value) {
         this.elem3 = value;

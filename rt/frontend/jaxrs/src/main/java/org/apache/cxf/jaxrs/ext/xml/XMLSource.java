@@ -49,6 +49,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -58,16 +59,16 @@ import org.apache.cxf.staxutils.StaxUtils;
  *
  */
 public class XMLSource {
-    
-    private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace"; 
-    
+
+    private static final String XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
+
     private InputStream stream;
-    private Document doc; 
-    
+    private Document doc;
+
     public XMLSource(InputStream is) {
         stream = is;
     }
-    
+
     /**
      * Allows for multiple queries against the same stream by buffering to DOM
      */
@@ -76,15 +77,14 @@ public class XMLSource {
             doc = StaxUtils.read(new StreamSource(stream));
             stream = null;
         } catch (XMLStreamException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new Fault(e); 
         }
     }
-    
+
     /**
      * Find the matching XML node and convert it into an instance of the provided class.
      * The default JAXB MessageBodyReader is currently used in case of non-primitive types.
-     * 
+     *
      * @param expression XPath expression
      * @param cls class of the node
      * @return the instance representing the matching node
@@ -92,11 +92,11 @@ public class XMLSource {
     public <T> T getNode(String expression, Class<T> cls) {
         return getNode(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class), cls);
     }
-    
+
     /**
      * Find the matching XML node and convert it into an instance of the provided class.
      * The default JAXB MessageBodyReader is currently used in case of non-primitive types.
-     * 
+     *
      * @param expression XPath expression
      * @param namespaces the namespaces map, prefixes which are used in the XPath expression
      *        are the keys, namespace URIs are the values; note, the prefixes do not have to match
@@ -113,19 +113,18 @@ public class XMLSource {
         if (obj instanceof Node) {
             Node node = (Node)obj;
             if (cls.isPrimitive() || cls == String.class) {
-                return (T)readPrimitiveValue(node, cls);    
-            } else {
-                return readNode(node, cls);
+                return (T)readPrimitiveValue(node, cls);
             }
+            return readNode(node, cls);
         }
         return cls.cast(evaluate(expression, namespaces, XPathConstants.STRING));
     }
-    
+
     /**
      * Find the list of matching XML nodes and convert them into
      * an array of instances of the provided class.
      * The default JAXB MessageBodyReader is currently used  in case of non-primitive types.
-     * 
+     *
      * @param expression XPath expression
      * @param cls class of the node
      * @return the array of instances representing the matching nodes
@@ -133,12 +132,12 @@ public class XMLSource {
     public <T> T[] getNodes(String expression, Class<T> cls) {
         return getNodes(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class), cls);
     }
-    
+
     /**
      * Find the list of matching XML nodes and convert them into
      * an array of instances of the provided class.
      * The default JAXB MessageBodyReader is currently used  in case of non-primitive types.
-     * 
+     *
      * @param expression XPath expression
      * @param namespaces the namespaces map, prefixes which are used in the XPath expression
      *        are the keys, namespace URIs are the values; note, the prefixes do not have to match
@@ -148,7 +147,7 @@ public class XMLSource {
      */
     @SuppressWarnings("unchecked")
     public <T> T[] getNodes(String expression, Map<String, String> namespaces, Class<T> cls) {
-        
+
         NodeList nodes = (NodeList)evaluate(expression, namespaces, XPathConstants.NODESET);
         if (nodes == null || nodes.getLength() == 0) {
             return null;
@@ -174,7 +173,7 @@ public class XMLSource {
     public URI getLink(String expression) {
         return getLink(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class));
     }
-    
+
     /**
      * Find an attribute or text node representing
      * an absolute or relative link and convert it to URI
@@ -188,7 +187,7 @@ public class XMLSource {
         String value = getValue(expression, namespaces);
         return value == null ? null : URI.create(value);
     }
-    
+
     /**
      * Find attributes or text nodes representing
      * absolute or relative links and convert them to URIs
@@ -209,20 +208,20 @@ public class XMLSource {
         }
         return uris;
     }
-    
+
     /**
      * Returns the value of the xml:base attribute, if any.
-     * This can be used to calculate an absolute URI provided 
-     * the links in the actual XML instance are relative. 
-     * 
+     * This can be used to calculate an absolute URI provided
+     * the links in the actual XML instance are relative.
+     *
      * @return the xml:base value
      */
     public URI getBaseURI() {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("xml", XML_NAMESPACE);
         return getLink("/*/@xml:base", map);
     }
-    
+
     /**
      * Find the attribute or simple/text node
      * @param expression the XPath expression
@@ -231,7 +230,7 @@ public class XMLSource {
     public String getValue(String expression) {
         return getValue(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class));
     }
-    
+
     /**
      * Find the attribute or simple/text node
      * @param expression the XPath expression
@@ -243,7 +242,7 @@ public class XMLSource {
     public String getValue(String expression, Map<String, String> namespaces) {
         return getValue(expression, namespaces, String.class);
     }
-    
+
     /**
      * Find the attributes or simple/text nodes
      * @param expression the XPath expression
@@ -252,7 +251,7 @@ public class XMLSource {
     public String[] getValues(String expression) {
         return getValues(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class));
     }
-    
+
     /**
      * Find the attributes or simple/text nodes
      * @param expression the XPath expression
@@ -264,10 +263,10 @@ public class XMLSource {
     public String[] getValues(String expression, Map<String, String> namespaces) {
         return getNodes(expression, namespaces, String.class);
     }
-    
+
     /**
      * Find the attribute or simple/text node and convert the string value to the
-     * instance of the provided class, example, Integer.class. 
+     * instance of the provided class, example, Integer.class.
      * @param expression the XPath expression
      * @param namespaces the namespaces map, prefixes which are used in the XPath expression
      *        are the keys, namespace URIs are the values; note, the prefixes do not have to match
@@ -278,10 +277,10 @@ public class XMLSource {
     @SuppressWarnings("unchecked")
     public <T> T getValue(String expression, Map<String, String> namespaces, Class<T> cls) {
         Object result = evaluate(expression, namespaces, XPathConstants.STRING);
-        return result == null ? null : (T)InjectionUtils.convertStringToPrimitive(result.toString(), cls); 
+        return result == null ? null : (T)InjectionUtils.convertStringToPrimitive(result.toString(), cls);
     }
-    
-    
+
+
     private Object evaluate(String expression, Map<String, String> namespaces, QName type) {
         XPathFactory factory = XPathFactory.newInstance();
         try {
@@ -294,10 +293,10 @@ public class XMLSource {
         boolean releaseDoc = false;
         try {
             if (stream != null) {
-                //xalan xpath evaluate parses to a DOM via a DocumentBuilderFactory, but doesn't 
-                //set the SecureProcessing on that. Since a DOM is always created, might as well 
-                //do it via stax and avoid the service factory performance hits that the 
-                //DocumentBuilderFactory will entail as well as get the extra security 
+                //xalan xpath evaluate parses to a DOM via a DocumentBuilderFactory, but doesn't
+                //set the SecureProcessing on that. Since a DOM is always created, might as well
+                //do it via stax and avoid the service factory performance hits that the
+                //DocumentBuilderFactory will entail as well as get the extra security
                 //that woodstox provides
                 setBuffering();
                 releaseDoc = true;
@@ -312,14 +311,14 @@ public class XMLSource {
             }
         }
     }
-    
-    
+
+
     private static class NamespaceContextImpl implements NamespaceContext {
-        
+
         private Map<String, String> namespaces;
-        
+
         NamespaceContextImpl(Map<String, String> namespaces) {
-            this.namespaces = namespaces;    
+            this.namespaces = namespaces;
         }
 
         public String getNamespaceURI(String prefix) {
@@ -335,7 +334,7 @@ public class XMLSource {
             return null;
         }
 
-        public Iterator<?> getPrefixes(String namespace) {
+        public Iterator<String> getPrefixes(String namespace) {
             String prefix = namespaces.get(namespace);
             if (prefix == null) {
                 return null;
@@ -343,34 +342,33 @@ public class XMLSource {
             return Collections.singletonList(prefix).iterator();
         }
     }
-    
+
     private <T> Object readPrimitiveValue(Node node, Class<T> cls) {
         if (String.class == cls) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 return StaxUtils.toString((Element)node);
-            } else {
-                return cls.cast(node.getNodeValue());
             }
-        } 
-        
+            return cls.cast(node.getNodeValue());
+        }
+
         return InjectionUtils.convertStringToPrimitive(node.getNodeValue(), cls);
     }
-    
-    
+
+
     private <T> T readNode(Node node, Class<T> cls) {
-        
+
         if (Node.class.isAssignableFrom(cls)) {
             return cls.cast(node);
         }
-        
+
         DOMSource s = new DOMSource(node);
         if (Source.class == cls || DOMSource.class == cls) {
             return cls.cast(s);
         }
-        
+
         try {
-            
-            JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
+
+            JAXBElementProvider<?> provider = new JAXBElementProvider<>();
             JAXBContext c = provider.getPackageContext(cls);
             if (c == null) {
                 c = provider.getClassContext(cls);
@@ -379,9 +377,8 @@ public class XMLSource {
             try {
                 if (cls.getAnnotation(XmlRootElement.class) != null) {
                     return cls.cast(u.unmarshal(s));
-                } else {
-                    return u.unmarshal(s, cls).getValue();
                 }
+                return u.unmarshal(s, cls).getValue();
             } finally {
                 JAXBUtils.closeUnmarshaller(u);
             }

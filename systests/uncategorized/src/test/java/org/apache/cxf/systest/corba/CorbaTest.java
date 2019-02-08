@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_corba.Greeter;
 import org.apache.cxf.hello_world_corba.GreeterCORBAService;
@@ -33,15 +34,18 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  *
  */
 public class CorbaTest extends AbstractBusClientServerTestBase {
 
     public static final String PORT = Server.PERSIST_PORT;
-    
-    private static final QName SERVICE_NAME = 
-        new QName("http://cxf.apache.org/hello_world_corba", 
+
+    private static final QName SERVICE_NAME =
+        new QName("http://cxf.apache.org/hello_world_corba",
                   "GreeterCORBAService");
 
     @BeforeClass
@@ -51,7 +55,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class)
         );
     }
-    
+
     @AfterClass
     public static void cleanupFile() throws Exception {
         File file = new File("./HelloWorld.ref");
@@ -74,7 +78,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
         String output = port.greetMe("Betty");
         assertTrue("Unexpected returned string: " + output, "Hello Betty".equals(output));
     }
-    
+
     @Test
     public void testException() throws Exception {
         System.getProperties().remove("com.sun.CORBA.POA.ORBServerId");
@@ -88,9 +92,12 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
             port.pingMe("USER");
         } catch (PingMeFault pe) {
             return;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
         fail("Didn't catch an exception");
     }
 
-    
+
 }

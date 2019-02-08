@@ -22,12 +22,12 @@ package org.apache.cxf.management.counters;
 import org.apache.cxf.management.ManagedComponent;
 
 public interface Counter extends ManagedComponent {
-    
-    String PERFORMANCE_COUNTER = "Performance.Counter";   
-    
-    void increase(MessageHandlingTimeRecorder mhtr);  
-        
+
+    String PERFORMANCE_COUNTER = "Performance.Counter";
+
+    void increase(MessageHandlingTimeRecorder mhtr);
+
     Number getNumInvocations();
-    
+
     boolean isEnabled();
 }

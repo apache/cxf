@@ -38,7 +38,11 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.hello_world.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeOneWay;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
@@ -54,7 +58,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         ServerImpl server = (ServerImpl)svrBean.create();
         assertTrue(server.getDestination() instanceof CustomDestination);
     }
-    
+
     public interface TestService<P> {
         int open(P args);
         void close(int handle);
@@ -64,11 +68,11 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         public void close(int handle) {
         }
 
-        public int open(P args) { 
+        public int open(P args) {
             return 0;
         }
     }
-    
+
     @Test
     public void testCXF1758() throws Exception {
         ServerFactoryBean svrBean = new ServerFactoryBean();
@@ -90,9 +94,9 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
         Map<String, Object> props = svrBean.getProperties();
         if (props == null) {
-            props = new HashMap<String, Object>();
+            props = new HashMap<>();
         }
-        props.put("jaxb.additionalContextClasses", 
+        props.put("jaxb.additionalContextClasses",
                   new Class[] {GreetMe.class, GreetMeOneWay.class});
         svrBean.setProperties(props);
         Server serv = svrBean.create();
@@ -116,27 +120,22 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     public static class CustomDestination implements Destination {
 
         public EndpointReferenceType getAddress() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Conduit getBackChannel(Message inMessage) throws IOException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void shutdown() {
-            // TODO Auto-generated method stub
-            
+
         }
 
         public void setMessageObserver(MessageObserver observer) {
-            // TODO Auto-generated method stub
-            
+
         }
 
         public MessageObserver getMessageObserver() {
-            // TODO Auto-generated method stub
             return null;
         }
 

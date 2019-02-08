@@ -20,6 +20,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.NamedNodeMap;
@@ -31,7 +32,7 @@ import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 
 public final class CustomNodeSelector {
-    private static final Map<String, String> BINDING_NS_MAP = new HashMap<String, String>();
+    private static final Map<String, String> BINDING_NS_MAP = new HashMap<>();
 
     private MapNamespaceContext context = new MapNamespaceContext();
 
@@ -69,18 +70,14 @@ public final class CustomNodeSelector {
 
     public Node queryNode(final Node target, final String expression) {
         XPathUtils xpath = new XPathUtils(context);
-       
-        Node node = (Node) xpath.getValue(expression, target, XPathConstants.NODE);
 
-        return node;
+        return (Node) xpath.getValue(expression, target, XPathConstants.NODE);
     }
-    
+
     public NodeList queryNodes(final Node target, final String expression) {
         XPathUtils xpath = new XPathUtils(context);
-       
-        NodeList nodeList = (NodeList) xpath.getValue(expression, target, XPathConstants.NODESET);
 
-        return nodeList;
+        return (NodeList) xpath.getValue(expression, target, XPathConstants.NODESET);
     }
-    
+
 }

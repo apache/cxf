@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 final class Utils {
     private Utils() {
     }
-    
+
     static XmlAccessType getXmlAccessType(Class<?> cls) {
         XmlAccessorType accessorType = cls.getAnnotation(XmlAccessorType.class);
         if (accessorType == null && cls.getPackage() != null) {
@@ -57,7 +57,7 @@ final class Utils {
     }
 
     private static Collection<Field> getFieldsInternal(Class<?> cls, XmlAccessType accessType) {
-        Set<Field> fields = new HashSet<Field>();
+        Set<Field> fields = new HashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached
@@ -75,10 +75,10 @@ final class Utils {
     private static Collection<Method> getMethods(Class<?> cls, XmlAccessType accessType, boolean acceptSetters) {
         return getMethodsInternal(cls, accessType, acceptSetters);
     }
-    
+
     private static Collection<Method> getMethodsInternal(Class<?> cls, XmlAccessType accessType,
             boolean acceptSetters) {
-        Set<Method> methods = new HashSet<Method>();
+        Set<Method> methods = new HashSet<>();
         Class<?> superClass = cls.getSuperclass();
         if (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Throwable.class)) {
             // process super class until java.lang.Object or java.lang.Throwable is not reached
@@ -92,7 +92,7 @@ final class Utils {
         }
         return methods;
     }
-    
+
     static Method getMethod(Class<?> cls, XmlAccessType accessType, String methodName,
             Class<?>... paramTypes) {
         for (Method m : getMethods(cls, accessType, true)) {
@@ -102,7 +102,7 @@ final class Utils {
         }
         return null;
     }
-    
+
     static Field getField(Class<?> cls, XmlAccessType accessType, String fieldName) {
         for (final Field f : getFields(cls, accessType)) {
             if (f.getName().equals(fieldName)) {
@@ -111,7 +111,7 @@ final class Utils {
         }
         return null;
     }
-    
+
     static Collection<Method> getGetters(Class<?> cls, XmlAccessType accessType) {
         return getMethods(cls, accessType, false);
     }
@@ -126,7 +126,7 @@ final class Utils {
             return false;
         }
         // Allow only public methods if PUBLIC_MEMBER access is requested
-        if (accessType == XmlAccessType.PUBLIC_MEMBER && !Modifier.isPublic(method.getModifiers())) { 
+        if (accessType == XmlAccessType.PUBLIC_MEMBER && !Modifier.isPublic(method.getModifiers())) {
             return false;
         }
         if (isGetter(method)) {
@@ -146,7 +146,7 @@ final class Utils {
         // method accepted
         return true;
     }
-    
+
     private static boolean isGetter(Method m) {
         if (m.getReturnType() != Void.class && m.getReturnType() != Void.TYPE && m.getParameterTypes().length == 0) {
             Method setter = getSetter(m);
@@ -169,10 +169,10 @@ final class Utils {
         }
         return null;
     }
-    
+
     private static boolean isSetter(Method m) {
         Class<?> declaringClass = m.getDeclaringClass();
-        boolean isVoidReturnType = m.getReturnType() == Void.class || m.getReturnType() == Void.TYPE; 
+        boolean isVoidReturnType = m.getReturnType() == Void.class || m.getReturnType() == Void.TYPE;
         if (isVoidReturnType && m.getParameterTypes().length == 1 && m.getName().startsWith("set")) {
             String getterName = "get" + m.getName().substring(3);
             Class<?> setterParamType = m.getParameterTypes()[0];
@@ -218,7 +218,7 @@ final class Utils {
         // if there is no adapter, yet we have a collection make sure
         // we return the Generic type; if there is an annotation let the
         // adapter handle what gets populated
-        if (adapter == null && m.getGenericReturnType() instanceof ParameterizedType 
+        if (adapter == null && m.getGenericReturnType() instanceof ParameterizedType
             && ((ParameterizedType)m.getGenericReturnType()).getActualTypeArguments().length < 2) {
             return null;
         }
@@ -230,14 +230,14 @@ final class Utils {
     static Object getFieldValue(Field f, Object target) throws Exception {
         XmlJavaTypeAdapter adapterAnnotation = getFieldXJTA(f);
         XmlAdapter adapter = getXmlAdapter(adapterAnnotation);
-        return adapter != null ? adapter.marshal(f.get(target)) : f.get(target); 
+        return adapter != null ? adapter.marshal(f.get(target)) : f.get(target);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     static Object getMethodValue(Method m, Object target) throws Exception {
         XmlJavaTypeAdapter adapterAnnotation = getMethodXJTA(m);
         XmlAdapter adapter = getXmlAdapter(adapterAnnotation);
-        return adapter != null ? adapter.marshal(m.invoke(target)) : m.invoke(target); 
+        return adapter != null ? adapter.marshal(m.invoke(target)) : m.invoke(target);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -254,7 +254,7 @@ final class Utils {
         setter.invoke(target, adapter != null ? adapter.unmarshal(value) : value);
     }
 
-    @SuppressWarnings("rawtypes") 
+    @SuppressWarnings("rawtypes")
     static XmlAdapter getXmlAdapter(XmlJavaTypeAdapter adapterAnnotation)
         throws InstantiationException, IllegalAccessException {
         return adapterAnnotation != null ? adapterAnnotation.value().newInstance() : null;
@@ -266,12 +266,15 @@ final class Utils {
             adapter = f.getType().getAnnotation(XmlJavaTypeAdapter.class);
         }
         if (adapter == null) {
-            XmlJavaTypeAdapters adapters = f.getDeclaringClass().getPackage().getAnnotation(XmlJavaTypeAdapters.class);
-            if (adapters != null) {
-                for (XmlJavaTypeAdapter candidate : adapters.value()) {
-                    if (candidate != null && candidate.type().equals(f.getType())) {
-                        adapter = candidate;
-                        break;
+            Package packageDeclaration = f.getDeclaringClass().getPackage();
+            if (packageDeclaration != null) {
+                XmlJavaTypeAdapters adapters = packageDeclaration.getAnnotation(XmlJavaTypeAdapters.class);
+                if (adapters != null) {
+                    for (XmlJavaTypeAdapter candidate : adapters.value()) {
+                        if (candidate != null && candidate.type().equals(f.getType())) {
+                            adapter = candidate;
+                            break;
+                        }
                     }
                 }
             }
@@ -291,19 +294,22 @@ final class Utils {
             adapter = m.getReturnType().getAnnotation(XmlJavaTypeAdapter.class);
         }
         if (adapter == null) {
-            XmlJavaTypeAdapters adapters = m.getDeclaringClass().getPackage().getAnnotation(XmlJavaTypeAdapters.class);
-            if (adapters != null) {
-                for (XmlJavaTypeAdapter candidate : adapters.value()) {
-                    if (candidate != null && candidate.type().equals(m.getGenericReturnType())) {
-                        adapter = candidate;
-                        break;
+            Package packageDeclaration = m.getDeclaringClass().getPackage();
+            if (packageDeclaration != null) {
+                XmlJavaTypeAdapters adapters = packageDeclaration.getAnnotation(XmlJavaTypeAdapters.class);
+                if (adapters != null) {
+                    for (XmlJavaTypeAdapter candidate : adapters.value()) {
+                        if (candidate != null && candidate.type().equals(m.getGenericReturnType())) {
+                            adapter = candidate;
+                            break;
+                        }
                     }
                 }
             }
         }
         return adapter;
     }
-    
+
     static Type getTypeFromXmlAdapter(XmlJavaTypeAdapter xjta) {
         if (xjta != null) {
             Class<?> c2 = xjta.value();

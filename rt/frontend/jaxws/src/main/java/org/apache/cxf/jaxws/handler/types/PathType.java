@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  * Java class for pathType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="pathType">
  *   &lt;simpleContent>

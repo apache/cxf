@@ -65,7 +65,7 @@ final class CryptoProviderUtils {
             if (handler == null) {
                 throw new CryptoProviderException("No callback handler and no password available");
             }
-    
+
             return getCallbackPwd(userName, usage, handler);
         } catch (Exception ex) {
             throw new CryptoProviderException("No callback handler and no password available", ex);

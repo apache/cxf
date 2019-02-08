@@ -30,19 +30,19 @@ import org.apache.cxf.tools.util.NameUtil;
 
 public final class AddressFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(AddressFactory.class);
-    
+
     private static final String PREFIX = "org.apache.cxf.tools.misc.processor.address";
     private static final AddressFactory INSTANCE = new AddressFactory();
 
-    private final Map<String, Address> addresses = new HashMap<String, Address>();
-    
+    private final Map<String, Address> addresses = new HashMap<>();
+
     private AddressFactory() {
     }
 
     public static AddressFactory getInstance() {
         return INSTANCE;
     }
-    
+
     public Address getAddresser(final String name) {
         Address address = addresses.get(name);
         if (address != null) {
@@ -62,6 +62,6 @@ public final class AddressFactory {
         } catch (Exception e) {
             Message msg = new Message("FOUND_NO_ADDRESSER", LOG, sb);
             throw new ToolException(msg);
-        } 
+        }
     }
 }

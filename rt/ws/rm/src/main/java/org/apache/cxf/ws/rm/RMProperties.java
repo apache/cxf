@@ -37,53 +37,54 @@ public class RMProperties {
     private CloseSequenceType closeSequence;
     private String namespaceURI;
     private boolean lastMessage;
-    
+    private long createdTime = System.currentTimeMillis();
+
     public Collection<SequenceAcknowledgement> getAcks() {
         return acks;
     }
-    
+
     public Collection<AckRequestedType> getAcksRequested() {
         return acksRequested;
     }
-    
+
     public CloseSequenceType getCloseSequence() {
         return closeSequence;
     }
-    
+
     public SequenceType getSequence() {
         return sequence;
     }
-    
+
     public long getMessageNumber() {
         return messageNumber;
     }
-    
+
     public SourceSequence getSourceSequence() {
         return sourceSequence;
     }
-    
+
     public boolean isLastMessage() {
         return lastMessage;
     }
-    
+
     public void setAcks(Collection<SequenceAcknowledgement> a) {
         // use threadsafe implementation for working copy, to avoid concurrent modifications
-        acks = new CopyOnWriteArrayList<SequenceAcknowledgement>(a);
+        acks = new CopyOnWriteArrayList<>(a);
     }
-    
+
     public void setAcksRequested(Collection<AckRequestedType> ar) {
         // use threadsafe implementation for working copy, to avoid concurrent modifications
-        acksRequested = new CopyOnWriteArrayList<AckRequestedType>(ar);       
+        acksRequested = new CopyOnWriteArrayList<>(ar);
     }
-    
+
     public void setCloseSequence(CloseSequenceType cs) {
         closeSequence = cs;
     }
-    
+
     public void setSequence(SequenceType s) {
         sequence = s;
     }
-    
+
     public void setSequence(SourceSequence seq) {
         sourceSequence = seq;
         messageNumber = seq.getCurrentMessageNr();
@@ -93,31 +94,48 @@ public class RMProperties {
         setSequence(s);
         lastMessage = seq.isLastMessage();
     }
-    
+
     public void addAck(DestinationSequence seq) {
         if (null == acks) {
-            acks = new ArrayList<SequenceAcknowledgement>();
+            acks = new ArrayList<>();
         }
         SequenceAcknowledgement ack = seq.getAcknowledgment();
         acks.add(ack);
         seq.acknowledgmentSent();
     }
-    
+
     /**
      * Get the WS-ReliableMessaging namespace to be used for encoding and decoding messages.
-     * 
+     *
      * @return
      */
     public String getNamespaceURI() {
         return namespaceURI;
     }
-    
+
     /**
      * Set the WS-ReliableMessaging namespace to be used for encoding and decoding messages.
-     * 
+     *
      * @return namespace URI
      */
     public void exposeAs(String uri) {
         namespaceURI = uri;
+    }
+
+    /**
+     * Get the initial creation time of this RM properties instance.
+     * @return Returns the createdTime.
+     */
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    /**
+     * Set the initial creation time of this RM properties instance.
+     *
+     * @param createdTime The createdTime to set.
+     */
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
     }
 }

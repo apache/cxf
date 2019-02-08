@@ -26,25 +26,24 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-
 import org.apache.cxf.service.model.BindingInfo;
 
 public class CorbaBinding extends AbstractBasicInterceptorProvider implements Binding {
 
     private BindingInfo bindingInfo;
-    
+
     public CorbaBinding() {
 
     }
-    
+
     public void setBindingInfo(BindingInfo info) {
         bindingInfo = info;
     }
-    
+
     public BindingInfo getBindingInfo() {
         return bindingInfo;
     }
-    
+
     public Message createMessage() {
         return createMessage(new MessageImpl());
     }
@@ -56,7 +55,7 @@ public class CorbaBinding extends AbstractBasicInterceptorProvider implements Bi
     public List<Interceptor<? extends Message>> getFaultInInterceptors() {
         return this.getInFaultInterceptors();
     }
-    
+
     public List<Interceptor<? extends Message>> getFaultOutInterceptors() {
         return this.getOutFaultInterceptors();
     }

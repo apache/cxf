@@ -26,7 +26,7 @@ import antlr.collections.AST;
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class TypeDclVisitor extends VisitorBase {
-    
+
     public TypeDclVisitor(Scope scope,
                           Definition defn,
                           XmlSchema schemaRef,
@@ -35,14 +35,12 @@ public class TypeDclVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result =
-            TypedefVisitor.accept(node)
+        return TypedefVisitor.accept(node)
             || StructVisitor.accept(node)
             || UnionVisitor.accept(node)
             || EnumVisitor.accept(node);
-        return result;
     }
-    
+
     public void visit(AST node) {
         // <type_dcl> ::= "typedef" <type_declarator>
         //              | <struct_type>
@@ -52,7 +50,7 @@ public class TypeDclVisitor extends VisitorBase {
         //              | <constr_forward_decl>
 
         Visitor visitor = null;
-        
+
         if (TypedefVisitor.accept(node)) {
             // "typedef" <type_declarator>
             visitor = new TypedefVisitor(getScope(), definition, schema, wsdlVisitor);
@@ -78,10 +76,10 @@ public class TypeDclVisitor extends VisitorBase {
         }
 
         // TODO forward declaration <constr_forward_declaration>
-        
+
         if (visitor != null) {
             visitor.visit(node);
-        }      
+        }
     }
 
 }

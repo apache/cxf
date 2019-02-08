@@ -18,19 +18,22 @@
  */
 package org.apache.cxf.rs.security.saml.sso;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.w3c.dom.Element;
+
+import org.opensaml.saml.saml2.core.Assertion;
 
 /**
  * Some information that encapsulates a successful validation by the SAMLSSOResponseValidator
  */
 public class SSOValidatorResponse {
-    private Date sessionNotOnOrAfter;
-    private Date created;
+    private Instant sessionNotOnOrAfter;
+    private Instant created;
     private String responseId;
     private String assertion;
     private Element assertionElement;
+    private Assertion opensamlAssertion;
 
     public String getAssertion() {
         return assertion;
@@ -39,19 +42,19 @@ public class SSOValidatorResponse {
     public void setAssertion(String assertion) {
         this.assertion = assertion;
     }
-    
-    public Date getSessionNotOnOrAfter() {
+
+    public Instant getSessionNotOnOrAfter() {
         return sessionNotOnOrAfter;
     }
-    
-    public void setSessionNotOnOrAfter(Date sessionNotOnOrAfter) {
+
+    public void setSessionNotOnOrAfter(Instant sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
-    
+
     public String getResponseId() {
         return responseId;
     }
-    
+
     public void setResponseId(String responseId) {
         this.responseId = responseId;
     }
@@ -64,11 +67,19 @@ public class SSOValidatorResponse {
         this.assertionElement = assertionElement;
     }
 
-    public Date getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Instant created) {
         this.created = created;
+    }
+
+    public Assertion getOpensamlAssertion() {
+        return opensamlAssertion;
+    }
+
+    public void setOpensamlAssertion(Assertion opensamlAssertion) {
+        this.opensamlAssertion = opensamlAssertion;
     }
 }

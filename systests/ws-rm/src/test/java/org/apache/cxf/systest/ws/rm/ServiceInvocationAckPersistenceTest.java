@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
  */
 public class ServiceInvocationAckPersistenceTest extends ServiceInvocationAckBase {
     static final String PORT = allocatePort(ServiceInvocationAckPersistenceTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("synack", true);

@@ -38,7 +38,7 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public final class JavaFirstUtil {
     private JavaFirstUtil() {
-        
+
     }
     public static JavaInterface serviceInfo2JavaInf(ServiceInfo service) {
         JavaInterface javaInf = new JavaInterface();
@@ -85,9 +85,8 @@ public final class JavaFirstUtil {
             Class<?> clz = (Class<?>)type;
             if (clz.isArray()) {
                 return clz.getComponentType().getName() + "[]";
-            } else {
-                return clz.getName();
             }
+            return clz.getName();
         } else if (type instanceof ParameterizedType) {
             return type.toString();
         } else if (type instanceof GenericArrayType) {

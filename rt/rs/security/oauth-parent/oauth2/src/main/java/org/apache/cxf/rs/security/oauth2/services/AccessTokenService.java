@@ -19,10 +19,10 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -50,10 +50,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 @Path("/token")
 public class AccessTokenService extends AbstractTokenService {
-    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
-    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
-    private List<String> audiences = new LinkedList<String>();
-    
+    private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<>();
+    private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<>();
+
     /**
      * Sets the list of optional grant handlers
      * @param handlers the grant handlers
@@ -61,53 +60,64 @@ public class AccessTokenService extends AbstractTokenService {
     public void setGrantHandlers(List<AccessTokenGrantHandler> handlers) {
         grantHandlers = handlers;
     }
-    
+
+    @Override
+    protected void injectContextIntoOAuthProviders() {
+        super.injectContextIntoOAuthProviders();
+        for (AccessTokenGrantHandler grantHandler : grantHandlers) {
+            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);
+        }
+    }
+
     /**
      * Sets a grant handler
      * @param handler the grant handler
      */
     public void setGrantHandler(AccessTokenGrantHandler handler) {
-        grantHandlers.add(handler);
+        setGrantHandlers(Collections.singletonList(handler));
     }
 
     public void setResponseFilters(List<AccessTokenResponseFilter> handlers) {
         this.responseHandlers = handlers;
     }
-    
+
     public void setResponseFilter(AccessTokenResponseFilter responseHandler) {
         responseHandlers.add(responseHandler);
     }
     /**
      * Processes an access token request
-     * @param params the form parameters representing the access token grant 
-     * @return Access Token or the error 
+     * @param params the form parameters representing the access token grant
+     * @return Access Token or the error
      */
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
     public Response handleTokenRequest(MultivaluedMap<String, String> params) {
-        
+
         // Make sure the client is authenticated
         Client client = authenticateClientIfNeeded(params);
-        
-        if (!OAuthUtils.isGrantSupportedForClient(client, 
+
+        if (!OAuthUtils.isGrantSupportedForClient(client,
                                                   isCanSupportPublicClients(),
                                                   params.getFirst(OAuthConstants.GRANT_TYPE))) {
-            return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
+            LOG.log(Level.FINE, "The grant type {} is not supported for the client",
+                     params.getFirst(OAuthConstants.GRANT_TYPE));
+            return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
-        
+
         try {
-            checkAudience(params);
+            checkAudience(client, params);
         } catch (OAuthServiceException ex) {
             return super.createErrorResponseFromBean(ex.getError());
-        } 
-                
+        }
+
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
+            LOG.fine("No Grant Handler found");
             return createErrorResponse(params, OAuthConstants.UNSUPPORTED_GRANT_TYPE);
         }
-        
+
         // Create the access token
         ServerAccessToken serverToken = null;
         try {
@@ -115,19 +125,21 @@ public class AccessTokenService extends AbstractTokenService {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (RuntimeException ex) {
-            // This is done to bypass a Check-Style 
-            // restriction on a number of return statements 
-            OAuthServiceException oauthEx = ex instanceof OAuthServiceException 
+            LOG.log(Level.FINE, "Error creating the access token", ex);
+            // This is done to bypass a Check-Style
+            // restriction on a number of return statements
+            OAuthServiceException oauthEx = ex instanceof OAuthServiceException
                 ? (OAuthServiceException)ex : new OAuthServiceException(ex);
             return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
         }
         if (serverToken == null) {
+            LOG.fine("No access token was created");
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
-        
+
         // Extract the information to be of use for the client
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(serverToken, isWriteOptionalParameters());
-        processClientAccessToken(clientToken, serverToken);    
+        processClientAccessToken(clientToken, serverToken);
         // Return it to the client
         return Response.ok(clientToken)
                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
@@ -136,37 +148,26 @@ public class AccessTokenService extends AbstractTokenService {
     }
     protected void processClientAccessToken(ClientAccessToken clientToken, ServerAccessToken serverToken) {
         for (AccessTokenResponseFilter filter : responseHandlers) {
-            filter.process(clientToken, serverToken); 
+            filter.process(clientToken, serverToken);
         }
     }
-    protected void checkAudience(MultivaluedMap<String, String> params) { 
-        if (audiences.isEmpty()) {
-            return;
-        }
-        
+    protected void checkAudience(Client c, MultivaluedMap<String, String> params) {
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
-        if (audienceParam == null) {
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
-        }
-        // must be URL
-        try {
-            new URL(audienceParam);
-        } catch (MalformedURLException ex) {
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_REQUEST));
-        }
-        
-        if (!audiences.contains(audienceParam)) {
+        if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
+            LOG.log(Level.FINE, "Error validating the audience parameter. Supplied audience {0} "
+                    + "does not match with the registered audiences {1}",
+                    new Object[] {audienceParam, c.getRegisteredAudiences() });
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
-        
+
     }
-    
+
     /**
      * Find the matching grant handler
      */
-    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {    
+    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
         String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);
-                
+
         if (grantType != null) {
             for (AccessTokenGrantHandler handler : grantHandlers) {
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
@@ -177,20 +178,12 @@ public class AccessTokenService extends AbstractTokenService {
             if (super.getDataProvider() instanceof AuthorizationCodeDataProvider) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
-                    handler.setDataProvider((AuthorizationCodeDataProvider)super.getDataProvider());
+                    handler.setDataProvider(super.getDataProvider());
                     return handler;
                 }
             }
         }
-        
+
         return null;
-    }
-
-    public List<String> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<String> audiences) {
-        this.audiences = audiences;
     }
 }

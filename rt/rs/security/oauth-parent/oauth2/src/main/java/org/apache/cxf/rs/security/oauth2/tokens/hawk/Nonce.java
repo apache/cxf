@@ -39,12 +39,12 @@ public class Nonce implements Serializable {
     public long getTs() {
         return ts;
     }
-    
+
     public int hashCode() {
         return nonceString.hashCode() + 37 * ts.hashCode();
     }
     public boolean equals(Object o) {
-        return o instanceof Nonce 
+        return o instanceof Nonce
             && this.nonceString.equals(((Nonce)o).nonceString)
             && this.ts.equals(((Nonce)o).ts);
     }

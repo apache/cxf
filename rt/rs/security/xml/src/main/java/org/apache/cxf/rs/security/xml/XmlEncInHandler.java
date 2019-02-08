@@ -28,11 +28,12 @@ import org.apache.cxf.message.Message;
 
 @PreMatching
 public class XmlEncInHandler extends AbstractXmlEncInHandler implements ContainerRequestFilter {
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
-        
+
         decryptContent(message);
     }
-    
+
 }

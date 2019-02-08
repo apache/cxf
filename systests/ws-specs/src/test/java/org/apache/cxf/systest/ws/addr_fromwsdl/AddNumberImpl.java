@@ -62,7 +62,7 @@ public class AddNumberImpl implements AddNumbersPortType {
         return null;
     }
 
-    public Future<?> addNumbers2Async(int number1, int number2, 
+    public Future<?> addNumbers2Async(int number1, int number2,
                                       AsyncHandler<AddNumbersResponse> asyncHandler) {
         return null;
     }
@@ -71,7 +71,7 @@ public class AddNumberImpl implements AddNumbersPortType {
         return null;
     }
 
-    public Future<?> addNumbers3Async(int number1, int number2, 
+    public Future<?> addNumbers3Async(int number1, int number2,
                                       AsyncHandler<AddNumbersResponse> asyncHandler) {
         return null;
     }

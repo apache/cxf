@@ -19,13 +19,14 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
@@ -54,49 +55,50 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenCancelOperation.class);
 
-    private List<TokenCanceller> tokencancellers = new ArrayList<TokenCanceller>();
-    
+    private List<TokenCanceller> tokencancellers = new ArrayList<>();
+
     public void setTokenCancellers(List<TokenCanceller> tokenCancellerList) {
         this.tokencancellers = tokenCancellerList;
     }
-    
+
     public List<TokenCanceller> getTokenCancellers() {
         return tokencancellers;
     }
-    
+
     public RequestSecurityTokenResponseType cancel(
-        RequestSecurityTokenType request, WebServiceContext context
+        RequestSecurityTokenType request, Principal principal,
+        Map<String, Object> messageContext
     ) {
         long start = System.currentTimeMillis();
         TokenCancellerParameters cancellerParameters = new TokenCancellerParameters();
-        
+
         try {
-            RequestRequirements requestRequirements = parseRequest(request, context);
-            
+            RequestRequirements requestRequirements = parseRequest(request, messageContext);
+
             KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
             TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
-            
+
             cancellerParameters.setStsProperties(stsProperties);
-            cancellerParameters.setPrincipal(context.getUserPrincipal());
-            cancellerParameters.setWebServiceContext(context);
+            cancellerParameters.setPrincipal(principal);
+            cancellerParameters.setMessageContext(messageContext);
             cancellerParameters.setTokenStore(getTokenStore());
-            
+
             cancellerParameters.setKeyRequirements(keyRequirements);
-            cancellerParameters.setTokenRequirements(tokenRequirements);  
-            
+            cancellerParameters.setTokenRequirements(tokenRequirements);
+
             ReceivedToken cancelTarget = tokenRequirements.getCancelTarget();
             if (cancelTarget == null || cancelTarget.getToken() == null) {
                 throw new STSException("No element presented for cancellation", STSException.INVALID_REQUEST);
             }
             cancellerParameters.setToken(cancelTarget);
-            
+
             if (tokenRequirements.getTokenType() == null) {
                 tokenRequirements.setTokenType(STSConstants.STATUS);
                 LOG.fine(
                     "Received TokenType is null, falling back to default token type: " + STSConstants.STATUS
                 );
             }
-            
+
             //
             // Cancel token
             //
@@ -117,29 +119,31 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
             if (tokenResponse == null || tokenResponse.getToken() == null) {
                 LOG.fine("No Token Canceller has been found that can handle this token");
                 throw new STSException(
-                    "No token canceller found for requested token type: " 
-                    + tokenRequirements.getTokenType(), 
+                    "No token canceller found for requested token type: "
+                    + tokenRequirements.getTokenType(),
                     STSException.REQUEST_FAILED
                 );
             }
-            
+
             if (tokenResponse.getToken().getState() != STATE.CANCELLED) {
                 LOG.log(Level.WARNING, "Token cancellation failed.");
                 throw new STSException("Token cancellation failed.");
             }
-            
+
             // prepare response
             try {
                 RequestSecurityTokenResponseType response = createResponse(tokenRequirements);
                 STSCancelSuccessEvent event = new STSCancelSuccessEvent(cancellerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException("Error in creating the response", ex, STSException.REQUEST_FAILED);
             }
-        
+
         } catch (RuntimeException ex) {
             STSCancelFailureEvent event = new STSCancelFailureEvent(cancellerParameters,
                                                               System.currentTimeMillis() - start, ex);
@@ -148,21 +152,21 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
         }
     }
 
-    
-    private RequestSecurityTokenResponseType createResponse(
+
+    protected RequestSecurityTokenResponseType createResponse(
         TokenRequirements tokenRequirements
     ) throws WSSecurityException {
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseType();
         String context = tokenRequirements.getContext();
         if (context != null) {
             response.setContext(context);
         }
-        RequestedTokenCancelledType cancelType = 
+        RequestedTokenCancelledType cancelType =
             QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelledType();
-        JAXBElement<RequestedTokenCancelledType> cancel = 
+        JAXBElement<RequestedTokenCancelledType> cancel =
             QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelled(cancelType);
-        response.getAny().add(cancel);            
+        response.getAny().add(cancel);
         return response;
     }
 }

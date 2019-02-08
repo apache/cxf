@@ -27,8 +27,8 @@
     <bean id="testStore" class="org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore">
         <property name="userName" value="scott"/>
         <property name="password" value="abc123"/>
-        <property name="driverClassName" value="org.apache.derby.jdbc.NoDriver"/>
-        <property name="url" value="jdbc:custom://localhost:1527/rmdb;create=true"/>
+        <property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <property name="url" value="jdbc:derby:target/wsrmdb4;create=true"/>
         <property name="tableExistsState" value="I6000"/>
     </bean>
 </beans>

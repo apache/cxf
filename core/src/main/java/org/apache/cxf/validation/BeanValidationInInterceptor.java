@@ -18,50 +18,13 @@
  */
 package org.apache.cxf.validation;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
-import javax.validation.ValidationException;
-
-import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-public class BeanValidationInInterceptor extends AbstractValidationInterceptor {
+public class BeanValidationInInterceptor extends AbstractBeanValidationInterceptor {
     public BeanValidationInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
     public BeanValidationInInterceptor(String phase) {
         super(phase);
-    }
-
-    protected Object getServiceObject(Message message) {
-        return checkNotNull(super.getServiceObject(message), "SERVICE_OBJECT_NULL");
-    }
-    
-    protected Method getServiceMethod(Message message) {
-        return (Method)checkNotNull(super.getServiceMethod(message), "SERVICE_METHOD_NULL");
-    }
-    
-    private Object checkNotNull(Object object, String name) {
-        if (object == null) {
-            String message = new org.apache.cxf.common.i18n.Message(name, BUNDLE).toString();
-            LOG.severe(message);
-            throw new ValidationException(message.toString());
-        }
-        return object;
-    }
-    
-    @Override
-    protected void handleValidation(final Message message, final Object resourceInstance,
-                                    final Method method, final List<Object> arguments) {
-        if (arguments.size() > 0) {
-            BeanValidationProvider provider = getProvider(message);
-            provider.validateParameters(resourceInstance, method, unwrapArgs(arguments).toArray());
-            message.getExchange().put(BeanValidationProvider.class, provider);
-        }
-    }
-    
-    protected List<Object> unwrapArgs(List<Object> arguments) {
-        return arguments;
     }
 }

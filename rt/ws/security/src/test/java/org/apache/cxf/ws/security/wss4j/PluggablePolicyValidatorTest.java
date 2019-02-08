@@ -38,7 +38,11 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParamete
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.neethi.Policy;
 import org.apache.wss4j.policy.SP12Constants;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * A test for plugging in custom SecurityPolicy Validators
@@ -55,7 +59,7 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             null,
             Arrays.asList(CoverageType.ENCRYPTED),
             null);
-        
+
         // This should fail (body content is encrypted, not the element)
         this.runInInterceptorAndValidate(
             "encrypted_body_content.xml",
@@ -64,7 +68,7 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             Arrays.asList(SP12Constants.ENCRYPTED_ELEMENTS),
             Arrays.asList(CoverageType.ENCRYPTED),
             null);
-        
+
         // Now plug in a custom SecurityPolicyValidator to allow the EncryptedElements policy
         // to pass
         Map<QName, SecurityPolicyValidator> validators = new HashMap<>();
@@ -77,14 +81,14 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             Arrays.asList(CoverageType.ENCRYPTED),
             validators);
     }
-  
+
     private void runInInterceptorAndValidate(
         String document, String policyDocument, List<QName> assertedInAssertions,
         List<QName> notAssertedInAssertions, List<CoverageType> types,
         Map<QName, SecurityPolicyValidator> validators
     ) throws Exception {
 
-        final Policy policy = 
+        final Policy policy =
             this.policyBuilder.getPolicy(this.readDocument(policyDocument).getDocumentElement());
 
         final Document doc = this.readDocument(document);
@@ -119,16 +123,16 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             }
         }
     }
-                                       
+
     private void runInInterceptorAndValidateWss(
         Document document, AssertionInfoMap aim, List<CoverageType> types,
         Map<QName, SecurityPolicyValidator> validators
     ) throws Exception {
-                                              
+
         PolicyBasedWSS4JInInterceptor inHandler = this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
-        
+
         if (validators != null) {
             inmsg.put(SecurityConstants.POLICY_VALIDATOR_MAP, validators);
         }
@@ -148,7 +152,7 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
             }
         }
     }
-    
+
     private static class NOOpPolicyValidator implements SecurityPolicyValidator {
 
         @Override
@@ -162,7 +166,7 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
                 ai.setAsserted(true);
             }
         }
-        
+
     };
-    
+
 }

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.claims;
 import java.util.List;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.sts.claims.ClaimTypes;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -36,30 +37,30 @@ import org.opensaml.core.xml.XMLObject;
  * check to make sure that the correct defined Claims have been met in the token.
  */
 public class ClaimsValidator extends SamlAssertionValidator {
-    
+
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
-        
+
         boolean valid = false;
         if (assertion.getSaml1() != null) {
             valid = handleSAML1Assertion(assertion.getSaml1());
         } else if (assertion.getSaml2() != null) {
             valid = handleSAML2Assertion(assertion.getSaml2());
         }
-        
+
         if (valid) {
             return validatedCredential;
         }
 
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
     }
-    
+
     private boolean handleSAML1Assertion(
         org.opensaml.saml.saml1.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -68,11 +69,11 @@ public class ClaimsValidator extends SamlAssertionValidator {
         for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
-                
+
                 if (!ClaimTypes.URI_BASE.toString().equals(attribute.getAttributeNamespace())) {
                     continue;
                 }
-                
+
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
@@ -84,23 +85,23 @@ public class ClaimsValidator extends SamlAssertionValidator {
         }
         return true;
     }
-    
+
     private boolean handleSAML2Assertion(
         org.opensaml.saml.saml2.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
                 if (!attribute.getName().startsWith(ClaimTypes.URI_BASE.toString())) {
                     continue;
                 }
-                
+
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();

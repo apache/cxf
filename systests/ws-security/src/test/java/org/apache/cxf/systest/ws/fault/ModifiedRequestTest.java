@@ -20,12 +20,9 @@
 package org.apache.cxf.systest.ws.fault;
 
 import java.net.URL;
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.Service;
@@ -33,20 +30,27 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for modified requests
@@ -54,13 +58,13 @@ import org.junit.BeforeClass;
 public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ModifiedRequestServer.class);
     static final String STAX_PORT = allocatePort(ModifiedRequestServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static boolean unrestrictedPoliciesInstalled = 
+    private static boolean unrestrictedPoliciesInstalled =
         SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -70,7 +74,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             launchServer(ModifiedRequestServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -79,7 +83,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testModifiedSignedTimestamp() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -88,23 +92,23 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
-        ModifiedTimestampInterceptor modifyInterceptor = 
+        ModifiedTimestampInterceptor modifyInterceptor =
             new ModifiedTimestampInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
-        
+
         makeInvocation(port, false);
-        
+
         // Streaming invocation
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, STAX_PORT);
@@ -114,14 +118,14 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(modifyInterceptor);
 
         makeInvocation(port, true);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testModifiedSignature() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -130,23 +134,23 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
-        ModifiedSignatureInterceptor modifyInterceptor = 
+        ModifiedSignatureInterceptor modifyInterceptor =
             new ModifiedSignatureInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
-        
+
         makeInvocation(port, false);
-        
+
         // Streaming invocation
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, STAX_PORT);
@@ -156,14 +160,14 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(modifyInterceptor);
 
         makeInvocation(port, true);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUntrustedSignature() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -172,31 +176,31 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client-untrusted.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         makeInvocation(port, false);
-        
+
         // Streaming invocation
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, STAX_PORT);
 
         makeInvocation(port, true);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testModifiedEncryptedKey() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -205,23 +209,23 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
-        ModifiedEncryptedKeyInterceptor modifyInterceptor = 
+        ModifiedEncryptedKeyInterceptor modifyInterceptor =
             new ModifiedEncryptedKeyInterceptor();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
-        
+
         makeInvocation(port, false);
-        
+
         // Streaming invocation
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, STAX_PORT);
@@ -231,14 +235,14 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(modifyInterceptor);
 
         makeInvocation(port, true);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testModifiedEncryptedSOAPBody() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -247,23 +251,23 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         URL busFile = ModifiedRequestTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = ModifiedRequestTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
-        ModifiedEncryptedSOAPBody modifyInterceptor = 
+        ModifiedEncryptedSOAPBody modifyInterceptor =
             new ModifiedEncryptedSOAPBody();
         cxfClient.getOutInterceptors().add(modifyInterceptor);
-        
+
         makeInvocation(port, false);
-        
+
         // Streaming invocation
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, STAX_PORT);
@@ -273,11 +277,11 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
         cxfClient.getOutInterceptors().add(modifyInterceptor);
 
         makeInvocation(port, true);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     private void makeInvocation(DoubleItPortType port, boolean streaming) throws DoubleItFault {
         try {
             port.doubleIt(25);
@@ -301,43 +305,38 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     private static class ModifiedTimestampInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
                 // Find the Timestamp + change it.
-                
-                Element timestampElement = 
-                    XMLUtils.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
-                Element createdValue = 
-                    XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
-                DateFormat zulu = new XmlSchemaDateFormat();
-                
-                XMLGregorianCalendar createdCalendar = 
-                    WSSConfig.datatypeFactory.newXMLGregorianCalendar(createdValue.getTextContent());
+
+                Element timestampElement =
+                    XMLUtils.findElement(securityHeader, "Timestamp", WSS4JConstants.WSU_NS);
+                Element createdValue =
+                    XMLUtils.findElement(timestampElement, "Created", WSS4JConstants.WSU_NS);
+
+                ZonedDateTime created = ZonedDateTime.parse(createdValue.getTextContent());
                 // Add 5 seconds
-                Duration duration = WSSConfig.datatypeFactory.newDuration(5000L);
-                createdCalendar.add(duration);
-                Date createdDate = createdCalendar.toGregorianCalendar().getTime();
-                createdValue.setTextContent(zulu.format(createdDate));
+                createdValue.setTextContent(DateUtil.getDateTimeFormatter(true).format(created.plusSeconds(5L)));
             }
         }
-        
+
         public void modifySOAPBody(Element soapBody) {
             //
         }
     }
-    
+
     private static class ModifiedSignatureInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
-                Element signatureElement = 
-                    XMLUtils.findElement(securityHeader, "Signature", WSConstants.SIG_NS);
-                
+                Element signatureElement =
+                    XMLUtils.findElement(securityHeader, "Signature", WSS4JConstants.SIG_NS);
+
                 Node firstChild = signatureElement.getFirstChild();
                 while (!(firstChild instanceof Element) && firstChild != null) {
                     firstChild = signatureElement.getNextSibling();
@@ -345,23 +344,23 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 ((Element)firstChild).setAttributeNS(null, "Id", "xyz");
             }
         }
-        
+
         public void modifySOAPBody(Element soapBody) {
             //
         }
     }
-    
+
     private static class ModifiedEncryptedKeyInterceptor extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
             if (securityHeader != null) {
-                Element encryptedKey = 
-                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSConstants.ENC_NS);
-                Element cipherValue = 
-                    XMLUtils.findElement(encryptedKey, "CipherValue", WSConstants.ENC_NS);
+                Element encryptedKey =
+                    XMLUtils.findElement(securityHeader, "EncryptedKey", WSS4JConstants.ENC_NS);
+                Element cipherValue =
+                    XMLUtils.findElement(encryptedKey, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
-                
+
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
                 int index = stringBuilder.length() / 2;
                 char ch = stringBuilder.charAt(index);
@@ -374,26 +373,26 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 cipherValue.setTextContent(stringBuilder.toString());
             }
         }
-        
+
         public void modifySOAPBody(Element soapBody) {
             //
         }
-        
+
     }
-    
+
     private static class ModifiedEncryptedSOAPBody extends AbstractModifyRequestInterceptor {
 
         @Override
         public void modifySecurityHeader(Element securityHeader) {
            //
         }
-        
+
         public void modifySOAPBody(Element soapBody) {
             if (soapBody != null) {
-                Element cipherValue = 
-                    XMLUtils.findElement(soapBody, "CipherValue", WSConstants.ENC_NS);
+                Element cipherValue =
+                    XMLUtils.findElement(soapBody, "CipherValue", WSS4JConstants.ENC_NS);
                 String cipherText = cipherValue.getTextContent();
-                
+
                 StringBuilder stringBuilder = new StringBuilder(cipherText);
                 int index = stringBuilder.length() / 2;
                 char ch = stringBuilder.charAt(index);
@@ -406,7 +405,7 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                 cipherValue.setTextContent(stringBuilder.toString());
             }
         }
-        
+
     }
-    
+
 }

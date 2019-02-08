@@ -41,20 +41,20 @@ import org.apache.neethi.builders.AssertionBuilder;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl implements
     AssertionBuilderRegistry, BusExtension {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionBuilderRegistryImpl.class);
-    private static final Logger LOG 
+    private static final Logger LOG
         = LogUtils.getL7dLogger(AssertionBuilderRegistryImpl.class);
-    private boolean ignoreUnknownAssertions = true; 
-    private Set<QName> ignored = new HashSet<QName>();
+    private boolean ignoreUnknownAssertions = true;
+    private Set<QName> ignored = new HashSet<>();
     private Bus bus;
     private boolean dynamicLoaded;
-    
+
     public AssertionBuilderRegistryImpl() {
         super(null);
     }
@@ -68,7 +68,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
         bus = b;
         if (b != null) {
             b.setExtension(this, AssertionBuilderRegistry.class);
-            org.apache.cxf.ws.policy.PolicyBuilder builder 
+            org.apache.cxf.ws.policy.PolicyBuilder builder
                 = b.getExtension(org.apache.cxf.ws.policy.PolicyBuilder.class);
             if (builder instanceof PolicyBuilder) {
                 engine = (PolicyBuilder)builder;
@@ -79,7 +79,7 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
     public Class<?> getRegistrationType() {
         return AssertionBuilderRegistry.class;
     }
-    
+
     public boolean isIgnoreUnknownAssertions() {
         return ignoreUnknownAssertions;
     }
@@ -109,10 +109,9 @@ public class AssertionBuilderRegistryImpl extends AssertionBuilderFactoryImpl im
                 LOG.warning(m.toString());
             }
             return new XMLPrimitiveAssertionBuilder();
-        } else {
-            Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
-            throw new PolicyException(m);
         }
+        Message m = new Message("NO_ASSERTIONBUILDER_EXC", BUNDLE, qname.toString());
+        throw new PolicyException(m);
     }
-    
+
 }

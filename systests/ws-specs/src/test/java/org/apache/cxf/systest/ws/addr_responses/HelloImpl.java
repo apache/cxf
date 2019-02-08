@@ -22,7 +22,7 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature.Responses;
 
 
-@WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort", 
+@WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort",
             targetNamespace = "http://cxf.apache.org/systest/wsa/responses",
             endpointInterface = "org.apache.cxf.systest.ws.addr_responses.Hello")
 @Addressing(responses = Responses.NON_ANONYMOUS)

@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws.handler;
 
 import java.util.List;
+
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
@@ -28,12 +29,14 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class AnnotationHandlerChainBuilderTest extends Assert {
+
+public class AnnotationHandlerChainBuilderTest {
 
     @Before
     public void setUp() {
@@ -45,9 +48,9 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         AnnotationHandlerChainBuilder chainBuilder = new AnnotationHandlerChainBuilder();
         @SuppressWarnings("rawtypes")
         List<Handler> handlers = chainBuilder
-            .buildHandlerChainFromClass(handlerTestImpl.getClass(), 
-                                        null, 
-                                        null, 
+            .buildHandlerChainFromClass(handlerTestImpl.getClass(),
+                                        null,
+                                        null,
                                         null);
         assertNotNull(handlers);
         assertEquals(9, handlers.size());
@@ -60,8 +63,8 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertEquals(TestLogicalHandler.class, handlers.get(6).getClass());
         assertEquals(TestProtocolHandler.class, handlers.get(7).getClass());
         assertEquals(TestProtocolHandler.class, handlers.get(8).getClass());
-    }    
-    
+    }
+
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBinding() {
         HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
@@ -75,7 +78,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertNotNull(handlers);
         assertEquals(5, handlers.size());
     }
-    
+
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBindingNegative() {
         HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
@@ -89,7 +92,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertNotNull(handlers);
         assertEquals(3, handlers.size());
     }
-    
+
     @Test
     public void testFindHandlerChainAnnotationPerPortServiceBindingWildcard() {
         HandlerTestImpl handlerTestImpl = new HandlerTestImpl();
@@ -103,7 +106,7 @@ public class AnnotationHandlerChainBuilderTest extends Assert {
         assertNotNull(handlers);
         assertEquals(7, handlers.size());
     }
-    
+
     public static class TestLogicalHandler implements LogicalHandler<LogicalMessageContext> {
         boolean initCalled;
 

@@ -29,19 +29,19 @@ public class OAuthContext {
 
     private UserSubject subject;
     private List<OAuthPermission> permissions;
-    
+
     public OAuthContext(UserSubject subject, List<OAuthPermission> perms) {
         this.subject = subject;
         this.permissions = perms;
     }
-    
+
     public UserSubject getSubject() {
         return subject;
     }
-    
+
     public List<OAuthPermission> getPermissions() {
         return Collections.unmodifiableList(permissions);
     }
-    
+
 
 }

@@ -19,15 +19,16 @@
 package org.apache.cxf.systest.handlers;
 
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
 
-@WebServiceClient(name = "AddNumbersService", 
+@WebServiceClient(name = "AddNumbersService",
                   wsdlLocation = "/wsdl/addNumbers.wsdl",
-                  targetNamespace = "http://apache.org/handlers") 
+                  targetNamespace = "http://apache.org/handlers")
 public class AddNumbersServiceUnwrap extends Service {
 
     public static final URL WSDL_LOCATION = null;
@@ -48,10 +49,10 @@ public class AddNumbersServiceUnwrap extends Service {
     public AddNumbersServiceUnwrap() {
         super(WSDL_LOCATION, SERVICE);
     }
-    
+
 
     /**
-     * 
+     *
      * @return
      *     returns AddNumbers
      */
@@ -61,10 +62,10 @@ public class AddNumbersServiceUnwrap extends Service {
     }
 
     /**
-     * 
+     *
      * @param features
-     *     A list of {@link javax.xml.ws.WebServiceFeature} to configure on the 
-     *     proxy.  Supported features not in the <code>features</code> parameter 
+     *     A list of {@link javax.xml.ws.WebServiceFeature} to configure on the
+     *     proxy.  Supported features not in the <code>features</code> parameter
      *     will have their default values.
      * @return
      *     returns AddNumbers

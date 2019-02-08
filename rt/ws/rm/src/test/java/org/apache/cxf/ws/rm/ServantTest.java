@@ -45,29 +45,33 @@ import org.apache.cxf.ws.rm.v200502.OfferType;
 import org.apache.cxf.ws.rm.v200502.TerminateSequenceType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class ServantTest extends Assert {
+public class ServantTest {
     private static final String SERVICE_URL = "http://localhost:9000/SoapContext/GreeterPort";
     private static final String DECOUPLED_URL = "http://localhost:9990/decoupled_endpoint";
 
-    private static final org.apache.cxf.ws.rm.manager.ObjectFactory RMMANGER_FACTORY = 
+    private static final org.apache.cxf.ws.rm.manager.ObjectFactory RMMANGER_FACTORY =
         new org.apache.cxf.ws.rm.manager.ObjectFactory();
     private static final Duration DURATION_SHORT = DatatypeFactory.createDuration("PT5S");
     private static final Duration DURATION_VERY_SHORT = DatatypeFactory.createDuration("PT2S");
     private static final Duration DURATION_DEFAULT = DatatypeFactory.createDuration("P0Y0M0DT0H0M0.0S");
-    
+
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -77,8 +81,8 @@ public class ServantTest extends Assert {
     public void tearDown() {
         control.verify();
     }
-    
-    
+
+
     @Test
     public void testCreateSequence() throws SequenceFault {
         RMEndpoint rme = control.createMock(RMEndpoint.class);
@@ -93,93 +97,93 @@ public class ServantTest extends Assert {
         control.replay();
 
         Servant servant = new Servant(rme);
-        
+
         verifyCreateSequenceDefault(servant, manager);
 
         verifyCreateSequenceExpiresSetAtDestination(servant, manager);
-        
+
         verifyCreateSequenceExpiresSetAtSource(servant, manager);
-        
+
         verifyCreateSequenceExpiresSetAtBoth(servant, manager);
-        
+
     }
-    
+
     private void verifyCreateSequenceDefault(Servant servant, RMManager manager) throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
         AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
         dp.setAcksPolicy(ap);
-        
+
         manager.setDestinationPolicy(dp);
-        
+
         Expires expires = new Expires();
         expires.setValue(DatatypeFactory.createDuration("P0Y0M0DT0H0M0.0S"));
         Message message = createTestCreateSequenceMessage(expires, null);
 
         CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
-        
+
         Expires expires2 = csr.getExpires();
-        
+
         assertNotNull(expires2);
         assertEquals(DatatypeFactory.PT0S, expires2.getValue());
     }
 
-    private void verifyCreateSequenceExpiresSetAtDestination(Servant servant, RMManager manager) 
+    private void verifyCreateSequenceExpiresSetAtDestination(Servant servant, RMManager manager)
         throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
         AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
         dp.setAcksPolicy(ap);
         dp.setSequenceExpiration(DURATION_SHORT);
         manager.setDestinationPolicy(dp);
-        
+
         Expires expires = new Expires();
         expires.setValue(DURATION_DEFAULT);
         Message message = createTestCreateSequenceMessage(expires, null);
 
         CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
-        
+
         Expires expires2 = csr.getExpires();
-        
+
         assertNotNull(expires2);
         assertEquals(DURATION_SHORT, expires2.getValue());
     }
 
-    private void verifyCreateSequenceExpiresSetAtSource(Servant servant, RMManager manager) 
+    private void verifyCreateSequenceExpiresSetAtSource(Servant servant, RMManager manager)
         throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
         AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
         dp.setAcksPolicy(ap);
         manager.setDestinationPolicy(dp);
-        
+
         Expires expires = new Expires();
         expires.setValue(DURATION_SHORT);
-    
-        Message message = createTestCreateSequenceMessage(expires, null);        
+
+        Message message = createTestCreateSequenceMessage(expires, null);
 
         CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
-        
+
         Expires expires2 = csr.getExpires();
-        
+
         assertNotNull(expires2);
         assertEquals(DURATION_SHORT, expires2.getValue());
     }
 
-    private void verifyCreateSequenceExpiresSetAtBoth(Servant servant, RMManager manager) 
+    private void verifyCreateSequenceExpiresSetAtBoth(Servant servant, RMManager manager)
         throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
         AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
         dp.setAcksPolicy(ap);
         dp.setSequenceExpiration(DURATION_SHORT);
         manager.setDestinationPolicy(dp);
-        
+
         Expires expires = new Expires();
         expires.setValue(DURATION_VERY_SHORT);
-        
-        Message message = createTestCreateSequenceMessage(expires, null);        
-        
+
+        Message message = createTestCreateSequenceMessage(expires, null);
+
         CreateSequenceResponseType csr = (CreateSequenceResponseType)servant.createSequence(message);
-        
+
         Expires expires2 = csr.getExpires();
-        
+
         assertNotNull(expires2);
         assertEquals(DURATION_VERY_SHORT, expires2.getValue());
     }
@@ -191,7 +195,7 @@ public class ServantTest extends Assert {
 //        exchange.setOutMessage(new MessageImpl());
 
         message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
-        
+
         AddressingProperties maps = new AddressingProperties();
         String msgId = "urn:uuid:12345-" + Math.random();
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
@@ -201,22 +205,22 @@ public class ServantTest extends Assert {
         maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
-        
+
         message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
-        
+
         CreateSequenceType cs = new CreateSequenceType();
         cs.setAcksTo(org.apache.cxf.ws.addressing.VersionTransformer
             .convert(RMUtils.createReference(DECOUPLED_URL)));
 
         cs.setExpires(expires);
         cs.setOffer(offer);
-        
+
         MessageContentsList contents = new MessageContentsList();
         contents.add(cs);
         message.setContent(List.class, contents);
 
         RMContextUtils.setProtocolVariation(message, ProtocolVariation.RM10WSA200408);
-        
+
         return message;
     }
 
@@ -230,29 +234,29 @@ public class ServantTest extends Assert {
         org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
         sid.setValue("123");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
-        
+
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
-        
+
         control.replay();
-        
+
         Servant servant = new Servant(rme);
 
-        destination.addSequence(seq, false);        
+        destination.addSequence(seq, false);
         verifyTerminateSequenceDefault(servant, manager, "123", ProtocolVariation.RM10WSA200408);
-        
+
         destination.addSequence(seq, false);
         verifyTerminateSequenceDefault(servant, manager, "123", ProtocolVariation.RM11WSA200508);
     }
-    
+
     private static Message createTestTerminateSequenceMessage(String sidstr, ProtocolVariation protocol) {
         Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         exchange.setInMessage(message);
 
         message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
-        
+
         AddressingProperties maps = new AddressingProperties();
         String msgId = "urn:uuid:12345-" + Math.random();
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
@@ -262,21 +266,21 @@ public class ServantTest extends Assert {
         maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
-        
+
         message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
 
         TerminateSequenceType ts = new TerminateSequenceType();
         Identifier sid = new Identifier();
         sid.setValue(sidstr);
         ts.setIdentifier(sid);
-        Object tst = ProtocolVariation.RM10WSA200408.getWSRMNamespace().equals(protocol.getWSRMNamespace()) 
+        Object tst = ProtocolVariation.RM10WSA200408.getWSRMNamespace().equals(protocol.getWSRMNamespace())
             ? ts : ProtocolVariation.RM10WSA200408.getCodec().convertReceivedTerminateSequence(ts);
         MessageContentsList contents = new MessageContentsList();
         contents.add(tst);
         message.setContent(List.class, contents);
 
         RMContextUtils.setProtocolVariation(message, protocol);
-        
+
         return message;
     }
 
@@ -286,7 +290,7 @@ public class ServantTest extends Assert {
         exchange.setInMessage(message);
 
         message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
-        
+
         AddressingProperties maps = new AddressingProperties();
         String msgId = "urn:uuid:12345-" + Math.random();
         AttributedURIType id = ContextUtils.getAttributedURI(msgId);
@@ -296,7 +300,7 @@ public class ServantTest extends Assert {
         maps.setTo(ContextUtils.getAttributedURI(SERVICE_URL));
 
         maps.setReplyTo(RMUtils.createReference(DECOUPLED_URL));
-        
+
         message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND, maps);
 
         CloseSequenceType cs = new CloseSequenceType();
@@ -308,22 +312,22 @@ public class ServantTest extends Assert {
         message.setContent(List.class, contents);
 
         RMContextUtils.setProtocolVariation(message, ProtocolVariation.RM11WSA200508);
-        
+
         return message;
     }
 
-    private void verifyTerminateSequenceDefault(Servant servant, RMManager manager, 
+    private void verifyTerminateSequenceDefault(Servant servant, RMManager manager,
                                                 String sidstr, ProtocolVariation protocol) throws SequenceFault {
         DestinationPolicyType dp = RMMANGER_FACTORY.createDestinationPolicyType();
         AcksPolicyType ap = RMMANGER_FACTORY.createAcksPolicyType();
         dp.setAcksPolicy(ap);
-        
+
         manager.setDestinationPolicy(dp);
-        
+
         Message message = createTestTerminateSequenceMessage(sidstr, protocol);
 
         Object tsr = servant.terminateSequence(message);
-        
+
         if (ProtocolVariation.RM10WSA200408.getWSRMNamespace().equals(protocol.getWSRMNamespace())) {
             // rm 1.0
             assertNull(tsr);
@@ -334,7 +338,7 @@ public class ServantTest extends Assert {
             assertNotNull(sid);
             assertEquals(sidstr, sid.getValue());
         }
-        
+
     }
 
     @Test
@@ -347,26 +351,26 @@ public class ServantTest extends Assert {
         org.apache.cxf.ws.rm.v200702.Identifier sid = new org.apache.cxf.ws.rm.v200702.Identifier();
         sid.setValue("123");
         EasyMock.expect(seq.getIdentifier()).andReturn(sid).anyTimes();
-        
+
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
         EasyMock.expect(rme.getManager()).andReturn(manager).anyTimes();
         EasyMock.expect(rme.getSource()).andReturn(source).anyTimes();
         Message message = createTestCloseSequenceMessage(sid.getValue());
-        
+
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
         OperationInfo oi = control.createMock(OperationInfo.class);
         EasyMock.expect(boi.getOperationInfo()).andReturn(oi).anyTimes();
         EasyMock.expect(oi.getName()).andReturn(RM11Constants.INSTANCE.getCloseSequenceOperationName()).anyTimes();
         message.getExchange().put(BindingOperationInfo.class, boi);
-        
+
         control.replay();
-        
+
         TestServant servant = new TestServant(rme);
 
         servant.invoke(message.getExchange(), message.getContent(List.class).get(0));
         assertTrue(servant.called);
     }
-    
+
     private static class TestServant extends Servant {
         boolean called;
 

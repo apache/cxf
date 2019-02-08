@@ -28,12 +28,12 @@ public final class IdlWString extends IdlDefnImplBase implements IdlType {
         super(null, "wstring");
         bound = 0;
     }
-    
+
     private IdlWString(int range) {
         super(null, "wstring<" + range + "> ");
         this.bound = range;
     }
-    
+
     public static IdlWString create() {
         return new IdlWString();
     }
@@ -58,6 +58,6 @@ public final class IdlWString extends IdlDefnImplBase implements IdlType {
         if (bound != 0) {
             pw.print("<" + bound + "> ");
         }
-    }    
-    
+    }
+
 }

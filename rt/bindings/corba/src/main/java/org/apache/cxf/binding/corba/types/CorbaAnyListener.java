@@ -93,7 +93,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
             CorbaObjectHandler obj = primitiveListener.getCorbaObject();
 
             Any a = orb.create_any();
-            
+
             CorbaAnyHandler anyHandler = (CorbaAnyHandler)handler;
             anyHandler.setValue(a);
             anyHandler.setAnyContainedType(obj);
@@ -125,7 +125,7 @@ public class CorbaAnyListener extends AbstractCorbaTypeListener {
             // typemap.
             idlType = new QName(typeMap.getTargetNamespace(), schemaType.getLocalPart());
         }
-        
+
         return idlType;
     }
 }

@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.binding.coloc;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
@@ -39,6 +37,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -68,7 +67,7 @@ public final class ColocUtil {
         boolean remove = true;
         while (iter.hasNext()) {
             Phase p = iter.next();
-            if (remove 
+            if (remove
                 && p.getName().equals(startPhase.getName())) {
                 remove = false;
             } else if (p.getName().equals(endPhase.getName())) {
@@ -78,11 +77,11 @@ public final class ColocUtil {
             }
         }
     }
-    
+
     public static InterceptorChain getOutInterceptorChain(Exchange ex, SortedSet<Phase> phases) {
         Bus bus = ex.getBus();
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
-        
+
         Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
@@ -99,7 +98,7 @@ public final class ColocUtil {
             LOG.fine("Interceptors contributed by bus: " + il);
         }
         chain.add(il);
-        
+
         if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
             il = ((InterceptorProvider)ep.getService().getDataBinding()).getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
@@ -111,11 +110,11 @@ public final class ColocUtil {
 
         return chain;
     }
-    
+
     public static InterceptorChain getInInterceptorChain(Exchange ex, SortedSet<Phase> phases) {
         Bus bus = ex.getBus();
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
-        
+
         Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
@@ -132,7 +131,7 @@ public final class ColocUtil {
             LOG.fine("Interceptors contributed by bus: " + il);
         }
         chain.add(il);
-        
+
         if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
             il = ((InterceptorProvider)ep.getService().getDataBinding()).getInInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
@@ -143,7 +142,7 @@ public final class ColocUtil {
         chain.setFaultObserver(new ColocOutFaultObserver(bus));
         modifyChain(chain, ex, true);
         return chain;
-    }    
+    }
     private static void modifyChain(PhaseInterceptorChain chain, Exchange ex, boolean in) {
         modifyChain(chain, ex.getInMessage(), in);
         modifyChain(chain, ex.getOutMessage(), in);
@@ -152,7 +151,7 @@ public final class ColocUtil {
         if (m == null) {
             return;
         }
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
@@ -164,7 +163,7 @@ public final class ColocUtil {
             }
         }
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)m.get(key));
         if (is != null) {
             chain.add(is);
@@ -172,30 +171,30 @@ public final class ColocUtil {
     }
 
     public static boolean isSameOperationInfo(OperationInfo oi1, OperationInfo oi2) {
-        return  oi1.getName().equals(oi2.getName())
+        return oi1.getName().equals(oi2.getName())
                 && isSameMessageInfo(oi1.getInput(), oi2.getInput())
                 && isSameMessageInfo(oi1.getOutput(), oi2.getOutput())
                 && isSameFaultInfo(oi1.getFaults(), oi2.getFaults());
     }
-    
+
     public static boolean isCompatibleOperationInfo(OperationInfo oi1, OperationInfo oi2) {
         return isSameOperationInfo(oi1, oi2)
-               || isAssignableOperationInfo(oi1, Source.class) 
+               || isAssignableOperationInfo(oi1, Source.class)
                || isAssignableOperationInfo(oi2, Source.class);
     }
-    
+
     public static boolean isAssignableOperationInfo(OperationInfo oi, Class<?> cls) {
         MessageInfo mi = oi.getInput();
         List<MessagePartInfo> mpis = mi.getMessageParts();
         return mpis.size() == 1 && cls.isAssignableFrom(mpis.get(0).getTypeClass());
     }
-    
+
     public static boolean isSameMessageInfo(MessageInfo mi1, MessageInfo mi2) {
         if ((mi1 == null && mi2 != null)
             || (mi1 != null && mi2 == null)) {
             return false;
         }
-        
+
         if (mi1 != null && mi2 != null) {
             List<MessagePartInfo> mpil1 = mi1.getMessageParts();
             List<MessagePartInfo> mpil2 = mi2.getMessageParts();
@@ -213,26 +212,26 @@ public final class ColocUtil {
         }
         return true;
     }
-    
-    public static boolean isSameFaultInfo(Collection<FaultInfo> fil1, 
+
+    public static boolean isSameFaultInfo(Collection<FaultInfo> fil1,
                                           Collection<FaultInfo> fil2) {
         if ((fil1 == null && fil2 != null)
             || (fil1 != null && fil2 == null)) {
             return false;
         }
-        
+
         if (fil1 != null && fil2 != null) {
             if (fil1.size() != fil2.size()) {
                 return false;
             }
             for (FaultInfo fi1 : fil1) {
                 Iterator<FaultInfo> iter = fil2.iterator();
-                Class<?> fiClass1 = fi1.getProperty(Class.class.getName(), 
+                Class<?> fiClass1 = fi1.getProperty(Class.class.getName(),
                                                     Class.class);
                 boolean match = false;
                 while (iter.hasNext()) {
                     FaultInfo fi2 = iter.next();
-                    Class<?> fiClass2 = fi2.getProperty(Class.class.getName(), 
+                    Class<?> fiClass2 = fi2.getProperty(Class.class.getName(),
                                                         Class.class);
                     //Sender/Receiver Service Model not same for faults wr.t message names.
                     //So Compare Exception Class Instance.
@@ -242,13 +241,13 @@ public final class ColocUtil {
                     }
                 }
                 if (!match) {
-                    return false;        
+                    return false;
                 }
             }
         }
         return true;
     }
-    
+
     public static void convertSourceToObject(Message message) {
         List<Object> content = CastUtils.cast(message.getContent(List.class));
         if (content == null || content.size() < 1) {
@@ -286,21 +285,18 @@ public final class ColocUtil {
         }
         // only supporting the wrapped style for now  (one pojo <-> one source)
         Object object = content.get(0);
-        DataWriter<OutputStream> writer = 
+        DataWriter<OutputStream> writer =
             message.getExchange().getService().getDataBinding().createWriter(OutputStream.class);
-        //TODO use a better conversion method to get a Source from a pojo.
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
         writer.write(object, bos);
-
-        content.set(0, new StreamSource(new ByteArrayInputStream(bos.toByteArray())));
+        content.set(0, new StreamSource(bos.createInputStream()));
     }
-    
+
     private static MessageInfo getMessageInfo(Message message) {
         OperationInfo oi = message.getExchange().getBindingOperationInfo().getOperationInfo();
         if (MessageUtils.isOutbound(message)) {
             return oi.getOutput();
-        } else {
-            return oi.getInput();
         }
+        return oi.getInput();
     }
 }

@@ -36,7 +36,7 @@ public final class Server {
         svrFactory.create();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         startServer();
         System.out.println("Server ready...");
 

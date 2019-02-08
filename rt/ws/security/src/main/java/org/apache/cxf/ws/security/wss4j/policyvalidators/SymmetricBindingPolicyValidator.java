@@ -22,8 +22,6 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
@@ -31,62 +29,59 @@ import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
-import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
-import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.SymmetricBinding;
 
 /**
  * Validate a SymmetricBinding policy.
  */
 public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.SYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.SYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
-        boolean hasDerivedKeys = 
+        boolean hasDerivedKeys =
             parameters.getResults().getActionResults().containsKey(WSConstants.DKT);
-        
+
         for (AssertionInfo ai : ais) {
             SymmetricBinding binding = (SymmetricBinding)ai.getAssertion();
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai, 
+            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai,
                                       parameters.getResults().getResults())) {
                 continue;
             }
-            
+
             // Check various properties of the binding
-            if (!checkProperties(binding, ai, parameters.getAssertionInfoMap(), parameters.getResults(), 
+            if (!checkProperties(binding, ai, parameters.getAssertionInfoMap(), parameters.getResults(),
                                  parameters.getSignedResults(), parameters.getMessage())) {
                 continue;
             }
-            
+
             // Check various tokens of the binding
-            if (!checkTokens(binding, ai, parameters.getAssertionInfoMap(), hasDerivedKeys, 
+            if (!checkTokens(binding, ai, parameters.getAssertionInfoMap(), hasDerivedKeys,
                              parameters.getSignedResults(), parameters.getEncryptedResults())) {
                 continue;
             }
         }
     }
-    
+
     /**
      * Check various tokens of the binding
      */
     private boolean checkTokens(
-        SymmetricBinding binding, 
+        SymmetricBinding binding,
         AssertionInfo ai,
         AssertionInfoMap aim,
         boolean hasDerivedKeys,
@@ -101,9 +96,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getEncryptionToken(), aim);
+            assertDerivedKeys(binding.getEncryptionToken().getToken(), aim);
         }
-        
+
         if (binding.getSignatureToken() != null) {
             PolicyUtils.assertPolicy(aim, binding.getSignatureToken().getName());
             if (!checkDerivedKeys(
@@ -112,9 +107,9 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getSignatureToken(), aim);
+            assertDerivedKeys(binding.getSignatureToken().getToken(), aim);
         }
-        
+
         if (binding.getProtectionToken() != null) {
             PolicyUtils.assertPolicy(aim, binding.getProtectionToken().getName());
             if (!checkDerivedKeys(
@@ -123,19 +118,10 @@ public class SymmetricBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("Message fails the DerivedKeys requirement");
                 return false;
             }
-            assertToken(binding.getProtectionToken(), aim);
+            assertDerivedKeys(binding.getProtectionToken().getToken(), aim);
         }
-        
+
         return true;
     }
-    
-    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
-        String namespace = tokenWrapper.getName().getNamespaceURI();
-        
-        AbstractToken token = tokenWrapper.getToken();
-        DerivedKeys derivedKeys = token.getDerivedKeys();
-        if (derivedKeys != null) {
-            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
-        }
-    }
+
 }

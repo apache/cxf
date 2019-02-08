@@ -45,13 +45,13 @@ import org.apache.cxf.version.Version;
  */
 public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractCXFToolContainer.class);
-    
+
     private final String name;
     private CommandDocument commandDocument;
     private boolean verbose;
     private String usage;
     private final ErrorVisitor errors = new ErrorVisitor();
-    
+
     public AbstractCXFToolContainer(String nm, ToolSpec toolspec) throws Exception {
         super(toolspec);
         name = nm;
@@ -73,12 +73,12 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
             if (commandDocument.hasParameter(ToolConstants.CFG_VERBOSE)) {
                 verbose = true;
                 outputFullCommandLine();
-                outputVersion();               
+                outputVersion();
             }
             checkParams(errors);
-        }             
+        }
     }
-    
+
     private void outputInfo() {
         CommandLineParser parser = getCommandLineParser();
 
@@ -151,7 +151,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         out.println();
     }
-    
+
     public String getFileBase(String wsdlUrl) {
         String fileBase = wsdlUrl;
         StringTokenizer tok = new StringTokenizer(wsdlUrl, "\\/");
@@ -160,7 +160,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
             fileBase = tok.nextToken();
         }
         if (fileBase.endsWith(".wsdl")) {
-            fileBase = new String(fileBase.substring(0, fileBase.length() - 5));
+            fileBase = fileBase.substring(0, fileBase.length() - 5);
         }
         return fileBase;
     }
@@ -218,7 +218,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         return ins;
     }
-   
+
     public Properties loadProperties(InputStream inputs) {
         Properties p = new Properties();
         try {
@@ -229,8 +229,8 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         return p;
     }
-    
-    
+
+
     public Properties loadProperties(String propertyFile) {
         Properties p = new Properties();
 
@@ -246,14 +246,14 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     }
 
     protected String[] getDefaultExcludedNamespaces(String excludeProps) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Properties props = loadProperties(excludeProps);
         java.util.Enumeration<?> nexcludes = props.propertyNames();
 
         while (nexcludes.hasMoreElements()) {
             result.add(props.getProperty((String)nexcludes.nextElement()));
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
     /**
@@ -261,7 +261,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
      * @param stringArrayKeys, contains keys, whose value should be string array
      */
     protected Map<String, Object> getParametersMap(Set<String> stringArrayKeys) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         CommandDocument doc = getCommandDocument();
         if (doc == null) {
             return map;
@@ -282,7 +282,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
 
     protected ClassCollector createClassCollector() {
         ClassCollector collector = new ClassCollector();
-        String reserved[] = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
+        String[] reserved = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
         if (reserved != null) {
             for (String r : reserved) {
                 collector.reserveClass(r);

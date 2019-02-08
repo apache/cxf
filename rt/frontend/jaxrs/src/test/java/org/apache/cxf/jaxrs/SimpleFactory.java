@@ -24,11 +24,11 @@ public final class SimpleFactory {
     private SimpleFactory(String s) {
         id = Integer.valueOf(s);
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     public static SimpleFactory valueOf(String s) {
         return new SimpleFactory(s);
     }

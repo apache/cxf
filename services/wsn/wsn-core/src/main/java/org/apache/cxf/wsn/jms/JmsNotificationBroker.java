@@ -96,7 +96,7 @@ public abstract class JmsNotificationBroker extends AbstractNotificationBroker {
 
     protected GetResourcePropertyResponse handleGetResourceProperty(QName property)
         throws ResourceUnavailableFault, ResourceUnknownFault, InvalidResourcePropertyQNameFault {
-        
+
         if (TOPIC_EXPRESSION_QNAME.equals(property)) {
             // TODO
         } else if (FIXED_TOPIC_SET_QNAME.equals(property)) {
@@ -104,11 +104,11 @@ public abstract class JmsNotificationBroker extends AbstractNotificationBroker {
         } else if (TOPIC_EXPRESSION_DIALECT_QNAME.equals(property)) {
             GetResourcePropertyResponse r = new GetResourcePropertyResponse();
             try {
-                r.getAny().add(new JAXBElement<URI>(TOPIC_EXPRESSION_DIALECT_QNAME, 
+                r.getAny().add(new JAXBElement<URI>(TOPIC_EXPRESSION_DIALECT_QNAME,
                         URI.class, new URI(JmsTopicExpressionConverter.SIMPLE_DIALECT)));
             } catch (URISyntaxException e) {
-                r.getAny().add(new JAXBElement<String>(TOPIC_EXPRESSION_DIALECT_QNAME, 
-                    String.class, JmsTopicExpressionConverter.SIMPLE_DIALECT));               
+                r.getAny().add(new JAXBElement<String>(TOPIC_EXPRESSION_DIALECT_QNAME,
+                    String.class, JmsTopicExpressionConverter.SIMPLE_DIALECT));
             }
             return r;
         } else if (TOPIC_SET_QNAME.equals(property)) {

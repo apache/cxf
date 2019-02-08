@@ -17,7 +17,17 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:interop="http://WSSec/wssec10" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:interop="http://WSSec/wssec10"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://www.w3.org/ns/ws-policy http://www.w3.org/2007/02/ws-policy.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -33,10 +43,10 @@
         <httpj:engine port="${testutil.ports.Server.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="Bethal.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="Truststore.jks"/>
+                    <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
@@ -65,6 +75,26 @@
             <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
         </jaxws:properties>
     </jaxws:endpoint>
+    
+    <bean id="kerberosCallbackHandler2" 
+          class="org.apache.cxf.systest.kerberos.common.KerberosServicePasswordCallback">
+         <property name="username" value="dave"/>
+         <property name="password" value="dave"/>
+    </bean>
+    
+    <bean id="kerberosValidator2" class="org.apache.wss4j.dom.validate.KerberosTokenValidator">
+        <property name="contextName" value="dave"/>
+        <property name="serviceName" value="dave/service.ws.apache.org@service.ws.apache.org"/>
+        <property name="usernameServiceNameForm" value="true"/>
+        <property name="callbackHandler" ref="kerberosCallbackHandler2"/>
+    </bean>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverTransport3" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransport3" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportPort3" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
+        <jaxws:properties>
+            <entry key="ws-security.is-bsp-compliant" value="false"/>
+            <entry key="ws-security.bst.validator" value-ref="kerberosValidator2"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KerberosOverSymmetric" address="http://localhost:${testutil.ports.Server}/DoubleItKerberosSymmetric" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosSymmetricPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value-ref="kerberosCallbackHandler"/>
@@ -181,11 +211,33 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <bean class="javax.xml.namespace.QName" id="bstQName">
+        <constructor-arg value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/>
+        <constructor-arg value="BinarySecurityToken"/>
+    </bean>
+    
+    <util:map id="kerberosValidatorMap">
+        <entry key-ref="bstQName" value-ref="kerberosValidator" />
+    </util:map>
+    
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="DoubleItKerberosTransportActionPort" address="https://localhost:${testutil.ports.Server.2}/DoubleItKerberosTransportAction" serviceName="s:DoubleItService" endpointName="s:DoubleItKerberosTransportActionPort" implementor="org.apache.cxf.systest.kerberos.common.DoubleItPortTypeImpl" wsdlLocation="org/apache/cxf/systest/kerberos/wssec/kerberos/DoubleItKerberos.wsdl" depends-on="tls-settings">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+                <constructor-arg>
+                    <map>
+                        <entry key="validatorMap" value-ref="kerberosValidatorMap"/>
+                    </map>
+                </constructor-arg>
+                <property name="ignoreActions" value="true"/>
+            </bean>
+        </jaxws:inInterceptors>
+    </jaxws:endpoint>
+    
     <httpj:engine-factory id="STSClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.Server.3}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore type="jks" password="sspass" resource="servicestore.jks"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>

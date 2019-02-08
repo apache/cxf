@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,24 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.dom.DOMSource;
-
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils.NullResolver;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.EncryptionActionToken;
 import org.apache.wss4j.common.SignatureActionToken;
 import org.apache.wss4j.dom.WSConstants;
@@ -53,8 +39,12 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.HandlerAction;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 /**
  * Some tests for configuring outbound security using SecurityActionTokens.
@@ -66,55 +56,52 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         SignatureActionToken actionToken = new SignatureActionToken();
         actionToken.setCryptoProperties("outsecurity.properties");
         actionToken.setUser("myalias");
-        List<HandlerAction> actions = 
+        List<HandlerAction> actions =
             Collections.singletonList(new HandlerAction(WSConstants.SIGN, actionToken));
-        
+
         Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
-        outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
-        
-        Map<String, String> inProperties = new HashMap<>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
-        inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        
-        List<String> xpaths = new ArrayList<String>();
+        outProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
+        Map<String, Object> inProperties = new HashMap<>();
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
+        inProperties.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");
+
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-         
-        X509Certificate certificate = 
+
+        X509Certificate certificate =
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(certificate);
     }
-    
+
     @Test
     public void testEncryption() throws Exception {
         EncryptionActionToken actionToken = new EncryptionActionToken();
         actionToken.setCryptoProperties("outsecurity.properties");
         actionToken.setUser("myalias");
-        List<HandlerAction> actions = 
+        List<HandlerAction> actions =
             Collections.singletonList(new HandlerAction(WSConstants.ENCR, actionToken));
-        
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
-        
-        Map<String, String> inProperties = new HashMap<String, String>();
-        inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
-            "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
-        );
-        
-        List<String> xpaths = new ArrayList<String>();
+
+        Map<String, Object> inProperties = new HashMap<>();
+        inProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
+        inProperties.put(ConfigurationConstants.DEC_PROP_FILE, "insecurity.properties");
+        inProperties.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
+        List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//s:Body/xenc:EncryptedData");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
 
         assertNotNull(handlerResults);
@@ -144,83 +131,11 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
             )
         );
     }
-    
-    private byte[] getMessageBytes(Document doc) throws Exception {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
-        StaxUtils.writeDocument(doc, byteArrayWriter, false);
-        byteArrayWriter.flush();
-        return outputStream.toByteArray();
-    }
 
     private List<WSHandlerResult> getResults(SoapMessage inmsg) {
-        final List<WSHandlerResult> handlerResults = 
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
-        return handlerResults;
+        return CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
     }
-    
-    private SoapMessage makeInvocation(
-        Map<String, Object> outProperties,
-        List<String> xpaths,
-        Map<String, String> inProperties
-    ) throws Exception {
-        Document doc = readDocument("wsse-request-clean.xml");
 
-        WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor();
-        PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
-
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
-
-        msg.setContent(SOAPMessage.class, saajMsg);
-        
-        for (String key : outProperties.keySet()) {
-            msg.put(key, outProperties.get(key));
-        }
-
-        handler.handleMessage(msg);
-
-        doc = part;
-
-        for (String xpath : xpaths) {
-            assertValid(xpath, doc);
-        }
-
-        byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
-
-        WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
-
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
-
-        for (String key : inProperties.keySet()) {
-            inHandler.setProperty(key, inProperties.get(key));
-        }
-
-        inHandler.handleMessage(inmsg);
-
-        return inmsg;
-    }
-    
     // FOR DEBUGGING ONLY
     /*private*/ static String serialize(Document doc) {
         return StaxUtils.toString(doc);

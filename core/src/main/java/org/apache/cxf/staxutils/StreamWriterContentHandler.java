@@ -34,14 +34,14 @@ import org.xml.sax.ext.LexicalHandler;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
- * 
+ *
  */
 public class StreamWriterContentHandler implements ContentHandler, LexicalHandler {
-    
+
     XMLStreamWriter writer;
-    Map<String, String> mapping = new LinkedHashMap<String, String>();
+    Map<String, String> mapping = new LinkedHashMap<>();
     boolean inCDATA;
-    
+
     public StreamWriterContentHandler(XMLStreamWriter w) {
         writer = w;
     }
@@ -61,7 +61,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
      * @throws SAXException
      */
     public void startDocument() throws SAXException {
-        // 
+        //
     }
 
     /**
@@ -72,7 +72,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
      * @param length
      * @throws SAXException
      */
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
         try {
             if (inCDATA) {
                 writer.writeCData(new String(ch, start, length));
@@ -92,7 +92,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
      * @param length
      * @throws SAXException
      */
-    public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
         try {
             writer.writeCharacters(ch, start, length);
         } catch (XMLStreamException e) {
@@ -174,9 +174,9 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
 
     /**
      * Method getPrefix.
-     * @param namespaceURI 
      *
-     * @param qname
+     * @param ns
+     * @param namespaceURI
      * @return Returns String.
      */
     private String getPrefix(String ns, String namespaceURI) {
@@ -207,7 +207,7 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
                              Attributes atts) throws SAXException {
         try {
             String prefix = getPrefix(qName, namespaceURI);
-            
+
             // it is only the prefix we want to learn from the QName! so we can get rid of the
             // spliting QName
             if (prefix == null) {

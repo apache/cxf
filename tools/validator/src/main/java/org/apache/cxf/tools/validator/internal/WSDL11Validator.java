@@ -41,6 +41,7 @@ import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 
 import org.w3c.dom.Document;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -61,7 +62,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 public class WSDL11Validator extends AbstractDefinitionValidator {
     protected static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
-    private final List<AbstractValidator> validators = new ArrayList<AbstractValidator>();
+    private final List<AbstractValidator> validators = new ArrayList<>();
 
     public WSDL11Validator(final Definition definition) {
         this(definition, null);
@@ -80,7 +81,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         try {
             OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(this.getBus());
 
-            String nw = new OASISCatalogManagerHelper().resolve(catalogResolver, 
+            String nw = new OASISCatalogManagerHelper().resolve(catalogResolver,
                                                                 wsdl, null);
             if (nw == null) {
                 nw = wsdl;
@@ -93,7 +94,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             throw new ToolException(e);
         }
     }
-    
+
     public boolean isValid() throws ToolException {
         //boolean isValid = true;
         String schemaDir = getSchemaDir();
@@ -116,12 +117,12 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
                 throw new ToolException(e);
             }
         }
-        
+
         WSDLRefValidator wsdlRefValidator = new WSDLRefValidator(this.def, doc, getBus());
-        wsdlRefValidator.setSuppressWarnings(env.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));        
+        wsdlRefValidator.setSuppressWarnings(env.optionSet(ToolConstants.CFG_SUPPRESS_WARNINGS));
         validators.add(wsdlRefValidator);
-        
-        
+
+
         if (env.fullValidateWSDL()) {
             validators.add(new UniqueBodyPartsValidator(this.def));
             validators.add(new WSIBPValidator(this.def));
@@ -132,11 +133,11 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         for (AbstractValidator validator : validators) {
             if (!validator.isValid()) {
                 notValid = true;
-                addErrorMessage(validator.getErrorMessage());                
+                addErrorMessage(validator.getErrorMessage());
             }
         }
         if (notValid) {
-            throw new ToolException(this.getErrorMessage());            
+            throw new ToolException(this.getErrorMessage());
         }
 
         // By default just use WsdlRefValidator
@@ -155,11 +156,11 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
 
         }
         if (!schemaValidator.isValid()) {
-            this.addErrorMessage(schemaValidator.getErrorMessage());            
+            this.addErrorMessage(schemaValidator.getErrorMessage());
             throw new ToolException(this.getErrorMessage());
 
         }
-        
+
         return true;
     }
 
@@ -173,9 +174,9 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         return dir;
     }
 
-        
+
     protected List<InputSource> getDefaultSchemas() throws IOException {
-        List<InputSource> xsdList = new ArrayList<InputSource>();
+        List<InputSource> xsdList = new ArrayList<>();
         URL url = ClassLoaderUtils.getResource("/schemas/configuration/parameterized-types.xsd",
                                                this.getClass());
         if (url != null) {
@@ -184,7 +185,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
             xsdList.add(is);
         }
         addDefaultSchemas(ToolConstants.CXF_SCHEMAS_DIR_INJAR, xsdList);
-        
+
         return xsdList;
     }
     private void addDefaultSchemas(String location, List<InputSource> xsdList) throws IOException {
@@ -192,20 +193,20 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         Enumeration<URL> urls = clzLoader.getResources(location);
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
-            //from jar files 
+            //from jar files
             if (url.toString().startsWith("jar")) {
-                
+
                 JarURLConnection jarConnection = (JarURLConnection)url.openConnection();
-                
+
                 JarFile jarFile = jarConnection.getJarFile();
-                
+
                 Enumeration<JarEntry> entry = jarFile.entries();
-                
+
                 while (entry.hasMoreElements()) {
                     JarEntry ele = entry.nextElement();
                     if (ele.getName().endsWith(".xsd")
                         && ele.getName().indexOf(ToolConstants.CXF_SCHEMAS_DIR_INJAR) > -1) {
-                        
+
                         URIResolver resolver = new URIResolver(ele.getName());
                         if (resolver.isResolved()) {
                             InputSource is = new InputSource(resolver.getInputStream());
@@ -251,7 +252,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
                 }
             }
         }
-        
+
         sort(xsdList);
     }
 

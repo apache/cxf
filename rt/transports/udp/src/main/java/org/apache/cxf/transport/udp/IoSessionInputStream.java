@@ -74,7 +74,7 @@ public class IoSessionInputStream extends InputStream {
             }
         }
     }
-    
+
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         waitForData();

@@ -28,7 +28,6 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -50,17 +49,17 @@ import org.apache.wss4j.policy.model.Layout.LayoutType;
  * Validate a Layout policy.
  */
 public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.LAYOUT.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.LAYOUT.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -69,15 +68,15 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             Layout layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
             assertToken(layout, parameters.getAssertionInfoMap());
-            
-            if (!validatePolicy(layout, parameters.getResults().getResults(), 
+
+            if (!validatePolicy(layout, parameters.getResults().getResults(),
                                 parameters.getSignedResults())) {
                 String error = "Layout does not match the requirements";
                 ai.setNotAsserted(error);
             }
         }
     }
-    
+
     private void assertToken(Layout token, AssertionInfoMap aim) {
         String namespace = token.getName().getNamespaceURI();
 
@@ -86,16 +85,16 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             PolicyUtils.assertPolicy(aim, new QName(namespace, layoutType.name()));
         }
     }
-    
+
     private boolean validatePolicy(
-        Layout layout, 
+        Layout layout,
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
         boolean timestampFirst = layout.getLayoutType() == LayoutType.LaxTsFirst;
         boolean timestampLast = layout.getLayoutType() == LayoutType.LaxTsLast;
         boolean strict = layout.getLayoutType() == LayoutType.Strict;
-        
+
         if (timestampFirst) {
             if (results.isEmpty()) {
                 return false;
@@ -108,27 +107,27 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             if (results.isEmpty()) {
                 return false;
             }
-            Integer lastAction = 
+            Integer lastAction =
                 (Integer)results.get(0).get(WSSecurityEngineResult.TAG_ACTION);
             if (lastAction.intValue() != WSConstants.TS) {
                 return false;
             }
-        } else if (strict && (!validateStrictSignaturePlacement(results, signedResults) 
+        } else if (strict && (!validateStrictSignaturePlacement(results, signedResults)
             || !validateStrictSignatureTokenPlacement(results)
             || !checkSignatureIsSignedPlacement(results, signedResults))) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     private boolean validateStrictSignaturePlacement(
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
     ) {
         // Go through each Signature and check any security header token is before the Signature
         for (WSSecurityEngineResult signedResult : signedResults) {
-            List<WSDataRef> sl = 
+            List<WSDataRef> sl =
                 CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             Integer actInt = (Integer)signedResult.get(WSSecurityEngineResult.TAG_ACTION);
             if (sl == null || WSConstants.ST_SIGNED == actInt) {
@@ -138,14 +137,14 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
             for (WSDataRef r : sl) {
                 String xpath = r.getXpath();
                 if (xpath != null) {
-                    String[] nodes = StringUtils.split(xpath, "/");
+                    String[] nodes = xpath.split("/");
                     // envelope/Header/wsse:Security/header
                     if (nodes.length == 5) {
                         Element protectedElement = r.getProtectedElement();
                         boolean tokenFound = false;
                         // Results are stored in reverse order
                         for (WSSecurityEngineResult result : results) {
-                            Element resultElement = 
+                            Element resultElement =
                                 (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                             if (resultElement == protectedElement) {
                                 tokenFound = true;
@@ -163,7 +162,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
 
         return true;
     }
-    
+
     private boolean validateStrictSignatureTokenPlacement(List<WSSecurityEngineResult> results) {
         // Go through each Signature and check that the Signing Token appears before the Signature
         for (int i = 0; i < results.size(); i++) {
@@ -176,10 +175,10 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     private boolean checkSignatureIsSignedPlacement(
         List<WSSecurityEngineResult> results,
         List<WSSecurityEngineResult> signedResults
@@ -204,7 +203,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
         }
         return true;
     }
-    
+
     private boolean isEndorsingSignatureInCorrectPlace(List<WSSecurityEngineResult> results,
                                               WSSecurityEngineResult signedResult,
                                               Element protectedElement) {
@@ -217,7 +216,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                 if (result == signedResult) {
                     endorsingSigFound = true;
                 }
-                Element resultElement = 
+                Element resultElement =
                     (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (endorsingSigFound && resultElement == protectedElement) {
                     return true;
@@ -228,9 +227,9 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
         }
         return true;
     }
-    
+
     /**
-     * Find the index of the token corresponding to either the X509Certificate or PublicKey used 
+     * Find the index of the token corresponding to either the X509Certificate or PublicKey used
      * to sign the "signatureResult" argument.
      */
     private int findCorrespondingTokenIndex(
@@ -238,38 +237,38 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
         List<WSSecurityEngineResult> results
     ) {
         // See what was used to sign this result
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)signatureResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        PublicKey publicKey = 
+        PublicKey publicKey =
             (PublicKey)signatureResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-        
+
         for (int i = 0; i < results.size(); i++) {
             WSSecurityEngineResult token = results.get(i);
             Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt == WSConstants.SIGN) {
                 continue;
             }
-            
-            BinarySecurity binarySecurity = 
+
+            BinarySecurity binarySecurity =
                 (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            PublicKey foundPublicKey = 
+            PublicKey foundPublicKey =
                 (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
             if (binarySecurity instanceof X509Security
                 || binarySecurity instanceof PKIPathSecurity) {
-                X509Certificate foundCert = 
+                X509Certificate foundCert =
                     (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
                 if (foundCert.equals(cert)) {
                     return i;
                 }
             } else if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                SamlAssertionWrapper assertionWrapper = 
+                SamlAssertionWrapper assertionWrapper =
                     (SamlAssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
                 if (samlKeyInfo != null) {
                     X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
                     PublicKey subjectPublicKey = samlKeyInfo.getPublicKey();
-                    if ((cert != null && subjectCerts != null 
+                    if ((cert != null && subjectCerts != null
                         && cert.equals(subjectCerts[0]))
                         || (subjectPublicKey != null && subjectPublicKey.equals(publicKey))) {
                         return i;
@@ -277,7 +276,7 @@ public class LayoutPolicyValidator extends AbstractSecurityPolicyValidator {
                 }
             } else if (publicKey != null && publicKey.equals(foundPublicKey)) {
                 return i;
-            } 
+            }
         }
         return -1;
     }

@@ -25,6 +25,8 @@ import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 public class XMLClientTypeTest extends AbstractTypeTestClient5 {
     static final String WSDL_PATH = "/wsdl/type_test/type_test_xml.wsdl";
     static final QName SERVICE_NAME = new QName("http://apache.org/type_test/xml", "XMLService");
@@ -37,8 +39,8 @@ public class XMLClientTypeTest extends AbstractTypeTestClient5 {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        boolean ok = launchServer(XMLServerImpl.class, true); 
+        boolean ok = launchServer(XMLServerImpl.class, true);
         assertTrue("failed to launch server", ok);
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
-    }  
+    }
 }

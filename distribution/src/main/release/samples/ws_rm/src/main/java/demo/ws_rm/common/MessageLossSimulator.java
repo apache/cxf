@@ -38,19 +38,19 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.RMContextUtils;
 
 /**
- * 
+ *
  */
 public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = Logger.getLogger(MessageLossSimulator.class.getName());
-    private int appMessageCount; 
-    
+    private int appMessageCount;
+
     public MessageLossSimulator() {
         super(Phase.PREPARE_SEND);
         addBefore(MessageSenderInterceptor.class.getName());
     }
 
-    
+    // CHECKSTYLE:OFF: ReturnCount 
     public void handleMessage(Message message) throws Fault {
         AddressingProperties maps =
             RMContextUtils.retrieveMAPs(message, false, true);
@@ -60,7 +60,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (maps != null && null != maps.getAction()) {
             action = maps.getAction().getValue();
         }
-        if (RMContextUtils.isRMProtocolMessage(action)) { 
+        if (RMContextUtils.isRMProtocolMessage(action)) {
             return;
         }
         appMessageCount++;
@@ -68,8 +68,8 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (0 != (appMessageCount % 2)) {
             return;
         }
-        
-        
+
+
         // discard even-numbered message
         InterceptorChain chain = message.getInterceptorChain();
         ListIterator<Interceptor<? extends Message>> it = chain.getIterator();
@@ -81,8 +81,8 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
                 break;
             }
         }
-        
-        message.setContent(OutputStream.class, new WrappedOutputStream(message));  
+
+        message.setContent(OutputStream.class, new WrappedOutputStream(message));
 
         message.getInterceptorChain().add(new AbstractPhaseInterceptor<Message>(Phase.PREPARE_SEND_ENDING) {
 
@@ -93,15 +93,16 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
                     throw new Fault(e);
                 }
             }
-            
-        });   
+
+        });
     }
-    
+    // CHECKSTYLE:ON: ReturnCount 
+
     private class WrappedOutputStream extends AbstractWrappedOutputStream {
 
         private Message outMessage;
 
-        public WrappedOutputStream(Message m) {
+        WrappedOutputStream(Message m) {
             this.outMessage = m;
         }
 
@@ -114,20 +115,20 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
             }
             wrappedStream = new DummyOutputStream();
         }
-    }    
+    }
 
-            
-    
+
+
     private class DummyOutputStream extends OutputStream {
 
         @Override
         public void write(int b) throws IOException {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
-    
-    
-    
+
+
+
 }

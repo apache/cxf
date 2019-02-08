@@ -37,7 +37,7 @@ import static org.ops4j.pax.exam.CoreOptions.when;
 public class NoAriesBlueprintTest extends OSGiTestSupport {
     /**
      * Make sure cxf bundles start up without aries blueprint
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -66,7 +66,7 @@ public class NoAriesBlueprintTest extends OSGiTestSupport {
                 mvnBundle("org.apache.cxf", "cxf-rt-bindings-xml"),
                 mvnBundle("org.apache.cxf", "cxf-rt-bindings-soap"),
                 mvnBundle("org.apache.cxf", "cxf-rt-frontend-simple"),
-                mvnBundle("org.apache.geronimo.specs", "geronimo-servlet_3.0_spec"),
+                mvnBundle("javax.servlet", "javax.servlet-api"),
                 mvnBundle("org.apache.cxf", "cxf-rt-transports-http"),
                 mvnBundle("org.apache.cxf", "cxf-rt-frontend-jaxws"),
                 junitBundles()

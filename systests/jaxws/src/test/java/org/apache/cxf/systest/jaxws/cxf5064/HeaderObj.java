@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.jaxws.cxf5064;
 
 /**
- * 
+ *
  */
 public class HeaderObj {
     String field1;
@@ -31,7 +31,7 @@ public class HeaderObj {
 
     public HeaderObj(String value) {
         if (value != null && !value.trim().isEmpty()) {
-            String fields[] = value.split("-");
+            String[] fields = value.split("-");
             if (fields.length == 2) {
                 field1 = fields[0];
                 field2 = fields[1];

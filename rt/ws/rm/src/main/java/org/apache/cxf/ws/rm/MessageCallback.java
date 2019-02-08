@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 /**
- * Called by RM code when messages accepted for sending and when acknowledged. 
+ * Called by RM code when messages accepted for sending and when acknowledged.
  */
 public interface MessageCallback {
     void messageAccepted(String seqId, long msgNum);

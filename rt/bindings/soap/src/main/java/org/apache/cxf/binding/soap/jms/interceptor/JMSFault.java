@@ -22,7 +22,7 @@ package org.apache.cxf.binding.soap.jms.interceptor;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *
  */
 public class JMSFault extends Exception {
 

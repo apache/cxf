@@ -31,8 +31,10 @@ public abstract class AbstractJAXWSGenerator extends AbstractGenerator {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXWSGenerator.class);
     protected static final String TEMPLATE_BASE = "org/apache/cxf/tools/wsdlto/frontend/jaxws/template";
 
-    public abstract boolean passthrough();
-    
+    public boolean passthrough() {
+        return false;
+    }
+
     public abstract void generate(ToolContext penv) throws ToolException;
 
     public void register(final ClassCollector collector, String packageName, String fileName) {

@@ -23,7 +23,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
 /**
- * 
+ *
  */
 public class CXFJAXWSContainer extends JAXWSContainer {
     public CXFJAXWSContainer(ToolSpec toolspec) throws Exception {

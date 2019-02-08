@@ -26,7 +26,7 @@ public class UsernameToken implements SecurityToken {
     private boolean isHashed;
     private String nonce;
     private String createdTime;
-    
+
     public UsernameToken(String name,
                          String password,
                          String passwordType,
@@ -64,7 +64,7 @@ public class UsernameToken implements SecurityToken {
     public String getCreatedTime() {
         return createdTime;
     }
-    
+
     public TokenType getTokenType() {
         return TokenType.UsernameToken;
     }

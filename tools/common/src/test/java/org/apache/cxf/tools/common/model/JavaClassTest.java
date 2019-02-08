@@ -19,10 +19,11 @@
 
 package org.apache.cxf.tools.common.model;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaClassTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JavaClassTest {
     @Test
     public void testGetterSetter() throws Exception {
         JavaField field = new JavaField("arg0",
@@ -67,7 +68,7 @@ public class JavaClassTest extends Assert {
                      setter.getParameters().get(0).getClassName());
         assertEquals("this.array = newArray;", setter.getJavaCodeBlock().getExpressions().get(0).toString());
 
-        
+
         field = new JavaField("return",
                               "String[]",
                               "http://doc.withannotation.fortest.tools.cxf.apache.org/");

@@ -22,9 +22,13 @@ import java.util.Arrays;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.policy.SP12Constants;
+
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
@@ -37,7 +41,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.SIGNED_ELEMENTS,
                 CoverageType.SIGNED);
     }
-    
+
     @Test
     public void testSignedElementsPolicyWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -46,7 +50,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.SIGNED_ELEMENTS,
                 null,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_elements_policy.xml",
@@ -56,7 +60,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testAsymmetricBindingAlgorithmSuitePolicy() throws Exception {
         this.runAndValidate(
@@ -76,7 +80,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testSignedElementsWithIssuedSAMLToken() throws Exception {
         this.runOutInterceptorAndValidateSamlTokenAttached(
@@ -91,14 +95,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 SP12Constants.SIGNED_PARTS,
                 CoverageType.SIGNED);
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
                 "signed_parts_policy_header_namespace_only.xml",
                 null,
                 SP12Constants.SIGNED_PARTS,
                 CoverageType.SIGNED);
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
                 "signed_parts_policy_header.xml",
@@ -106,7 +110,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.SIGNED_PARTS,
                 CoverageType.SIGNED);
     }
-    
+
     @Test
     public void testSignedPartsPolicyWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -115,7 +119,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.SIGNED_PARTS,
                 null,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_parts_policy_body.xml",
@@ -124,14 +128,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.SIGNED));
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial.xml",
                 "signed_parts_policy_header_namespace_only.xml",
                 SP12Constants.SIGNED_PARTS,
                 null,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_parts_policy_header_namespace_only.xml",
@@ -140,14 +144,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.SIGNED));
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial.xml",
                 "signed_parts_policy_header.xml",
                 SP12Constants.SIGNED_PARTS,
                 null,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_parts_policy_header.xml",
@@ -156,14 +160,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.SIGNED));
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial.xml",
                 "signed_parts_policy_header_and_body.xml",
                 SP12Constants.SIGNED_PARTS,
                 null,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_parts_policy_header_and_body.xml",
@@ -173,7 +177,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -182,7 +186,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 SP12Constants.ENCRYPTED_ELEMENTS,
                 CoverageType.ENCRYPTED);
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_elements_policy2.xml",
@@ -190,7 +194,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.ENCRYPTED_ELEMENTS,
                 CoverageType.ENCRYPTED);
     }
-    
+
     @Test
     public void testEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -210,7 +214,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         } catch (org.apache.cxf.binding.soap.SoapFault fault) {
             // expected
         }
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_elements_policy.xml",
@@ -219,14 +223,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(new QName[] {SP12Constants.ENCRYPTED_ELEMENTS}),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_element.xml",
                 "encrypted_elements_policy2.xml",
                 SP12Constants.ENCRYPTED_ELEMENTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_elements_policy2.xml",
@@ -236,7 +240,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
     }
-    
+
     @Test
     public void testContentEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -246,7 +250,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
                 CoverageType.ENCRYPTED);
     }
-    
+
     @Test
     public void testContentEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -255,7 +259,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "content_encrypted_elements_policy.xml",
@@ -265,7 +269,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
     }
-    
+
     @Test
     public void testEncryptedPartsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -274,21 +278,21 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 SP12Constants.ENCRYPTED_PARTS,
                 CoverageType.ENCRYPTED);
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_element.xml",
                 "encrypted_parts_policy_body.xml",
                 null,
                 SP12Constants.ENCRYPTED_PARTS,
                 CoverageType.ENCRYPTED);
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_missing_enc_header.xml",
                 "encrypted_parts_policy_header_namespace_only.xml",
                 null,
                 SP12Constants.ENCRYPTED_PARTS,
                 CoverageType.ENCRYPTED);
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_missing_enc_header.xml",
                 "encrypted_parts_policy_header.xml",
@@ -296,7 +300,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.ENCRYPTED_PARTS,
                 CoverageType.ENCRYPTED);
     }
-    
+
     @Test
     public void testEncryptedPartsPolicyWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -305,7 +309,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 SP12Constants.ENCRYPTED_PARTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_body.xml",
@@ -314,14 +318,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_parts_policy_header_namespace_only.xml",
                 SP12Constants.ENCRYPTED_PARTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_namespace_only.xml",
@@ -330,14 +334,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_parts_policy_header.xml",
                 SP12Constants.ENCRYPTED_PARTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header.xml",
@@ -346,14 +350,14 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
-        
+
         this.runInInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 "encrypted_parts_policy_header_and_body.xml",
                 SP12Constants.ENCRYPTED_PARTS,
                 null,
                 CoverageType.ENCRYPTED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_and_body.xml",
@@ -363,7 +367,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED));
     }
-    
+
     @Test
     public void testSignedEncryptedPartsWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -374,7 +378,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
         if (!checkUnrestrictedPoliciesInstalled()) {
@@ -383,24 +387,24 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_encrypted.xml",
                 "signed_parts_policy_header_and_body_encrypted.xml",
-                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS,
                         SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "signed_parts_policy_header_and_body_encrypted.xml",
                 null,
                 null,
-                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS,
                         SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testEncryptedSignedPartsWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -410,13 +414,13 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_PARTS),
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
     }
-    
+
     @Test
     public void testEncryptedSignedPartsWithCompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
                 "encrypted_body_content_signed.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
-                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS,
                         SP12Constants.SIGNED_PARTS),
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
@@ -429,7 +433,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
 
-        this.runAndValidate(
+        if (!JavaUtils.isJava9Compatible()) {
+            // CXF-7270
+            this.runAndValidate(
                 "wsse-request-clean.xml",
                 "encrypted_parts_policy_header_and_body_signed.xml",
                 null,
@@ -439,20 +445,21 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(CoverageType.ENCRYPTED,
                         CoverageType.SIGNED));
+        }
     }
-    
+
     @Test
     public void testProtectTokenAssertion() throws Exception {
-        
+
         // ////////////////////////////////////////////////////
         // x509 Direct Ref Tests
-        
+
         /* REVISIT
         No inbound validation is available for the PROTECT_TOKENS assertion.
         We cannot yet test inbound in the standard manner.  Since we can't
         test inbound, we can't test reound trip either and thus must take
         a different approach for now.
-         
+
         this.runInInterceptorAndValidate(
                 "signed_x509_direct_ref_token_prot.xml",
                 "protect_token_policy_asym_x509_direct_ref.xml",
@@ -466,7 +473,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 SP12Constants.PROTECT_TOKENS,
                 CoverageType.SIGNED);
-        
+
         this.runAndValidate(
                 "wsse-request-clean.xml",
                 "protect_token_policy_asym_x509_direct_ref.xml",
@@ -476,7 +483,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(new CoverageType[] {CoverageType.SIGNED }));
         */
-        
+
         // REVISIT
         // We test using a policy with ProtectTokens enabled on
         // the outbound but with a policy using a SignedElements policy
@@ -492,16 +499,16 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                         Arrays.asList(new QName[] {SP12Constants.SIGNED_ELEMENTS}),
                         null),
                 Arrays.asList(new CoverageType[] {CoverageType.SIGNED }));
-        
+
         // ////////////////////////////////////////////////////
         // x509 Issuer Serial Tests
-        
+
         /* REVISIT
         No inbound validation is available for the PROTECT_TOKENS assertion.
         We cannot yet test inbound in the standard manner.  Since we can't
         test inbound, we can't test reound trip either and thus must take
         a different approach for now.
-        
+
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_token_prot.xml",
                 "protect_token_policy_asym_x509_issuer_serial.xml",
@@ -525,7 +532,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
                 null,
                 Arrays.asList(new CoverageType[] { CoverageType.SIGNED }));
         */
-        
+
         // REVISIT
         // We test using a policy with ProtectTokens enabled on
         // the outbound but with a policy using a SignedElements policy
@@ -548,7 +555,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
         // TODO: Tests for Key Identifier are needed but require that the
         // certificates used in the test cases be updated to version 3
         // according to WSS4J.
-        
+
         // TODO: Tests for derived keys.
     }
 

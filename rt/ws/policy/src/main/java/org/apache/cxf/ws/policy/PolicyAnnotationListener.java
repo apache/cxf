@@ -63,18 +63,18 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.neethi.Constants;
 
 /**
- * 
+ *
  */
 public class PolicyAnnotationListener implements FactoryBeanListener {
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyAnnotationListener.class);
     private static final String EXTRA_POLICIES = PolicyAnnotationListener.class.getName() + ".EXTRA_POLICIES";
-    
+
     private Bus bus;
-    
+
     public PolicyAnnotationListener(Bus bus) {
         this.bus = bus;
     }
-    
+
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
         switch (ev) {
         case INTERFACE_CREATED: {
@@ -83,36 +83,35 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             addPolicies(factory, ii, cls);
             break;
         }
-        
+
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
             Class<?> implCls = (Class<?>)args[3];
             Endpoint ep = (Endpoint)args[1];
             if (ep.getEndpointInfo().getInterface() != null) {
                 addPolicies(factory, ep, cls);
-            
-                // this will allow us to support annotations in Implementations, but only for
-                // class level annotations.  Method level annotations are not currently supported
-                // for implementations.  The call has been moved here so that the ServiceInfo
+
+                // this will allow us to support annotations in Implementations.
+                // The call has been moved here so that the ServiceInfo
                 // policy stuff is loaded before jaxws factory calls the PolicyEngineImpl
                 addEndpointImplPolicies(factory, ep, implCls);
             }
             break;
         }
-        
+
         case INTERFACE_OPERATION_BOUND: {
             OperationInfo inf = (OperationInfo)args[0];
             Method m = (Method)args[1];
             addPolicies(factory, inf, m);
             break;
         }
-        
+
         case BINDING_OPERATION_CREATED:
             BindingOperationInfo boi = (BindingOperationInfo) args[1];
             Method m = (Method)args[2];
             addPolicies(factory, boi.getOperationInfo(), m);
             break;
-            
+
         default:
             //ignore
         }
@@ -122,11 +121,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         if (m == null) {
             return;
         }
-        
+
         Policy p = m.getAnnotation(Policy.class);
         Policies ps = m.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            List<Policy> list = new ArrayList<Policy>();
+            List<Policy> list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }
@@ -144,24 +143,24 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 Class<?> cls = m.getDeclaringClass();
                 switch (place) {
                 case PORT_TYPE_OPERATION:
-                    addPolicy(inf, service, p, cls, 
+                    addPolicy(inf, service, p, cls,
                               inf.getName().getLocalPart() + "PortTypeOpPolicy");
                     it.remove();
                     break;
                 case PORT_TYPE_OPERATION_INPUT:
-                    addPolicy(inf.getInput(), service, p, cls, 
+                    addPolicy(inf.getInput(), service, p, cls,
                               inf.getName().getLocalPart() + "PortTypeOpInputPolicy");
                     it.remove();
                     break;
                 case PORT_TYPE_OPERATION_OUTPUT:
-                    addPolicy(inf.getOutput(), service, p, cls, 
+                    addPolicy(inf.getOutput(), service, p, cls,
                               inf.getName().getLocalPart() + "PortTypeOpOutputPolicy");
                     it.remove();
                     break;
                 case PORT_TYPE_OPERATION_FAULT: {
                     for (FaultInfo f : inf.getFaults()) {
                         if (p.faultClass().equals(f.getProperty(Class.class.getName()))) {
-                            addPolicy(f, service, p, cls, 
+                            addPolicy(f, service, p, cls,
                                       f.getName().getLocalPart() + "PortTypeOpFaultPolicy");
                             it.remove();
                         }
@@ -172,7 +171,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                     //nothing
                 }
             }
-            
+
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)inf.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {
@@ -185,7 +184,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                     inf.setProperty(EXTRA_POLICIES, list);
                 }
             }
-        }        
+        }
     }
 
     private void addPolicies(AbstractServiceFactoryBean factory, Endpoint ep, Class<?> cls) {
@@ -194,7 +193,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         if (list != null) {
             addPolicies(factory, ep, cls, list, Policy.Placement.BINDING);
         }
-        
+
         ServiceInfo service = ep.getService().getServiceInfos().get(0);
         for (BindingOperationInfo binfo : ep.getBinding().getBindingInfo().getOperations()) {
             List<Policy> later = CastUtils.cast((List<?>)binfo.getOperationInfo()
@@ -204,22 +203,22 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                     switch (p.placement()) {
                     case DEFAULT:
                     case BINDING_OPERATION:
-                        addPolicy(binfo, service, p, cls, 
+                        addPolicy(binfo, service, p, cls,
                                   binfo.getName().getLocalPart() + "BindingOpPolicy");
                         break;
                     case BINDING_OPERATION_INPUT:
-                        addPolicy(binfo.getInput(), service, p, cls, 
+                        addPolicy(binfo.getInput(), service, p, cls,
                                   binfo.getName().getLocalPart() + "BindingOpInputPolicy");
                         break;
                     case BINDING_OPERATION_OUTPUT:
-                        addPolicy(binfo.getOutput(), service, p, cls, 
+                        addPolicy(binfo.getOutput(), service, p, cls,
                                   binfo.getName().getLocalPart() + "BindingOpOutputPolicy");
                         break;
                     case BINDING_OPERATION_FAULT: {
                         for (BindingFaultInfo f : binfo.getFaults()) {
                             if (p.faultClass().equals(f.getFaultInfo()
                                                         .getProperty(Class.class.getName()))) {
-                                addPolicy(f, service, p, cls, 
+                                addPolicy(f, service, p, cls,
                                           f.getFaultInfo().getName().getLocalPart() + "BindingOpFaultPolicy");
                             }
                         }
@@ -232,7 +231,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             }
         }
     }
-    
+
     private void addEndpointImplPolicies(AbstractServiceFactoryBean factory, Endpoint endpoint, Class<?> cls) {
         List<Policy> list = CastUtils.cast((List<?>)endpoint.getEndpointInfo()
                                            .getInterface().removeProperty(EXTRA_POLICIES));
@@ -242,11 +241,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         if (cls == null) {
             return;
         }
-        
+
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            list = new ArrayList<Policy>();
+            list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }
@@ -254,7 +253,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.addAll(Arrays.asList(ps.value()));
             }
             addPolicies(factory, endpoint, cls, list, Policy.Placement.SERVICE);
-        }        
+        }
     }
 
     private void addPolicies(AbstractServiceFactoryBean factory, Endpoint endpoint, Class<?> cls,
@@ -271,25 +270,25 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             }
             switch (place) {
             case PORT_TYPE: {
-                addPolicy(inf, si, p, cls, 
+                addPolicy(inf, si, p, cls,
                           inf.getName().getLocalPart() + "PortTypePolicy");
                 it.remove();
                 break;
             }
             case BINDING: {
-                addPolicy(binf, si, p, cls, 
+                addPolicy(binf, si, p, cls,
                           binf.getName().getLocalPart() + "BindingPolicy");
                 it.remove();
                 break;
             }
             case SERVICE: {
-                addPolicy(si, si, p, cls, 
+                addPolicy(si, si, p, cls,
                           si.getName().getLocalPart() + "ServicePolicy");
                 it.remove();
                 break;
             }
             case SERVICE_PORT: {
-                addPolicy(endpoint.getEndpointInfo(), si, p, cls, 
+                addPolicy(endpoint.getEndpointInfo(), si, p, cls,
                           endpoint.getEndpointInfo().getName().getLocalPart() + "PortPolicy");
                 it.remove();
                 break;
@@ -308,7 +307,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         Policy p = cls.getAnnotation(Policy.class);
         Policies ps = cls.getAnnotation(Policies.class);
         if (p != null || ps != null) {
-            List<Policy> list = new ArrayList<Policy>();
+            List<Policy> list = new ArrayList<>();
             if (p != null) {
                 list.add(p);
             }
@@ -324,7 +323,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 }
                 switch (place) {
                 case PORT_TYPE: {
-                    addPolicy(ii, ii.getService(), p, cls, 
+                    addPolicy(ii, ii.getService(), p, cls,
                               ii.getName().getLocalPart() + "PortTypePolicy");
                     it.remove();
                     break;
@@ -332,7 +331,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 case SERVICE: {
                     addPolicy(ii.getService(),
                               ii.getService(),
-                              p, cls, 
+                              p, cls,
                               ii.getService().getName().getLocalPart() + "ServicePolicy");
                     it.remove();
                     break;
@@ -340,7 +339,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 default:
                 }
             }
-            
+
             if (!list.isEmpty()) {
                 List<Policy> stuff = CastUtils.cast((List<?>)ii.getProperty(EXTRA_POLICIES));
                 if (stuff != null) {
@@ -357,7 +356,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     }
 
     private void addPolicy(AbstractPropertiesHolder place,
-                           ServiceInfo service, 
+                           ServiceInfo service,
                            Policy p,
                            Class<?> cls,
                            String defName) {
@@ -373,17 +372,17 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private Element addPolicy(ServiceInfo service, Policy p, Class<?> cls, String defName) {
         String uri = p.uri();
         String ns = Constants.URI_POLICY_NS;
-        
+
         if (p.includeInWSDL()) {
             Element element = loadPolicy(uri, defName);
             if (element == null) {
                 return null;
             }
-            
+
             // might have been updated on load policy
             uri = getPolicyId(element);
             ns = element.getNamespaceURI();
-            
+
             if (service.getDescription() == null && cls != null) {
                 service.setDescription(new DescriptionInfo());
                 URL u = cls.getResource("/");
@@ -392,7 +391,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 }
             }
 
-            // if not already added to service add it, otherwise ignore 
+            // if not already added to service add it, otherwise ignore
             // and just create the policy reference.
             if (!isExistsPolicy(service.getDescription().getExtensors().get(), uri)) {
                 UnknownExtensibilityElement uee = new UnknownExtensibilityElement();
@@ -401,11 +400,11 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 uee.setElementType(DOMUtils.getElementQName(element));
                 service.getDescription().addExtensor(uee);
             }
-            
+
             uri = "#" + uri;
         }
-        
-        Document doc = DOMUtils.createDocument();
+
+        Document doc = DOMUtils.getEmptyDocument();
         Element el = doc.createElementNS(ns, "wsp:" + Constants.ELEM_POLICY_REF);
         Attr att = doc.createAttributeNS(null, "URI");
         att.setValue(uri);
@@ -420,7 +419,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private String getPolicyRefURI(Element element) {
         return element.getAttributeNS(null, "URI");
     }
-    private boolean isExistsPolicy(Object exts[], String uri) {
+    private boolean isExistsPolicy(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
@@ -433,8 +432,8 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         }
         return false;
     }
-    
-    private boolean isExistsPolicyReference(Object exts[], String uri) {
+
+    private boolean isExistsPolicyReference(Object[] exts, String uri) {
         exts = exts == null ? new Object[0] : exts;
         for (Object o : exts) {
             if (o instanceof UnknownExtensibilityElement) {
@@ -451,15 +450,14 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
     private Element loadPolicy(String uri, String defName) {
         if (!uri.startsWith("#")) {
             return loadRemotePolicy(uri, defName);
-        } else {
-            return loadLocalPolicy(uri);
         }
+        return loadLocalPolicy(uri);
     }
-        
+
     private Element loadRemotePolicy(String uri, String defName) {
         ExtendedURIResolver resolver = new ExtendedURIResolver();
         InputSource src = resolver.resolve(uri, "classpath:");
-        
+
         if (null == src) {
             return null;
         }
@@ -474,7 +472,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 att.setNodeValue(defName);
                 doc.getDocumentElement().setAttributeNodeNS(att);
             }
-            
+
             return doc.getDocumentElement();
         } catch (XMLStreamException e) {
             LOG.log(Level.WARNING, e.getMessage());
@@ -487,14 +485,13 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
             }
         }
     }
-    
+
     private Element loadLocalPolicy(String uri) {
         PolicyBean pb = bus.getExtension(ConfiguredBeanLocator.class)
             .getBeanOfType(uri.substring(1), PolicyBean.class);
         if (null != pb) {
-            return pb.getElement(); 
-        } else {
-            return null;
+            return pb.getElement();
         }
+        return null;
     }
 }

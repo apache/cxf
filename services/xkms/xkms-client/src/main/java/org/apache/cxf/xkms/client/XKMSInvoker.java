@@ -62,7 +62,7 @@ public class XKMSInvoker {
     private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
             new org.apache.cxf.xkms.model.xkms.ObjectFactory();
 
-    private static final String XKMS_LOCATE_INVALID_CERTIFICATE = 
+    private static final String XKMS_LOCATE_INVALID_CERTIFICATE =
             "Cannot instantiate X509 certificate from XKMS response";
     private static final String XKMS_VALIDATE_ERROR = "Certificate [%s] is not valid";
 
@@ -71,16 +71,16 @@ public class XKMSInvoker {
     public XKMSInvoker(XKMSPortType xkmsConsumer) {
         this.xkmsConsumer = xkmsConsumer;
     }
-    
+
     public X509Certificate getServiceCertificate(QName serviceName) {
         return getCertificateForId(Applications.SERVICE_NAME, serviceName.toString());
     }
-    
+
     public X509Certificate getCertificateForId(Applications application, String id) {
         List<X509AppId> ids = Collections.singletonList(new X509AppId(application, id));
         return getCertificate(ids);
     }
-    
+
     public X509Certificate getCertificateForIssuerSerial(String issuerDN, BigInteger serial) {
         List<X509AppId> ids = new ArrayList<>();
         ids.add(new X509AppId(Applications.ISSUER, issuerDN));
@@ -161,7 +161,7 @@ public class XKMSInvoker {
 
     @SuppressWarnings("unchecked")
     protected X509Certificate parseLocateXKMSResponse(LocateResultType locateResultType, List<X509AppId> ids) {
-        
+
         XKMSException exception = ExceptionMapper.fromResponse(locateResultType);
         if (exception != null) {
             throw exception;
@@ -185,10 +185,9 @@ public class XKMSInvoker {
 
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf
+            return (X509Certificate)cf
                 .generateCertificate(new ByteArrayInputStream(certificate
                     .getValue()));
-            return cert;
         } catch (CertificateException e) {
             throw new XKMSLocateException(XKMS_LOCATE_INVALID_CERTIFICATE, e);
         }
@@ -263,5 +262,5 @@ public class XKMSInvoker {
         request.setService(XKMSConstants.XKMS_ENDPOINT_NAME);
         request.setId(UUID.randomUUID().toString());
     }
-    
+
 }

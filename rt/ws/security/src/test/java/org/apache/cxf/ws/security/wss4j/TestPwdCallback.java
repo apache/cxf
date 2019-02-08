@@ -30,7 +30,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 public class TestPwdCallback implements CallbackHandler {
 
-    private static Map<String, String> passwords = new HashMap<String, String>();
+    private static Map<String, String> passwords = new HashMap<>();
 
     static {
         passwords.put("myalias", "myAliasPassword");

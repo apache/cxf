@@ -30,7 +30,7 @@ import org.apache.cxf.sts.token.validator.SubjectRoleParser;
  * This interface defines a way to extract roles from a JWT Token
  */
 public interface JWTRoleParser extends SubjectRoleParser {
-    
+
     /**
      * Return the set of User/Principal roles from the token.
      * @param principal the Principal associated with the token

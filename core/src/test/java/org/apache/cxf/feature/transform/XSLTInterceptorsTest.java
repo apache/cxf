@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -44,6 +45,7 @@ import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,7 +73,7 @@ public class XSLTInterceptorsTest {
         inInterceptor = new XSLTInInterceptor(TRANSFORMATION_XSL);
         outInterceptor = new XSLTOutInterceptor(TRANSFORMATION_XSL);
     }
-    
+
     @Test
     public void inStreamTest() throws Exception {
         message.setContent(InputStream.class, messageIS);
@@ -141,7 +143,7 @@ public class XSLTInterceptorsTest {
         Document doc = StaxUtils.read(cWriter.getReader());
         Assert.assertTrue("Message was not transformed", checkTransformedXML(doc));
     }
-    
+
     private boolean checkTransformedXML(Document doc) {
         NodeList list = doc.getDocumentElement()
             .getElementsByTagNameNS("http://customerservice.example.com/", "getCustomersByName1");

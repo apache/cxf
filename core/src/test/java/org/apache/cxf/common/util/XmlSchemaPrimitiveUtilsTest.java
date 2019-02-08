@@ -18,21 +18,22 @@
  */
 package org.apache.cxf.common.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XmlSchemaPrimitiveUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class XmlSchemaPrimitiveUtilsTest {
 
     @Test
     public void testDefaultRepresentation() {
         assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class));
         assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class));
     }
-    
+
     @Test
     public void testXsdRepresentation() {
         assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class, "xsd"));
         assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class, "xsd"));
     }
-    
+
 }

@@ -29,23 +29,23 @@ import org.apache.wss4j.stax.validate.TokenContext;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 /**
- * A trivial custom Validator for a SAML Assertion. It makes sure that the issuer is 
+ * A trivial custom Validator for a SAML Assertion. It makes sure that the issuer is
  * "www.example.com", checks the version of the assertion, and checks the subject confirmation
  * method.
  */
 public class CustomStaxSamlValidator extends SamlTokenValidatorImpl {
-    
+
     private boolean requireSAML1Assertion = true;
     private boolean requireSenderVouches = true;
-    
+
     public void setRequireSAML1Assertion(boolean requireSAML1Assertion) {
         this.requireSAML1Assertion = requireSAML1Assertion;
     }
-    
+
     public void setRequireSenderVouches(boolean requireSenderVouches) {
         this.requireSenderVouches = requireSenderVouches;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends SamlSecurityToken & InboundSecurityToken> T validate(
@@ -62,14 +62,14 @@ public class CustomStaxSamlValidator extends SamlTokenValidatorImpl {
         final SamlSecurityToken token =
             super.</*fake @see above*/SamlSecurityTokenImpl>
                         validate(samlAssertionWrapper, subjectSecurityToken, tokenContext);
-        
+
         //
         // Do some custom validation on the assertion
         //
         if (!"www.example.com".equals(samlAssertionWrapper.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         if (requireSAML1Assertion && samlAssertionWrapper.getSaml1() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         } else if (!requireSAML1Assertion && samlAssertionWrapper.getSaml2() == null) {
@@ -82,12 +82,12 @@ public class CustomStaxSamlValidator extends SamlTokenValidatorImpl {
         }
         if (requireSenderVouches && !OpenSAMLUtil.isMethodSenderVouches(confirmationMethod)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
-        } else if (!requireSenderVouches 
+        } else if (!requireSenderVouches
             && !OpenSAMLUtil.isMethodHolderOfKey(confirmationMethod)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         return (T)token;
     }
-    
+
 }

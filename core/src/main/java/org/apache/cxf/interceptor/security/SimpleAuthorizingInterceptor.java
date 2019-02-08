@@ -25,32 +25,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.security.SecurityContext;
 
 
 public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
 
-    protected Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> methodRolesMap = new HashMap<>();
     protected Map<String, List<String>> userRolesMap = Collections.emptyMap();
     protected List<String> globalRoles = Collections.emptyList();
     private boolean checkConfiguredRolesOnly;
-    
+
     public SimpleAuthorizingInterceptor() {
         this(true);
     }
     public SimpleAuthorizingInterceptor(boolean uniqueId) {
         super(uniqueId);
     }
-    
-    @Override 
+
+    @Override
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
         if (!checkConfiguredRolesOnly && !super.isUserInRole(sc, roles, deny)) {
             return false;
         }
         // Additional check.
         if (!userRolesMap.isEmpty()) {
-            List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());    
+            List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());
             if (userRoles == null) {
                 return false;
             }
@@ -60,11 +59,10 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
                 }
             }
             return false;
-        } else {
-            return !checkConfiguredRolesOnly;
         }
+        return !checkConfiguredRolesOnly;
     }
-    
+
     protected String createMethodSig(Method method) {
         StringBuilder b = new StringBuilder(method.getReturnType().getName());
         b.append(' ').append(method.getName()).append('(');
@@ -79,7 +77,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
         b.append(')');
         return b.toString();
     }
-    
+
     @Override
     protected List<String> getExpectedRoles(Method method) {
         List<String> roles = methodRolesMap.get(createMethodSig(method));
@@ -94,25 +92,25 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
 
     public void setMethodRolesMap(Map<String, String> rolesMap) {
-        methodRolesMap.putAll(parseRolesMap(rolesMap)); 
+        methodRolesMap.putAll(parseRolesMap(rolesMap));
     }
-    
+
     public void setUserRolesMap(Map<String, String> rolesMap) {
         userRolesMap = parseRolesMap(rolesMap);
     }
-    
+
     public void setGlobalRoles(String roles) {
-        globalRoles = Arrays.asList(StringUtils.split(roles, " "));
+        globalRoles = Arrays.asList(roles.split(" "));
     }
-    
+
     public void setCheckConfiguredRolesOnly(boolean checkConfiguredRolesOnly) {
         this.checkConfiguredRolesOnly = checkConfiguredRolesOnly;
     }
-    
+
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        Map<String, List<String>> map = new HashMap<>();
         for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
-            map.put(entry.getKey(), Arrays.asList(StringUtils.split(entry.getValue(), " ")));
+            map.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
         }
         return map;
     }

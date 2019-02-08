@@ -34,7 +34,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
@@ -55,21 +54,21 @@ import org.apache.wss4j.common.cache.EHCacheManagerHolder;
  * the relationship is of type FederateIdentity.
  */
 @ManagedResource()
-public class EHCacheIdentityCache extends AbstractIdentityCache 
+public class EHCacheIdentityCache extends AbstractIdentityCache
     implements Closeable, BusLifeCycleListener {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(EHCacheIdentityCache.class);
-    
+
     private Ehcache cache;
     private CacheManager cacheManager;
-    
-    
+
+
     public EHCacheIdentityCache(
         IdentityMapper identityMapper, Bus b
     ) {
         this(identityMapper, EHCacheIdentityCache.class.getName(), b, null);
     }
-    
+
     public EHCacheIdentityCache(
         IdentityMapper identityMapper, String key, Bus b, URL configFileURL
     ) {
@@ -92,11 +91,11 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
             cacheManager = EHCacheUtils.getCacheManager(b, getDefaultConfigFileURL());
         }
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager);
-        
+
         Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
-    
+
     @Override
     public void add(String user, String realm, Map<String, String> identities) {
         cache.put(new Element(user + "@" + realm, identities));
@@ -115,21 +114,21 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
 
     @Override
     public void remove(String user, String realm) {
-        cache.remove(user + "@" + realm);       
+        cache.remove(user + "@" + realm);
     }
-    
+
     @ManagedOperation()
     @Override
     public void clear() {
         cache.removeAll();
     }
-    
+
     @ManagedOperation()
     @Override
     public int size() {
         return cache.getSize();
     }
-    
+
     @ManagedOperation()
     public String getContent() {
         return this.cache.toString();
@@ -141,7 +140,7 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
             if (cache != null) {
                 cacheManager.removeCache(cache.getName());
             }
-            
+
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;
@@ -161,7 +160,7 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
     public void postShutdown() {
         close();
     }
-    
+
     private URL getDefaultConfigFileURL() {
         URL url = null;
         if (super.getBus() != null) {

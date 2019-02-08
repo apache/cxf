@@ -40,13 +40,13 @@ public final class ParameterMapper {
 
     private ParameterMapper() {
     }
-    
-    public static JavaParameter map(JavaMethod jm, MessagePartInfo part, 
+
+    public static JavaParameter map(JavaMethod jm, MessagePartInfo part,
                                     JavaType.Style style, ToolContext context) {
         String name = ProcessorUtil.mangleNameToVariableName(part.getName().getLocalPart());
         String namespace = ProcessorUtil.resolvePartNamespace(part);
         String type = ProcessorUtil.resolvePartType(part, context);
-        
+
         JavaParameter parameter = new JavaParameter(name, type, namespace);
         parameter.setPartName(part.getName().getLocalPart());
         if (part.getXmlSchema() instanceof XmlSchemaSimpleType) {
@@ -60,7 +60,7 @@ public final class ParameterMapper {
         parameter.setQName(ProcessorUtil.getElementName(part));
         parameter.setDefaultValueWriter(ProcessorUtil.getDefaultValueWriter(part, context));
         String fullJavaName = ProcessorUtil.getFullClzName(part, context, false);
-        
+
         parameter.setClassName(fullJavaName);
 
         if (style == JavaType.Style.INOUT || style == JavaType.Style.OUT) {
@@ -69,11 +69,11 @@ public final class ParameterMapper {
             String holderClass = fullJavaName;
             if (JAXBUtils.holderClass(fullJavaName) != null) {
                 holderClass = JAXBUtils.holderClass(fullJavaName).getName();
-            }  
+            }
             parameter.setClassName(holderClass);
         }
         parameter.setStyle(style);
-        
+
         return parameter;
     }
 
@@ -83,10 +83,10 @@ public final class ParameterMapper {
             && (!part.isElement() || !jm.isWrapperStyle())) {
             parameter.annotate(new XmlListAnotator(jm.getInterface()));
         }
-        if (Constants.XSD_HEXBIN.equals(xmlSchema.getQName()) 
+        if (Constants.XSD_HEXBIN.equals(xmlSchema.getQName())
             && (!part.isElement() || !jm.isWrapperStyle())) {
             parameter.annotate(new XmlJavaTypeAdapterAnnotator(jm.getInterface(), HexBinaryAdapter.class));
         }
     }
-   
+
 }

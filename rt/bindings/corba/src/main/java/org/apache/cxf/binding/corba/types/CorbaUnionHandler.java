@@ -29,7 +29,6 @@ import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
-
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
@@ -37,14 +36,14 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
 
     private CorbaObjectHandler discriminator;
     private CorbaObjectHandler value;
-    private List<CorbaObjectHandler> cases = new ArrayList<CorbaObjectHandler>();
+    private List<CorbaObjectHandler> cases = new ArrayList<>();
     private int defaultIndex;
-    private List<String> labels = new ArrayList<String>();
+    private List<String> labels = new ArrayList<>();
 
     public CorbaUnionHandler(QName unionName, QName unionIdlType, TypeCode unionTC, Object unionType) {
         super(unionName, unionIdlType, unionTC, unionType);
-        
-        // Build a list of labels.  This will be used to generate a discriminator value for the 
+
+        // Build a list of labels.  This will be used to generate a discriminator value for the
         // default case (since we are not provided with one from the Stax stream of the Celtix object)
         Union union = (Union)unionType;
         List<Unionbranch> branches = union.getUnionbranch();
@@ -52,7 +51,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
         for (Iterator<Unionbranch> branchesIter = branches.iterator(); branchesIter.hasNext();) {
             Unionbranch branch = branchesIter.next();
             List<CaseType> branchCases = branch.getCase();
-            if (branchCases.size() == 0) {
+            if (branchCases.isEmpty()) {
                 defaultIndex = index;
             } else {
                 for (Iterator<CaseType> casesIter = branchCases.iterator(); casesIter.hasNext();) {
@@ -60,15 +59,15 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
                     labels.add(ct.getLabel());
                 }
             }
-            
+
             index++;
         }
     }
-    
+
     public CorbaObjectHandler getDiscriminator() {
         return discriminator;
     }
-    
+
     public String getDisciminatorValueData() {
         String result = null;
         // The discriminator is handled by either the enum handler or the primitive handler.
@@ -79,13 +78,13 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
             CorbaPrimitiveHandler primitiveHandler = (CorbaPrimitiveHandler)discriminator;
             result = primitiveHandler.getDataFromValue();
         }
-        return result;        
+        return result;
     }
-    
+
     public void setDiscriminator(CorbaObjectHandler disc) {
         discriminator = disc;
     }
-    
+
     public void setDiscriminatorValueFromData(String data) {
         // The discriminator is handled by either the enum handler or the primitive handler.
         if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
@@ -96,11 +95,11 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
             primitiveHandler.setValueFromData(data);
         }
     }
-    
+
     public List<CorbaObjectHandler> getCases() {
         return cases;
     }
-    
+
     public CorbaObjectHandler getBranchByName(String caseName) {
         for (Iterator<CorbaObjectHandler> caseIter = cases.iterator(); caseIter.hasNext();) {
             CorbaObjectHandler obj = caseIter.next();
@@ -108,35 +107,35 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
                 return obj;
             }
         }
-        
+
         return null;
     }
-    
+
     public void addCase(CorbaObjectHandler unionCase) {
         cases.add(unionCase);
     }
-    
+
     public CorbaObjectHandler getValue() {
         return value;
     }
-    
+
     public void setValue(String caseName, CorbaObjectHandler val) {
         value = val;
     }
-    
+
     public int getDefaultIndex() {
         return defaultIndex;
     }
-    
+
     public String createDefaultDiscriminatorLabel() {
         String label = null;
-        // According to the CORBA specification, an enumeration discriminator can be one of the 
+        // According to the CORBA specification, an enumeration discriminator can be one of the
         // following types:
         //   - *integer* (short, long, ulong, either signed or unsigned)
         //   - boolean
         //   - character
         //   - enumeration
-        // So when we need to create a default discriminator to accomodate for the lack of a 
+        // So when we need to create a default discriminator to accomodate for the lack of a
         // discriminator from, these are the four cases we must check for.
         if (discriminator.getTypeCodeKind().value() == TCKind._tk_boolean) {
             // We can only have a default case with a boolean discriminator if we have
@@ -160,14 +159,14 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
             }
         } else if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
             // Get the list of possible enumerations in the enumerator and compare these to the
-            // labels we obtained from the Union definition.  In order for the union/enum 
+            // labels we obtained from the Union definition.  In order for the union/enum
             // combination to be syntactically correct, there must be one enumeration not included
             // as a case for the default case to be valid.
             Enum enumType = (Enum)discriminator.getType();
             List<Enumerator> enumerators = enumType.getEnumerator();
             if (labels.isEmpty()) {
                 // Any value will do since we only have a default case.
-                label = enumerators.get(0).getValue();                  
+                label = enumerators.get(0).getValue();
             } else {
                 String enumLabel = null;
                 for (Iterator<Enumerator> enumIter = enumerators.iterator(); enumIter.hasNext();) {
@@ -187,7 +186,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
                 if (!labels.contains(String.valueOf(i))) {
                     label = String.valueOf(i);
                     break;
-                }   
+                }
             }
         } else if ((discriminator.getTypeCodeKind().value() == TCKind._tk_long)
                    || (discriminator.getTypeCodeKind().value() == TCKind._tk_ulong)) {
@@ -198,7 +197,7 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
                 if (!labels.contains(String.valueOf(i))) {
                     label = String.valueOf(i);
                     break;
-                }   
+                }
             }
         }
         return label;
@@ -206,10 +205,10 @@ public class CorbaUnionHandler extends CorbaObjectHandler {
 
     public void clear() {
         if (discriminator != null) {
-            discriminator.clear();          
+            discriminator.clear();
         }
         if (value != null) {
             value.clear();
         }
-    }  
+    }
 }

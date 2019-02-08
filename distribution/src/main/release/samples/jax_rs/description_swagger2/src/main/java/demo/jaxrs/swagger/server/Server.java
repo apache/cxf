@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
 import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
-import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -34,29 +33,19 @@ public class Server {
     protected Server() throws Exception {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9000);
 
-        // Configuring all static web resource
-        final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
-        // Register and map the dispatcher servlet
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-        final ServletContextHandler context = new ServletContextHandler();      
+        final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
-        context.addServlet(staticHolder, "/static/*");
-        context.addServlet(servletHolder, "/*");  
-        context.setResourceBase(
-            getClass().getResource("/META-INF/resources/webjars/swagger-ui/2.1.0").toURI().toString());
-        
-        servletHolder.setInitParameter("redirects-list", 
-            "/ /index.html /.*[.]js /css/.* /images/.* lib/.* .*ico /fonts/.*");
-        servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
-        servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
+        context.addServlet(servletHolder, "/*");
         servletHolder.setInitParameter("jaxrs.serviceClasses", Sample.class.getName());
-        servletHolder.setInitParameter("jaxrs.features", Swagger2Feature.class.getName());
+        servletHolder.setInitParameter("jaxrs.features",
+            Swagger2Feature.class.getName());
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] {
                 MultipartProvider.class.getName(),
                 JacksonJsonProvider.class.getName(),
                 ApiOriginFilter.class.getName()
-            }, ",") 
+            }, ",")
         );
 
         server.setHandler(context);
@@ -64,7 +53,7 @@ public class Server {
         server.join();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

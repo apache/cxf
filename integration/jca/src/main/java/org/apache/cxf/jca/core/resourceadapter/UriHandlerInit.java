@@ -20,12 +20,13 @@ package org.apache.cxf.jca.core.resourceadapter;
 
 import java.util.*;
 import java.util.logging.Logger;
+
 import org.apache.cxf.common.logging.LogUtils;
 
 public class UriHandlerInit {
     private static final String PACKAGE_PREFIX = "org.apache.cxf.jca.core";
     private static final Logger LOG = LogUtils.getL7dLogger(UriHandlerInit.class);
-  
+
 
     public UriHandlerInit() {
         initUriHandlers(PACKAGE_PREFIX);

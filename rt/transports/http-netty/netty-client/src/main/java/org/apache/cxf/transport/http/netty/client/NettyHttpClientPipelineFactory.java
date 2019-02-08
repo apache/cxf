@@ -39,28 +39,28 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 
 
 public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> {
-    
+
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpClientPipelineFactory.class);
     private final TLSClientParameters tlsClientParameters;
-    
+
     public NettyHttpClientPipelineFactory(TLSClientParameters clientParameters) {
         this.tlsClientParameters = clientParameters;
     }
-    
+
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-        
+
         SslHandler sslHandler = configureClientSSLOnDemand();
         if (sslHandler != null) {
-            LOG.log(Level.FINE, 
+            LOG.log(Level.FINE,
                     "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}",
                     sslHandler);
             pipeline.addLast("ssl", sslHandler);
         }
 
-        
+
         pipeline.addLast("decoder", new HttpResponseDecoder());
         // TODO need to configure the aggregator size
         pipeline.addLast("aggregator", new HttpObjectAggregator(1048576));
@@ -68,15 +68,14 @@ public class NettyHttpClientPipelineFactory extends ChannelInitializer<Channel> 
         pipeline.addLast("chunkedWriter", new ChunkedWriteHandler());
         pipeline.addLast("client", new NettyHttpClientHandler());
     }
-    
+
     private SslHandler configureClientSSLOnDemand() throws Exception {
         if (tlsClientParameters != null) {
             SSLEngine sslEngine = SSLUtils.createClientSSLEngine(tlsClientParameters);
             return new SslHandler(sslEngine);
-        } else {
-            return null;
         }
+        return null;
     }
-    
-    
+
+
 }

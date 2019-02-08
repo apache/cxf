@@ -52,7 +52,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * The CXF Service implementation which is used 
+ * The CXF Service implementation which is used
  * to register the JAX-RS endpoint with the runtime.
  */
 public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider implements Service, Configurable {
@@ -61,11 +61,11 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     private DataBinding dataBinding;
     private Executor executor;
     private Invoker invoker;
-    private Map<QName, Endpoint> endpoints = new HashMap<QName, Endpoint>();
+    private Map<QName, Endpoint> endpoints = new HashMap<>();
     private String address;
     private boolean createServiceModel;
     private QName serviceName;
-    
+
     public JAXRSServiceImpl(String address, QName qname) {
         this.address = address;
         this.serviceName = qname;
@@ -75,20 +75,20 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         this.classResourceInfos = cri;
         this.serviceName = qname;
     }
-    
+
     public JAXRSServiceImpl(List<ClassResourceInfo> cri) {
         this(cri, null);
     }
-    
+
     public JAXRSServiceImpl(List<ClassResourceInfo> cri, boolean create) {
         this(cri, null);
         createServiceModel = true;
     }
-    
+
     public void setCreateServiceModel(boolean create) {
         createServiceModel = create;
     }
-    
+
     public String getBeanName() {
         return getName().toString();
     }
@@ -101,27 +101,26 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
             Class<?> primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
             return new QName(ns, primaryClass.getSimpleName());
-        } else {
-            return new QName(address, "WebClient");
         }
+        return new QName(address, "WebClient");
     }
 
     public List<ClassResourceInfo> getClassResourceInfos() {
         return classResourceInfos;
     }
-    
+
     public List<ServiceInfo> getServiceInfos() {
         if (!createServiceModel) {
             return Collections.emptyList();
         }
         // try to convert to WSDL-centric model so that CXF DataBindings can get initialized
         // might become useful too if we support wsdl2
-        
-        // make databindings to use databinding-specific information 
+
+        // make databindings to use databinding-specific information
         // like @XmlRootElement for ex to select a namespace
         this.put("org.apache.cxf.databinding.namespace", "true");
-        
-        List<ServiceInfo> infos = new ArrayList<ServiceInfo>();
+
+        List<ServiceInfo> infos = new ArrayList<>();
         for (ClassResourceInfo cri : classResourceInfos) {
             ServiceInfo si = new ServiceInfo();
             infos.add(si);
@@ -135,15 +134,15 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
                 OperationInfo oi = inf.addOperation(oname);
                 createMessagePartInfo(oi, m.getReturnType(), qname, m, false);
                 for (Parameter pm : ori.getParameters()) {
-                    
+
                     if (pm.getType() == ParameterType.REQUEST_BODY) {
-                        createMessagePartInfo(oi, 
+                        createMessagePartInfo(oi,
                                               ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()],
-                                              qname, m, true);    
+                                              qname, m, true);
                     }
                 }
             }
-            
+
         }
         return infos;
     }
@@ -156,9 +155,9 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         if (InjectionUtils.isPrimitive(type) || Response.class == type) {
             return;
         }
-        QName mName = new QName(qname.getNamespaceURI(), 
+        QName mName = new QName(qname.getNamespaceURI(),
                                 (input ? "in" : "out") + m.getName());
-        MessageInfo ms = oi.createMessage(mName, 
+        MessageInfo ms = oi.createMessage(mName,
                                            input ? MessageInfo.Type.INPUT : MessageInfo.Type.OUTPUT);
         if (input) {
             oi.setInput("in", ms);
@@ -171,13 +170,13 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
         mpi.setTypeQName(mpQName);
         mpi.setTypeClass(type);
     }
-    
-    public EndpointInfo getEndpointInfo(QName endpoint) {        
+
+    public EndpointInfo getEndpointInfo(QName endpoint) {
         // For WSDL-based services, this is to construct an EndpointInfo
         // (transport, binding, address etc) from WSDL's physical part.
         // not applicable to JAX-RS services.
         return null;
-    }    
+    }
 
     public Executor getExecutor() {
         return executor;

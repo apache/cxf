@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.jaxrs;
 
 import javax.ws.rs.Produces;
@@ -27,7 +27,6 @@ import javax.xml.bind.JAXBContext;
 public class JAXBContextProvider implements ContextResolver<JAXBContext> {
 
     public JAXBContext getContext(Class<?> type) {
-        // TODO Auto-generated method stub
         return null;
     }
 

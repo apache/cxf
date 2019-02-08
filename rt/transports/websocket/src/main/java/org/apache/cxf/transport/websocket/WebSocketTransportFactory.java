@@ -21,6 +21,7 @@ package org.apache.cxf.transport.websocket;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,13 +48,13 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class WebSocketTransportFactory extends AbstractTransportFactory implements ConduitInitiator,
     DestinationFactory {
 
-    public static final List<String> DEFAULT_NAMESPACES 
-        = Arrays.asList(
+    public static final List<String> DEFAULT_NAMESPACES
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/transports/websocket",
             "http://cxf.apache.org/transports/websocket/configuration"
-        );
+        ));
 
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("ws://");
         URI_PREFIXES.add("wss://");
@@ -66,7 +67,7 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
     public WebSocketTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    
+
     public WebSocketTransportFactory(DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES);
         if (registry == null) {
@@ -81,13 +82,13 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
     /**
      * This call uses the Configurer from the bus to configure
      * a bean.
-     * 
+     *
      * @param bean
      */
     protected void configure(Bus b, Object bean) {
         configure(b, bean, null, null);
     }
-    
+
     protected void configure(Bus bus, Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -97,8 +98,8 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
             }
         }
     }
-    
-    
+
+
     public Conduit getConduit(EndpointInfo endpointInfo, Bus b) throws IOException {
         return getConduit(endpointInfo, endpointInfo.getTarget(), b);
     }
@@ -134,6 +135,11 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
             AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
             if (d == null) {
                 d = factory.createDestination(endpointInfo, bus, registry);
+                if (d == null) {
+                    String error = "No destination available. The CXF websocket transport needs either the "
+                        + "Jetty WebSocket or Atmosphere dependencies to be available";
+                    throw new IOException(error);
+                }
                 registry.addDestination(d);
                 configure(bus, d);
                 d.finalizeConfig();
@@ -141,7 +147,7 @@ public class WebSocketTransportFactory extends AbstractTransportFactory implemen
             return d;
         }
     }
-    
+
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
     }

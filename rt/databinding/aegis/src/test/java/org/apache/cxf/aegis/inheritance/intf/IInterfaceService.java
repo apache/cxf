@@ -20,8 +20,8 @@ package org.apache.cxf.aegis.inheritance.intf;
 
 public interface IInterfaceService {
     IChild getChild();
-    
+
     IParent getChildViaParent();
-    
+
     IGrandChild getGrandChild();
 }

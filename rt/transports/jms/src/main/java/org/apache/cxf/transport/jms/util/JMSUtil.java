@@ -31,16 +31,19 @@ import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.transport.jms.JMSConstants;
 
 public final class JMSUtil {
+    
+    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer"; 
     private static final char[] CORRELATTION_ID_PADDING = {
         '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
     };
-    
+
     private JMSUtil() {
     }
-    
+
     public static Message receive(Session session,
                                   Destination replyToDestination,
                                   String correlationId,
@@ -50,6 +53,30 @@ public final class JMSUtil {
             String messageSelector = correlationId == null ? null : "JMSCorrelationID = '" + correlationId + "'";
             MessageConsumer consumer = closer.register(session.createConsumer(replyToDestination, messageSelector,
                                                  pubSubNoLocal));
+            javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
+            if (replyMessage == null) {
+                throw new RuntimeException("Timeout receiving message with correlationId "
+                                           + correlationId);
+            }
+            return replyMessage;
+        } catch (JMSException e) {
+            throw convertJmsException(e);
+        }
+    }
+    
+    public static Message receive(Session session,
+                                  Destination replyToDestination,
+                                  String correlationId,
+                                  long receiveTimeout,
+                                  boolean pubSubNoLocal,
+                                  Exchange exchange) {
+        try (ResourceCloser closer = new ResourceCloser()) {
+            String messageSelector = correlationId == null ? null : "JMSCorrelationID = '" + correlationId + "'";
+            MessageConsumer consumer = closer.register(session.createConsumer(replyToDestination, messageSelector,
+                                                 pubSubNoLocal));
+            if (exchange != null) {
+                exchange.put(JMS_MESSAGE_CONSUMER, consumer);
+            }
             javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
             if (replyMessage == null) {
                 throw new RuntimeException("Timeout receiving message with correlationId "
@@ -75,7 +102,7 @@ public final class JMSUtil {
 
     /**
      * Create a JMS of the appropriate type populated with the given payload.
-     * 
+     *
      * @param payload the message payload, expected to be either of type String or byte[] depending on payload
      *            type
      * @param session the JMS session
@@ -96,17 +123,19 @@ public final class JMSUtil {
         }
         return message;
     }
-    
+
     public static Queue createQueue(Connection connection, String name) throws JMSException {
         Session session = null;
         try {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             return session.createQueue(name);
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
     }
-    
+
     public static int getNumMessages(Connection connection, Queue queue) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         QueueBrowser browser = session.createBrowser(queue);

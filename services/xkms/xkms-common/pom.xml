@@ -27,9 +27,16 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.xkms.common</cxf.module.name>
+        <cxf.osgi.import>
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
+        </cxf.osgi.import>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -45,7 +52,6 @@
         <dependency>
             <groupId>org.apache.wss4j</groupId>
             <artifactId>wss4j-ws-security-dom</artifactId>
-            <version>${cxf.wss4j.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -54,6 +60,13 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -65,6 +78,9 @@
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <wsdlOptions>
                                 <wsdlOption>
+                                    <xjcargs>
+                                        <xjcarg>-Xdv</xjcarg>
+                                    </xjcargs>
                                     <wsdl>${basedir}/src/main/model/xkms.wsdl</wsdl>
                                     <bindingFile>${basedir}/src/main/model/binding.xjb</bindingFile>
                                 </wsdlOption>

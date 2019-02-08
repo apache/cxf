@@ -30,9 +30,9 @@ public abstract class AbstractSTSEvent {
         this.source = source;
     }
 
-    
+
     public abstract String getOperation();
-    
+
     public long getDuration() {
         return duration;
     }

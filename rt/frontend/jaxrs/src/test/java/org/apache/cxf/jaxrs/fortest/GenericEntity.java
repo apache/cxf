@@ -23,8 +23,8 @@ import javax.ws.rs.POST;
 
 
 public interface GenericEntity<T> {
-    
+
     @POST
     void postEntity(T object);
-    
+
 }

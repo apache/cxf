@@ -33,7 +33,7 @@ public class PartialXMLStreamReader extends DepthXMLStreamReader {
     private boolean foundEnd;
     private int endDepth;
     private int currentEvent;
-    
+
     public PartialXMLStreamReader(XMLStreamReader r, QName endTag) {
         super(r);
         this.endTag = endTag;
@@ -42,7 +42,7 @@ public class PartialXMLStreamReader extends DepthXMLStreamReader {
 
     @Override
     public int next() throws XMLStreamException {
-        if (!foundEnd) { 
+        if (!foundEnd) {
             currentEvent = super.next();
 
             if (currentEvent == START_ELEMENT && getName().equals(endTag)) {
@@ -50,7 +50,7 @@ public class PartialXMLStreamReader extends DepthXMLStreamReader {
                 endDepth = getDepth();
                 return START_ELEMENT;
             }
-            
+
             return currentEvent;
         } else if (endDepth > 0) {
             endDepth--;
@@ -58,7 +58,7 @@ public class PartialXMLStreamReader extends DepthXMLStreamReader {
         } else {
             currentEvent = END_DOCUMENT;
         }
-        
+
         return currentEvent;
     }
 
@@ -71,6 +71,6 @@ public class PartialXMLStreamReader extends DepthXMLStreamReader {
     public boolean hasNext() {
         return currentEvent != END_DOCUMENT;
     }
-    
-    
+
+
 }

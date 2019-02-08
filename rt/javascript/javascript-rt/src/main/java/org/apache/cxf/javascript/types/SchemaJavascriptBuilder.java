@@ -304,7 +304,7 @@ public class SchemaJavascriptBuilder {
         code.append("//\n");
         code.append("function " + functionName + "(cxfjsutils, elementName, extraNamespaces) {\n");
         utils.startXmlStringAccumulator("xml");
-        utils.startIf("elementName != null");
+        utils.startIf("elementName !== null");
         utils.appendString("<");
         utils.appendExpression("elementName");
         // now add any accumulated namespaces.
@@ -321,7 +321,7 @@ public class SchemaJavascriptBuilder {
         utils.appendString(">");
         utils.endBlock();
         code.append(bodyCode);
-        utils.startIf("elementName != null");
+        utils.startIf("elementName !== null");
         utils.appendString("</");
         utils.appendExpression("elementName");
         utils.appendString(">");

@@ -22,12 +22,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -38,37 +39,34 @@ import org.apache.cxf.rs.security.oidc.rp.OidcClientTokenContext;
 @Path("/")
 public class BigQueryService {
 
-    private static final String BQ_SELECT = 
+    private static final String BQ_SELECT =
         "SELECT corpus,corpus_date FROM publicdata:samples.shakespeare WHERE word=\\\"%s\\\"";
     private static final String BQ_REQUEST = "{"
-        + "\"kind\": \"bigquery#queryRequest\"," 
+        + "\"kind\": \"bigquery#queryRequest\","
         + "\"query\": \"%s\","
-        + "\"maxResults\": %d" 
+        + "\"maxResults\": %d"
         + "}";
-    
+
     @Context
     private OidcClientTokenContext oidcContext;
     private WebClient bigQueryClient;
-    
+
     @GET
     @Path("/start")
     @Produces("text/html")
     public BigQueryStart startBigQuerySearch() {
         return new BigQueryStart(getUserInfo());
     }
-    
+
     @POST
     @Path("/complete")
+    @Consumes("application/x-www-form-urlencoded")
     @Produces("text/html")
-    public BigQueryResponse completeBigQuerySearch() {
-        
+    public BigQueryResponse completeBigQuerySearch(@FormParam("word") String searchWord,
+                                                   @FormParam("maxResults") String maxResults) {
+
         ClientAccessToken accessToken = oidcContext.getToken();
-        
-        MultivaluedMap<String, String> state = oidcContext.getState();
-        
-        String searchWord = state.getFirst("word");
-        String maxResults = state.getFirst("maxResults");
-        
+
         BigQueryResponse bigQueryResponse = new BigQueryResponse(getUserInfo(), searchWord);
         bigQueryResponse.setTexts(getMatchingTexts(bigQueryClient, accessToken, searchWord, maxResults));
         return bigQueryResponse;
@@ -80,22 +78,22 @@ public class BigQueryService {
         } else {
             return oidcContext.getIdToken().getSubject();
         }
-        
+
     }
 
     public void setBigQueryClient(WebClient bigQueryClient) {
         this.bigQueryClient = bigQueryClient;
     }
-    
-    static List<ShakespeareText> getMatchingTexts(WebClient bqClient, ClientAccessToken accessToken, 
+
+    static List<ShakespeareText> getMatchingTexts(WebClient bqClient, ClientAccessToken accessToken,
                                                   String searchWord, String maxResults) {
         bqClient.authorization(accessToken);
         String bigQuerySelect = String.format(BQ_SELECT, searchWord);
         String bigQueryRequest = String.format(BQ_REQUEST, bigQuerySelect, Integer.parseInt(maxResults));
-        
+
         JsonMapObject jsonMap = bqClient.post(bigQueryRequest, JsonMapObject.class);
-        
-        List<ShakespeareText> texts = new LinkedList<ShakespeareText>(); 
+
+        List<ShakespeareText> texts = new LinkedList<>();
         List<Map<String, Object>> rows = CastUtils.cast((List<?>)jsonMap.getProperty("rows"));
         if (rows != null) {
             for (Map<String, Object> row : rows) {

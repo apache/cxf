@@ -60,10 +60,10 @@ public class RequestWrapper extends Wrapper {
     @Override
     protected List<JavaField> buildFields() {
         return buildFields(getMethod(), getOperationInfo().getUnwrappedOperation().getInput());
-    }    
-    
+    }
+
     protected List<JavaField> buildFields(final Method method, final MessageInfo message) {
-        List<JavaField> fields = new ArrayList<JavaField>();
+        List<JavaField> fields = new ArrayList<>();
 
         final Type[] paramClasses = method.getGenericParameterTypes();
         final Annotation[][] paramAnnotations = method.getParameterAnnotations();
@@ -76,7 +76,7 @@ public class RequestWrapper extends Wrapper {
 
             JavaField field = new JavaField(name, type, "");
 
-            if (paramAnnotations != null 
+            if (paramAnnotations != null
                 && paramAnnotations.length == paramClasses.length) {
                 WebParam wParam = getWebParamAnnotation(paramAnnotations[idx]);
                 if (wParam != null && !StringUtils.isEmpty(wParam.targetNamespace())) {
@@ -87,7 +87,7 @@ public class RequestWrapper extends Wrapper {
             }
 
             List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method, idx);
-            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
+            field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[0]));
             fields.add(field);
         }
 

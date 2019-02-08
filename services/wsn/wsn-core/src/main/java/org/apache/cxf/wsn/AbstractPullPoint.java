@@ -56,14 +56,14 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
     }
 
     /**
-     * 
+     *
      * @param notify
      */
     @WebMethod(operationName = "Notify")
     @Oneway
     public void notify(
-            @WebParam(name = "Notify", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+            @WebParam(name = "Notify",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                       partName = "Notify")
             Notify notify) {
 
@@ -74,19 +74,19 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
     }
 
     /**
-     * 
+     *
      * @param getMessagesRequest
      * @return returns org.oasis_open.docs.wsn.b_1.GetMessagesResponse
      * @throws ResourceUnknownFault
      * @throws UnableToGetMessagesFault
      */
     @WebMethod(operationName = "GetMessages")
-    @WebResult(name = "GetMessagesResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+    @WebResult(name = "GetMessagesResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                partName = "GetMessagesResponse")
     public GetMessagesResponse getMessages(
-            @WebParam(name = "GetMessages", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+            @WebParam(name = "GetMessages",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                       partName = "GetMessagesRequest")
             GetMessages getMessagesRequest) throws ResourceUnknownFault, UnableToGetMessagesFault {
 
@@ -99,21 +99,21 @@ public abstract class AbstractPullPoint extends AbstractEndpoint implements Pull
     }
 
     /**
-     * 
+     *
      * @param destroyPullPointRequest
      * @return returns org.oasis_open.docs.wsn.b_1.DestroyResponse
      * @throws ResourceUnknownFault
      * @throws UnableToDestroyPullPointFault
      */
     @WebMethod(operationName = "DestroyPullPoint")
-    @WebResult(name = "DestroyPullPointResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "DestroyPullPointResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "DestroyPullPointResponse")
     public DestroyPullPointResponse destroyPullPoint(
-            @WebParam(name = "DestroyPullPoint", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "DestroyPullPoint",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "DestroyPullPointRequest")
-            DestroyPullPoint destroyPullPointRequest) 
+            DestroyPullPoint destroyPullPointRequest)
         throws ResourceUnknownFault, UnableToDestroyPullPointFault {
 
         LOGGER.finest("Destroy");

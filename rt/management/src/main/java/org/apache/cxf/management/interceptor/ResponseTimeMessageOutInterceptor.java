@@ -27,16 +27,16 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTimeInterceptor {
-    private EndingInterceptor ending = new EndingInterceptor(); 
+    private EndingInterceptor ending = new EndingInterceptor();
 
     public ResponseTimeMessageOutInterceptor() {
         super(Phase.PREPARE_SEND_ENDING);
         addBefore(MessageSenderInterceptor.MessageSenderEndingInterceptor.class.getName());
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
-        Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
+        Boolean forceDisabled = Boolean.FALSE.equals(ex.get("org.apache.cxf.management.counter.enabled"));
         if (!forceDisabled && isServiceCounterEnabled(ex)) {
             if (ex.get(Exception.class) != null) {
                 endHandlingMessage(ex);
@@ -55,7 +55,7 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
             }
         }
     }
-    
+
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
@@ -77,7 +77,7 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
     EndingInterceptor getEndingInterceptor() {
         return ending;
     }
-    
+
     public class EndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public EndingInterceptor() {
             super(Phase.PREPARE_SEND_ENDING);

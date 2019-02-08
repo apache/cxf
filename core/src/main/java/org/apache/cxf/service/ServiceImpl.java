@@ -44,24 +44,24 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     private DataBinding dataBinding;
     private Executor executor;
     private Invoker invoker;
-    private Map<QName, Endpoint> endpoints = new HashMap<QName, Endpoint>();
-    
+    private Map<QName, Endpoint> endpoints = new HashMap<>();
+
     public ServiceImpl() {
         this((ServiceInfo)null);
     }
-    
+
     public ServiceImpl(ServiceInfo si) {
-        serviceInfos = new ArrayList<ServiceInfo>();
+        serviceInfos = new ArrayList<>();
         if (si != null) {
             serviceInfos.add(si);
         }
-        executor = SynchronousExecutor.getInstance();    
+        executor = SynchronousExecutor.getInstance();
     }
     public ServiceImpl(List<ServiceInfo> si) {
         serviceInfos = si;
-        executor = SynchronousExecutor.getInstance();    
+        executor = SynchronousExecutor.getInstance();
     }
-    
+
     public String getBeanName() {
         return getName().toString();
     }
@@ -73,7 +73,7 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     public List<ServiceInfo> getServiceInfos() {
         return serviceInfos;
     }
-    
+
     public EndpointInfo getEndpointInfo(QName endpoint) {
         for (ServiceInfo inf : serviceInfos) {
             EndpointInfo ef = inf.getEndpoint(endpoint);
@@ -83,7 +83,7 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
         }
         return null;
     }
-    
+
 
     public Executor getExecutor() {
         return executor;
@@ -120,7 +120,7 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     public void setProperties(Map<String, Object> properties) {
         this.putAll(properties);
     }
-    
+
     @Override
     public String toString() {
         return "[ServiceImpl " + getName() + "]";

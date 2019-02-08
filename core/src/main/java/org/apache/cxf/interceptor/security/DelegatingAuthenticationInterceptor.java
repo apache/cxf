@@ -29,33 +29,33 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class DelegatingAuthenticationInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    
-    private Map<String, Interceptor<Message>> authenticationHandlers = Collections.emptyMap(); 
-    
+
+    private Map<String, Interceptor<Message>> authenticationHandlers = Collections.emptyMap();
+
     public DelegatingAuthenticationInterceptor() {
         super(Phase.UNMARSHAL);
     }
-    
+
     public DelegatingAuthenticationInterceptor(String phase) {
         super(phase);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
-        
+
         String scheme = getAuthenticationScheme(message);
         Interceptor<Message> handler = authenticationHandlers.get(scheme);
         if (handler == null) {
             throw new AuthenticationException();
-        } 
+        }
         handler.handleMessage(message);
     }
 
     public void setSchemeHandlers(Map<String, Interceptor<Message>> handlers) {
         this.authenticationHandlers = handlers;
     }
-    
+
     protected String getAuthenticationScheme(Message message) {
         Map<String, String> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null || !headers.containsKey(AUTHORIZATION_HEADER)) {
@@ -63,5 +63,5 @@ public class DelegatingAuthenticationInterceptor extends AbstractPhaseIntercepto
         }
         return headers.get(AUTHORIZATION_HEADER).split(" ")[0].trim();
     }
-    
+
 }

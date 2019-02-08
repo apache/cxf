@@ -29,30 +29,26 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
- * 
+ *
  */
 public class JsNamedNodeMap extends ScriptableObject {
-    
+
     private static final long serialVersionUID = -3714155882606691342L;
     private NamedNodeMap wrappedMap;
-    
+
     public JsNamedNodeMap() {
         // just to make Rhino happy.
     }
-    
+
     @Override
     public String getClassName() {
         return "NamedNodeMap";
     }
-    
+
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsNamedNodeMap.class);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -69,12 +65,12 @@ public class JsNamedNodeMap extends ScriptableObject {
     public void setWrappedMap(NamedNodeMap wrappedMap) {
         this.wrappedMap = wrappedMap;
     }
-    
+
     // Rhino won't let us use a constructor.
     void initialize(NamedNodeMap map) {
         wrappedMap = map;
     }
-    
+
     public static JsNamedNodeMap wrapMap(Scriptable scope, NamedNodeMap map) {
         Context cx = ContextFactory.getGlobal().enterContext();
         JsNamedNodeMap newObject = (JsNamedNodeMap)cx.newObject(scope, "NamedNodeMap");
@@ -83,15 +79,15 @@ public class JsNamedNodeMap extends ScriptableObject {
     }
 
     // CHECKSTYLE:OFF
-    
+
     public int jsGet_length() {
         return wrappedMap.getLength();
     }
-    
+
     public Object jsFunction_getNamedItem(String name) {
         return JsSimpleDomNode.wrapNode(getParentScope(), wrappedMap.getNamedItem(name));
     }
-    
+
     public Object jsFunction_getNamedItemNS(String uri, String local) {
         return JsSimpleDomNode.wrapNode(getParentScope(), wrappedMap.getNamedItemNS(uri, local));
     }
@@ -99,6 +95,6 @@ public class JsNamedNodeMap extends ScriptableObject {
     public Object jsFunction_item(int index) {
         return JsSimpleDomNode.wrapNode(getParentScope(), wrappedMap.item(index));
     }
-    
+
     // don't implement the 'modify' APIs.
 }

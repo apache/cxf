@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
@@ -57,22 +58,21 @@ public final class ImageHelper {
     private static BufferedImage convertToBufferedImage(Image image) throws IOException {
         if (image instanceof BufferedImage) {
             return (BufferedImage)image;
-        } else {
-            /*not sure how this is used*/
-            MediaTracker tracker = new MediaTracker(null);
-            tracker.addImage(image, 0);
-            try {
-                tracker.waitForAll();
-            } catch (InterruptedException e) {
-                throw new IOException(e.getMessage());
-            }
-            BufferedImage bufImage = new BufferedImage(
-                                                       image.getWidth(null),
-                                                       image.getHeight(null),
-                                                       BufferedImage.TYPE_INT_RGB);
-            Graphics g = bufImage.createGraphics();
-            g.drawImage(image, 0, 0, null);
-            return bufImage;
         }
+        /*not sure how this is used*/
+        MediaTracker tracker = new MediaTracker(null);
+        tracker.addImage(image, 0);
+        try {
+            tracker.waitForAll();
+        } catch (InterruptedException e) {
+            throw new IOException(e.getMessage());
+        }
+        BufferedImage bufImage = new BufferedImage(
+                                                   image.getWidth(null),
+                                                   image.getHeight(null),
+                                                   BufferedImage.TYPE_INT_RGB);
+        Graphics g = bufImage.createGraphics();
+        g.drawImage(image, 0, 0, null);
+        return bufImage;
     }
 }

@@ -67,14 +67,14 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(JaxWsServiceConfiguration.class); 
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxWsServiceConfiguration.class);
 
     private JaxWsImplementorInfo implInfo;
     /**
      * We retrieve the wrapper methods more than once
      * while creating an endpoint. So caching the wrapper
      * classes saves CPU time.
-     * 
+     *
      * It would also be good to cache across creations,
      * but Method.equals isn't good enough.
      */
@@ -83,13 +83,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     private List<Method> responseMethodClassNotFoundCache;
     private List<Method> requestMethodClassNotFoundCache;
     private Map<Method, Annotation[][]> methodAnnotationCache;
-    
+
     public JaxWsServiceConfiguration() {
-        responseMethodClassCache = new HashMap<Object, Class<?>>();
-        requestMethodClassCache = new HashMap<Object, Class<?>>();
-        responseMethodClassNotFoundCache = new ArrayList<Method>();
-        requestMethodClassNotFoundCache = new ArrayList<Method>();
-        methodAnnotationCache = new HashMap<Method, Annotation[][]>();
+        responseMethodClassCache = new HashMap<>();
+        requestMethodClassCache = new HashMap<>();
+        responseMethodClassNotFoundCache = new ArrayList<>();
+        requestMethodClassNotFoundCache = new ArrayList<>();
+        methodAnnotationCache = new HashMap<>();
     }
 
     @Override
@@ -145,9 +145,8 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             }
 
             return new QName(intf.getName().getNamespaceURI(), name);
-        } else {
-            return new QName(intf.getName().getNamespaceURI(), method.getName());
         }
+        return new QName(intf.getName().getNamespaceURI(), method.getName());
     }
 
     public Boolean isWebMethod(final Method method) {
@@ -157,15 +156,15 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             || method.isSynthetic()) {
             return Boolean.FALSE;
         }
-        
+
         WebMethod wm = method.getAnnotation(WebMethod.class);
         Class<?>  cls = method.getDeclaringClass();
         if ((wm != null) && wm.exclude()) {
             return Boolean.FALSE;
         }
-        if ((wm != null && !wm.exclude()) 
+        if ((wm != null && !wm.exclude())
             || (implInfo.getSEIClass() != null
-                && cls.isInterface() 
+                && cls.isInterface()
                 && cls.isAssignableFrom(implInfo.getSEIClass()))) {
             return Boolean.TRUE;
         }
@@ -185,7 +184,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (Object.class.equals(method.getDeclaringClass())) {
             return false;
         }
-        
+
         if (method.getDeclaringClass() == implInfo.getSEIClass()) {
             WebMethod wm = method.getAnnotation(WebMethod.class);
             if (wm != null && wm.exclude()) {
@@ -195,7 +194,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             }
         }
 
-        
+
         Class<?> implClz = implInfo.getImplementorClass();
         Method m = getDeclaredMethod(implClz, method);
         if (m != null) {
@@ -209,9 +208,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return isWebMethod(getDeclaredMethod(method));
     }
-    
+
     private boolean hasWebServiceAnnotation(Method method) {
-        return method.getDeclaringClass().getAnnotation(WebService.class) != null; 
+        return method.getDeclaringClass().getAnnotation(WebService.class) != null;
     }
 
     Method getDeclaredMethod(Method method) {
@@ -236,7 +235,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (paramNumber < 0) {
             return null;
         }
-                
+
         return getPartName(op, method, paramNumber, op.getInput(), "arg", true);
     }
 
@@ -245,7 +244,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (paramNumber < 0) {
             return null;
         }
-        
+
         return getParameterName(op, method, paramNumber, op.getInput().size(), "arg", true);
     }
 
@@ -257,7 +256,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         String tns = mi.getName().getNamespaceURI();
         String local = null;
         if (param != null) {
-            if (Boolean.TRUE.equals(isRPC(method)) 
+            if (Boolean.TRUE.equals(isRPC(method))
                 || isDocumentBare(method)
                 || param.header()) {
                 local = param.partName();
@@ -277,7 +276,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         return new QName(tns, local);
     }
-    
+
     private int getPartIndex(Method method, int paraNumber, boolean isIn) {
         int ret = 0;
         if (isIn && isInParam(method, paraNumber)) {
@@ -300,7 +299,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         return ret;
     }
 
-    private QName getParameterName(OperationInfo op, Method method, int paramNumber, 
+    private QName getParameterName(OperationInfo op, Method method, int paramNumber,
                                    int curSize, String prefix, boolean input) {
         int partIndex = getPartIndex(method, paramNumber, input);
         method = getDeclaredMethod(method);
@@ -311,13 +310,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             tns = param.targetNamespace();
             local = param.name();
         }
-        
+
         if (tns == null || tns.length() == 0) {
             QName wrappername = null;
             if (input) {
                 wrappername = getRequestWrapperName(op, method);
             } else {
-                wrappername = getResponseWrapperName(op, method); 
+                wrappername = getResponseWrapperName(op, method);
             }
             if (wrappername != null) {
                 tns = wrappername.getNamespaceURI();
@@ -337,13 +336,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 }
             }
         }
-        
+
         return new QName(tns, local);
     }
 
-    private String getDefaultLocalName(OperationInfo op, Method method, int paramNumber, 
+    private String getDefaultLocalName(OperationInfo op, Method method, int paramNumber,
                                        int partIndex, String prefix) {
-        String paramName = null;        
+        String paramName = null;
         if (paramNumber != -1) {
             paramName = prefix + partIndex;
         } else {
@@ -358,23 +357,22 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (annotations == null) {
             annotations = method.getParameterAnnotations();
             methodAnnotationCache.put(method, annotations);
-        } 
+        }
         if (parameter >= annotations.length) {
             return null;
-        } else {
-            for (int i = 0; i < annotations[parameter].length; i++) {
-                Annotation annotation = annotations[parameter][i];
-                // With the ibm jdk, the condition:
-                // if (annotation.annotationType().equals(WebParam.class)) {
-                // SOMETIMES returns false even when the annotation type
-                // is a WebParam.  Doing an instanceof check or using the
-                // == operator seems to give the desired result.
-                if (annotation instanceof WebParam) {
-                    return (WebParam)annotation;
-                }
-            }
-            return null;
         }
+        for (int i = 0; i < annotations[parameter].length; i++) {
+            Annotation annotation = annotations[parameter][i];
+            // With the ibm jdk, the condition:
+            // if (annotation.annotationType().equals(WebParam.class)) {
+            // SOMETIMES returns false even when the annotation type
+            // is a WebParam.  Doing an instanceof check or using the
+            // == operator seems to give the desired result.
+            if (annotation instanceof WebParam) {
+                return (WebParam)annotation;
+            }
+        }
+        return null;
     }
     @Override
     public String getRequestWrapperPartName(OperationInfo op, Method method) {
@@ -399,17 +397,17 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         int countOut = 0;
         int countHeaders = 0;
-        
+
         if (webResult != null
             && webResult.header()) {
             countHeaders++;
         } else if (method.getReturnType() != Void.TYPE) {
             countOut++;
         }
-        
+
         for (int x = 0; x < method.getParameterTypes().length; x++) {
             WebParam parm = getWebParam(method, x);
-            if (parm != null) {                
+            if (parm != null) {
                 if (parm.header()) {
                     countHeaders++;
                 }
@@ -424,7 +422,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             return "result";
         }
         return null;
-    }  
+    }
     public String getFaultMessageName(OperationInfo op, Class<?> exClass, Class<?> beanClass) {
         WebFault f = exClass.getAnnotation(WebFault.class);
         if (f != null) {
@@ -446,83 +444,81 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     }
 
     @Override
-    public QName getOutParameterName(OperationInfo op, Method method, int paramNumber) {       
+    public QName getOutParameterName(OperationInfo op, Method method, int paramNumber) {
         method = getDeclaredMethod(method);
-        
+
         if (paramNumber >= 0) {
             return getParameterName(op, method, paramNumber, op.getOutput().size(), "return", false);
-        } else {
-            WebResult webResult = getWebResult(method);
-
-            String tns = null;
-            String local = null;
-            if (webResult != null) {
-                tns = webResult.targetNamespace();
-                local = webResult.name();
-            }
-            if (tns == null || tns.length() == 0) {
-                QName wrappername = getResponseWrapperName(op, method);
-                if (wrappername != null) {
-                    tns = wrappername.getNamespaceURI();
-                }
-            }
-
-            if (tns == null || tns.length() == 0) {
-                tns = op.getName().getNamespaceURI();
-            }
-
-            if (local == null || local.length() == 0) {
-                if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
-                    local = getDefaultLocalName(op, method, paramNumber, op.getOutput().size(), "return");
-                } else {
-                    local = getOperationName(op.getInterface(),
-                                             method).getLocalPart() + "Response";
-                }
-            }
-            
-            return new QName(tns, local);
         }
+        WebResult webResult = getWebResult(method);
+
+        String tns = null;
+        String local = null;
+        if (webResult != null) {
+            tns = webResult.targetNamespace();
+            local = webResult.name();
+        }
+        if (tns == null || tns.length() == 0) {
+            QName wrappername = getResponseWrapperName(op, method);
+            if (wrappername != null) {
+                tns = wrappername.getNamespaceURI();
+            }
+        }
+
+        if (tns == null || tns.length() == 0) {
+            tns = op.getName().getNamespaceURI();
+        }
+
+        if (local == null || local.length() == 0) {
+            if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
+                local = getDefaultLocalName(op, method, paramNumber, op.getOutput().size(), "return");
+            } else {
+                local = getOperationName(op.getInterface(),
+                                         method).getLocalPart() + "Response";
+            }
+        }
+
+        return new QName(tns, local);
     }
 
     @Override
     public QName getOutPartName(OperationInfo op, Method method, int paramNumber) {
         method = getDeclaredMethod(method);
-        
+
         if (paramNumber >= 0) {
             return getPartName(op, method, paramNumber, op.getOutput(), "return", false);
-        } else {
-            WebResult webResult = getWebResult(method);
-            String tns = op.getOutput().getName().getNamespaceURI();
-            String local = null;
-            if (webResult != null) {
-                if (Boolean.TRUE.equals(isRPC(method)) || isDocumentBare(method)) {
-                    local = webResult.partName();
-                }
-                if (local == null || local.length() == 0) {
-                    local = webResult.name();
-                }
+        }
+        WebResult webResult = getWebResult(method);
+        String tns = op.getOutput().getName().getNamespaceURI();
+        String local = null;
+        if (webResult != null) {
+            if (Boolean.TRUE.equals(isRPC(method)) || isDocumentBare(method)) {
+                local = webResult.partName();
             }
-
             if (local == null || local.length() == 0) {
-                if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
-                    local = "return";
-                } else {
-                    local = getOperationName(op.getInterface(), method).getLocalPart() + "Response";
-                }
+                local = webResult.name();
             }
+        }
 
-            return new QName(tns, local);
-        }        
+        if (local == null || local.length() == 0) {
+            if (Boolean.TRUE.equals(isRPC(method)) || !Boolean.FALSE.equals(isWrapped(method))) {
+                local = "return";
+            } else {
+                local = getOperationName(op.getInterface(), method).getLocalPart() + "Response";
+            }
+        }
+
+        return new QName(tns, local);
     }
 
     @Override
-    public Boolean isInParam(Method method, int j) {        
+    public Boolean isInParam(Method method, int j) {
         if (j < 0) {
             return Boolean.FALSE;
         }
-            
+
         method = getDeclaredMethod(method);
-        
+
         WebParam webParam = getWebParam(method, j);
 
         return webParam == null || (webParam.mode().equals(Mode.IN) || webParam.mode().equals(Mode.INOUT));
@@ -531,7 +527,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     private WebResult getWebResult(Method method) {
         return method.getAnnotation(WebResult.class);
     }
-    
+
     @Override
     public Boolean isOutParam(Method method, int j) {
         method = getDeclaredMethod(method);
@@ -544,9 +540,24 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (webParam != null && (webParam.mode().equals(Mode.OUT) || webParam.mode().equals(Mode.INOUT))) {
             return Boolean.TRUE;
         }
-        
         return method.getParameterTypes()[j] == Holder.class;
     }
+
+    @Override
+    public Boolean isInOutParam(Method method, int j) {
+        method = getDeclaredMethod(method);
+        if (j == -1) {
+            return !method.getReturnType().equals(void.class);
+        }
+
+        WebParam webParam = getWebParam(method, j);
+
+        if (webParam != null && webParam.mode().equals(Mode.INOUT)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
+    }
+
 
     @Override
     public QName getRequestWrapperName(OperationInfo op, Method method) {
@@ -565,12 +576,12 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (StringUtils.isEmpty(nm)) {
             nm = op.getName().getNamespaceURI();
         }
-        if (!StringUtils.isEmpty(nm) && !StringUtils.isEmpty(lp)) {            
-            return new QName(nm, lp); 
-        } 
-        return null;        
-    }  
-    
+        if (!StringUtils.isEmpty(nm) && !StringUtils.isEmpty(lp)) {
+            return new QName(nm, lp);
+        }
+        return null;
+    }
+
     @Override
     public QName getResponseWrapperName(OperationInfo op, Method method) {
         Method m = getDeclaredMethod(method);
@@ -591,13 +602,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (StringUtils.isEmpty(nm)) {
             nm = op.getName().getNamespaceURI();
         }
-        if (!StringUtils.isEmpty(nm) && !StringUtils.isEmpty(lp)) {            
-            return new QName(nm, lp); 
-        } 
-        return null;        
+        if (!StringUtils.isEmpty(nm) && !StringUtils.isEmpty(lp)) {
+            return new QName(nm, lp);
+        }
+        return null;
     }
-    
-    
+
+
     @Override
     public Class<?> getResponseWrapper(Method selected) {
         if (this.responseMethodClassNotFoundCache.contains(selected)) {
@@ -618,7 +629,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         } else {
             clsName = rw.className();
         }
-        
+
         if (clsName.length() > 0) {
             cachedClass = responseMethodClassCache.get(clsName);
             if (cachedClass != null) {
@@ -629,7 +640,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 Class<?> r = ClassLoaderUtils.loadClass(clsName, implInfo.getEndpointClass());
                 responseMethodClassCache.put(clsName, r);
                 responseMethodClassCache.put(selected, r);
-                
+
                 if (r.equals(m.getReturnType())) {
                     LOG.log(Level.WARNING, "INVALID_RESPONSE_WRAPPER", new Object[] {clsName,
                             m.getReturnType().getName()});
@@ -671,7 +682,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return null;
     }
-    
+
     @Override
     public Class<?> getRequestWrapper(Method selected) {
         if (this.requestMethodClassNotFoundCache.contains(selected)) {
@@ -714,11 +725,11 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         requestMethodClassNotFoundCache.add(selected);
         return null;
     }
-    
+
     private static String getPackageName(Method method) {
         return PackageUtils.getPackageName(method.getDeclaringClass());
     }
-    
+
     @Override
     public QName getFaultName(InterfaceInfo service, OperationInfo o, Class<?> exClass, Class<?> beanClass) {
         WebFault fault = exClass.getAnnotation(WebFault.class);
@@ -747,7 +758,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         SOAPBinding ann = m.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            if (ann.style().equals(Style.RPC)) { 
+            if (ann.style().equals(Style.RPC)) {
                 Message message = new Message("SOAPBinding_MESSAGE_RPC", LOG, m.getName());
                 throw new Fault(new JaxWsConfigurationException(message));
             }
@@ -756,7 +767,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         return isWrapped();
     }
-    
+
     @Override
     public Boolean isWrapped() {
         SOAPBinding ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
@@ -772,12 +783,11 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (j >= 0) {
             WebParam webParam = getWebParam(method, j);
             return webParam != null && webParam.header();
-        } else {
-            WebResult webResult = getWebResult(method);
-            return webResult != null && webResult.header();
         }
+        WebResult webResult = getWebResult(method);
+        return webResult != null && webResult.header();
     }
-    
+
     @Override
     public String getStyle() {
         SOAPBinding ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
@@ -786,21 +796,21 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return super.getStyle();
     }
-    
+
     private boolean isDocumentBare(Method method) {
         SOAPBinding ann = method.getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.DOCUMENT) 
+            return ann.style().equals(SOAPBinding.Style.DOCUMENT)
                    && ann.parameterStyle().equals(SOAPBinding.ParameterStyle.BARE);
         }
         ann = implInfo.getEndpointClass().getAnnotation(SOAPBinding.class);
         if (ann != null) {
-            return ann.style().equals(SOAPBinding.Style.DOCUMENT) 
+            return ann.style().equals(SOAPBinding.Style.DOCUMENT)
                    && ann.parameterStyle().equals(SOAPBinding.ParameterStyle.BARE);
         }
         return false;
     }
-    
+
     @Override
     public Boolean isRPC(Method method) {
         SOAPBinding ann = method.getAnnotation(SOAPBinding.class);
@@ -813,15 +823,15 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return super.isRPC(method);
     }
-    
-    
-    @Override 
+
+
+    @Override
     public Boolean hasOutMessage(Method method) {
         method = getDeclaredMethod(method);
         return !method.isAnnotationPresent(Oneway.class);
     }
-    
-    @Override 
+
+    @Override
     public String getAction(OperationInfo op, Method method) {
         method = getDeclaredMethod(method);
         WebMethod wm = method.getAnnotation(WebMethod.class);
@@ -840,7 +850,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isHolder(Class<?> cls, Type type) {
         return Holder.class.equals(cls);
     }
-    
+
     public Type getHolderType(Class<?> cls, Type type) {
         if (cls.equals(Holder.class) && type instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType)type;
@@ -849,7 +859,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
 
         return cls;
     }
-    
+
     public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
         Annotation[] annotations = (Annotation[])mpi.getProperty("parameter.annotations");
         if (annotations != null) {
@@ -858,7 +868,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
                 if (an instanceof WebParam) {
                     tns = ((WebParam)an).targetNamespace();
                 } else if (an instanceof WebResult) {
-                    tns = ((WebResult)an).targetNamespace();                    
+                    tns = ((WebResult)an).targetNamespace();
                 }
                 if (tns != null && !StringUtils.isEmpty(tns)) {
                     return Boolean.TRUE;
@@ -867,7 +877,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return null;
     }
-    
+
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
         Annotation[] a = (Annotation[])mpi.getProperty(ReflectionServiceFactoryBean.PARAM_ANNOTATION);
         if (a != null) {
@@ -883,5 +893,5 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         return null;
     }
 
-    
+
 }

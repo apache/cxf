@@ -25,12 +25,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonObject;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 
-public class JwsJsonSignatureEntry {
+public class JwsJsonSignatureEntry implements JsonObject {
     protected static final Logger LOG = LogUtils.getL7dLogger(JwsJsonSignatureEntry.class);
     private String jwsPayload;
     private String encodedProtectedHeader;
@@ -39,7 +40,7 @@ public class JwsJsonSignatureEntry {
     private JwsHeaders unprotectedHeader;
     private JwsHeaders unionHeaders;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
-      
+
     public JwsJsonSignatureEntry(String jwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
@@ -48,7 +49,7 @@ public class JwsJsonSignatureEntry {
             LOG.warning("Invalid Signature entry");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
-        
+
         this.jwsPayload = jwsPayload;
         this.encodedProtectedHeader = encodedProtectedHeader;
         this.encodedSignature = encodedSignature;
@@ -60,12 +61,12 @@ public class JwsJsonSignatureEntry {
     }
     private void prepare() {
         unionHeaders = new JwsHeaders();
-        
+
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
         }
         if (unprotectedHeader != null) {
-            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                      unprotectedHeader.asMap().keySet())) {
                 LOG.warning("Protected and unprotected headers have duplicate values");
                 throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
@@ -79,9 +80,8 @@ public class JwsJsonSignatureEntry {
     public String getDecodedJwsPayload() {
         if (protectedHeader == null || !JwsUtils.isPayloadUnencoded(protectedHeader)) {
             return JoseUtils.decodeToString(jwsPayload);
-        } else {
-            return jwsPayload;
         }
+        return jwsPayload;
     }
     public byte[] getDecodedJwsPayloadBytes() {
         return StringUtils.toBytesUTF8(getDecodedJwsPayload());
@@ -107,9 +107,8 @@ public class JwsJsonSignatureEntry {
     public String getUnsignedSequence() {
         if (getEncodedProtectedHeader() != null) {
             return getEncodedProtectedHeader() + "." + getJwsPayload();
-        } else {
-            return "." + getJwsPayload();
         }
+        return "." + getJwsPayload();
     }
     public String getKeyId() {
         return getUnionHeader().getKeyId();

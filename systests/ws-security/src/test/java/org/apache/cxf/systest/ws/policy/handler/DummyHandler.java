@@ -44,8 +44,8 @@ public class DummyHandler implements SOAPHandler<SOAPMessageContext> {
 
     @Override
     public Set<QName> getHeaders() {
-        Set<QName> understoodHeaders = new HashSet<QName>();
-        QName securityHeader = 
+        Set<QName> understoodHeaders = new HashSet<>();
+        QName securityHeader =
             new QName("http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", "Security");
         understoodHeaders.add(securityHeader);
         return understoodHeaders;

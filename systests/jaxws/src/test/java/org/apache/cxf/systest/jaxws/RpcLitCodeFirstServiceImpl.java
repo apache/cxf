@@ -30,12 +30,12 @@ import javax.xml.ws.Holder;
             portName = "RpcLitCodeFirstServicePort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/RpcLitCodeFirstService")
 public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
-    public static final String DATA[] = new String[] {"string1", "string2", "string3"};
-    
+    public static final String[] DATA = new String[] {"string1", "string2", "string3"};
+
     public int thisShouldNotBeInTheWSDL(int i) {
         return i;
     }
-    
+
     public String[] arrayOutput() {
         return DATA;
     }
@@ -61,7 +61,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
         }
         return buf.toString();
     }
-    
+
     public String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y) {
         StringBuilder buf = new StringBuilder();
         for (String s : inputs1) {
@@ -81,7 +81,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
 
     public String multiInOut(Holder<String> a, Holder<String> b, Holder<String> c, Holder<String> d,
                              Holder<String> e, Holder<String> f, Holder<String> g) {
-        String ret = b.value + d.value + e.value; 
+        String ret = b.value + d.value + e.value;
         a.value = "a";
         b.value = "b";
         c.value = "c";
@@ -94,7 +94,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
     public String multiHeaderInOut(Holder<String> a, Holder<String> b,
                                    Holder<String> c,  Holder<String> d,
                                    Holder<String> e, Holder<String> f, Holder<String> g) {
-        String ret = b.value + d.value + e.value; 
+        String ret = b.value + d.value + e.value;
         a.value = "a";
         b.value = "b";
         c.value = "c";
@@ -104,7 +104,7 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
         g.value = "g";
         return ret;
     }
-    
+
     public List<Foo> listObjectOutput() {
         Foo a = new Foo();
         a.setName("a");
@@ -122,12 +122,12 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
         c.setName("c");
         Foo d = new Foo();
         d.setName("d");
-        
+
         return Arrays.asList(new Foo[] {a, b}, new Foo[] {c, d});
     }
 
     public String[] convertToString(int[] numbers) {
-        String ret[] = new String[numbers.length];
+        String[] ret = new String[numbers.length];
         for (int x = 0; x < numbers.length; x++) {
             ret[x] = Integer.toString(numbers[x]);
         }

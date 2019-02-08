@@ -33,34 +33,33 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.cxf.jaxrs.provider.StringTextProvider;
 
 public class StringTextWriter extends StringTextProvider {
-    
+
     @Context
     private UriInfo ui;
-    
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return false;
     }
-    
+
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         String path = ui.getAbsolutePath().toString();
         if (path.endsWith("/webapp/resources/bookstore/nonexistent")) {
             return super.isWriteable(type, genericType, annotations, mt);
-        } else {
-            return false;
         }
+        return false;
     }
-    
-    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns, 
+
+    public void writeTo(String obj, Class<?> type, Type genType, Annotation[] anns,
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         if (type == String.class && type == genType) {
-            obj = "Nonexistent method".equals(obj) ? "StringTextWriter - " + obj : obj; 
+            obj = "Nonexistent method".equals(obj) ? "StringTextWriter - " + obj : obj;
             super.writeTo(obj, type, genType, anns, mt, headers, os);
             return;
         }
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        
+
     }
 }

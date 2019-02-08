@@ -48,15 +48,15 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 @Path("/web/bookstore")
 public class BookStoreWebSocket {
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
-    private Map<String, OutputStream> eventsStreams = new HashMap<String, OutputStream>();
-    
+    private Map<String, OutputStream> eventsStreams = new HashMap<>();
+
     @GET
     @Path("/booknames")
     @Produces("text/plain")
     public byte[] getBookName() {
         return "CXF in Action".getBytes();
     }
-    
+
     @GET
     @Path("/booknames/servletstream")
     @Produces("text/plain")
@@ -66,22 +66,22 @@ public class BookStoreWebSocket {
         os.write("CXF in Action".getBytes());
         os.flush();
     }
-    
+
     @GET
     @Path("/books/{id}")
     @Produces("application/xml")
     public Book getBook(@PathParam("id") long id) {
         return new Book("CXF in Action", id);
     }
-    
+
     @POST
     @Path("/booksplain")
     @Consumes("text/plain")
     @Produces("text/plain")
     public Long echoBookId(long theBookId) {
-        return new Long(theBookId);
+        return Long.valueOf(theBookId);
     }
-    
+
     @GET
     @Path("/bookbought")
     @Produces("application/*")
@@ -107,7 +107,7 @@ public class BookStoreWebSocket {
             }
         };
     }
-    
+
     @GET
     @Path("/bookstream")
     @Produces("application/json")
@@ -131,7 +131,7 @@ public class BookStoreWebSocket {
             }
         };
     }
-    
+
     @GET
     @Path("/hold/{t}")
     @Produces("text/plain")
@@ -144,7 +144,7 @@ public class BookStoreWebSocket {
         }
         return "Held from " + from + " for " + t + " ms";
     }
-    
+
     @GET
     @Path("/events/register")
     @Produces("text/plain")
@@ -180,7 +180,7 @@ public class BookStoreWebSocket {
     @Path("/events/unregister/{key}")
     @Produces("text/plain")
     public String unregisterEventsStream(@PathParam("key") String key) {
-        return (eventsStreams.remove(key) != null ? "Unregistered: " : "Already Unregistered: ") + key; 
+        return (eventsStreams.remove(key) != null ? "Unregistered: " : "Already Unregistered: ") + key;
     }
 }
 

@@ -33,11 +33,14 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSFactory;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class JMSUtilTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JMSUtilTest {
+
     @Test
     public void testCorrelationIDGeneration() {
         final String conduitId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -45,7 +48,7 @@ public class JMSUtilTest extends Assert {
         // test min edge case
         AtomicLong messageMinCount = new AtomicLong(0);
         createAndCheck(conduitId, "0000000000000000", messageMinCount.get());
-        
+
         // test max edge case
         AtomicLong messageMaxCount = new AtomicLong(0xFFFFFFFFFFFFFFFFL);
         createAndCheck(conduitId, "ffffffffffffffff", messageMaxCount.get());
@@ -53,7 +56,7 @@ public class JMSUtilTest extends Assert {
         // test overflow case
         AtomicLong overflowCount = new AtomicLong(0xFFFFFFFFFFFFFFFFL);
         createAndCheck(conduitId, "0000000000000000", overflowCount.incrementAndGet());
-        
+
         // Test sequence
         AtomicLong sequence = new AtomicLong(0);
         createAndCheck(conduitId, "0000000000000001", sequence.incrementAndGet());
@@ -65,21 +68,21 @@ public class JMSUtilTest extends Assert {
         assertEquals("The correlationID value does not match expected value",
                      prefix + expectedIndex, correlationID);
     }
-    
+
     @Test
     public void testJMSMessageMarshal() throws IOException, JMSException {
         String testMsg = "Test Message";
         final byte[] testBytes = testMsg.getBytes(Charset.defaultCharset().name()); // TODO encoding
         JMSConfiguration jmsConfig = new JMSConfiguration();
         jmsConfig.setConnectionFactory(new ActiveMQConnectionFactory("vm://tesstMarshal?broker.persistent=false"));
-        
+
         try (ResourceCloser closer = new ResourceCloser()) {
             Connection connection = JMSFactory.createConnection(jmsConfig);
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            javax.jms.Message jmsMessage = 
+            javax.jms.Message jmsMessage =
                 JMSUtil.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             assertTrue("Message should have been of type BytesMessage ", jmsMessage instanceof BytesMessage);
         }
-        
+
     }
 }

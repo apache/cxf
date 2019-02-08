@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class ManagedConnectionImplTest {
     @Test
     public void testHandleEqualsMethod() throws Exception {
         BusFactory.setDefaultBus(null);
-        
+
         IMocksControl control = EasyMock.createNiceControl();
 
         ManagedConnectionFactoryImpl mcf = control.createMock(ManagedConnectionFactoryImpl.class);

@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.rs.security.oidc.common;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public abstract class AbstractUserInfo extends JwtClaims {
     public static final String NAME_CLAIM = "name";
@@ -43,6 +46,8 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public static final String PHONE_VERIFIED_CLAIM = "phone_number_verified";
     public static final String ADDRESS_CLAIM = "address";
     public static final String UPDATED_AT_CLAIM = "updated_at";
+    private static final long serialVersionUID = 4554501320190745304L;
+
     public AbstractUserInfo() {
     }
     public AbstractUserInfo(JwtClaims claims) {
@@ -51,7 +56,7 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public AbstractUserInfo(Map<String, Object> claims) {
         super(claims);
     }
-    
+
     public void setName(String name) {
         setProperty(NAME_CLAIM, name);
     }
@@ -139,7 +144,7 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public void setBirthDate(String date) {
         setProperty(BIRTHDATE_CLAIM, date);
     }
-    public String getBirthdate() {
+    public String getBirthDate() {
         return (String)getProperty(BIRTHDATE_CLAIM);
     }
     public String getPhoneNumber() {
@@ -159,13 +164,13 @@ public abstract class AbstractUserInfo extends JwtClaims {
         if (value instanceof UserAddress) {
             return (UserAddress)value;
         } else if (value instanceof Map) {
-            Map<String, Object> map = CastUtils.cast((Map<?, ?>)value); 
+            Map<String, Object> map = CastUtils.cast((Map<?, ?>)value);
             return new UserAddress(map);
         } else {
             return null;
         }
     }
-    public void setUserAddressNumber(UserAddress address) {
+    public void setUserAddress(UserAddress address) {
         setProperty(ADDRESS_CLAIM, address);
     }
     public void setUpdatedAt(Long time) {
@@ -174,5 +179,100 @@ public abstract class AbstractUserInfo extends JwtClaims {
     public Long getUpdatedAt() {
         return getLongProperty(UPDATED_AT_CLAIM);
     }
-    
+
+    public void setAggregatedClaims(AggregatedClaims claims) {
+        setAddClaimNames(claims.getClaimNames());
+        Map<String, Map<String, String>> sources = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : claims.getClaimNames().entrySet()) {
+            String source = entry.getValue();
+            String jwt = claims.getClaimSources().get(source);
+            sources.put(source,
+                        Collections.singletonMap(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY, jwt));
+
+        }
+        setAddClaimSources(sources);
+    }
+    private void setAddClaimSources(Map<String, Map<String, String>> newSources) {
+        Map<String, Map<String, String>> sources =
+            CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_SOURCES_PROPERTY));
+        if (sources == null) {
+            setProperty(OidcUtils.CLAIM_SOURCES_PROPERTY, sources);
+        } else {
+            sources.putAll(newSources);
+        }
+    }
+    private void setAddClaimNames(Map<String, String> claimNames) {
+        Map<String, String> names = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_NAMES_PROPERTY));
+        if (names == null) {
+            setProperty(OidcUtils.CLAIM_NAMES_PROPERTY, claimNames);
+        } else {
+            names.putAll(claimNames);
+        }
+    }
+    public AggregatedClaims getAggregatedClaims() {
+        Map<String, String> names = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_NAMES_PROPERTY));
+        Map<String, Map<String, String>> sources =
+            CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_SOURCES_PROPERTY));
+        if (names == null || sources == null) {
+            return null;
+        }
+
+        AggregatedClaims claims = new AggregatedClaims();
+
+        Map<String, String> namesMap = new LinkedHashMap<>();
+        Map<String, String> sourcesMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : names.entrySet()) {
+            String source = entry.getValue();
+            Map<String, String> sourceValue = sources.get(source);
+            if (sourceValue != null && sourceValue.containsKey(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY)) {
+                namesMap.put(entry.getKey(), source);
+                String jwt = sourceValue.values().iterator().next();
+                sourcesMap.put(source, jwt);
+            }
+        }
+        claims.setClaimNames(namesMap);
+        claims.setClaimSources(sourcesMap);
+        return claims;
+    }
+    public void setDistributedClaims(DistributedClaims claims) {
+        setAddClaimNames(claims.getClaimNames());
+        Map<String, Map<String, String>> sources = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : claims.getClaimNames().entrySet()) {
+            String source = entry.getValue();
+            DistributedClaimSource distSource = claims.getClaimSources().get(source);
+            Map<String, String> mapSource = new LinkedHashMap<>();
+            mapSource.put(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY, distSource.getEndpoint());
+            if (distSource.getAccessToken() != null) {
+                mapSource.put(OidcUtils.TOKEN_CLAIM_SOURCE_PROPERTY, distSource.getAccessToken());
+            }
+            sources.put(source, mapSource);
+        }
+        setAddClaimSources(sources);
+    }
+    public DistributedClaims getDistributedClaims() {
+        Map<String, String> names = CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_NAMES_PROPERTY));
+        Map<String, Map<String, String>> sources =
+            CastUtils.cast((Map<?, ?>)getProperty(OidcUtils.CLAIM_SOURCES_PROPERTY));
+        if (names == null || sources == null) {
+            return null;
+        }
+        DistributedClaims claims = new DistributedClaims();
+        Map<String, String> namesMap = new LinkedHashMap<>();
+        Map<String, DistributedClaimSource> sourcesMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : names.entrySet()) {
+            String source = entry.getValue();
+            Map<String, String> sourceValue = sources.get(source);
+            if (sourceValue != null
+                && !sourceValue.containsKey(OidcUtils.JWT_CLAIM_SOURCE_PROPERTY)) {
+                namesMap.put(entry.getKey(), source);
+                DistributedClaimSource distSource = new DistributedClaimSource();
+                distSource.setEndpoint(sourceValue.get(OidcUtils.ENDPOINT_CLAIM_SOURCE_PROPERTY));
+                distSource.setAccessToken(sourceValue.get(OidcUtils.TOKEN_CLAIM_SOURCE_PROPERTY));
+                sourcesMap.put(source, distSource);
+            }
+        }
+        claims.setClaimNames(namesMap);
+        claims.setClaimSources(sourcesMap);
+        return claims;
+    }
 }

@@ -55,8 +55,8 @@ public class JavaToWSDLProcessor implements Processor {
     private static final String DEFAULT_ADDRESS = "http://localhost:9090/hello";
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private ToolContext context;
-    private final List<AbstractGenerator<?>> generators = new ArrayList<AbstractGenerator<?>>();
-    
+    private final List<AbstractGenerator<?>> generators = new ArrayList<>();
+
     private void customize(ServiceInfo service) {
         if (context.containsKey(ToolConstants.CFG_TNS)) {
             String ns = (String)context.get(ToolConstants.CFG_TNS);
@@ -77,14 +77,14 @@ public class JavaToWSDLProcessor implements Processor {
         EndpointInfo endpointInfo = service.getEndpoints().iterator().next();
         String address = ToolConstants.DEFAULT_ADDRESS + "/" + endpointInfo.getName().getLocalPart();
         if (context.get(ToolConstants.CFG_ADDRESS) != null) {
-            address = (String)context.get(ToolConstants.CFG_ADDRESS);          
+            address = (String)context.get(ToolConstants.CFG_ADDRESS);
         }
         endpointInfo.setAddress(address);
         context.put(ToolConstants.CFG_ADDRESS, address);
-        
+
     }
-    
-    
+
+
     public void process() throws ToolException {
         String oldClassPath = System.getProperty(JAVA_CLASS_PATH);
         LOG.log(Level.FINE, "OLD_CP", oldClassPath);
@@ -95,13 +95,13 @@ public class JavaToWSDLProcessor implements Processor {
         }
 
         // check for command line specification of data binding.
-       
+
 
         ServiceBuilder builder = getServiceBuilder();
         ServiceInfo service = builder.createService();
 
         customize(service);
-        
+
 
         File wsdlFile = getOutputFile(builder.getOutputFile(),
                                       service.getName().getLocalPart() + ".wsdl");
@@ -113,10 +113,10 @@ public class JavaToWSDLProcessor implements Processor {
         if (context.containsKey(ToolConstants.CFG_WRAPPERBEAN)) {
             generators.add(getWrapperBeanGenerator());
             generators.add(getFaultBeanGenerator());
-            
+
         }
         generate(service, outputDir);
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
         serviceList.add(service);
         context.put(ToolConstants.SERVICE_LIST, serviceList);
         System.setProperty(JAVA_CLASS_PATH, oldClassPath);
@@ -160,7 +160,7 @@ public class JavaToWSDLProcessor implements Processor {
     @SuppressWarnings("unchecked")
     public ServiceBuilder getServiceBuilder() throws ToolException {
         Object beanFilesParameter = context.get(ToolConstants.CFG_BEAN_CONFIG);
-        List<String> beanDefinitions = new ArrayList<String>();
+        List<String> beanDefinitions = new ArrayList<>();
         if (beanFilesParameter != null) {
             if (beanFilesParameter instanceof String) {
                 beanDefinitions.add((String)beanFilesParameter);
@@ -168,14 +168,14 @@ public class JavaToWSDLProcessor implements Processor {
                 // is there a better way to avoid the warning?
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
-                String list[] = (String[]) beanFilesParameter;
+                String[] list = (String[]) beanFilesParameter;
                 for (String b : list) {
                     beanDefinitions.add(b);
                 }
             }
         }
-        
-        ServiceBuilderFactory builderFactory 
+
+        ServiceBuilderFactory builderFactory
             = ServiceBuilderFactory.getInstance(beanDefinitions,
                                                 getDataBindingName());
         Class<?> clz = getServiceClass();
@@ -188,9 +188,7 @@ public class JavaToWSDLProcessor implements Processor {
             if (clz.getInterfaces().length == 1) {
                 context.put(ToolConstants.SEI_CLASS, clz.getInterfaces()[0].getName());
             }
-            //TODO: if it is simple frontend, and the impl class implments 
-            //multiple interfaces
-            context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE); 
+            context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE);
         }
         builderFactory.setServiceClass(clz);
         builderFactory.setDatabindingName(getDataBindingName());
@@ -222,9 +220,8 @@ public class JavaToWSDLProcessor implements Processor {
     protected String getBindingId() {
         if (isSOAP12()) {
             return WSDLConstants.NS_SOAP12;
-        } else {
-            return WSDLConstants.NS_SOAP11;
         }
+        return WSDLConstants.NS_SOAP11;
     }
 
     protected boolean isSOAP12() {
@@ -241,13 +238,13 @@ public class JavaToWSDLProcessor implements Processor {
     protected File getOutputDir(File wsdlLocation) {
         String dir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
         if (dir == null) {
-            if (wsdlLocation == null 
+            if (wsdlLocation == null
                 || wsdlLocation.getParentFile() == null
                 || !wsdlLocation.getParentFile().exists()) {
                 dir = "./";
             } else {
                 dir = wsdlLocation.getParent();
-            } 
+            }
         }
         return new File(dir);
     }
@@ -324,7 +321,7 @@ public class JavaToWSDLProcessor implements Processor {
     public ToolContext getEnvironment() {
         return this.context;
     }
-    
+
     public String getDataBindingName() {
         String databindingName = (String)context.get(ToolConstants.CFG_DATABINDING);
         if (databindingName == null) {

@@ -30,19 +30,19 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class FaultThrowingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final MessageFormat MESSAGE_FORMAT
         = new MessageFormat("Interceptor fault in phase {0}.");
     private static final Logger LOG = LogUtils.getLogger(FaultThrowingInterceptor.class);
-    
+
     public FaultThrowingInterceptor() {
         super(Phase.USER_LOGICAL);
     }
-    
-    
+
+
     public FaultThrowingInterceptor(String phase) {
         super(phase);
     }

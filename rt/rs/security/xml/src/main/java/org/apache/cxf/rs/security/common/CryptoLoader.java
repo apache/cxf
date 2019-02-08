@@ -35,42 +35,41 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 public class CryptoLoader {
-    
+
     private static final String CRYPTO_CACHE = "rs-security-xml-crypto.cache";
 
     public Crypto loadCrypto(String cryptoResource) throws IOException, WSSecurityException {
-        URL url = 
+        URL url =
             org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(cryptoResource);
         if (url != null) {
             return loadCryptoFromURL(url);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Crypto getCrypto(Message message,
-                            String cryptoKey, 
-                            String propKey) 
+                            String cryptoKey,
+                            String propKey)
         throws IOException, WSSecurityException {
-        Crypto crypto = 
+        Crypto crypto =
             (Crypto)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(cryptoKey, message);
         if (crypto != null) {
             return crypto;
         }
-        
+
         Object o = org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(propKey, message);
         if (o == null) {
             return null;
         }
-        
+
         String propResourceName = (String)o;
-        
+
         Map<Object, Crypto> cryptoCache = getCryptoCache(message);
         crypto = cryptoCache != null ? cryptoCache.get(propResourceName) : null;
         if (crypto != null) {
             return crypto;
         }
-        
+
         URL url = org.apache.cxf.rt.security.utils.SecurityUtils.loadResource(message, propResourceName);
 
         if (url != null) {
@@ -81,24 +80,24 @@ public class CryptoLoader {
         if (cryptoCache != null && crypto != null) {
             cryptoCache.put(o, crypto);
         }
-        
+
         return crypto;
     }
-    
+
     public static Crypto loadCryptoFromURL(URL url) throws IOException, WSSecurityException {
         Properties props = new Properties();
-        InputStream in = url.openStream(); 
+        InputStream in = url.openStream();
         props.load(in);
         in.close();
         return CryptoFactory.getInstance(props);
     }
-    
+
     public final Map<Object, Crypto> getCryptoCache(Message message) {
         Endpoint endpoint = message.getExchange().getEndpoint();
         if (endpoint != null) {
-            EndpointInfo info  = endpoint.getEndpointInfo();
+            EndpointInfo info = endpoint.getEndpointInfo();
             synchronized (info) {
-                Map<Object, Crypto> o = 
+                Map<Object, Crypto> o =
                     CastUtils.cast((Map<?, ?>)info.getProperty(CRYPTO_CACHE));
                 if (o == null) {
                     o = new ConcurrentHashMap<>();
@@ -106,8 +105,7 @@ public class CryptoLoader {
                 }
                 return o;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 }

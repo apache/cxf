@@ -33,20 +33,23 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.ObjectFactory;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class LogicalMessageImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class LogicalMessageImplTest {
     AddNumbers req;
     List<Object> args;
 
     @Before
     public void setUp() {
-        req = new AddNumbers();        
+        req = new AddNumbers();
         req.setArg0(10);
         req.setArg1(20);
-        args = new ArrayList<Object>();
+        args = new ArrayList<>();
         args.add(req);
     }
 
@@ -60,16 +63,16 @@ public class LogicalMessageImplTest extends Assert {
         LogicalMessageContextImpl lmci = new LogicalMessageContextImpl(message);
 
         JAXBElement<AddNumbers> el = new ObjectFactory().createAddNumbers(req);
-        
+
         LogicalMessageImpl lmi = new LogicalMessageImpl(lmci);
         lmi.setPayload(el, ctx);
-        
+
         Object obj = lmi.getPayload(ctx);
         assertTrue(obj instanceof JAXBElement);
         JAXBElement<?> el2 = (JAXBElement<?>)obj;
         assertTrue(el2.getValue() instanceof AddNumbers);
         AddNumbers resp = (AddNumbers)el2.getValue();
-        assertEquals(req.getArg0(), resp.getArg0());        
-        assertEquals(req.getArg1(), resp.getArg1());        
+        assertEquals(req.getArg0(), resp.getArg0());
+        assertEquals(req.getArg1(), resp.getArg1());
     }
 }

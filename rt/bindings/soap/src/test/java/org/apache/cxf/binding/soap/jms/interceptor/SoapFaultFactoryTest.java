@@ -25,26 +25,29 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.SoapFault;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 /**
- * 
+ *
  */
-public class SoapFaultFactoryTest extends Assert {
+public class SoapFaultFactoryTest {
 
     private IMocksControl control;
     private JMSFault jmsFault;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl(); 
+        control = EasyMock.createNiceControl();
     }
-    
+
     JMSFault setupJMSFault(boolean isSender, QName code, Object detail, boolean isSoap12) {
         jmsFault = control.createMock(JMSFault.class);
         EasyMock.expect(jmsFault.getReason()).andReturn("reason");
@@ -59,28 +62,28 @@ public class SoapFaultFactoryTest extends Assert {
         }
         return jmsFault;
     }
-    
-    @Test 
+
+    @Test
     public void createSoap11Fault() {
         SoapBinding sb = control.createMock(SoapBinding.class);
-        EasyMock.expect(sb.getSoapVersion()).andReturn(Soap11.getInstance());        
+        EasyMock.expect(sb.getSoapVersion()).andReturn(Soap11.getInstance());
         setupJMSFault(true, SoapJMSConstants.getContentTypeMismatchQName(), null, false);
         control.replay();
-        
+
         SoapFaultFactory factory = new SoapFaultFactory(sb);
         SoapFault fault = (SoapFault)factory.createFault(jmsFault);
         assertEquals("reason", fault.getReason());
         assertEquals(SoapJMSConstants.getContentTypeMismatchQName(), fault.getFaultCode());
         assertNull(fault.getDetail());
         assertSame(jmsFault, fault.getCause());
-        control.verify();        
+        control.verify();
     }
-    
-    @Test 
+
+    @Test
     public void createSoap12Fault() {
         SoapBinding sb = control.createMock(SoapBinding.class);
-        EasyMock.expect(sb.getSoapVersion()).andReturn(Soap12.getInstance());        
-        setupJMSFault(true, SoapJMSConstants.getMismatchedSoapActionQName(), null, true);        
+        EasyMock.expect(sb.getSoapVersion()).andReturn(Soap12.getInstance());
+        setupJMSFault(true, SoapJMSConstants.getMismatchedSoapActionQName(), null, true);
         control.replay();
         SoapFaultFactory factory = new SoapFaultFactory(sb);
         SoapFault fault = (SoapFault)factory.createFault(jmsFault);
@@ -89,6 +92,6 @@ public class SoapFaultFactoryTest extends Assert {
         assertEquals(SoapJMSConstants.getMismatchedSoapActionQName(), fault.getSubCode());
         assertNull(fault.getDetail());
         assertNull(fault.getCause());
-        control.verify();        
+        control.verify();
     }
 }

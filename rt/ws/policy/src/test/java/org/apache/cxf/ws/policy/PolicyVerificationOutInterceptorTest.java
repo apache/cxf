@@ -22,46 +22,46 @@ package org.apache.cxf.ws.policy;
 import java.lang.reflect.Method;
 
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
-public class PolicyVerificationOutInterceptorTest extends Assert {
- 
+public class PolicyVerificationOutInterceptorTest {
+
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();   
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testHandleMessage() throws NoSuchMethodException {
         Method m = AbstractPolicyInterceptor.class.getDeclaredMethod("getTransportAssertions",
             new Class[] {Message.class});
-        PolicyVerificationOutInterceptor interceptor = 
+        PolicyVerificationOutInterceptor interceptor =
             EasyMock.createMockBuilder(PolicyVerificationOutInterceptor.class)
                 .addMockedMethod(m).createMock(control);
-        
+
         Message message = control.createMock(Message.class);
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.TRUE);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();
-        
+
         control.reset();
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(null);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();
-        
-        control.reset();   
+
+        control.reset();
         EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(null);
         AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
@@ -72,11 +72,11 @@ public class PolicyVerificationOutInterceptorTest extends Assert {
         EasyMock.expect(ep.getPolicy()).andReturn(null);
 
         aim.checkEffectivePolicy(null);
-        
+
         EasyMock.expectLastCall().andReturn(null);
-        
-        control.replay();        
-        interceptor.handleMessage(message);       
+
+        control.replay();
+        interceptor.handleMessage(message);
         control.verify();
     }
 }

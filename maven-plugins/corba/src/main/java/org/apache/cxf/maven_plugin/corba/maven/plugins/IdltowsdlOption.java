@@ -25,7 +25,7 @@ public class IdltowsdlOption {
 
     String idl;
     List<String> extraargs;
-    
+
     public String getIDL() {
         return idl;
     }

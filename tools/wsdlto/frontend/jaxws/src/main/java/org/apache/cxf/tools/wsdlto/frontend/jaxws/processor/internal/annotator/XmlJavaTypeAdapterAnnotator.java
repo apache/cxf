@@ -33,7 +33,7 @@ public class XmlJavaTypeAdapterAnnotator implements Annotator {
     private JavaInterface jf;
     private Class<? extends XmlAdapter<?, ?>> adapter;
 
-    public XmlJavaTypeAdapterAnnotator(JavaInterface intf, 
+    public XmlJavaTypeAdapterAnnotator(JavaInterface intf,
                                        Class<? extends XmlAdapter<?, ?>> adapter) {
         this.jf = intf;
         this.adapter = adapter;

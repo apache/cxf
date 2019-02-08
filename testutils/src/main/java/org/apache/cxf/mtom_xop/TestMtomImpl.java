@@ -26,16 +26,16 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 
-@WebService(serviceName = "TestMtomService", 
-        portName = "TestMtomPort", 
-        targetNamespace = "http://cxf.apache.org/mime", 
+@WebService(serviceName = "TestMtomService",
+        portName = "TestMtomPort",
+        targetNamespace = "http://cxf.apache.org/mime",
         endpointInterface = "org.apache.cxf.mime.TestMtom",
         wsdlLocation = "testutils/mtom_xop.wsdl")
-        
+
 public class TestMtomImpl implements TestMtom {
 
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {
-        if (name.value.equals("have name") && attachinfo.value.getName() != null) {
+        if ("have name".equals(name.value) && attachinfo.value.getName() != null) {
             name.value = "return detail + " + attachinfo.value.getName();
         } else {
             name.value = "return detail + " + name.value;

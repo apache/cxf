@@ -32,21 +32,29 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletDestination;
 //import org.apache.cxf.transport.websocket.jetty.JettyWebSocketServletDestination;
 
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    private static final Constructor<?> JETTY_WEBSOCKET_DESTINATION_CTR =
-        probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");
+    private static final boolean JETTY_AVAILABLE = 
+        probeClass("org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory");
+    private static final boolean UNDERTOW_AVAILABLE = 
+        probeClass("org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory");
     private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
+    private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR =
+        probeUndertowConstructor("org.apache.cxf.transport.websocket.undertow.UndertowWebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");
+    private static final Constructor<?> ATMOSPHERE_WEBSOCKET_UNDERTOW_DESTINATION_CTR =
+        probeUndertowConstructor(
+            "org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketUndertowDestination");
 
-    private final boolean atmosphereDisabled = Boolean.valueOf(
-        SystemPropertyAction.getPropertyOrNull("org.apache.cxf.transport.websocket.atmosphere.disabled"));
+    private final boolean atmosphereDisabled = Boolean.parseBoolean(SystemPropertyAction
+        .getPropertyOrNull("org.apache.cxf.transport.websocket.atmosphere.disabled"));
 
     private static boolean probeClass(String name) {
         try {
@@ -56,58 +64,76 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             return false;
         }
     }
-    
+
     private static Constructor<?> probeConstructor(String name) {
         try {
             Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
-            return clz.getConstructor(Bus.class, DestinationRegistry.class, 
-                                      EndpointInfo.class, JettyHTTPServerEngineFactory.class);
+            return clz.getConstructor(Bus.class, DestinationRegistry.class, EndpointInfo.class,
+                                      JettyHTTPServerEngineFactory.class);
         } catch (Throwable t) {
             return null;
         }
     }
-    
+
+    private static Constructor<?> probeUndertowConstructor(String name) {
+        try {
+            Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
+            return clz.getConstructor(Bus.class, DestinationRegistry.class, EndpointInfo.class,
+                                      UndertowHTTPServerEngineFactory.class);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
         if (endpointInfo.getAddress().startsWith("ws")) {
-            // for the embedded mode, we stick to jetty
-            JettyHTTPServerEngineFactory serverEngineFactory = bus
-                .getExtension(JettyHTTPServerEngineFactory.class);
+
             if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
                 // use atmosphere if available
-                return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
-                                                  bus, registry, endpointInfo, serverEngineFactory);
-            } else {
-                if (serverEngineFactory.isJetty8()) {
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, serverEngineFactory);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, serverEngineFactory);
+                if (JETTY_AVAILABLE) {
+                    // for the embedded mode, we stick to jetty
+                    JettyHTTPServerEngineFactory serverEngineFactory = bus
+                        .getExtension(JettyHTTPServerEngineFactory.class);
+                    return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR, bus,
+                                                      registry, endpointInfo, serverEngineFactory);
+                } else if (UNDERTOW_AVAILABLE) {
+                    // use AtmosphereWebSocketUndertowDestination
+                    UndertowHTTPServerEngineFactory undertowServerEngineFactory = bus
+                        .getExtension(UndertowHTTPServerEngineFactory.class);
+                    return createUndertowHTTPDestination(ATMOSPHERE_WEBSOCKET_UNDERTOW_DESTINATION_CTR, bus,
+                                                         registry, endpointInfo, undertowServerEngineFactory);
                 }
+                return null;
             }
-        } else {
-            //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
-            registry = getDestinationRegistry(bus);
-            
-            // choose atmosphere if available, otherwise assume jetty is available
-            if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
-                // use atmosphere if available
-                return new AtmosphereWebSocketServletDestination(bus, registry,
-                                                                 endpointInfo, endpointInfo.getAddress());
-            } else {
+            if (JETTY_AVAILABLE) {
+            // for the embedded mode, we stick to jetty if jetty is available
                 JettyHTTPServerEngineFactory serverEngineFactory = bus
                     .getExtension(JettyHTTPServerEngineFactory.class);
-                // use jetty-websocket
-                if (serverEngineFactory.isJetty8()) { 
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, null);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, null);
-                }
+                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
+                                              endpointInfo, serverEngineFactory);
+            } else if (UNDERTOW_AVAILABLE) {
+                // use UndertowWebSocketDestination
+                UndertowHTTPServerEngineFactory undertowServerEngineFactory = bus
+                    .getExtension(UndertowHTTPServerEngineFactory.class);
+                return createUndertowHTTPDestination(UNDERTOW_WEBSOCKET_DESTINATION_CTR, bus,
+                                                     registry, endpointInfo, undertowServerEngineFactory);
             }
+            return null;
         }
+        // REVISIT other way of getting the registry of http so that the plain cxf servlet finds the
+        // destination?
+        registry = getDestinationRegistry(bus);
+
+        // choose atmosphere if available, otherwise assume jetty is available
+        if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
+            // use atmosphere if available
+            return new AtmosphereWebSocketServletDestination(bus, registry, endpointInfo,
+                                                             endpointInfo.getAddress());
+        }
+        // use jetty-websocket
+        return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
+                                          endpointInfo, null);
     }
 
     private static DestinationRegistry getDestinationRegistry(Bus bus) {
@@ -124,13 +150,30 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         }
         return null;
     }
-    
-    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus, 
+
+    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus,
                                                                DestinationRegistry registry, EndpointInfo ei,
-                                                               JettyHTTPServerEngineFactory jhsef) throws IOException {
+                                                               JettyHTTPServerEngineFactory jhsef)
+                                                                   throws IOException {
         if (ctr != null) {
             try {
-                return (AbstractHTTPDestination) ctr.newInstance(bus, registry, ei, jhsef);
+                return (AbstractHTTPDestination)ctr.newInstance(bus, registry, ei, jhsef);
+            } catch (Throwable t) {
+                // log
+                t.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private AbstractHTTPDestination createUndertowHTTPDestination(Constructor<?> ctr, Bus bus,
+                                                                  DestinationRegistry registry,
+                                                                  EndpointInfo ei,
+                                                                  UndertowHTTPServerEngineFactory jhsef)
+                                                                      throws IOException {
+        if (ctr != null) {
+            try {
+                return (AbstractHTTPDestination)ctr.newInstance(bus, registry, ei, jhsef);
             } catch (Throwable t) {
                 // log
                 t.printStackTrace();

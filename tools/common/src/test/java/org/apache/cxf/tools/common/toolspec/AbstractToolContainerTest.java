@@ -20,11 +20,14 @@
 package org.apache.cxf.tools.common.toolspec;
 
 import org.apache.cxf.tools.common.ToolException;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractToolContainerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AbstractToolContainerTest {
     private DummyToolContainer dummyTool;
 
     @Before
@@ -55,7 +58,6 @@ public class AbstractToolContainerTest extends Assert {
             assertEquals("Tool specification has to be set before initializing", e.getMessage());
             return;
         }
-        assertTrue(true);
     }
 
     @Test

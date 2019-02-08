@@ -22,20 +22,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.cxf.helpers.CastUtils;
-
 /**
  * Helper methods for {@link DestinationFactory}s and {@link ConduitInitiator}s.
  */
 public abstract class AbstractTransportFactory {
-    private List<String> transportIds;
+    public static final String PREFERRED_TRANSPORT_ID = "org.apache.cxf.preferred.transport.id";
     
+    private List<String> transportIds;
+
     public AbstractTransportFactory() {
     }
     public AbstractTransportFactory(List<String> ids) {
         transportIds = ids;
     }
-    
+
     public final List<String> getTransportIds() {
         return transportIds;
     }
@@ -45,6 +45,6 @@ public abstract class AbstractTransportFactory {
     }
 
     public Set<String> getUriPrefixes() {
-        return CastUtils.cast(Collections.EMPTY_SET);
+        return Collections.emptySet();
     }
 }

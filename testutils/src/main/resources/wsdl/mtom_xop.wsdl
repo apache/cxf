@@ -96,6 +96,9 @@
         <wsdl:port name="TestMtomPort" binding="tns:TestMtomBinding">
             <soap:address location="http://localhost:9036/mime-test"/>
         </wsdl:port>
+        <wsdl:port name="TestMtomProviderPort" binding="tns:TestMtomBinding">
+            <soap:address location="http://localhost:9036/mime-test-provider"/>
+        </wsdl:port>
     </wsdl:service>
     <wsdl:service name="TestMtomJMSService">
         <wsdl:port name="TestMtomJMSPort" binding="tns:TestMtomBinding">

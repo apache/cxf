@@ -28,20 +28,25 @@ import javax.resource.ResourceException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 import org.apache.cxf.test.AbstractCXFTest;
+
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JCABusFactoryTest extends AbstractCXFTest {
-   
-    
+
+
     @Test
     public void testSetAppserverClassLoader() {
         ClassLoader loader = new DummyClassLoader();
         JCABusFactory bf = new JCABusFactory(new ManagedConnectionFactoryImpl());
         bf.setAppserverClassLoader(loader);
         assertSame("Checking appserverClassLoader.", loader, bf.getAppserverClassLoader());
-    } 
+    }
 
     @Test
     public void testLoadNonexistentProperties() throws Exception {
@@ -55,7 +60,7 @@ public class JCABusFactoryTest extends AbstractCXFTest {
                        re.getCause() instanceof FileNotFoundException);
         }
     }
-    
+
     @Test
     public void testInvalidMonitorConfigNoPropsURL() throws Exception {
         ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl();
@@ -71,12 +76,12 @@ public class JCABusFactoryTest extends AbstractCXFTest {
                 .indexOf("EJBServicePropertiesURL is not set") != -1);
         }
     }
-    
+
     @Ignore
     @Test
     public void testInitServants() throws Exception {
         ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl();
-        //get resource 
+        //get resource
         URL propFile = getClass().getResource("resources/ejb_servants.properties");
         mcf.setEJBServicePropertiesURL(propFile.toString());
         JCABusFactory jcaBusFactory = new JCABusFactory(mcf);
@@ -84,10 +89,10 @@ public class JCABusFactoryTest extends AbstractCXFTest {
 
         jcaBusFactory.setBus(mockBus);
         jcaBusFactory.initializeServants();
-        
+
     }
-    
-   
+
+
 }
 
 

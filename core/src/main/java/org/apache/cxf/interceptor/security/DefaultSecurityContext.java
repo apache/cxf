@@ -18,38 +18,55 @@
  */
 package org.apache.cxf.interceptor.security;
 
+
+import java.lang.reflect.Method;
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.apache.cxf.common.security.GroupPrincipal;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.security.LoginSecurityContext;
 
 /**
  * SecurityContext which implements isUserInRole using the
  * following approach : skip the first Subject principal, and then checks
  * Groups the principal is a member of
- * 
- * TODO : consider moving this class into a rt-core-security module
  */
 public class DefaultSecurityContext implements LoginSecurityContext {
-
+    
+    private static Class<?> javaGroup; 
+    private static Class<?> karafGroup;
+    
     private Principal p;
-    private Subject subject; 
+    private Subject subject;
+
+    static {
+        try {
+            javaGroup = Class.forName("java.security.acl.Group");
+        } catch (Throwable e) {
+            javaGroup = null;
+        }
+        try {
+            karafGroup = Class.forName("org.apache.karaf.jaas.boot.principal.Group");
+        } catch (Throwable e) {
+            karafGroup = null;
+        }
+    }
     
     public DefaultSecurityContext(Subject subject) {
         this.p = findPrincipal(null, subject);
         this.subject = subject;
     }
-    
+
     public DefaultSecurityContext(String principalName, Subject subject) {
         this.p = findPrincipal(principalName, subject);
         this.subject = subject;
     }
-    
+
     public DefaultSecurityContext(Principal p, Subject subject) {
         this.p = p;
         this.subject = subject;
@@ -57,39 +74,40 @@ public class DefaultSecurityContext implements LoginSecurityContext {
             this.p = findPrincipal(null, subject);
         }
     }
-    
+
     private static Principal findPrincipal(String principalName, Subject subject) {
         if (subject == null) {
             return null;
         }
-        
+
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof Group) 
+            if (!isGroupPrincipal(principal)
                 && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
         }
-        
+
         // No match for the principalName. Just return first non-Group Principal
         if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (!(principal instanceof Group)) { 
+                if (!isGroupPrincipal(principal)) {
                     return principal;
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public Principal getUserPrincipal() {
         return p;
     }
-    
+
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal instanceof Group && checkGroup((Group)principal, role)) {
+                if (isGroupPrincipal(principal) 
+                    && checkGroup((Principal)principal, role)) {
                     return true;
                 } else if (p != principal
                            && role.equals(principal.getName())) {
@@ -100,36 +118,65 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         return false;
     }
 
-    protected boolean checkGroup(Group group, String role) {
-        if (group.getName().equals(role)) {
+
+    protected boolean checkGroup(Principal principal, String role) {
+        if (principal.getName().equals(role)) {
             return true;
         }
-            
-        for (Enumeration<? extends Principal> members = group.members(); members.hasMoreElements();) {
+
+        Enumeration<? extends Principal> members = null;
+        
+        try {
+            Method m = ReflectionUtil.getMethod(principal.getClass(), "members");
+            @SuppressWarnings("unchecked")
+            Enumeration<? extends Principal> ms = (Enumeration<? extends Principal>)m.invoke(principal);
+            members = ms;
+        } catch (Exception e) {
+            return false;
+        }
+        
+        while (members.hasMoreElements()) {
             // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
-            if (member.getName().equals(role) 
-                || member instanceof Group && checkGroup((Group)member, role)) {
+            if (member.getName().equals(role)
+                || isGroupPrincipal(member) 
+                && checkGroup((GroupPrincipal)member, role)) {
                 return true;
             }
         }
-        return false;    
+        return false;
     }
 
-    
+
     public Subject getSubject() {
         return subject;
     }
 
     public Set<Principal> getUserRoles() {
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal != p) { 
+                if (principal != p) {
                     roles.add(principal);
                 }
             }
         }
         return roles;
     }
+    
+    
+    private static boolean instanceOfGroup(Object obj) { 
+        try {
+            return (javaGroup != null && javaGroup.isInstance(obj)) 
+                || (karafGroup != null && karafGroup.isInstance(obj));
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+    
+    public static boolean isGroupPrincipal(Principal principal) {
+        return principal instanceof GroupPrincipal
+            || instanceOfGroup(principal);
+    }
+
 }

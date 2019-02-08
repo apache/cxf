@@ -37,18 +37,18 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler.UnwrapParam;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 
 public class ASMHelper {
-    protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<Class<?>, String>();
-    protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<Class<?>, String>();
-    protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<Class<?>, Integer>();
-    
-    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP 
-        = new WeakIdentityHashMap<ClassLoader, WeakReference<TypeHelperClassLoader>>();
-    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP 
-        = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
-    
+    protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<>();
+    protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<>();
+    protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
+
+    protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
+        = new WeakIdentityHashMap<>();
+    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> CLASS_MAP
+        = new WeakIdentityHashMap<>();
+
     protected static boolean badASM;
     private static Class<?> cwClass;
-    
+
     static {
         PRIMITIVE_MAP.put(Byte.TYPE, "B");
         PRIMITIVE_MAP.put(Boolean.TYPE, "Z");
@@ -68,12 +68,12 @@ public class ASMHelper {
         NONPRIMITIVE_MAP.put(Float.TYPE, Float.class.getName().replaceAll("\\.", "/"));
         NONPRIMITIVE_MAP.put(Double.TYPE, Double.class.getName().replaceAll("\\.", "/"));
     }
-    
+
     private static void tryClass(String s) {
         if (cwClass == null) {
             try {
                 Class<?> c2 = ClassLoaderUtils.loadClass(s, ASMHelper.class);
-                
+
                 //old versions don't have this, but we need it
                 Class<?> cls = ClassLoaderUtils.loadClass(c2.getPackage().getName() + ".MethodVisitor", c2);
                 cls.getMethod("visitFrame", Integer.TYPE, Integer.TYPE,
@@ -88,14 +88,16 @@ public class ASMHelper {
         //force this to make sure the proper OSGi import is generated
         return org.objectweb.asm.ClassWriter.class;
     }
-    
+
     private static synchronized Class<?> getASMClass() throws ClassNotFoundException {
         if (cwClass == null) {
             //try the "real" asm first, then the others
-            tryClass("org.objectweb.asm.ClassWriter"); 
-            tryClass("org.apache.xbean.asm5.ClassWriter"); 
-            tryClass("org.apache.xbean.asm4.ClassWriter"); 
-            tryClass("org.apache.xbean.asm.ClassWriter"); 
+            tryClass("org.objectweb.asm.ClassWriter");
+            tryClass("org.apache.xbean.asm7.ClassWriter");
+            tryClass("org.apache.xbean.asm5.ClassWriter");
+            tryClass("org.apache.xbean.asm6.ClassWriter");
+            tryClass("org.apache.xbean.asm4.ClassWriter");
+            tryClass("org.apache.xbean.asm.ClassWriter");
             tryClass("org.springframework.asm.ClassWriter");
             if (cwClass == null) {
                 cwClass = getASMClassWriterClass();
@@ -103,11 +105,11 @@ public class ASMHelper {
         }
         return cwClass;
     }
-    
+
     public static class Opcodes {
         //CHECKSTYLE:OFF
         //Will use reflection to set these based on the package name and such
-        //so we don't want them "final" or the compiler will optimize them out 
+        //so we don't want them "final" or the compiler will optimize them out
         //to just "0" which we really don't want
         public static int ARETURN = 0;
         public static int ALOAD = 0;
@@ -158,7 +160,7 @@ public class ASMHelper {
         public static int DCONST_0;
         public static int IF_ICMPLT = 0;
         public static java.lang.Integer INTEGER;
-        
+
         //CHECKSTYLE:ON
         static {
             try {
@@ -171,7 +173,7 @@ public class ASMHelper {
             } catch (Throwable e) {
                 //ignore
             }
-            
+
             PRIMITIVE_ZERO_MAP.put(Byte.TYPE, Opcodes.ICONST_0);
             PRIMITIVE_ZERO_MAP.put(Boolean.TYPE, Opcodes.ICONST_0);
             PRIMITIVE_ZERO_MAP.put(Long.TYPE, Opcodes.LCONST_0);
@@ -182,7 +184,7 @@ public class ASMHelper {
             PRIMITIVE_ZERO_MAP.put(Double.TYPE, Opcodes.DCONST_0);
         }
     }
-    
+
     protected static String getMethodSignature(Method m) {
         StringBuilder buf = new StringBuilder("(");
         for (Class<?> cl : m.getParameterTypes()) {
@@ -190,12 +192,12 @@ public class ASMHelper {
         }
         buf.append(")");
         buf.append(getClassCode(m.getReturnType()));
-        
+
         return buf.toString();
     }
-    
+
     public static String periodToSlashes(String s) {
-        char ch[] = s.toCharArray();
+        char[] ch = s.toCharArray();
         for (int x = 0; x < ch.length; x++) {
             if (ch[x] == '.') {
                 ch[x] = '/';
@@ -203,8 +205,8 @@ public class ASMHelper {
         }
         return new String(ch);
     }
-    
-    
+
+
     public static String getClassCode(Class<?> cl) {
         if (cl == Void.TYPE) {
             return "V";
@@ -228,9 +230,8 @@ public class ASMHelper {
             java.lang.reflect.Type[] bounds = tv.getBounds();
             if (bounds != null && bounds.length == 1) {
                 return getClassCode(bounds[0]);
-            } else {
-                throw new IllegalArgumentException("Unable to determine type for: " + tv);
             }
+            throw new IllegalArgumentException("Unable to determine type for: " + tv);
         } else if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)type;
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));
@@ -262,7 +263,7 @@ public class ASMHelper {
         return null;
     }
 
-    
+
     public ClassWriter createClassWriter() {
         Object newCw = null;
         if (!badASM) {
@@ -276,13 +277,13 @@ public class ASMHelper {
             }
             try {
                 // ASM 1.5.x/2.x
-                Constructor<?> cons 
+                Constructor<?> cons
                     = cwClass.getConstructor(new Class<?>[] {Boolean.TYPE});
-                
+
                 try {
                     // got constructor, now check if it's 1.x which is very
                     // different from 2.x and 3.x
-                    cwClass.getMethod("newConstInt", new Class<?>[] {Integer.TYPE});               
+                    cwClass.getMethod("newConstInt", new Class<?>[] {Integer.TYPE});
                     // newConstInt was removed in 2.x, if we get this far, we're
                     // using 1.5.x,
                     // set to null so we don't attempt to use it.
@@ -290,11 +291,11 @@ public class ASMHelper {
                 } catch (Throwable t) {
                     newCw = cons.newInstance(new Object[] {Boolean.TRUE});
                 }
-                
+
             } catch (Throwable e) {
                 // ASM 3.x/4.x
                 try {
-                    Constructor<?> cons 
+                    Constructor<?> cons
                         = cwClass.getConstructor(new Class<?>[] {Integer.TYPE});
                     int i = cwClass.getField("COMPUTE_MAXS").getInt(null);
                     i |= cwClass.getField("COMPUTE_FRAMES").getInt(null);
@@ -309,8 +310,8 @@ public class ASMHelper {
         }
         return null;
     }
-    
-    
+
+
     public Class<?> loadClass(String className, Class<?> clz, byte[] bytes) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         synchronized (loader) {
@@ -331,15 +332,15 @@ public class ASMHelper {
             return cls;
         }
     }
-    public Class<?> findClass(String className, Class<?> clz) { 
+    public Class<?> findClass(String className, Class<?> clz) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(clz);
         return loader.lookupDefinedClass(className);
     }
-    public Class<?> findClass(String className, ClassLoader l) { 
+    public Class<?> findClass(String className, ClassLoader l) {
         TypeHelperClassLoader loader = getTypeHelperClassLoader(l);
         return loader.lookupDefinedClass(className);
     }
-    
+
     private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(ClassLoader l) {
         WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
         TypeHelperClassLoader ret;
@@ -362,18 +363,26 @@ public class ASMHelper {
         }
         return ret;
     }
-    
+
     public static class TypeHelperClassLoader extends ClassLoader {
-        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<String, Class<?>>();
-        
+        ConcurrentHashMap<String, Class<?>> defined = new ConcurrentHashMap<>();
+
         TypeHelperClassLoader(ClassLoader parent) {
             super(parent);
         }
         public Class<?> lookupDefinedClass(String name) {
             return defined.get(name.replace('/', '.'));
         }
-        
-        public Class<?> defineClass(String name, byte bytes[]) {
+
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
+            if (name.endsWith("package-info")) {
+                return getParent().loadClass(name);
+            }
+            return super.findClass(name);
+        }
+
+        public Class<?> defineClass(String name, byte[] bytes) {
             Class<?> ret = defined.get(name.replace('/', '.'));
             if (ret != null) {
                 return ret;
@@ -384,14 +393,14 @@ public class ASMHelper {
                     definePackage(name.substring(0, name.length() - 13).replace('/', '.'),
                                     null,
                                     null,
-                                    null, 
+                                    null,
                                     null,
                                     null,
                                     null,
                                     null);
                 }
             }
-            
+
             ret = super.defineClass(name.replace('/', '.'), bytes, 0, bytes.length);
             Class<?> tmpRet = defined.putIfAbsent(name.replace('/', '.'), ret);
             if (tmpRet != null) {
@@ -449,29 +458,29 @@ public class ASMHelper {
             throw new RuntimeException(e);
         }
     }
-        
+
     public interface ClassWriter {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean t);
-        
+
         @WrapReturn(FieldVisitor.class)
         FieldVisitor visitField(int accPrivate, String fieldName, String classCode,
                                 String fieldDescriptor, Object object);
-        
+
         void visitEnd();
         byte[] toByteArray();
-        
-        @WrapReturn(MethodVisitor.class)        
-        MethodVisitor visitMethod(int accPublic, String string, String string2, 
+
+        @WrapReturn(MethodVisitor.class)
+        MethodVisitor visitMethod(int accPublic, String string, String string2,
                                   String s3,
                                   String[] s4);
         void visit(int v15, int i, String newClassName, String object, String string, String[] object2);
         void visitSource(String arg0, String arg1);
     }
-    
+
     public interface Label {
     }
-    
+
     public interface FieldVisitor {
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean b);
@@ -486,9 +495,9 @@ public class ASMHelper {
         void visitVarInsn(int aload, int i);
         void visitCode();
         void visitLdcInsn(String sig);
-        void visitLocalVariable(String string, 
+        void visitLocalVariable(String string,
                                 String string2,
-                                String string3, 
+                                String string3,
                                 @UnwrapParam(typeMethodName = "realType") Label lBegin,
                                 @UnwrapParam(typeMethodName = "realType") Label lEnd,
                                 int i);
@@ -501,7 +510,7 @@ public class ASMHelper {
                             String string, String string2);
         void visitJumpInsn(int ifnonnull, @UnwrapParam(typeMethodName = "realType") Label nonNullLabel);
         void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack);
-        
+
         @WrapReturn(AnnotationVisitor.class)
         AnnotationVisitor visitAnnotation(String cls, boolean b);
     }
@@ -515,6 +524,6 @@ public class ASMHelper {
         void visitEnd();
         void visitEnum(String arg0, String arg1, String arg2);
     }
-                                                            
-    
+
+
 }

@@ -30,29 +30,30 @@ import org.apache.cxf.message.Message;
 
 public class ResourceContextImpl implements ResourceContext {
     private static final String CONTEXT_PROVIDER_PROP = "org.apache.cxf.jaxrs.resource.context.provider";
-    private ClassResourceInfo cri;
-    private Class<?> subClass;
-    private Message m;
+    private final ClassResourceInfo cri;
+    private final Class<?> subClass;
+    private final Message m;
     public ResourceContextImpl(Message m, OperationResourceInfo ori) {
         this.m = m;
         this.cri = ori.getClassResourceInfo();
         this.subClass = ori.getMethodToInvoke().getReturnType();
     }
-    
+
     @Override
     public <T> T getResource(Class<T> cls) {
         ResourceProvider rp = null;
-        
+
         Object propValue = m.getContextualProperty(CONTEXT_PROVIDER_PROP);
         if (propValue instanceof ResourceContextProvider) {
             rp = ((ResourceContextProvider)propValue).getResourceProvider(cls);
-        } else { 
+        } else {
             rp = new PerRequestResourceProvider(cls);
         }
         T resource = cls.cast(rp.getInstance(m));
         return doInitResource(cls, resource);
     }
-    
+
+    @Override
     public <T> T initResource(T resource) {
         return doInitResource(resource.getClass(), resource);
     }

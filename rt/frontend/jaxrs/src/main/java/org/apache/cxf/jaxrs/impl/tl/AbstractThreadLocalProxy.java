@@ -22,12 +22,12 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 public class AbstractThreadLocalProxy<T> implements ThreadLocalProxy<T> {
 
-    private ThreadLocal<T> infos = new ThreadLocal<T>();
-    
+    private ThreadLocal<T> infos = new ThreadLocal<>();
+
     protected AbstractThreadLocalProxy() {
-        
+
     }
-    
+
     public T get() {
         return infos.get();
     }

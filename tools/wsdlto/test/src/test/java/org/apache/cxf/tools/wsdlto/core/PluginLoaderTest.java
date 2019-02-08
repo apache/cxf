@@ -26,19 +26,22 @@ import org.apache.cxf.tools.plugin.DataBinding;
 import org.apache.cxf.tools.plugin.FrontEnd;
 import org.apache.cxf.tools.plugin.Generator;
 import org.apache.cxf.tools.plugin.Plugin;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class PluginLoaderTest extends Assert {
-   
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class PluginLoaderTest {
+
     @Test
     public void testLoadPlugins() throws Exception {
         PluginLoader loader = PluginLoader.getInstance();
-        assertEquals(4, loader.getPlugins().size());
+        assertEquals(3, loader.getPlugins().size());
 
         Plugin plugin = getPlugin(loader, 0);
         assertNotNull(plugin.getName());
-        
+
         Map<String, FrontEnd> frontends = loader.getFrontEnds();
         assertNotNull(frontends);
         assertEquals(3, frontends.size());
@@ -49,18 +52,18 @@ public class PluginLoaderTest extends Assert {
         assertEquals("JAXWSProfile", frontend.getProfile());
         assertNotNull(frontend.getGenerators());
         assertNotNull(frontend.getGenerators().getGenerator());
-        
+
         assertEquals("AntGenerator", getGenerator(frontend, 0).getName());
-        
+
         assertEquals("JAXWSContainer", frontend.getContainer().getName());
         assertEquals("jaxws-toolspec.xml", frontend.getContainer().getToolspec());
-        
+
         loader.getFrontEndProfile("jaxws");
-                  
+
         Map<String, DataBinding> databindings = loader.getDataBindings();
         assertNotNull(databindings);
-        assertEquals(6, databindings.size());
-        
+        assertEquals(5, databindings.size());
+
         DataBinding databinding = databindings.get("jaxb");
         assertNotNull(databinding);
         assertEquals("jaxb", databinding.getName());
@@ -75,7 +78,7 @@ public class PluginLoaderTest extends Assert {
     protected Generator getGenerator(FrontEnd frontend, int index) {
         return frontend.getGenerators().getGenerator().get(index);
     }
-    
+
     protected FrontEnd getFrontEnd(Map<String, FrontEnd> frontends, int index) {
         int size = frontends.size();
         return frontends.values().toArray(new FrontEnd[size])[index];
@@ -85,7 +88,7 @@ public class PluginLoaderTest extends Assert {
         int size = databindings.size();
         return databindings.values().toArray(new DataBinding[size])[index];
     }
-    
+
     protected Plugin getPlugin(PluginLoader loader, int index) {
         int size = loader.getPlugins().size();
         return loader.getPlugins().values().toArray(new Plugin[size])[index];

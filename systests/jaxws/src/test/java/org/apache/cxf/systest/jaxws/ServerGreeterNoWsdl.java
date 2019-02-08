@@ -35,7 +35,7 @@ public class ServerGreeterNoWsdl extends AbstractBusTestServerBase {
         Object implementor = new GreeterImplNoWsdl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
         Endpoint ep = Endpoint.create(implementor);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(WSDLGetUtils.WSDL_CREATE_IMPORTS, Boolean.TRUE);
         ep.setProperties(props);
         ep.publish(address);

@@ -30,36 +30,41 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
 public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerNoBodyParts.class);
 
     public static class Server extends AbstractBusTestServerBase {
-        
-        protected void run()  {            
+
+        protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             javax.xml.ws.Endpoint.publish(address, implementor);
         }
-        
+
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-        
+
         @WebService(serviceName = "BasicGreeterService",
                     portName = "GreeterPort",
                     endpointInterface = "org.apache.cxf.greeter_control.Greeter",
@@ -67,41 +72,41 @@ public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
                     wsdlLocation = "testutils/greeter_control.wsdl")
         public class GreeterImpl extends AbstractGreeterImpl {
         }
-    }  
- 
+    }
+
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-         
+
     @Test
     public void testUseCustomExecutorOnClient() throws Exception {
         BasicGreeterService service = new BasicGreeterService();
-        
+
         class CustomExecutor implements Executor {
-            
+
             private int count;
-            
+
             public void execute(Runnable command) {
                 count++;
                 command.run();
             }
-            
+
             public int getCount() {
                 return count;
             }
         }
-        
-        CustomExecutor executor = new CustomExecutor();        
+
+        CustomExecutor executor = new CustomExecutor();
         service.setExecutor(executor);
         assertSame(executor, service.getExecutor());
-        
+
         Greeter proxy = service.getGreeterPort();
         updateAddressPort(proxy, PORT);
-        
+
         assertEquals(0, executor.getCount());
-        
+
         Response<GreetMeResponse>  response = proxy.greetMeAsync("cxf");
         int waitCount = 0;
         while (!response.isDone() && waitCount < 15) {
@@ -109,8 +114,8 @@ public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
             waitCount++;
         }
         assertTrue("Response still not received.", response.isDone());
-        
+
         assertEquals(1, executor.getCount());
     }
-   
+
 }

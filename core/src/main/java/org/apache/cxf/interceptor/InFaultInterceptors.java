@@ -26,15 +26,15 @@ import java.lang.annotation.Target;
 
 import org.apache.cxf.message.Message;
 /**
- * Specifies a list of classes that are added to the inbound fault 
- * interceptor chain. This annotation effects SEI classes and service 
+ * Specifies a list of classes that are added to the inbound fault
+ * interceptor chain. This annotation effects SEI classes and service
  * implementation classes.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InFaultInterceptors {
-    
+
     String[] interceptors() default { };
-    
+
     Class<? extends Interceptor<? extends Message>>[] classes() default { };
 }

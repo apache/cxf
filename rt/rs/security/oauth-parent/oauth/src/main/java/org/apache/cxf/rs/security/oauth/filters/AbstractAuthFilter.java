@@ -37,7 +37,6 @@ import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.OAuthValidator;
 import net.oauth.server.OAuthServlet;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -59,7 +58,7 @@ import org.apache.cxf.security.SecurityContext;
  */
 public class AbstractAuthFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthFilter.class);
-    private static final String[] REQUIRED_PARAMETERS = 
+    private static final String[] REQUIRED_PARAMETERS =
         new String[] {
             OAuth.OAUTH_CONSUMER_KEY,
             OAuth.OAUTH_TOKEN,
@@ -68,24 +67,24 @@ public class AbstractAuthFilter {
             OAuth.OAUTH_TIMESTAMP,
             OAuth.OAUTH_NONCE
         };
-    
+
     private static final Set<String> ALLOWED_OAUTH_PARAMETERS;
     static {
-        ALLOWED_OAUTH_PARAMETERS = new HashSet<String>();
+        ALLOWED_OAUTH_PARAMETERS = new HashSet<>();
         ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }
-    
+
     private boolean supportUnknownParameters;
     private boolean useUserSubject;
     private OAuthDataProvider dataProvider;
     private OAuthValidator validator = new DefaultOAuthValidator();
-    
+
     protected AbstractAuthFilter() {
-        
+
     }
-    
+
     /**
      * Sets {@link OAuthDataProvider} provider.
      * @param provider the provider
@@ -93,7 +92,7 @@ public class AbstractAuthFilter {
     public void setDataProvider(OAuthDataProvider provider) {
         dataProvider = provider;
     }
-    
+
     public void setUseUserSubject(boolean useUserSubject) {
         this.useUserSubject = useUserSubject;
     }
@@ -104,7 +103,7 @@ public class AbstractAuthFilter {
 
     /**
      * Authenticates the third-party consumer and returns
-     * {@link OAuthInfo} bean capturing the information about the request. 
+     * {@link OAuthInfo} bean capturing the information about the request.
      * @param req http request
      * @return OAuth info
      * @see OAuthInfo
@@ -116,11 +115,11 @@ public class AbstractAuthFilter {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "OAuth security filter for url: {0}", req.getRequestURL());
         }
-        
+
         AccessToken accessToken = null;
         Client client = null;
-        
-        OAuthMessage oAuthMessage = OAuthServlet.getMessage(new CustomHttpServletWrapper(req), 
+
+        OAuthMessage oAuthMessage = OAuthServlet.getMessage(new CustomHttpServletWrapper(req),
                                                             OAuthServlet.getRequestURL(req));
         if (oAuthMessage.getParameter(OAuth.OAUTH_TOKEN) != null) {
             oAuthMessage.requireParameters(REQUIRED_PARAMETERS);
@@ -132,14 +131,14 @@ public class AbstractAuthFilter {
                 LOG.warning("Access token is unavailable");
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
-            client = accessToken.getClient(); 
-            
-            OAuthUtils.validateMessage(oAuthMessage, client, accessToken, 
-                                       dataProvider, validator);    
+            client = accessToken.getClient();
+
+            OAuthUtils.validateMessage(oAuthMessage, client, accessToken,
+                                       dataProvider, validator);
         } else {
             String consumerKey = null;
             String consumerSecret = null;
-            
+
             String authHeader = oAuthMessage.getHeader("Authorization");
             if (authHeader != null) {
                 if (authHeader.startsWith("OAuth")) {
@@ -153,7 +152,7 @@ public class AbstractAuthFilter {
                     }
                 }
             }
-            
+
             if (consumerKey != null) {
                 client = dataProvider.getClient(consumerKey);
             }
@@ -161,14 +160,13 @@ public class AbstractAuthFilter {
                 LOG.warning("Client is invalid");
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
             }
-            
+
             if (consumerSecret != null && !consumerSecret.equals(client.getSecretKey())) {
                 LOG.warning("Client secret is invalid");
                 throw new OAuthProblemException(OAuth.Problems.CONSUMER_KEY_UNKNOWN);
-            } else {
-                OAuthUtils.validateMessage(oAuthMessage, client, null, 
-                                           dataProvider, validator);
             }
+            OAuthUtils.validateMessage(oAuthMessage, client, null,
+                                       dataProvider, validator);
             accessToken = client.getPreAuthorizedToken();
             if (accessToken == null || !accessToken.isPreAuthorized()) {
                 LOG.warning("Preauthorized access token is unavailable");
@@ -177,8 +175,8 @@ public class AbstractAuthFilter {
         }
 
         List<OAuthPermission> permissions = accessToken.getScopes();
-        List<OAuthPermission> matchingPermissions = new ArrayList<OAuthPermission>();
-        
+        List<OAuthPermission> matchingPermissions = new ArrayList<>();
+
         for (OAuthPermission perm : permissions) {
             boolean uriOK = checkRequestURI(req, perm.getUris());
             boolean verbOK = checkHttpVerb(req, perm.getHttpVerbs());
@@ -186,23 +184,23 @@ public class AbstractAuthFilter {
                 matchingPermissions.add(perm);
             }
         }
-        
-        if (permissions.size() > 0 && matchingPermissions.isEmpty()) {
+
+        if (!permissions.isEmpty() && matchingPermissions.isEmpty()) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
             throw new OAuthProblemException(message);
         }
         return new OAuthInfo(accessToken, matchingPermissions);
-        
+
     }
-    
+
     protected AuthorizationPolicy getAuthorizationPolicy(String authorizationHeader) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        return m != null ? (AuthorizationPolicy)m.get(AuthorizationPolicy.class) : null;
+        return m != null ? m.get(AuthorizationPolicy.class) : null;
     }
-    
+
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {
-        if (!verbs.isEmpty() 
+        if (!verbs.isEmpty()
             && !verbs.contains(req.getMethod())) {
             String message = "Invalid http verb";
             LOG.fine(message);
@@ -210,9 +208,9 @@ public class AbstractAuthFilter {
         }
         return true;
     }
-    
+
     protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
-        
+
         if (uris.isEmpty()) {
             return true;
         }
@@ -230,39 +228,39 @@ public class AbstractAuthFilter {
         }
         return foundValidScope;
     }
-    
-    protected SecurityContext createSecurityContext(HttpServletRequest request, 
+
+    protected SecurityContext createSecurityContext(HttpServletRequest request,
                                                     final OAuthInfo info) {
-        // TODO: 
-        // This custom parameter is only needed by the "oauth" 
+        // TODO:
+        // This custom parameter is only needed by the "oauth"
         // demo shipped in the distribution; needs to be removed.
         request.setAttribute("oauth_authorities", info.getRoles());
-        
+
         UserSubject subject = info.getToken().getSubject();
 
         final UserSubject theSubject = subject;
         return new SecurityContext() {
 
             public Principal getUserPrincipal() {
-                String login = AbstractAuthFilter.this.useUserSubject 
+                String login = AbstractAuthFilter.this.useUserSubject
                     ? (theSubject != null ? theSubject.getLogin() : null)
-                    : info.getToken().getClient().getLoginName();  
+                    : info.getToken().getClient().getLoginName();
                 return new SimplePrincipal(login);
             }
 
             public boolean isUserInRole(String role) {
                 List<String> roles = null;
                 if (AbstractAuthFilter.this.useUserSubject && theSubject != null) {
-                    roles = theSubject.getRoles();    
+                    roles = theSubject.getRoles();
                 } else {
                     roles = info.getRoles();
                 }
                 return roles.contains(role);
             }
-             
+
         };
     }
-    
+
     protected OAuthContext createOAuthContext(OAuthInfo info) {
         UserSubject subject = null;
         if (info.getToken() != null) {
@@ -270,7 +268,7 @@ public class AbstractAuthFilter {
         }
         return new OAuthContext(subject, info.getMatchedPermissions());
     }
-    
+
     public void setValidator(OAuthValidator validator) {
         this.validator = validator;
     }
@@ -283,17 +281,17 @@ public class AbstractAuthFilter {
         CustomHttpServletWrapper(HttpServletRequest req) {
             super(req);
         }
-        
+
         public Map<String, String[]> getParameterMap() {
             Map<String, String[]> params = super.getParameterMap();
-            
+
             if (supportUnknownParameters || ALLOWED_OAUTH_PARAMETERS.containsAll(params.keySet())) {
                 return params;
             }
-            
-            Map<String, String[]> newParams = new HashMap<String, String[]>();
+
+            Map<String, String[]> newParams = new HashMap<>();
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {    
+                if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {
                     newParams.put(entry.getKey(), entry.getValue());
                 }
             }

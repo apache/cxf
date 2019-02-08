@@ -40,18 +40,18 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 /**
- * 
+ *
  */
 public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RMOutInterceptor.class);
- 
+
     public RMOutInterceptor() {
         super(Phase.PRE_STREAM);
         addAfter(RMCaptureOutInterceptor.class.getName());
     }
-    
-    protected void handle(Message msg) throws SequenceFault, RMException {  
+
+    protected void handle(Message msg) throws SequenceFault, RMException {
         AddressingProperties maps = ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
@@ -60,11 +60,11 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         if (Boolean.TRUE.equals(msg.get(RMMessageConstants.RM_RETRANSMISSION))) {
             return;
         }
-        
+
         if (isRuntimeFault(msg)) {
             return;
         }
-        
+
         RMConfiguration config = getManager().getEffectiveConfiguration(msg);
         String wsaNamespace = config.getAddressingNamespace();
         String rmNamespace = config.getRMNamespace();
@@ -76,7 +76,9 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         if (null != maps.getAction()) {
             action = maps.getAction().getValue();
         }
-        
+        //make sure we use the appropriate namespace
+        maps.exposeAs(wsaNamespace);
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Action: " + action);
         }
@@ -85,30 +87,32 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
-        
+
         if (isApplicationMessage && !isPartialResponse) {
             addRetransmissionInterceptor(msg);
         }
-        
+
         Identifier inSeqId = null;
         if (isApplicationMessage) {
             RMProperties rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
                 inSeqId = rmpsIn.getSequence().getIdentifier();
-                
+
                 SourceSequence seq = rmpsIn.getSourceSequence();
                 SequenceType sequence = rmpsIn.getSequence();
                 if (seq == null || sequence == null) {
-                    LOG.warning("sequence not set for outbound message, skipped acknowledgement request"); 
+                    LOG.warning("sequence not set for outbound message, skipped acknowledgement request");
                 } else {
                     addAckRequest(msg, rmpsIn, seq, sequence);
                 }
             }
         }
-        
+
         // add Acknowledgements (to application messages or explicitly created Acknowledgement messages only)
         boolean isAck = constants.getSequenceAckAction().equals(action);
-        if (isApplicationMessage || isAck) {
+        boolean isClose = constants.getCloseSequenceAction().equals(action);
+        boolean isTerminate = constants.getTerminateSequenceAction().equals(action);
+        if (isApplicationMessage || isAck || isClose || isTerminate) {
             AttributedURIType to = maps.getTo();
             assert null != to;
             addAcknowledgements(destination, rmpsOut, inSeqId, to);
@@ -117,12 +121,12 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 msg.remove(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE);
                 isAck = true;
             }
-        } 
-        if (isAck || (constants.getTerminateSequenceAction().equals(action)
+        }
+        if (isAck || (isTerminate
                 && RM10Constants.NAMESPACE_URI.equals(rmNamespace))) {
             maps.setReplyTo(RMUtils.createNoneReference());
         }
-        
+
         assertReliability(msg);
     }
 
@@ -131,7 +135,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
      * properties or in the source policy is used to determine whether AcknowledgementRequested is always
      * added, never added, or added only when we're waiting for the acknowledgement to a previously-sent
      * message.
-     *  
+     *
      * @param msg
      * @param rmpsIn
      * @param seq
@@ -150,7 +154,7 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             || (mode == AckRequestModeType.PENDING && seq.needAcknowledge(rmpsIn.getMessageNumber()))) {
             Collection<AckRequestedType> reqs = rmpsIn.getAcksRequested();
             if (reqs == null) {
-                reqs = new ArrayList<AckRequestedType>();
+                reqs = new ArrayList<>();
             }
             Identifier identifier = new Identifier();
             identifier.setValue(sequence.getIdentifier().getValue());
@@ -160,13 +164,16 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
             rmpsIn.setAcksRequested(reqs);
         }
     }
-    
+
     void addAcknowledgements(Destination destination, RMProperties rmpsOut, Identifier inSeqId,  AttributedURIType to) {
+        if (destination == null) {
+            return;
+        }
         for (DestinationSequence seq : destination.getAllSequences()) {
             if (!seq.sendAcknowledgement()) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("no need to add acknowledgements for sequence "
-                        + seq.getIdentifier().getValue()); 
+                        + seq.getIdentifier().getValue());
                 }
                 continue;
             }
@@ -178,9 +185,9 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
                 }
                 continue;
             }
-            // there may be multiple sources with anonymous acksTo 
+            // there may be multiple sources with anonymous acksTo
             if (RMUtils.getAddressingConstants().getAnonymousURI().equals(address)
-                && !AbstractSequence.identifierEquals(seq.getIdentifier(), inSeqId)) {                
+                && !AbstractSequence.identifierEquals(seq.getIdentifier(), inSeqId)) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("sequence identifier does not match inbound sequence identifier");
                 }
@@ -203,19 +210,19 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         RetransmissionInterceptor ri = new RetransmissionInterceptor();
         ri.setManager(getManager());
         // TODO:
-        // On the server side: If a fault occurs after this interceptor we will switch 
-        // interceptor chains (if this is not already a fault message) and therefore need to 
+        // On the server side: If a fault occurs after this interceptor we will switch
+        // interceptor chains (if this is not already a fault message) and therefore need to
         // make sure the retransmission interceptor is added to the fault chain
-        // 
+        //
         msg.getInterceptorChain().add(ri);
         LOG.fine("Added RetransmissionInterceptor to chain.");
-        
+
         RetransmissionQueue queue = getManager().getRetransmissionQueue();
         if (queue != null) {
             queue.start();
         }
     }
-    
+
     boolean isRuntimeFault(Message message) {
         FaultMode mode = MessageUtils.getFaultMode(message);
         if (null == mode) {

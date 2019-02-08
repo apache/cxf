@@ -31,21 +31,21 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
- * 
+ *
  */
 public final class JAXBBeanFactory {
     private JAXBBeanFactory() {
         //nothing
     }
-    
-    public static <T> T createJAXBBean(JAXBContext context, 
+
+    public static <T> T createJAXBBean(JAXBContext context,
                                         String s,
                                         Class<T> c) {
-        
+
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
         try {
-            
+
             T obj = null;
             if (c != null) {
                 obj = JAXBUtils.unmarshall(context, data, c).getValue();
@@ -56,7 +56,7 @@ public final class JAXBBeanFactory {
                     @SuppressWarnings("unchecked")
                     T ot = (T)el.getValue();
                     obj = ot;
-                }                
+                }
             }
             return obj;
         } catch (JAXBException e) {

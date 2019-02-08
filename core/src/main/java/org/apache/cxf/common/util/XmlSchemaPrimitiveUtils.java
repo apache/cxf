@@ -25,13 +25,13 @@ import java.util.Map;
 
 public final class XmlSchemaPrimitiveUtils {
     private static final String SCHEMA_NS_PREFIX = "xs";
-    private static final Map<Class<?>, String> XML_SCHEMA_PRIMITIVE_MAP = new HashMap<Class<?>, String>();
+    private static final Map<Class<?>, String> XML_SCHEMA_PRIMITIVE_MAP = new HashMap<>();
     static {
         initializeMap();
     }
     private XmlSchemaPrimitiveUtils() {
     }
-    
+
     private static void initializeMap() {
         registerPrimitiveClasses("int", Integer.class, int.class);
         registerPrimitiveClasses("byte", Byte.class, byte.class);
@@ -40,28 +40,28 @@ public final class XmlSchemaPrimitiveUtils {
         registerPrimitiveClasses("float", Float.class, float.class);
         registerPrimitiveClasses("double", Double.class, double.class);
         registerPrimitiveClasses("string", String.class);
-        
-        registerPrimitiveClasses("dateTime", java.sql.Date.class, 
-                                 java.util.Date.class, 
+
+        registerPrimitiveClasses("dateTime", java.sql.Date.class,
+                                 java.util.Date.class,
                                  Calendar.class,
                                  java.sql.Timestamp.class);
         registerPrimitiveClasses("time", java.sql.Time.class);
         // add more as needed
     }
-    
+
     private static void registerPrimitiveClasses(String value, Class<?> ... classes) {
         for (Class<?> cls : classes) {
             XML_SCHEMA_PRIMITIVE_MAP.put(cls, value);
         }
     }
-    
+
     public static String getSchemaRepresentation(Class<?> type) {
         return getSchemaRepresentation(type, SCHEMA_NS_PREFIX);
     }
-    
+
     public static String getSchemaRepresentation(Class<?> type, String xsdPrefix) {
-        String value =  XML_SCHEMA_PRIMITIVE_MAP.get(type);
+        String value = XML_SCHEMA_PRIMITIVE_MAP.get(type);
         return value == null ? value : xsdPrefix + ":" + value;
     }
-    
+
 }

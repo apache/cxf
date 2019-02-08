@@ -73,11 +73,10 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.WSAContextUtils;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,8 +85,11 @@ import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class MAPAggregatorTest extends Assert {
+public class MAPAggregatorTest {
 
     private MAPAggregatorImpl aggregator;
     private IMocksControl control;
@@ -96,7 +98,7 @@ public class MAPAggregatorTest extends Assert {
     private String expectedReplyTo;
     private String expectedRelatesTo;
     private String expectedAction;
-    
+
     @Before
     public void setUp() {
         aggregator = new MAPAggregatorImpl();
@@ -113,16 +115,16 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundUsingAddressingMAPsInContext() 
+    public void testRequestorOutboundUsingAddressingMAPsInContext()
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true);
         aggregator.mediate(message, false);
         control.verify();
         verifyMessage(message, true, true, true);
     }
-    
+
     @Test
-    public void testRequestorOutboundUsingAddressingMAPsInContextZeroLengthAction() 
+    public void testRequestorOutboundUsingAddressingMAPsInContextZeroLengthAction()
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true, true);
         aggregator.mediate(message, false);
@@ -131,7 +133,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundUsingAddressingMAPsInContextFault() 
+    public void testRequestorOutboundUsingAddressingMAPsInContextFault()
         throws Exception {
         Message message = setUpMessage(true, true, false, true, true);
         aggregator.mediate(message, true);
@@ -140,16 +142,16 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundUsingAddressingNoMAPsInContext() 
+    public void testRequestorOutboundUsingAddressingNoMAPsInContext()
         throws Exception {
         Message message = setUpMessage(true, true, false, true, false);
         aggregator.mediate(message, false);
         control.verify();
         verifyMessage(message, true, true, true);
     }
-    
+
     @Test
-    public void testRequestorOutboundUsingAddressingNoMAPsInContextFault() 
+    public void testRequestorOutboundUsingAddressingNoMAPsInContextFault()
         throws Exception {
         Message message = setUpMessage(true, true, false, true, false);
         aggregator.mediate(message, true);
@@ -166,7 +168,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundNotUsingAddressingFault() 
+    public void testRequestorOutboundNotUsingAddressingFault()
         throws Exception {
         Message message = setUpMessage(true, true, false, false);
         aggregator.mediate(message, true);
@@ -175,7 +177,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundOnewayUsingAddressingMAPsInContext() 
+    public void testRequestorOutboundOnewayUsingAddressingMAPsInContext()
         throws Exception {
         Message message = setUpMessage(true, true, true, true, true);
         aggregator.mediate(message, false);
@@ -184,7 +186,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundOnewayUsingAddressingMAPsInContextFault() 
+    public void testRequestorOutboundOnewayUsingAddressingMAPsInContextFault()
         throws Exception {
         Message message = setUpMessage(true, true, true, true, true);
         aggregator.mediate(message, true);
@@ -193,7 +195,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundOnewayUsingAddressingNoMAPsInContext() 
+    public void testRequestorOutboundOnewayUsingAddressingNoMAPsInContext()
         throws Exception {
         Message message = setUpMessage(true, true, true, true, false);
         aggregator.mediate(message, false);
@@ -202,7 +204,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     @Test
-    public void testRequestorOutboundOnewayUsingAddressingNoMAPsInContextFault() 
+    public void testRequestorOutboundOnewayUsingAddressingNoMAPsInContextFault()
         throws Exception {
         Message message = setUpMessage(true, true, true, true, false);
         aggregator.mediate(message, true);
@@ -217,10 +219,10 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, true, true, false);
     }
-    
+
 
     @Test
-    public void testRequestorOutboundOnewayNotUsingAddressingFault() 
+    public void testRequestorOutboundOnewayNotUsingAddressingFault()
         throws Exception {
         Message message = setUpMessage(true, true, true, false);
         aggregator.mediate(message, true);
@@ -235,19 +237,19 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, false, false, false);
     }
-    
+
     @Test
     public void testResponderInboundDecoupled() throws Exception {
-        Message message = 
+        Message message =
             setUpMessage(false, false, false, true, false, true, true);
         aggregator.mediate(message, false);
         control.verify();
         verifyMessage(message, false, false, true);
     }
-    
+
     @Test
     public void testResponderInboundOneway() throws Exception {
-        Message message = 
+        Message message =
             setUpMessage(false, false, true, true, false, true, true);
         aggregator.mediate(message, false);
         control.verify();
@@ -281,7 +283,7 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
-    
+
     @Test(expected = SoapFault.class)
     public void testResponderInboundInvalidMAPsNoMessageIdReqResp() throws Exception {
         SetupMessageArgs args = new SetupMessageArgs();
@@ -294,14 +296,14 @@ public class MAPAggregatorTest extends Assert {
         args.zeroLengthAction = true;
         args.fault = false;
         args.noMessageId = true;
-        
+
         Message message = setUpMessage(args);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
         control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
-    
+
     @Test()
     public void testResponderInboundNoMessageIdOneWay() throws Exception {
         SetupMessageArgs args = new SetupMessageArgs();
@@ -314,7 +316,7 @@ public class MAPAggregatorTest extends Assert {
         args.zeroLengthAction = true;
         args.fault = false;
         args.noMessageId = true;
-        
+
         Message message = setUpMessage(args);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
@@ -329,16 +331,16 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, false, true, true);
     }
-    
+
     @Test
     public void testResponderOutboundZeroLengthAction() throws Exception {
-        Message message = 
+        Message message =
             setUpMessage(false, true, false, false, false, false, false);
         aggregator.mediate(message, false);
         control.verify();
         verifyMessage(message, false, true, true);
     }
-    
+
     @Test
     public void testResponderOutboundNoMessageId() throws Exception {
         SetupMessageArgs args = new SetupMessageArgs();
@@ -351,8 +353,8 @@ public class MAPAggregatorTest extends Assert {
         args.zeroLengthAction = false;
         args.fault = false;
         args.noMessageId = true;
-        
-        Message message = 
+
+        Message message =
             setUpMessage(args);
         aggregator.mediate(message, false);
         control.verify();
@@ -371,9 +373,9 @@ public class MAPAggregatorTest extends Assert {
         args.zeroLengthAction = false;
         args.fault = true;
         args.noMessageId = false;
-        
+
         Message message = setUpMessage(args);
-                
+
         aggregator.mediate(message, true);
         control.verify();
         verifyMessage(message, false, true, true);
@@ -394,10 +396,10 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, true, false, false /*check*/);
     }
-    
+
     @Test(expected = SoapFault.class)
     public void testTwoWayRequestWithReplyToNone() throws Exception {
-        Message message = new MessageImpl();  
+        Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         exchange.setOutMessage(message);
         message.setExchange(exchange);
@@ -408,7 +410,7 @@ public class MAPAggregatorTest extends Assert {
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_NONE_ADDRESS));
         maps.setReplyTo(replyTo);
-        AttributedURIType id = 
+        AttributedURIType id =
             ContextUtils.getAttributedURI("urn:uuid:12345");
         maps.setMessageID(id);
         maps.setAction(ContextUtils.getAttributedURI(""));
@@ -418,13 +420,13 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              "org.apache.cxf.ws.addressing.map.fault.name",
                              "NoneAddress");
-        
+
         aggregator.mediate(message, false);
     }
-    
+
     @Test
     public void testReplyToWithAnonymousAddressRetained() throws Exception {
-        Message message = new MessageImpl();  
+        Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
         exchange.setOutMessage(message);
@@ -435,7 +437,7 @@ public class MAPAggregatorTest extends Assert {
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_ANONYMOUS_ADDRESS));
         maps.setReplyTo(replyTo);
-        AttributedURIType id = 
+        AttributedURIType id =
             ContextUtils.getAttributedURI("urn:uuid:12345");
         maps.setMessageID(id);
         maps.setAction(ContextUtils.getAttributedURI(""));
@@ -443,7 +445,7 @@ public class MAPAggregatorTest extends Assert {
                              CLIENT_ADDRESSING_PROPERTIES,
                              maps);
         aggregator.mediate(message, false);
-        AddressingProperties props = 
+        AddressingProperties props =
             (AddressingProperties)message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
         assertSame(replyTo, props.getReplyTo());
     }
@@ -455,17 +457,17 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         assertEquals("http://foo/bar/SEI/opRequest", action);
     }
-    
+
     @Test
     public void testGetReplyToUsingBaseAddress() throws Exception {
-        Message message = new MessageImpl();  
+        Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
 
-        final String localReplyTo =  "/SoapContext/decoupled";
+        final String localReplyTo = "/SoapContext/decoupled";
         final String decoupledEndpointBase = "http://localhost:8181/cxf";
-        final String replyTo =  decoupledEndpointBase + localReplyTo;
-        
+        final String replyTo = decoupledEndpointBase + localReplyTo;
+
         ServiceInfo s = new ServiceInfo();
         Service svc = new ServiceImpl(s);
         EndpointInfo ei = new EndpointInfo();
@@ -475,7 +477,7 @@ public class MAPAggregatorTest extends Assert {
         SoapBindingInfo b = new SoapBindingInfo(s, "http://schemas.xmlsoap.org/soap/", Soap11.getInstance());
         b.setTransportURI("http://schemas.xmlsoap.org/soap/http");
         ei.setBinding(b);
-        
+
         ei.setAddress("http://nowhere.com/bar/foo");
         ei.setName(new QName("http://nowhere.com/port", "foo"));
         Bus bus = new ExtensionManagerBus();
@@ -487,7 +489,7 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expect(df.getDestination(
             EasyMock.anyObject(EndpointInfo.class), EasyMock.anyObject(Bus.class))).andReturn(d);
         EasyMock.expect(d.getAddress()).andReturn(EndpointReferenceUtils.getEndpointReference(localReplyTo));
-        
+
         Endpoint ep = new EndpointImpl(bus, svc, ei);
         exchange.put(Endpoint.class, ep);
         exchange.put(Bus.class, bus);
@@ -498,9 +500,9 @@ public class MAPAggregatorTest extends Assert {
         message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
         message.put(WSAContextUtils.REPLYTO_PROPERTY, localReplyTo);
         message.put(WSAContextUtils.DECOUPLED_ENDPOINT_BASE_PROPERTY, decoupledEndpointBase);
-        
+
         AddressingProperties maps = new AddressingProperties();
-        AttributedURIType id = 
+        AttributedURIType id =
             ContextUtils.getAttributedURI("urn:uuid:12345");
         maps.setMessageID(id);
         maps.setAction(ContextUtils.getAttributedURI(""));
@@ -509,22 +511,22 @@ public class MAPAggregatorTest extends Assert {
                              maps);
         control.replay();
         aggregator.mediate(message, false);
-        AddressingProperties props = 
+        AddressingProperties props =
             (AddressingProperties)message.get(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND);
 
         assertEquals(replyTo, props.getReplyTo().getAddress().getValue());
         control.verify();
     }
-    
-    private Message setUpMessage(boolean requestor, 
+
+    private Message setUpMessage(boolean requestor,
                                  boolean outbound,
-                                 boolean oneway) 
+                                 boolean oneway)
         throws Exception {
         return setUpMessage(requestor, outbound, oneway, false, false, false);
     }
 
-    
-    private Message setUpMessage(boolean requestor, 
+
+    private Message setUpMessage(boolean requestor,
                                  boolean outbound,
                                  boolean oneway,
                                  boolean usingAddressing)
@@ -537,12 +539,12 @@ public class MAPAggregatorTest extends Assert {
                             false);
     }
 
-    
-    private Message setUpMessage(boolean requestor, 
+
+    private Message setUpMessage(boolean requestor,
                                  boolean outbound,
                                  boolean oneway,
                                  boolean usingAddressing,
-                                 boolean mapsInContext) 
+                                 boolean mapsInContext)
         throws Exception {
         return setUpMessage(requestor,
                             outbound,
@@ -552,15 +554,15 @@ public class MAPAggregatorTest extends Assert {
                             false);
     }
 
-    
-    private Message setUpMessage(boolean requestor, 
+
+    private Message setUpMessage(boolean requestor,
                                  boolean outbound,
                                  boolean oneway,
                                  boolean usingAddressing,
                                  boolean mapsInContext,
-                                 boolean decoupled) 
+                                 boolean decoupled)
         throws Exception {
-        return setUpMessage(requestor, 
+        return setUpMessage(requestor,
                             outbound,
                             oneway,
                             usingAddressing,
@@ -569,17 +571,17 @@ public class MAPAggregatorTest extends Assert {
                             false);
     }
 
-    
-    
-    private Message setUpMessage(boolean requestor, 
+
+
+    private Message setUpMessage(boolean requestor,
                                  boolean outbound,
                                  boolean oneway,
                                  boolean usingAddressing,
                                  boolean mapsInContext,
                                  boolean decoupled,
-                                 boolean zeroLengthAction) 
+                                 boolean zeroLengthAction)
         throws Exception {
-        
+
         SetupMessageArgs args = new SetupMessageArgs();
         args.requestor = requestor;
         args.outbound = outbound;
@@ -590,14 +592,14 @@ public class MAPAggregatorTest extends Assert {
         args.zeroLengthAction = zeroLengthAction;
         args.fault = false;
         args.noMessageId = false;
-        
+
         return setUpMessage(args);
     }
 
     private Message setUpMessage(SetupMessageArgs args)
         throws Exception {
-        
-        Message message = getMessage();        
+
+        Message message = getMessage();
         Exchange exchange = getExchange();
         setUpOutbound(message, exchange, args.outbound, args.fault);
         setUpMessageProperty(message,
@@ -611,11 +613,11 @@ public class MAPAggregatorTest extends Assert {
             if (args.usingAddressing) {
                 setUpRequestor(message,
                                exchange,
-                               args.oneway, 
+                               args.oneway,
                                args.mapsInContext,
                                args.decoupled,
                                args.zeroLengthAction);
-            } 
+            }
         } else if (!args.requestor) {
             SetupResponderArgs srArgs = new SetupResponderArgs();
             srArgs.oneway = args.oneway;
@@ -624,12 +626,16 @@ public class MAPAggregatorTest extends Assert {
             srArgs.zeroLengthAction = args.zeroLengthAction;
             srArgs.fault = args.fault;
             srArgs.noMessageId = args.noMessageId;
-            
+
+            Endpoint endpoint = control.createMock(Endpoint.class);
+            exchange.getEndpoint();
+            EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
+
             setUpResponder(message,
                            exchange,
-                           srArgs);
-            
-            Endpoint endpoint = control.createMock(Endpoint.class);
+                           srArgs, 
+                           endpoint);
+
             endpoint.getOutInterceptors();
             EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
             Service serv = control.createMock(Service.class);
@@ -637,8 +643,6 @@ public class MAPAggregatorTest extends Assert {
             EasyMock.expectLastCall().andReturn(serv).anyTimes();
             serv.getOutInterceptors();
             EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
-            exchange.getEndpoint();
-            EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
         }
         control.replay();
         return message;
@@ -651,13 +655,13 @@ public class MAPAggregatorTest extends Assert {
         Endpoint endpoint = control.createMock(Endpoint.class);
         endpoint.getOutInterceptors();
         EasyMock.expectLastCall().andReturn(new ArrayList<Interceptor<? extends Message>>()).anyTimes();
-        
+
         setUpExchangeGet(exchange, Endpoint.class, endpoint);
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         endpoint.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(endpointInfo).anyTimes();
         List<ExtensibilityElement> endpointExts =
-            new ArrayList<ExtensibilityElement>();
+            new ArrayList<>();
         endpointInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
         EasyMock.expectLastCall().andReturn(endpointExts).anyTimes();
         BindingInfo bindingInfo = control.createMock(BindingInfo.class);
@@ -670,18 +674,18 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expectLastCall().andReturn(serviceInfo).anyTimes();
         serviceInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
         EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST).anyTimes();
-        ExtensibilityElement ext = 
+        ExtensibilityElement ext =
             control.createMock(ExtensibilityElement.class);
         if (usingAddressing) {
-            QName elementType = usingAddressing 
-                ? Names.WSAW_USING_ADDRESSING_QNAME 
+            QName elementType = usingAddressing
+                ? Names.WSAW_USING_ADDRESSING_QNAME
                 : new QName(SOAP_NAMESPACE, "encodingStyle");
             ext.getElementType();
             EasyMock.expectLastCall().andReturn(elementType).anyTimes();
             endpointExts.add(ext);
         }
     }
-    
+
     private void setUpRequestor(Message message,
                                 Exchange exchange,
                                 boolean oneway,
@@ -691,10 +695,10 @@ public class MAPAggregatorTest extends Assert {
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.valueOf(Boolean.TRUE));
-        AddressingProperties maps = mapsInContext 
+        AddressingProperties maps = mapsInContext
                                         ? new AddressingProperties()
                                         : null;
-        if (zeroLengthAction) {
+        if (zeroLengthAction && maps != null) {
             maps.setAction(ContextUtils.getAttributedURI(""));
         }
         setUpMessageProperty(message,
@@ -714,7 +718,7 @@ public class MAPAggregatorTest extends Assert {
         setUpOneway(message, exchange, oneway);
         expectedMAPs = maps;
         expectedTo = Names.WSA_NONE_ADDRESS;
-        expectedReplyTo = oneway 
+        expectedReplyTo = oneway
                           ? Names.WSA_NONE_ADDRESS
                           : Names.WSA_ANONYMOUS_ADDRESS;
         // Now verified via verifyMessage()
@@ -729,7 +733,8 @@ public class MAPAggregatorTest extends Assert {
 
     private void setUpResponder(Message message,
                                 Exchange exchange,
-                                SetupResponderArgs args) throws Exception {
+                                SetupResponderArgs args,
+                                Endpoint endpoint) throws Exception {
 
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
@@ -747,13 +752,13 @@ public class MAPAggregatorTest extends Assert {
                                           ? "http://localhost:9999/fault"
                                           : Names.WSA_ANONYMOUS_ADDRESS));
         maps.setFaultTo(faultTo);
-        
+
         if (!args.noMessageId) {
-            AttributedURIType id = 
+            AttributedURIType id =
                 ContextUtils.getAttributedURI("urn:uuid:12345");
             maps.setMessageID(id);
         }
-        
+
         if (args.zeroLengthAction) {
             maps.setAction(ContextUtils.getAttributedURI(""));
         }
@@ -763,10 +768,10 @@ public class MAPAggregatorTest extends Assert {
         if (!args.outbound) {
             setUpOneway(message, exchange, args.oneway);
             if (args.oneway || args.decoupled) {
-                setUpRebase(message, exchange);
+                setUpRebase(message, exchange, endpoint);
             }
         }
-        
+
         if (args.outbound || ((DefaultMessageIdCache) aggregator.getMessageIdCache())
             .getMessageIdSet().size() > 0) {
             if (!args.zeroLengthAction) {
@@ -775,7 +780,7 @@ public class MAPAggregatorTest extends Assert {
                 setUpMessageProperty(message,
                                      REQUESTOR_ROLE,
                                      Boolean.FALSE);
-                
+
                 if (args.fault) {
                     message.setContent(Exception.class, new SoapFault("blah",
                             new Exception(), Fault.FAULT_CODE_SERVER));
@@ -789,17 +794,17 @@ public class MAPAggregatorTest extends Assert {
                                  Boolean.FALSE);
             setUpMessageProperty(message,
                                  ADDRESSING_PROPERTIES_INBOUND,
-                                 maps);            
+                                 maps);
             if (args.fault) {
                 // REVISIT test double rebase does not occur
-                setUpRebase(message, exchange);
+                setUpRebase(message, exchange, endpoint);
             }
             expectedTo = args.decoupled
                          ? args.fault
                            ? "http://localhost:9999/fault"
                            : "http://localhost:9999/decoupled"
                          : Names.WSA_ANONYMOUS_ADDRESS;
-            
+
             if (maps.getMessageID() != null && maps.getMessageID().getValue() != null) {
                 expectedRelatesTo = maps.getMessageID().getValue();
             } else {
@@ -813,17 +818,14 @@ public class MAPAggregatorTest extends Assert {
             //EasyMock.expectLastCall().andReturn(null);
         }
     }
-    
-    private void setUpRebase(Message message, Exchange exchange)
+
+    private void setUpRebase(Message message, Exchange exchange, Endpoint endpoint)
         throws Exception {
         setUpMessageProperty(message,
                              "org.apache.cxf.ws.addressing.partial.response.sent",
                              Boolean.FALSE);
-        Endpoint endpoint = control.createMock(Endpoint.class);
-        exchange.getEndpoint();
-        EasyMock.expectLastCall().andReturn(endpoint);
         Binding binding = control.createMock(Binding.class);
-        endpoint.getBinding();        
+        endpoint.getBinding();
         EasyMock.expectLastCall().andReturn(binding).anyTimes();
         Message partialResponse = getMessage();
         binding.createMessage(EasyMock.isA(Message.class));
@@ -848,7 +850,7 @@ public class MAPAggregatorTest extends Assert {
     }
 
     private void setUpConduit(Message message, Exchange exchange) {
-        setUpMessageExchange(message, exchange);        
+        setUpMessageExchange(message, exchange);
         Conduit conduit = EasyMock.createMock(Conduit.class);
         setUpExchangeConduit(message, exchange, conduit);
         EndpointReferenceType to =
@@ -857,7 +859,7 @@ public class MAPAggregatorTest extends Assert {
         conduit.getTarget();
         EasyMock.expectLastCall().andReturn(to).anyTimes();
     }
-    
+
     private void setUpMethod(Message message, Exchange exchange, Method method) {
         setUpMessageExchange(message, exchange);
         BindingOperationInfo bindingOpInfo = setUpBindingOperationInfo("http://foo/bar",
@@ -868,20 +870,20 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expect(exchange.getBindingOperationInfo()).andReturn(bindingOpInfo).anyTimes();
         // Usual fun with EasyMock not always working as expected
         //BindingOperationInfo bindingOpInfo =
-        //    EasyMock.createMock(BindingOperationInfo.class); 
-        //OperationInfo opInfo = EasyMock.createMock(OperationInfo.class); 
+        //    EasyMock.createMock(BindingOperationInfo.class);
+        //OperationInfo opInfo = EasyMock.createMock(OperationInfo.class);
         //bindingOpInfo.getOperationInfo();
         //EasyMock.expectLastCall().andReturn(opInfo);
         //opInfo.getProperty(EasyMock.eq(Method.class.getName()));
         //EasyMock.expectLastCall().andReturn(method);
     }
-    
-    private BindingOperationInfo setUpBindingOperationInfo(String nsuri, 
+
+    private BindingOperationInfo setUpBindingOperationInfo(String nsuri,
                                                            String opreq,
                                                            String opresp,
                                                            String opfault, Method method) {
         ServiceInfo si = new ServiceInfo();
-        InterfaceInfo iinf = new InterfaceInfo(si, 
+        InterfaceInfo iinf = new InterfaceInfo(si,
                                                new QName(nsuri, method.getDeclaringClass().getSimpleName()));
         OperationInfo opInfo = iinf.addOperation(new QName(nsuri, method.getName()));
         opInfo.setProperty(Method.class.getName(), method);
@@ -889,12 +891,10 @@ public class MAPAggregatorTest extends Assert {
         opInfo.setOutput(opresp, opInfo.createMessage(new QName(nsuri, opresp), Type.INPUT));
         FaultInfo finfo = opInfo.addFault(new QName(nsuri, opfault), new QName(nsuri, opfault));
         finfo.addMessagePart("fault");
-        
-        BindingOperationInfo bindingOpInfo = new TestBindingOperationInfo(opInfo);
-        
-        return bindingOpInfo;
+
+        return new TestBindingOperationInfo(opInfo);
     }
-    
+
     private Message getMessage() {
         //return control.createMock(Message.class);
         return new MessageImpl();
@@ -904,14 +904,14 @@ public class MAPAggregatorTest extends Assert {
         Bus bus = control.createMock(Bus.class);
         bus.getExtension(PhaseManager.class);
         EasyMock.expectLastCall().andReturn(new PhaseManagerImpl()).anyTimes();
-        
+
         Exchange exchange = control.createMock(Exchange.class);
         exchange.getBus();
         EasyMock.expectLastCall().andReturn(bus).anyTimes();
         EasyMock.expect(exchange.isEmpty()).andReturn(true).anyTimes();
         return exchange;
     }
-    
+
     private void setUpMessageProperty(Message message, String key, Object value) {
         //message.get(key);
         //EasyMock.expectLastCall().andReturn(value);
@@ -923,11 +923,11 @@ public class MAPAggregatorTest extends Assert {
         //EasyMock.expectLastCall().andReturn(exchange);
         message.setExchange(exchange);
     }
-    
+
     private void setUpMessageDestination(Message message, Destination target) {
         //message.getDestination();
         //EasyMock.expectLastCall().andReturn(target);
-        ((MessageImpl)message).setDestination(target);    
+        ((MessageImpl)message).setDestination(target);
     }
 
     private <T> void setUpExchangeGet(Exchange exchange, Class<T> clz, T value) {
@@ -969,36 +969,36 @@ public class MAPAggregatorTest extends Assert {
             return compareExpected(other);
         }
         return false;
-    }    
+    }
 
     private boolean compareExpected(AddressingProperties other) {
         boolean ret = false;
         if (expectedMAPs == null || expectedMAPs == other) {
-            boolean toOK = 
-                expectedTo == null 
+            boolean toOK =
+                expectedTo == null
                 || expectedTo.equals(other.getTo().getValue());
-            boolean replyToOK = 
-                expectedReplyTo == null 
+            boolean replyToOK =
+                expectedReplyTo == null
                 || expectedReplyTo.equals(
                        other.getReplyTo().getAddress().getValue());
             boolean relatesToOK =
-                expectedRelatesTo == null 
+                expectedRelatesTo == null
                 || expectedRelatesTo.equals(
                        other.getRelatesTo().getValue());
             boolean actionOK =
                 expectedAction == null
                 || expectedAction.equals(other.getAction().getValue());
             boolean messageIdOK = other.getMessageID() != null;
-            ret = toOK 
-                  && replyToOK 
-                  && relatesToOK 
+            ret = toOK
+                  && replyToOK
+                  && relatesToOK
                   && actionOK
                   && messageIdOK;
         }
         return ret;
     }
-    
-    private String getMAPProperty(boolean requestor, boolean outbound) { 
+
+    private String getMAPProperty(boolean requestor, boolean outbound) {
         return outbound
                  ? ADDRESSING_PROPERTIES_OUTBOUND
                  : ADDRESSING_PROPERTIES_INBOUND;
@@ -1011,7 +1011,7 @@ public class MAPAggregatorTest extends Assert {
         if (expectMapsInContext) {
             assertTrue("unexpected MAPs",
                        verifyMAPs(message.get(getMAPProperty(requestor, outbound))));
-        } 
+        }
     }
 
     private interface SEI {
@@ -1019,19 +1019,19 @@ public class MAPAggregatorTest extends Assert {
         @ResponseWrapper(targetNamespace = "http://foo/bar", className = "SEI", localName = "opResponse")
         String op();
     }
-    
+
     private static class TestBindingMessageInfo extends BindingMessageInfo {
     }
 
     private static class TestBindingOperationInfo extends BindingOperationInfo {
         private Map<QName, BindingFaultInfo> faults;
-        
+
         TestBindingOperationInfo(OperationInfo oi) {
             opInfo = oi;
-            
+
             Collection<FaultInfo> of = opInfo.getFaults();
             if (of != null && !of.isEmpty()) {
-                faults = new ConcurrentHashMap<QName, BindingFaultInfo>(of.size());
+                faults = new ConcurrentHashMap<>(of.size());
                 for (FaultInfo fault : of) {
                     faults.put(fault.getFaultName(), new BindingFaultInfo(fault, this));
                 }
@@ -1041,7 +1041,7 @@ public class MAPAggregatorTest extends Assert {
         public BindingMessageInfo getInput() {
             return new TestBindingMessageInfo();
         }
-    
+
         public BindingMessageInfo getOutput() {
             return new TestBindingMessageInfo();
         }
@@ -1049,11 +1049,11 @@ public class MAPAggregatorTest extends Assert {
         @Override
         public Collection<BindingFaultInfo> getFaults() {
             return Collections.unmodifiableCollection(this.faults.values());
-        }        
+        }
     }
-    
+
     private static class SetupMessageArgs {
-        boolean requestor; 
+        boolean requestor;
         boolean outbound;
         boolean oneway;
         boolean usingAddressing;
@@ -1061,11 +1061,11 @@ public class MAPAggregatorTest extends Assert {
         boolean decoupled;
         boolean zeroLengthAction;
         boolean fault;
-        boolean noMessageId; 
+        boolean noMessageId;
     }
-    
+
     private static class SetupResponderArgs {
-        boolean outbound; 
+        boolean outbound;
         boolean oneway;
         boolean decoupled;
         boolean zeroLengthAction;

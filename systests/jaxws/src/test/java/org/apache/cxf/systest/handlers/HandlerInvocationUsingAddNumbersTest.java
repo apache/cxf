@@ -25,7 +25,6 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
@@ -43,9 +42,14 @@ import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersService;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServerTestBase {
 
@@ -77,7 +81,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         int result1 = port.addNumbers(5, 6);
         assertEquals(11, result1);
     }
-    
+
     @Test
     public void testAddHandlerByAnnotationClientSide() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
@@ -91,7 +95,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         int result1 = port.addNumbers(5, 6);
         assertEquals(11, result1);
     }
-    
+
     @Test
     public void testInvokeFromDispatchWithJAXBPayload() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
@@ -124,19 +128,19 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
             }
         };
         addHandlersProgrammatically(disp, sh, soapHandler);
-      
-        org.apache.handlers.types.AddNumbers req = new org.apache.handlers.types.AddNumbers();        
+
+        org.apache.handlers.types.AddNumbers req = new org.apache.handlers.types.AddNumbers();
         req.setArg0(10);
-        req.setArg1(20);        
-        ObjectFactory factory = new ObjectFactory();        
-        JAXBElement<org.apache.handlers.types.AddNumbers> e = factory.createAddNumbers(req);        
+        req.setArg1(20);
+        ObjectFactory factory = new ObjectFactory();
+        JAXBElement<org.apache.handlers.types.AddNumbers> e = factory.createAddNumbers(req);
 
         JAXBElement<?> response = (JAXBElement<?>)disp.invoke(e);
         assertNotNull(response);
         AddNumbersResponse value = (AddNumbersResponse)response.getValue();
         assertEquals(200, value.getReturn());
     }
-    
+
     @Test
     public void testHandlerPostConstruct() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
@@ -148,19 +152,19 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);
-        
-        assertTrue(h.isPostConstructInvoked());      
-    }  
+
+        assertTrue(h.isPostConstructInvoked());
+    }
 
     @Test
     public void testHandlerInjectingResource() throws Exception {
-        //When CXF is deployed in a servlet container, ServletContextResourceResolver is used to resolve 
+        //When CXF is deployed in a servlet container, ServletContextResourceResolver is used to resolve
         //Servlet context resources.
         Bus bus = BusFactory.getDefaultBus();
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
         assertNotNull(resourceManager);
         resourceManager.addResourceResolver(new TestResourceResolver());
-       
+
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
@@ -170,10 +174,10 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);
-        
-        assertEquals("injectedValue", h.getInjectedString());      
-    } 
-    
+
+        assertEquals("injectedValue", h.getInjectedString());
+    }
+
     private void addHandlersProgrammatically(BindingProvider bp, Handler<?>...handlers) {
         @SuppressWarnings("rawtypes")
         List<Handler> handlerChain = bp.getBinding().getHandlerChain();

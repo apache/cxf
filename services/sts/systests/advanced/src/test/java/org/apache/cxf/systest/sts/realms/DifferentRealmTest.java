@@ -24,27 +24,31 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * In this test, a CXF client obtains a SAML token from an STS in one realm and sends it to a CXF
  * endpoint. The CXF endpoint dispatches it for validation to a different STS.
  */
 public class DifferentRealmTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -66,7 +70,7 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
                 launchServer(STSServer2.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -83,26 +87,26 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         URL busFile = DifferentRealmTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = DifferentRealmTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItRealmAPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-       
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
-     * In this test, a token is issued by the first STS in the default realm. The second STS is 
-     * configured to trust the signing cert of the default realm (via a cert constraint) and so 
+     * In this test, a token is issued by the first STS in the default realm. The second STS is
+     * configured to trust the signing cert of the default realm (via a cert constraint) and so
      * authentication succeeds.
      */
     @org.junit.Test
@@ -111,23 +115,23 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         URL busFile = DifferentRealmTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = DifferentRealmTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItDefaultRealmPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * In this test, a token is issued by the first STS in realm "C". The second STS is not
      * configured to trust realm "C" (via a cert constraint) and so authentication does not succeed.
@@ -138,13 +142,13 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         URL busFile = DifferentRealmTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = DifferentRealmTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItRealmCPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
@@ -154,11 +158,11 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * In this test, a token is issued by the first STS in realm "A". The second STS is configured
      * to trust realm "A" (via a cert constraint) and so authentication succeeds. The service
@@ -171,19 +175,19 @@ public class DifferentRealmTest extends AbstractBusClientServerTestBase {
         URL busFile = DifferentRealmTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = DifferentRealmTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItRealmTransformPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }

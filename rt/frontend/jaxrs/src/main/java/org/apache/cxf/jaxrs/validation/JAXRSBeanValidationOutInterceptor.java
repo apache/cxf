@@ -33,24 +33,37 @@ import org.apache.cxf.validation.BeanValidationOutInterceptor;
 @Provider
 public class JAXRSBeanValidationOutInterceptor extends BeanValidationOutInterceptor
     implements ContainerResponseFilter {
+    private static final String OUT_VALIDATION_DONE = "out.bean.validation.done";
+    private boolean supportMultipleValidations;
     public JAXRSBeanValidationOutInterceptor() {
     }
     public JAXRSBeanValidationOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     @Override
     protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
-    
+
     @Override
     protected Object unwrapEntity(Object entity) {
         return entity instanceof Response ? ((Response)entity).getEntity() : entity;
     }
-    
+
     @Override
     public void filter(ContainerRequestContext in, ContainerResponseContext out) throws IOException {
-        super.handleMessage(PhaseInterceptorChain.getCurrentMessage());
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (Boolean.TRUE != message.get(OUT_VALIDATION_DONE)
+            || supportMultipleValidations) {
+            try {
+                super.handleMessage(message);
+            } finally {
+                message.put(OUT_VALIDATION_DONE, Boolean.TRUE);
+            }
+        }
+    }
+    public void setSupportMultipleValidations(boolean supportMultipleValidations) {
+        this.supportMultipleValidations = supportMultipleValidations;
     }
 }

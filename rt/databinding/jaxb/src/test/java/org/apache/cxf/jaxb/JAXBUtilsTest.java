@@ -31,12 +31,15 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.hello_world_soap_http.types.GreetMe;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class JAXBUtilsTest extends Assert {
-    
+
+public class JAXBUtilsTest {
+
     @Test
     public void testBuiltInTypeToJavaType() {
         assertEquals("boolean", JAXBUtils.builtInTypeToJavaType("boolean"));
@@ -70,7 +73,7 @@ public class JAXBUtilsTest extends Assert {
                 JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.auto"));
         assertEquals("org.apache.cxf.configuration.types_mouse",
                 JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.mouse"));
-        
+
         // other tests
         assertEquals("https.com.mytech.rosette_analysis",
                 JAXBUtils.namespaceURIToPackage("https://mytech.com/rosette.analysis"));
@@ -85,85 +88,89 @@ public class JAXBUtilsTest extends Assert {
         assertEquals("org.apache.cxf.config.types",
                 JAXBUtils.namespaceURIToPackage("urn:cxf-apache-org:config:types"));
         assertEquals("types", JAXBUtils.namespaceURIToPackage("types"));
-    } 
-    
-    @Test
-    public void testNameToIdentifier() {
-        assertEquals("_return", 
-                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("getReturn", 
-                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.GETTER));
-        assertEquals("setReturn", 
-                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.SETTER));
-        
+    }
 
-        assertEquals("_public", 
+    @Test
+    public void testNameToIdentifier() {        
+        assertEquals("_return",
+                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.VARIABLE));
+        assertEquals("getReturn",
+                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.GETTER));
+        assertEquals("setReturn",
+                     JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.SETTER));
+
+
+        assertEquals("_public",
                      JAXBUtils.nameToIdentifier("public", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("getPublic", 
+        assertEquals("getPublic",
                      JAXBUtils.nameToIdentifier("public", JAXBUtils.IdentifierType.GETTER));
-        assertEquals("setPublic", 
+        assertEquals("setPublic",
                      JAXBUtils.nameToIdentifier("public", JAXBUtils.IdentifierType.SETTER));
 
-        assertEquals("arg0", 
+        assertEquals("arg0",
                      JAXBUtils.nameToIdentifier("arg0", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("getArg0", 
+        assertEquals("getArg0",
                      JAXBUtils.nameToIdentifier("arg0", JAXBUtils.IdentifierType.GETTER));
-        assertEquals("setArg0", 
+        assertEquals("setArg0",
                      JAXBUtils.nameToIdentifier("arg0", JAXBUtils.IdentifierType.SETTER));
-        
-        assertEquals("mixedCaseName", 
+
+        assertEquals("mixedCaseName",
                      JAXBUtils.nameToIdentifier("mixedCaseName", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("MixedCaseName", 
+        assertEquals("MixedCaseName",
                      JAXBUtils.nameToIdentifier("mixedCaseName", JAXBUtils.IdentifierType.CLASS));
-        assertEquals("setMixedCaseName", 
+        assertEquals("setMixedCaseName",
                      JAXBUtils.nameToIdentifier("mixedCaseName", JAXBUtils.IdentifierType.SETTER));
-        assertEquals("MIXED_CASE_NAME", 
+        assertEquals("MIXED_CASE_NAME",
                      JAXBUtils.nameToIdentifier("mixedCaseName", JAXBUtils.IdentifierType.CONSTANT));
-        
-        assertEquals("answer42", 
+
+        assertEquals("answer42",
                      JAXBUtils.nameToIdentifier("Answer42", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("Answer42", 
-                     JAXBUtils.nameToIdentifier("Answer42", JAXBUtils.IdentifierType.CLASS)); 
-        assertEquals("getAnswer42", 
+        assertEquals("Answer42",
+                     JAXBUtils.nameToIdentifier("Answer42", JAXBUtils.IdentifierType.CLASS));
+        assertEquals("getAnswer42",
                      JAXBUtils.nameToIdentifier("Answer42", JAXBUtils.IdentifierType.GETTER));
-        assertEquals("ANSWER_42", 
+        assertEquals("ANSWER_42",
                      JAXBUtils.nameToIdentifier("Answer42", JAXBUtils.IdentifierType.CONSTANT));
-        
-        assertEquals("nameWithDashes", 
+
+        assertEquals("nameWithDashes",
                      JAXBUtils.nameToIdentifier("name-with-dashes", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("NameWithDashes", 
+        assertEquals("NameWithDashes",
                      JAXBUtils.nameToIdentifier("name-with-dashes", JAXBUtils.IdentifierType.CLASS));
-        assertEquals("setNameWithDashes", 
+        assertEquals("setNameWithDashes",
                      JAXBUtils.nameToIdentifier("name-with-dashes", JAXBUtils.IdentifierType.SETTER));
-        assertEquals("NAME_WITH_DASHES", 
+        assertEquals("NAME_WITH_DASHES",
                      JAXBUtils.nameToIdentifier("name-with-dashes", JAXBUtils.IdentifierType.CONSTANT));
-        
-        assertEquals("otherPunctChars", 
+
+        assertEquals("otherPunctChars",
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.VARIABLE));
-        assertEquals("OtherPunctChars", 
+        assertEquals("OtherPunctChars",
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.CLASS));
-        assertEquals("getOtherPunctChars", 
+        assertEquals("getOtherPunctChars",
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.GETTER));
-        assertEquals("OTHER_PUNCT_CHARS", 
+        assertEquals("OTHER_PUNCT_CHARS",
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.CONSTANT));
+        
+        assertEquals("XMLTransfer",
+                     JAXBUtils.nameToIdentifier("XMLTransfer", JAXBUtils.IdentifierType.CLASS));
+
     }
-    
+
     @Test
     public void testNsToPkg() {
-        String urn = "urn:cxf.apache.org";     
+        String urn = "urn:cxf.apache.org";
         String pkg = JAXBUtils.namespaceURIToPackage(urn);
         assertEquals("org.apache.cxf", pkg);
-        
+
         urn = "urn:cxf.apache.org:test.v4.6.4";
         pkg = JAXBUtils.namespaceURIToPackage(urn);
-        assertEquals("org.apache.cxf.test_v4_6_4", pkg);       
+        assertEquals("org.apache.cxf.test_v4_6_4", pkg);
     }
-    
+
     @Test
     public void testSetNamespaceMapper() throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(GreetMe.class);
         Marshaller marshaller = ctx.createMarshaller();
-        Map<String, String> nspref = new HashMap<String, String>();
+        Map<String, String> nspref = new HashMap<>();
         nspref.put("http://cxf.apache.org/hello_world_soap_http/types", "x");
         JAXBUtils.setNamespaceMapper(nspref, marshaller);
         String mapperkey = null;
@@ -177,12 +184,12 @@ public class JAXBUtilsTest extends Assert {
         if (mapperkey != null) {
             Object mapper = marshaller.getProperty(mapperkey);
             assertNotNull(mapper);
-            
+
             // also verify this mapper has setContextualNamespaceDecls
-            Method m = ReflectionUtil.getDeclaredMethod(mapper.getClass(), 
+            Method m = ReflectionUtil.getDeclaredMethod(mapper.getClass(),
                                                         "setContextualNamespaceDecls", new Class<?>[]{String[].class});
             assertNotNull(m);
         }
-        
+
     }
 }

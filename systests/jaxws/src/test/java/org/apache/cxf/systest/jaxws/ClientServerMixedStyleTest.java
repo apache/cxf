@@ -33,8 +33,14 @@ import org.apache.hello_world_mixedstyle.Greeter;
 import org.apache.hello_world_mixedstyle.SOAPService;
 import org.apache.hello_world_mixedstyle.types.GreetMe1;
 import org.apache.hello_world_mixedstyle.types.GreetMeResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(ServerMixedStyle.class);
@@ -46,7 +52,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(ServerMixedStyle.class, true));
     }
-    
+
     @Test
     public void testMixedStyle() throws Exception {
 
@@ -56,7 +62,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
             updateAddressPort(greeter, PORT);
-            
+
             GreetMe1 request = new GreetMe1();
             request.setRequestType("Bonjour");
             GreetMeResponse greeting = greeter.greetMe(request);
@@ -66,7 +72,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
             String reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);
             assertEquals("Bonjour", reply);
-            
+
             try {
                 greeter.pingMe();
                 fail("expected exception not caught");
@@ -85,30 +91,30 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
                                                         "http://localhost:" + PORT + "/cxf885");
         String ret = test.hello("A", "B");
         assertEquals("Hello A and B", ret);
-        
+
         String ret2 = test.simple("Dan");
         assertEquals("Hello Dan", ret2);
-        
+
         String ret3 = test.tripple("A", "B", "C");
         assertEquals("Tripple: A B C", ret3);
-        
+
         String ret4 = test.simple2(24);
         assertEquals("Int: 24", ret4);
-        
+
         serv = Service.create(new URL("http://localhost:" + PORT + "/cxf885?wsdl"),
                               new QName("http://example.com", "MixedTestImplService"));
         test = serv.getPort(new QName("http://example.com", "MixedTestImplPort"),
                             MixedTest.class);
-        
+
         ret = test.hello("A", "B");
         assertEquals("Hello A and B", ret);
-        
+
         ret2 = test.simple("Dan");
         assertEquals("Hello Dan", ret2);
-        
+
         ret3 = test.tripple("A", "B", "C");
         assertEquals("Tripple: A B C", ret3);
-        
+
         ret4 = test.simple2(24);
         assertEquals("Int: 24", ret4);
     }

@@ -34,15 +34,15 @@ public interface AegisWriter<SinkT> extends AegisIo {
      * @param optional true to omit for null. (minOccurs=0)
      * @param output The output sink.
      * @param aegisType The aegis type to use. Null is allowed, but only if
-     * obj is not null. 
+     * obj is not null.
      * @throws Exception
      */
-    void write(Object obj, 
+    void write(Object obj,
                QName elementName,
                boolean optional,
-               SinkT output, 
+               SinkT output,
                AegisType aegisType) throws Exception;
-    
+
     /**
      * Write an object to the sink, providing a {@link java.lang.reflect.Type} to specify
      * its type.

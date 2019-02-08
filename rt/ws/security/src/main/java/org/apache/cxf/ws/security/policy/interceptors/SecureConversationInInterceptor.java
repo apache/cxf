@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -58,6 +59,7 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
@@ -75,21 +77,21 @@ import org.apache.wss4j.policy.model.SignedParts;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
+
     SecureConversationInInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(WSS4JStaxInInterceptor.class.getName());
         addBefore(HttpsTokenInInterceptor.class.getName());
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
         final AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            final Collection<AssertionInfo> ais = 
+            final Collection<AssertionInfo> ais =
                 PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
@@ -100,7 +102,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     ai.setAsserted(true);
                 }
                 assertPolicies(aim);
-                
+
                 Object s = message.getContextualProperty(SecurityConstants.STS_TOKEN_DO_CANCEL);
                 if (s != null && (Boolean.TRUE.equals(s) || "true".equalsIgnoreCase(s.toString()))) {
                     message.getInterceptorChain().add(SecureConversationCancelInterceptor.INSTANCE);
@@ -111,13 +113,13 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             if (s == null) {
                 s = SoapActionInInterceptor.getSoapAction(message);
             }
-            
+
             if (s != null) {
                 handleMessageForAction(message, s, aim, ais);
             } else {
                 // could not get an action, we have to delay until after the WS-A headers are read and
                 // processed
-                AbstractPhaseInterceptor<SoapMessage> post 
+                AbstractPhaseInterceptor<SoapMessage> post
                     = new AbstractPhaseInterceptor<SoapMessage>(Phase.PRE_PROTOCOL) {
                             public void handleMessage(SoapMessage message) throws Fault {
                                 String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
@@ -135,8 +137,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
     }
-    
-    void handleMessageForAction(SoapMessage message, String s, 
+
+    void handleMessageForAction(SoapMessage message, String s,
                                 AssertionInfoMap aim,
                                 Collection<AssertionInfo> ais) {
         String addNs = null;
@@ -150,7 +152,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
 
-        if (s != null 
+        if (s != null
             && s.contains("/RST/SCT")
             && (s.startsWith(STSUtils.WST_NS_05_02)
                 || s.startsWith(STSUtils.WST_NS_05_12))) {
@@ -167,8 +169,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                 all.addPolicyComponent(ass);
                 ea.addPolicyComponent(all);
-                
-                final SecureConversationToken secureConversationToken = 
+
+                final SecureConversationToken secureConversationToken =
                     new SecureConversationToken(
                         SPConstants.SPVersion.SP12,
                         SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
@@ -177,19 +179,19 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         null,
                         new Policy()
                     );
-                
+
                 Policy sctPolicy = new Policy();
                 ExactlyOne sctPolicyEa = new ExactlyOne();
                 sctPolicy.addPolicyComponent(sctPolicyEa);
                 All sctPolicyAll = new All();
                 sctPolicyAll.addPolicyComponent(secureConversationToken);
                 sctPolicyEa.addPolicyComponent(sctPolicyAll);
-                
+
                 Policy bindingPolicy = new Policy();
                 ExactlyOne bindingPolicyEa = new ExactlyOne();
                 bindingPolicy.addPolicyComponent(bindingPolicyEa);
                 All bindingPolicyAll = new All();
-                
+
                 AbstractBinding origBinding = PolicyUtils.getSecurityBinding(aim);
                 bindingPolicyAll.addPolicyComponent(origBinding.getAlgorithmSuite());
                 bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, sctPolicy));
@@ -198,14 +200,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 bindingPolicyAll.addAssertion(
                     new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
                 bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
-                
-                DefaultSymmetricBinding binding = 
+
+                DefaultSymmetricBinding binding =
                     new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
                 binding.setOnlySignEntireHeadersAndBody(true);
                 binding.setProtectTokens(false);
-                
+
                 all.addPolicyComponent(binding);
-                
+
                 SignedParts signedParts = getSignedParts(aim, addNs);
                 all.addPolicyComponent(signedParts);
                 pol = p;
@@ -220,14 +222,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 ea.addPolicyComponent(all);
                 pol = p.merge(pol);
             }
-            
+
             //setup SCT endpoint and forward to it.
             unmapSecurityProps(message);
             String ns = STSUtils.WST_NS_05_12;
             if (s.startsWith(STSUtils.WST_NS_05_02)) {
                 ns = STSUtils.WST_NS_05_02;
             }
-            NegotiationUtils.recalcEffectivePolicy(message, ns, pol, 
+            NegotiationUtils.recalcEffectivePolicy(message, ns, pol,
                                                    new SecureConversationSTSInvoker(),
                                                    true);
             //recalc based on new endpoint
@@ -235,12 +237,12 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         } else {
             message.getInterceptorChain().add(SecureConversationTokenFinderInterceptor.INSTANCE);
         }
-        
+
         assertPolicies(aim);
     }
-    
+
     private SignedParts getSignedParts(AssertionInfoMap aim, String addNs) {
-        AssertionInfo signedPartsAi = 
+        AssertionInfo signedPartsAi =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
         SignedParts signedParts = null;
         if (signedPartsAi != null) {
@@ -257,21 +259,21 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 headers.add(new Header("MessageID", addNs));
                 headers.add(new Header("RelatesTo", addNs));
             }
-            
-            signedParts = 
+
+            signedParts =
                 new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
         }
         return signedParts;
     }
-    
+
     private void assertPolicies(AssertionInfoMap aim) {
         PolicyUtils.assertPolicy(aim, SPConstants.BOOTSTRAP_POLICY);
         PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_AMEND);
         PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_CANCEL);
         PolicyUtils.assertPolicy(aim, SPConstants.MUST_NOT_SEND_RENEW);
-        QName oldCancelQName = 
+        QName oldCancelQName =
             new QName(
-                "http://schemas.microsoft.com/ws/2005/07/securitypolicy", 
+                "http://schemas.microsoft.com/ws/2005/07/securitypolicy",
                 SPConstants.MUST_NOT_SEND_CANCEL
             );
         PolicyUtils.assertPolicy(aim, oldCancelQName);
@@ -297,7 +299,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             Exchange exchange,
             Element binaryExchange,
             W3CDOMStreamWriter writer,
-            String prefix, 
+            String prefix,
             String namespace
         ) throws Exception {
             doIssueOrRenew(requestEl, exchange, binaryExchange, writer, prefix, namespace, null);
@@ -328,9 +330,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
             writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
 
-            byte clientEntropy[] = null;
+            byte[] clientEntropy = null;
             int keySize = 256;
-            long ttl = 300000L;
+            long ttl = WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage());
             String tokenType = null;
             Element el = DOMUtils.getFirstElement(requestEl);
             while (el != null) {
@@ -339,7 +341,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     if ("Entropy".equals(localName)) {
                         Element bs = DOMUtils.getFirstElement(el);
                         if (bs != null) {
-                            clientEntropy = Base64.decode(bs.getTextContent());
+                            clientEntropy = XMLUtils.decode(bs.getTextContent());
                         }
                     } else if ("KeySize".equals(localName)) {
                         keySize = Integer.parseInt(el.getTextContent());
@@ -374,9 +376,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         .createSecureId("sctId-", sct.getElement()));
             }
 
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + ttl);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(ttl / 1000L);
 
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
@@ -440,14 +441,14 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             return null;
         }
     }
-    
-    
-    static final class SecureConversationTokenFinderInterceptor 
+
+
+    static final class SecureConversationTokenFinderInterceptor
         extends AbstractPhaseInterceptor<SoapMessage> {
-        
-        static final SecureConversationTokenFinderInterceptor INSTANCE 
+
+        static final SecureConversationTokenFinderInterceptor INSTANCE
             = new SecureConversationTokenFinderInterceptor();
-        
+
         private SecureConversationTokenFinderInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
@@ -459,7 +460,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = 
+                Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
                 if (ais.isEmpty()) {
                     return;
@@ -477,33 +478,33 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
     }
-    
+
     static class SecureConversationCancelInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
         static final SecureConversationCancelInterceptor INSTANCE = new SecureConversationCancelInterceptor();
-        
+
         SecureConversationCancelInterceptor() {
             super(Phase.POST_LOGICAL);
         }
-        
+
         public void handleMessage(SoapMessage message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim == null) {
                 return;
             }
-            AssertionInfo ai = 
+            AssertionInfo ai =
                 PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ai == null) {
                 return;
             }
-            
+
             SecureConversationToken tok = (SecureConversationToken)ai.getAssertion();
             doCancel(message, aim, tok);
         }
-        
+
         private void doCancel(SoapMessage message, AssertionInfoMap aim, SecureConversationToken itok) {
             Message m2 = message.getExchange().getOutMessage();
-            
+
             SecurityToken tok = (SecurityToken)m2.getContextualProperty(SecurityConstants.TOKEN);
             if (tok == null) {
                 String tokId = (String)m2.getContextualProperty(SecurityConstants.TOKEN_ID);
@@ -520,7 +521,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 maps = (AddressingProperties)m2
                     .get("javax.xml.ws.addressing.context");
             }
-            
+
             synchronized (client) {
                 try {
                     SecureConversationTokenInterceptorProvider
@@ -529,7 +530,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                     if (maps != null) {
                         client.setAddressingNamespace(maps.getNamespaceURI());
                     }
-                    
+
                     client.cancelSecurityToken(tok);
                     TokenStore tokenStore = TokenStoreUtils.getTokenStore(m2);
                     if (tokenStore != null) {
@@ -551,9 +552,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
         }
 
-        
-    }
-    
 
-    
+    }
+
+
+
 }

@@ -19,37 +19,38 @@
 package org.apache.cxf.systest.jaxrs.description;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class Swagger2RegularServiceDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = allocatePort(Swagger2RegularServiceDescriptionTest.class);
-    
+
     public static class SwaggerRegular extends Server {
         public SwaggerRegular() {
             super(PORT, false);
         }
-        
+
         public static void main(String[] args) {
             start(new SwaggerRegular());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServers(SwaggerRegular.class);
     }
-    
+
     @Override
     protected String getPort() {
         return PORT;
     }
 
     @Override
-    protected String getExpectedFileJson() {
-        return "swagger2-json.txt";
-    }
-
-    @Override
     protected String getExpectedFileYaml() {
         return "swagger2-yaml.txt";
+    }
+
+    @Test
+    public void testApiListingIsProperlyReturnedJSON() throws Exception {
+        doTestApiListingIsProperlyReturnedJSON();
     }
 }

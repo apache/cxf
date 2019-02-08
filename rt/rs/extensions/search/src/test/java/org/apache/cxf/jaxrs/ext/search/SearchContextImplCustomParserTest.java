@@ -21,10 +21,12 @@ package org.apache.cxf.jaxrs.ext.search;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SearchContextImplCustomParserTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class SearchContextImplCustomParserTest {
 
     @Test
     public void testQuery() {
@@ -33,11 +35,11 @@ public class SearchContextImplCustomParserTest extends Assert {
         m.put(SearchContextImpl.CUSTOM_SEARCH_PARSER_PROPERTY, new CustomParser());
         m.put(Message.QUERY_STRING, "$customfilter=color is red");
         SearchCondition<Color> sc = new SearchContextImpl(m).getCondition(Color.class);
-        
+
         assertTrue(sc.isMet(new Color("red")));
         assertFalse(sc.isMet(new Color("blue")));
     }
-    
+
     private static class CustomParser implements SearchConditionParser<Color> {
 
         @Override
@@ -46,14 +48,13 @@ public class SearchContextImplCustomParserTest extends Assert {
                 throw new SearchParseException();
             }
             String value = searchExpression.substring(9);
-            SearchCondition<Color> color = new PrimitiveSearchCondition<Color>("color", 
-                                               value,
-                                               ConditionType.EQUALS,
-                                               new Color(value));
-            
-            return color;
+            return new PrimitiveSearchCondition<Color>("color",
+                                                        value,
+                                                        ConditionType.EQUALS,
+                                                        new Color(value));
+
         }
-        
+
     }
 
     private static class Color {

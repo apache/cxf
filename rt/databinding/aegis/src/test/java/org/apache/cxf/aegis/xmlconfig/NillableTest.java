@@ -30,6 +30,8 @@ import org.apache.cxf.aegis.services.NillableService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class NillableTest extends AbstractAegisTest {
 
     private Document arrayWsdlDoc;
@@ -52,7 +54,7 @@ public class NillableTest extends AbstractAegisTest {
                                             + "[@name='array']", arrayWsdlDoc);
         Element typeElement = (Element)typeList.item(0);
         String nillableValue = typeElement.getAttribute("nillable");
-        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals("nillableValue"));
+        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals(nillableValue));
 
         typeList = assertValid("/wsdl:definitions/wsdl:types"
                                + "/xsd:schema[@targetNamespace='urn:nillable']"
@@ -60,7 +62,7 @@ public class NillableTest extends AbstractAegisTest {
                                + "/xsd:sequence/xsd:element[@name='string']", arrayWsdlDoc);
         typeElement = (Element)typeList.item(0);
         nillableValue = typeElement.getAttribute("nillable");
-        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals("nillableValue"));
+        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals(nillableValue));
 
     }
 }

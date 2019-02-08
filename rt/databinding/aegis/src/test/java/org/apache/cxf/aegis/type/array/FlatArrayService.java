@@ -19,14 +19,14 @@
 package org.apache.cxf.aegis.type.array;
 
 public class FlatArrayService implements FlatArrayServiceInterface {
-    
+
     String[] stringArrayValue;
     BeanWithFlatArray beanWithFlatArrayValue;
     BeanWithFlatCollection beanWithFlatCollection;
-    
+
     public FlatArrayService() {
     }
-    
+
     /** {@inheritDoc}*/
     public String[] getStringArrayValue() {
         return new String[] {"bleh", "bleh"};
@@ -36,12 +36,12 @@ public class FlatArrayService implements FlatArrayServiceInterface {
     public void submitStringArray(String[] array) {
         stringArrayValue = array;
     }
-    
+
     /** {@inheritDoc}*/
     public void takeBeanWithFlatArray(BeanWithFlatArray bwfa) {
         beanWithFlatArrayValue = bwfa;
     }
-    
+
     public BeanWithFlatCollection echoBeanWithFlatCollection(BeanWithFlatCollection c) {
         beanWithFlatCollection = c;
         return c;

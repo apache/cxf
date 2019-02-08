@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.systest.jaxrs.validation.spring;
 
+import java.util.Arrays;
+
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -28,6 +31,8 @@ import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.validation.JAXRSClientBeanValidationFeature;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 import org.apache.cxf.systest.jaxrs.validation.AbstractJAXRSValidationTest;
@@ -37,15 +42,19 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidationTest {
     public static final String PORT = allocatePort(JAXRSClientServerValidationSpringTest.class);
-    
+
     @Ignore
     public static class Server extends AbstractSpringServer {
         public Server() {
             super("/jaxrs_spring_validation", Integer.parseInt(PORT));
         }
-        
+
         public static void main(String[] args) {
             try {
                 Server s = new Server();
@@ -58,14 +67,14 @@ public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidati
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
-    
+
     @Test
     public void testProgrammaticValidationFailsIfNameIsNull()  {
         final Response r = createWebClient("/jaxrs/bookstore/books").post(new Form().param("id", "1"));
@@ -77,34 +86,53 @@ public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidati
         final Response r = createWebClient("/jaxrs/bookstore/books").post(new Form().param("name", "aa"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testHelloRestValidationFailsIfNameIsNull() throws Exception {
         String address = "http://localhost:" + PORT + "/bwrest";
-        
+
         BookWorld service = JAXRSClientFactory.create(address, BookWorld.class);
-        
+
         BookWithValidation bw = service.echoBook(new BookWithValidation("RS", "123"));
         assertEquals("123", bw.getId());
-        
+
         try {
             service.echoBook(new BookWithValidation(null, "123"));
             fail("Validation failure expected");
         } catch (BadRequestException ex) {
             // complete
         }
-        
+
+    }
+
+    @Test
+    public void testHelloRestValidationFailsIfNameIsNullClient() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://localhost:" + PORT + "/bwrest");
+        bean.setServiceClass(BookWorld.class);
+        bean.setFeatures(Arrays.asList(new JAXRSClientBeanValidationFeature()));
+        BookWorld service = bean.create(BookWorld.class);
+        BookWithValidation bw = service.echoBook(new BookWithValidation("RS", "123"));
+        assertEquals("123", bw.getId());
+
+        try {
+            service.echoBook(new BookWithValidation(null, "123"));
+            fail("Validation failure expected");
+        } catch (ConstraintViolationException ex) {
+            // complete
+        }
+
     }
     @Test
     public void testHelloSoapValidationFailsIfNameIsNull() throws Exception {
         final QName serviceName = new QName("http://bookworld.com", "BookWorld");
         final QName portName = new QName("http://bookworld.com", "BookWorldPort");
         final String address = "http://localhost:" + PORT + "/bwsoap";
-        
+
         Service service = Service.create(serviceName);
         service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
-    
-        BookWorld bwService = service.getPort(BookWorld.class); 
+
+        BookWorld bwService = service.getPort(BookWorld.class);
         BookWithValidation bw = bwService.echoBook(new BookWithValidation("WS", "123"));
         assertEquals("123", bw.getId());
         try {
@@ -118,6 +146,6 @@ public class JAXRSClientServerValidationSpringTest extends AbstractJAXRSValidati
     @Override
     protected String getPort() {
         return PORT;
-    }   
+    }
 }
 

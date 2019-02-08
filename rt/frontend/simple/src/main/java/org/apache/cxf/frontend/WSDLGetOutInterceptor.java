@@ -46,17 +46,18 @@ public class WSDLGetOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return;
         }
         message.remove(WSDLGetInterceptor.DOCUMENT_HOLDER);
-        
+
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         if (writer == null) {
             return;
         }
         message.put(Message.CONTENT_TYPE, "text/xml");
         try {
-            StaxUtils.writeDocument(doc, writer, true,
-                                    !MessageUtils.getContextualBoolean(message, 
-                                                                       StaxOutInterceptor.FORCE_START_DOCUMENT, 
-                                                                       false));
+            StaxUtils.writeDocument(doc, writer,
+                                    !MessageUtils.getContextualBoolean(message,
+                                                                       StaxOutInterceptor.FORCE_START_DOCUMENT,
+                                                                       false),
+                                    true);
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }

@@ -44,13 +44,13 @@ import java.util.Map;
  */
 class ParamReader extends ClassReader {
     private String methodName;
-    private Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
+    private Map<String, MethodInfo> methods = new HashMap<>();
     private Class<?>[] paramTypes;
 
     /**
      * process a class file, given it's class. We'll use the defining
      * classloader to locate the bytecode.
-     * 
+     *
      * @param c
      * @throws IOException
      */
@@ -60,7 +60,7 @@ class ParamReader extends ClassReader {
 
     /**
      * process the given class bytes directly.
-     * 
+     *
      * @param b
      * @throws IOException
      */
@@ -117,7 +117,7 @@ class ParamReader extends ClassReader {
         if (numParams == 0) {
             return null;
         }
-        
+
         // get declaring class
         Class<?> c = method.getDeclaringClass();
 
@@ -159,7 +159,7 @@ class ParamReader extends ClassReader {
      * we cannot determine the names, return null. The returned array will have
      * one name per parameter. The length of the array will be the same as the
      * length of the Class[] array returned by Constructor.getParameterTypes().
-     * 
+     *
      * @param ctor
      * @return String[] array of names, one per parameter, or null
      */
@@ -173,7 +173,7 @@ class ParamReader extends ClassReader {
      * cannot determine the names, return null. The returned array will have one
      * name per parameter. The length of the array will be the same as the
      * length of the Class[] array returned by Method.getParameterTypes().
-     * 
+     *
      * @param method
      * @return String[] array of names, one per parameter, or null
      */
@@ -208,12 +208,10 @@ class ParamReader extends ClassReader {
 
             if (found) {
                 return paramNames;
-            } else {
-                return null;
             }
-        } else {
             return null;
         }
+        return null;
     }
 
     private static class MethodInfo {
@@ -234,7 +232,7 @@ class ParamReader extends ClassReader {
 
     /**
      * this is invoked when a LocalVariableTable attribute is encountered.
-     * 
+     *
      * @throws IOException
      */
     public void readLocalVariableTable() throws IOException {

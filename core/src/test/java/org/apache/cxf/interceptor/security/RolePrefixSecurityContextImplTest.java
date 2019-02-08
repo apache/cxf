@@ -27,10 +27,14 @@ import javax.security.auth.Subject;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class RolePrefixSecurityContextImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class RolePrefixSecurityContextImplTest {
 
     @Test
     public void testUserNotInRole() {
@@ -39,7 +43,7 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         s.getPrincipals().add(p);
         assertFalse(new RolePrefixSecurityContextImpl(s, "").isUserInRole("friend"));
     }
-    
+
     @Test
     public void testUserInRole() {
         Subject s = new Subject();
@@ -49,7 +53,7 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         assertTrue(new RolePrefixSecurityContextImpl(s, "role_")
                        .isUserInRole("role_friend"));
     }
-    
+
     @Test
     public void testUserInRoleWithRolePrincipal() {
         Subject s = new Subject();
@@ -59,42 +63,42 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         assertTrue(new RolePrefixSecurityContextImpl(s, "RolePrincipal", "classname")
                        .isUserInRole("friend"));
     }
-    
-    
+
+
     @Test
     public void testMultipleRoles() {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        
-        Set<Principal> roles = new HashSet<Principal>();
+
+        Set<Principal> roles = new HashSet<>();
         roles.add(new SimplePrincipal("role_friend"));
         roles.add(new SimplePrincipal("role_admin"));
         s.getPrincipals().addAll(roles);
-        
+
         LoginSecurityContext context = new RolePrefixSecurityContextImpl(s, "role_");
         assertTrue(context.isUserInRole("role_friend"));
         assertTrue(context.isUserInRole("role_admin"));
         assertFalse(context.isUserInRole("role_bar"));
-        
-        Set<Principal> roles2 =  context.getUserRoles();
+
+        Set<Principal> roles2 = context.getUserRoles();
         assertEquals(roles2, roles);
     }
-    
+
     @Test
     public void testGetSubject() {
         Subject s = new Subject();
         assertSame(new RolePrefixSecurityContextImpl(s, "").getSubject(), s);
     }
-    
+
     private static class RolePrincipal implements Principal {
-        private String roleName; 
+        private String roleName;
         RolePrincipal(String roleName) {
             this.roleName = roleName;
         }
         public String getName() {
             return roleName;
         }
-        
+
     }
 }

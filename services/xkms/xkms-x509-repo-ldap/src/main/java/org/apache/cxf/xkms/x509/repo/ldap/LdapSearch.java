@@ -40,12 +40,12 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 public class LdapSearch {
     private static final String SECURITY_AUTHENTICATION = "simple";
     private static final Logger LOG = LogUtils.getL7dLogger(LdapSearch.class);
-    
+
     private String ldapuri;
     private String bindDN;
     private String bindPassword;
     private int numRetries;
-    
+
     private InitialDirContext dirContext;
 
     public LdapSearch(String ldapuri, String bindDN, String bindPassword, int numRetries) {
@@ -88,7 +88,7 @@ public class LdapSearch {
             }
         }
     }
-    
+
     public Attributes getAttributes(String dn) throws NamingException {
         int retry = 0;
         while (true) {
@@ -108,24 +108,23 @@ public class LdapSearch {
             }
         }
     }
-    
+
     public Attribute getAttribute(String dn, String attrName) throws NamingException {
         Attribute attr = getAttributes(dn).get(attrName);
         if (attr != null) {
             return attr;
         }
-        throw new RuntimeException("Did not find a matching attribute for dn: " + dn 
+        throw new RuntimeException("Did not find a matching attribute for dn: " + dn
                                    + " attributeName: " + attrName);
     }
-    
+
     public Attributes findAttributes(String rootDN, String filter) throws NamingException {
         NamingEnumeration<SearchResult> answer = searchSubTree(rootDN, filter);
         if (answer.hasMore()) {
             SearchResult sr = answer.next();
             return sr.getAttributes();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Attribute findAttribute(String rootDN, String filter, String attrName) throws NamingException {
@@ -133,11 +132,11 @@ public class LdapSearch {
         if (attrs != null) {
             Attribute attr = attrs.get(attrName);
             if (attr == null) {
-                throw new RuntimeException("Did not find a matching attribute for root: " + rootDN 
+                throw new RuntimeException("Did not find a matching attribute for root: " + rootDN
                                            + " filter: " + filter + " attributeName: " + attrName);
             }
             return attr;
-        } 
+        }
         return null;
     }
 

@@ -24,18 +24,18 @@ import javax.xml.ws.WebServiceContext;
 import wssec.wssec10.IPingService;
 
 public abstract class PingServiceBase implements IPingService {
-    
+
     @Resource
     protected WebServiceContext ctx;
 
     protected PingServiceBase() {
     }
- 
+
 
     public java.lang.String echo(String request) {
         //System.out.println("echo(" + request + ")");
         return request;
     }
 
-    
+
 }

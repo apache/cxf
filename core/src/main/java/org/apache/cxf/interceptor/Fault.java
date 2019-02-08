@@ -41,7 +41,7 @@ public class Fault extends UncheckedException {
     public static final String STACKTRACE = "stackTrace";
     private static final int DEFAULT_HTTP_RESPONSE_CODE = HttpURLConnection.HTTP_INTERNAL_ERROR;
     private static final long serialVersionUID = -1583932965031558864L;
-    
+
     private Element detail;
     private String messageString;
     private QName code;
@@ -56,7 +56,7 @@ public class Fault extends UncheckedException {
         this.messageString = message.toString();
         code = FAULT_CODE_SERVER;
     }
-    
+
     public Fault(Message message) {
         super(message);
         this.messageString = message.toString();
@@ -81,7 +81,7 @@ public class Fault extends UncheckedException {
     public Fault(String message, ResourceBundle b, Throwable t, Object ... params) {
         this(new Message(message, b, params), t);
     }
-    
+
     public Fault(Throwable t) {
         super(t);
         if (message != null) {
@@ -91,13 +91,13 @@ public class Fault extends UncheckedException {
         }
         code = FAULT_CODE_SERVER;
     }
-    
+
     public Fault(Message message, Throwable throwable, QName fc) {
         super(message, throwable);
         this.messageString = message.toString();
         code = fc;
     }
-    
+
     public Fault(Message message, QName fc) {
         super(message);
         this.messageString = message.toString();
@@ -121,11 +121,11 @@ public class Fault extends UncheckedException {
     public void setMessage(String message) {
         this.messageString = message;
     }
-    
+
     public QName getFaultCode() {
         return code;
     }
-    
+
     public Fault setFaultCode(QName c) {
         code = c;
         return this;
@@ -141,7 +141,7 @@ public class Fault extends UncheckedException {
 
     /**
      * Sets a details <code>Node</code> on this fault.
-     * 
+     *
      * @param details the detail node.
      */
     public void setDetail(Element details) {
@@ -150,7 +150,7 @@ public class Fault extends UncheckedException {
 
     /**
      * Indicates whether this fault has a detail message.
-     * 
+     *
      * @return <code>true</code> if this fault has a detail message;
      *         <code>false</code> otherwise.
      */
@@ -161,27 +161,27 @@ public class Fault extends UncheckedException {
     /**
      * Returns the detail node. If no detail node has been set, an empty
      * <code>&lt;detail&gt;</code> is created.
-     * 
+     *
      * @return the detail node.
      */
     public Element getOrCreateDetail() {
         if (detail == null) {
-            detail = DOMUtils.createDocument().createElement("detail");
+            detail = DOMUtils.getEmptyDocument().createElement("detail");
         }
         return detail;
     }
-    
+
     /**
-     * Returns  http header status code.
+     * Returns http header status code.
      * @return status code.
      */
     public int getStatusCode() {
         return this.statusCode;
     }
-    
+
     /**
      * Set http header status code on this fault.
-     * 
+     *
      * @param statusCode
      */
     public void setStatusCode(int statusCode) {

@@ -25,7 +25,7 @@ import java.util.Enumeration;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletConfig> 
+public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletConfig>
     implements ServletConfig {
 
     public String getInitParameter(String name) {
@@ -37,13 +37,13 @@ public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletCo
     }
 
     public ServletContext getServletContext() {
-        return get().getServletContext();    
+        return get().getServletContext();
     }
 
     public String getServletName() {
         return get().getServletName();
     }
 
-    
+
 
 }

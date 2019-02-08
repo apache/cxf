@@ -1,0 +1,98 @@
+== Spring Boot - Samples - CXF Rest Web Services 
+
+This sample project demonstrates how to use CXF JAX-RS services
+with Spring Boot. This demo has two JAX-RS class resources being auto-discovered 
+and deployed in a single JAX-RS endpoint. 
+
+The application registers itself with Eureka Registry.  
+
+The client discovers the client address from the registry and invokes it.
+Make sure that the Eureka registry is started as described in the eureka-registry/README
+before running this application.
+
+= Starting the server =
+
+The sample uses Maven. It can be built and run from the command line using Maven, Java or Docker:
+
+---- With Maven ----
+
+$ mvn spring-boot:run
+
+---- With Java ----
+
+$ java -jar target/spring-boot-sample-rs-scan-app.jar
+
+---- With Docker ----
+
+Install Docker, create the demo image:
+--
+$ mvn dockerfile:build
+--
+
+Optional step, push the image. 
+Create a DockerHub id, for example, make this id set to your current ${username}
+--
+$ docker login
+$ mvn dockerfile:push
+--
+
+Run the container:
+
+By default it is expected that EUREKA_SERVER_URI environment variable is passed and set to 
+"http://{docker.host}" where you can find the value of {docker.host} by running 'ifconfig' and checking 
+the IP address of the docker bridge 'docker0'.
+
+--
+docker run -p 8080:8080 -e EUREKA_SERVER_URI='http://{docker.host}' -t ${username}/apachecxf:spring-boot-sample-rs-scan-app 
+--
+
+Alternatively you can run the docker in the 'host' network mode.
+--
+docker run -p 8080:8080 --network="host" -t ${username}/apachecxf:spring-boot-sample-rs-scan-app 
+--
+
+= Testing the server =
+
+---- From the browser ----
+ 
+http://localhost:8080/services/helloservice/sayHello/ApacheCxfUser
+
+will display "Hello ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+http://localhost:8080/services/helloservice/sayHello2/ApacheCxfUser
+
+will display "Hello2 ApacheCxfUser, Welcome to CXF RS Spring Boot World!!!"
+
+
+---- From the command line ----
+
+Check client/README on how to run a command line client.
+
+= Swagger JSON and UI =
+
+http://localhost:8080/services/helloservice/swagger.json will return a Swagger JSON
+description of services.
+
+To view the Swagger document using Swagger-UI, use your Browser to 
+open the Swagger-UI page at
+
+  http://localhost:8080/services/helloservice/api-docs?url=/services/helloservice/swagger.json
+
+or access it from the CXF Services page:
+
+  http://localhost:8080/services/helloservice/info
+  and follow a Swagger link.
+(Note - CXF Services page is available by default at the path ending with "/services" - but in this demo
+it has been configured to listen at "/info")
+
+= System metrics and health checks =
+
+http://localhost:8080/system/metrics 
+
+will expose all registered Spring Actuator metrics 
+
+http://localhost:8080/system/health 
+
+will expose all registered Spring Actuator health checks
+
+

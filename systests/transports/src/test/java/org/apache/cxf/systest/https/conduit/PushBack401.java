@@ -44,17 +44,17 @@ import org.apache.cxf.transport.http.Headers;
  *    Username Mary            --> 401 Realm=Andromeda
  *    Username Edward          --> 401 Realm=Zorantius
  *    Username George          --> 401 Realm=Cronus
- *    If the password is not "password" a 401 is issued without 
+ *    If the password is not "password" a 401 is issued without
  *    realm.
  */
 public class PushBack401 extends AbstractPhaseInterceptor<Message> {
-    
+
     PushBack401() {
         super(Phase.RECEIVE);
     }
-    
+
     /**
-     * This function extracts the user:pass token from 
+     * This function extracts the user:pass token from
      * the Authorization:Basic header. It returns a two element
      * String array, the first being the userid, the second
      * being the password. It returns null, if it cannot parse.
@@ -69,18 +69,18 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         } catch (Exception e) {
             return null;
         }
-        
+
     }
-    
+
     /**
-     * This function returns the realm which depends on 
+     * This function returns the realm which depends on
      * the user name, as follows:
      * <pre>
      *    Username Mary            --> Andromeda
      *    Username Edward          --> Zorantius
      *    Username George          --> Cronus
      * </pre>
-     * However, if the password is not "password" this function 
+     * However, if the password is not "password" this function
      * throws an exception, regardless.
      */
     private String checkUserPass(
@@ -102,50 +102,47 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         }
         return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
-        
+
         Map<String, List<String>> headers =
-            (Map<String, List<String>>) 
+            (Map<String, List<String>>)
                 message.get(Message.PROTOCOL_HEADERS);
-        
+
         List<String> auth = headers.get("Authorization");
         if (auth == null) {
             // No Auth Header, respond with 401 Realm=Cronus
             replyUnauthorized(message, "Cronus");
             return;
-        } else {
-            for (String a : auth) {
-                if (a.startsWith("Basic ")) {
-                    String[] userpass = 
-                        extractUserPass(a.substring("Basic ".length()));
-                    if (userpass != null) {
-                        try {
-                            String realm = 
-                                checkUserPass(userpass[0], userpass[1]);
-                            if (realm != null) {
-                                replyUnauthorized(message, realm);
-                                return;
-                            } else {
-                                // Password is good and no realm
-                                // We just return for successful fall thru.
-                                return;
-                            }
-                        } catch (Exception e) {
-                            // Bad Password
-                            replyUnauthorized(message, null);
+        }
+        for (String a : auth) {
+            if (a.startsWith("Basic ")) {
+                String[] userpass =
+                    extractUserPass(a.substring("Basic ".length()));
+                if (userpass != null) {
+                    try {
+                        String realm =
+                            checkUserPass(userpass[0], userpass[1]);
+                        if (realm != null) {
+                            replyUnauthorized(message, realm);
                             return;
                         }
+                        // Password is good and no realm
+                        // We just return for successful fall thru.
+                        return;
+                    } catch (Exception e) {
+                        // Bad Password
+                        replyUnauthorized(message, null);
+                        return;
                     }
                 }
             }
-            // No Authorization: Basic
-            replyUnauthorized(message, null);
-            return;
         }
+        // No Authorization: Basic
+        replyUnauthorized(message, null);
     }
-    
+
     /**
      * This function issues a 401 response back down the conduit.
      * If the realm is not null, a WWW-Authenticate: Basic realm=
@@ -154,11 +151,11 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
      */
     private void replyUnauthorized(Message message, String realm) {
         Message outMessage = getOutMessage(message);
-        outMessage.put(Message.RESPONSE_CODE, 
+        outMessage.put(Message.RESPONSE_CODE,
                 HttpURLConnection.HTTP_UNAUTHORIZED);
-        
+
         if (realm != null) {
-            setHeader(outMessage, 
+            setHeader(outMessage,
                       "WWW-Authenticate", "Basic realm=" + realm);
         }
         message.getInterceptorChain().abort();
@@ -170,7 +167,7 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Retrieves/creates the corresponding Outbound Message.
      */
@@ -188,7 +185,7 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         }
         return outMessage;
     }
-    
+
     /**
      * This function sets the header in the PROTOCO_HEADERS of
      * the message.
@@ -197,7 +194,7 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> responseHeaders = Headers.getSetProtocolHeaders(message);
         responseHeaders.put(key, Arrays.asList(new String[] {value}));
     }
-    
+
     /**
      * This method retrieves/creates the conduit for the response
      * message.
@@ -209,7 +206,7 @@ public class PushBack401 extends AbstractPhaseInterceptor<Message> {
         exchange.setConduit(conduit);
         return conduit;
     }
-    
+
     /**
      * This method closes the output stream associated with the
      * message.

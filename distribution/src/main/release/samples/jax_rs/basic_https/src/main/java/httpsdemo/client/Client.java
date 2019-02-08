@@ -22,52 +22,60 @@ package httpsdemo.client;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.ssl.SSLContexts;
 import httpsdemo.common.Customer;
 import httpsdemo.common.CustomerService;
 
 public final class Client {
 
     private static final String CLIENT_CONFIG_FILE = "ClientConfig.xml";
-    private static final String BASE_SERVICE_URL = 
+    private static final String BASE_SERVICE_URL =
         "https://localhost:9000/customerservice/customers";
-    
+
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {       
+    public static void main(String[] args) throws Exception {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
 
-        /* 
+        SSLContext sslcontext = SSLContexts.custom()
+                .loadTrustMaterial(keyStore, null)
+                .loadKeyMaterial(keyStore, "ckpass".toCharArray())
+                .useProtocol("TLSv1.2")
+                .build();
+
+        /*
          * Send HTTP GET request to query customer info using portable HttpClient
          * object from Apache HttpComponents
          */
-        SSLSocketFactory sf = new SSLSocketFactory(keyStore, "ckpass", keyStore); 
-        Scheme httpsScheme = new Scheme("https", 9000, sf);
+        SSLConnectionSocketFactory sf = new SSLConnectionSocketFactory(sslcontext);
 
         System.out.println("Sending HTTPS GET request to query customer info");
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        httpclient.getConnectionManager().getSchemeRegistry().register(httpsScheme);
+        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sf).build();
         HttpGet httpget = new HttpGet(BASE_SERVICE_URL + "/123");
-        BasicHeader bh = new BasicHeader("Accept" , "text/xml");
+        BasicHeader bh = new BasicHeader("Accept", "text/xml");
         httpget.addHeader(bh);
-        HttpResponse response = httpclient.execute(httpget);
+        CloseableHttpResponse response = httpclient.execute(httpget);
         HttpEntity entity = response.getEntity();
         entity.writeTo(System.out);
-        httpclient.getConnectionManager().shutdown();
-        
+        response.close();
+        httpclient.close();
+
         /*
          *  Send HTTP PUT request to update customer info, using CXF WebClient method
          *  Note: if need to use basic authentication, use the WebClient.create(baseAddress,
@@ -93,7 +101,7 @@ public final class Client {
         customer = new Customer();
         customer.setName("Jack");
         resp = wc.post(customer);
-        
+
         System.out.println("\n");
         System.exit(0);
     }

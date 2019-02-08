@@ -38,9 +38,9 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 public abstract class AbstractFaultChainInitiatorObserver implements MessageObserver {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractFaultChainInitiatorObserver.class);
-    
+
     private Bus bus;
     private ClassLoader loader;
 
@@ -52,30 +52,30 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
     }
 
     public void onMessage(Message message) {
-      
+
         assert null != message;
-        
+
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         ClassLoaderHolder origLoader = null;
         try {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            
+
             Exchange exchange = message.getExchange();
-    
+
             Message faultMessage = null;
-    
+
             // now that we have switched over to the fault chain,
-            // prevent any further operations on the in/out message 
-    
+            // prevent any further operations on the in/out message
+
             if (isOutboundObserver()) {
                 Exception ex = message.getContent(Exception.class);
                 if (!(ex instanceof Fault)) {
                     ex = new Fault(ex);
                 }
                 FaultMode mode = message.get(FaultMode.class);
-                
+
                 faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {
                     faultMessage = new MessageImpl();
@@ -100,21 +100,21 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                 faultMessage = message;
                 exchange.setInMessage(null);
                 exchange.setInFaultMessage(faultMessage);
-            }          
-             
-           
+            }
+
+
             // setup chain
             PhaseInterceptorChain chain = new PhaseInterceptorChain(getPhases());
             initializeInterceptors(faultMessage.getExchange(), chain);
-            
+
             faultMessage.setInterceptorChain(chain);
             try {
                 chain.doIntercept(faultMessage);
             } catch (RuntimeException exc) {
-                LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
+                LOG.log(Level.SEVERE, "ERROR_DURING_ERROR_PROCESSING", exc);
                 throw exc;
             } catch (Exception exc) {
-                LOG.log(Level.SEVERE, "Error occurred during error handling, give up!", exc);
+                LOG.log(Level.SEVERE, "ERROR_DURING_ERROR_PROCESSING", exc);
                 throw new RuntimeException(exc);
             }
         } finally {
@@ -132,7 +132,7 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
     protected abstract SortedSet<Phase> getPhases();
 
     protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
-        
+
     }
 
     public Bus getBus() {

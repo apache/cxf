@@ -62,6 +62,10 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests control of WS-RM protocol variations on the client, and of the server responses matching whichever
  * variation is used by the client.
@@ -89,7 +93,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        
+
         protected void run() {
             SpringBusFactory factory = new SpringBusFactory();
             Bus bus = factory.createBus();
@@ -104,7 +108,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             implementor.setImplementor(greeterImplementor);
             ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/ControlPort", implementor);
             BusFactory.setDefaultBus(null);
-            BusFactory.setThreadDefaultBus(null); 
+            BusFactory.setThreadDefaultBus(null);
         }
         public void tearDown() {
             ep.stop();
@@ -117,8 +121,8 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
-            
-    
+
+
     @After
     public void tearDown() throws Exception {
         try {
@@ -129,7 +133,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         }
         Thread.sleep(100);
     }
-    
+
     @Test
     public void testDefault() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
@@ -140,11 +144,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM10WSA200408() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // same as default, but explicitly setting the WS-Addressing namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
@@ -155,11 +159,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM10WSA15() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.0, but using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names.WSA_NAMESPACE_NAME);
@@ -170,11 +174,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM11() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.1 and WS-A 1.0
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
@@ -186,11 +190,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
     }
-    
+
     @Test
     public void testInvalidRM11WSA200408() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.1, but using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
@@ -204,16 +208,16 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             // verify a partial error text match to exclude an unexpected exception
             // (see UNSUPPORTED_NAMESPACE in Messages.properties)
             final String text = Names200408.WSA_NAMESPACE_NAME + " is not supported";
-            assertTrue(e.getCause().getMessage() != null 
+            assertTrue(e.getCause().getMessage() != null
                        && e.getCause().getMessage().indexOf(text) >= 0);
         }
-        
+
     }
-    
+
     @Test
     public void testInvalidRM11WSA200408OnReceive() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.0 using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
@@ -221,10 +225,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-RM namespace to 1.1
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{" + RM11Constants.NAMESPACE_URI + "}*");
         trans.setOutTransformElements(outElements);
-        
+
         client.getOutInterceptors().add(trans);
         try {
             greeter.greetMe("one");
@@ -234,15 +238,15 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
             final String text = "WS-ReliableMessaging is required";
-            assertTrue(e.getCause().getMessage() != null 
+            assertTrue(e.getCause().getMessage() != null
                        && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
-    
+
     @Test
     public void testInvalidWSAOnReceive() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.0 using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
@@ -250,10 +254,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-A namespace to an invalid one
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + Names200408.WSA_NAMESPACE_NAME + "}*", "{http://cxf.apache.org/invalid}*");
         trans.setOutTransformElements(outElements);
-        
+
         client.getOutInterceptors().add(trans);
         try {
             greeter.greetMe("one");
@@ -263,7 +267,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSA_REQUIRED_EXC in Messages.properties)
             final String text = "WS-Addressing is required";
-            assertTrue(e.getCause().getMessage() != null 
+            assertTrue(e.getCause().getMessage() != null
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
@@ -271,7 +275,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testInvalidWSRMMustUnderstandOnReceive() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.0 using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
@@ -279,10 +283,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-RM namespace to an invalid one
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{http://cxf.apache.org/invalid}*");
         trans.setOutTransformElements(outElements);
-        
+
         client.getOutInterceptors().add(trans);
         try {
             greeter.greetMe("one");
@@ -290,7 +294,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         } catch (Exception e) {
             assertTrue(e.getCause() instanceof SoapFault);
             final String text = "WS-ReliableMessaging is required";
-            assertTrue(e.getCause().getMessage(), e.getCause().getMessage() != null 
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage() != null
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
@@ -298,7 +302,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testInvalidWSRMOnReceive() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false);
-        
+
         // WS-RM 1.0 using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM10Constants.NAMESPACE_URI);
@@ -306,10 +310,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // remove the outgoing message's WS-RM header
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}Sequence", "");
         trans.setOutTransformElements(outElements);
-        
+
         client.getOutInterceptors().add(trans);
         try {
             greeter.greetMe("one");
@@ -319,13 +323,13 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
             final String text = "WS-ReliableMessaging is required";
-            assertTrue(e.getCause().getMessage() != null 
+            assertTrue(e.getCause().getMessage() != null
                 && e.getCause().getMessage().indexOf(text) >= 0);
         }
     }
 
-    
-    
+
+
     @Test
     public void testDefaultDecoupled() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
@@ -336,11 +340,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM10WSA200408Decoupled() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
-        
+
         // same as default, but explicitly setting the WS-Addressing namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names200408.WSA_NAMESPACE_NAME);
@@ -351,11 +355,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM10WSA15Decoupled() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
-        
+
         // WS-RM 1.0, but using the WS-A 1.0 namespace
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names.WSA_NAMESPACE_NAME);
@@ -366,11 +370,11 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         verifyTwowayNonAnonymous(Names.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
-    
+
     @Test
     public void testRM11Decoupled() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
-        
+
         // WS-RM 1.1 and WS-A 1.0
         Client client = ClientProxy.getClient(greeter);
         client.getRequestContext().put(RMManager.WSRM_VERSION_PROPERTY, RM11Constants.NAMESPACE_URI);
@@ -391,7 +395,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         manager.getSourcePolicy().getSequenceTerminationPolicy().setMaxLength(1);
 
         greeter.greetMeOneWay("one");
-        
+
         verifyTerminateSequence(Names200408.WSA_NAMESPACE_NAME, RM10Constants.INSTANCE);
     }
 
@@ -408,19 +412,19 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         client.getRequestContext().put(RMManager.WSRM_WSA_VERSION_PROPERTY, Names.WSA_NAMESPACE_NAME);
 
         greeter.greetMeOneWay("one");
-        
+
         verifyTerminateSequence(Names.WSA_NAMESPACE_NAME, RM11Constants.INSTANCE);
     }
-    
+
 
     private void verifyTerminateSequence(String wsaUri, RMConstants consts) throws Exception {
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
                                          inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
         if (RM11Constants.NAMESPACE_URI.equals(consts.getWSRMNamespace())) {
             awaitMessages(4, 4);
-            
+
             mf.verifyMessages(4, true);
-            String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+            String[] expectedActions = new String[] {consts.getCreateSequenceAction(),
                                                      GREETME_ONEWAY_ACTION,
                                                      consts.getCloseSequenceAction(),
                                                      consts.getTerminateSequenceAction()};
@@ -432,7 +436,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
             // CrSR, ACK, ClSR, TSR
             mf.verifyMessages(4, false);
-            expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
+            expectedActions = new String[] {consts.getCreateSequenceResponseAction(),
                                             consts.getSequenceAckAction(),
                                             RM11Constants.INSTANCE.getCloseSequenceResponseAction(),
                                             RM11Constants.INSTANCE.getTerminateSequenceResponseAction()};
@@ -441,9 +445,9 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         } else {
             awaitMessages(3, 2);
-            
+
             mf.verifyMessages(3, true);
-            String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+            String[] expectedActions = new String[] {consts.getCreateSequenceAction(),
                                                      GREETME_ONEWAY_ACTION,
                                                      consts.getTerminateSequenceAction()};
             mf.verifyActions(expectedActions, true);
@@ -454,7 +458,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
             // CrSR, ACK, PR
             mf.verifyMessages(2, false);
-            expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
+            expectedActions = new String[] {consts.getCreateSequenceResponseAction(),
                                             consts.getSequenceAckAction()};
             mf.verifyActions(expectedActions, false);
             mf.verifyAcknowledgements(new boolean[] {false, true}, false);
@@ -464,19 +468,19 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
 
     private void verifyTwowayNonAnonymous(String wsaUri, RMConstants consts) throws Exception {
-    
+
         // CreateSequence and three greetMe messages
 
         awaitMessages(4, 4);
-        
+
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), wsaUri, consts.getWSRMNamespace());
-        
-        
+
+
         mf.verifyMessages(4, true);
-        String[] expectedActions = new String[] {consts.getCreateSequenceAction(), 
+        String[] expectedActions = new String[] {consts.getCreateSequenceAction(),
                                                  GREETME_ACTION,
-                                                 GREETME_ACTION, 
+                                                 GREETME_ACTION,
                                                  GREETME_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
@@ -488,26 +492,26 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         mf.verifyMessages(4, false);
 
-        expectedActions = new String[] {consts.getCreateSequenceResponseAction(), 
-                                        GREETME_RESPONSE_ACTION, 
-                                        GREETME_RESPONSE_ACTION, 
+        expectedActions = new String[] {consts.getCreateSequenceResponseAction(),
+                                        GREETME_RESPONSE_ACTION,
+                                        GREETME_RESPONSE_ACTION,
                                         GREETME_RESPONSE_ACTION};
         mf.verifyActions(expectedActions, false);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, false);
         mf.verifyLastMessage(new boolean[4], false);
         mf.verifyAcknowledgements(new boolean[] {false, true, true, true}, false);
     }
-    
+
     // --- test utilities ---
-    
+
     private void init(String cfgResource, boolean useDecoupledEndpoint) {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         initControl(bf, cfgResource);
         initGreeterBus(bf, cfgResource);
         initProxy(useDecoupledEndpoint, null);
     }
-    
+
     private void initControl(SpringBusFactory bf, String cfgResource) {
         controlBus = bf.createBus();
         BusFactory.setDefaultBus(controlBus);
@@ -519,10 +523,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //ignore
         }
-        
-        assertTrue("Failed to start greeter", control.startGreeter(cfgResource));        
+
+        assertTrue("Failed to start greeter", control.startGreeter(cfgResource));
     }
-    
+
     private void initGreeterBus(SpringBusFactory bf,
                                 String cfgResource) {
         greeterBus = bf.createBus(cfgResource);
@@ -535,13 +539,13 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
         greeterBus.getInInterceptors().add(inRecorder);
     }
 
-    private void initProxy(boolean useDecoupledEndpoint, Executor executor) {        
+    private void initProxy(boolean useDecoupledEndpoint, Executor executor) {
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
             gs.setExecutor(executor);
         }
-   
+
         greeter = gs.getGreeterPort();
         try {
             updateAddressPort(greeter, PORT);
@@ -560,7 +564,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     private void initDecoupledEndpoint(Client c) {
         // programatically configure decoupled endpoint that is guaranteed to
         // be unique across all test cases
-        decoupledEndpoint = "http://localhost:" 
+        decoupledEndpoint = "http://localhost:"
             + allocatePort("decoupled-" + decoupledCount++) + "/decoupled_endpoint";
 
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
@@ -569,10 +573,10 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         LOG.fine("Using decoupled endpoint: " + cp.getDecoupledEndpoint());
     }
-    
+
     private void stopClient() {
         if (null != greeterBus) {
-            
+
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
             if (greeter != null) {
@@ -589,16 +593,16 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
     }
 
     private void stopControl() {
-        if (null != control) {  
+        if (null != control) {
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
             controlBus.shutdown(true);
         }
     }
-    
+
     private void awaitMessages(int nExpectedOut, int nExpectedIn) {
         awaitMessages(nExpectedOut, nExpectedIn, 10000);
     }
-    
+
     private void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(nExpectedOut, nExpectedIn, timeout);

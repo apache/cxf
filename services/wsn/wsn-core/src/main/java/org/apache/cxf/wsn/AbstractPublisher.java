@@ -60,19 +60,19 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
     }
 
     /**
-     * 
+     *
      * @param destroyRegistrationRequest
      * @return returns org.oasis_open.docs.wsn.br_1.DestroyResponse
      * @throws ResourceNotDestroyedFault
      * @throws ResourceUnknownFault
      */
     @WebMethod(operationName = "DestroyRegistration")
-    @WebResult(name = "DestroyRegistrationResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/br-2", 
+    @WebResult(name = "DestroyRegistrationResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/br-2",
                partName = "DestroyRegistrationResponse")
     public DestroyRegistrationResponse destroyRegistration(
-            @WebParam(name = "DestroyRegistration", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/br-2", 
+            @WebParam(name = "DestroyRegistration",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/br-2",
                       partName = "DestroyRegistrationRequest")
             DestroyRegistration destroyRegistrationRequest)
         throws ResourceNotDestroyedFault, ResourceUnknownFault {
@@ -100,15 +100,15 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
     }
 
     protected void validatePublisher(RegisterPublisher registerPublisherRequest)
-        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault, 
+        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
         PublisherRegistrationRejectedFault, ResourceUnknownFault, TopicNotSupportedFault {
-        
+
         // Check consumer reference
         publisherReference = registerPublisherRequest.getPublisherReference();
         // Check topic
         topic = registerPublisherRequest.getTopic();
         // Check demand based
-        demand = registerPublisherRequest.isDemand() != null 
+        demand = registerPublisherRequest.isDemand() != null
             ? registerPublisherRequest.isDemand().booleanValue()
                 : false;
         // Check all parameters
@@ -116,7 +116,7 @@ public abstract class AbstractPublisher extends AbstractEndpoint implements Publ
             PublisherRegistrationFailedFaultType fault = new PublisherRegistrationFailedFaultType();
             throw new PublisherRegistrationFailedFault("Invalid PublisherReference: null", fault);
         }
-        if (demand && (topic == null || topic.size() == 0)) {
+        if (demand && (topic == null || topic.isEmpty())) {
             InvalidTopicExpressionFaultType fault = new InvalidTopicExpressionFaultType();
             throw new InvalidTopicExpressionFault(
                     "Must specify at least one topic for demand-based publishing", fault);

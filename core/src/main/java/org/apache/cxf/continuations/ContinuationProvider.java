@@ -21,16 +21,16 @@ package org.apache.cxf.continuations;
 
 /**
  * Provides transport-neutral support for creating suspended invocation primitives
- * or continuations   
+ * or continuations
  */
 public interface ContinuationProvider {
-    
+
     /**
      * Creates a new continuation or retrieves the existing one
      * @return transport-neutral ContinuationWrapper
      */
     Continuation getContinuation();
-    
+
     /**
      * Let the provider know that the exchange is complete
      */

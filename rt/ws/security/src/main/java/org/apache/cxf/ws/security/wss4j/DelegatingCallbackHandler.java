@@ -28,11 +28,11 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 public class DelegatingCallbackHandler implements CallbackHandler {
 
     private CallbackHandler pwdHandler;
-    
+
     public DelegatingCallbackHandler(CallbackHandler pwdHandler) {
         this.pwdHandler = pwdHandler;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (Callback c : callbacks) {
             handleCallback(c);
@@ -41,7 +41,7 @@ public class DelegatingCallbackHandler implements CallbackHandler {
             pwdHandler.handle(callbacks);
         }
     }
-    
+
     protected void handleCallback(Callback c) throws IOException {
         // complete
     }

@@ -37,8 +37,11 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class XMLMessageOutInterceptorTest extends TestBase {
 
@@ -74,7 +77,7 @@ public class XMLMessageOutInterceptorTest extends TestBase {
         chain.add(out);
         prepareMessage(params);
     }
-   
+
     @Test
     public void testBareOutSingle() throws Exception {
 
@@ -97,7 +100,7 @@ public class XMLMessageOutInterceptorTest extends TestBase {
         DepthXMLStreamReader dxr = new DepthXMLStreamReader(reader);
         StaxUtils.nextEvent(dxr);
         StaxUtils.toNextElement(dxr);
-        
+
         assertEquals(bareMyComplexStructTypeQName.getLocalPart(), dxr.getLocalName());
         StaxUtils.toNextElement(dxr);
         StaxUtils.toNextText(dxr);
@@ -113,7 +116,7 @@ public class XMLMessageOutInterceptorTest extends TestBase {
         myComplexStruct.setElem3(45);
         params.add("tli");
         params.add(myComplexStruct);
-        
+
         common("/wsdl/hello_world_xml_bare.wsdl", new QName(bareNs, "XMLPort"),
                         MyComplexStructType.class);
 
@@ -132,13 +135,13 @@ public class XMLMessageOutInterceptorTest extends TestBase {
         assertEquals("multiParamRootReq", dxr.getLocalName());
         StaxUtils.nextEvent(dxr);
         StaxUtils.toNextElement(dxr);
-        
+
         assertEquals(bareRequestTypeQName, dxr.getName());
         StaxUtils.nextEvent(dxr);
         if (StaxUtils.toNextText(dxr)) {
             assertEquals("tli", dxr.getText());
         }
-        
+
         boolean foundRequest = false;
         while (true) {
             StaxUtils.nextEvent(dxr);
@@ -189,7 +192,7 @@ public class XMLMessageOutInterceptorTest extends TestBase {
 
     private XMLStreamReader getXMLReader() throws Exception {
         ByteArrayOutputStream o = (ByteArrayOutputStream) xmlMessage.getContent(OutputStream.class);
-        writer.flush();        
+        writer.flush();
         InputStream in = new ByteArrayInputStream(o.toByteArray());
         return StaxUtils.createXMLStreamReader(in);
     }

@@ -32,13 +32,13 @@ import javax.xml.stream.events.Namespace;
 import org.apache.cxf.binding.corba.types.CorbaTypeEventProducer;
 
 public class CorbaStreamReader implements XMLStreamReader {
-     
+
     private CorbaTypeEventProducer eventProducer;
     private int currentState;
-    
+
     public CorbaStreamReader(CorbaTypeEventProducer evProducer) {
         eventProducer = evProducer;
-        currentState = XMLStreamReader.START_DOCUMENT;
+        currentState = XMLStreamConstants.START_DOCUMENT;
     }
 
     public QName getName() {
@@ -62,25 +62,25 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public boolean hasNext() throws XMLStreamException {
-        if (currentState == XMLStreamReader.START_DOCUMENT) {
+        if (currentState == XMLStreamConstants.START_DOCUMENT) {
             return true;
         }
         boolean hasNextEvent = eventProducer.hasNext();
-        if (!hasNextEvent && currentState != XMLStreamReader.END_DOCUMENT) {
-            currentState = XMLStreamReader.END_DOCUMENT;
+        if (!hasNextEvent && currentState != XMLStreamConstants.END_DOCUMENT) {
+            currentState = XMLStreamConstants.END_DOCUMENT;
             hasNextEvent = true;
         }
         return hasNextEvent;
     }
 
     public int next() throws XMLStreamException {
-        if (currentState == XMLStreamReader.START_DOCUMENT) {
+        if (currentState == XMLStreamConstants.START_DOCUMENT) {
             currentState = 0;
-            return XMLStreamReader.START_DOCUMENT;
+            return XMLStreamConstants.START_DOCUMENT;
         }
         // ensure we catch end_document state
         hasNext();
-        if (currentState != XMLStreamReader.END_DOCUMENT) {
+        if (currentState != XMLStreamConstants.END_DOCUMENT) {
             currentState = eventProducer.next();
         }
         return currentState;
@@ -103,11 +103,10 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public void close() throws XMLStreamException {
-        // TODO Auto-generated method stub
     }
 
     public int getAttributeCount() {
-        List<Attribute> currentAttributes =  eventProducer.getAttributes();
+        List<Attribute> currentAttributes = eventProducer.getAttributes();
         if (currentAttributes != null) {
             return currentAttributes.size();
         }
@@ -138,7 +137,7 @@ public class CorbaStreamReader implements XMLStreamReader {
         return ret;
     }
 
- 
+
     public String getAttributeNamespace(int arg0) {
         String ret = null;
         List<Attribute> currentAttributes = eventProducer.getAttributes();
@@ -176,7 +175,6 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public String getCharacterEncodingScheme() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -185,44 +183,36 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public String getEncoding() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Location getLocation() {
-        // TODO Auto-generated method stub
         return new Location() {
 
             public int getCharacterOffset() {
-                // TODO Auto-generated method stub
                 return -1;
             }
 
             public int getColumnNumber() {
-                // TODO Auto-generated method stub
                 return -1;
             }
 
             public int getLineNumber() {
-                // TODO Auto-generated method stub
                 return -1;
             }
 
             public String getPublicId() {
-                // TODO Auto-generated method stub
                 return null;
             }
 
             public String getSystemId() {
-                // TODO Auto-generated method stub
                 return null;
             }
-            
+
         };
     }
 
     public NamespaceContext getNamespaceContext() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -248,7 +238,6 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public String getNamespaceURI(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -266,22 +255,18 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public String getPIData() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getPITarget() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String getPrefix() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Object getProperty(String arg0) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -290,17 +275,14 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public int getTextCharacters(int arg0, char[] arg1, int arg2, int arg3) throws XMLStreamException {
-        // TODO Auto-generated method stub
         throw new RuntimeException("Not implemented");
     }
 
     public int getTextStart() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     public String getVersion() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -309,22 +291,18 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public boolean hasText() {
-        // TODO Auto-generated method stub
         throw new RuntimeException("Not implemented");
     }
 
     public boolean isAttributeSpecified(int arg0) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public boolean isStandalone() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public boolean isWhiteSpace() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -333,11 +311,9 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public void require(int arg0, String arg1, String arg2) throws XMLStreamException {
-        // TODO Auto-generated method stub        
     }
 
     public boolean standaloneSet() {
-        // TODO Auto-generated method stub
         return false;
     }
 

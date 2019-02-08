@@ -29,18 +29,24 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.NullConduitSelector;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.HelloService;
 import org.apache.cxf.service.factory.HelloServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class SpringBeansTest extends AbstractSimpleFrontendSpringTest {
@@ -77,7 +83,7 @@ public class SpringBeansTest extends AbstractSimpleFrontendSpringTest {
         bean = (ServerFactoryBean) ctx.getBean("simpleWithWSDL");
         assertNotNull(bean);
         assertEquals(bean.getWsdlLocation(), "org/apache/cxf/frontend/spring/simple.wsdl");
-        
+
         bean = (ServerFactoryBean) ctx.getBean("proxyBean");
         assertNotNull(bean);
     }
@@ -133,7 +139,7 @@ public class SpringBeansTest extends AbstractSimpleFrontendSpringTest {
         ClientProxyFactoryBean clientProxyFactoryBean =
             (ClientProxyFactoryBean) ctx.getBean("client2.proxyFactory");
         assertNotNull(clientProxyFactoryBean);
-        assertEquals("get the wrong transportId", 
+        assertEquals("get the wrong transportId",
                      clientProxyFactoryBean.getTransportId(),
                      "http://cxf.apache.org/transports/local");
 
@@ -141,9 +147,9 @@ public class SpringBeansTest extends AbstractSimpleFrontendSpringTest {
                      clientProxyFactoryBean.getBindingId(),
                      "http://cxf.apache.org/bindings/xformat");
 
-        greeter = (HelloService) ctx.getBean("client2");        
+        greeter = (HelloService) ctx.getBean("client2");
         assertNotNull(greeter);
-     
+
 
         greeter = (HelloService) ctx.getBean("client3");
         assertNotNull(greeter);

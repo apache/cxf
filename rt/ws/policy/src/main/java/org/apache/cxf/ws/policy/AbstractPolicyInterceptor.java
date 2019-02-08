@@ -29,17 +29,17 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 
 /**
- * 
+ *
  */
 public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     public AbstractPolicyInterceptor(String phase) {
         super(phase);
     }
     public AbstractPolicyInterceptor(String id, String phase) {
         super(id, phase);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         handle(message);
     }
@@ -56,9 +56,9 @@ public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor
             assertor.assertMessage(message);
         }
     }
-    
+
     protected BindingFaultInfo getBindingFaultInfo(Message msg, Exception ex, BindingOperationInfo boi) {
-        BindingFaultInfo bfi = msg.get(BindingFaultInfo.class);        
+        BindingFaultInfo bfi = msg.get(BindingFaultInfo.class);
         if (null == bfi && ex != null) {
             Throwable cause = ex.getCause();
             if (null == cause) {
@@ -71,7 +71,7 @@ public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor
                     msg.put(BindingFaultInfo.class, bfi);
                     break;
                 }
-            }  
+            }
             if (null == bfi && null != boi.getWrappedOperation()) {
                 for (BindingFaultInfo b : boi.getWrappedOperation().getFaults()) {
                     Class<?> faultClass = b.getFaultInfo().getProperty(Class.class.getName(), Class.class);
@@ -80,12 +80,12 @@ public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor
                         msg.put(BindingFaultInfo.class, bfi);
                         break;
                     }
-                }  
+                }
             }
         }
         return bfi;
     }
-    
+
     protected abstract void handle(Message message) throws PolicyException;
 
 }

@@ -37,11 +37,11 @@ public class TypesCodeWriter extends CodeWriter {
     /** The target directory to put source code. */
     private File target;
     private OutputStreamCreator osc;
-    
-    private List<String> excludeFileList = new ArrayList<String>();
+
+    private List<String> excludeFileList = new ArrayList<>();
     private List<String> excludePkgList;
-    
-    private List<File> generatedFiles = new ArrayList<File>();
+
+    private List<File> generatedFiles = new ArrayList<>();
 
     public TypesCodeWriter(File ftarget, List<String> excludePkgs, String e,
                            OutputStreamCreator outputStreamCreator)
@@ -51,7 +51,7 @@ public class TypesCodeWriter extends CodeWriter {
         setEncoding(e);
         osc = outputStreamCreator == null ? new OutputStreamCreator() : outputStreamCreator;
     }
-    
+
 
 
     private void setEncoding(String s) {
@@ -75,7 +75,7 @@ public class TypesCodeWriter extends CodeWriter {
     public List<File> getGeneratedFiles() {
         return generatedFiles;
     }
-    
+
     protected File getFile(JPackage pkg, String fileName) throws IOException {
         String dirName = pkg.name().replace('.', File.separatorChar);
         File dir = pkg.isUnnamed() ? target : new File(target, dirName);
@@ -95,9 +95,9 @@ public class TypesCodeWriter extends CodeWriter {
     public void close() throws IOException {
 
     }
-    
+
     public List<String> getExcludeFileList() {
         return excludeFileList;
     }
-    
+
 }

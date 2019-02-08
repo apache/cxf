@@ -29,6 +29,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactConsumer;
@@ -41,7 +42,8 @@ import org.apache.cxf.security.SecurityContext;
 public class JwsContainerRequestFilter extends AbstractJwsReaderProvider implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
-        if (HttpMethod.GET.equals(context.getMethod())) {
+        if (isMethodWithNoContent(context.getMethod())
+            || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
         JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
@@ -51,16 +53,21 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             return;
         }
         JoseUtils.validateRequestContextProperty(p.getJwsHeaders());
+        
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        
+
         String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }
+
+        if (super.isValidateHttpHeaders()) {
+            super.validateHttpHeadersIfNeeded(context.getHeaders(), p.getJwsHeaders());
+        }
         
-        Principal currentPrincipal = context.getSecurityContext().getUserPrincipal(); 
+        Principal currentPrincipal = context.getSecurityContext().getUserPrincipal();
         if (currentPrincipal == null || currentPrincipal.getName() == null) {
             SecurityContext securityContext = configureSecurityContext(theSigVerifier);
             if (securityContext != null) {
@@ -68,11 +75,11 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             }
         }
     }
-    
+
     protected SecurityContext configureSecurityContext(JwsSignatureVerifier sigVerifier) {
         if (sigVerifier instanceof PublicKeyJwsSignatureVerifier
             && ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate() != null) {
-            final Principal principal = 
+            final Principal principal =
                 ((PublicKeyJwsSignatureVerifier)sigVerifier).getX509Certificate().getSubjectX500Principal();
             return new SecurityContext() {
 
@@ -86,5 +93,9 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             };
         }
         return null;
+    }
+    
+    protected boolean isMethodWithNoContent(String method) {
+        return HttpMethod.DELETE.equals(method) || HttpUtils.isMethodWithNoRequestContent(method);
     }
 }

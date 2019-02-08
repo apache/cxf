@@ -28,9 +28,12 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
+    <properties>
+        <cxf.module.name>org.apache.cxf.wsn</cxf.module.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -50,12 +53,22 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <version>${project.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${cxf.xjc-utils.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
                             <defaultOptions>
+                                <xjcargs>
+                                    <xjcarg>-Xdv</xjcarg>
+                                </xjcargs>
                                 <markGenerated>true</markGenerated>
                                 <faultSerialVersionUID>1</faultSerialVersionUID>
                             </defaultOptions>
@@ -90,10 +103,10 @@
                         <Export-Package>
                             org.oasis_open.docs.wsn.*;version=1.3;-noimport:=true,
                             org.oasis_open.docs.wsrf.*;version=1.2,
-                            org.apache.cxf.wsn.client;version=${project.version},
-                            org.apache.cxf.wsn.util;version=${project.version},
-                            org.apache.cxf.wsn.wsdl;version=${project.version},
-                            org.apache.cxf.wsn.jaxws;version=${project.version}
+                            org.apache.cxf.wsn.client;version=${cxf.osgi.version.clean},
+                            org.apache.cxf.wsn.util;version=${cxf.osgi.version.clean},
+                            org.apache.cxf.wsn.wsdl;version=${cxf.osgi.version.clean},
+                            org.apache.cxf.wsn.jaxws;version=${cxf.osgi.version.clean}
                         </Export-Package>
                         <_nouses>true</_nouses>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>

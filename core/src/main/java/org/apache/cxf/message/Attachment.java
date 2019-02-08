@@ -30,16 +30,16 @@ public interface Attachment {
      * @return The attachment id.
      */
     String getId();
-    
+
     String getHeader(String name);
-    
+
     Iterator<String> getHeaderNames();
-    
+
     /**
-     * Whether or not this is an XOP package. This will affect the 
+     * Whether or not this is an XOP package. This will affect the
      * serialization of the attachment. If true, it will be serialized
      * as binary data, and not Base64Binary.
-     * 
+     *
      * @return true if this attachment is an XOP package
      */
     boolean isXOP();

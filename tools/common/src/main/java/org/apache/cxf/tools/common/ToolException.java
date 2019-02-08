@@ -30,15 +30,15 @@ import org.apache.cxf.common.i18n.Message;
  */
 public class ToolException extends RuntimeException {
     private static final long serialVersionUID = -4418907917249006910L;
-    List<Throwable> suppressed = new ArrayList<Throwable>(0);
+    List<Throwable> suppressed = new ArrayList<>(0);
     boolean hasSuppressed;
-    
+
     public ToolException() {
         super();
     }
     public ToolException(String message, List<ToolErrorListener.ErrorInfo> e) {
         super(message);
-        
+
         if (e.size() > 1) {
             for (ToolErrorListener.ErrorInfo er : e) {
                 String ms = createMessage(er);
@@ -57,7 +57,7 @@ public class ToolException extends RuntimeException {
         }
     }
 
-    
+
     public ToolException(Message msg) {
         super(msg.toString());
     }
@@ -68,7 +68,7 @@ public class ToolException extends RuntimeException {
     public ToolException(Message msg, Throwable t) {
         super(msg.toString(), t);
     }
-    
+
     public ToolException(String msg, Throwable t) {
         super(msg, t);
     }
@@ -89,7 +89,7 @@ public class ToolException extends RuntimeException {
     }
     private String createMessage(ToolErrorListener.ErrorInfo e) {
         if (e.file != null) {
-            return e.file + " [" + e.line + "," + e.col + "]: " + e.message; 
+            return e.file + " [" + e.line + "," + e.col + "]: " + e.message;
         }
         if (e.message == null && e.cause != null) {
             return e.cause.getLocalizedMessage();
@@ -101,7 +101,7 @@ public class ToolException extends RuntimeException {
             super.printStackTrace(ps);
             return;
         }
-        printStackTrace(ps, "", "");   
+        printStackTrace(ps, "", "");
     }
     public void printStackTrace(PrintStream ps, String pfx, String cap) {
         ps.println(pfx + cap + this);
@@ -120,7 +120,7 @@ public class ToolException extends RuntimeException {
         if (ourCause != null && (!hasSuppressed || ourCause != suppressed.get(0))) {
             printThrowable(ourCause, ps, pfx + "\t", "Caused by: ");
         }
-    }    
+    }
     private void printThrowable(Throwable t, PrintStream ps, String pfx, String cap) {
         if (t instanceof ToolException) {
             ((ToolException)t).printStackTrace(ps, pfx, cap);
@@ -134,10 +134,10 @@ public class ToolException extends RuntimeException {
                 printThrowable(t.getCause(), ps, pfx + "\t", "Caused by: ");
             }
         }
-        
+
     }
 
-    
+
     private void addSuppressedThrowable(Throwable t) {
         try {
             this.getClass().getMethod("addSuppressed", Throwable.class).invoke(this, t);

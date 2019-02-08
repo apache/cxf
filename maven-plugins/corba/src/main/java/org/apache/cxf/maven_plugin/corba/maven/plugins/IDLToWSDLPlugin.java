@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.tools.corba.IDLToWSDL;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -37,21 +36,22 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class IDLToWSDLPlugin extends AbstractMojo {
 
     /**
-     * @parameter  expression="${project.build.directory}/generated/src/main/java"
+     * @parameter expression="${project.build.directory}/generated/src/main/java"
      * @required
      */
     String outputDir;
-    
+
     /**
      * @parameter
      */
-    IdltowsdlOption idltowsdlOptions[];
+    IdltowsdlOption[] idltowsdlOptions;
 
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         File outputDirFile = new File(outputDir);
         outputDirFile.mkdirs();
-        
+
         if (idltowsdlOptions == null) {
             throw new MojoExecutionException("Please specify the idl2wsdl options");
         }
@@ -68,13 +68,13 @@ public class IDLToWSDLPlugin extends AbstractMojo {
             }
 
             if (doWork) {
-                List<Object> list = new ArrayList<Object>();
+                List<Object> list = new ArrayList<>();
                 list.add("-o");
                 list.add(outputDir);
                 list.addAll(idltowsdlOptions[x].getExtraargs());
-                list.add(idltowsdlOptions[x].getIDL());            
+                list.add(idltowsdlOptions[x].getIDL());
                 try {
-                    IDLToWSDL.run(list.toArray(new String[list.size()]));
+                    IDLToWSDL.run(list.toArray(new String[0]));
                     doneFile.delete();
                     doneFile.createNewFile();
                 } catch (Throwable e) {

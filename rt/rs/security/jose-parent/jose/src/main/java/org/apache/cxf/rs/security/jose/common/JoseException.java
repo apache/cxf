@@ -24,10 +24,13 @@ public class JoseException extends RuntimeException {
     public JoseException() {
 
     }
-    public JoseException(String error) {
-        super(error);
+    public JoseException(String message) {
+        super(message);
     }
     public JoseException(Throwable cause) {
         super(cause);
+    }
+    public JoseException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

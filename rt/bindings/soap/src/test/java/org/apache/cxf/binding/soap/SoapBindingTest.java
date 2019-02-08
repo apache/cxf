@@ -22,11 +22,15 @@ package org.apache.cxf.binding.soap;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class SoapBindingTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SoapBindingTest {
+
     @Test
     public void testCreateMessage() throws Exception {
         Message message = new MessageImpl();
@@ -38,12 +42,12 @@ public class SoapBindingTest extends Assert {
         assertEquals(Soap11.getInstance(), soapMessage.getVersion());
 
         assertEquals("text/xml", soapMessage.get(Message.CONTENT_TYPE));
-        
+
         soapMessage.remove(Message.CONTENT_TYPE);
-        
+
         sb.setSoapVersion(Soap12.getInstance());
         soapMessage = (SoapMessage) sb.createMessage(soapMessage);
-        assertEquals(Soap12.getInstance(), soapMessage.getVersion());     
+        assertEquals(Soap12.getInstance(), soapMessage.getVersion());
         assertEquals("application/soap+xml", soapMessage.get(Message.CONTENT_TYPE));
     }
 

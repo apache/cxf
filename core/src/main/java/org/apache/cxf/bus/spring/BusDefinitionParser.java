@@ -54,7 +54,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     }
 
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        String bus = element.getAttribute("bus");        
+        String bus = element.getAttribute("bus");
         if (StringUtils.isEmpty(bus)) {
             bus = element.getAttribute("name");
             if (StringUtils.isEmpty(bus)) {
@@ -71,7 +71,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
 
         super.doParse(element, ctx, bean);
-        
+
         if (ctx.getRegistry().containsBeanDefinition(bus)) {
             BeanDefinition def = ctx.getRegistry().getBeanDefinition(bus);
             copyProps(bean, def);
@@ -87,12 +87,12 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         } else {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY, bus, ctx);
-            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE, 
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_CREATE,
                                                      resolveId(element, null, ctx));
             bean.addConstructorArgValue(bus);
         }
     }
-    protected boolean processBusAttribute(Element element, ParserContext ctx, 
+    protected boolean processBusAttribute(Element element, ParserContext ctx,
                                           BeanDefinitionBuilder bean,
                                           String val) {
         return false;
@@ -104,13 +104,13 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
             src.getBeanDefinition().getPropertyValues().removePropertyValue(v);
         }
-        
+
     }
 
     @Override
-    protected void mapElement(ParserContext ctx, 
-                              BeanDefinitionBuilder bean, 
-                              Element e, 
+    protected void mapElement(ParserContext ctx,
+                              BeanDefinitionBuilder bean,
+                              Element e,
                               String name) {
         if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
@@ -123,7 +123,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
     }
     @Override
-    protected String resolveId(Element element, AbstractBeanDefinition definition, 
+    protected String resolveId(Element element, AbstractBeanDefinition definition,
                                ParserContext ctx) {
         String bus = null;
         try {
@@ -132,7 +132,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             //ignore
         }
         if (bus == null) {
-            bus = element.getAttribute("bus");        
+            bus = element.getAttribute("bus");
             if (StringUtils.isEmpty(bus)) {
                 bus = element.getAttribute("name");
             }
@@ -144,26 +144,26 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             try {
                 element.setUserData("ID", bus, null);
             } catch (Throwable t) {
-                //maybe no DOM level 3, ignore, but, may have issues with the counter 
+                //maybe no DOM level 3, ignore, but, may have issues with the counter
             }
         }
         return bus;
     }
-    
+
     @NoJSR250Annotations
     public static class BusConfig extends AbstractBasicInterceptorProvider
         implements ApplicationContextAware {
-        
+
         Bus bus;
         String busName;
         String id;
         Collection<Feature> features;
         Map<String, Object> properties;
-        
+
         public BusConfig(String busName) {
             this.busName = busName;
         }
-        
+
         public void setBus(Bus bb) {
             if (bus == bb) {
                 return;
@@ -197,9 +197,9 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
             if (bus != null) {
                 return;
-            }             
+            }
         }
-        
+
         public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
             if (bus != null) {
                 return bus.getOutFaultInterceptors();
@@ -259,7 +259,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
                 super.setOutFaultInterceptors(interceptors);
             }
         }
-        
+
         public Collection<Feature> getFeatures() {
             if (bus != null) {
                 return bus.getFeatures();
@@ -273,13 +273,13 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             } else {
                 this.features = CastUtils.cast(features);
             }
-            
+
         }
-        
+
         public Map<String, Object> getProperties() {
             if (bus != null) {
                 return bus.getProperties();
-            } 
+            }
             return properties;
         }
         public void setProperties(Map<String, Object> s) {
@@ -289,7 +289,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
                 this.properties = s;
             }
         }
-        
+
         public void setId(String s) {
             id = s;
         }

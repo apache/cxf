@@ -30,11 +30,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
     private static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/ControlPort";
-    private static final String GREETER_ADDRESS 
+    private static final String GREETER_ADDRESS
         = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
- 
+
     Endpoint endpoint;
-    
+
     protected void run()  {
 
         SpringBusFactory factory = new SpringBusFactory();
@@ -48,23 +48,23 @@ public class Server extends AbstractBusTestServerBase {
         GreeterImpl greeterImplementor = new GreeterImpl();
         implementor.setImplementor(greeterImplementor);
         endpoint = Endpoint.publish(ADDRESS, implementor);
-        
+
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }
-    
+
     public void tearDown() throws Exception {
         endpoint.stop();
     }
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

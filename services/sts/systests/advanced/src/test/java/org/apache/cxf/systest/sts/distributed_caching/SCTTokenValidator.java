@@ -34,15 +34,15 @@ import org.apache.wss4j.policy.SP12Constants;
  * that the SCT is replicated in the distributed cache to the (second) STS instance
  */
 public class SCTTokenValidator extends STSTokenValidator {
-    
+
     public SCTTokenValidator() {
         super();
     }
-    
+
     public SCTTokenValidator(boolean alwaysValidateToSTS) {
         super(alwaysValidateToSTS);
     }
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         // Sleep to make sure token gets replicated
         try {
@@ -51,18 +51,18 @@ public class SCTTokenValidator extends STSTokenValidator {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         Credential validatedCredential = super.validate(credential, data);
-        
-        // Hack to verify the IssuedToken assertion, as this is not done by default in CXF for a 
+
+        // Hack to verify the IssuedToken assertion, as this is not done by default in CXF for a
         // SecurityContextToken
         SoapMessage soapMessage = (SoapMessage)data.getMsgContext();
         AssertionInfoMap aim = soapMessage.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ISSUED_TOKEN);
         for (AssertionInfo ai : ais) {
             ai.setAsserted(true);
-        }  
-        
+        }
+
         return validatedCredential;
     }
 

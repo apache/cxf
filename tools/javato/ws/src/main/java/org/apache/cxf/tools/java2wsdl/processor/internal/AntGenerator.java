@@ -32,7 +32,7 @@ import org.apache.cxf.tools.wsdlto.core.AbstractGenerator;
 
 public class AntGenerator extends AbstractGenerator {
 
-    private static final String BUILD_TEMPLATE 
+    private static final String BUILD_TEMPLATE
         = "org/apache/cxf/tools/java2wsdl/processor/internal/build.xml.vm";
 
 
@@ -49,13 +49,13 @@ public class AntGenerator extends AbstractGenerator {
         if (passthrough()) {
             return;
         }
-        
+
         JavaModel javaModel = env.get(JavaModel.class);
         Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
-        
-        Map<String, String> serverClassNamesMap = new HashMap<String, String>();
-        Map<String, String> clientClassNamesMap = new HashMap<String, String>();
+
+        Map<String, String> serverClassNamesMap = new HashMap<>();
+        Map<String, String> clientClassNamesMap = new HashMap<>();
         for (JavaInterface intf : interfaces.values()) {
             clientClassNamesMap.put(intf.getName() + "Client",
                                     intf.getFullClassName() + "Client");
@@ -66,12 +66,12 @@ public class AntGenerator extends AbstractGenerator {
         clearAttributes();
         setAttributes("clientClassNamesMap", clientClassNamesMap);
         setAttributes("serverClassNamesMap", serverClassNamesMap);
-        
+
         setAttributes("srcdir", penv.get(ToolConstants.CFG_SOURCEDIR));
         setAttributes("clsdir", penv.get(ToolConstants.CFG_CLASSDIR));
         setAttributes("classpath", penv.get(ToolConstants.CFG_CLASSPATH));
         setAttributes("classpath", penv.get(ToolConstants.CFG_CLASSPATH));
-        
+
         setCommonAttributes();
         doWrite(BUILD_TEMPLATE, parseOutputName(null, "build", ".xml"));
     }

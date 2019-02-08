@@ -30,14 +30,13 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.saml.sso.EHCacheUtil;
 
 /**
- * An in-memory EHCache implementation of the SPStateManager interface. 
+ * An in-memory EHCache implementation of the SPStateManager interface.
  * The default TTL is 5 minutes.
  */
 public class EHCacheSPStateManager implements SPStateManager {
@@ -46,36 +45,36 @@ public class EHCacheSPStateManager implements SPStateManager {
     public static final String REQUEST_CACHE_KEY = "cxf.samlp.request.state.cache";
     public static final String RESPONSE_CACHE_KEY = "cxf.samlp.response.state.cache";
     private static final String DEFAULT_CONFIG_URL = "/cxf-samlp-ehcache.xml";
-    
+
     private Ehcache requestCache;
     private Ehcache responseCache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
-    
+
     public EHCacheSPStateManager() {
         this(DEFAULT_CONFIG_URL, null);
     }
-    
+
     public EHCacheSPStateManager(Bus bus) {
         this(DEFAULT_CONFIG_URL, bus);
     }
-    
+
     public EHCacheSPStateManager(String configFileURL) {
         this(configFileURL, null);
     }
-    
+
     public EHCacheSPStateManager(String configFileURL, Bus bus) {
         createCaches(configFileURL, bus);
     }
-    
+
     private void createCaches(String configFile, Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus(true);
         }
-        
+
         URL configFileURL = null;
         try {
-            configFileURL = 
+            configFileURL =
                 ResourceUtils.getClasspathResourceURL(configFile, EHCacheSPStateManager.class, bus);
         } catch (Exception ex) {
             // ignore
@@ -84,7 +83,7 @@ public class EHCacheSPStateManager implements SPStateManager {
             cacheManager = EHCacheUtil.createCacheManager();
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-            
+
             if (bus != null) {
                 conf.setName(bus.getId());
                 DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
@@ -94,21 +93,21 @@ public class EHCacheSPStateManager implements SPStateManager {
                     conf.getDiskStoreConfiguration().setPath(path);
                 }
             }
-            
+
             cacheManager = EHCacheUtil.createCacheManager(conf);
         }
-        
+
         CacheConfiguration requestCC = EHCacheUtil.getCacheConfiguration(REQUEST_CACHE_KEY, cacheManager);
-        
+
         Ehcache newCache = new Cache(requestCC);
         requestCache = cacheManager.addCacheIfAbsent(newCache);
-        
+
         CacheConfiguration responseCC = EHCacheUtil.getCacheConfiguration(RESPONSE_CACHE_KEY, cacheManager);
-        
+
         newCache = new Cache(responseCC);
         responseCache = cacheManager.addCacheIfAbsent(newCache);
     }
-    
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -116,7 +115,7 @@ public class EHCacheSPStateManager implements SPStateManager {
     public void setTTL(long newTtl) {
         ttl = newTtl;
     }
-    
+
     /**
      * Get the (default) TTL value in seconds
      * @return the (default) TTL value in seconds
@@ -124,7 +123,7 @@ public class EHCacheSPStateManager implements SPStateManager {
     public long getTTL() {
         return ttl;
     }
-    
+
     public ResponseState getResponseState(String securityContextKey) {
         Element element = responseCache.get(securityContextKey);
         if (element != null) {
@@ -150,30 +149,30 @@ public class EHCacheSPStateManager implements SPStateManager {
         if (securityContextKey == null || "".equals(securityContextKey)) {
             return;
         }
-        
+
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 5 minutes if the default TTL is set incorrectly
             parsedTTL = 60 * 5;
         }
         Element element = new Element(securityContextKey, state);
         element.setTimeToLive(parsedTTL);
         element.setTimeToIdle(parsedTTL);
-        
+
         responseCache.put(element);
     }
-    
+
     public void setRequestState(String relayState, RequestState state) {
         if (relayState == null || "".equals(relayState)) {
             return;
         }
-        
+
         int parsedTTL = (int)ttl;
-        if (ttl != (long)parsedTTL) {
+        if (ttl != parsedTTL) {
             // Fall back to 60 minutes if the default TTL is set incorrectly
             parsedTTL = 3600;
         }
-        
+
         Element element = new Element(relayState, state);
         element.setTimeToLive(parsedTTL);
         element.setTimeToIdle(parsedTTL);
@@ -188,7 +187,7 @@ public class EHCacheSPStateManager implements SPStateManager {
         }
         return null;
     }
-    
+
     public void close() throws IOException {
         if (cacheManager != null) {
             cacheManager.shutdown();

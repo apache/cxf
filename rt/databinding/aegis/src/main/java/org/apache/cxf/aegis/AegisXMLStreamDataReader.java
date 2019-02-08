@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.basic.ArrayType;
@@ -37,7 +38,7 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
     public AegisXMLStreamDataReader(AegisContext globalContext) {
         super(globalContext);
     }
-    
+
     /**
      * This constructor is used by the Element data reader to borrow this class.
      * @param globalContext
@@ -63,7 +64,7 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
     public Object read(XMLStreamReader reader) throws Exception {
         return read(reader, null);
     }
-    
+
     /** {@inheritDoc}*/
     public Object read(XMLStreamReader reader, AegisType desiredType) throws Exception {
         setupReaderPosition(reader);
@@ -73,9 +74,9 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
             elReader.readToEnd();
             return null;
         }
-        
+
         AegisType type = TypeUtil.getReadTypeStandalone(reader, aegisContext, desiredType);
-        
+
         if (type == null) {
             throw new DatabindingException(new Message("NO_MAPPING", LOG));
         }
@@ -83,11 +84,11 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
         return type.readObject(elReader, context);
     }
 
-    public Object readFlatArray(XMLStreamReader input, 
+    public Object readFlatArray(XMLStreamReader input,
                                 ArrayType arrayType, QName concreteName) throws Exception {
         setupReaderPosition(input);
         ElementReader elReader = new ElementReader(input);
         return arrayType.readObject(elReader, concreteName, context, true);
-        
+
     }
 }

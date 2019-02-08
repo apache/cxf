@@ -35,14 +35,14 @@ public class ResourceInfoImpl implements ResourceInfo {
     public ResourceInfoImpl(OperationResourceInfo ori) {
         this.ori = ori;
     }
-    
+
     @Override
     public Method getResourceMethod() {
         return ori == null ? null : ori.getMethodToInvoke();
     }
     @Override
     public Class<?> getResourceClass() {
-        return ori == null ? null : ori.getClassResourceInfo().getResourceClass();
+        return ori == null ? null : ori.getClassResourceInfo().getServiceClass();
     }
-    
+
 }

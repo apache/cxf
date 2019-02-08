@@ -33,83 +33,85 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 
 /**
- * 
+ *
  */
-public class MinimalMaximalAlternativeSelectorTest extends Assert {
+public class MinimalMaximalAlternativeSelectorTest {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl(); 
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testChooseMinAlternative() {
         Message m = new MessageImpl();
         AlternativeSelector selector = new MinimalAlternativeSelector();
-        
+
         PolicyEngine engine = control.createMock(PolicyEngine.class);
         Assertor assertor = control.createMock(Assertor.class);
-               
+
         Policy policy = new Policy();
         ExactlyOne ea = new ExactlyOne();
         All all = new All();
-        PolicyAssertion a1 = new TestAssertion(); 
+        PolicyAssertion a1 = new TestAssertion();
         all.addAssertion(a1);
         ea.addPolicyComponent(all);
-        Collection<PolicyAssertion> maxAlternative = 
+        Collection<PolicyAssertion> maxAlternative =
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         all = new All();
         ea.addPolicyComponent(all);
-        Collection<PolicyAssertion> minAlternative = 
+        Collection<PolicyAssertion> minAlternative =
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
-        policy.addPolicyComponent(ea);  
+        policy.addPolicyComponent(ea);
         EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor, m)).andReturn(true);
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor, m)).andReturn(true);
-        
-        control.replay();        
-        Collection<Assertion> choice = 
-            selector.selectAlternative(policy, engine, assertor, null, m); 
+
+        control.replay();
+        Collection<Assertion> choice =
+            selector.selectAlternative(policy, engine, assertor, null, m);
         assertEquals(0, choice.size());
         control.verify();
     }
-    
+
     @Test
     public void testChooseMaxAlternative() {
         Message m = new MessageImpl();
         AlternativeSelector selector = new MaximalAlternativeSelector();
-        
+
         PolicyEngine engine = control.createMock(PolicyEngine.class);
         Assertor assertor = control.createMock(Assertor.class);
-               
+
         Policy policy = new Policy();
         ExactlyOne ea = new ExactlyOne();
         All all = new All();
-        PolicyAssertion a1 = new TestAssertion(); 
+        PolicyAssertion a1 = new TestAssertion();
         all.addAssertion(a1);
         ea.addPolicyComponent(all);
-        Collection<PolicyAssertion> maxAlternative = 
+        Collection<PolicyAssertion> maxAlternative =
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         all = new All();
         ea.addPolicyComponent(all);
-        Collection<PolicyAssertion> minAlternative = 
+        Collection<PolicyAssertion> minAlternative =
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
-        policy.addPolicyComponent(ea);  
+        policy.addPolicyComponent(ea);
         EasyMock.expect(engine.supportsAlternative(maxAlternative, assertor, m)).andReturn(true);
         EasyMock.expect(engine.supportsAlternative(minAlternative, assertor, m)).andReturn(true);
-        
-        control.replay();        
-        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null, m); 
+
+        control.replay();
+        Collection<Assertion> choice = selector.selectAlternative(policy, engine, assertor, null, m);
         assertEquals(1, choice.size());
         assertSame(a1, choice.iterator().next());
         control.verify();

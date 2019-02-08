@@ -26,19 +26,22 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitConfigurer;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests thread pool config.
@@ -46,14 +49,14 @@ import org.junit.BeforeClass;
 
 public class JettyBasicAuthTest extends AbstractClientServerTestBase {
     private static final String ADDRESS = JettyBasicAuthServer.ADDRESS;
-    private static final QName SERVICE_NAME = 
+    private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private Greeter greeter;
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(JettyBasicAuthServer.class, true));
     }
 
@@ -63,7 +66,7 @@ public class JettyBasicAuthTest extends AbstractClientServerTestBase {
         greeter = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
         BindingProvider bp = (BindingProvider)greeter;
         ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
-        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor()); 
+        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    ADDRESS);
         bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, "ffang");
@@ -71,17 +74,17 @@ public class JettyBasicAuthTest extends AbstractClientServerTestBase {
     }
 
     @org.junit.Test
-    public void testBasicAuth() throws Exception { 
+    public void testBasicAuth() throws Exception {
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
     }
-    
+
     @org.junit.Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());
-       
+
         MyHTTPConduitConfigurer myHttpConduitConfig = new MyHTTPConduitConfigurer();
         bus.setExtension(myHttpConduitConfig, HTTPConduitConfigurer.class);
         JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance(bus);

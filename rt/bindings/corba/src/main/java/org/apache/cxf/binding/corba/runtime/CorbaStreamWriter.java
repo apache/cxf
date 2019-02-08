@@ -55,12 +55,12 @@ public class CorbaStreamWriter implements XMLStreamWriter {
     private List<ArgType> params;
     private int paramCounter;
 
-    private Stack<QName> elements = new Stack<QName>();
+    private Stack<QName> elements = new Stack<>();
     private QName paramElement;
-    private QName wrapElementName;    
+    private QName wrapElementName;
 
     private boolean skipWrap;
-    
+
 
     public CorbaStreamWriter(ORB orbRef,
                              CorbaTypeMap map,
@@ -180,7 +180,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         writeStartElement(localName);
         writeEndElement();
     }
-    
+
     public void writeEndDocument()
         throws XMLStreamException {
     }
@@ -309,26 +309,26 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         throws java.lang.IllegalArgumentException {
         return null;
     }
-    
-    
-    
+
+
+
     public class CorbaNamespaceContext implements NamespaceContext {
 
         private Map<String, String> map;
         private CorbaNamespaceContext parent;
 
         public CorbaNamespaceContext() {
-            this.map = new HashMap<String, String>();
+            this.map = new HashMap<>();
         }
 
         private CorbaNamespaceContext(Map<String, String> map, CorbaNamespaceContext p) {
             this.map = map;
             this.parent = p;
         }
-        
+
         public void push() {
             parent = new CorbaNamespaceContext(map, parent);
-            map = new HashMap<String, String>();
+            map = new HashMap<>();
         }
         public void pop() {
             if (parent != null) {
@@ -336,7 +336,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
                 parent = parent.parent;
             }
         }
-        
+
         public void setPrefix(String pfx, String ns) {
             map.put(pfx, ns);
         }
@@ -361,7 +361,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         }
 
         public Iterator<String> getPrefixes(String namespaceURI) {
-            Set<String> set = new HashSet<String>();
+            Set<String> set = new HashSet<>();
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 if (namespaceURI.equals(entry.getValue())) {
                     set.add(entry.getKey());
@@ -377,5 +377,5 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         }
     }
 
-    
+
 }

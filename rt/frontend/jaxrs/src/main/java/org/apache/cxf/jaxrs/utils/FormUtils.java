@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -40,7 +42,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -50,19 +51,20 @@ import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class FormUtils {
     public static final String FORM_PARAMS_FROM_HTTP_PARAMS = "set.form.parameters.from.http.parameters";
     public static final String FORM_PARAM_MAP = "org.apache.cxf.form_data";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(FormUtils.class);
-    private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
-    private static final String MAX_FORM_PARAM_COUNT = "maxFormParameterCount";  
-    private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";    
+    private static final String MULTIPART_FORM_DATA_TYPE = "form-data";
+    private static final String MAX_FORM_PARAM_COUNT = "maxFormParameterCount";
+    private static final String CONTENT_DISPOSITION_FILES_PARAM = "files";
     private FormUtils() {
-        
+
     }
-    
+
     public static String formToString(Form form) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             FormUtils.writeMapToOutputStream(form.asMap(), bos, StandardCharsets.UTF_8.name(), false);
@@ -72,36 +74,36 @@ public final class FormUtils {
         }
         return "";
     }
-    
-    public static void restoreForm(FormEncodingProvider<Form> provider, 
-                                   Form form, 
+
+    public static void restoreForm(FormEncodingProvider<Form> provider,
+                                   Form form,
                                    Message message)
         throws Exception {
         CachedOutputStream os = new CachedOutputStream();
         writeForm(provider, form, os);
         message.setContent(InputStream.class, os.getInputStream());
     }
-    
-    public static void writeForm(FormEncodingProvider<Form> provider, 
+
+    public static void writeForm(FormEncodingProvider<Form> provider,
                                  Form form, OutputStream os)
         throws Exception {
-        provider.writeTo(form, Form.class, Form.class, new Annotation[]{}, 
+        provider.writeTo(form, Form.class, Form.class, new Annotation[]{},
                          MediaType.APPLICATION_FORM_URLENCODED_TYPE, new MetadataMap<String, Object>(), os);
     }
-    
-    public static Form readForm(FormEncodingProvider<Form> provider, Message message) 
+
+    public static Form readForm(FormEncodingProvider<Form> provider, Message message)
         throws Exception {
-        return provider.readFrom(Form.class, Form.class, 
-                              new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
-                              new MetadataMap<String, String>(), 
+        return provider.readFrom(Form.class, Form.class,
+                              new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE,
+                              new MetadataMap<String, String>(),
                               message.getContent(InputStream.class));
     }
-    
+
     public static void addPropertyToForm(MultivaluedMap<String, String> map, String name, Object value) {
         if (!"".equals(name)) {
             map.add(name, value.toString());
         } else {
-            MultivaluedMap<String, Object> values = 
+            MultivaluedMap<String, Object> values =
                 InjectionUtils.extractValuesFromBean(value, "");
             for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
                 for (Object v : entry.getValue()) {
@@ -110,7 +112,7 @@ public final class FormUtils {
             }
         }
     }
-    
+
     public static String readBody(InputStream is, String encoding) {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -120,17 +122,17 @@ public final class FormUtils {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
-    
+
     public static void populateMapFromString(MultivaluedMap<String, String> params,
                                              Message m,
-                                             String postBody, 
+                                             String postBody,
                                              String enc,
                                              boolean decode) {
         if (StringUtils.isEmpty(postBody)) {
             return;
         }
-        List<String> parts = Arrays.asList(StringUtils.split(postBody, "&"));
-        checkNumberOfParts(m, parts.size());
+        String[] parts = postBody.split("&");
+        checkNumberOfParts(m, parts.length);
         for (String part : parts) {
             String[] keyValue = new String[2];
             int index = part.indexOf("=");
@@ -148,18 +150,28 @@ public final class FormUtils {
                 params.add(name, keyValue[1]);
             }
         }
+
+    }
+
+    public static void populateMapFromStringOrHttpRequest(MultivaluedMap<String, String> params,
+                                             Message m,
+                                             String postBody,
+                                             String enc,
+                                             boolean decode) {
+        HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+        populateMapFromString(params, m, postBody, enc, decode, request);
         
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params,
                                              Message m,
-                                             String postBody, 
+                                             String postBody,
                                              String enc,
                                              boolean decode,
                                              javax.servlet.http.HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             populateMapFromString(params, m, postBody, enc, decode);
-        } else if (request != null 
+        } else if (request != null
             && MessageUtils.getContextualBoolean(m, FORM_PARAMS_FROM_HTTP_PARAMS, true)) {
             for (Enumeration<String> en = request.getParameterNames(); en.hasMoreElements();) {
                 String paramName = en.nextElement();
@@ -169,14 +181,14 @@ public final class FormUtils {
             logRequestParametersIfNeeded(params, enc);
         }
     }
-    
+
     public static void logRequestParametersIfNeeded(Map<String, List<String>> params, String enc) {
         if ((PhaseInterceptorChain.getCurrentMessage() == null)
             || (PhaseInterceptorChain.getCurrentMessage().getInterceptorChain() == null)) {
             return;
         }
         String chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain().toString();
-        if (chain.contains(LoggingInInterceptor.class.getSimpleName())) {
+        if (chain.contains("LoggingInInterceptor")) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
                 writeMapToOutputStream(params, bos, enc, false);
@@ -186,27 +198,38 @@ public final class FormUtils {
             }
         }
     }
-    
-    public static void writeMapToOutputStream(Map<String, List<String>> map, 
+
+    public static void writeMapToOutputStream(Map<String, List<String>> map,
                                               OutputStream os,
                                               String enc,
                                               boolean encoded) throws IOException {
         for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, List<String>> entry = it.next();
+
+            String key = entry.getKey();
+            if (!encoded) {
+                key = HttpUtils.urlEncode(key, enc);
+            }
             for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
-                String value = entryIterator.next();
-                os.write(entry.getKey().getBytes(enc));
+                os.write(key.getBytes(enc));
                 os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value, enc);
-                os.write(data.getBytes(enc));
-                if (entryIterator.hasNext() || it.hasNext()) {
+
+                String value = entryIterator.next();
+                if (!encoded) {
+                    value = HttpUtils.urlEncode(value, enc);
+                }
+                os.write(value.getBytes(enc));
+                if (entryIterator.hasNext()) {
                     os.write('&');
                 }
+            }
+            if (it.hasNext()) {
+                os.write('&');
             }
 
         }
     }
-    
+
     public static void populateMapFromMultipart(MultivaluedMap<String, String> params,
                                                 MultipartBody body,
                                                 Message m,
@@ -221,7 +244,7 @@ public final class FormUtils {
             String cdName = cd == null ? null : cd.getParameter("name");
             String contentId = a.getContentId();
             String name = StringUtils.isEmpty(cdName) ? contentId : cdName.replace("\"", "").replace("'", "");
-            if (StringUtils.isEmpty(name)) { 
+            if (StringUtils.isEmpty(name)) {
                 throw ExceptionUtils.toBadRequestException(null, null);
             }
             if (CONTENT_DISPOSITION_FILES_PARAM.equals(name)) {
@@ -241,7 +264,7 @@ public final class FormUtils {
             }
         }
     }
-    
+
     private static void checkNumberOfParts(Message m, int numberOfParts) {
         if (m == null || m.getExchange() == null || m.getExchange().getInMessage() == null) {
             return;
@@ -252,12 +275,17 @@ public final class FormUtils {
             return;
         }
         try {
-            int maxPartsCount = Integer.valueOf(maxPartsCountProp);
+            int maxPartsCount = Integer.parseInt(maxPartsCountProp);
             if (maxPartsCount != -1 && numberOfParts >= maxPartsCount) {
                 throw new WebApplicationException(413);
             }
         } catch (NumberFormatException ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
+    }
+
+    public static boolean isFormPostRequest(Message m) {
+        return MediaType.APPLICATION_FORM_URLENCODED.equals(m.get(Message.CONTENT_TYPE))
+            && HttpMethod.POST.equals(m.get(Message.HTTP_REQUEST_METHOD));
     }
 }

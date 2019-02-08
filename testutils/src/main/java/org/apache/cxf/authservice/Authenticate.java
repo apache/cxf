@@ -39,12 +39,12 @@ public class Authenticate {
         return uid;
     }
 
-    
+
     public void setUid(String value) {
         this.uid = value;
     }
 
-    
+
     public String getPwd() {
         return pwd;
     }

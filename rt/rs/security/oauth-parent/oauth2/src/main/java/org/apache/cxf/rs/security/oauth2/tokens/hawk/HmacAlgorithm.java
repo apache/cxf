@@ -22,7 +22,7 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public enum HmacAlgorithm {
-    
+
     HmacSHA1(OAuthConstants.HMAC_ALGO_SHA_1),
     HmacSHA256(OAuthConstants.HMAC_ALGO_SHA_256);
 
@@ -49,5 +49,5 @@ public enum HmacAlgorithm {
         }
         return null;
     }
-    
+
 }

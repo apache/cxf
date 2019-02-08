@@ -31,7 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
@@ -60,190 +59,193 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for validating JWTTokens.
  */
-public class JWTTokenValidatorTest extends org.junit.Assert {
+public class JWTTokenValidatorTest {
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     @org.junit.Test
     public void testCreateAndValidateSignedJWT() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
     }
-    
+
     @org.junit.Test
     public void testInvalidSignature() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
         Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
         CallbackHandler callbackHandler = new EveCallbackHandler();
         providerParameters.getStsProperties().setSignatureCrypto(crypto);
         providerParameters.getStsProperties().setCallbackHandler(callbackHandler);
         providerParameters.getStsProperties().setSignatureUsername("eve");
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     @org.junit.Test
     public void testUnsignedToken() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(false);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
         Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
         CallbackHandler callbackHandler = new EveCallbackHandler();
         providerParameters.getStsProperties().setSignatureCrypto(crypto);
         providerParameters.getStsProperties().setCallbackHandler(callbackHandler);
         providerParameters.getStsProperties().setSignatureUsername("eve");
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 2);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     @org.junit.Test
     public void testInvalidConditionJWT() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
-        
+
         DefaultJWTClaimsProvider jwtClaimsProvider = new DefaultJWTClaimsProvider();
         jwtClaimsProvider.setLifetime(1L);
         ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(jwtClaimsProvider);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         Thread.sleep(1500L);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     @org.junit.Test
     public void testChangedSignature() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
-        
+
         DefaultJWTClaimsProvider jwtClaimsProvider = new DefaultJWTClaimsProvider();
         jwtClaimsProvider.setLifetime(1L);
         ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(jwtClaimsProvider);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
@@ -251,48 +253,48 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         token += "blah";
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         Thread.sleep(1500L);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     @org.junit.Test
     public void testJWTWithRoles() throws Exception {
         // Create
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         ((JWTTokenProvider)jwtTokenProvider).setSignToken(true);
-        
+
         JWTClaimsProvider claimsProvider = new RoleJWTClaimsProvider("manager");
         ((JWTTokenProvider)jwtTokenProvider).setJwtClaimsProvider(claimsProvider);
-        
+
         TokenProviderParameters providerParameters = createProviderParameters();
-        
+
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3);
-        
+
         // Validate the token
         TokenValidator jwtTokenValidator = new JWTTokenValidator();
         // Set the role
@@ -301,48 +303,47 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         ((JWTTokenValidator)jwtTokenValidator).setRoleParser(roleParser);
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a JWT Token
         ReceivedToken validateTarget = new ReceivedToken(createTokenWrapper(token));
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(jwtTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             jwtTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
+        assertNotNull(validatorResponse);
+        assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
         Set<Principal> roles = validatorResponse.getRoles();
         assertTrue(roles != null && !roles.isEmpty());
-        assertTrue(roles.iterator().next().getName().equals("manager"));
+        assertTrue("manager".equals(roles.iterator().next().getName()));
     }
-    
+
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(JWTTokenProvider.JWT_TOKEN_TYPE);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -351,32 +352,31 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
         stsProperties.setEncryptionCrypto(crypto);
         stsProperties.setEncryptionUsername("myservicekey");
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        
+
         return parameters;
     }
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(STSConstants.STATUS);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -388,21 +388,21 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
+
     private Properties getEveCryptoProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -410,10 +410,10 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
-        
+
         return properties;
     }
-    
+
     public class EveCallbackHandler implements CallbackHandler {
 
         public void handle(Callback[] callbacks) throws IOException,
@@ -429,22 +429,22 @@ public class JWTTokenValidatorTest extends org.junit.Assert {
             }
         }
     }
-    
+
     private Element createTokenWrapper(String token) {
-        Document doc = DOMUtils.newDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element tokenWrapper = doc.createElementNS(null, "TokenWrapper");
         tokenWrapper.setTextContent(token);
         return tokenWrapper;
     }
-    
+
     private static class RoleJWTClaimsProvider extends DefaultJWTClaimsProvider {
-        
+
         private String role;
-        
-        public RoleJWTClaimsProvider(String role) {
+
+        RoleJWTClaimsProvider(String role) {
             this.role = role;
         }
-        
+
         @Override
         public JwtClaims getJwtClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
             JwtClaims claims = super.getJwtClaims(jwtClaimsProviderParameters);

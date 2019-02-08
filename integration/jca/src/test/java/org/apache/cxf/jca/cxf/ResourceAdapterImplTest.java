@@ -33,15 +33,21 @@ import javax.resource.spi.ResourceAdapter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.jca.core.resourceadapter.ResourceBean;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class ResourceAdapterImplTest extends Assert {
+
+public class ResourceAdapterImplTest {
 
     public ResourceAdapterImplTest() {
-        
+
     }
 
     @Test
@@ -135,7 +141,7 @@ public class ResourceAdapterImplTest extends Assert {
     @Test
     public void testStopWithEmptyBusCache() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        rai.setBusCache(new HashSet<Bus>());
+        rai.setBusCache(new HashSet<>());
         try {
             assertNotNull("bus cache is not null", rai.getBusCache());
             assertTrue("bus cache is empty", rai.getBusCache().isEmpty());
@@ -148,15 +154,15 @@ public class ResourceAdapterImplTest extends Assert {
     @Test
     public void testStopWithNonEmptyBusCache() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        rai.setBusCache(new HashSet<Bus>());
+        rai.setBusCache(new HashSet<>());
         Bus bus = EasyMock.createMock(Bus.class);
         bus.shutdown(true);
         EasyMock.expectLastCall();
-        EasyMock.replay(bus);        
+        EasyMock.replay(bus);
         rai.registerBus(bus);
         rai.stop();
         EasyMock.verify(bus);
     }
 
-    
+
 }

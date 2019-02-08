@@ -59,28 +59,28 @@ public class CollectionType extends ArrayType {
     @SuppressWarnings("unchecked")
     protected Collection<Object> createCollection() {
         Collection<Object> values = null;
-        
+
         /*
          * getTypeClass returns the type of the object. These 'if's asked if the proposed
          * type can be assigned to the object, not the other way around. Thus List before
          * Vector and Set before SortedSet.
          */
-        
+
         Class<?> userTypeClass = getTypeClass();
         if (userTypeClass.isAssignableFrom(List.class)) {
-            values = new ArrayList<Object>();
+            values = new ArrayList<>();
         } else if (userTypeClass.isAssignableFrom(LinkedList.class)) {
-            values = new LinkedList<Object>();
+            values = new LinkedList<>();
         } else if (userTypeClass.isAssignableFrom(Set.class)) {
-            values = new HashSet<Object>();
+            values = new HashSet<>();
         } else if (userTypeClass.isAssignableFrom(SortedSet.class)) {
-            values = new TreeSet<Object>();
+            values = new TreeSet<>();
         } else if (userTypeClass.isAssignableFrom(Vector.class)) {
-            values = new Vector<Object>();
+            values = new Vector<>();
         } else if (userTypeClass.isAssignableFrom(Stack.class)) {
-            values = new Stack<Object>();
+            values = new Stack<>();
         } else if (userTypeClass.isInterface()) {
-            values = new ArrayList<Object>();
+            values = new ArrayList<>();
         } else {
             try {
                 values = (Collection<Object>)userTypeClass.newInstance();

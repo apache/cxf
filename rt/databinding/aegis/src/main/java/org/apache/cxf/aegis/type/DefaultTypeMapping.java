@@ -78,7 +78,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  * also indexed by the XML Schema QName of each type.
  */
 public class DefaultTypeMapping implements TypeMapping {
-    public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
+    public static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultTypeMapping.class);
     private Map<Type, AegisType> class2Type;
     private Map<QName, AegisType> xml2Type;
@@ -92,7 +92,7 @@ public class DefaultTypeMapping implements TypeMapping {
 
         this.nextTM = defaultTM;
     }
-    
+
     public DefaultTypeMapping() {
         this(DEFAULT_MAPPING_URI);
     }
@@ -204,7 +204,7 @@ public class DefaultTypeMapping implements TypeMapping {
         return nextTM;
     }
 
-    private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class<?> class1, 
+    private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class<?> class1,
                                         QName name,
                                         AegisType type) {
         if (!defaultNillable) {
@@ -214,7 +214,7 @@ public class DefaultTypeMapping implements TypeMapping {
         tm.register(class1, name, type);
     }
 
-    private static void fillStandardMappings(TypeMapping tm, boolean defaultNillable, 
+    private static void fillStandardMappings(TypeMapping tm, boolean defaultNillable,
                                              boolean enableMtomXmime, boolean enableJDOM) {
         defaultRegister(tm, defaultNillable, BigDecimal.class, Constants.XSD_DECIMAL,
                         new BigDecimalType());
@@ -240,7 +240,7 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, URI.class, Constants.XSD_ANYURI, new URIType());
         defaultRegister(tm, defaultNillable, XMLStreamReader.class, Constants.XSD_ANYTYPE,
                         new XMLStreamReaderType());
-        
+
         defaultRegister(tm, defaultNillable, boolean.class, Constants.XSD_BOOLEAN,
                         new BooleanType());
         defaultRegister(tm, defaultNillable, byte[].class, Constants.XSD_BASE64, new Base64Type());
@@ -257,7 +257,7 @@ public class DefaultTypeMapping implements TypeMapping {
                         new SqlDateType());
         defaultRegister(tm, defaultNillable, Number.class, Constants.XSD_DECIMAL,
                         new BigDecimalType());
-        
+
         QName mtomBase64 = Constants.XSD_BASE64;
         if (enableMtomXmime) {
             mtomBase64 = AbstractXOPType.XML_MIME_BASE64;
@@ -267,7 +267,7 @@ public class DefaultTypeMapping implements TypeMapping {
                         new DataSourceType(enableMtomXmime, null));
         defaultRegister(tm, defaultNillable, DataHandler.class, mtomBase64,
                         new DataHandlerType(enableMtomXmime, null));
-        
+
 
         defaultRegister(tm, defaultNillable, Document.class, Constants.XSD_ANYTYPE, new DocumentType());
         if (enableJDOM) {
@@ -285,9 +285,9 @@ public class DefaultTypeMapping implements TypeMapping {
         } catch (ClassNotFoundException e) {
             // not available.
         }
-        
+
         try {
-            Class<?> jdomElementClass = 
+            Class<?> jdomElementClass =
                 ClassLoaderUtils.loadClass("org.jdom.Element", DefaultTypeMapping.class);
             defaultRegister(tm, defaultNillable, jdomElementClass, Constants.XSD_ANYTYPE,
                                 new JDOMElementType());
@@ -304,7 +304,7 @@ public class DefaultTypeMapping implements TypeMapping {
      * @param enableJDOM whether to add mappings for JDOM.
      * @return
      */
-    public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
+    public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable,
                                                              boolean enableMtomXmime, boolean enableJDOM) {
         // Create a AegisType Mapping for SOAP 1.1 Encoding
         DefaultTypeMapping soapTM = new DefaultTypeMapping(Soap11.SOAP_ENCODING_URI);
@@ -339,7 +339,7 @@ public class DefaultTypeMapping implements TypeMapping {
         return soapTM;
     }
 
-    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
+    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable,
                                                               boolean enableMtomXmime) {
         return createDefaultTypeMapping(
                                         defaultNillable,
@@ -354,16 +354,16 @@ public class DefaultTypeMapping implements TypeMapping {
      * @param enableJDOM whether to map JDOM types.
      * @return
      */
-    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-                                                              boolean enableMtomXmime, 
+    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable,
+                                                              boolean enableMtomXmime,
                                                               boolean enableJDOM) {
         // by convention, the default mapping is against the XML schema URI.
         DefaultTypeMapping tm = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD);
         fillStandardMappings(tm, defaultNillable, enableMtomXmime, enableJDOM);
-        defaultRegister(tm, defaultNillable, Character.class, 
+        defaultRegister(tm, defaultNillable, Character.class,
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                         new CharacterAsStringType());
-        defaultRegister(tm, defaultNillable, char.class, 
+        defaultRegister(tm, defaultNillable, char.class,
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                         new CharacterAsStringType());
 
@@ -402,6 +402,6 @@ public class DefaultTypeMapping implements TypeMapping {
 
     public void setMappingIdentifierURI(String uri) {
         identifierURI = uri;
-        
+
     }
 }

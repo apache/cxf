@@ -43,10 +43,10 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public final class JMSConfigFactory {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSConfigFactory.class);
-    
+
     private JMSConfigFactory() {
     }
-    
+
     public static JMSConfiguration createFromEndpointInfo(Bus bus, EndpointInfo endpointInfo,
                                                           EndpointReferenceType target) {
         JMSEndpoint jmsEndpoint = new JMSEndpoint(endpointInfo, target);
@@ -60,14 +60,14 @@ public final class JMSConfigFactory {
      */
     public static JMSConfiguration createFromEndpoint(Bus bus, JMSEndpoint endpoint) {
         JMSConfiguration jmsConfig = new JMSConfiguration();
-        
-        int deliveryMode = endpoint.getDeliveryMode() 
+
+        int deliveryMode = endpoint.getDeliveryMode()
             == org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType.PERSISTENT
             ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT;
         jmsConfig.setDeliveryMode(deliveryMode);
-        
+
         jmsConfig.setPriority(endpoint.getPriority());
-        
+
         jmsConfig.setExplicitQosEnabled(true);
         jmsConfig.setMessageType(endpoint.getMessageType().value());
         boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSEndpoint.TOPIC);
@@ -86,10 +86,12 @@ public final class JMSConfigFactory {
         jmsConfig.setUserName(endpoint.getUsername());
         jmsConfig.setPassword(endpoint.getPassword());
         jmsConfig.setConcurrentConsumers(endpoint.getConcurrentConsumers());
+        jmsConfig.setOneSessionPerConnection(endpoint.isOneSessionPerConnection());
+        jmsConfig.setMessageSelector(endpoint.getMessageSelector());
 
         TransactionManager tm = getTransactionManager(bus, endpoint);
         jmsConfig.setTransactionManager(tm);
-        
+
         if (endpoint.getJndiURL() != null) {
             // Configure Connection Factory using jndi
             jmsConfig.setJndiEnvironment(JMSConfigFactory.getInitialContextEnv(endpoint));
@@ -123,12 +125,15 @@ public final class JMSConfigFactory {
             jmsConfig.setTargetDestination(endpoint.getDestinationName());
             setReplyDestination(jmsConfig, endpoint);
         }
-        
+
         String requestURI = endpoint.getRequestURI();
         jmsConfig.setRequestURI(requestURI);
-        
+
         String targetService = endpoint.getTargetService();
         jmsConfig.setTargetService(targetService);
+        jmsConfig.setMessageSelector(endpoint.getMessageSelector());
+        int retryInterval = endpoint.getRetryInterval();
+        jmsConfig.setRetryInterval(retryInterval);
         return jmsConfig;
     }
 
@@ -143,7 +148,7 @@ public final class JMSConfigFactory {
             if (tm == null) {
                 tm = getTransactionManagerFromJndi(tmName);
             }
-            
+
         }
         if (tm == null && locator != null) {
             Collection<? extends TransactionManager> tms = locator.getBeansOfType(TransactionManager.class);
@@ -185,7 +190,7 @@ public final class JMSConfigFactory {
         }
         return env;
     }
-    
+
     private static TransactionManager getTransactionManagerFromJndi(String transactionManagerJndiName) {
         if (transactionManagerJndiName == null) {
             return null;
@@ -194,7 +199,7 @@ public final class JMSConfigFactory {
             InitialContext ictx = new InitialContext();
             return (TransactionManager)ictx.lookup(transactionManagerJndiName);
         } catch (NamingException e) {
-            throw new IllegalArgumentException("Transaction Manager " + transactionManagerJndiName 
+            throw new IllegalArgumentException("Transaction Manager " + transactionManagerJndiName
                                                + " not found in jndi");
         }
     }

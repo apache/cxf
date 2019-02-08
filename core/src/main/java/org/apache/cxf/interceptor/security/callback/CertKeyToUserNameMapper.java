@@ -27,7 +27,7 @@ import javax.naming.ldap.Rdn;
 
 public class CertKeyToUserNameMapper implements CertificateToNameMapper {
     private String key;
-    
+
     /**
      * Returns Subject DN from X509Certificate
      *

@@ -30,7 +30,6 @@ import javax.activation.URLDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
@@ -49,7 +48,6 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -59,9 +57,14 @@ import org.apache.handlers.types.AddNumbers;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBase {
     private static String addNumbersAddress
@@ -75,7 +78,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
     private final QName portNameXML = new QName("http://apache.org/hello_world_xml_http/wrapped",
                                                 "XMLDispatchPort");
-    
+
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -93,7 +96,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         JAXBContext jc = JAXBContext.newInstance("org.apache.handlers.types");
         Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
         setAddress(disp, addNumbersAddress);
-        
+
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
@@ -109,13 +112,13 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         AddNumbersResponse value = (AddNumbersResponse)response.getValue();
         assertEquals(222, value.getReturn());
     }
-    
+
     @Test
     public void testInvokeWithJAXBUnwrapPayloadMode() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
         assertNotNull(wsdl);
 
-        org.apache.cxf.systest.handlers.AddNumbersServiceUnwrap service = 
+        org.apache.cxf.systest.handlers.AddNumbersServiceUnwrap service =
             new org.apache.cxf.systest.handlers.AddNumbersServiceUnwrap(wsdl, serviceName);
         assertNotNull(service);
 
@@ -125,17 +128,17 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
         setAddress(disp, addNumbersAddress);
-        
+
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        org.apache.cxf.systest.handlers.types.AddNumbers req = 
+        org.apache.cxf.systest.handlers.types.AddNumbers req =
             new org.apache.cxf.systest.handlers.types.AddNumbers();
         req.setArg0(10);
         req.setArg1(20);
-        
-        org.apache.cxf.systest.handlers.types.AddNumbersResponse response = 
+
+        org.apache.cxf.systest.handlers.types.AddNumbersResponse response =
             (org.apache.cxf.systest.handlers.types.AddNumbersResponse)disp.invoke(req);
         assertNotNull(response);
         assertEquals(222, response.getReturn());
@@ -181,7 +184,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReqPayload.xml");
+        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReqPayload.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
         DOMSource domReqMessage = new DOMSource(soapReq.getSOAPPart());
@@ -205,7 +208,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
 
@@ -229,7 +232,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
 
@@ -305,12 +308,8 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
 
-        try {
-            disp.invoke(ds);
-            fail("Did not get expected exception");
-        } catch (HTTPException e) {
-            //expected
-        }
+        DataSource resp = disp.invoke(ds);
+        assertNotNull(resp);
     }
 
     @Test
@@ -329,14 +328,8 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
-
-        try {
-            disp.invoke(ds);
-            fail("Did not get expected exception");
-        } catch (HTTPException e) {
-            assertEquals(e.getCause().getMessage(),
-                         "DataSource is not valid in PAYLOAD mode with XML/HTTP binding.");
-        }
+        DataSource resp = disp.invoke(ds);
+        assertNotNull(resp);
     }
 
     @Test
@@ -417,13 +410,13 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
                     assertEquals(10, req.getArg0());
                     assertEquals(20, req.getArg1());
-                    
+
                     req.setArg0(11);
                     req.setArg1(21);
                     ObjectFactory of = new ObjectFactory();
                     of.createAddNumbers(req);
                     msg.setPayload(of.createAddNumbers(req), jaxbContext);
-                    
+
                 } else {
                     LogicalMessage msg = ctx.getMessage();
                     JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
@@ -432,12 +425,12 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                         (org.apache.handlers.types.AddNumbersResponse)payload;
 
                     assertEquals(333, res.getReturn());
-                    
+
                     res.setReturn(222);
-                    
+
                     ObjectFactory of = new ObjectFactory();
-                    msg.setPayload(of.createAddNumbersResponse(res), jaxbContext);                     
-                    
+                    msg.setPayload(of.createAddNumbersResponse(res), jaxbContext);
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -484,7 +477,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                     SOAPBody body = env.getBody();
                     Iterator<?> it = body.getChildElements();
                     while (it.hasNext()) {
-                        
+
                         Object elem = it.next();
                         if (elem instanceof SOAPElement) {
 
@@ -494,11 +487,11 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("arg0") >= 0 && value.equalsIgnoreCase("11")) {
+                                    if (name.indexOf("arg0") >= 0 && "11".equalsIgnoreCase(value)) {
                                         value = "12";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
-                                    if (name.indexOf("arg1") >= 0 && value.equalsIgnoreCase("21")) {
+                                    if (name.indexOf("arg1") >= 0 && "21".equalsIgnoreCase(value)) {
                                         value = "22";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
@@ -506,7 +499,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                             }
                         }
                     }
-                    msg.saveChanges();           
+                    msg.saveChanges();
                 } else {
                     SOAPMessage msg = ctx.getMessage();
                     /*
@@ -519,7 +512,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                     SOAPBody body = env.getBody();
                     Iterator<?> it = body.getChildElements();
                     while (it.hasNext()) {
-                        
+
                         Object elem = it.next();
                         if (elem instanceof SOAPElement) {
 
@@ -529,7 +522,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                                 if (elem2 instanceof SOAPElement) {
                                     String value = ((SOAPElement)elem2).getValue();
                                     String name = ((SOAPElement)elem2).getLocalName();
-                                    if (name.indexOf("return") >= 0 && value.equalsIgnoreCase("264")) {
+                                    if (name.indexOf("return") >= 0 && "264".equalsIgnoreCase(value)) {
                                         value = "333";
                                         ((SOAPElement)elem2).setValue(value);
                                     }
@@ -537,7 +530,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
                             }
                         }
                     }
-                    msg.saveChanges();                     
+                    msg.saveChanges();
                 }
 /*                SOAPMessage msg = ctx.getMessage();
                 //msg.writeTo(System.out);
@@ -549,7 +542,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
             return true;
         }
-        
+
         public final Set<QName> getHeaders() {
             return null;
         }

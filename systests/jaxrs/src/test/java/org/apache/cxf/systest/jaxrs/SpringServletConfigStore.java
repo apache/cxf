@@ -40,7 +40,7 @@ public class SpringServletConfigStore implements ServletConfigAware {
     public String getServletConfigInitParam(@PathParam("name") String name) {
         return servletConfig.getInitParameter(name);
     }
-    
+
     @GET
     @Produces("text/plain")
     @Path("config/query")

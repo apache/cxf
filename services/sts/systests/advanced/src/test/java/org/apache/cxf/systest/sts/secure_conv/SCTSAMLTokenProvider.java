@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.sts.STSConstants;
@@ -45,6 +46,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.SCTValidator;
 import org.apache.cxf.ws.security.sts.provider.STSException;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.saml.SAMLCallback;
 import org.apache.wss4j.common.saml.SAMLUtil;
@@ -52,9 +54,6 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
-import org.apache.wss4j.dom.WSConstants;
-import org.joda.time.DateTime;
-import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * A TokenProvider implementation that provides a SAML Token that contains a Symmetric Key that is obtained
@@ -74,14 +73,14 @@ public class SCTSAMLTokenProvider implements TokenProvider {
      * that corresponds to the given TokenType.
      */
     public boolean canHandleToken(String tokenType) {
-        return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
-            || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
+        return WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML2_NS.equals(tokenType)
+            || WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML_NS.equals(tokenType);
     }
 
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     /**
      * Create a token given a TokenProviderParameters
      */
@@ -106,25 +105,16 @@ public class SCTSAMLTokenProvider implements TokenProvider {
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(token);
             String tokenType = tokenRequirements.getTokenType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) 
-                    || WSConstants.SAML2_NS.equals(tokenType)) {
+            if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+                    || WSS4JConstants.SAML2_NS.equals(tokenType)) {
                 response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
-            
-            DateTime validFrom = null;
-            DateTime validTill = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validFrom = assertion.getSaml2().getConditions().getNotBefore();
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-            } else {
-                validFrom = assertion.getSaml1().getConditions().getNotBefore();
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-            }
-            response.setCreated(validFrom.toDate());
-            response.setExpires(validTill.toDate());
-            
+
+            response.setCreated(assertion.getNotBefore());
+            response.setExpires(assertion.getNotOnOrAfter());
+
             response.setEntropy(entropyBytes);
             if (keySize > 0) {
                 response.setKeySize(keySize);
@@ -226,13 +216,13 @@ public class SCTSAMLTokenProvider implements TokenProvider {
     ) throws Exception {
         // Parse the AttributeStatements
         List<AttributeStatementBean> attrBeanList = null;
-        if (attributeStatementProviders != null && attributeStatementProviders.size() > 0) {
-            attrBeanList = new ArrayList<AttributeStatementBean>();
+        if (attributeStatementProviders != null && !attributeStatementProviders.isEmpty()) {
+            attrBeanList = new ArrayList<>();
             for (AttributeStatementProvider statementProvider : attributeStatementProviders) {
                 AttributeStatementBean statementBean = statementProvider.getStatement(tokenParameters);
                 if (statementBean != null) {
                     LOG.fine(
-                        "AttributeStatements" + statementBean.toString() 
+                        "AttributeStatements" + statementBean.toString()
                         + "returned by AttributeStatementProvider " + statementProvider.getClass().getName()
                     );
                     attrBeanList.add(statementBean);
@@ -242,7 +232,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
         // If no statements, then default to the DefaultAttributeStatementProvider
         if (attrBeanList == null || attrBeanList.isEmpty()) {
-            attrBeanList = new ArrayList<AttributeStatementBean>();
+            attrBeanList = new ArrayList<>();
             AttributeStatementProvider attributeProvider = new DefaultAttributeStatementProvider();
             AttributeStatementBean attributeBean = attributeProvider.getStatement(tokenParameters);
             attrBeanList.add(attributeBean);
@@ -255,7 +245,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
         subjectProviderParameters.setSecret(secret);
         subjectProviderParameters.setAttrBeanList(attrBeanList);
         SubjectBean subjectBean = subjectProvider.getSubject(subjectProviderParameters);
-        
+
         ConditionsBean conditionsBean = conditionsProvider.getConditions(tokenParameters);
 
         // Set all of the beans on the SamlCallbackHandler
@@ -276,8 +266,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
 
         String keyType = keyRequirements.getKeyType();
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
-            if (keyRequirements.getReceivedKey() == null
-                || keyRequirements.getReceivedKey().getX509Cert() == null) {
+            if (keyRequirements.getReceivedCredential() == null
+                || keyRequirements.getReceivedCredential().getX509Cert() == null) {
                 LOG.log(Level.WARNING, "A PublicKey Keytype is requested, but no certificate is provided");
                 throw new STSException(
                     "No client certificate for PublicKey KeyType", STSException.INVALID_REQUEST

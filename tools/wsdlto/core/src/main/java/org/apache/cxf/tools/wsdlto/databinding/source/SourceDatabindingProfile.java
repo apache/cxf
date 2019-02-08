@@ -33,12 +33,12 @@ import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 
 /**
- * 
+ *
  */
 public class SourceDatabindingProfile implements DataBindingProfile {
     Class<? extends Source> cls;
-    
-    
+
+
     /** {@inheritDoc}*/
     public void generate(ToolContext context) throws ToolException {
         //nothing to generate
@@ -48,7 +48,7 @@ public class SourceDatabindingProfile implements DataBindingProfile {
     public void initialize(ToolContext c) throws ToolException {
         //nothing really to do
         c.put(ToolConstants.RUNTIME_DATABINDING_CLASS, SourceDataBinding.class.getName() + ".class");
-        
+
         String s = (String)c.get(ToolConstants.CFG_DATABINDING);
         if ("source".equalsIgnoreCase(s)) {
             cls = Source.class;

@@ -52,7 +52,7 @@ public class JaxWsImplementorInfo {
     private Class<?> implementorClass;
     private Class<?> seiClass;
     private ParameterizedType seiType;
-    private List<WebService> wsAnnotations = new ArrayList<WebService>(2);
+    private List<WebService> wsAnnotations = new ArrayList<>(2);
     private WebServiceProvider wsProviderAnnotation;
 
     public JaxWsImplementorInfo(Class<?> ic) {
@@ -70,7 +70,7 @@ public class JaxWsImplementorInfo {
     public Class<?> getImplementorClass() {
         return implementorClass;
     }
-    
+
     public Class<?> getEndpointClass() {
         Class<?> endpointInterface = getSEIClass();
         if (null == endpointInterface) {
@@ -85,8 +85,8 @@ public class JaxWsImplementorInfo {
                 return service.wsdlLocation();
             }
         }
-        
-        if (null != wsProviderAnnotation 
+
+        if (null != wsProviderAnnotation
             && !StringUtils.isEmpty(wsProviderAnnotation.wsdlLocation())) {
             return wsProviderAnnotation.wsdlLocation();
         }
@@ -95,7 +95,7 @@ public class JaxWsImplementorInfo {
 
     /**
      * See use of targetNamespace in {@link WebService}.
-     * 
+     *
      * @return the qualified name of the service.
      */
     public QName getServiceName() {
@@ -103,7 +103,7 @@ public class JaxWsImplementorInfo {
         String namespace = null;
 
         // serviceName cannot be specified on SEI so check impl class only
-        if (wsAnnotations.size() > 0) {
+        if (!wsAnnotations.isEmpty()) {
             int offset = 1;
             if (seiClass == null) {
                 offset = 0;
@@ -119,8 +119,8 @@ public class JaxWsImplementorInfo {
                 }
             }
         }
-        
-        if ((serviceName == null || namespace == null) 
+
+        if ((serviceName == null || namespace == null)
             && wsProviderAnnotation != null) {
             serviceName = wsProviderAnnotation.serviceName();
             namespace = wsProviderAnnotation.targetNamespace();
@@ -139,7 +139,7 @@ public class JaxWsImplementorInfo {
 
     /**
      * See use of targetNamespace in {@link WebService}.
-     * 
+     *
      * @return the qualified name of the endpoint.
      */
     public QName getEndpointName() {
@@ -148,7 +148,7 @@ public class JaxWsImplementorInfo {
         String name = null;
 
         // portName cannot be specified on SEI so check impl class only
-        if (wsAnnotations.size() > 0) {
+        if (!wsAnnotations.isEmpty()) {
             int offset = 1;
             if (seiClass == null) {
                 offset = 0;
@@ -191,7 +191,7 @@ public class JaxWsImplementorInfo {
     public QName getInterfaceName() {
         String name = null;
         String namespace = null;
-        
+
         if (seiClass != null) {
             WebService service = seiClass.getAnnotation(WebService.class);
             if (!StringUtils.isEmpty(service.name())) {
@@ -224,7 +224,7 @@ public class JaxWsImplementorInfo {
                 namespace = getDefaultNamespace(implementorClass);
             }
         }
-        
+
         return new QName(namespace, name);
     }
 
@@ -232,9 +232,9 @@ public class JaxWsImplementorInfo {
         String pkg = PackageUtils.getNamespace(PackageUtils.getPackageName(clazz));
         return StringUtils.isEmpty(pkg) ? "http://unknown.namespace/" : pkg;
     }
-        
+
     private String getWSInterfaceName(Class<?> implClz) {
-        if (implClz.isInterface() 
+        if (implClz.isInterface()
             && implClz.getAnnotation(WebService.class) != null) {
             return implClz.getName();
         }
@@ -255,17 +255,17 @@ public class JaxWsImplementorInfo {
         }
         return null;
     }
-    
+
     protected static boolean ifAnnotationLoadedByOtherClassLoader(Class<?> cls,
         Class<? extends Annotation> annotationClass) {
         for (Annotation an : cls.getAnnotations()) {
-            if (an.annotationType() != null 
+            if (an.annotationType() != null
                 && annotationClass.getName().equals(an.annotationType().getName())) {
                 return true;
             }
         }
         return false;
-        
+
     }
     private void initialize() {
         Class<?> cls = implementorClass;
@@ -285,14 +285,14 @@ public class JaxWsImplementorInfo {
                 }
             }
             if (cls != null) {
-                cls = cls.getSuperclass();                
+                cls = cls.getSuperclass();
             }
         }
         String sei = getImplementorClassName();
         boolean seiFromWsAnnotation = true;
         if (StringUtils.isEmpty(sei)) {
             seiFromWsAnnotation = false;
-            sei = getWSInterfaceName(implementorClass);                
+            sei = getWSInterfaceName(implementorClass);
         }
         if (!StringUtils.isEmpty(sei)) {
             try {
@@ -304,7 +304,7 @@ public class JaxWsImplementorInfo {
             if (null == seiAnnotation) {
                 throw new WebServiceException(BUNDLE.getString("SEI_WITHOUT_WEBSERVICE_ANNOTATION_EXC"));
             }
-            if (seiFromWsAnnotation 
+            if (seiFromWsAnnotation
                 && (!StringUtils.isEmpty(seiAnnotation.portName())
                 || !StringUtils.isEmpty(seiAnnotation.serviceName())
                 || !StringUtils.isEmpty(seiAnnotation.endpointInterface()))) {
@@ -312,7 +312,7 @@ public class JaxWsImplementorInfo {
                 throw new WebServiceException(expString);
             }
             wsAnnotations.add(seiAnnotation);
-            
+
             for (int x = implementorClass.getInterfaces().length - 1; x >= 0; x--) {
                 if (seiClass.equals(implementorClass.getInterfaces()[x])) {
                     Type type = implementorClass.getGenericInterfaces()[x];
@@ -322,7 +322,7 @@ public class JaxWsImplementorInfo {
                 }
             }
         }
-        
+
         wsProviderAnnotation = getWebServiceProviderAnnotation(implementorClass);
     }
 
@@ -333,27 +333,25 @@ public class JaxWsImplementorInfo {
         WebServiceProvider ann = cls.getAnnotation(WebServiceProvider.class);
         if (null != ann) {
             return ann;
-        } else {
-            if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
-                LOG.log(Level.WARNING, 
-                    "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
-                    WebServiceProvider.class.getName());
-            }
+        }
+        if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+            LOG.log(Level.WARNING,
+                "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                WebServiceProvider.class.getName());
         }
         for (Class<?> inf : cls.getInterfaces()) {
             if (null != inf.getAnnotation(WebServiceProvider.class)) {
                 return inf.getAnnotation(WebServiceProvider.class);
-            } else {
-                if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
-                    LOG.log(Level.WARNING, 
-                            "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
-                            WebServiceProvider.class.getName());
-                }
+            }
+            if (ifAnnotationLoadedByOtherClassLoader(cls, WebServiceProvider.class)) {
+                LOG.log(Level.WARNING,
+                        "WEBSERVICE_ANNOTATIONS_IS_LOADED_BY_OTHER_CLASSLOADER",
+                        WebServiceProvider.class.getName());
             }
         }
         return getWebServiceProviderAnnotation(cls.getSuperclass());
     }
-    
+
     public boolean isWebServiceProvider() {
         return Provider.class.isAssignableFrom(implementorClass);
     }
@@ -376,23 +374,22 @@ public class JaxWsImplementorInfo {
 
     private static Class<?> doGetProviderParameterType(Class<?> c) {
         while (c != null) {
-            Type intfTypes[] = c.getGenericInterfaces();
+            Type[] intfTypes = c.getGenericInterfaces();
             for (Type t : intfTypes) {
                 Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
                 if (Provider.class.isAssignableFrom(clazz)) {
                     if (Provider.class == clazz) {
-                        Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
+                        Type[] paramTypes = ((ParameterizedType)t).getActualTypeArguments();
                         return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
-                    } else {
-                        return doGetProviderParameterType(clazz);
                     }
+                    return doGetProviderParameterType(clazz);
                 }
             }
             c = c.getSuperclass();
         }
         return null;
     }
-    
+
     public String getBindingType() {
         BindingType bType = implementorClass.getAnnotation(BindingType.class);
         if (bType != null) {

@@ -45,7 +45,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class Java5TypeCreator extends AbstractTypeCreator {
     private static final Logger LOG = LogUtils.getL7dLogger(Java5TypeCreator.class);
-    
+
     private AnnotationReader annotationReader;
 
     public Java5TypeCreator() {
@@ -55,16 +55,15 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     public Java5TypeCreator(AnnotationReader annotationReader) {
         this.annotationReader = annotationReader;
     }
-    
+
     public static Class<? extends AegisType> castToAegisTypeClass(Class<?> c) {
         if (c == null) {
             return null;
         }
         if (AegisType.class.isAssignableFrom(c)) {
             return c.asSubclass(AegisType.class);
-        } else {
-            throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
         }
+        throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
     }
 
     @Override
@@ -90,32 +89,31 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                                              annotationReader.getParamNamespace(m, index)));
             }
             return info;
-        } else {
-            Type genericReturnType = m.getGenericReturnType();
-            TypeClassInfo info;
-            if (genericReturnType instanceof Class) {
-                info = nextCreator.createClassInfo(m, index);
-            } else {
-                info = new TypeClassInfo();
-                info.setDescription("method " + m.getName() + " parameter " + index);
-                info.setType(genericReturnType);
-            }
-
-            if (m.getParameterAnnotations() != null && m.getAnnotations().length > 0) {
-                info.setAnnotations(m.getAnnotations());
-            }
-
-            info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
-            String returnName = annotationReader.getReturnTypeName(m);
-            if (returnName != null) {
-                info.setTypeName(createQName(m.getReturnType(),
-                                             genericReturnType,
-                                             returnName,
-                                             annotationReader.getReturnNamespace(m)));
-                
-            }
-            return info;
         }
+        Type genericReturnType = m.getGenericReturnType();
+        TypeClassInfo info;
+        if (genericReturnType instanceof Class) {
+            info = nextCreator.createClassInfo(m, index);
+        } else {
+            info = new TypeClassInfo();
+            info.setDescription("method " + m.getName() + " parameter " + index);
+            info.setType(genericReturnType);
+        }
+
+        if (m.getParameterAnnotations() != null && m.getAnnotations().length > 0) {
+            info.setAnnotations(m.getAnnotations());
+        }
+
+        info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
+        String returnName = annotationReader.getReturnTypeName(m);
+        if (returnName != null) {
+            info.setTypeName(createQName(m.getReturnType(),
+                                         genericReturnType,
+                                         returnName,
+                                         annotationReader.getReturnNamespace(m)));
+
+        }
+        return info;
     }
 
     /*
@@ -140,9 +138,8 @@ public class Java5TypeCreator extends AbstractTypeCreator {
 
         if (componentType != null) {
             return createCollectionTypeFromGeneric(info);
-        } else {
-            return nextCreator.createCollectionType(info);
         }
+        return nextCreator.createCollectionType(info);
     }
 
     // should be called 'collection'
@@ -163,9 +160,9 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         Map<String, Type> pm = generic.getTypeVars();
         if (map) {
             if (pm == null) {
-                pm = new HashMap<String, Type>();
+                pm = new HashMap<>();
             } else {
-                pm = new HashMap<String, Type>(pm);
+                pm = new HashMap<>(pm);
             }
             paramType = getComponentTypeForMap(generic.getType(), pm, index == 0);
         } else {
@@ -186,61 +183,57 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         if (paramType == null) {
             return createObjectType();
         }
-        
+
         /* null arises when the index-th parameter to generic is something list List<T> */
         Class<?> clazz = TypeUtil.getTypeRelatedClass(paramType);
         if (clazz == null) {
             return createObjectType();
         }
-        
+
         // here is where we insist that we only deal with collection types.
 
-        if (!Collection.class.isAssignableFrom(clazz) 
+        if (!Collection.class.isAssignableFrom(clazz)
             && !Map.class.isAssignableFrom(clazz)) {
             return getTopCreator().createType(clazz);
         }
-        
+
         TypeClassInfo info = createBasicClassInfo(clazz);
         info.setDescription(clazz.toString());
-        info.setType(paramType, paramType instanceof ParameterizedType ? pm : null); 
+        info.setType(paramType, paramType instanceof ParameterizedType ? pm : null);
 
-        AegisType type = createTypeForClass(info);
-
-        return type;
+        return createTypeForClass(info);
     }
 
     protected Type getComponentType(Type genericType, int index) {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType)genericType;
-            Type paramType = type.getActualTypeArguments()[index]; 
+            Type paramType = type.getActualTypeArguments()[index];
             if (paramType instanceof WildcardType) {
                 WildcardType wildcardType = (WildcardType)paramType;
                 // we really aren't prepared to deal with multiple upper bounds,
                 // so we just look at the first one.
                 return wildcardType.getUpperBounds()[0];
-            } else {
-                return paramType; // take our chances.
             }
-        } else {
-            return null;
+            return paramType; // take our chances.
         }
+        return null;
     }
 
     protected Type getComponentTypeForMap(Type genericType, Map<String, Type> pm, boolean key) {
         if (pm == null) {
-            pm = new HashMap<String, Type>();
+            pm = new HashMap<>();
         }
         return findMapGenericTypes(genericType, pm, key);
     }
-    
-    
+
+
     private Type findMapGenericTypes(Type cls, Map<String, Type> pm, boolean key) {
         if (cls == null) {
             return null;
         }
         if (cls instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)cls;
-            Type types[] = pt.getActualTypeArguments();
+            Type[] types = pt.getActualTypeArguments();
             TypeVariable<?>[] params = ((Class<?>)pt.getRawType()).getTypeParameters();
             for (int x = 0; x < types.length; x++) {
                 Type type = types[x];
@@ -256,13 +249,13 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             if (Map.class.equals(pt.getRawType())) {
                 return types[key ? 0 : 1];
             }
-            return findMapGenericTypes((Class<?>)pt.getRawType(), pm, key);
+            return findMapGenericTypes(pt.getRawType(), pm, key);
         } else if (cls instanceof Class) {
             Class<?> c = (Class<?>)cls;
             if (Map.class.isAssignableFrom(c)) {
-                
+
                 for (Type tp : c.getGenericInterfaces()) {
-                    Map<String, Type> cp = new HashMap<String, Type>(pm);
+                    Map<String, Type> cp = new HashMap<>(pm);
 
                     Type types = findMapGenericTypes(tp, cp, key);
                     if (types != null) {
@@ -273,10 +266,10 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 if (c.getSuperclass() != null && Map.class.isAssignableFrom(c.getSuperclass())) {
                     return findMapGenericTypes(c.getGenericSuperclass(), pm, key);
                 }
-            } 
+            }
         }
         return null;
-    }    
+    }
 
     @Override
     public AegisType createDefaultType(TypeClassInfo info) {
@@ -338,7 +331,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 typeClass = (Class<?>)type;
             }
         }
-        
+
         if (name == null || name.length() == 0) {
             name = ServiceUtils.makeServiceNameFromClassName(typeClass);
         }

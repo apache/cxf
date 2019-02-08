@@ -27,11 +27,14 @@ import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.selector.MaximalAlternativeSelector;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class PolicyBeansTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class PolicyBeansTest {
+
 
     @Test
     public void testParse() {
@@ -40,11 +43,11 @@ public class PolicyBeansTest extends Assert {
             PolicyEngine pe = bus.getExtension(PolicyEngine.class);
             assertTrue("Policy engine is not enabled", pe.isEnabled());
             assertTrue("Unknown assertions are not ignored", pe.isIgnoreUnknownAssertions());
-            
-            assertEquals(MaximalAlternativeSelector.class.getName(), 
-                         pe.getAlternativeSelector().getClass().getName()); 
-            
-            
+
+            assertEquals(MaximalAlternativeSelector.class.getName(),
+                         pe.getAlternativeSelector().getClass().getName());
+
+
             PolicyEngineImpl pei = (PolicyEngineImpl)pe;
             Collection<PolicyProvider> providers = pei.getPolicyProviders();
             assertEquals(4, providers.size());
@@ -59,7 +62,7 @@ public class PolicyBeansTest extends Assert {
             bus.shutdown(true);
         }
     }
-        
-    
-   
+
+
+
 }

@@ -22,7 +22,6 @@
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
   xsi:schemaLocation="
   		   http://cxf.apache.org/configuration/security
   		      http://cxf.apache.org/schemas/configuration/security.xsd
@@ -37,12 +36,10 @@
 
 	   <http:tlsClientParameters disableCNCheck="true">
 	      <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+	           <sec:keyStore type="JKS" password="password" resource="keys/Morpit.jks"/>
 	      </sec:keyManagers>
 	      <sec:trustManagers>
-	          <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	          <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
 	      </sec:trustManagers>
 	      <sec:cipherSuitesFilter>
 	        <!-- these filters ensure that a ciphersuite with

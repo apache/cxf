@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.systest.http.auth;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -28,6 +26,7 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class DigestServer extends AbstractBusTestServerBase {
@@ -35,48 +34,32 @@ public class DigestServer extends AbstractBusTestServerBase {
 
     private org.eclipse.jetty.server.Server server;
 
-    public DigestServer() {
-    }
+    private void configureServer() throws Exception {
+        URL resource = getClass().getResource("jetty-realm.properties");
 
-    protected void configureServer() throws Exception {
-        URL resource = getClass()
-            .getResource("jetty-realm.properties");
-        File file = new File(resource.toURI());
-        
-        LoginService realm = 
-            new HashLoginService("BookStoreRealm", file.getAbsolutePath());
+        LoginService realm =
+            new HashLoginService("BookStoreRealm", resource.toString());
         server.addBean(realm);
     }
-    
-    protected void run() {
-        //System.out.println("Starting Server");
 
+    protected void run() {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
         WebAppContext webappcontext = new WebAppContext();
         webappcontext.setContextPath("/digestauth");
-
-        String warPath = null;
-        try {
-            URL res = getClass().getResource("/digestauth");
-            warPath = res.toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
-        
-        webappcontext.setWar(warPath);
+        webappcontext.setBaseResource(Resource.newClassPathResource("/digestauth"));
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
 
         server.setHandler(handlers);
-        
+
         try {
             configureServer();
             server.start();
         } catch (Exception e) {
-            e.printStackTrace();
-        }     
+            throw new RuntimeException(e);
+        }
     }
     public void tearDown() throws Exception {
         if (server != null) {
@@ -85,7 +68,7 @@ public class DigestServer extends AbstractBusTestServerBase {
             server = null;
         }
     }
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             DigestServer s = new DigestServer();
             s.start();

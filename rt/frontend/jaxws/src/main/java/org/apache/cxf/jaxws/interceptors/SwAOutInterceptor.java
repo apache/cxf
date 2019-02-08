@@ -24,6 +24,8 @@ import java.awt.MediaTracker;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
@@ -59,6 +61,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -74,20 +77,20 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public class SwAOutInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(SwAOutInterceptor.class);
-    
-    private static final Map<String, Method> SWA_REF_METHOD 
-        = new ConcurrentHashMap<String, Method>(4, 0.75f, 2);
-    private static final Set<String> SWA_REF_NO_METHOD 
+
+    private static final Map<String, Method> SWA_REF_METHOD
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
+    private static final Set<String> SWA_REF_NO_METHOD
         = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>(4, 0.75f, 2));
-    
+
     AttachmentOutInterceptor attachOut = new AttachmentOutInterceptor();
-    
+
     public SwAOutInterceptor() {
         super(Phase.PRE_LOGICAL);
         addAfter(HolderOutInterceptor.class.getName());
         addBefore(WrapperClassOutInterceptor.class.getName());
     }
-    
+
     private boolean callSWARefMethod(final JAXBContext ctx) {
         String cname = ctx.getClass().getName();
         Method m = SWA_REF_METHOD.get(cname);
@@ -128,21 +131,21 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         if (bop == null) {
             return;
         }
-        
+
         if (bop.isUnwrapped()) {
             bop = bop.getWrappedOperation();
         }
-        
+
         boolean client = isRequestor(message);
         BindingMessageInfo bmi = client ? bop.getInput() : bop.getOutput();
-        
+
         if (bmi == null) {
             return;
         }
-        
+
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
-        
-        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
+
+        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().isEmpty()) {
             Service s = ex.getService();
             DataBinding db = s.getDataBinding();
             if (db instanceof JAXBDataBinding
@@ -156,60 +159,62 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
     protected void processAttachments(SoapMessage message, SoapBodyInfo sbi) {
         Collection<Attachment> atts = setupAttachmentOutput(message);
         List<Object> outObjects = CastUtils.cast(message.getContent(List.class));
-        
+
         for (MessagePartInfo mpi : sbi.getAttachments()) {
             String partName = mpi.getConcreteName().getLocalPart();
             String ct = (String) mpi.getProperty(Message.CONTENT_TYPE);
-            
+
             String id = new StringBuilder().append(partName)
                 .append("=")
                 .append(UUID.randomUUID())
                 .append("@apache.org").toString();
-            
+
             // this assumes things are in order...
             int idx = mpi.getIndex();
             Object o = outObjects.get(idx);
-            
+
             if (o == null) {
                 continue;
             }
             outObjects.set(idx, null);
             DataHandler dh = null;
-            
+
             // This code could probably be refactored out somewhere...
             if (o instanceof Source) {
                 dh = new DataHandler(createDataSource((Source)o, ct));
             } else if (o instanceof Image) {
-                // TODO: make this streamable. This is one of my pet
-                // peeves in JAXB RI as well, so if you fix this, submit the 
-                // code to the JAXB RI as well (see RuntimeBuiltinLeafInfoImpl)! - DD
-                ByteArrayOutputStream bos = new ByteArrayOutputStream(2048);
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(ct);
-                if (writers.hasNext()) {
-                    ImageWriter writer = writers.next();
-                    
-                    try {
-                        BufferedImage bimg = convertToBufferedImage((Image) o);
-                        ImageOutputStream out = ImageIO.createImageOutputStream(bos); 
-                        writer.setOutput(out);
-                        writer.write(bimg);
-                        writer.dispose();
-                        out.flush();
-                        out.close();
-                        bos.close();
-                    } catch (IOException e) {
-                        throw new Fault(e);
+                final Image img = (Image)o;
+                final String contentType = ct;
+                dh = new DataHandler(o, ct) {
+                    @Override
+                    public InputStream getInputStream() throws IOException {
+                        LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
+                        writeTo(bout);
+                        return bout.createInputStream();
                     }
-                } else {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED", 
-                                     LOG, ct));                    
-                }
+                    @Override
+                    public void writeTo(OutputStream out) throws IOException {
+                        ImageWriter writer = null;
+                        Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(contentType);
+                        if (writers.hasNext()) {
+                            writer = writers.next();
+                        }
+                        if (writer != null) {
+                            BufferedImage bimg = convertToBufferedImage(img);
+                            ImageOutputStream iout = ImageIO.createImageOutputStream(out);
+                            writer.setOutput(iout);
+                            writer.write(bimg);
+                            writer.dispose();
+                            iout.flush();
+                            out.flush();
+                        }
+                    }
+                };
                 
-                dh = new DataHandler(new ByteDataSource(bos.toByteArray(), ct));
             } else if (o instanceof DataHandler) {
                 dh = (DataHandler) o;
                 ct = dh.getContentType();
-                
+
                 try {
                     if ("text/xml".equals(ct)
                         && dh.getContent() instanceof Source) {
@@ -222,17 +227,17 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 if (ct == null) {
                     ct = "application/octet-stream";
                 }
-                dh = new DataHandler(new ByteDataSource((byte[])o, ct));                
+                dh = new DataHandler(new ByteDataSource((byte[])o, ct));
             } else if (o instanceof String) {
                 if (ct == null) {
                     ct = "text/plain; charset=\'UTF-8\'";
                 }
                 dh = new DataHandler(new ByteDataSource(((String)o).getBytes(StandardCharsets.UTF_8), ct));
             } else {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED", 
+                throw new Fault(new org.apache.cxf.common.i18n.Message("ATTACHMENT_NOT_SUPPORTED",
                                                                        LOG, o.getClass()));
             }
-            
+
             AttachmentImpl att = new AttachmentImpl(id);
             att.setDataHandler(dh);
             att.setHeader("Content-Type", ct);
@@ -248,17 +253,18 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
 
     private DataSource createDataSource(Source o, String ct) {
         DataSource ds = null;
-        
+
         if (o instanceof StreamSource) {
             StreamSource src = (StreamSource)o;
             try {
                 if (src.getInputStream() != null) {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream(2048);
-                    IOUtils.copy(src.getInputStream(), bos, 1024);
-                    ds = new ByteDataSource(bos.toByteArray(), ct);
+                    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(2048)) {
+                        IOUtils.copy(src.getInputStream(), bos, 1024);
+                        ds = new ByteDataSource(bos.toByteArray(), ct);
+                    }
                 } else {
                     ds = new ByteDataSource(IOUtils.toString(src.getReader()).getBytes(StandardCharsets.UTF_8),
-                                                 ct);                            
+                                                 ct);
                 }
             } catch (IOException e) {
                 throw new Fault(e);
@@ -279,15 +285,15 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         }
         return ds;
     }
-    
+
     private BufferedImage convertToBufferedImage(Image image) throws IOException {
         if (image instanceof BufferedImage) {
             return (BufferedImage)image;
         }
-        
+
         // Wait until the image is completely loaded
         MediaTracker tracker = new MediaTracker(new Component() {
-            private static final long serialVersionUID = 6412221228374321325L; 
+            private static final long serialVersionUID = 6412221228374321325L;
         });
         tracker.addImage(image, 0);
         try {
@@ -295,7 +301,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         } catch (InterruptedException e) {
             throw new Fault(e);
         }
-        
+
         // Create a BufferedImage so we can write it out later
         BufferedImage bufImage = new BufferedImage(
                 image.getWidth(null),
@@ -306,17 +312,17 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         g.drawImage(image, 0, 0, null);
         return bufImage;
     }
-    
+
     private Collection<Attachment> setupAttachmentOutput(SoapMessage message) {
         // We have attachments, so add the interceptor
         message.getInterceptorChain().add(attachOut);
         // We should probably come up with another property for this
         message.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, Boolean.TRUE);
-        
-        
+
+
         Collection<Attachment> atts = message.getAttachments();
         if (atts == null) {
-            atts = new ArrayList<Attachment>();
+            atts = new ArrayList<>();
             message.setAttachments(atts);
         }
         return atts;

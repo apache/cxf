@@ -27,7 +27,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * 
+ *
  */
 public class TestApplicationContext extends ClassPathXmlApplicationContext {
 
@@ -45,5 +45,5 @@ public class TestApplicationContext extends ClassPathXmlApplicationContext {
         reader.setEntityResolver(new BusEntityResolver(cl, new BeansDtdResolver(),
             new PluggableSchemaResolver(cl)));
     }
-   
+
 }

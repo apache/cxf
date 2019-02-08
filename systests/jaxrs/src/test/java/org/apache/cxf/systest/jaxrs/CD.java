@@ -25,15 +25,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class CD {
     private String name;
     private long id;
-    
+
     public CD() {
     }
-    
+
     public CD(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -41,11 +41,11 @@ public class CD {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -54,12 +54,12 @@ public class CD {
         if (!(o instanceof CD)) {
             return false;
         }
-        
+
         CD other = (CD)o;
         return name.equals(other.name) && id == other.id;
     }
-    
+
     public int hashCode() {
-        return name.hashCode() + new Long(id).hashCode();
+        return name.hashCode() + Long.valueOf(id).hashCode();
     }
 }

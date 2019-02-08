@@ -26,19 +26,19 @@ public class ThreadingParameters {
 
     private int threadPoolSize = 200;
     private boolean threadPoolSizeSet;
-    
-    
+
+
     public void setThreadPoolSize(int number) {
         threadPoolSizeSet = true;
         threadPoolSize = number;
     }
-    
+
     public int getThreadPoolSize() {
         return threadPoolSize;
     }
-    
+
     public boolean isSeThreadPoolSize() {
         return threadPoolSizeSet;
     }
-    
+
 }

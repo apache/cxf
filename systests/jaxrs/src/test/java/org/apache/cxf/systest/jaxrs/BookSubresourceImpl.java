@@ -29,33 +29,33 @@ import javax.ws.rs.core.UriInfo;
 public class BookSubresourceImpl implements BookSubresource {
 
     private Long id;
-    
+
     public BookSubresourceImpl() {
         id = 123L;
     }
-    
+
     public BookSubresourceImpl(Long id) {
         this.id = id;
     }
-    
+
     public Book getTheBook() throws BookNotFoundFault {
-        
+
         if (id == 0) {
             return null;
         }
-        
+
         Book b = new Book();
         b.setId(id);
         b.setName("CXF in Action");
         return b;
     }
 
-    public Book getTheBook2(String n1, String n2, String n3, String n33, 
-                            String n4, String n5, String n6) 
+    public Book getTheBook2(String n1, String n2, String n3, String n33,
+                            String n4, String n5, String n6)
         throws BookNotFoundFault {
-        
+
         Book b = new Book();
-        b.setId(id); 
+        b.setId(id);
         b.setName(n1 + n2 + n3 + n33 + n4 + n5 + n6);
         return b;
     }
@@ -64,17 +64,17 @@ public class BookSubresourceImpl implements BookSubresource {
         if (nameParts.size() != 2) {
             throw new RuntimeException("Wrong number of name parts");
         }
-        
+
         Book b = new Book();
-        
-        b.setId(Long.valueOf(sid)); 
+
+        b.setId(Long.valueOf(sid));
         b.setName(nameParts.get(0) + nameParts.get(1));
         return b;
     }
-    
-    public Book getTheBook4(Book bookPath, Book bookQuery, 
+
+    public Book getTheBook4(Book bookPath, Book bookQuery,
                             Book bookMatrix, Book formBook) throws BookNotFoundFault {
-        if (bookPath == null || bookQuery == null 
+        if (bookPath == null || bookQuery == null
             || bookMatrix == null || formBook == null) {
             throw new RuntimeException();
         }
@@ -89,7 +89,7 @@ public class BookSubresourceImpl implements BookSubresource {
         String name2 = bookQuery.getName();
         String name3 = bookMatrix.getName();
         String name4 = formBook.getName();
-        if (!"CXF Rocks".equals(name1) || !name1.equals(name2) 
+        if (!"CXF Rocks".equals(name1) || !name1.equals(name2)
             || !name1.equals(name3) || !name1.equals(name4)) {
             throw new RuntimeException();
         }
@@ -99,7 +99,7 @@ public class BookSubresourceImpl implements BookSubresource {
     public Book getTheBookNoProduces() throws BookNotFoundFault {
         return getTheBook();
     }
-    
+
     public OrderBean addOrder(OrderBean order) {
         return order;
     }
@@ -118,9 +118,8 @@ public class BookSubresourceImpl implements BookSubresource {
         String comment2 = comments.get(2L);
         if ("Good".equals(comment1) && "Good".equals(comment2)) {
             return book;
-        } else {
-            return null;
         }
+        return null;
     }
 
 }

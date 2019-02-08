@@ -36,7 +36,7 @@ public final class HttpAddressPlugin extends AbstractWSDLPlugin {
     public ExtensibilityElement createExtension(final Map<String, Object> args) throws WSDLException {
         String address = getOption(args, ToolConstants.CFG_ADDRESS);
 
-        ExtensibilityElement  addr = registry.createExtension(Port.class,
+        ExtensibilityElement addr = registry.createExtension(Port.class,
                                                               WSDLConstants.QNAME_XMLHTTP_BINDING_ADDRESS);
 
         if (addr instanceof AddressType) {

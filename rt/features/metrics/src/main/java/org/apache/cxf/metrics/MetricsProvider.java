@@ -23,7 +23,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
- * 
+ *
  */
 public interface MetricsProvider {
     String CLIENT_ID = "MetricsProvider.CLIENT_ID";

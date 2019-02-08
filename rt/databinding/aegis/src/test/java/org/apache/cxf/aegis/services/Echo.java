@@ -29,7 +29,7 @@ public class Echo {
     public String echo(@WebParam(name = "echo") String echo) {
         return echo;
     }
-    
+
     public String simpleEcho(String string) throws Exception {
         return string;
     }
@@ -38,7 +38,7 @@ public class Echo {
         @WebParam(name = "firstHeader", header = true) int i,
         @WebParam(name = "secondHeader", header = true) String s,
         String string) {
-        
+
         return string;
     }
 }

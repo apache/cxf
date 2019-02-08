@@ -29,43 +29,43 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 
 public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface,
     HttpHeadersContext {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    @Context 
+    private Map<Long, Book> books = new HashMap<>();
+    @Context
     private UriInfo ui;
 
     private HttpHeaders hs;
-    
+
     public BookStoreNoAnnotationsImpl() {
         Book b = new Book();
         b.setId(123L);
         b.setName("CXF in Action");
         books.put(b.getId(), b);
     }
-    
+
     public void setHttpHeaders(HttpHeaders headers) {
-        this.hs = headers;    
+        this.hs = headers;
     }
-    
+
     public Book getBook(Long id) throws BookNotFoundFault {
         if (hs == null) {
             throw new WebApplicationException(Response.serverError().build());
         }
-        boolean springProxy = MessageUtils.isTrue(hs.getHeaderString("SpringProxy"));
+        boolean springProxy = PropertyUtils.isTrue(hs.getHeaderString("SpringProxy"));
         if (!springProxy && ui == null) {
             throw new WebApplicationException(Response.serverError().build());
         }
         return books.get(id);
     }
-    
+
     public ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault {
         Book b = books.get(id);
         Chapter ch = b.getChapter(1);
-        
+
         ChapterNoAnnotations ch2 = new ChapterNoAnnotations();
         ch2.setId(ch.getId());
         ch2.setTitle(ch.getTitle());
@@ -79,5 +79,5 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
     public void pingBookStore() {
         // complete
     }
-    
+
 }

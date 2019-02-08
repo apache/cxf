@@ -26,18 +26,17 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.ExpandableBuffer;
 
 /**
- * Content buffer that can be shared by multiple threads, usually the I/O dispatch of 
+ * Content buffer that can be shared by multiple threads, usually the I/O dispatch of
  * an I/O reactor and a worker thread.
  * <p/>
  * The I/O dispatch thread is expected to transfer data from the buffer to
- *   {@link ContentEncoder} by calling {@link #produceContent(ContentEncoder)}.
+ *   {@link ContentEncoder} by calling {@link #produceContent(ContentEncoder, IOControl)}.
  * <p/>
  * The worker thread is expected to write data to the buffer by calling
  * {@link #write(int)}, {@link #write(byte[], int, int)} or {@link #writeCompleted()}
@@ -45,7 +44,6 @@ import org.apache.http.nio.util.ExpandableBuffer;
  * In case of an abnormal situation or when no longer needed the buffer must be
  * shut down using {@link #shutdown()} method.
  */
-@ThreadSafe
 public class SharedOutputBuffer extends ExpandableBuffer {
 
     private final ReentrantLock lock;
@@ -54,7 +52,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
     private volatile IOControl ioctrl;
     private volatile boolean shutdown;
     private volatile boolean endOfStream;
-    
+
     private volatile ByteBuffer largeWrapper;
 
     public SharedOutputBuffer(int buffersize, final ByteBufferAllocator allocator) {
@@ -146,7 +144,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                     this.ioctrl.suspendOutput();
                 }
             }
-            // no need to signal if the large wrapper is present and has data remaining 
+            // no need to signal if the large wrapper is present and has data remaining
             if (largeWrapper == null || !largeWrapper.hasRemaining()) {
                 this.condition.signalAll();
             }
@@ -210,7 +208,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                         buffer.position(p + i);
                     }
                     /*
-                    System.out.println("p: " + p + "  " + i + " " + this.buffer.position() 
+                    System.out.println("p: " + p + "  " + i + " " + this.buffer.position()
                                        + " " + this.buffer.hasRemaining());
                                        */
                 }
@@ -255,7 +253,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             this.lock.unlock();
         }
     }
-    
+
     public int write(ByteBuffer b) throws IOException {
         if (b == null) {
             return 0;
@@ -266,7 +264,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                 throw new IllegalStateException("Buffer already closed for writing");
             }
             setInputMode();
-            
+
             if (!this.buffer.hasRemaining()) {
                 flushContent();
                 setInputMode();
@@ -346,6 +344,6 @@ public class SharedOutputBuffer extends ExpandableBuffer {
         }
     }
 
-    
+
 
 }

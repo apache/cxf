@@ -38,13 +38,14 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.apache.hello_world_doc_lit.Greeter;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSTransactionTest extends AbstractVmJMSTest {
-    private static final String SERVICE_ADDRESS = 
+    private static final String SERVICE_ADDRESS =
         "jms:queue:greeter.queue.tx?receivetTimeOut=5000&sessionTransacted=true";
     private static EndpointImpl endpoint;
     private static TransactionManager transactionManager;
@@ -54,7 +55,7 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         startBusAndJMS(brokerURI);
         startBroker(brokerURI);
     }
-    
+
     public static void startBusAndJMS(String brokerURI) {
         try {
             transactionManager = new GeronimoTransactionManager();
@@ -81,7 +82,7 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         mybl.register("tm", transactionManager);
         bus.setExtension(mybl, ConfiguredBeanLocator.class);
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startBusAndJMS(JMSTransactionTest.class);
@@ -100,7 +101,7 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
 
     /**
      * Request reply should not cause roll backs
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -115,24 +116,24 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
             // Fine
         }
     }
-    
+
     @Test
     public void testTransactionOneWay() throws Exception {
         Connection conn = cf.createConnection();
         conn.start();
         Queue queue = JMSUtil.createQueue(conn, "ActiveMQ.DLQ");
         assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
-        
+
         Greeter greeter = markForClose(createGreeterProxy());
         // Should be processed normally
         greeter.greetMeOneWay(GreeterImplWithTransaction.GOOD_GUY);
-        
-        
+
+
         assertNumMessagesInQueue("DLQ should be empty", conn, queue, 0, 1000);
 
         // Should cause rollback, redelivery and in the end the message should go to the dead letter queue
         greeter.greetMeOneWay(GreeterImplWithTransaction.BAD_GUY);
-        
+
         assertNumMessagesInQueue("Request should be put into DLQ", conn, queue, 1, 2000);
         conn.close();
     }
@@ -146,7 +147,7 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         factory.setAddress(SERVICE_ADDRESS);
         return (Greeter)markForClose(factory.create());
     }
-    
+
     private void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
                                           int expectedNum, int timeout) throws JMSException,
         InterruptedException {
@@ -154,12 +155,12 @@ public class JMSTransactionTest extends AbstractVmJMSTest {
         int actualNum;
         do {
             actualNum = JMSUtil.getNumMessages(connection, queue);
-            
+
             //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
             //                   + ", expecting: " + expectedNum);
             Thread.sleep(100);
         } while ((System.currentTimeMillis() - startTime < timeout) && expectedNum != actualNum);
         Assert.assertEquals(message + " -> number of messages", expectedNum, actualNum);
     }
-    
+
 }

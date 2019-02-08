@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.sts.deployment;
 
+import java.util.Base64;
+
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.validator.TokenValidator;
@@ -26,7 +28,6 @@ import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.xml.security.utils.Base64;
 
 
 /**
@@ -34,39 +35,39 @@ import org.apache.xml.security.utils.Base64;
  */
 public class CustomBSTTokenValidator implements TokenValidator {
 
-    private static final String TOKEN_TYPE = 
+    private static final String TOKEN_TYPE =
         "http://custom.apache.org/token";
-    
+
     public boolean canHandleToken(ReceivedToken validateTarget) {
         Object token = validateTarget.getToken();
         return (token instanceof BinarySecurityTokenType)
             && TOKEN_TYPE.equals(((BinarySecurityTokenType)token).getValueType());
     }
-    
+
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         return canHandleToken(validateTarget);
     }
-    
+
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         if (!validateTarget.isBinarySecurityToken()) {
             return response;
         }
         BinarySecurityTokenType binarySecurityToken = (BinarySecurityTokenType)validateTarget.getToken();
-        
+
         //
         // Do some validation of the token here
         //
-        if (Base64.encode("12345678".getBytes()).equals(binarySecurityToken.getValue())) {
+        if (Base64.getMimeEncoder().encodeToString("12345678".getBytes()).equals(binarySecurityToken.getValue())) {
             validateTarget.setState(STATE.VALID);
         }
         response.setPrincipal(new CustomTokenPrincipal("alice"));
-        
+
         return response;
     }
-    
+
 }

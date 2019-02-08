@@ -27,7 +27,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
@@ -35,34 +35,34 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  */
 public class CustomUsernameTokenProvider implements TokenProvider {
 
-    private static final String TOKEN_TYPE = 
+    private static final String TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
-    
+
     public boolean canHandleToken(String tokenType) {
         return TOKEN_TYPE.equals(tokenType);
     }
-    
+
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
-            Document doc = DOMUtils.createDocument();
-            
+            Document doc = DOMUtils.getEmptyDocument();
+
             // Mock up a UsernameToken
-            UsernameToken usernameToken = new UsernameToken(true, doc, WSConstants.PASSWORD_TEXT);
+            UsernameToken usernameToken = new UsernameToken(true, doc, WSS4JConstants.PASSWORD_TEXT);
             usernameToken.setName("alice");
             usernameToken.setPassword("password");
             String id = "UT-1234";
             usernameToken.addWSSENamespace();
             usernameToken.addWSUNamespace();
             usernameToken.setID(id);
-            
+
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(usernameToken.getElement());
             response.setTokenId(id);
-            
+
             // Store the token in the cache
             if (tokenParameters.getTokenStore() != null) {
                 SecurityToken securityToken = new SecurityToken(usernameToken.getID());
@@ -72,7 +72,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
                 securityToken.setTokenHash(hashCode);
                 tokenParameters.getTokenStore().add(identifier, securityToken);
             }
-            
+
             return response;
         } catch (Exception e) {
             e.printStackTrace();

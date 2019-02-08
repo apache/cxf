@@ -19,11 +19,11 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
@@ -65,9 +66,9 @@ public final class CustomizationParser {
 
     private ToolContext env;
     // map for jaxws binding and wsdl element
-    private final Map<Element, Element> jaxwsBindingsMap = new HashMap<Element, Element>();
-    private final List<InputSource> jaxbBindings = new ArrayList<InputSource>();
-    private final Map<String, Element> customizedElements = new HashMap<String, Element>();
+    private final Map<Element, Element> jaxwsBindingsMap = new HashMap<>();
+    private final List<InputSource> jaxbBindings = new ArrayList<>();
+    private final Map<String, Element> customizedElements = new HashMap<>();
 
     private Element handlerChains;
     private Element wsdlNode;
@@ -92,11 +93,11 @@ public final class CustomizationParser {
 
             if (env.get(ToolConstants.CFG_CATALOG) != null) {
                 wsdlNode = resolveNodeByCatalog(wsdlURL);
-            } 
+            }
             if (wsdlNode == null) {
                 wsdlNode = getTargetNode(this.wsdlURL);
             }
-            
+
             if (wsdlNode == null) {
                 throw new ToolException(new Message("MISSING_WSDL", LOG, wsdlURL));
             }
@@ -126,9 +127,9 @@ public final class CustomizationParser {
             internalizeBinding(entry.getKey(), targetNode, "");
             String uri = entry.getKey().getAttribute("wsdlLocation");
             customizedElements.put(uri, targetNode);
-            updateJaxwsBindingMapValue(targetNode);  
+            updateJaxwsBindingMapValue(targetNode);
         }
-        
+
         buildHandlerChains();
     }
 
@@ -152,7 +153,7 @@ public final class CustomizationParser {
         if (ins == null) {
             return null;
         }
-        
+
         XMLStreamReader reader = null;
         try {
             reader = StaxUtils.createXMLStreamReader(uri, ins);
@@ -177,7 +178,7 @@ public final class CustomizationParser {
         } catch (Exception ex) {
             //ignore - probably not DOM level 3
         }
-        
+
         if (doc != null) {
             return doc.getDocumentElement();
         }
@@ -193,20 +194,20 @@ public final class CustomizationParser {
             }
         }
     }
-    
+
     private void buildHandlerChains() {
 
-        for (Element jaxwsBinding : jaxwsBindingsMap.keySet()) {            
-            List<Element> elemList = 
-                DOMUtils.findAllElementsByTagNameNS(jaxwsBinding, 
-                                                    ToolConstants.HANDLER_CHAINS_URI, 
-                                                    ToolConstants.HANDLER_CHAINS);         
-            if (elemList.size() == 0) {
+        for (Element jaxwsBinding : jaxwsBindingsMap.keySet()) {
+            List<Element> elemList =
+                DOMUtils.findAllElementsByTagNameNS(jaxwsBinding,
+                                                    ToolConstants.HANDLER_CHAINS_URI,
+                                                    ToolConstants.HANDLER_CHAINS);
+            if (elemList.isEmpty()) {
                 continue;
-            }         
+            }
             // take the first one, anyway its 1 handler-config per customization
             this.handlerChains = elemList.get(0);
- 
+
             return;
         }
 
@@ -249,7 +250,7 @@ public final class CustomizationParser {
     private void appendJaxbVersion(final Element schemaElement) {
         String jaxbPrefix = schemaElement.lookupPrefix(ToolConstants.NS_JAXB_BINDINGS);
         if (jaxbPrefix == null) {
-            schemaElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+            schemaElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
                                        "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
             schemaElement.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS, "jaxb:version", "2.0");
         }
@@ -263,7 +264,7 @@ public final class CustomizationParser {
         Node[] embededNodes = getAnnotationNodes(schemaNode);
         Node annotationNode = embededNodes[0];
         Node appinfoNode = embededNodes[1];
-        
+
         for (Node childNode = jaxwsBindingNode.getFirstChild();
             childNode != null;
             childNode = childNode.getNextSibling()) {
@@ -276,20 +277,20 @@ public final class CustomizationParser {
             if (!(childNode instanceof Element)) { //!isJaxbBindings(childNode)) {
                 continue;
             }
-            
+
             Element childEl = (Element)childNode;
             if (isJaxbBindings(childNode) && isJaxbBindingsElement(childEl)) {
-                
+
                 NodeList nlist = nodeSelector.queryNodes(schemaNode, childEl.getAttribute("node"));
                 for (int i = 0; i < nlist.getLength(); i++) {
                     Node node = nlist.item(i);
                     copyAllJaxbDeclarations(node, childEl);
-                }              
-                
+                }
+
             } else {
-                Element cloneNode = (Element)ProcessorUtil.cloneNode(schemaNode.getOwnerDocument(), 
+                Element cloneNode = (Element)ProcessorUtil.cloneNode(schemaNode.getOwnerDocument(),
                                                                      childEl, true);
-                
+
                 NamedNodeMap atts = cloneNode.getAttributes();
                 for (int x = 0; x < atts.getLength(); x++) {
                     Attr attr = (Attr)atts.item(x);
@@ -302,7 +303,7 @@ public final class CustomizationParser {
                 appinfoNode.appendChild(cloneNode);
             }
         }
-        
+
         if (schemaNode.getFirstChild() != null) {
             schemaNode.insertBefore(annotationNode, schemaNode.getFirstChild());
         } else {
@@ -319,12 +320,12 @@ public final class CustomizationParser {
             NamedNodeMap atts = el.getAttributes();
             for (int x = 0; x < atts.getLength(); x++) {
                 Attr attr = (Attr)atts.item(x);
-                if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) { 
-                    Attr attrnew = schemaNode.getOwnerDocument().createAttributeNS(attr.getNamespaceURI(), 
+                if (ToolConstants.NS_JAXB_BINDINGS.equals(attr.getNamespaceURI())) {
+                    Attr attrnew = schemaNode.getOwnerDocument().createAttributeNS(attr.getNamespaceURI(),
                                                                                 attr.getName());
                     attrnew.setValue(attr.getValue());
                     schemaNode.setAttributeNodeNS(attrnew);
-                    
+
                     if ("extensionBindingPrefixes".equals(attr.getLocalName())) {
                         String pfxs = attr.getValue();
                         while (pfxs.length() > 0) {
@@ -337,7 +338,7 @@ public final class CustomizationParser {
                                 pfxs = "";
                             }
                             String ns = el.lookupNamespaceURI(pfx);
-                            schemaNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+                            schemaNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
                                                       "xmlns:" + pfx,
                                                       ns);
                         }
@@ -345,7 +346,7 @@ public final class CustomizationParser {
                 }
             }
         }
-        
+
     }
 
     protected void internalizeBinding(Element bindings, Element targetNode, String expression) {
@@ -358,7 +359,7 @@ public final class CustomizationParser {
             if (targetNode != wsdlNode) {
                 nodeSelector.addNamespaces(targetNode);
             }
-            
+
             copyBindingsToWsdl(targetNode, bindings, nodeSelector.getNamespaceContext());
         }
 
@@ -380,8 +381,8 @@ public final class CustomizationParser {
                     copyBindingsToWsdl(node, bindings, nodeSelector.getNamespaceContext());
                 }
             }
-            
-           
+
+
         }
 
         Element[] children = getChildElements(bindings, ToolConstants.NS_JAXWS_BINDINGS);
@@ -414,7 +415,7 @@ public final class CustomizationParser {
         Node firstChild = DOMUtils.getChild(node, "jaxws:bindings");
         if (firstChild == null && cloneNode.getNodeName().indexOf("bindings") == -1) {
             wsdlNode.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
-                                  "xmlns:jaxws", 
+                                  "xmlns:jaxws",
                                   ToolConstants.JAXWS_BINDINGS.getNamespaceURI());
             Element jaxwsBindingElement = node.getOwnerDocument()
                     .createElementNS(ToolConstants.JAXWS_BINDINGS.getNamespaceURI(),
@@ -433,14 +434,14 @@ public final class CustomizationParser {
 
         Element cloneEle = (Element)cloneNode;
         cloneEle.removeAttribute("node");
-        
+
         Element elem = DOMUtils.getFirstElement(cloneNode);
         while (elem != null) {
             Node attrNode = elem.getAttributeNode("node");
             if (attrNode != null) {
                 cloneNode.removeChild(elem);
-            }        
-            elem = DOMUtils.getNextElement(elem);       
+            }
+            elem = DOMUtils.getNextElement(elem);
         }
 
         if (firstChild != null) {
@@ -451,11 +452,11 @@ public final class CustomizationParser {
     private boolean isGlobaleBindings(Element binding) {
 
         boolean globleNode = binding.getNamespaceURI().equals(ToolConstants.NS_JAXWS_BINDINGS)
-                             && binding.getLocalName().equals("package")
-                             || binding.getLocalName().equals("enableAsyncMapping")
-                             || binding.getLocalName().equals("enableAdditionalSOAPHeaderMapping")
-                             || binding.getLocalName().equals("enableWrapperStyle")
-                             || binding.getLocalName().equals("enableMIMEContent");
+                             && "package".equals(binding.getLocalName())
+                             || "enableAsyncMapping".equals(binding.getLocalName())
+                             || "enableAdditionalSOAPHeaderMapping".equals(binding.getLocalName())
+                             || "enableWrapperStyle".equals(binding.getLocalName())
+                             || "enableMIMEContent".equals(binding.getLocalName());
         Node parentNode = binding.getParentNode();
         if (parentNode instanceof Element) {
             Element ele = (Element)parentNode;
@@ -469,7 +470,7 @@ public final class CustomizationParser {
     }
 
     private Element[] getChildElements(Element parent, String nsUri) {
-        List<Element> a = new ArrayList<Element>();
+        List<Element> a = new ArrayList<>();
         for (Node item = parent.getFirstChild(); item != null; item = item.getNextSibling()) {
             if (!(item instanceof Element)) {
                 continue;
@@ -478,7 +479,7 @@ public final class CustomizationParser {
                 a.add((Element)item);
             }
         }
-        return a.toArray(new Element[a.size()]);
+        return a.toArray(new Element[0]);
     }
 
     private void addBinding(String bindingFile) throws XMLStreamException {
@@ -487,7 +488,7 @@ public final class CustomizationParser {
         XMLStreamReader xmlReader = null;
         try {
             URIResolver resolver = new URIResolver(bindingFile);
-            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(), 
+            xmlReader = StaxUtils.createXMLStreamReader(resolver.getURI().toString(),
                                                                      resolver.getInputStream());
             root = StaxUtils.read(xmlReader, true).getDocumentElement();
         } catch (Exception e1) {
@@ -511,7 +512,7 @@ public final class CustomizationParser {
                     targetNode = getTargetNode(resolvedLoc);
                 }
                 if (targetNode == null) {
-                    Message msg = new Message("POINT_TO_WSDL_DOES_NOT_EXIST", 
+                    Message msg = new Message("POINT_TO_WSDL_DOES_NOT_EXIST",
                                               LOG, new Object[] {bindingFile, resolvedLoc});
                     throw new ToolException(msg);
                 }
@@ -538,7 +539,7 @@ public final class CustomizationParser {
                 jaxbBindings.add(tmpIns);
             } else {
                 jaxbBindings.add(new InputSource(bindingFile));
-            } 
+            }
         }
     }
 
@@ -547,7 +548,7 @@ public final class CustomizationParser {
         try {
             locURI = new URI(uri);
         } catch (URISyntaxException e) {
-            Message msg = new Message("BINDING_LOC_ERROR", 
+            Message msg = new Message("BINDING_LOC_ERROR",
                                       LOG, new Object[] {uri});
             throw new ToolException(msg);
         }
@@ -565,7 +566,7 @@ public final class CustomizationParser {
         }
         return locURI.toString();
     }
-    
+
     private Element resolveNodeByCatalog(String url) {
         String resolvedLocation = resolveByCatalog(url);
         return getTargetNode(resolvedLocation);
@@ -577,9 +578,9 @@ public final class CustomizationParser {
         }
         Bus bus = env.get(Bus.class);
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-        
+
         try {
-            return new OASISCatalogManagerHelper().resolve(catalogResolver, 
+            return new OASISCatalogManagerHelper().resolve(catalogResolver,
                                                            url, null);
         } catch (Exception e1) {
             Message msg = new Message("FAILED_RESOLVE_CATALOG", LOG, url);
@@ -591,7 +592,7 @@ public final class CustomizationParser {
         InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, new FileOutputStream(tmpFile));
+        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
         return result;

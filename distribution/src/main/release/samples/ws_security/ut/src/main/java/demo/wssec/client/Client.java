@@ -42,7 +42,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();
@@ -50,14 +50,14 @@ public final class Client {
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
-            Map<String, Object> outProps = new HashMap<String, Object>();
+            Map<String, Object> outProps = new HashMap<>();
             outProps.put("action", "UsernameToken Timestamp");
 
             outProps.put("passwordType", "PasswordDigest");
             outProps.put("user", "abcd");
             outProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");
 
-            Map<String, Object> inProps = new HashMap<String, Object>();
+            Map<String, Object> inProps = new HashMap<>();
             inProps.put("action", "UsernameToken Timestamp");
             inProps.put("passwordType", "PasswordText");
             inProps.put("passwordCallbackClass", "demo.wssec.client.UTPasswordCallback");

@@ -19,11 +19,14 @@
 package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.Principal;
-import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -42,34 +45,34 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * A default implementation to create a JWTClaims object. The Subject name is the name
- * of the current principal. 
+ * of the current principal.
  */
 public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
-    
+
     public static final long DEFAULT_MAX_LIFETIME = 60L * 60L * 12L;
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultJWTClaimsProvider.class);
     private boolean useX500CN;
-    
+
     private long lifetime = 60L * 30L;
     private long maxLifetime = DEFAULT_MAX_LIFETIME;
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;
     private long futureTimeToLive = 60L;
-                                                            
+    private Map<String, String> claimTypeMap;
+
     /**
      * Get a JwtClaims object.
      */
     public JwtClaims getJwtClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
-        
+
         JwtClaims claims = new JwtClaims();
         claims.setSubject(getSubjectName(jwtClaimsProviderParameters));
         claims.setTokenId(UUID.randomUUID().toString());
-        
+
         // Set the Issuer
         String issuer = jwtClaimsProviderParameters.getIssuer();
         if (issuer == null) {
@@ -78,23 +81,25 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         } else {
             claims.setIssuer(issuer);
         }
-        
+
         handleWSTrustClaims(jwtClaimsProviderParameters, claims);
-        
+
         handleConditions(jwtClaimsProviderParameters, claims);
-        
+
         handleAudienceRestriction(jwtClaimsProviderParameters, claims);
-        
+
+        handleActAs(jwtClaimsProviderParameters, claims);
+
         return claims;
     }
-    
+
     protected String getSubjectName(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
         Principal principal = getPrincipal(jwtClaimsProviderParameters);
         if (principal == null) {
             LOG.fine("Error in getting principal");
             throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
         }
-        
+
         String subjectName = principal.getName();
         if (principal instanceof X500Principal) {
             // Just use the "cn" instead of the entire DN
@@ -108,14 +113,13 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 //Ignore, not X500 compliant thus use the whole string as the value
             }
         }
-        
+
         return subjectName;
     }
-        
+
     /**
      * Get the Principal (which is used as the Subject). By default, we check the following (in order):
      *  - A valid OnBehalfOf principal
-     *  - A valid ActAs principal
      *  - A valid principal associated with a token received as ValidateTarget
      *  - The principal associated with the request. We don't need to check to see if it is "valid" here, as it
      *    is not parsed by the STS (but rather the WS-Security layer).
@@ -125,14 +129,9 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
         Principal principal = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
-        //if validation was successful, the principal was set in ReceivedToken 
+        //if validation was successful, the principal was set in ReceivedToken
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
-            if (receivedToken.getState().equals(STATE.VALID)) {
-                principal = receivedToken.getPrincipal();
-            }
-        } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 principal = receivedToken.getPrincipal();
             }
@@ -147,10 +146,10 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
         return principal;
     }
-    
+
     protected void handleWSTrustClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
+
         // Handle Claims
         ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
         if (retrievedClaims != null) {
@@ -162,74 +161,70 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                     if (claim.getValues().size() == 1) {
                         claimValues = claim.getValues().get(0);
                     }
-                    claims.setProperty(claim.getClaimType().toString(), claimValues);
+                    claims.setProperty(translateClaim(claim.getClaimType().toString()), claimValues);
                 }
             }
         }
     }
-    
+
     protected void handleConditions(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
-        Date currentDate = new Date();
-        long currentTimeInSeconds = currentDate.getTime() / 1000L;
+
+        Instant currentDate = Instant.now();
+        long currentTime = currentDate.getEpochSecond();
         
         // Set the defaults first
-        claims.setIssuedAt(currentTimeInSeconds);
-        claims.setNotBefore(currentTimeInSeconds);
-        claims.setExpiryTime(currentTimeInSeconds + lifetime);
-        
+        claims.setIssuedAt(currentTime);
+        claims.setNotBefore(currentTime);
+        claims.setExpiryTime(currentTime + lifetime);
+
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null
             && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
+            Instant creationTime = null;
+            Instant expirationTime = null;
             try {
-                XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-                Date creationTime = fmt.parse(tokenLifetime.getCreated());
-                Date expirationTime = fmt.parse(tokenLifetime.getExpires());
-                if (creationTime == null || expirationTime == null) {
-                    LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
-                    throw new STSException(
-                                           "Error in parsing Timestamp Created or Expiration Strings",
-                                           STSException.INVALID_TIME
-                        );
-                }
-
-                // Check to see if the created time is in the future
-                Date validCreation = new Date();
-                long currentTime = validCreation.getTime();
-                if (futureTimeToLive > 0) {
-                    validCreation.setTime(currentTime + futureTimeToLive * 1000L);
-                }
-                if (creationTime.after(validCreation)) {
-                    LOG.fine("The Created Time is too far in the future");
-                    throw new STSException("The Created Time is too far in the future", STSException.INVALID_TIME);
-                }
-
-                long requestedLifetime = expirationTime.getTime() - creationTime.getTime();
-                if (requestedLifetime > (getMaxLifetime() * 1000L)) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Requested lifetime [").append(requestedLifetime / 1000L);
-                    sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
-                    sb.append(" sec]");
-                    LOG.warning(sb.toString());
-                    if (isFailLifetimeExceedance()) {
-                        throw new STSException("Requested lifetime exceeds maximum lifetime",
-                                               STSException.INVALID_TIME);
-                    } else {
-                        expirationTime.setTime(creationTime.getTime() + (getMaxLifetime() * 1000L));
-                    }
-                }
-
-                long creationTimeInSeconds = creationTime.getTime() / 1000L;
-                claims.setIssuedAt(creationTimeInSeconds);
-                claims.setNotBefore(creationTimeInSeconds);
-                claims.setExpiryTime(expirationTime.getTime() / 1000L);
-            } catch (ParseException e) {
-                LOG.warning("Failed to parse life time element: " + e.getMessage());
+                creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
+                expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
+            } catch (DateTimeParseException ex) {
+                LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
+                throw new STSException(
+                                       "Error in parsing Timestamp Created or Expiration Strings",
+                                       STSException.INVALID_TIME
+                    );
             }
+
+            // Check to see if the created time is in the future
+            Instant validCreation = Instant.now();
+            if (futureTimeToLive > 0) {
+                validCreation = validCreation.plusSeconds(futureTimeToLive);
+            }
+            if (creationTime.isAfter(validCreation)) {
+                LOG.fine("The Created Time is too far in the future");
+                throw new STSException("The Created Time is too far in the future", STSException.INVALID_TIME);
+            }
+
+            long requestedLifetime = Duration.between(creationTime, expirationTime).getSeconds();
+            if (requestedLifetime > getMaxLifetime()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Requested lifetime [").append(requestedLifetime);
+                sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
+                sb.append(" sec]");
+                LOG.warning(sb.toString());
+                if (isFailLifetimeExceedance()) {
+                    throw new STSException("Requested lifetime exceeds maximum lifetime",
+                                           STSException.INVALID_TIME);
+                }
+                expirationTime = creationTime.plusSeconds(getMaxLifetime());
+            }
+
+            long creationTimeInSeconds = creationTime.getEpochSecond();
+            claims.setIssuedAt(creationTimeInSeconds);
+            claims.setNotBefore(creationTimeInSeconds);
+            claims.setExpiryTime(expirationTime.getEpochSecond());
         }
     }
-    
+
     /**
      * Set the audience restriction claim. The Audiences are from an AppliesTo address, and the wst:Participants
      * (if either exist).
@@ -238,13 +233,13 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims
     ) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
-        List<String> audiences = new ArrayList<String>();
+
+        List<String> audiences = new ArrayList<>();
         String appliesToAddress = providerParameters.getAppliesToAddress();
         if (appliesToAddress != null) {
             audiences.add(appliesToAddress);
         }
-        
+
         Participants participants = providerParameters.getTokenRequirements().getParticipants();
         if (participants != null) {
             String address = TokenProviderUtils.extractAddressFromParticipantsEPR(participants.getPrimaryParticipant());
@@ -266,9 +261,29 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         if (!audiences.isEmpty()) {
             claims.setAudiences(audiences);
         }
-        
+
     }
-    
+
+    protected void handleActAs(
+        JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims
+    ) {
+        TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
+
+        if (providerParameters.getTokenRequirements().getActAs() != null) {
+            ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
+            if (receivedToken.getState().equals(STATE.VALID)) {
+                claims.setClaim("ActAs", receivedToken.getPrincipal().getName());
+            }
+        }
+    }
+
+    private String translateClaim(String claimType) {
+        if (claimTypeMap == null || !claimTypeMap.containsKey(claimType)) {
+            return claimType;
+        }
+        return claimTypeMap.get(claimType);
+    }
+
     public boolean isUseX500CN() {
         return useX500CN;
     }
@@ -276,7 +291,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setUseX500CN(boolean useX500CN) {
         this.useX500CN = useX500CN;
     }
-    
+
     /**
      * Get how long (in seconds) a client-supplied Created Element is allowed to be in the future.
      * The default is 60 seconds to avoid common problems relating to clock skew.
@@ -292,7 +307,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setFutureTimeToLive(long futureTimeToLive) {
         this.futureTimeToLive = futureTimeToLive;
     }
-    
+
     /**
      * Set the default lifetime in seconds for issued JWT tokens
      * @param default lifetime in seconds
@@ -300,7 +315,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setLifetime(long lifetime) {
         this.lifetime = lifetime;
     }
-    
+
     /**
      * Get the default lifetime in seconds for issued JWT token where requestor
      * doesn't specify a lifetime element
@@ -309,7 +324,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public long getLifetime() {
         return lifetime;
     }
-    
+
     /**
      * Set the maximum lifetime in seconds for issued JWT tokens
      * @param maximum lifetime in seconds
@@ -317,7 +332,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setMaxLifetime(long maxLifetime) {
         this.maxLifetime = maxLifetime;
     }
-    
+
     /**
      * Get the maximum lifetime in seconds for issued JWT token
      * if requestor specifies lifetime element
@@ -326,7 +341,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public long getMaxLifetime() {
         return maxLifetime;
     }
-    
+
     /**
      * Is client lifetime element accepted
      * Default: false
@@ -334,14 +349,14 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public boolean isAcceptClientLifetime() {
         return this.acceptClientLifetime;
     }
-    
+
     /**
      * Set whether client lifetime is accepted
      */
     public void setAcceptClientLifetime(boolean acceptClientLifetime) {
         this.acceptClientLifetime = acceptClientLifetime;
     }
-    
+
     /**
      * If requested lifetime exceeds shall it fail (default)
      * or overwrite with maximum lifetime
@@ -349,7 +364,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public boolean isFailLifetimeExceedance() {
         return this.failLifetimeExceedance;
     }
-    
+
     /**
      * If requested lifetime exceeds shall it fail (default)
      * or overwrite with maximum lifetime
@@ -357,5 +372,17 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setFailLifetimeExceedance(boolean failLifetimeExceedance) {
         this.failLifetimeExceedance = failLifetimeExceedance;
     }
-    
+
+    public Map<String, String> getClaimTypeMap() {
+        return claimTypeMap;
+    }
+
+    /**
+     * Specify a way to map ClaimType URIs to custom ClaimTypes
+     * @param claimTypeMap
+     */
+    public void setClaimTypeMap(Map<String, String> claimTypeMap) {
+        this.claimTypeMap = claimTypeMap;
+    }
+
 }

@@ -24,7 +24,7 @@ import org.apache.cxf.common.i18n.Message;
 
 /**
  * This exception is thrown when the Javascript client generator hits a schema
- * construct that it cannot handle. 
+ * construct that it cannot handle.
  */
 public class UnsupportedConstruct extends RuntimeException {
 
@@ -36,16 +36,16 @@ public class UnsupportedConstruct extends RuntimeException {
     public UnsupportedConstruct(String explanation) {
         super(explanation);
     }
-    
+
     public UnsupportedConstruct(Logger logger, String messageKey, Object...args) {
         super(new Message(messageKey, logger, args).toString());
-        
+
     }
 
     public UnsupportedConstruct(Throwable cause) {
         super(cause);
     }
-    
+
     public UnsupportedConstruct(Throwable cause, Logger logger, String messageKey, Object...args) {
         super(new Message(messageKey, logger, args).toString(), cause);
     }

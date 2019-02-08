@@ -39,18 +39,18 @@ public class TestDateMapping {
     private AegisContext context;
     private TestUtilities testUtilities;
     private XMLOutputFactory xmlOutputFactory;
-    
+
     @Before
     public void before() {
         testUtilities = new TestUtilities(getClass());
         testUtilities.addNamespace("test", "urn:test");
         xmlOutputFactory = XMLOutputFactory.newInstance();
     }
-    
+
     @Test
     public void testWriteSqlDateAsDate() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();
@@ -66,11 +66,11 @@ public class TestDateMapping {
         xmlWriter.close();
         // an absence of exception is success here.
     }
-    
+
     @Test
     public void testWriteCustomTypeSchemaType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();
@@ -81,6 +81,6 @@ public class TestDateMapping {
         XmlSchema root = new XmlSchema(); // dummy to put schema in.
      /* will explode if the type object created for the custom mapping isn't fully initialized.
       */
-        sbType.writeSchema(root); 
+        sbType.writeSchema(root);
     }
 }

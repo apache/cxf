@@ -31,16 +31,16 @@ import org.apache.cxf.resource.ResourceResolver;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class WebServiceContextResourceResolver implements ResourceResolver {
-    
+
     Bus bus;
 
     public WebServiceContextResourceResolver() {
     }
-    
+
     public WebServiceContextResourceResolver(Bus b) {
         setBus(b);
     }
-    
+
     @Resource
     public final void setBus(Bus b) {
         bus = b;
@@ -49,8 +49,8 @@ public class WebServiceContextResourceResolver implements ResourceResolver {
             bus.getExtension(ResourceManager.class).addResourceResolver(this);
         }
     }
-    
-    
+
+
 
     public final InputStream getAsStream(final String string) {
         return null;

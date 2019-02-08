@@ -21,19 +21,19 @@ package org.apache.demo.resources;
 public class Book {
     private String name;
     private String id;
-    
+
     public Book() {
     }
-    
+
     public Book(String id) {
         this.id = id;
     }
-    
+
     public Book(String name, String id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -41,11 +41,11 @@ public class Book {
     public String getName() {
         return name;
     }
-    
+
     public void setId(String i) {
         id = i;
     }
- 
+
     public String getId() {
         return id;
     }

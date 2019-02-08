@@ -27,22 +27,22 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor {
     public static final PolicyVerificationOutInterceptor INSTANCE = new PolicyVerificationOutInterceptor();
-    
-    private static final Logger LOG 
+
+    private static final Logger LOG
         = LogUtils.getL7dLogger(PolicyVerificationOutInterceptor.class);
     public PolicyVerificationOutInterceptor() {
         super(Phase.POST_STREAM);
     }
 
-    /** 
+    /**
      * Checks if all assertions in the chosen alternative have been asserted.
      * Note that although the alternative was chosen in such a way that at least all
      * interceptors necessary to assert the assertions are present, it is not possible
-     * to predict if these interceptors actually have asserted their assertions.  
+     * to predict if these interceptors actually have asserted their assertions.
      * @param message
      * @throws PolicyException if none of the alternatives is supported
      */
@@ -50,15 +50,15 @@ public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor 
         if (MessageUtils.isPartialResponse(message)) {
             LOG.fine("Not verifying policies on outbound partial response.");
             return;
-        } 
-        
+        }
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return;
         }
-        
+
         getTransportAssertions(message);
-        
+
         EffectivePolicy policy = message.get(EffectivePolicy.class);
         if (policy == null) {
             return;

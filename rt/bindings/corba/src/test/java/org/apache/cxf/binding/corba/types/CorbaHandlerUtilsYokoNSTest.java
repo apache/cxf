@@ -26,10 +26,10 @@ import org.apache.cxf.binding.corba.TestUtils;
 
 public class CorbaHandlerUtilsYokoNSTest extends CorbaHandlerUtilsTest {
 
-    
+
     protected CorbaDestination getDestination() throws Exception {
         TestUtils testUtils = new TestUtils();
         return testUtils.getComplexTypesTestDestinationYoko();
     }
-    
+
 }

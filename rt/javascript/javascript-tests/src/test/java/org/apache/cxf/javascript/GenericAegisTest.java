@@ -33,6 +33,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -40,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
  * as the SEB. The simple front end, due to type erasure, turns all the <T> items
  * into xsd:anyType. That exposed a bad assumption in the Javascript code generator,
  * and this test regresses it by not exploding on contact. However, this will
- * be obsolete if the Simple front end is made to cope correctly with Generic 
+ * be obsolete if the Simple front end is made to cope correctly with Generic
  * SEBs.
  */
 public class GenericAegisTest  {
@@ -50,7 +51,7 @@ public class GenericAegisTest  {
     @Test
     public void testGenerateJavascript() throws Exception {
      // Create our service implementation
-        GenericGenericClass<String> impl = new GenericGenericClass<String>();
+        GenericGenericClass<String> impl = new GenericGenericClass<>();
 
         // Create our Server
         ServerFactoryBean svrFactory = new ServerFactoryBean();

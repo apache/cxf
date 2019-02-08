@@ -28,11 +28,11 @@ public class DocumentArtifact {
     private String artifactId;
     private String version;
     private String type;
-    
+
     public DocumentArtifact() {
         type = "wadl";
     }
-        
+
     public String getGroupId() {
         return groupId;
     }
@@ -57,10 +57,10 @@ public class DocumentArtifact {
     public void setType(String type) {
         this.type = type;
     }
-    
+
     public boolean doesMatch(DocumentArtifact artifact) {
         return type.equals(artifact.getType()) && groupId.equals(artifact.getGroupId())
-              && artifactId.equals(artifact.getArtifactId()) 
+              && artifactId.equals(artifact.getArtifactId())
               && (version == null || version.equals(artifact.getVersion()));
     }
 }

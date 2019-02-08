@@ -22,7 +22,6 @@ package org.apache.cxf.bus.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -37,13 +36,13 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
 
     public void setApplicationContext(ApplicationContext ctx) {
         context = ctx;
-    } 
-    
+    }
+
     public int getOrder() {
         return 1001;
     }
-    
-        
+
+
     public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
         return bean;
     }
@@ -60,7 +59,7 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private <T> void registerExt(Object bean, Class<T> cls) {
         getBus().setExtension(cls.cast(bean), cls);
     }
-    
+
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);

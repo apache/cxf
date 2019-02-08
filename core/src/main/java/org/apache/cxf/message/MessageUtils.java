@@ -19,8 +19,11 @@
 
 package org.apache.cxf.message;
 
+import java.util.logging.Logger;
+
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 
 
@@ -28,6 +31,8 @@ import org.apache.cxf.common.util.PropertyUtils;
  * Holder for utility methods relating to messages.
  */
 public final class MessageUtils {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(MessageUtils.class);
 
     /**
      * Prevents instantiation.
@@ -37,11 +42,15 @@ public final class MessageUtils {
 
     /**
      * Determine if message is outbound.
-     * 
+     *
      * @param message the current Message
      * @return true if the message direction is outbound
      */
     public static boolean isOutbound(Message message) {
+        if (message == null) {
+            return false;
+        }
+
         Exchange exchange = message.getExchange();
         return exchange != null
                && (message == exchange.getOutMessage() || message == exchange.getOutFaultMessage());
@@ -49,7 +58,7 @@ public final class MessageUtils {
 
     /**
      * Determine if message is fault.
-     * 
+     *
      * @param message the current Message
      * @return true if the message is a fault
      */
@@ -59,11 +68,11 @@ public final class MessageUtils {
                && (message == message.getExchange().getInFaultMessage() || message == message.getExchange()
                    .getOutFaultMessage());
     }
-    
+
     /**
-     * Determine the fault mode for the underlying (fault) message 
+     * Determine the fault mode for the underlying (fault) message
      * (for use on server side only).
-     * 
+     *
      * @param message the fault message
      * @return the FaultMode
      */
@@ -74,43 +83,45 @@ public final class MessageUtils {
             FaultMode mode = message.get(FaultMode.class);
             if (null != mode) {
                 return mode;
-            } else {
-                return FaultMode.RUNTIME_FAULT;
             }
+            return FaultMode.RUNTIME_FAULT;
         }
-        return null;    
+        return null;
     }
 
     /**
      * Determine if current messaging role is that of requestor.
-     * 
+     *
      * @param message the current Message
      * @return true if the current messaging role is that of requestor
      */
     public static boolean isRequestor(Message message) {
-        Boolean requestor = (Boolean)message.get(Message.REQUESTOR_ROLE);
-        return requestor != null && requestor.booleanValue();
+        if (message != null) {
+            Boolean requestor = (Boolean) message.get(Message.REQUESTOR_ROLE);
+            return requestor != null && requestor;
+        }
+        return false;
     }
-    
+
     /**
      * Determine if the current message is a partial response.
-     * 
+     *
      * @param message the current message
      * @return true if the current messags is a partial response
      */
     public static boolean isPartialResponse(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
+        return message != null && Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
     }
-    
+
     /**
      * Determines if the current message is an empty partial response, which
      * is a partial response with an empty content.
-     * 
+     *
      * @param message the current message
      * @return true if the current messags is a partial empty response
      */
     public static boolean isEmptyPartialResponse(Message message) {
-        return Boolean.TRUE.equals(message.get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE));
+        return message != null && Boolean.TRUE.equals(message.get(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE));
     }
 
     /**
@@ -118,11 +129,14 @@ public final class MessageUtils {
      * @param value
      * @return true if value is either the String "true" or Boolean.TRUE
      */
+    @Deprecated
     public static boolean isTrue(Object value) {
-        // TODO - consider deprecation as this really belongs in PropertyUtils
         return PropertyUtils.isTrue(value);
     }
-    
+
+    public static boolean getContextualBoolean(Message m, String key) {
+        return getContextualBoolean(m, key, false);
+    }
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         if (m != null) {
             Object o = m.getContextualProperty(key);
@@ -132,25 +146,45 @@ public final class MessageUtils {
         }
         return defaultValue;
     }
-    
+
+    public static int getContextualInteger(Message m, String key, int defaultValue) {
+        if (m != null) {
+            Object o = m.getContextualProperty(key);
+            if (o instanceof String) {
+                try {
+                    int i = Integer.parseInt((String)o);
+                    if (i > 0) {
+                        return i;
+                    }
+                } catch (NumberFormatException ex) {
+                    LOG.warning("Incorrect integer value of " + o + " specified for: " + key);
+                }
+            }
+        }
+        return defaultValue;
+    }
+
     public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
-        Object prop = m.getContextualProperty(propPreferred);
-        if (prop == null && propDefault != null) {
-            prop = m.getContextualProperty(propDefault);
+        Object prop = null;
+        if (m != null) {
+            prop = m.getContextualProperty(propPreferred);
+            if (prop == null && propDefault != null) {
+                prop = m.getContextualProperty(propDefault);
+            }
         }
         return prop;
     }
-    
+
     /**
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
     public static boolean isDOMPresent(Message m) {
-        return m.getContent(Node.class) != null;
+        return m != null && m.getContent(Node.class) != null;
         /*
         for (Class c : m.getContentFormats()) {
-            if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
+            if (c.equals(Node.class) || "javax.xml.soap.SOAPMessage".equals(c.getName())) {
                 return true;
-            }   
+            }
         }
         return false;
         */

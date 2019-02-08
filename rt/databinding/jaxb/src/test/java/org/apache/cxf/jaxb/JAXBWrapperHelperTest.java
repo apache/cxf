@@ -29,10 +29,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.databinding.WrapperHelper;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class JAXBWrapperHelperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JAXBWrapperHelperTest {
 
 
     @Test
@@ -40,7 +45,7 @@ public class JAXBWrapperHelperTest extends Assert {
         SetIsOK ok = new SetIsOK();
         ok.setParameter3(new boolean[] {true, false});
         ok.setParameter4("hello");
-        
+
         List<String> partNames = Arrays.asList(new String[] {
             "Parameter1",
             "Parameter2",
@@ -62,13 +67,13 @@ public class JAXBWrapperHelperTest extends Assert {
             String.class,
             List.class,
         });
-        
+
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(SetIsOK.class,
                                                                      null,
                                           partNames,
                                           elTypeNames,
                                           partClasses);
-        
+
         List<Object> lst = wh.getWrapperParts(ok);
         assertEquals(5, lst.size());
         assertTrue(lst.get(0) instanceof Boolean);
@@ -99,16 +104,16 @@ public class JAXBWrapperHelperTest extends Assert {
         @XmlElement(name = "Parameter2")
         protected int parameter2;
         @XmlElement(name = "Parameter3")
-        protected boolean parameter3[];
+        protected boolean[] parameter3;
         @XmlElement(name = "Parameter4")
         protected String parameter4;
         @XmlElement(name = "Parameter5")
-        protected List<String> parameter5 = new ArrayList<String>();
-        
-        
+        protected List<String> parameter5 = new ArrayList<>();
+
+
         /**
          * Gets the value of the parameter1 property.
-         * 
+         *
          */
         public boolean isParameter1() {
             return parameter1;
@@ -116,7 +121,7 @@ public class JAXBWrapperHelperTest extends Assert {
 
         /**
          * Sets the value of the parameter1 property.
-         * 
+         *
          */
         public void setParameter1(boolean value) {
             this.parameter1 = value;
@@ -124,7 +129,7 @@ public class JAXBWrapperHelperTest extends Assert {
 
         /**
          * Gets the value of the parameter2 property.
-         * 
+         *
          */
         public int getParameter2() {
             return parameter2;
@@ -132,16 +137,16 @@ public class JAXBWrapperHelperTest extends Assert {
 
         /**
          * Sets the value of the parameter2 property.
-         * 
+         *
          */
         public void setParameter2(int value) {
             this.parameter2 = value;
         }
-        
-        
+
+
         /**
          * Gets the value of the parameter2 property.
-         * 
+         *
          */
         public boolean[] getParameter3() {
             return parameter3;
@@ -149,12 +154,12 @@ public class JAXBWrapperHelperTest extends Assert {
 
         /**
          * Sets the value of the parameter2 property.
-         * 
+         *
          */
-        public void setParameter3(boolean value[]) {
+        public void setParameter3(boolean[] value) {
             this.parameter3 = value;
         }
-        
+
         public String getParameter4() {
             return parameter4;
         }
@@ -167,4 +172,3 @@ public class JAXBWrapperHelperTest extends Assert {
         }
     }
 }
-

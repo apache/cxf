@@ -28,15 +28,14 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
-
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItPortTypeImpl implements DoubleItPortType {
-    
+
     @Resource
     WebServiceContext wsc;
 
@@ -47,11 +46,11 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
         MessageContext context = wsc.getMessageContext();
         WrappedMessageContext wmc = (WrappedMessageContext)context;
         Exchange exchange = wmc.getWrappedMessage().getExchange();
-        
+
         exchange.getEndpoint().put(
             SecurityConstants.STS_CLIENT, new STSClient(exchange.getBus())
         );
         return numberToDouble * 2;
     }
-    
+
 }

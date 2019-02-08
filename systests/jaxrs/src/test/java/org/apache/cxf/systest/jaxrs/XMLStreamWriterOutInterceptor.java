@@ -33,11 +33,11 @@ public class XMLStreamWriterOutInterceptor extends AbstractOutDatabindingInterce
     public XMLStreamWriterOutInterceptor() {
         super(Phase.PRE_MARSHAL);
     }
-    
+
     public void handleMessage(Message m) throws Fault {
         String method = m.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD).toString();
         if ("POST".equals(method)) {
-            XMLStreamWriter writer = 
+            XMLStreamWriter writer =
                 StaxUtils.createXMLStreamWriter(m.getContent(OutputStream.class));
             m.setContent(XMLStreamWriter.class, new CustomXmlStreamWriter(writer));
         }

@@ -37,6 +37,6 @@ public class DualOutService {
 
     @WebMethod
     public Collection<String> getStrings() {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 }

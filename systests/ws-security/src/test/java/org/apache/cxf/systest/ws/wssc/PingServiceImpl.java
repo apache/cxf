@@ -20,13 +20,12 @@ package org.apache.cxf.systest.ws.wssc;
 
 
 import org.xmlsoap.ping.PingResponseBody;
-
 import wssec.wssc.IPingService;
 import wssec.wssc.PingRequest;
 import wssec.wssc.PingResponse;
 
 /**
- * 
+ *
  */
 public class PingServiceImpl implements IPingService {
 
@@ -34,7 +33,7 @@ public class PingServiceImpl implements IPingService {
         return request;
     }
 
-    
+
 
     public PingResponse ping(PingRequest parameters) {
         PingResponse resp = new PingResponse();

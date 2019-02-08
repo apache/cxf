@@ -1,0 +1,31 @@
+server:
+  port: 8080
+  servlet-path: /system
+
+management.security.enabled: false
+
+cxf:
+  path: /services/helloservice
+  servlet.init: 
+    service-list-path: /info
+  jaxrs:
+    component-scan: true
+    classes-scan-packages: org.apache.cxf.jaxrs.swagger,org.apache.cxf.metrics
+
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URI:http://127.0.0.1}:${EUREKA_SERVER_PORT:8761}/eureka/
+  instance:
+    prefer-ip-address: true
+    statusPageUrlPath: /services/helloservice/info
+    healthCheckUrlPath: /system/health
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+      servletPath: ${cxf.path}
+
+endpoints:
+  jmx:
+    enabled: true
+    unique-names: true

@@ -26,9 +26,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Controls the implementation of preflight processing 
+ * Controls the implementation of preflight processing
  * on an OPTIONS method.
- * If the current method is OPTIONS, and this method wants to 
+ * If the current method is OPTIONS, and this method wants to
  * handle the preflight process for itself then have this annotation
  * attached to it, otherwise the filter performs it.
  */

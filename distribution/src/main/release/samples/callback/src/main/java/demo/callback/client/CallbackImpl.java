@@ -23,14 +23,14 @@ package demo.callback.client;
 import org.apache.callback.CallbackPortType;
 
 
-@javax.jws.WebService(serviceName = "CallbackService", 
+@javax.jws.WebService(serviceName = "CallbackService",
                       portName = "CallbackPort",
                       endpointInterface = "org.apache.callback.CallbackPortType",
                       targetNamespace = "http://apache.org/callback")
-                  
+
 public class CallbackImpl implements CallbackPortType  {
 
-    
+
     /**
      * serverSayHi
      * @param: return_message (String)
@@ -41,5 +41,5 @@ public class CallbackImpl implements CallbackPortType  {
         System.out.println("Message received: " + message);
         return new String("Hi " + message);
     }
-    
+
 }

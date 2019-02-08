@@ -55,25 +55,23 @@ public class SOAPHandlerFaultOutInterceptor extends
         SoapInterceptor {
     private static final SAAJOutInterceptor SAAJ_OUT = new SAAJOutInterceptor();
     private static final String ENDING_ID = SOAPHandlerFaultOutInterceptor.class.getName() + ".ENDING";
-    
+
     AbstractSoapInterceptor ending = new AbstractSoapInterceptor(ENDING_ID, Phase.USER_PROTOCOL) {
         public void handleMessage(SoapMessage message) throws Fault {
             handleMessageInternal(message);
         }
     };
-    
+
     public SOAPHandlerFaultOutInterceptor(Binding binding) {
         super(binding, Phase.PRE_PROTOCOL_FRONTEND);
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<URI>();
-        // TODO
-        return roles;
+        return new HashSet<>();
     }
 
     public Set<QName> getUnderstoodHeaders() {
-        Set<QName> understood = new HashSet<QName>();
+        Set<QName> understood = new HashSet<>();
         for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
                 Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());
@@ -96,16 +94,16 @@ public class SOAPHandlerFaultOutInterceptor extends
         checkUnderstoodHeaders(message);
 
         if (getInvoker(message).isOutbound()) {
-            //The SOAPMessage might be set from the outchain, in this case, 
+            //The SOAPMessage might be set from the outchain, in this case,
             //we need to clean it up and create a new SOAPMessage dedicated to fault.
             message.setContent(SOAPMessage.class, null);
 
             SAAJ_OUT.handleMessage(message);
 
             message.getInterceptorChain().add(ending);
-        } 
+        }
     }
-    
+
     private void checkUnderstoodHeaders(SoapMessage soapMessage) {
         Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
         if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
@@ -121,7 +119,7 @@ public class SOAPHandlerFaultOutInterceptor extends
     private void handleMessageInternal(SoapMessage message) {
         MessageContext context = createProtocolMessageContext(message);
         HandlerChainInvoker invoker = getInvoker(message);
-        invoker.setProtocolMessageContext(context);        
+        invoker.setProtocolMessageContext(context);
 
         try {
             if (!invoker.invokeProtocolHandlersHandleFault(isRequestor(message), context)) {
@@ -178,12 +176,10 @@ public class SOAPHandlerFaultOutInterceptor extends
 
         onCompletion(message);
     }
-    
+
     @Override
     protected MessageContext createProtocolMessageContext(SoapMessage message) {
         return new SOAPMessageContextImpl(message);
     }
 
-    public void handleFault(SoapMessage message) {
-    }
 }

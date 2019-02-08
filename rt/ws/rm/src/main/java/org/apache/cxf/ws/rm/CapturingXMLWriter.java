@@ -32,7 +32,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.transform.OutTransformWriter;
 
 public class CapturingXMLWriter implements XMLStreamWriter {
-    
+
     XMLStreamWriter delegate;
     XMLStreamWriter capture;
     LoadingByteArrayOutputStream bos = new LoadingByteArrayOutputStream();
@@ -41,23 +41,23 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     public CapturingXMLWriter(XMLStreamWriter del) {
         delegate = del;
         capture = StaxUtils.createXMLStreamWriter(bos, StandardCharsets.UTF_8.name());
-        
-        Map<String, String> map = new HashMap<String, String>();
+
+        Map<String, String> map = new HashMap<>();
         map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}Sequence", "");
         map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}SequenceAcknowledgement", "");
         map.put("{http://docs.oasis-open.org/ws-rx/wsrm/200702}Sequence", "");
         map.put("{http://docs.oasis-open.org/ws-rx/wsrm/200702}SequenceAcknowledgement", "");
-        
+
         capture = new OutTransformWriter(capture,
                                          map,
                                          Collections.<String, String>emptyMap(),
                                          Collections.<String>emptyList(),
-                                         false, 
+                                         false,
                                          null);
     }
-    
+
     public void setDefaultNamespace(String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.setDefaultNamespace(uri);
             } catch (Throwable t) {
@@ -67,7 +67,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         capture.setDefaultNamespace(uri);
     }
     public void setNamespaceContext(NamespaceContext ctx) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.setNamespaceContext(ctx);
             } catch (Throwable t) {
@@ -77,7 +77,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         capture.setNamespaceContext(ctx);
     }
     public void setPrefix(String pfx, String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.setPrefix(pfx, uri);
             } catch (Throwable t) {
@@ -87,9 +87,9 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         capture.setPrefix(pfx, uri);
     }
 
-    public void writeAttribute(String prefix, String uri, 
+    public void writeAttribute(String prefix, String uri,
                                String local, String value) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeAttribute(prefix, uri, local, value);
             } catch (Throwable t) {
@@ -100,7 +100,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String uri, String local, String value) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeAttribute(uri, local, value);
             } catch (Throwable t) {
@@ -111,7 +111,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String local, String value) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeAttribute(local, value);
             } catch (Throwable t) {
@@ -122,7 +122,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeCData(String cdata) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeCData(cdata);
             } catch (Throwable t) {
@@ -133,7 +133,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(char[] arg0, int arg1, int arg2) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeCharacters(arg0, arg1, arg2);
             } catch (Throwable t) {
@@ -144,7 +144,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeCharacters(text);
             } catch (Throwable t) {
@@ -155,7 +155,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeComment(String text) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeComment(text);
             } catch (Throwable t) {
@@ -166,7 +166,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeDefaultNamespace(String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeDefaultNamespace(uri);
             } catch (Throwable t) {
@@ -177,7 +177,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeDTD(String dtd) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeDTD(dtd);
             } catch (Throwable t) {
@@ -188,7 +188,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String prefix, String local, String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEmptyElement(prefix, local, uri);
             } catch (Throwable t) {
@@ -199,7 +199,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String uri, String local) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEmptyElement(uri, local);
             } catch (Throwable t) {
@@ -210,7 +210,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEmptyElement(String localName) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEmptyElement(localName);
             } catch (Throwable t) {
@@ -221,7 +221,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEndDocument() throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEndDocument();
             } catch (Throwable t) {
@@ -232,7 +232,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEndElement();
             } catch (Throwable t) {
@@ -243,7 +243,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeEntityRef(String ent) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeEntityRef(ent);
             } catch (Throwable t) {
@@ -254,7 +254,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeNamespace(String prefix, String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeNamespace(prefix, uri);
             } catch (Throwable t) {
@@ -265,7 +265,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeProcessingInstruction(target, data);
             } catch (Throwable t) {
@@ -275,7 +275,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         capture.writeProcessingInstruction(target, data);
     }
     public void writeProcessingInstruction(String target) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeProcessingInstruction(target);
             } catch (Throwable t) {
@@ -286,7 +286,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument() throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartDocument();
             } catch (Throwable t) {
@@ -297,7 +297,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument(String encoding, String ver) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartDocument(encoding, ver);
             } catch (Throwable t) {
@@ -308,7 +308,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument(String ver) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartDocument(ver);
             } catch (Throwable t) {
@@ -319,7 +319,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartElement(prefix, local, uri);
             } catch (Throwable t) {
@@ -330,7 +330,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String uri, String local) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartElement(uri, local);
             } catch (Throwable t) {
@@ -341,7 +341,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String local) throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.writeStartElement(local);
             } catch (Throwable t) {
@@ -353,7 +353,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
 
 
     public void close() throws XMLStreamException {
-        if (delegate != null) {            
+        if (delegate != null) {
             try {
                 delegate.close();
             } catch (Throwable t) {
@@ -391,7 +391,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         }
         return capture.getProperty(name);
     }
-    
+
     public LoadingByteArrayOutputStream getOutputStream() throws XMLStreamException {
         capture.flush();
         capture.close();
@@ -400,9 +400,9 @@ public class CapturingXMLWriter implements XMLStreamWriter {
     public Throwable getThrowable() {
         return throwable;
     }
-    
-    //if there is some problem writing to the original output, we need to stop writing 
-    // to the output, but keep capturing the message so we can try and resend later 
+
+    //if there is some problem writing to the original output, we need to stop writing
+    // to the output, but keep capturing the message so we can try and resend later
     private void stopToDelegate(Throwable t) {
         if (throwable == null) {
             throwable = t;

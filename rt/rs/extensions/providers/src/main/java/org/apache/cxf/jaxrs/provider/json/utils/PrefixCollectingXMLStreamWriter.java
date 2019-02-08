@@ -33,8 +33,8 @@ import javax.xml.stream.XMLStreamWriter;
 public class PrefixCollectingXMLStreamWriter implements XMLStreamWriter {
     private XMLStreamWriter target;
     private Map<String, String> namespaces;
-    
-    public PrefixCollectingXMLStreamWriter(XMLStreamWriter target, 
+
+    public PrefixCollectingXMLStreamWriter(XMLStreamWriter target,
                                            Map<String, String> namespaces) {
         this.target = target;
         this.namespaces = namespaces;
@@ -82,8 +82,8 @@ public class PrefixCollectingXMLStreamWriter implements XMLStreamWriter {
         target.writeAttribute(prefix, namespaceURI, localName, value);
     }
 
-    public void writeAttribute(String namespaceURI, 
-                               String localName, 
+    public void writeAttribute(String namespaceURI,
+                               String localName,
                                String value) throws XMLStreamException {
         target.writeAttribute(namespaceURI, localName, value);
     }
@@ -177,6 +177,6 @@ public class PrefixCollectingXMLStreamWriter implements XMLStreamWriter {
     public void writeStartElement(String localName) throws XMLStreamException {
         target.writeStartElement(localName);
     }
-    
+
 
 }

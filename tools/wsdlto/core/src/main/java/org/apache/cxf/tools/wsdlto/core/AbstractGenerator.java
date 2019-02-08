@@ -81,11 +81,11 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
             return null;
         }
 
-        fw = new FileWriterUtil(getOutputDir(), 
-                                (OutputStreamCreator)env.get(OutputStreamCreator.class));
+        fw = new FileWriterUtil(getOutputDir(),
+                                env.get(OutputStreamCreator.class));
         try {
             if (".java".equals(ext)) {
-                writer = fw.getWriter(packageName, filename + ext, 
+                writer = fw.getWriter(packageName, filename + ext,
                                       (String)getEnvironment().get(ToolConstants.CFG_ENCODING));
             } else {
                 writer = fw.getWriter(packageName, filename + ext);
@@ -98,7 +98,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         return writer;
     }
 
-    public abstract void register(final ClassCollector collector, String packageName, String fileName);
+    public abstract void register(ClassCollector collector, String packageName, String fileName);
 
     protected Writer parseOutputName(String packageName, String filename) throws ToolException {
         register(env.get(ClassCollector.class), packageName, filename);
@@ -116,7 +116,9 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         setAttributes("version", Version.getCurrentVersion());
         setAttributes("fullversion", Version.getCompleteVersionString());
         setAttributes("name", Version.getName());
-        setAttributes("mark-generated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
+        setAttributes(ToolConstants.CFG_MARK_GENERATED, env.optionSet(ToolConstants.CFG_MARK_GENERATED));
+        setAttributes(ToolConstants.CFG_SUPPRESS_GENERATED_DATE,
+                      env.optionSet(ToolConstants.CFG_SUPPRESS_GENERATED_DATE));
         if (env.optionSet(ToolConstants.CFG_FRONTEND)) {
             setAttributes("frontend", env.get(ToolConstants.CFG_FRONTEND));
         }
@@ -138,7 +140,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
     }
 
     public String getOutputDir() {
-        return (String)env.get(ToolConstants.CFG_OUTPUTDIR);           
+        return (String)env.get(ToolConstants.CFG_OUTPUTDIR);
     }
 
     public String getName() {

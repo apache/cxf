@@ -37,20 +37,26 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
                                                 "SOAPService");
-    
+
     private final QName portName = new QName("http://apache.org/hello_world_soap_http",
                                              "SoapPort");
 
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         public static final String PORT = allocatePort(Server.class);
-        
+
         Endpoint ep;
         protected void run() {
             setBus(BusFactory.getDefaultBus());
@@ -62,7 +68,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-        
+
         public static void main(String[] args) {
             try {
                 Server s = new Server();
@@ -81,26 +87,26 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     @org.junit.Ignore
     public void testBasicConnection() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull(service);
-                
-        CXFConnectionRequestInfo cri = new CXFConnectionRequestInfo(Greeter.class, 
+
+        CXFConnectionRequestInfo cri = new CXFConnectionRequestInfo(Greeter.class,
                                            wsdl,
                                            service.getServiceName(),
                                            portName);
         cri.setAddress("http://localhost:" + PORT + "/SoapContext/SoapPort");
         ManagedConnectionFactory managedFactory = new ManagedConnectionFactoryImpl();
         Subject subject = new Subject();
-        ManagedConnection mc = managedFactory.createManagedConnection(subject, cri);        
+        ManagedConnection mc = managedFactory.createManagedConnection(subject, cri);
         Object o = mc.getConnection(subject, cri);
-        
+
         // test for the Object hash()
         try {
             o.hashCode();
@@ -108,33 +114,33 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException ex) {
             fail("The connection object should support Object method");
         }
-        
+
         verifyResult(o);
     }
-    
-    
+
+
     @Test
     @org.junit.Ignore
     public void testGetConnectionFromSEI() throws Exception {
         CXFConnectionRequestInfo requestInfo = new CXFConnectionRequestInfo();
         requestInfo.setInterface(Greeter.class);
         requestInfo.setAddress("http://localhost:" + PORT + "/SoapContext/SoapPort");
-        
+
         ManagedConnectionFactory factory = new ManagedConnectionFactoryImpl();
         ManagedConnection mc = factory.createManagedConnection(null, requestInfo);
         Object client = mc.getConnection(null, requestInfo);
-        
+
         verifyResult(client);
     }
-    
-    
+
+
     private void verifyResult(Object o) throws Exception {
-        
+
         assertTrue("returned connect does not implement Connection interface", o instanceof Connection);
         assertTrue("returned connect does not implement Connection interface", o instanceof Greeter);
-   
-        Greeter greeter = (Greeter) o;   
-        String response = new String("Bonjour");      
+
+        Greeter greeter = (Greeter) o;
+        String response = new String("Bonjour");
         for (int idx = 0; idx < 5; idx++) {
             String reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);

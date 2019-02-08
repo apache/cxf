@@ -24,6 +24,7 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.systest.jms.Hello;
 import org.apache.cxf.systest.jms.HelloImpl;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class JavaFirstNoWsdlTest extends AbstractVmJMSTest {
         factory.getFeatures().add(cff);
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         factory.setServiceClass(Hello.class);
-        factory.setAddress(address); 
+        factory.setAddress(address);
         Hello client = (Hello)markForClose(factory.create());
         String reply = client.sayHi(" HI");
         Assert.assertEquals("get HI", reply);

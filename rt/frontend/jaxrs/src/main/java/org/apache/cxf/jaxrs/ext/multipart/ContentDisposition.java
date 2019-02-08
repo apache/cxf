@@ -21,7 +21,7 @@ package org.apache.cxf.jaxrs.ext.multipart;
 
 
 public class ContentDisposition extends org.apache.cxf.attachment.ContentDisposition {
-    
+
     public ContentDisposition(String value) {
         super(value);
     }

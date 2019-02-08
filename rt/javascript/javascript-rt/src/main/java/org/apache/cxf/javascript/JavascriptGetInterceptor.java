@@ -49,7 +49,7 @@ import org.apache.cxf.transport.Conduit;
 
 public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final Interceptor<? extends Message> INSTANCE = new JavascriptGetInterceptor();
-   
+
     private static final String JS_UTILS_PATH = "/org/apache/cxf/javascript/cxf-utils.js";
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static final String NO_UTILS_QUERY_KEY = "nojsutils";
@@ -60,7 +60,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
         getAfter().add(EndpointSelectionInterceptor.class.getName());
     }
 
-    
+
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
@@ -69,7 +69,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
         }
         String baseUri = (String)message.get(Message.REQUEST_URL);
         URI uri = null;
-        
+
         try {
             uri = URI.create(baseUri);
         } catch (IllegalArgumentException iae) {
@@ -92,14 +92,14 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
             }
         }
     }
-    
+
     private boolean isRecognizedQuery(Map<String, String> map, URI uri, EndpointInfo endpointInfo) {
         if (uri == null) {
             return false;
         }
         return map.containsKey(CODE_QUERY_KEY);
     }
-    
+
     public static void writeUtilsToResponseStream(Class<?> referenceClass, OutputStream outputStream) {
         InputStream utils = referenceClass.getResourceAsStream(JS_UTILS_PATH);
         if (utils == null) {
@@ -117,7 +117,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
         OutputStreamWriter writer = new OutputStreamWriter(os, UTF8);
         if (!map.containsKey(NO_UTILS_QUERY_KEY)) {
             writeUtilsToResponseStream(JavascriptGetInterceptor.class, os);
-        } 
+        }
         if (map.containsKey(CODE_QUERY_KEY)) {
             ServiceInfo serviceInfo = serverEndpoint.getService().getServiceInfos().get(0);
             Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
@@ -133,7 +133,7 @@ public class JavascriptGetInterceptor extends AbstractPhaseInterceptor<Message> 
                     writer.append(allThatJavascript);
                 }
 
-                ServiceJavascriptBuilder serviceBuilder 
+                ServiceJavascriptBuilder serviceBuilder
                     = new ServiceJavascriptBuilder(serviceInfo,
                                                    serverEndpoint.getEndpointInfo().getAddress(),
                                                    prefixManager,

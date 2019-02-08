@@ -26,24 +26,24 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 
 /**
- * Strategy for lazy deferred retreival of a Conduit to mediate an 
+ * Strategy for lazy deferred retreival of a Conduit to mediate an
  * outbound message.
  */
 public class DeferredConduitSelector extends AbstractConduitSelector {
-    
+
     private static final Logger LOG =
         LogUtils.getL7dLogger(DeferredConduitSelector.class);
-    
+
     /**
      * Normal constructor.
      */
     public DeferredConduitSelector() {
         super();
     }
-    
+
     /**
      * Constructor, allowing a specific conduit to override normal selection.
-     * 
+     *
      * @param c specific conduit
      */
     public DeferredConduitSelector(Conduit c) {
@@ -52,7 +52,7 @@ public class DeferredConduitSelector extends AbstractConduitSelector {
 
     /**
      * Called prior to the interceptor chain being traversed.
-     * 
+     *
      * @param message the current Message
      */
     public void prepare(Message message) {
@@ -61,7 +61,7 @@ public class DeferredConduitSelector extends AbstractConduitSelector {
 
     /**
      * Called when a Conduit is actually required.
-     * 
+     *
      * @param message
      * @return the Conduit to use for mediation of the message
      */

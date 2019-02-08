@@ -28,13 +28,13 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
- * Describes the effective policy of an outbound message. 
+ * Describes the effective policy of an outbound message.
  */
 public interface EffectivePolicy {
-    
+
     Policy getPolicy();
-    
+
     Collection<Assertion> getChosenAlternative();
-    
+
     List<Interceptor<? extends Message>> getInterceptors();
 }

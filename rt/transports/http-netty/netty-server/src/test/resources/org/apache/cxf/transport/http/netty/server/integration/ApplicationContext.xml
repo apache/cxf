@@ -20,7 +20,14 @@
 <!-- 
   ** This file configures the Server which runs the web service.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpn="http://cxf.apache.org/transports/http-netty-server/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xsi:schemaLocation="             http://cxf.apache.org/configuration/security                       http://cxf.apache.org/schemas/configuration/security.xsd             http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd             http://cxf.apache.org/transports/http-netty-server/configuration                      http://cxf.apache.org/schemas/configuration/http-netty-server.xsd                     http://cxf.apache.org/jaxws             http://cxf.apache.org/schemas/jaxws.xsd             http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd             http://www.springframework.org/schema/beans             http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpn="http://cxf.apache.org/transports/http-netty-server/configuration"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xsi:schemaLocation="http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-netty-server/configuration http://cxf.apache.org/schemas/configuration/http-netty-server.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus/>
     <jaxws:endpoint id="myEndpoint" bus="cxf" implementor="org.apache.hello_world_soap_http.GreeterImpl" address="https://localhost:${SSLNettySpringServerTest.port}/SoapContext/SoapPort"/>
@@ -30,10 +37,10 @@
         <httpn:engine port="${SSLNettySpringServerTest.port}">
             <httpn:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/server/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/server/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore type="jks" password="stsspass" resource="keys/stsstore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpn:tlsServerParameters>

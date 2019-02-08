@@ -34,7 +34,7 @@ public class MimeBodyPartInputStream extends InputStream {
 
     private boolean closed;
 
-    public MimeBodyPartInputStream(PushbackInputStream inStreamParam, 
+    public MimeBodyPartInputStream(PushbackInputStream inStreamParam,
                                    byte[] boundaryParam,
                                    int pbsize) {
         super();
@@ -43,14 +43,14 @@ public class MimeBodyPartInputStream extends InputStream {
         this.pbAmount = pbsize;
     }
 
-    public int read(byte buf[], int origOff, int origLen) throws IOException {
-        byte b[] = buf;
+    public int read(byte[] buf, int origOff, int origLen) throws IOException {
+        byte[] b = buf;
         int off = origOff;
         int len = origLen;
         if (boundaryFound || closed) {
             return -1;
         }
-        if ((off < 0) || (off > b.length) || (len < 0) 
+        if ((off < 0) || (off > b.length) || (len < 0)
             || ((off + len) > b.length) || ((off + len) < 0)) {
 
             throw new IndexOutOfBoundsException();
@@ -60,7 +60,7 @@ public class MimeBodyPartInputStream extends InputStream {
         }
         boolean bufferCreated = false;
         if (len < boundary.length * 2) {
-            //buffer is too short to detect boundaries with it.  We'll need to create a larger buffer   
+            //buffer is too short to detect boundaries with it.  We'll need to create a larger buffer
             bufferCreated = true;
             if (boundaryBuffer == null) {
                 boundaryBuffer = new byte[boundary.length * 2];
@@ -85,7 +85,7 @@ public class MimeBodyPartInputStream extends InputStream {
             return -1;
         }
         len = idx;
-        
+
         int i = processBuffer(b, off, len);
         if (bufferCreated && i > 0) {
             // read more than we need, push it back
@@ -99,7 +99,7 @@ public class MimeBodyPartInputStream extends InputStream {
         } else if (i == 0 && boundaryFound) {
             return -1;
         }
-        
+
         return i;
     }
 
@@ -110,7 +110,7 @@ public class MimeBodyPartInputStream extends InputStream {
             return true;
         } else if (pointer >= 1000000000) {
             inStream.unread(b, initialPointer, (off + len) - initialPointer);
-            return false;            
+            return false;
         } else {
             int x = inStream.read();
             if (x != -1) {
@@ -134,19 +134,17 @@ public class MimeBodyPartInputStream extends InputStream {
                 value = buffer[initialI + 1];
                 if (value != 10) {
                     continue;
-                } else {  //if it comes here then 13, 10 are values and will try to match boundaries
-                    if (!hasData(buffer, initialI, initialI + 2, off, len)) {
-                        return initialI - off;
-                    }
-                    value = buffer[initialI + 2];
-                    if ((byte) value != boundary[0]) {
-                        i++;
-                        continue;
-                    } else { //13, 10, boundaries first value matched
-                        needUnread0d0a = true;
-                        i += 2; //i after this points to boundary[0] element
-                    }
                 }
+                if (!hasData(buffer, initialI, initialI + 2, off, len)) {
+                    return initialI - off;
+                }
+                value = buffer[initialI + 2];
+                if ((byte) value != boundary[0]) {
+                    i++;
+                    continue;
+                }
+                needUnread0d0a = true;
+                i += 2; //i after this points to boundary[0] element
             } else if (value != boundary[0]) {
                 continue;
             }
@@ -155,7 +153,7 @@ public class MimeBodyPartInputStream extends InputStream {
             while ((boundaryIndex < boundary.length) && (value == boundary[boundaryIndex])) {
                 if (!hasData(buffer, initialI, i + 1, off, len)) {
                     return initialI - off;
-                }                
+                }
                 value = buffer[++i];
                 boundaryIndex++;
             }
@@ -164,7 +162,7 @@ public class MimeBodyPartInputStream extends InputStream {
                 if (initialI != off) {
                     i = 1000000000;
                 }
-                if (initialI - off != 0 
+                if (initialI - off != 0
                     && !hasData(buffer, initialI, i + 1, off, len)) {
                     return initialI - off;
                 }
@@ -221,16 +219,14 @@ public class MimeBodyPartInputStream extends InputStream {
             if (value != 10) {
                 inStream.unread(value);
                 return 13;
-            } else {
-                value = inStream.read();
-                if ((byte) value != boundary[0]) {
-                    inStream.unread(value);
-                    inStream.unread(10);
-                    return 13;
-                } else {
-                    needUnread0d0a = true;
-                }
             }
+            value = inStream.read();
+            if ((byte) value != boundary[0]) {
+                inStream.unread(value);
+                inStream.unread(10);
+                return 13;
+            }
+            needUnread0d0a = true;
         } else if ((byte) value != boundary[0]) {
             return value;
         }
@@ -265,12 +261,12 @@ public class MimeBodyPartInputStream extends InputStream {
             inStream.unread(10);
             value = 13;
         } else {
-            inStream.unread(boundary, 1, boundaryIndex - 1);                
+            inStream.unread(boundary, 1, boundaryIndex - 1);
             value = boundary[0];
         }
         return value;
     }
-    
+
     public void close() throws IOException {
         this.closed = true;
     }

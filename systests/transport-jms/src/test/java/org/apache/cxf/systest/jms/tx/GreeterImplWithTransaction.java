@@ -26,6 +26,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
+
 import org.junit.Assert;
 
 /**
@@ -35,7 +36,7 @@ import org.junit.Assert;
 public class GreeterImplWithTransaction implements Greeter {
     public static final String BAD_GUY = "Bad guy";
     public static final String GOOD_GUY = "Good guy";
-    
+
     public String greetMe(String name) {
         if (BAD_GUY.equals(name)) {
             throw new RuntimeException("Got a bad guy call for greetMe");
@@ -50,8 +51,8 @@ public class GreeterImplWithTransaction implements Greeter {
         try {
             Assert.assertNotNull("We should run inside a transaction", tm.getTransaction());
         } catch (SystemException e) {
-            throw new RuntimeException(e.getMessage(), e); 
-        } 
+            throw new RuntimeException(e.getMessage(), e);
+        }
         if (BAD_GUY.equals(name)) {
             throw new RuntimeException("Got a bad guy call for greetMe");
         }
@@ -66,5 +67,5 @@ public class GreeterImplWithTransaction implements Greeter {
     public String sayHi() {
         throw new IllegalArgumentException("Not implemented");
     }
-    
+
 }

@@ -30,42 +30,42 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * Abstract access token grant
  */
 public abstract class AbstractGrant implements AccessTokenGrant {
-    
+
     private static final long serialVersionUID = 3586571576928674560L;
     private String grantType;
     private String scope;
     private String audience;
-    
+
     protected AbstractGrant(String grantType) {
         this(grantType, null);
     }
-    
+
     protected AbstractGrant(String grantType, String scope) {
-        this(grantType, scope, null);    
+        this(grantType, scope, null);
     }
-    
+
     protected AbstractGrant(String grantType, String scope, String audience) {
         this.grantType = grantType;
         this.scope = scope;
         this.audience = audience;
     }
-    
+
     public String getType() {
         return grantType;
     }
-    
+
     public void setAudience(String audience) {
         this.audience = audience;
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, getType());
         if (scope != null) {
             map.putSingle(OAuthConstants.SCOPE, scope);
         }
         if (audience != null) {
-            map.putSingle(OAuthConstants.CLIENT_AUDIENCE, scope);
+            map.putSingle(OAuthConstants.CLIENT_AUDIENCE, audience);
         }
         return map;
     }

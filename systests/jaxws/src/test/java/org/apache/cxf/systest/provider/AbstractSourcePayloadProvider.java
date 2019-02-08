@@ -57,19 +57,19 @@ import org.apache.cxf.staxutils.StaxUtils;
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public abstract class AbstractSourcePayloadProvider implements SourceProvider {
     boolean doneStax;
-    @Resource 
+    @Resource
     WebServiceContext ctx;
-    
+
     public AbstractSourcePayloadProvider() {
     }
-    
-   
-    public Source invoke(Source request) {   
+
+
+    public Source invoke(Source request) {
         QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         try {
             if (request instanceof StaxSource) {
                 StaxSource ss = (StaxSource)request;
@@ -78,7 +78,7 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
                 }
             }
             String input = getSourceAsString(request);
-            
+
             if (input.indexOf("ServerLogicalHandler") >= 0) {
                 return map(request.getClass());
             }
@@ -89,10 +89,10 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
         }
         return null;
     }
-    
-    private Source map(Class<? extends Source> class1) 
+
+    private Source map(Class<? extends Source> class1)
         throws Exception {
-        
+
         InputStream greetMeInputStream = getClass()
             .getResourceAsStream("resources/GreetMeRpcLiteralRespBody.xml");
         if (DOMSource.class.equals(class1)) {
@@ -101,10 +101,9 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
             if (doneStax) {
                 XMLReader reader = XMLReaderFactory.createXMLReader();
                 return new SAXSource(reader, new InputSource(greetMeInputStream));
-            } else {
-                doneStax = true;
-                return new StaxSource(StaxUtils.createXMLStreamReader(greetMeInputStream));
             }
+            doneStax = true;
+            return new StaxSource(StaxUtils.createXMLStreamReader(greetMeInputStream));
         } else if (StreamSource.class.equals(class1)) {
             StreamSource source = new StreamSource();
             source.setInputStream(greetMeInputStream);
@@ -117,15 +116,17 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
 
     public static String getSourceAsString(Source s) throws Exception {
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-            Writer out = new StringWriter();
-            StreamResult streamResult = new StreamResult();
-            streamResult.setWriter(out);
-            transformer.transform(s, streamResult);
-            return streamResult.getWriter().toString();
-            
+            try (Writer out = new StringWriter()) {
+                StreamResult streamResult = new StreamResult();
+                streamResult.setWriter(out);
+                transformer.transform(s, streamResult);
+                return streamResult.getWriter().toString();
+            }
         } catch (TransformerException te) {
             if ("javax.xml.transform.stax.StAXSource".equals(s.getClass().getName())) {
                 //on java6, we will get this class if "stax" is configured

@@ -21,11 +21,13 @@ package org.apache.cxf.common.i18n;
 
 import java.util.ResourceBundle;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class BundleUtilsTest extends Assert {
+
+public class BundleUtilsTest {
     @Test
     public void testGetBundleName() throws Exception {
         assertEquals("unexpected resource bundle name",
@@ -40,13 +42,13 @@ public class BundleUtilsTest extends Assert {
     public void testGetBundle() throws Exception {
         ResourceBundle bundle = BundleUtils.getBundle(getClass());
         assertNotNull("expected resource bundle", bundle);
-        assertEquals("unexpected resource", 
+        assertEquals("unexpected resource",
                      "localized message",
                      bundle.getString("I18N_MSG"));
         ResourceBundle nonDefaultBundle = BundleUtils.getBundle(getClass(), "Messages");
         assertNotNull("expected resource bundle", nonDefaultBundle);
-        assertEquals("unexpected resource", 
+        assertEquals("unexpected resource",
                      "localized message",
-                     nonDefaultBundle.getString("I18N_MSG"));             
+                     nonDefaultBundle.getString("I18N_MSG"));
     }
 }

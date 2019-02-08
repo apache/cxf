@@ -25,11 +25,11 @@ import javax.ws.rs.core.SecurityContext;
 
 @Path("/bookstorestorage/")
 public abstract class AbstractSecureBookStore implements Injectable {
-    protected SecurityContext securityContext; 
-    
+    protected SecurityContext securityContext;
+
     protected AbstractSecureBookStore() {
     }
-    
+
     @Context
     public void setSecurityContext(SecurityContext sc) {
         securityContext = sc;

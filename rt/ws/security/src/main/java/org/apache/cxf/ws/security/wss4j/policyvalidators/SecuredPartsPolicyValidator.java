@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 
 import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -35,33 +37,32 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SPConstants;
+import org.apache.wss4j.policy.model.AbstractSecuredParts;
 import org.apache.wss4j.policy.model.Attachments;
 import org.apache.wss4j.policy.model.Header;
-import org.apache.wss4j.policy.model.SignedParts;
 
 /**
  * Validate either a SignedParts or EncryptedParts policy
  */
 public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
-    
+
     private CoverageType coverageType = CoverageType.ENCRYPTED;
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         if (coverageType == CoverageType.SIGNED) {
-            return assertionInfo.getAssertion() != null 
+            return assertionInfo.getAssertion() != null
                 && (SP12Constants.SIGNED_PARTS.equals(assertionInfo.getAssertion().getName())
                     || SP11Constants.SIGNED_PARTS.equals(assertionInfo.getAssertion().getName()));
-        } else {
-            return assertionInfo.getAssertion() != null 
-                && (SP12Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName())
-                    || SP11Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName()));
         }
+        return assertionInfo.getAssertion() != null
+            && (SP12Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName())
+                || SP11Constants.ENCRYPTED_PARTS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -75,20 +76,23 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
 
         Message msg = parameters.getMessage();
         Element soapBody = parameters.getSoapBody();
+        Element header = parameters.getSoapHeader();
+        soapBody = (Element)DOMUtils.getDomElement(soapBody);
+        header = (Element)DOMUtils.getDomElement(header);
         Collection<WSDataRef> dataRefs = parameters.getEncrypted();
         if (coverageType == CoverageType.SIGNED) {
             dataRefs = parameters.getSigned();
         }
-        
+
         for (AssertionInfo ai : ais) {
             if (ai.isAsserted()) {
                 // Secured Parts could already have been asserted by one of the other validators, if
                 // they are a child of a SupportingToken
                 continue;
             }
-            SignedParts p = (SignedParts)ai.getAssertion();
+            AbstractSecuredParts p = (AbstractSecuredParts)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             if (p.isBody()) {
                 try {
                     if (coverageType == CoverageType.SIGNED) {
@@ -105,17 +109,17 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
                     continue;
                 }
             }
-            
+
             for (Header h : p.getHeaders()) {
                 try {
-                    CryptoCoverageUtil.checkHeaderCoverage(parameters.getSoapHeader(), dataRefs, 
+                    CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
                             h.getNamespace(), h.getName(), coverageType,
                             CoverageScope.ELEMENT);
                 } catch (WSSecurityException e) {
                     ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + coverageType);
                 }
             }
-            
+
             Attachments attachments = p.getAttachments();
             if (attachments != null) {
                 try {
@@ -123,13 +127,13 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
                     if (attachments.isContentSignatureTransform()) {
                         scope = CoverageScope.CONTENT;
                     }
-                    CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), dataRefs, 
+                    CryptoCoverageUtil.checkAttachmentsCoverage(msg.getAttachments(), dataRefs,
                                                                 coverageType, scope);
                 } catch (WSSecurityException e) {
                     ai.setNotAsserted("An attachment was not signed/encrypted");
                 }
             }
-            
+
         }
     }
 
@@ -138,17 +142,17 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
         if (symAis != null) {
             return false;
         }
-        
+
         AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (asymAis != null) {
             return false;
         }
-        
+
         AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (transAis != null) {
             return true;
         }
-        
+
         // No bindings, check if we are using TLS
         TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
         if (tlsInfo != null) {
@@ -159,7 +163,7 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
             PolicyUtils.assertPolicy(aim, SP11Constants.SIGNED_PARTS);
             return true;
         }
-        
+
         return false;
     }
 

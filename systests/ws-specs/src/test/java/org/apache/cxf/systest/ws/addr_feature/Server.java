@@ -32,7 +32,7 @@ public class Server extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber(Server.class, 1);
     public static final String PORT2 = TestUtil.getPortNumber(Server.class, 2);
     EndpointImpl ep;
-    protected void run()  { 
+    protected void run()  {
         setBus(BusFactory.getDefaultBus());
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/add";
@@ -41,22 +41,22 @@ public class Server extends AbstractBusTestServerBase {
         ep = (EndpointImpl) Endpoint.create(implementor);
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
-        
-        
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+
+
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
         ep.setServiceName(new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersService"));
         ep.setEndpointName(new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                      "AddNumbersNonAnonPort"));
-        String address12 = "http://localhost:" + PORT2 + "/jaxws/soap12/add";       
+        String address12 = "http://localhost:" + PORT2 + "/jaxws/soap12/add";
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address12);
-        
-        
+
+
     }
-    
+
     public void tearDown() {
         ep.stop();
         ep = null;

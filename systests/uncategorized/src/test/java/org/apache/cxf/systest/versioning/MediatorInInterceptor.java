@@ -49,8 +49,8 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
 
     @Override
     protected Endpoint selectEndpoint(Message message, Set<Endpoint> eps) {
-        
-        InputStream is = message.getContent(InputStream.class);        
+
+        InputStream is = message.getContent(InputStream.class);
         if (is == null) {
             return null;
         }
@@ -59,9 +59,9 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
         try {
             IOUtils.copy(is, bos);
             is.close();
-            
+
             message.setContent(InputStream.class, bos.getInputStream());
-        
+
             String encoding = (String)message.get(Message.ENCODING);
 
             XMLStreamReader xsr;
@@ -73,25 +73,25 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
                     xsr = factory.createXMLStreamReader(bos.getInputStream(), encoding);
                 }
             }
-            
-            // move to the soap body            
-            while (true) {                
-                xsr.nextTag();              
-                
+
+            // move to the soap body
+            while (true) {
+                xsr.nextTag();
+
                 if ("Body".equals(xsr.getName().getLocalPart())) {
                     break;
                 }
             }
-            
+
             xsr.nextTag();
             if (!xsr.isStartElement()) {
                 return null;
             }
-            
+
             String methodName = xsr.getName().getLocalPart();
             //if the incoming message has a element containes "SayHi", we redirect the message
             //to the new version of service on endpoint "local://localhost:9027/SoapContext/version2/SoapPort"
-            for (Endpoint ep : eps) {               
+            for (Endpoint ep : eps) {
                 if (methodName.indexOf("sayHi") != -1) {
                     if ("2".equals(ep.get("version"))) {
                         return ep;
@@ -100,10 +100,10 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
                     return ep;
                 }
             }
-            bos.close();            
+            bos.close();
         } catch (Exception e) {
             throw new Fault(e);
-        }    
+        }
         return null;
     }
 

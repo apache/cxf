@@ -32,12 +32,12 @@ import javax.activation.DataHandler;
 
 import org.apache.cxf.message.Attachment;
 
-public class LazyAttachmentCollection 
+public class LazyAttachmentCollection
     implements Collection<Attachment> {
-    
+
     private AttachmentDeserializer deserializer;
-    private final List<Attachment> attachments = new ArrayList<Attachment>();
-    
+    private final List<Attachment> attachments = new ArrayList<>();
+
     public LazyAttachmentCollection(AttachmentDeserializer deserializer) {
         super();
         this.deserializer = deserializer;
@@ -73,7 +73,7 @@ public class LazyAttachmentCollection
                 return true;
             }
             return false;
-        } 
+        }
         return deserializer.hasNext();
     }
 
@@ -84,21 +84,20 @@ public class LazyAttachmentCollection
         return new Iterator<Attachment>() {
             int current;
             boolean removed;
-            
+
             public boolean hasNext() {
                 if (attachments.size() > current) {
                     return true;
                 }
-                
+
                 // check if there is another attachment
                 try {
                     Attachment a = deserializer.readNext();
                     if (a == null) {
                         return false;
-                    } else {
-                        attachments.add(a);
-                        return true;
                     }
+                    attachments.add(a);
+                    return true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -118,13 +117,13 @@ public class LazyAttachmentCollection
                 attachments.remove(--current);
                 removed = true;
             }
-            
+
         };
     }
-    
+
     public int size() {
         loadAll();
-        
+
         return attachments.size();
     }
 
@@ -137,7 +136,7 @@ public class LazyAttachmentCollection
     }
 
     public void clear() {
-        attachments.clear();   
+        attachments.clear();
     }
 
     public boolean contains(Object arg0) {
@@ -169,27 +168,27 @@ public class LazyAttachmentCollection
 
     public Object[] toArray() {
         loadAll();
-        
+
         return attachments.toArray();
     }
 
     public <T> T[] toArray(T[] arg0) {
         loadAll();
-        
+
         return attachments.toArray(arg0);
     }
-    
+
     public Map<String, DataHandler> createDataHandlerMap() {
         return new LazyAttachmentMap(this);
     }
 
     private static class LazyAttachmentMap implements Map<String, DataHandler> {
         LazyAttachmentCollection collection;
-        
+
         LazyAttachmentMap(LazyAttachmentCollection c) {
             collection = c;
         }
-        
+
         public void clear() {
             collection.clear();
         }
@@ -233,7 +232,7 @@ public class LazyAttachmentCollection
         public int size() {
             return collection.size();
         }
-        
+
         public DataHandler remove(Object key) {
             Iterator<Attachment> it = collection.iterator();
             while (it.hasNext()) {
@@ -257,7 +256,7 @@ public class LazyAttachmentCollection
             }
         }
 
-        
+
         public Set<Map.Entry<String, DataHandler>> entrySet() {
             return new AbstractSet<Map.Entry<String, DataHandler>>() {
                 public Iterator<Map.Entry<String, DataHandler>> iterator() {
@@ -280,9 +279,8 @@ public class LazyAttachmentCollection
                                         DataHandler h = at.getDataHandler();
                                         ((AttachmentImpl)at).setDataHandler(value);
                                         return h;
-                                    } else {
-                                        throw new UnsupportedOperationException();
                                     }
+                                    throw new UnsupportedOperationException();
                                 }
                             };
                         }
@@ -345,7 +343,7 @@ public class LazyAttachmentCollection
                 }
             };
         }
-        
+
     }
 
 

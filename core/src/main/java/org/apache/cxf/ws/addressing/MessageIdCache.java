@@ -22,12 +22,12 @@ package org.apache.cxf.ws.addressing;
  * Interface abstracting various ID caches for enforcement of ID uniqueness.
  */
 public interface MessageIdCache {
-    
+
     /**
      * Check {@code messageId} for uniqueness against previously
      * encountered values and cache the ID.  Note that the retention
      * policy for previously encountered values is implementation specific.
-     * 
+     *
      * @param messageId the message ID to check for uniqueness and cache for
      *                  future comparison
      *

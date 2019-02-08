@@ -40,8 +40,6 @@ import org.apache.cxf.common.logging.LogUtils;
     serviceName = "AsyncMessagingService",
     portName = "AsyncMessagingImplPort")
 @ServiceMode(value = Service.Mode.MESSAGE)
-//FIXME: When using "PAYLOAD" mode, it works; but when using "MESSAGE" mode, it breaks
-//@ServiceMode(value = Service.Mode.PAYLOAD)
 public class MessageProviderWithAddressingPolicy implements Provider<Source> {
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);
@@ -51,12 +49,13 @@ public class MessageProviderWithAddressingPolicy implements Provider<Source> {
     }
 
     public Source invoke(Source request) {
-        TransformerFactory tfactory = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
         try {
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             /*
             tfactory.setAttribute("indent-number", "2");
              */
-            Transformer serializer = tfactory.newTransformer();
+            Transformer serializer = transformerFactory.newTransformer();
             // Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

@@ -22,6 +22,7 @@ package org.apache.cxf.systest.coloc;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.junit.Test;
 
 
@@ -35,7 +36,7 @@ public class ColocHeaderDocLitTest extends AbstractHeaderServiceDocLitTest {
     }
 
     protected Object getServiceImpl() {
-        HttpServiceImpl impl =  new HttpServiceImpl();
+        HttpServiceImpl impl = new HttpServiceImpl();
         impl.init(getLogger());
         return impl;
     }

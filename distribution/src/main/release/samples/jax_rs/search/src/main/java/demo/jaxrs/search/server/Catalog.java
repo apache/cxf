@@ -90,47 +90,48 @@ import org.apache.tika.parser.pdf.PDFParser;
 @Path("/catalog")
 public class Catalog {
     private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(
-        Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()), 
-        new LuceneDocumentMetadata());    
+        Arrays.< Parser >asList(new PDFParser(), new OpenDocumentParser()),
+        new LuceneDocumentMetadata());
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
-    private final Storage storage; 
+    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
+    private final Storage storage;
     private final LuceneQueryVisitor<SearchBean> visitor;
     private final ExecutorService executor = Executors.newFixedThreadPool(
         Runtime.getRuntime().availableProcessors());
-    
+
     public Catalog() throws IOException {
         this(new Storage());
     }
-    
+
     public Catalog(final Storage storage) throws IOException {
         this.storage = storage;
         this.visitor = createVisitor();
         initIndex();
     }
-    
+
+    // CHECKSTYLE:OFF: ReturnCount 
     @POST
     @CrossOriginResourceSharing(allowAllOrigins = true)
     @Consumes("multipart/form-data")
-    public void addBook(@Suspended final AsyncResponse response, @Context final UriInfo uri, 
+    public void addBook(@Suspended final AsyncResponse response, @Context final UriInfo uri,
             final MultipartBody body)  {
-        
+
         executor.submit(new Runnable() {
             public void run() {
                 for (final Attachment attachment: body.getAllAttachments()) {
-                    final DataHandler handler =  attachment.getDataHandler();
-                    
+                    final DataHandler handler = attachment.getDataHandler();
+
                     if (handler != null) {
                         final String source = handler.getName();
                         if (StringUtils.isEmpty(source)) {
                             response.resume(Response.status(Status.BAD_REQUEST).build());
                             return;
                         }
-                                                
+
                         final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
                             .withSource(source)
                             .withField("modified", Date.class);
-                        
+
                         try {
                             if (exists(source)) {
                                 response.resume(Response.status(Status.CONFLICT).build());
@@ -140,66 +141,67 @@ public class Catalog {
                             final byte[] content = IOUtils.readBytesFromStream(handler.getInputStream());
                             storeAndIndex(metadata, content);
                         } catch (final Exception ex) {
-                            response.resume(Response.serverError().build());  
-                        } 
-                        
+                            response.resume(Response.serverError().build());
+                        }
+
                         if (response.isSuspended()) {
                             response.resume(Response.created(uri.getRequestUriBuilder().path(source).build())
                                     .build());
                         }
-                    }                       
-                }              
-                
+                    }
+                }
+
                 if (response.isSuspended()) {
                     response.resume(Response.status(Status.BAD_REQUEST).build());
                 }
             }
         });
     }
-    
+    // CHECKSTYLE:ON: ReturnCount
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public JsonArray getBooks() throws IOException {
         final IndexReader reader = DirectoryReader.open(directory);
         final IndexSearcher searcher = new IndexSearcher(reader);
         final JsonArrayBuilder builder = Json.createArrayBuilder();
-        
+
         try {
             final Query query = new MatchAllDocsQuery();
-            
+
             for (final ScoreDoc scoreDoc: searcher.search(query, 1000).scoreDocs) {
-                final DocumentStoredFieldVisitor fieldVisitor = 
-                    new DocumentStoredFieldVisitor(LuceneDocumentMetadata.SOURCE_FIELD);                
-                
+                final DocumentStoredFieldVisitor fieldVisitor =
+                    new DocumentStoredFieldVisitor(LuceneDocumentMetadata.SOURCE_FIELD);
+
                 reader.document(scoreDoc.doc, fieldVisitor);
                 builder.add(fieldVisitor
                         .getDocument()
                         .getField(LuceneDocumentMetadata.SOURCE_FIELD)
                         .stringValue());
             }
-            
+
             return builder.build();
         } finally {
             reader.close();
         }
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @CrossOriginResourceSharing(allowAllOrigins = true)
     @Path("/search")
-    public Response findBook(@Context SearchContext searchContext, 
+    public Response findBook(@Context SearchContext searchContext,
             @Context final UriInfo uri) throws IOException {
-        
+
         final IndexReader reader = DirectoryReader.open(directory);
         final IndexSearcher searcher = new IndexSearcher(reader);
         final JsonArrayBuilder builder = Json.createArrayBuilder();
 
-        try {            
+        try {
             visitor.reset();
             visitor.visit(searchContext.getCondition(SearchBean.class));
-            
-            final Query query = visitor.getQuery();            
+
+            final Query query = visitor.getQuery();
             if (query != null) {
                 final TopDocs topDocs = searcher.search(query, 1000);
                 for (final ScoreDoc scoreDoc: topDocs.scoreDocs) {
@@ -207,7 +209,7 @@ public class Catalog {
                     final String source = document
                         .getField(LuceneDocumentMetadata.SOURCE_FIELD)
                         .stringValue();
-                    
+
                     builder.add(
                         Json.createObjectBuilder()
                             .add("source", source)
@@ -219,18 +221,18 @@ public class Catalog {
                     );
                 }
             }
-            
+
             return Response.ok(builder.build()).build();
         } finally {
             reader.close();
         }
     }
-    
+
     @GET
     @Path("/{source}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public StreamingOutput getBook(@PathParam("source") final String source) throws IOException {            
-        return new StreamingOutput() {            
+    public StreamingOutput getBook(@PathParam("source") final String source) throws IOException {
+        return new StreamingOutput() {
             @Override
             public void write(final OutputStream out) throws IOException, WebApplicationException {
                 try (InputStream in = storage.getDocument(source)) {
@@ -241,25 +243,25 @@ public class Catalog {
             }
         };
     }
-    
+
     @DELETE
     public Response delete() throws IOException {
         final IndexWriter writer = getIndexWriter();
-        
+
         try {
             storage.deleteAll();
             writer.deleteAll();
             writer.commit();
         } finally {
             writer.close();
-        }  
-        
+        }
+
         return Response.ok().build();
     }
-    
+
     private void initIndex() throws IOException {
         final IndexWriter writer = getIndexWriter();
-        
+
         try {
             writer.commit();
         } finally {
@@ -270,40 +272,40 @@ public class Catalog {
     private IndexWriter getIndexWriter() throws IOException {
         return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
     }
-    
+
     private LuceneQueryVisitor< SearchBean > createVisitor() {
-        final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
+        final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
-        
-        LuceneQueryVisitor<SearchBean> newVisitor = new LuceneQueryVisitor<SearchBean>(
+
+        LuceneQueryVisitor<SearchBean> newVisitor = new LuceneQueryVisitor<>(
             "ct", "contents", analyzer);
         newVisitor.setPrimitiveFieldTypeMap(fieldTypes);
-        
+
         return newVisitor;
     }
-    
+
     private boolean exists(final String source) throws IOException {
         final IndexReader reader = DirectoryReader.open(directory);
         final IndexSearcher searcher = new IndexSearcher(reader);
 
-        try {            
+        try {
             return searcher.search(new TermQuery(
                 new Term(LuceneDocumentMetadata.SOURCE_FIELD, source)), 1).totalHits > 0;
         } finally {
             reader.close();
         }
     }
-    
+
     private void storeAndIndex(final LuceneDocumentMetadata metadata, final byte[] content)
         throws IOException {
-        
+
         try (BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(content))) {
-            
+
             final Document document = extractor.extract(in, metadata);
-            if (document != null) {                    
+            if (document != null) {
                 final IndexWriter writer = getIndexWriter();
-                
-                try {                                              
+
+                try {
                     storage.addDocument(metadata.getSource(), content);
                     writer.addDocument(document);
                     writer.commit();

@@ -27,6 +27,7 @@ import org.apache.cxf.xkms.model.xkms.RegisterRequestType;
 import org.apache.cxf.xkms.model.xkms.RegisterResultType;
 import org.apache.cxf.xkms.model.xkms.ResultMajorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,5 +62,5 @@ public class XKRSSDisableTest extends BasicIntegrationTest {
         ResultDetails message = (ResultDetails)result.getMessageExtension().get(0);
         Assert.assertEquals("XKRSS Operations are disabled", message.getDetails());
     }
-    
+
 }

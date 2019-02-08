@@ -31,13 +31,13 @@ import org.apache.cxf.interceptor.security.RolePrefixSecurityContextImpl;
  * A default implementation to extract roles from a Subject
  */
 public class DefaultSubjectRoleParser implements SubjectRoleParser {
-    
+
     private String roleClassifier;
     private String roleClassifierType = "prefix";
 
     /**
      * Return the set of User/Principal roles from the Subject.
-     * @param principal the optional Principal 
+     * @param principal the optional Principal
      * @param subject the JAAS Subject
      * @return the set of User/Principal roles from the Subject.
      */
@@ -47,22 +47,21 @@ public class DefaultSubjectRoleParser implements SubjectRoleParser {
                 RolePrefixSecurityContextImpl securityContext =
                     new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType);
                 return securityContext.getUserRoles();
-            } else {
-                return new DefaultSecurityContext(principal, subject).getUserRoles();
             }
+            return new DefaultSecurityContext(principal, subject).getUserRoles();
         }
-        
+
         return Collections.emptySet();
     }
-    
+
     public String getRoleClassifier() {
         return roleClassifier;
     }
 
     /**
      * Set the Subject Role Classifier to use. If this value is not specified, then it tries to
-     * get roles from the supplied JAAS Subject (if not null) using the DefaultSecurityContext 
-     * in cxf-rt-core. Otherwise it uses this value in combination with the 
+     * get roles from the supplied JAAS Subject (if not null) using the DefaultSecurityContext
+     * in cxf-rt-core. Otherwise it uses this value in combination with the
      * SUBJECT_ROLE_CLASSIFIER_TYPE to get the roles from the Subject.
      * @param roleClassifier the Subject Role Classifier to use
      */
@@ -75,13 +74,13 @@ public class DefaultSubjectRoleParser implements SubjectRoleParser {
     }
 
     /**
-     * Set the Subject Role Classifier Type to use. Currently accepted values are "prefix" or 
-     * "classname". Must be used in conjunction with the SUBJECT_ROLE_CLASSIFIER. The default 
+     * Set the Subject Role Classifier Type to use. Currently accepted values are "prefix" or
+     * "classname". Must be used in conjunction with the SUBJECT_ROLE_CLASSIFIER. The default
      * value is "prefix".
      * @param roleClassifierType the Subject Role Classifier Type to use
      */
     public void setRoleClassifierType(String roleClassifierType) {
         this.roleClassifierType = roleClassifierType;
     }
-    
+
 }

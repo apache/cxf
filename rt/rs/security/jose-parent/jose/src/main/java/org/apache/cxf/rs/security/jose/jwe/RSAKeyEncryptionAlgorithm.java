@@ -30,5 +30,5 @@ public class RSAKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorith
     public RSAKeyEncryptionAlgorithm(RSAPublicKey publicKey, KeyAlgorithm jweAlgo, boolean wrap) {
         super(publicKey, jweAlgo, wrap, AlgorithmUtils.RSA_CEK_SET);
     }
-    
+
 }

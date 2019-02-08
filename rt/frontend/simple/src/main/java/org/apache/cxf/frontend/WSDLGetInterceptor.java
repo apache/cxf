@@ -44,22 +44,22 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String DOCUMENT_HOLDER = WSDLGetInterceptor.class.getName() + ".documentHolder";
     private static final String TRANSFORM_SKIP = "transform.skip";
     private Interceptor<Message> wsdlGetOutInterceptor = WSDLGetOutInterceptor.INSTANCE;
-    
+
     public WSDLGetInterceptor() {
         super(Phase.READ);
         getAfter().add(EndpointSelectionInterceptor.class.getName());
     }
-    
+
     public WSDLGetInterceptor(Interceptor<Message> outInterceptor) {
         this();
-        // Let people override the wsdlGetOutInterceptor 
+        // Let people override the wsdlGetOutInterceptor
         wsdlGetOutInterceptor = outInterceptor;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
-        
+
         if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
             return;
         }
@@ -75,7 +75,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, String> map = UrlUtils.parseQueryString(query);
         if (isRecognizedQuery(map)) {
             Document doc = getDocument(utils, message, baseUri, map, ctx);
-            
+
             Endpoint e = message.getExchange().getEndpoint();
             Message mout = new MessageImpl();
             mout.setExchange(message.getExchange());
@@ -85,10 +85,10 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
 
             mout.put(DOCUMENT_HOLDER, doc);
             mout.put(Message.CONTENT_TYPE, "text/xml");
- 
+
             // just remove the interceptor which should not be used
             cleanUpOutInterceptors(mout);
-            
+
             // notice this is being added after the purge above, don't swap the order!
             mout.getInterceptorChain().add(wsdlGetOutInterceptor);
 
@@ -99,7 +99,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                     OutgoingChainInterceptor.class.getName());
         }
     }
-    
+
     protected void cleanUpOutInterceptors(Message outMessage) {
         // TODO - how can I improve this to provide a specific interceptor chain that just has the
         // stax, gzip and message sender components, while also ensuring that GZIP is only provided
@@ -113,7 +113,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
                 outMessage.getInterceptorChain().remove(inInterceptor);
             }
         }
-        
+
     }
 
     private Document getDocument(WSDLGetUtils utils,
@@ -126,7 +126,7 @@ public class WSDLGetInterceptor extends AbstractPhaseInterceptor<Message> {
         // any addresses and returning them, so for both WSDL and XSD this is the only part that needs
         // to be synchronized.
         synchronized (message.getExchange().getEndpoint()) {
-            return utils.getDocument(message, base, params, ctxUri, 
+            return utils.getDocument(message, base, params, ctxUri,
                                      message.getExchange().getEndpoint().getEndpointInfo());
         }
     }

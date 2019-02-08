@@ -27,23 +27,23 @@ public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
 
     EndpointImpl ep;
-    
+
     protected void run() {
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/add";
         setBus(BusFactory.getThreadDefaultBus());
-        ep = new EndpointImpl(getBus(), 
-                              implementor, 
-                              null, 
+        ep = new EndpointImpl(getBus(),
+                              implementor,
+                              null,
                               getWsdl());
         ep.publish(address);
     }
-    
+
     public void tearDown() {
         ep.stop();
         ep = null;
     }
-    
+
     private String getWsdl() {
         try {
             java.net.URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
@@ -52,7 +52,7 @@ public class Server extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
         return null;
-    }    
+    }
 
     public static void main(String[] args) {
         try {

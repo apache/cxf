@@ -29,7 +29,7 @@ import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 
 /**
- * 
+ *
  */
 public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
     private static final long serialVersionUID = 2092269997296804632L;
@@ -51,7 +51,7 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP12Constants.X509_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.ENCRYPTION_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.SIGNATURE_TOKEN);
-        ASSERTION_TYPES.add(SP12Constants.TRANSPORT_TOKEN);            
+        ASSERTION_TYPES.add(SP12Constants.TRANSPORT_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.INITIATOR_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.INITIATOR_SIGNATURE_TOKEN);
         ASSERTION_TYPES.add(SP12Constants.INITIATOR_ENCRYPTION_TOKEN);
@@ -73,7 +73,7 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         ASSERTION_TYPES.add(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
-        
+
         ASSERTION_TYPES.add(SP11Constants.LAYOUT);
         ASSERTION_TYPES.add(SP11Constants.INCLUDE_TIMESTAMP);
         ASSERTION_TYPES.add(SP11Constants.ALGORITHM_SUITE);
@@ -89,7 +89,7 @@ public class WSSecurityPolicyInterceptorProvider extends AbstractPolicyIntercept
         ASSERTION_TYPES.add(SP11Constants.X509_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.ENCRYPTION_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.SIGNATURE_TOKEN);
-        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_TOKEN);            
+        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.INITIATOR_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.INITIATOR_SIGNATURE_TOKEN);
         ASSERTION_TYPES.add(SP11Constants.INITIATOR_ENCRYPTION_TOKEN);

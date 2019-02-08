@@ -30,7 +30,7 @@ public class ResponseType {
 
     /**
      * Gets the value of the text property.
-     * 
+     *
      * @return possible object is {@link String }
      */
     public String getText() {
@@ -39,7 +39,7 @@ public class ResponseType {
 
     /**
      * Sets the value of the text property.
-     * 
+     *
      * @param value allowed object is {@link String }
      */
     public void setText(String value) {

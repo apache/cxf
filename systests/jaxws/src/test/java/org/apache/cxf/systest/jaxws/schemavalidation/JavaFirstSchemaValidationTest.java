@@ -42,21 +42,24 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class JavaFirstSchemaValidationTest extends Assert {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JavaFirstSchemaValidationTest {
     static final String PORT = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT2 = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
     static final String PORT_UNUSED = TestUtil.getNewPortNumber(JavaFirstSchemaValidationTest.class);
 
-    private static List<Server> serverList = new ArrayList<Server>();
+    private static List<Server> serverList = new ArrayList<>();
     private static PersonServiceAnnotated annotatedClient;
     private static PersonService client;
     private static PersonServiceRPC rpcClient;
-    
+
     private static PersonServiceWithRequestResponseAnns annotatedNonValidatingClient;
     private static PersonServiceWithRequestResponseAnns disconnectedClient;
     private static PersonServiceWithRequestResponseAnns noValidationServerClient;
@@ -64,20 +67,21 @@ public class JavaFirstSchemaValidationTest extends Assert {
     @BeforeClass
     public static void startServers() throws Exception {
         createServer(PORT, PersonService.class, new PersonServiceImpl(), null, createSchemaValidationFeature());
-        
-        createServer(PORT2, PersonServiceWithRequestResponseAnns.class, 
-                new PersonServiceWithRequestResponseAnnsImpl(), SchemaValidationType.NONE);
-        
+
+        createServer(PORT2, PersonServiceWithRequestResponseAnns.class,
+                new PersonServiceWithRequestResponseAnnsImpl(), SchemaValidationType.NONE,
+                    createNoSchemaValidationFeature());
+
         createServer(PORT, PersonServiceAnnotated.class, new PersonServiceAnnotatedImpl(), null);
-        
-        createServer(PORT, PersonServiceRPC.class, new PersonServiceRPCImpl(), null, 
+
+        createServer(PORT, PersonServiceRPC.class, new PersonServiceRPCImpl(), null,
                 createSchemaValidationFeature());
-        
-        createServer(PORT, PersonServiceWithRequestResponseAnns.class, 
+
+        createServer(PORT, PersonServiceWithRequestResponseAnns.class,
                 new PersonServiceWithRequestResponseAnnsImpl(), null);
 
         annotatedClient = createClient(PORT, PersonServiceAnnotated.class, SchemaValidationType.NONE);
-        annotatedNonValidatingClient = createClient(PORT, PersonServiceWithRequestResponseAnns.class, 
+        annotatedNonValidatingClient = createClient(PORT, PersonServiceWithRequestResponseAnns.class,
                 SchemaValidationType.NONE);
         client = createClient(PORT, PersonService.class, SchemaValidationType.NONE);
         disconnectedClient = createClient(PORT_UNUSED, PersonServiceWithRequestResponseAnns.class, null);
@@ -86,7 +90,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
     }
 
     private static SchemaValidationFeature createSchemaValidationFeature() {
-        Map<String, SchemaValidationType> operationMap = new HashMap<String, SchemaValidationType>();
+        Map<String, SchemaValidationType> operationMap = new HashMap<>();
         operationMap.put("saveInheritEndpoint", SchemaValidationType.BOTH);
         operationMap.put("saveNoValidation", SchemaValidationType.NONE);
         operationMap.put("saveValidateIn", SchemaValidationType.IN);
@@ -94,7 +98,13 @@ public class JavaFirstSchemaValidationTest extends Assert {
         DefaultSchemaValidationTypeProvider provider = new DefaultSchemaValidationTypeProvider(operationMap);
         return new SchemaValidationFeature(provider);
     }
-    
+    private static SchemaValidationFeature createNoSchemaValidationFeature() {
+        Map<String, SchemaValidationType> operationMap = new HashMap<>();
+        operationMap.put("*", SchemaValidationType.NONE);
+        DefaultSchemaValidationTypeProvider provider = new DefaultSchemaValidationTypeProvider(operationMap);
+        return new SchemaValidationFeature(provider);
+    }
+
     @AfterClass
     public static void cleanup() throws Exception {
         for (Server server : serverList) {
@@ -107,13 +117,13 @@ public class JavaFirstSchemaValidationTest extends Assert {
     }
 
     @Test
-    public void testRPCLit() throws Exception { 
+    public void testRPCLit() throws Exception {
         Person person = new Person();
         person.setFirstName("Foo");
         person.setLastName("Bar");
         //this should work
         rpcClient.saveValidateOut(person);
-        
+
         try {
             person.setFirstName(null);
             rpcClient.saveValidateOut(person);
@@ -121,10 +131,10 @@ public class JavaFirstSchemaValidationTest extends Assert {
         } catch (SOAPFaultException sfe) {
             assertTrue(sfe.getMessage().contains("Marshalling Error"));
             assertTrue(sfe.getMessage().contains("lastName"));
-        }            
+        }
     }
 
-    
+
     // so this is the default, we are inheriting from the service level SchemaValidation annotation
     // which is set to BOTH
     @Test
@@ -149,7 +159,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         person.setLastName(""); // empty string is valid
         annotatedClient.saveInheritEndpoint(person);
     }
-    
+
     @Test
     public void testSaveValidateInAnnotated() {
         Person person = new Person();
@@ -196,7 +206,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             // has to be server side exception, as all validation is disabled on client
             assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
-        
+
         person.setFirstName(""); // empty string is valid
         try {
             annotatedNonValidatingClient.saveValidateIn(person);
@@ -208,7 +218,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         person.setLastName(""); // empty string is valid
         annotatedNonValidatingClient.saveValidateIn(person);
     }
-    
+
     @Test
     public void testResponseValidationWithClientValidationDisabled() {
         Person person = new Person();
@@ -222,7 +232,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
     }
-    
+
     @Test
     public void testEndpointSchemaValidationProvider() {
         Person person = new Person();
@@ -233,7 +243,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         } catch (SOAPFaultException sfe) {
             assertTrue(sfe.getMessage().contains("Unmarshalling Error"));
         }
-       
+
         try {
             person.setFirstName(""); // empty string is valid
             client.saveInheritEndpoint(person);
@@ -291,7 +301,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         } catch (SOAPFaultException sfe) {
             assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
-        
+
         person.setFirstName(""); // empty string is valid
         try {
             disconnectedClient.saveValidateOut(person);
@@ -301,7 +311,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         }
 
         person.setLastName(""); // empty string is valid
-        
+
         // this confirms that we passed client validation as we then got the connectivity error
         try {
             disconnectedClient.saveValidateOut(person);
@@ -310,7 +320,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             assertTrue(e.getMessage().contains("Could not send Message"));
         }
     }
-    
+
     @Test
     public void testResponseClientValidation() {
         Person person = new Person();
@@ -319,9 +329,9 @@ public class JavaFirstSchemaValidationTest extends Assert {
             noValidationServerClient.saveValidateIn(person);
             fail("Expected exception");
         } catch (SOAPFaultException e) {
-            assertTrue(e.getMessage().contains("Unmarshalling Error"));
+            assertTrue(e.getMessage(), e.getMessage().contains("Unmarshalling Error"));
         }
-        
+
         person.setFirstName(""); // empty string is valid
         try {
             noValidationServerClient.saveValidateIn(person);
@@ -331,10 +341,10 @@ public class JavaFirstSchemaValidationTest extends Assert {
         }
 
         person.setLastName(""); // empty string is valid
-        
-        noValidationServerClient.saveValidateIn(person);        
+
+        noValidationServerClient.saveValidateIn(person);
     }
-    
+
     @Test
     public void testSaveValidationOutProvider() {
         Person person = new Person();
@@ -345,7 +355,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
             // verify its server side outgoing
             assertTrue(sfe.getMessage().contains("Marshalling Error"));
         }
-        
+
         person.setFirstName(""); // empty string is valid
         try {
             client.saveValidateOut(person);
@@ -357,53 +367,53 @@ public class JavaFirstSchemaValidationTest extends Assert {
         client.saveValidateOut(person);
     }
 
-    private static <T> T createClient(String port, Class<T> serviceClass, SchemaValidationType type, 
+    private static <T> T createClient(String port, Class<T> serviceClass, SchemaValidationType type,
             Feature ... features) {
         JaxWsProxyFactoryBean clientFactory = new JaxWsProxyFactoryBean();
         clientFactory.setServiceClass(serviceClass);
-        
-        
+
+
         clientFactory.setAddress(getAddress(port, serviceClass));
-        
+
         if (features != null) {
             clientFactory.getFeatures().addAll(Arrays.asList(features));
         }
-        
+
         @SuppressWarnings("unchecked")
         T newClient = (T)clientFactory.create();
 
         Client proxy = ClientProxy.getClient(newClient);
-        
+
         if (type != null) {
             proxy.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, type);
         }
-        
+
         HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
         // give me longer debug times
         HTTPClientPolicy clientPolicy = new HTTPClientPolicy();
         clientPolicy.setConnectionTimeout(1000000);
         clientPolicy.setReceiveTimeout(1000000);
         conduit.setClient(clientPolicy);
-        
+
         return newClient;
     }
 
-    public static Server createServer(String port, Class<?> serviceInterface, Object serviceImpl, 
+    public static Server createServer(String port, Class<?> serviceInterface, Object serviceImpl,
             SchemaValidationType type, Feature ... features)
         throws IOException {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(serviceImpl.getClass());
-        
+
         if (features != null) {
             svrFactory.getFeatures().addAll(Arrays.asList(features));
         }
-        
+
         if (type != null) {
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, type);
             svrFactory.setProperties(properties);
         }
-        
+
         svrFactory.setAddress(getAddress(port, serviceInterface));
         svrFactory.setServiceBean(serviceImpl);
         Server server = svrFactory.create();

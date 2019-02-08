@@ -30,16 +30,16 @@ import org.apache.cxf.service.model.EndpointInfo;
  * Factory for Destinations.
  */
 public interface DestinationFactory {
-    
+
     /**
      * Create a destination.
-     * 
+     *
      * @param ei the endpoint info of the destination.
      * @return the created Destination.
      */
     Destination getDestination(EndpointInfo ei, Bus bus) throws IOException;
-    
+
     Set<String> getUriPrefixes();
-    
+
     List<String> getTransportIds();
 }

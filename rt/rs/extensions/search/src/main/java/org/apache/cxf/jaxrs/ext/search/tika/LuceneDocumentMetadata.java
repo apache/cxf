@@ -27,12 +27,12 @@ import org.apache.cxf.jaxrs.ext.search.DefaultParamConverterProvider;
 
 public class LuceneDocumentMetadata {
     public static final String SOURCE_FIELD = "source";
-    
+
     private final Map< String, Class< ? > > fieldTypes;
     private final String contentFieldName;
     private String source;
     private ParamConverterProvider converterProvider = new DefaultParamConverterProvider();
-    
+
     public LuceneDocumentMetadata() {
         this("contents");
     }
@@ -46,22 +46,22 @@ public class LuceneDocumentMetadata {
         this.contentFieldName = contentFieldName;
         this.fieldTypes = fieldTypes;
     }
-    
+
     public LuceneDocumentMetadata withField(final String name, final Class< ? > type) {
         fieldTypes.put(name, type);
         return this;
     }
-    
+
     public LuceneDocumentMetadata withFieldTypeConverter(final ParamConverterProvider provider) {
         this.converterProvider = provider;
         return this;
     }
-    
+
     public LuceneDocumentMetadata withSource(final String src) {
         this.source = src;
         return this;
     }
-    
+
     public String getContentFieldName() {
         return contentFieldName;
     }
@@ -73,15 +73,15 @@ public class LuceneDocumentMetadata {
     public String getSource() {
         return source;
     }
-    
+
     public Class<?> getFieldType(String name) {
         return fieldTypes.get(name);
     }
-    
+
     public Map<String, Class<?>> getFieldTypes() {
         return fieldTypes;
-    }    
-    
+    }
+
     public ParamConverterProvider getFieldTypeConverter() {
         return converterProvider;
     }

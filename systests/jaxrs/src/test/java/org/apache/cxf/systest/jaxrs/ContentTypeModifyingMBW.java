@@ -37,7 +37,7 @@ public class ContentTypeModifyingMBW implements MessageBodyWriter<String> {
 
     @Override
     public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mt) {
-        return mt.toString().equals("text/custom");
+        return "text/custom".equals(mt.toString());
     }
 
     @Override
@@ -45,6 +45,7 @@ public class ContentTypeModifyingMBW implements MessageBodyWriter<String> {
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
         headers.putSingle("Content-Type", mt.toString() + ";charset=us-ascii");
+        headers.putSingle("CustomHeader", "CustomValue");
         os.write(str.getBytes());
     }
 

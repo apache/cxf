@@ -32,43 +32,63 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 
 public class OAuthInvoker extends JAXRSInvoker {
+    private static final String OAUTH2_CALL_RETRIED = "oauth2.call.retried";
     private WebClient accessTokenServiceClient;
     private ClientTokenContextManager clientTokenContextManager;
     private Consumer consumer;
     @Override
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
                                        Object[] paramArray) throws Exception {
+        Message inMessage = exchange.getInMessage();
+        ClientTokenContext tokenContext = inMessage.getContent(ClientTokenContext.class);
         try {
+            if (tokenContext != null) {
+                StaticClientTokenContext.setClientTokenContext(tokenContext);
+            }
+
             return super.performInvocation(exchange, serviceObject, m, paramArray);
         } catch (InvocationTargetException ex) {
-            if (ex.getCause() instanceof NotAuthorizedException) {
-                Message inMessage = exchange.getInMessage();
-                ClientTokenContext tokenContext = inMessage.getContent(ClientTokenContext.class);
+            if (tokenContext != null
+                && ex.getCause() instanceof NotAuthorizedException
+                && !inMessage.containsKey(OAUTH2_CALL_RETRIED)) {
                 ClientAccessToken accessToken = tokenContext.getToken();
-                String refreshToken  = accessToken.getRefreshToken();
+                String refreshToken = accessToken.getRefreshToken();
                 if (refreshToken != null) {
-                    accessToken = OAuthClientUtils.refreshAccessToken(accessTokenServiceClient, 
-                                                        consumer, 
+                    accessToken = OAuthClientUtils.refreshAccessToken(accessTokenServiceClient,
+                                                        consumer,
                                                         accessToken);
+                    validateRefreshedToken(tokenContext, accessToken);
                     MessageContext mc = new MessageContextImpl(inMessage);
-                    ((ClientTokenContextImpl)tokenContext).setToken(accessToken);           
+                    ((ClientTokenContextImpl)tokenContext).setToken(accessToken);
                     clientTokenContextManager.setClientTokenContext(mc, tokenContext);
-                    
+
                     //retry
+                    inMessage.put(OAUTH2_CALL_RETRIED, true);
                     return super.performInvocation(exchange, serviceObject, m, paramArray);
                 }
             }
             throw ex;
+        } finally {
+            if (tokenContext != null) {
+                StaticClientTokenContext.removeClientTokenContext();
+            }
         }
     }
-    
+
+    protected void validateRefreshedToken(ClientTokenContext tokenContext, ClientAccessToken refreshedToken) {
+        // complete
+    }
+
     public void setAccessTokenServiceClient(WebClient accessTokenServiceClient) {
         this.accessTokenServiceClient = accessTokenServiceClient;
     }
 
-    
+
     public void setConsumer(Consumer consumer) {
         this.consumer = consumer;
+    }
+    public Consumer getConsumer() {
+        return consumer;
     }
 
     public void setClientTokenContextManager(ClientTokenContextManager clientTokenContextManager) {

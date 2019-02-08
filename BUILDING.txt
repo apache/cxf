@@ -6,7 +6,7 @@ Initial Setup
 
 1) Install J2SE SDK, which can be downloaded from 
    http://www.oracle.com/technetwork/java/archive-139210.html#javase
-   CXF supports most versions newer than 1.7.0_25
+   The minimum suported Java version is 1.8.
 
 2) Make sure that your JAVA_HOME environment variable is set to the newly installed 
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
@@ -22,13 +22,13 @@ Building
 
 1) Change to the top level directory of Apache CXF source distribution.
 2) Set the MAVEN_OPTS environment variable to include more memory
-   Unix/Linux/OSX   $> export MAVEN_OPTS="-XX:MaxPermSize=192m -Xmx768M"
-   Windows          > set MAVEN_OPTS="-XX:MaxPermSize=192m -Xmx768M"
+   Unix/Linux/OSX   $> export MAVEN_OPTS="-Xmx2048M"
+   Windows          > set MAVEN_OPTS="-Xmx2048M"
 3) Run
 	$> mvn
    This will compile Apache CXF and run all of the tests in the Apache CXF source
    distribution. Alternatively, you can run
-         $> mvn -Pfastinstall.
+    $> mvn -Pfastinstall.
    This will compile Apache CXF without running the tests and takes less
    time to build.
    Depending on the load of remote Maven repositories, you may have 

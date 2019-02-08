@@ -34,9 +34,9 @@ public class UriDomainFactoryBeanListener implements FactoryBeanListener {
         if (ev.equals(Event.START_CREATE)) {
             // Remove original URIDomainExpressionBuilder to be replaced on custom one
             ExtensionManagerImpl orig = (ExtensionManagerImpl)factory.getBus().getExtension(ExtensionManager.class);
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             names.add(org.apache.cxf.ws.policy.attachment.external.URIDomainExpressionBuilder.class.getName());
-            ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
+            orig.removeBeansOfNames(names);
         }
     }
 }

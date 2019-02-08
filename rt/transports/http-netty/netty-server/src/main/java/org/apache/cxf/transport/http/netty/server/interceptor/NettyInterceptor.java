@@ -29,6 +29,6 @@ public interface NettyInterceptor {
     void onRequestReceived(ChannelHandlerContext ctx, HttpRequest request);
 
     void onRequestSuccessed(ChannelHandlerContext ctx, HttpResponse response);
-    
+
     void onRequestFailed(ChannelHandlerContext ctx, Throwable cause);
 }

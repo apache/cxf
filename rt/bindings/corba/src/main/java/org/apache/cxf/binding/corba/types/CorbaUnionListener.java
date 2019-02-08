@@ -48,12 +48,12 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
         serviceInfo = sInfo;
         orb = oorb;
         unionType = (Union) handler.getType();
-        branches = unionType.getUnionbranch();  
+        branches = unionType.getUnionbranch();
     }
 
     public void processStartElement(QName name) {
         if (currentTypeListener == null) {
-            for (Unionbranch branch : branches) {               
+            for (Unionbranch branch : branches) {
                 CorbaObjectHandler content;
                 QName unionName = null;
                 String branchName = branch.getName();
@@ -85,14 +85,14 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
                         currentTypeListener.processStartElement(name);
                     }
                 } else {
-                    QName emptyBranchContentQName = 
+                    QName emptyBranchContentQName =
                         new QName(name.getNamespaceURI(), branchName);
                     content = CorbaHandlerUtils.initializeObjectHandler(orb,
                                                                         emptyBranchContentQName,
                                                                         branch.getIdltype(),
                                                                         typeMap,
                                                                         serviceInfo);
-                }                
+                }
                 ((CorbaUnionHandler)handler).addCase(content);
             }
         } else {
@@ -104,14 +104,14 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
         if (currentTypeListener != null) {
             currentTypeListener.processCharacters(text);
         } else {
-            //Nillable primitive cases, you do not get the start element            
+            //Nillable primitive cases, you do not get the start element
             CorbaPrimitiveHandler discObj =
                 new CorbaPrimitiveHandler(new QName("discriminator"),
                                           unionType.getDiscriminator(),
                                           orb.get_primitive_tc(TCKind.from_int(TCKind._tk_boolean)),
                                           null);
             discObj.setValue(Boolean.TRUE);
-            ((CorbaUnionHandler)handler).setDiscriminator(discObj);           
+            ((CorbaUnionHandler)handler).setDiscriminator(discObj);
             CorbaTypeListener typeListener =
                 CorbaHandlerUtils.getTypeListener(handler.getName(),
                                                   branches.get(0).getIdltype(),
@@ -132,7 +132,7 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
 
     private String determineDescriminatorValue(Unionbranch branch) {
         String descriminatorValue;
-        // Determine the value of the discriminator.  
+        // Determine the value of the discriminator.
         List<CaseType> branchCases = branch.getCase();
         if (branchCases.size() != 0) {
             CaseType caseLabel = branchCases.get(0);
@@ -157,7 +157,7 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
             discObj.setValue(Boolean.FALSE);
             ((CorbaUnionHandler)handler).setDiscriminator(discObj);
             Unionbranch branch = branches.get(0);
-            QName emptyBranchContentQName = 
+            QName emptyBranchContentQName =
                 new QName(handler.getName().getNamespaceURI(), branch.getName());
             CorbaObjectHandler content = CorbaHandlerUtils.initializeObjectHandler(orb,
                                                                                    emptyBranchContentQName,

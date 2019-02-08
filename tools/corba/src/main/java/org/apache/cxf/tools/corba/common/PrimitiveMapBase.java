@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 
 public abstract class PrimitiveMapBase {
     protected Map<String, QName> corbaPrimitiveMap;
-    
+
     public Object get(Object key) {
         return corbaPrimitiveMap.get(key);
     }

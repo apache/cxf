@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
@@ -33,33 +34,38 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.systest.sts.deployment.StaxSTSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * In this test case, a CXF JAX-WS client sends BasicAuth via (1-way) TLS to a CXF provider.
- * The provider converts it into Username Token and dispatches it to an STS for validation 
- * (via TLS). 
+ * The provider converts it into Username Token and dispatches it to an STS for validation
+ * (via TLS).
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
 
     final TestParam test;
-    
+
     public JaxwsBasicAuthTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -87,17 +93,17 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
-    public static Collection<TestParam[]> data() {
-       
-        return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, "")},
-                                                {new TestParam(PORT, true, "")},
-                                                {new TestParam(STAX_PORT, false, "")},
-                                                {new TestParam(STAX_PORT, true, "")},
+    public static Collection<TestParam> data() {
+
+        return Arrays.asList(new TestParam[] {new TestParam(PORT, false, ""),
+                                              new TestParam(PORT, true, ""),
+                                              new TestParam(STAX_PORT, false, ""),
+                                              new TestParam(STAX_PORT, true, ""),
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -111,26 +117,26 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = JaxwsBasicAuthTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = JaxwsBasicAuthTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         doubleIt(port, 25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testBadBasicAuth() throws Exception {
 
@@ -138,16 +144,16 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
         URL busFile = JaxwsBasicAuthTest.class.getResource("cxf-bad-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = JaxwsBasicAuthTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
@@ -160,7 +166,7 @@ public class JaxwsBasicAuthTest extends AbstractBusClientServerTestBase {
             assertTrue(message.contains("STS Authentication failed")
                 || message.contains("Validation of security token failed"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }

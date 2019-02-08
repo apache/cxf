@@ -38,14 +38,14 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
  * This class validates a SecurityContextToken.
  */
 public class SCTValidator implements TokenValidator {
-    
+
     /**
      * This tag refers to the secret key (byte[]) associated with a SecurityContextToken that has been
      * validated. It is inserted into the additional properties map of the response, so that it can be
      * retrieved and inserted into a generated token by a TokenProvider instance.
      */
     public static final String SCT_VALIDATOR_SECRET = "sct-validator-secret";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SCTValidator.class);
 
     /**
@@ -55,7 +55,7 @@ public class SCTValidator implements TokenValidator {
     public boolean canHandleToken(ReceivedToken validateTarget) {
         return canHandleToken(validateTarget, null);
     }
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument. The realm is ignored in this token Validator.
@@ -66,7 +66,7 @@ public class SCTValidator implements TokenValidator {
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((STSUtils.SCT_NS_05_02.equals(namespace) 
+            if ((STSUtils.SCT_NS_05_02.equals(namespace)
                 || STSUtils.SCT_NS_05_12.equals(namespace))
                 && "SecurityContextToken".equals(localname)) {
                 return true;
@@ -74,23 +74,23 @@ public class SCTValidator implements TokenValidator {
         }
         return false;
     }
-    
+
     /**
      * Validate a Token using the given TokenValidatorParameters.
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating SecurityContextToken");
-        
+
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTValidator");
             return response;
         }
-        
+
         if (validateTarget.isDOMElement()) {
             try {
                 Element validateTargetElement = (Element)validateTarget.getToken();
@@ -111,7 +111,7 @@ public class SCTValidator implements TokenValidator {
                 properties.put(SCT_VALIDATOR_SECRET, secret);
                 response.setAdditionalProperties(properties);
                 response.setPrincipal(token.getPrincipal());
-                
+
                 Map<String, Object> props = token.getProperties();
                 if (props != null) {
                     String realm = (String)props.get(STSConstants.TOKEN_REALM);
@@ -125,5 +125,5 @@ public class SCTValidator implements TokenValidator {
         }
         return response;
     }
-    
+
 }

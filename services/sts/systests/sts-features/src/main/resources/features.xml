@@ -20,8 +20,10 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" name="cxf-sts-osgi">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${project.version}/xml/features</repository>
     <feature name="cxf-sts-service" version="${project.version}">
+        <feature>aries-blueprint</feature>
         <feature>cxf</feature>
         <feature>cxf-sts</feature>
         <bundle>mvn:${project.groupId}/cxf-services-sts-systests-osgi/${project.version}</bundle>
+        <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/${cxf.xerces.bundle.version}</bundle>
     </feature>
 </features>

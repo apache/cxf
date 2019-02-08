@@ -23,7 +23,7 @@ import javax.jws.WebParam;
 
 @javax.jws.WebService(targetNamespace = "aNamespace")
 public interface HelloWorld {
-    
+
     @WebMethod(operationName = "sayHi")
     PassedObject sayHi(@WebParam(name = "text") PassedObject name);
 

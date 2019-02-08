@@ -37,11 +37,11 @@ public class SoapBindingConfiguration extends BindingConfiguration {
     private boolean mtomEnabled;
     private QName bindingName;
     private String bindingNamePostfix = "SoapBinding";
-    
+
     public SoapBindingConfiguration() {
-        
+
     }
-    
+
 
     @Override
     public String getBindingId() {
@@ -57,9 +57,8 @@ public class SoapBindingConfiguration extends BindingConfiguration {
         String action = (String)op.getProperty("action");
         if (action == null) {
             return defaultSoapAction;
-        } else {
-            return action;
         }
+        return action;
     }
 
     public String getTransportURI() {
@@ -73,7 +72,7 @@ public class SoapBindingConfiguration extends BindingConfiguration {
     public boolean isSetStyle() {
         return style != null;
     }
-    
+
     public String getStyle() {
         return style == null ? "document" : style;
     }
@@ -109,7 +108,7 @@ public class SoapBindingConfiguration extends BindingConfiguration {
     public void setMtomEnabled(boolean mtomEnabled) {
         this.mtomEnabled = mtomEnabled;
     }
-    
+
     public QName getBindingName(ServiceInfo si) {
         if (bindingName == null) {
             return new QName(si.getName().getNamespaceURI(),
@@ -121,17 +120,17 @@ public class SoapBindingConfiguration extends BindingConfiguration {
     public QName getBindingName() {
         return bindingName;
     }
-    
+
     public void setBindingName(QName b) {
         bindingName = b;
     }
-    
+
     public String getBindingNamePostfix() {
         return bindingNamePostfix;
     }
-    
+
     public void setBindingNamePostfix(String b) {
         bindingNamePostfix = b;
     }
-    
+
 }

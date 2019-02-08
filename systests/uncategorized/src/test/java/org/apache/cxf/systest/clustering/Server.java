@@ -36,7 +36,7 @@ public class Server extends AbstractBusTestServerBase {
         "org/apache/cxf/systest/clustering/targets.xml";
 
     Endpoint ep;
-    
+
     protected void run()  {
 
         SpringBusFactory factory = new SpringBusFactory();
@@ -53,13 +53,13 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

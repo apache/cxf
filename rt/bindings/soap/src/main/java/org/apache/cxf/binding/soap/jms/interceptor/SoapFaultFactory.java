@@ -32,34 +32,33 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.interceptor.Fault;
 
 /**
- * 
+ *
  */
 public class SoapFaultFactory  {
-    
+
     private SoapVersion version;
-    
+
     public SoapFaultFactory(Binding binding) {
         version = ((SoapBinding)binding).getSoapVersion();
     }
-    
+
     public Fault createFault(JMSFault jmsFault) {
         Fault f = null;
         if (version == Soap11.getInstance()) {
             f = createSoap11Fault(jmsFault);
-            // so we can encode the SequenceFault as header   
+            // so we can encode the SequenceFault as header
             f.initCause(jmsFault);
         } else {
             f = createSoap12Fault(jmsFault);
         }
         return f;
     }
-    
+
     Fault createSoap11Fault(JMSFault jmsFault) {
-        SoapFault fault = new SoapFault(jmsFault.getReason(),
-            jmsFault.getSubCode());
-        return fault;
+        return new SoapFault(jmsFault.getReason(),
+                             jmsFault.getSubCode());
     }
-    
+
     Fault createSoap12Fault(JMSFault jmsFault) {
         SoapFault fault = new SoapFault(jmsFault.getReason(),
             jmsFault.isSender() ? version.getSender() : version.getReceiver());
@@ -72,7 +71,7 @@ public class SoapFaultFactory  {
         setDetail(fault, detail);
         return fault;
     }
-    
+
     void setDetail(SoapFault fault, Object detail) {
         Element el = null;
         if (detail instanceof Element) {
@@ -84,11 +83,10 @@ public class SoapFaultFactory  {
             fault.setDetail(el);
         }
     }
-    
+
     public String toString(Fault f) {
-        SoapFault sf = (SoapFault)f;
-        return sf.toString();
+        return f.toString();
     }
-        
+
 
 }

@@ -20,7 +20,7 @@
 package org.apache.cxf.sts.event;
 
 /**
- * 
+ *
  */
 public interface STSEventListener {
     void handleSTSEvent(AbstractSTSEvent event);

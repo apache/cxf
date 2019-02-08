@@ -50,21 +50,11 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         return handlerChainAnnotation;
     }
 
-    public boolean passthrough() {
-       //TODO: enable the handler chain
-        /* if (this.intf.getHandlerChains() == null) {
-            return true;
-        }*/
-        return false;
-    }
-
     public void setJavaInterface(JavaInterface javaInterface) {
-        this.intf = javaInterface; 
+        this.intf = javaInterface;
     }
 
     public void generate(ToolContext penv) throws ToolException {
-        
-       
         this.env = penv;
 
         if (passthrough()) {
@@ -72,24 +62,24 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         }
 
         Element e = this.intf.getHandlerChains();
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(e, 
-                                                                     ToolConstants.HANDLER_CHAINS_URI, 
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(e,
+                                                                     ToolConstants.HANDLER_CHAINS_URI,
                                                                      ToolConstants.HANDLER_CHAIN);
-        if (elemList.size() > 0) {
+        if (!elemList.isEmpty()) {
             String fName = ProcessorUtil.getHandlerConfigFileName(this.intf.getName());
             handlerChainAnnotation = new JAnnotation(HandlerChain.class);
-            handlerChainAnnotation.addElement(new JAnnotationElement("name", 
+            handlerChainAnnotation.addElement(new JAnnotationElement("name",
                                                                      HANDLER_CHAIN_NAME));
-            handlerChainAnnotation.addElement(new JAnnotationElement("file", fName + ".xml"));           
+            handlerChainAnnotation.addElement(new JAnnotationElement("file", fName + ".xml"));
             generateHandlerChainFile(e, parseOutputName(this.intf.getPackageName(),
                                                         fName,
                                                         ".xml"));
         }
     }
 
-    private void generateHandlerChainFile(Element hChains, Writer writer) 
+    private void generateHandlerChainFile(Element hChains, Writer writer)
         throws ToolException {
-        
+
         try {
             StaxUtils.writeTo(hChains, writer, 2);
             writer.close();

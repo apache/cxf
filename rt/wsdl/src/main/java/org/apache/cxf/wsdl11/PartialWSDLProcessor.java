@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
@@ -40,9 +41,7 @@ import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap.SOAPBody;
 import javax.wsdl.extensions.soap.SOAPFault;
 import javax.wsdl.extensions.soap.SOAPOperation;
-
 import javax.xml.namespace.QName;
-
 
 import org.apache.cxf.helpers.CastUtils;
 
@@ -51,15 +50,15 @@ import org.apache.cxf.helpers.CastUtils;
 public final class PartialWSDLProcessor  {
     private static String bindingName = "SoapBinding";
     private static String style = "document";
-    private static String useLiteral =  "literal";
-    private static String serviceName =  "Service";
+    private static String useLiteral = "literal";
+    private static String serviceName = "Service";
     private static String portName = "Port";
 
 
     private PartialWSDLProcessor() {
     }
 
-    
+
     public static boolean isPortTypeExisted(Definition wsdlDefinition, QName name) {
         Map<QName, PortType>  portTypes = CastUtils.cast(wsdlDefinition.getAllPortTypes());
         if (portTypes == null || portTypes.isEmpty()) {
@@ -68,13 +67,13 @@ public final class PartialWSDLProcessor  {
         String existPortTypeName = null;
         PortType portType = null;
         try {
-            for (QName existPortTypeQName : portTypes.keySet()) {
-                existPortTypeName = existPortTypeQName.getLocalPart();
+            for (Entry<QName, PortType> entry : portTypes.entrySet()) {
+                existPortTypeName = entry.getKey().getLocalPart();
                 if (name.getLocalPart().contains(existPortTypeName)) {
-                    portType = portTypes.get(existPortTypeQName);
+                    portType = entry.getValue();
                     break;
                 }
-            }  
+            }
         } catch (Exception e) {
             portType = null;
         }
@@ -88,9 +87,9 @@ public final class PartialWSDLProcessor  {
             return false;
         }
         try {
-            for (QName existBindingQName : bindings.keySet()) {
-                if (existBindingQName.getLocalPart().contains(name.getLocalPart())) {
-                    binding = bindings.get(existBindingQName);
+            for (Entry<QName, Binding> entry : bindings.entrySet()) {
+                if (entry.getKey().getLocalPart().contains(name.getLocalPart())) {
+                    binding = entry.getValue();
                     break;
                 }
             }
@@ -103,7 +102,7 @@ public final class PartialWSDLProcessor  {
         return wsdlDefinition.getService(name) != null;
     }
 
-    public static Binding doAppendBinding(Definition wsdlDefinition, String name, PortType portType, 
+    public static Binding doAppendBinding(Definition wsdlDefinition, String name, PortType portType,
                                              ExtensionRegistry extReg) throws Exception {
         Binding binding = wsdlDefinition.createBinding();
         binding.setQName(new QName(wsdlDefinition.getTargetNamespace(), name + bindingName));
@@ -113,20 +112,20 @@ public final class PartialWSDLProcessor  {
         addBindingOperation(wsdlDefinition, portType, binding, extReg);
         return binding;
 
-    
+
     }
 
     private static void setSoapBindingExtElement(Definition wsdlDefinition, Binding binding,
                                                  ExtensionRegistry extReg) throws Exception {
         SOAPBindingUtil.addSOAPNamespace(wsdlDefinition, false);
-        SOAPBinding 
+        SOAPBinding
             soapBinding = SOAPBindingUtil.createSoapBinding(extReg, false);
         soapBinding.setStyle(style);
         binding.addExtensibilityElement(soapBinding);
     }
 
     @SuppressWarnings("unchecked")
-    private static void addBindingOperation(Definition wsdlDefinition, PortType portType, Binding binding, 
+    private static void addBindingOperation(Definition wsdlDefinition, PortType portType, Binding binding,
                                             ExtensionRegistry extReg) throws Exception {
         List<Operation> ops = portType.getOperations();
         for (Operation op : ops) {
@@ -146,10 +145,10 @@ public final class PartialWSDLProcessor  {
             binding.addBindingOperation(bindingOperation);
         }
     }
-    
-    
-    
-    
+
+
+
+
     private static void setSoapOperationExtElement(BindingOperation bo, ExtensionRegistry extReg) throws Exception {
         SOAPOperation soapOperation = SOAPBindingUtil.createSoapOperation(extReg, false);
         soapOperation.setStyle(style);
@@ -157,8 +156,8 @@ public final class PartialWSDLProcessor  {
         bo.addExtensibilityElement(soapOperation);
     }
 
-    
-    
+
+
     private static BindingInput getBindingInput(Input input, Definition wsdlDefinition,
                                                 ExtensionRegistry extReg) throws Exception {
         BindingInput bi = wsdlDefinition.createBindingInput();
@@ -167,8 +166,8 @@ public final class PartialWSDLProcessor  {
         return bi;
     }
 
-    
-    private static BindingOutput getBindingOutput(Output output, Definition wsdlDefinition, 
+
+    private static BindingOutput getBindingOutput(Output output, Definition wsdlDefinition,
                                                   ExtensionRegistry extReg) throws Exception {
         BindingOutput bo = wsdlDefinition.createBindingOutput();
         bo.setName(output.getName());
@@ -182,7 +181,7 @@ public final class PartialWSDLProcessor  {
         return soapBody;
     }
 
-    private static void addSoapFaults(Operation op, BindingOperation bindingOperation, Definition wsdlDefinition, 
+    private static void addSoapFaults(Operation op, BindingOperation bindingOperation, Definition wsdlDefinition,
                                       ExtensionRegistry extReg) throws Exception {
         Map<String, Fault> faults = CastUtils.cast(op.getFaults());
         for (Fault fault : faults.values()) {
@@ -199,14 +198,14 @@ public final class PartialWSDLProcessor  {
         soapFault.setUse(useLiteral);
         bf.addExtensibilityElement(soapFault);
     }
-    
-    public static SOAPAddress setAddrElement(Definition wsdlDefinition, Port port, 
+
+    public static SOAPAddress setAddrElement(Definition wsdlDefinition, Port port,
                                              ExtensionRegistry extReg) throws Exception {
-        SOAPAddress address  = SOAPBindingUtil.createSoapAddress(extReg, false);
+        SOAPAddress address = SOAPBindingUtil.createSoapAddress(extReg, false);
         address.setLocationURI("dummy");
         return address;
     }
-    public static javax.wsdl.Service doAppendService(Definition wsdlDefinition, 
+    public static javax.wsdl.Service doAppendService(Definition wsdlDefinition,
                                                      String existPortName, ExtensionRegistry
                                                      extReg, Binding binding) throws Exception {
         javax.wsdl.Service wsdlService = wsdlDefinition.createService();
@@ -219,6 +218,6 @@ public final class PartialWSDLProcessor  {
         wsdlService.addPort(port);
         return wsdlService;
     }
-    
+
 
 }

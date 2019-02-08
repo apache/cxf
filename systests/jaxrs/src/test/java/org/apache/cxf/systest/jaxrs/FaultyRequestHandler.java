@@ -30,15 +30,16 @@ public class FaultyRequestHandler implements ContainerRequestFilter {
 
     @Context
     private UriInfo uriInfo;
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         if (uriInfo.getPath().endsWith("/propogateExceptionVar/1")) {
             MultivaluedMap<String, String> vars = uriInfo.getPathParameters();
-            if (vars.size() == 1 
-                && vars.get("i") != null 
-                && vars.get("i").size() == 1 
+            if (vars.size() == 1
+                && vars.get("i") != null
+                && vars.get("i").size() == 1
                 && "1".equals(vars.getFirst("i"))) {
-                
+
                 JAXRSUtils.getCurrentMessage().getExchange()
                     .put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);
                 throw new RuntimeException();

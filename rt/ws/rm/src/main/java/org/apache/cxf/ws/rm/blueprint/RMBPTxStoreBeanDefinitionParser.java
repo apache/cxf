@@ -28,19 +28,19 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 /**
  * This class provides some common functions used by the two BP TxStore bean definition parsers
- * in this package. 
- * 
+ * in this package.
+ *
  */
 public class RMBPTxStoreBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
 
     public RMBPTxStoreBeanDefinitionParser() {
         super(RMTxStore.class);
     }
-    
+
     @Override
     protected void parseChildElements(Element element, ParserContext ctx, MutableBeanMetadata bean) {
         super.parseChildElements(element, ctx, bean);
-        
+
         bean.setInitMethod("init");
         bean.setDestroyMethod("destroy");
     }
@@ -53,7 +53,7 @@ public class RMBPTxStoreBeanDefinitionParser extends SimpleBPBeanDefinitionParse
                 bean.addProperty("dataSource", createRef(context, val));
             }
         } else {
-            super.mapAttribute(bean, e, name, val, context);    
+            super.mapAttribute(bean, e, name, val, context);
         }
     }
 

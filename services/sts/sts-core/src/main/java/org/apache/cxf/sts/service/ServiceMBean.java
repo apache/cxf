@@ -28,45 +28,45 @@ import java.util.List;
  * must match with a "known" address of the implementation of this MBean.
  */
 public interface ServiceMBean {
-    
+
     /**
      * Return true if the supplied address corresponds to a known address for this service
      */
     boolean isAddressInEndpoints(String address);
-    
+
     /**
      * Get the default Token Type to be issued for this Service
      */
     String getTokenType();
-    
+
     /**
      * Set the default Token Type to be issued for this Service
      */
     void setTokenType(String tokenType);
-    
+
     /**
      * Get the default Key Type to be issued for this Service
      */
     String getKeyType();
-    
+
     /**
      * Set the default Key Type to be issued for this Service
      */
     void setKeyType(String keyType);
-    
+
     /**
      * Set the list of endpoint addresses that correspond to this service
      */
     void setEndpoints(List<String> endpoints);
-    
+
     /**
      * Get the EncryptionProperties to be used to encrypt tokens issued for this service
      */
     EncryptionProperties getEncryptionProperties();
-    
+
     /**
      * Set the EncryptionProperties to be used to encrypt tokens issued for this service
      */
     void setEncryptionProperties(EncryptionProperties encryptionProperties);
-    
+
 }

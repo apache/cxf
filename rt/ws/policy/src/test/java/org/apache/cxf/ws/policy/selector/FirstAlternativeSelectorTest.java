@@ -33,69 +33,71 @@ import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 
 /**
- * 
+ *
  */
-public class FirstAlternativeSelectorTest extends Assert {
+public class FirstAlternativeSelectorTest {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl(); 
-    } 
+        control = EasyMock.createNiceControl();
+    }
     @Test
     public void testChooseAlternative() {
         AlternativeSelector selector = new FirstAlternativeSelector();
-        
+
         PolicyEngine engine = control.createMock(PolicyEngine.class);
         Assertor assertor = control.createMock(Assertor.class);
-               
+
         Policy policy = new Policy();
         ExactlyOne ea = new ExactlyOne();
         All all = new All();
-        PolicyAssertion a1 = new TestAssertion(); 
+        PolicyAssertion a1 = new TestAssertion();
         all.addAssertion(a1);
         ea.addPolicyComponent(all);
-        Collection<PolicyAssertion> firstAlternative = 
+        Collection<PolicyAssertion> firstAlternative =
             CastUtils.cast(all.getPolicyComponents(), PolicyAssertion.class);
         policy.addPolicyComponent(ea);
         Message m = new MessageImpl();
 
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(false);
         control.replay();
-        
-        assertNull(selector.selectAlternative(policy, engine, assertor, null, m));  
+
+        assertNull(selector.selectAlternative(policy, engine, assertor, null, m));
         control.verify();
-        
-        control.reset();        
+
+        control.reset();
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(true);
-        control.replay();         
-        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null, m); 
+        control.replay();
+        Collection<Assertion> chosen = selector.selectAlternative(policy, engine, assertor, null, m);
         assertSame(1, chosen.size());
         assertSame(chosen.size(), firstAlternative.size());
         assertSame(chosen.iterator().next(), firstAlternative.iterator().next());
         control.verify();
-        
+
         control.reset();
         All other = new All();
         other.addAssertion(a1);
         ea.addPolicyComponent(other);
-        Collection<PolicyAssertion> secondAlternative = 
+        Collection<PolicyAssertion> secondAlternative =
             CastUtils.cast(other.getPolicyComponents(), PolicyAssertion.class);
         EasyMock.expect(engine.supportsAlternative(firstAlternative, assertor, m)).andReturn(false);
         EasyMock.expect(engine.supportsAlternative(secondAlternative, assertor, m)).andReturn(true);
-        control.replay();        
-      
-        chosen = selector.selectAlternative(policy, engine, assertor, null, m); 
+        control.replay();
+
+        chosen = selector.selectAlternative(policy, engine, assertor, null, m);
         assertSame(1, chosen.size());
         assertSame(chosen.size(), secondAlternative.size());
         assertSame(chosen.iterator().next(), secondAlternative.iterator().next());

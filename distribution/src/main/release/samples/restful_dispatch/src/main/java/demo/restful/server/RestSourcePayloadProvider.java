@@ -22,8 +22,6 @@ package demo.restful.server;
 import java.io.InputStream;
 
 import javax.annotation.Resource;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
@@ -33,8 +31,8 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
-
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @WebServiceProvider()
 @ServiceMode(value = Service.Mode.PAYLOAD)
@@ -56,15 +54,15 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
         System.out.println("--query--- " + query);
         System.out.println("--httpMethod--- " + httpMethod);
 
-        if (httpMethod.equalsIgnoreCase("POST")) {
+        if ("POST".equalsIgnoreCase(httpMethod)) {
             // TBD: parse query info from DOMSource
             System.out.println("---Invoking updateCustomer---");
             return updateCustomer(request);
-        } else if (httpMethod.equalsIgnoreCase("GET")) {
-            if (path.equals("/customerservice/customer") && query == null) {
+        } else if ("GET".equalsIgnoreCase(httpMethod)) {
+            if ("/customerservice/customer".equals(path) && query == null) {
                 System.out.println("---Invoking getAllCustomers---");
                 return getAllCustomers();
-            } else if (path.equals("/customerservice/customer") && query != null) {
+            } else if ("/customerservice/customer".equals(path) && query != null) {
                 System.out.println("---Invoking getCustomer---");
                 return getCustomer(query);
             }
@@ -87,18 +85,10 @@ public class RestSourcePayloadProvider implements Provider<DOMSource> {
     }
 
     private DOMSource createDOMSource(String fileName) {
-        DocumentBuilderFactory factory;
-        DocumentBuilder builder;
-        Document document = null;
         DOMSource response = null;
 
-        try {
-            factory = DocumentBuilderFactory.newInstance();
-            //factory.setValidating(true);
-            builder = factory.newDocumentBuilder();
-            InputStream greetMeResponse = getClass().getResourceAsStream(fileName);
-
-            document = builder.parse(greetMeResponse);
+        try (InputStream greetMeResponse = getClass().getResourceAsStream(fileName)) {
+            Document document = StaxUtils.read(greetMeResponse);
             response = new DOMSource(document);
         } catch (Exception e) {
             e.printStackTrace();

@@ -26,9 +26,9 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 public final class IdlArray extends IdlArrayBase {
-     
+
     private static final Logger LOG = LogUtils.getL7dLogger(IdlArray.class);
-    
+
     private IdlArray(IdlScopeBase parent, String name, IdlType elem, int size) {
         super(parent, name, elem, size);
     }
@@ -49,5 +49,5 @@ public final class IdlArray extends IdlArrayBase {
             LOG.log(Level.WARNING, "Ignoring Array " + localName() + " with Empty Element Type.");
         }
     }
-    
+
 }

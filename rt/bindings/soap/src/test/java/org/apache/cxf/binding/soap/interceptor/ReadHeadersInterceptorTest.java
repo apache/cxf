@@ -29,15 +29,18 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
- * 
+ *
  */
-public class ReadHeadersInterceptorTest extends Assert {
-    private static final byte[] TEST_SOAP = 
+public class ReadHeadersInterceptorTest {
+    private static final byte[] TEST_SOAP =
         ("<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'"
             + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
             + " xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:bar='tmp:bar'>"
@@ -45,9 +48,9 @@ public class ReadHeadersInterceptorTest extends Assert {
             + "<ns2:payload xmlns:ns2='urn:tmp:foo'/>"
             + "</soap:Body>"
             + "</soap:Envelope>").getBytes();
-    
+
     private ReadHeadersInterceptor interceptor;
-    
+
     @Before
     public void setUp() {
         interceptor = new ReadHeadersInterceptor(null);
@@ -57,7 +60,7 @@ public class ReadHeadersInterceptorTest extends Assert {
     public void testNotAddNSContext() throws Exception {
         SoapMessage message = setUpMessage();
         interceptor.handleMessage(message);
-        Map<String, String> nsc = CastUtils.cast((Map<?, ?>)message.get("soap.body.ns.context")); 
+        Map<String, String> nsc = CastUtils.cast((Map<?, ?>)message.get("soap.body.ns.context"));
         assertNull(nsc);
     }
 
@@ -71,7 +74,7 @@ public class ReadHeadersInterceptorTest extends Assert {
         assertEquals("http://www.w3.org/2001/XMLSchema-instance", nsc.get("xsi"));
         assertEquals("http://www.w3.org/2001/XMLSchema", nsc.get("xs"));
         assertEquals("tmp:bar", nsc.get("bar"));
-        
+
     }
 
     private SoapMessage setUpMessage() throws Exception {

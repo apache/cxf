@@ -19,23 +19,26 @@
 
 package org.apache.cxf.staxutils;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DepthXMLStreamReaderTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class DepthXMLStreamReaderTest {
+
     @Test
     public void testReader() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
-        
+
         DepthXMLStreamReader dr = new DepthXMLStreamReader(reader);
-        
+
         StaxUtils.toNextElement(dr);
         assertEquals("ItemLookup", dr.getLocalName());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.getEventType());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.getEventType());
 
         assertEquals(1, dr.getDepth());
 
@@ -54,7 +57,7 @@ public class DepthXMLStreamReaderTest extends Assert {
 
         dr.next();
         assertEquals("1E5AY4ZG53H4AMC8QH82", dr.getText());
-        
+
         dr.close();
     }
 }

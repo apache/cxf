@@ -60,24 +60,24 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 
 
 /**
- * Abstract bean holding functionality common for creating 
+ * Abstract bean holding functionality common for creating
  * JAX-RS Server and Client objects.
  */
 public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXRSFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXRSFactoryBean.class);
-    
+
     protected List<String> schemaLocations;
     protected JAXRSServiceFactoryBean serviceFactory;
-    protected List<Object> entityProviders = new LinkedList<Object>();
+    protected List<Object> entityProviders = new LinkedList<>();
     private Comparator<?> providerComparator;
-    
+
     protected AbstractJAXRSFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,14 +94,14 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         super.setServiceName(name);
         serviceFactory.setServiceName(name);
     }
-    
+
     private void checkBindingFactory(Bus bus) {
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         try {
             bfm.getBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID);
         } catch (Throwable b) {
             //not registered, let's register one
-            bfm.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, 
+            bfm.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID,
                                        new JAXRSBindingFactory(bus));
         }
     }
@@ -114,14 +114,14 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         checkBindingFactory(bus);
         serviceFactory.setBus(bus);
     }
-    
+
     /*
      * EndpointInfo contains information form WSDL's physical part such as
      * endpoint address, binding, transport etc. For JAX-RS based EndpointInfo,
      * as there is no WSDL, these information are set manually, eg, default
      * transport is http, binding is JAX-RS binding, endpoint address is from
      * server mainline.
-     */    
+     */
     protected EndpointInfo createEndpointInfo(Service service) throws BusException {
         String transportId = getTransportId();
         if (transportId == null && getAddress() != null) {
@@ -147,11 +147,11 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         EndpointInfo ei = new EndpointInfo();
         ei.setTransportId(transportId);
         ei.setName(serviceFactory.getService().getName());
-        ei.setAddress(getAddress());        
+        ei.setAddress(getAddress());
 
         BindingInfo bindingInfo = createBindingInfo();
         ei.setBinding(bindingInfo);
-        
+
         if (!StringUtils.isEmpty(publishedEndpointUrl)) {
             ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
         }
@@ -201,8 +201,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
 
     /**
-     * Sets the custom service factory which processes 
-     * the registered classes and providers 
+     * Sets the custom service factory which processes
+     * the registered classes and providers
      * @param serviceFactory the factory
      */
     public void setServiceFactory(JAXRSServiceFactoryBean serviceFactory) {
@@ -218,11 +218,11 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
         EndpointInfo ei = createEndpointInfo(service);
         Endpoint ep = new EndpointImpl(getBus(), service, ei);
-        
+
         if (properties != null) {
             ep.putAll(properties);
         }
-        
+
         if (getInInterceptors() != null) {
             ep.getInInterceptors().addAll(getInInterceptors());
         }
@@ -235,7 +235,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (getOutFaultInterceptors() != null) {
             ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
         }
-        
+
         List<ClassResourceInfo> list = serviceFactory.getRealClassResourceInfo();
         for (ClassResourceInfo cri : list) {
             initializeAnnotationInterceptors(ep, cri.getServiceClass());
@@ -245,33 +245,33 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         ep.put(JAXRSServiceFactoryBean.class.getName(), serviceFactory);
         return ep;
     }
-    
+
     /**
      * Sets the location of the schema which can be used to validate
      * the incoming XML or JAXB-driven JSON. JAX-RS MessageBodyReader implementations
-     * which have the setSchemaLocations method accepting a list of schema locations 
+     * which have the setSchemaLocations method accepting a list of schema locations
      * will be injected with this value.
-     * 
+     *
      * @param schema the schema location
      */
     public void setSchemaLocation(String schema) {
-        setSchemaLocations(Collections.singletonList(schema));    
+        setSchemaLocations(Collections.singletonList(schema));
     }
-    
+
     /**
      * Sets the locations of the schemas which can be used to validate
      * the incoming XML or JAXB-driven JSON. JAX-RS MessageBodyReader implementations
-     * which have the setSchemaLocations method accepting a list of schema locations 
+     * which have the setSchemaLocations method accepting a list of schema locations
      * will be injected with this value.
-     * 
+     *
      * For example, if A.xsd imports B.xsd then both A.xsd and B.xsd need to be referenced.
-     * 
-     * @param schema the schema locations
+     *
+     * @param schemas the schema locations
      */
     public void setSchemaLocations(List<String> schemas) {
-        this.schemaLocations = schemas;    
+        this.schemaLocations = schemas;
     }
-    
+
     /**
      * @return the list of custom JAX-RS providers
      */
@@ -281,18 +281,18 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
     /**
      * Add custom JAX-RS providers to the list of providers
-     * 
-     * @param entityProviders the entityProviders
+     *
+     * @param providers the entity providers
      */
     public void setProviders(List<? extends Object> providers) {
-        List<Object> newBeans = new ArrayList<Object>();
+        List<Object> newBeans = new ArrayList<>();
         addToBeans(newBeans, providers);
         this.entityProviders.addAll(newBeans);
     }
-    
+
     /**
      * Add custom JAX-RS provider to the list of providers
-     * 
+     *
      * @param provider the custom provider.
      */
     public void setProvider(Object provider) {
@@ -309,44 +309,44 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
                 }
             }
         }
-        if (list.size() == 0) {
-            org.apache.cxf.common.i18n.Message msg = 
-                new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE", 
+        if (list.isEmpty()) {
+            org.apache.cxf.common.i18n.Message msg =
+                new org.apache.cxf.common.i18n.Message("NO_RESOURCES_AVAILABLE",
                                                        BUNDLE);
             LOG.severe(msg.toString());
             throw new ServiceConstructionException(msg);
         }
     }
-    
+
     protected boolean isValidClassResourceInfo(ClassResourceInfo cri) {
         Class<?> serviceCls = cri.getServiceClass();
-        return !(cri.isCreatedFromModel() && serviceCls == cri.getResourceClass() 
+        return !(cri.isCreatedFromModel() && serviceCls == cri.getResourceClass()
             && !InjectionUtils.isConcreteClass(serviceCls));
     }
-    
-    protected void setupFactory(ProviderFactory factory, Endpoint ep) { 
+
+    protected void setupFactory(ProviderFactory factory, Endpoint ep) {
         if (providerComparator != null) {
             factory.setProviderComparator(providerComparator);
         }
         if (entityProviders != null) {
-            factory.setUserProviders(entityProviders); 
+            factory.setUserProviders(entityProviders);
         }
         setDataBindingProvider(factory, ep.getService());
-        
+
         factory.setBus(getBus());
         factory.initProviders(serviceFactory.getRealClassResourceInfo());
         if (schemaLocations != null) {
             factory.setSchemaLocations(schemaLocations);
         }
-        
+
         ep.put(factory.getClass().getName(), factory);
     }
-    
+
     protected void setDataBindingProvider(ProviderFactory factory, Service s) {
-        
+
         List<ClassResourceInfo> cris = serviceFactory.getRealClassResourceInfo();
-        if (getDataBinding() == null && cris.size() > 0) {
-            org.apache.cxf.annotations.DataBinding ann = 
+        if (getDataBinding() == null && !cris.isEmpty()) {
+            org.apache.cxf.annotations.DataBinding ann =
                 cris.get(0).getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
             if (ann != null) {
                 try {
@@ -366,47 +366,47 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         db.initialize(s);
         factory.setUserProviders(Collections.singletonList(new DataBindingProvider<Object>(db)));
     }
-    
+
     /**
      * Sets the description of root resources.
      * Can be used to 'attach' the JAX-RS like description to the application
      * classes without adding JAX-RS annotations.
-     *   
-     * @param resources root resource descriptions 
+     *
+     * @param resources root resource descriptions
      */
     public void setModelBeans(UserResource... resources) {
         setModelBeans(Arrays.asList(resources));
     }
-    
+
     /**
      * Sets the description of root resources.
      * Can be used to 'attach' the JAX-RS like description to the application
      * classes without adding JAX-RS annotations.
-     *   
-     * @param resources root resource descriptions 
+     *
+     * @param resources root resource descriptions
      */
     public void setModelBeans(List<UserResource> resources) {
         serviceFactory.setUserResources(resources);
     }
-    
+
     /**
      * Sets the description of root resources with the list of concrete classes.
      * Can be used to 'attach' the JAX-RS like description to the application
      * classes without adding JAX-RS annotations. Some models may only reference
      * interfaces, thus providing a list of concrete classes that will be
      * instantiated is required in such cases.
-     *   
+     *
      * @param resources root resource descriptions.
      * @param sClasses concrete root resource classes
      */
     public void setModelBeansWithServiceClass(List<UserResource> resources, Class<?>... sClasses) {
         serviceFactory.setUserResourcesWithServiceClass(resources, sClasses);
     }
-    
+
     /**
-     * Sets a reference to the external user model, 
+     * Sets a reference to the external user model,
      * Example: "classpath:/model/resources.xml"
-     * 
+     *
      * @param modelRef the reference to the external model resource.
      */
     public void setModelRef(String modelRef) {
@@ -415,13 +415,13 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             serviceFactory.setUserResources(resources);
         }
     }
-    
+
     /**
-     * Sets a reference to the external user model, 
+     * Sets a reference to the external user model,
      * Example: "classpath:/model/resources.xml".
-     * Some models may only reference interfaces, thus providing a list of 
+     * Some models may only reference interfaces, thus providing a list of
      * concrete classes that will be instantiated is required in such cases.
-     * 
+     *
      * @param modelRef the reference to the external model resource.
      * @param sClasses concrete root resource classes
      */
@@ -434,6 +434,6 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     public void setProviderComparator(Comparator<?> providerComparator) {
         this.providerComparator = providerComparator;
     }
-    
-    
+
+
 }

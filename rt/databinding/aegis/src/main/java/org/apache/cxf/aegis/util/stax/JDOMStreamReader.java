@@ -47,10 +47,9 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
 
     private Content content;
 
-    private FastStack<Map<String, Namespace>> namespaceStack
-        = new FastStack<Map<String, Namespace>>();
+    private FastStack<Map<String, Namespace>> namespaceStack = new FastStack<>();
 
-    private List<Namespace> namespaces = new ArrayList<Namespace>();
+    private List<Namespace> namespaces = new ArrayList<>();
 
     private Map<String, Namespace> prefix2decNs;
 
@@ -119,7 +118,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
             namespaceStack.push(prefix2decNs);
         }
 
-        prefix2decNs = new HashMap<String, Namespace>();
+        prefix2decNs = new HashMap<>();
         namespaces.clear();
 
         for (Iterator<?> itr = element.getAdditionalNamespaces().iterator(); itr.hasNext();) {
@@ -174,7 +173,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
 
     @Override
     protected void endElement() {
-        if (namespaceStack.size() > 0) {
+        if (!namespaceStack.isEmpty()) {
             prefix2decNs = namespaceStack.pop();
         }
     }

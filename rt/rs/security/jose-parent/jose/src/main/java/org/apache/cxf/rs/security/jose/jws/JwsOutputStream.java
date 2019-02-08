@@ -28,9 +28,11 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 public class JwsOutputStream extends FilterOutputStream {
     private boolean flushed;
     private JwsSignature signature;
-    public JwsOutputStream(OutputStream out, JwsSignature signature) {
+    private boolean writeSignature;
+    public JwsOutputStream(OutputStream out, JwsSignature signature, boolean writeSignature) {
         super(out);
         this.signature = signature;
+        this.writeSignature = writeSignature;
     }
 
     @Override
@@ -38,9 +40,9 @@ public class JwsOutputStream extends FilterOutputStream {
         byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
         write(bytes, 0, bytes.length);
     }
-    
+
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         signature.update(b, off, len);
         out.write(b, off, len);
         out.flush();
@@ -50,10 +52,14 @@ public class JwsOutputStream extends FilterOutputStream {
         if (flushed) {
             return;
         }
-        byte[] finalBytes = signature.sign();
-        out.write(new byte[]{'.'});
-        Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
+        if (writeSignature) {
+            byte[] finalBytes = signature.sign();
+            out.write(new byte[]{'.'});
+            Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
+        } else {
+            super.flush();
+        }
         flushed = true;
     }
-    
+
 }

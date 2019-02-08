@@ -51,13 +51,16 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
  */
 public abstract class AbstractServerPersistenceTest extends AbstractBusClientServerTestBase {
 
-    public static final String GREETMEONEWAY_ACTION 
+    public static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     public static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
@@ -66,22 +69,22 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
     private static final Logger LOG = LogUtils.getLogger(ServerPersistenceTest.class);
     private static final String CFG = "/org/apache/cxf/systest/ws/rm/persistent.xml";
-    private static final String SERVER_LOSS_CFG 
+    private static final String SERVER_LOSS_CFG
         = "/org/apache/cxf/systest/ws/rm/persistent-message-loss-server.xml";
 
     private OutMessageRecorder out;
     private InMessageRecorder in;
     private Bus greeterBus;
-    
+
     public static class Server extends AbstractBusTestServerBase {
         String port;
         String pfx;
         Endpoint ep;
-        public Server(String args[]) {
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
-        
+
         protected void run()  {
             SpringBusFactory factory = new SpringBusFactory();
             Bus bus = factory.createBus();
@@ -96,57 +99,57 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
             implementor.setImplementor(greeterImplementor);
             ep = Endpoint.publish("http://localhost:" + port + "/SoapContext/ControlPort", implementor);
             BusFactory.setDefaultBus(null);
-            BusFactory.setThreadDefaultBus(null);            
+            BusFactory.setThreadDefaultBus(null);
         }
         public void tearDown() {
             ep.stop();
             ep = null;
         }
-        public static void main(String args[]) {
+        public static void main(String[] args) {
             new Server(args).start();
         }
-    }    
-    
+    }
+
     public abstract String getPort();
     public abstract String getDecoupledPort();
     public abstract String getPrefix();
-    
+
     public static void startServers(String port, String pfx) throws Exception {
         RMTxStore.deleteDatabaseFiles(pfx + "-recovery", true);
         RMTxStore.deleteDatabaseFiles(pfx + "-greeter", true);
-        assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, null, new String[] {port, pfx}, true));  
+        assertTrue("server did not launch correctly",
+                   launchServer(Server.class, null, new String[] {port, pfx}, true));
     }
 
-    @Test 
+    @Test
     public void testRecovery() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus();
-        BusFactory.setDefaultBus(bus);        
+        BusFactory.setDefaultBus(bus);
         LOG.fine("Created bus " + bus + " with default cfg");
         ControlService cs = new ControlService();
         Control control = cs.getControlPort();
         ConnectionHelper.setKeepAliveConnection(control, false, true);
         updateAddressPort(control, getPort());
-        
-        assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG)); 
+
+        assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG));
         LOG.fine("Started greeter server.");
-        
+
         System.setProperty("db.name", getPrefix() + "-recovery");
         greeterBus = new SpringBusFactory().createBus(CFG);
         System.clearProperty("db.name");
-        LOG.fine("Created bus " + greeterBus + " with cfg : " + CFG);        
+        LOG.fine("Created bus " + greeterBus + " with cfg : " + CFG);
         BusFactory.setDefaultBus(greeterBus);
-        
+
         // avoid early client resends
         greeterBus.getExtension(RMManager.class).getConfiguration()
-            .setBaseRetransmissionInterval(new Long(60000));
+            .setBaseRetransmissionInterval(Long.valueOf(60000));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, getPort());
-        
+
         LOG.fine("Created greeter client.");
- 
+
         ConnectionHelper.setKeepAliveConnection(greeter, false, true);
 
         Client c = ClientProxy.getClient(greeter);
@@ -159,42 +162,42 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
         greeterBus.getOutInterceptors().add(out);
         greeterBus.getInInterceptors().add(in);
-        
+
         LOG.fine("Configured greeter client.");
 
-        Response<GreetMeResponse> responses[] = cast(new Response[4]);
-        
+        Response<GreetMeResponse>[] responses = cast(new Response[4]);
+
         responses[0] = greeter.greetMeAsync("one");
         responses[1] = greeter.greetMeAsync("two");
         responses[2] = greeter.greetMeAsync("three");
-        
+
         verifyMissingResponse(responses);
         control.stopGreeter(SERVER_LOSS_CFG);
         LOG.fine("Stopped greeter server");
-       
+
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
-        
+
         control.startGreeter(CFG);
         String nl = System.getProperty("line.separator");
         LOG.fine("Restarted greeter server" + nl + nl);
-        
+
         verifyServerRecovery(responses);
         responses[3] = greeter.greetMeAsync("four");
-        
+
         verifyRetransmissionQueue();
         verifyAcknowledgementRange(1, 4);
-        
+
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
 
         greeterBus.shutdown(true);
-        
+
         control.stopGreeter(CFG);
         bus.shutdown(true);
     }
-    
-    void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
+
+    void verifyMissingResponse(Response<GreetMeResponse>[] responses) throws Exception {
         awaitMessages(5, 3, 25000);
 
         int nDone = 0;
@@ -203,9 +206,9 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
                 nDone++;
             }
         }
-        
+
         assertEquals("Unexpected number of responses already received.", 2, nDone);
-        
+
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
         String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION,
@@ -216,7 +219,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
         mf.verifyActions(expectedActions, true);
         // mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
         // mf.verifyAcknowledgements(new boolean[] {false, false, true, false}, true);
-        
+
 //        mf.verifyPartialResponses(5);
 //        mf.purgePartialResponses();
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
@@ -224,11 +227,11 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
                                         GREETME_RESPONSE_ACTION};
         mf.verifyActions(expectedActions, false);
         // mf.verifyMessageNumbers(new String[] {null, "1", "3"}, false);
-        // mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);    
+        // mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
-    
-    void verifyServerRecovery(Response<GreetMeResponse> responses[]) throws Exception {
-   
+
+    void verifyServerRecovery(Response<GreetMeResponse>[] responses) throws Exception {
+
         // wait until all messages have received their responses
         int nDone = 0;
         long waited = 0;
@@ -245,11 +248,11 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
             Thread.sleep(500);
             waited++;
         }
-        
+
         assertEquals("Not all responses have been received.", 3, nDone);
 
         // verify that all inbound messages are resent responses
-        
+
         synchronized (this) {
             MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
                 Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -264,16 +267,21 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
             mf.verifyActions(expectedActions, false);
         }
     }
-  
-    
+
+
     void verifyRetransmissionQueue() throws Exception {
-        awaitMessages(2, 3, 60000);
-        
-        Thread.sleep(5000);
+        awaitMessages(2, 2, 60000);
+
+        int count = 0;
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
+        while (count < 50 && !empty) {
+            Thread.sleep(100);
+            empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
+            count++;
+        }
         assertTrue("Retransmission Queue is not empty", empty);
     }
-    
+
     void verifyAcknowledgementRange(long lower, long higher) throws Exception {
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
@@ -283,12 +291,12 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
     protected void awaitMessages(int nExpectedOut, int nExpectedIn) {
         awaitMessages(nExpectedOut, nExpectedIn, 20000);
     }
-    
+
     private void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
         MessageRecorder mr = new MessageRecorder(out, in);
         mr.awaitMessages(nExpectedOut, nExpectedIn, timeout);
     }
-    
+
     @SuppressWarnings("unchecked")
     <T> Response<T>[] cast(Response<?>[] val) {
         return (Response<T>[])val;

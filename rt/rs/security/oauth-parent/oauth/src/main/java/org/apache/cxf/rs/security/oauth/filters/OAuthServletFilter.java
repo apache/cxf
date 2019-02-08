@@ -31,10 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import net.oauth.OAuthProblemException;
 import net.oauth.server.OAuthServlet;
-
-import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
@@ -44,12 +42,12 @@ import org.apache.cxf.security.SecurityContext;
  */
 public class OAuthServletFilter extends AbstractAuthFilter implements javax.servlet.Filter {
     protected static final String USE_USER_SUBJECT = "org.apache.cxf.rs.security.oauth.use_user_subject";
-    
+
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
         super.setDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
         super.setValidator(OAuthUtils.getOAuthValidator(servletContext));
-        super.setUseUserSubject(MessageUtils.isTrue(servletContext.getInitParameter(USE_USER_SUBJECT)));
+        super.setUseUserSubject(PropertyUtils.isTrue(servletContext.getInitParameter(USE_USER_SUBJECT)));
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
@@ -61,28 +59,26 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
             OAuthInfo info = handleOAuthRequest(req);
             req = setSecurityContext(req, info);
             chain.doFilter(req, resp);
-        } catch (OAuthProblemException e) {
-            OAuthServlet.handleException(resp, e, "");
         } catch (Exception e) {
             OAuthServlet.handleException(resp, e, "");
         }
     }
 
-    protected HttpServletRequest setSecurityContext(HttpServletRequest request, 
+    protected HttpServletRequest setSecurityContext(HttpServletRequest request,
                                                     OAuthInfo info) {
         final SecurityContext sc = createSecurityContext(request, info);
         HttpServletRequest newRequest = new HttpServletRequestWrapper(request) {
-        
+
             @Override
             public Principal getUserPrincipal() {
                 return sc.getUserPrincipal();
             }
-            
+
             @Override
             public boolean isUserInRole(String role) {
                 return sc.isUserInRole(role);
             }
-            
+
             @Override
             public String getAuthType() {
                 return "OAuth";
@@ -91,7 +87,7 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
         newRequest.setAttribute(OAuthContext.class.getName(), createOAuthContext(info));
         return newRequest;
     }
-    
+
     public void destroy() {
     }
 }

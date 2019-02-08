@@ -25,15 +25,15 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class Book {
     private String name;
     private long id;
-    
+
     public Book(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public Book() {
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -41,12 +41,12 @@ public class Book {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-   
+
 }

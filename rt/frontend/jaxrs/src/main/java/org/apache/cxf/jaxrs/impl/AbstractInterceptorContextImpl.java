@@ -38,11 +38,11 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
         this.type = type;
         this.anns = anns;
     }
-    
+
     public Class<?> getType() {
         return cls;
     }
-    
+
     public Annotation[] getAnnotations() {
         return anns;
     }
@@ -69,7 +69,7 @@ public class AbstractInterceptorContextImpl extends AbstractPropertiesImpl {
         }
         cls = ctype;
     }
-    
+
     protected void providerSelectionPropertyChanged() {
         m.put(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED, Boolean.TRUE);
     }

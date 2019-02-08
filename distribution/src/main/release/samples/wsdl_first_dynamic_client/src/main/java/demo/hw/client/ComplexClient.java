@@ -37,14 +37,14 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * 
+ *
  */
 public final class ComplexClient {
-    
-    private static final QName SERVICE_NAME 
-        = new QName("http://Company.com/Application", 
+
+    private static final QName SERVICE_NAME
+        = new QName("http://Company.com/Application",
                      "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_Prt");
-    
+
     private ComplexClient() {
     }
 
@@ -52,9 +52,9 @@ public final class ComplexClient {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        if (args.length == 0) { 
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
 
         URL wsdlURL;
@@ -64,15 +64,15 @@ public final class ComplexClient {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         System.out.println(wsdlURL);
-        
+
         JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance();
         Client client = factory.createClient(wsdlURL.toExternalForm(), SERVICE_NAME);
         ClientImpl clientImpl = (ClientImpl) client;
         Endpoint endpoint = clientImpl.getEndpoint();
         ServiceInfo serviceInfo = endpoint.getService().getServiceInfos().get(0);
-        QName bindingName = new QName("http://Company.com/Application", 
+        QName bindingName = new QName("http://Company.com/Application",
             "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap");
         BindingInfo binding = serviceInfo.getBinding(bindingName);
         //{
@@ -94,7 +94,7 @@ public final class ComplexClient {
         Object inputPartObject = partPropType.newInstance();
         partPropertyDescriptor.getWriteMethod().invoke(inputObject, inputPartObject);
         PropertyDescriptor numberPropertyDescriptor = new PropertyDescriptor("agentNumber", partPropType);
-        numberPropertyDescriptor.getWriteMethod().invoke(inputPartObject, new Integer(314159));
+        numberPropertyDescriptor.getWriteMethod().invoke(inputPartObject, Integer.valueOf(314159));
 
         Object[] result = client.invoke(opName, inputObject);
         Class<?> resultClass = result[0].getClass();
@@ -106,7 +106,7 @@ public final class ComplexClient {
         PropertyDescriptor agentNameDescriptor = new PropertyDescriptor("agentName", wsResponseClass);
         String agentName = (String)agentNameDescriptor.getReadMethod().invoke(wsResponse);
         System.out.println("Agent name: " + agentName);
-            
+
     }
 
 }

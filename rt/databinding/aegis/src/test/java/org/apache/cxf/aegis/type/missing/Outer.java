@@ -30,7 +30,7 @@ public class Outer implements Serializable {
     // object.
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -2435297692897827392L;
     /**
@@ -48,14 +48,14 @@ public class Outer implements Serializable {
 
     /**
      * The type of name in the taxonomy of entity types.
-     * 
+     *
      * @see com.basistech.rlp.RLPNEConstants for constants for this field.
      */
     int entityType;
 
     /**
      * The unique identifier of the entity containing this name, or none.
-     * 
+     *
      * @see Entity
      */
     String entityUID;
@@ -67,7 +67,7 @@ public class Outer implements Serializable {
 
     /**
      * Any pre-computed inners for the name.
-     * 
+     *
      * @@uml.property name="inners"
      * @@uml.associationEnd multiplicity="(0 -1)"
      */
@@ -89,7 +89,7 @@ public class Outer implements Serializable {
 
     /**
      * Set arbitrary data stored with this name.
-     * 
+     *
      * @param extra the extra to set
      */
     public void setExtra(String extra) {
@@ -99,7 +99,7 @@ public class Outer implements Serializable {
     /**
      * Set a unique ID for this name. This API does not check or enforce
      * uniqueness.
-     * 
+     *
      * @param uid
      */
     public void setUID(String auid) {
@@ -116,7 +116,7 @@ public class Outer implements Serializable {
     /**
      * Set the textual content of the name. This call does not automatically set
      * any other properties, such as script or language.
-     * 
+     *
      * @param data the data to set.
      */
     public void setData(String data) {
@@ -136,7 +136,7 @@ public class Outer implements Serializable {
      * influences the interpretating and matching of the name. Use the value
      * {@link com.basistech.rlp.RLPNEConstants#NE_TYPE_NONE} if there is no type
      * available.
-     * 
+     *
      * @param entityType
      */
     public void setEntityType(int entityType) {
@@ -154,7 +154,7 @@ public class Outer implements Serializable {
      * Set an entity UID for this name. Entities group multiple names for a
      * single real-world item. All the names of a single entity are connected
      * via their entity unique ID.
-     * 
+     *
      * @param entityUID the UID.
      */
     public void setEntityUID(String entityUID) {
@@ -174,7 +174,7 @@ public class Outer implements Serializable {
      * Set the 'primary' flag for this name. If names are grouped by entities
      * {@link #setEntityUID(String)}, one of the names of an entity may be
      * marked primary. This API does not check that only one name is marked.
-     * 
+     *
      * @param primary the primary flag.
      */
     public void setPrimary(boolean primary) {
@@ -190,7 +190,7 @@ public class Outer implements Serializable {
 
     /**
      * Set pre-calculated inners for this name.
-     * 
+     *
      * @param inners the inners.
      */
     public void setTransliterations(Inner[] transliterations) {

@@ -52,7 +52,7 @@ public class NodeDataWriter implements DataWriter<Node> {
                     && ((DOMSource) s).getNode() == null) {
                 return;
             }
-            
+
             XMLStreamWriter writer = new W3CDOMStreamWriter((Element)n);
             StaxUtils.copy(s, writer);
         } catch (XMLStreamException e) {
@@ -65,10 +65,10 @@ public class NodeDataWriter implements DataWriter<Node> {
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
- 
+
     }
 
     public void setProperty(String key, Object value) {
     }
-    
+
 }

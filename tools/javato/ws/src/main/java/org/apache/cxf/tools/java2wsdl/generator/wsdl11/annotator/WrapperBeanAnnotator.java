@@ -36,14 +36,14 @@ import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
 public class WrapperBeanAnnotator implements Annotator {
     Class<?> sourceClass;
-    
+
     public WrapperBeanAnnotator() {
-        
+
     }
     public WrapperBeanAnnotator(Class<?> cls) {
         this.sourceClass = cls;
     }
-    
+
     public void annotate(final JavaAnnotatable clz) {
         WrapperBeanClass beanClass = null;
         if (clz instanceof WrapperBeanClass) {
@@ -53,11 +53,11 @@ public class WrapperBeanAnnotator implements Annotator {
         }
 
         JAnnotation xmlRootElement = new JAnnotation(XmlRootElement.class);
-        xmlRootElement.addElement(new JAnnotationElement("name", 
+        xmlRootElement.addElement(new JAnnotationElement("name",
                                                          beanClass.getElementName().getLocalPart()));
-        xmlRootElement.addElement(new JAnnotationElement("namespace", 
+        xmlRootElement.addElement(new JAnnotationElement("namespace",
                                                          beanClass.getElementName().getNamespaceURI()));
-        
+
         JAnnotation xmlAccessorType = new JAnnotation(XmlAccessorType.class);
         xmlAccessorType.addElement(new JAnnotationElement(null, XmlAccessType.FIELD));
 
@@ -67,31 +67,31 @@ public class WrapperBeanAnnotator implements Annotator {
         }
         JAnnotation xmlType = new JAnnotation(XmlType.class);
         if (tp == null) {
-            xmlType.addElement(new JAnnotationElement("name", 
+            xmlType.addElement(new JAnnotationElement("name",
                                                   beanClass.getElementName().getLocalPart()));
-            xmlType.addElement(new JAnnotationElement("namespace", 
+            xmlType.addElement(new JAnnotationElement("namespace",
                                                   beanClass.getElementName().getNamespaceURI()));
         } else {
             if (!"##default".equals(tp.name())) {
-                xmlType.addElement(new JAnnotationElement("name", 
+                xmlType.addElement(new JAnnotationElement("name",
                                                           tp.name()));
             }
             if (!"##default".equals(tp.namespace())) {
-                xmlType.addElement(new JAnnotationElement("namespace", 
+                xmlType.addElement(new JAnnotationElement("namespace",
                                                           tp.namespace()));
             }
             if (!StringUtils.isEmpty(tp.factoryMethod())) {
                 xmlType.addElement(new JAnnotationElement("factoryMethod",
                                                           tp.factoryMethod()));
             }
-            if (tp.propOrder().length != 1 
+            if (tp.propOrder().length != 1
                 || !StringUtils.isEmpty(tp.propOrder()[0])) {
-                xmlType.addElement(new JAnnotationElement("propOrder", 
+                xmlType.addElement(new JAnnotationElement("propOrder",
                                                       tp.propOrder()));
             }
-            
+
         }
-        List<String> props = new ArrayList<String>();
+        List<String> props = new ArrayList<>();
         for (JavaField f : beanClass.getFields()) {
             props.add(f.getParaName());
         }
@@ -99,7 +99,7 @@ public class WrapperBeanAnnotator implements Annotator {
             xmlType.addElement(new JAnnotationElement("propOrder",
                                                       props));
         }
-        
+
         // Revisit: why annotation is string?
         beanClass.addAnnotation(xmlRootElement);
         beanClass.addAnnotation(xmlAccessorType);

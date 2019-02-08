@@ -25,12 +25,12 @@ package org.apache.cxf.transport;
 public interface Observable {
     /**
      * Register a message observer for incoming messages.
-     * 
+     *
      * @param observer the observer to notify on receipt of incoming
      */
     void setMessageObserver(MessageObserver observer);
-    
-    
+
+
     /**
      * Retrieves the message observer for incoming messages
      * @return the MessageObserver for incoming messages

@@ -39,7 +39,7 @@ public class Chapter {
     public Chapter(int id) {
         this.id = id;
     }
-    
+
     @GET
     @Path("/id")
     @Produces({"application/xml", "application/json" })
@@ -47,11 +47,11 @@ public class Chapter {
     public Chapter getIt() {
         return this;
     }
-    
+
     public void setId(int ident) {
         id = ident;
     }
-    
+
     public int getId() {
         return id;
     }

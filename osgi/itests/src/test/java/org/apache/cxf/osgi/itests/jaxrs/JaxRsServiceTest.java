@@ -20,15 +20,16 @@ package org.apache.cxf.osgi.itests.jaxrs;
 
 import java.io.InputStream;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
-import org.junit.Assert;
+import org.osgi.framework.Constants;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -38,7 +39,9 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
-import org.osgi.framework.Constants;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
@@ -50,63 +53,72 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     private static final String BASE_URL = "http://localhost:8181/cxf/jaxrs/bookstore";
 
-    private final WebTarget wt;
+    private final WebTarget wt = ClientBuilder.newClient().target(BASE_URL);
 
-    public JaxRsServiceTest() {
-        Client client = ClientBuilder.newClient();
-        wt = client.target(BASE_URL);
-    }
-    
     @Test
     public void testJaxRsGet() throws Exception {
         Book book = wt.path("/books/123").request("application/xml").get(Book.class);
-        Assert.assertNotNull(book);
+        assertNotNull(book);
+    }
+
+    @Test
+    public void testJaxRsPost() throws Exception {
+        Book book = new Book("New Book", 321);
+        Response response = wt.path("/books/").request("application/xml").post(Entity.xml(book));
+        assertStatus(Status.CREATED, response);
+        assertNotNull(response.getLocation());
     }
     
     @Test
-    public void testJaxRsPost() throws Exception {
-        Book book = new Book();
-        book.setId(321);
-        book.setName("New Book");
-        Response response = wt.path("/books/").request("application/xml").post(Entity.xml(book));
-        Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        Assert.assertNotNull(response.getLocation());
+    public void postWithValidationError() throws Exception {
+        Book book = new Book(null, -1);
+        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        assertStatus(Status.BAD_REQUEST, response);
+    }
+
+    @Test
+    public void postWithValidation() throws Exception {
+        Book book = new Book("A Book", 3212);
+        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        assertStatus(Status.CREATED, response);
+        assertNotNull(response.getLocation());
     }
 
     @Test
     public void testJaxRsDelete() throws Exception {
         Response response = wt.path("/books/123").request("application/xml").delete();
-        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertStatus(Status.OK, response);
     }
 
     @Test
     public void testJaxRsPut() throws Exception {
-        Book book = new Book();
-        book.setId(123);
-        book.setName("Updated Book");
+        Book book = new Book("Updated Book", 123);
         Response response = wt.path("/books/123").request("application/xml").put(Entity.xml(book));
-        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertStatus(Status.OK, response);
     }
 
-    
+    private static void assertStatus(Status expectedStatus, Response response) {
+        assertEquals(expectedStatus.getStatusCode(), response.getStatus());
+    }
+
     @Configuration
     public Option[] config() {
         return new Option[] {
             cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http"),
-            testUtils(),
+            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "cxf-bean-validation-core", "cxf-bean-validation"),
             logLevel(LogLevel.INFO),
             provision(serviceBundle())
         };
     }
 
-    private InputStream serviceBundle() {
+    private static InputStream serviceBundle() {
         return TinyBundles.bundle()
+                  .add(AbstractServerActivator.class)
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)
                   .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
                   .build(TinyBundles.withBnd());
     }
-    
+
 }

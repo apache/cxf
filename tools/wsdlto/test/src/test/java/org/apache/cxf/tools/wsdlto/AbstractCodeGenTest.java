@@ -22,12 +22,14 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +38,7 @@ import org.junit.rules.ExternalResource;
 public abstract class AbstractCodeGenTest extends ProcessorTestBase {
 
     //CHECKSTYLE:OFF
-    @Rule 
+    @Rule
     public ExternalResource envRule = new ExternalResource() {
         protected void before() throws Throwable {
             File classFile = tmpDir.newFolder("classes");
@@ -54,15 +56,17 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
         }
     };
     //CHECKSTYLE:ON
-    
-    
+
+
     protected JAXWSContainer processor;
     protected ClassLoader classLoader;
 
     @Before
     public void setUp() throws Exception {
         processor = new JAXWSContainer(null);
-    
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
     }
 
     @After

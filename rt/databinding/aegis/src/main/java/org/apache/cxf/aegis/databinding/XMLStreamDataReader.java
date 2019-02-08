@@ -37,23 +37,22 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
     private AegisDatabinding databinding;
     private AegisXMLStreamDataReader reader;
-    
+
     public XMLStreamDataReader(AegisDatabinding databinding, Bus bus) {
         this.databinding = databinding;
         reader = new AegisXMLStreamDataReader(databinding.getAegisContext());
     }
-    
+
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         try {
             AegisType type = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
             if (type == null) {
                 type = databinding.getType(part);
-                return reader.read(input, type); 
-            } else {
-                ArrayType arrayType = (ArrayType) type;
-                return reader.readFlatArray(input, arrayType, part.getConcreteName());
+                return reader.read(input, type);
             }
-     
+            ArrayType arrayType = (ArrayType) type;
+            return reader.readFlatArray(input, arrayType, part.getConcreteName());
+
         } catch (Exception e) {
             throw new Fault(e);
         }

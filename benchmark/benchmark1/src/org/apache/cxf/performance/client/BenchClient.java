@@ -49,7 +49,7 @@ public class BenchClient {
 	private final static QName SERVICE_NAME = new QName("http://www.extreme.indiana.edu/wsdl/Benchmark1", "Benchmark");
     private final static boolean VERBOSE = true;
     private final static String SMOKE_TEST = "smoke_test";
-    
+
     Benchmark_Service service;
     Benchmark port;
 
@@ -64,14 +64,14 @@ public class BenchClient {
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        }        
-      
+        }
+
         service = new Benchmark_Service(wsdlURL, SERVICE_NAME);
-        port = service.getBenchmark(); 
-       
-        
-        /*options.setProperty(org.apache.axis2.transport.http.HTTPConstants.SO_TIMEOUT,new Integer(480000));
-        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.CONNECTION_TIMEOUT,new Integer(480000));*/
+        port = service.getBenchmark();
+
+
+        /*options.setProperty(org.apache.axis2.transport.http.HTTPConstants.SO_TIMEOUT,Integer.valueOf(480000));
+        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.CONNECTION_TIMEOUT,Integer.valueOf(480000));*/
     }
 
     //URL or port of service
@@ -87,12 +87,12 @@ public class BenchClient {
         verbose("Starting " + ID + " at " + (new Date()));
 
         // allow multiple URLs (each must start with http"
-        List<String> locationList = new ArrayList<String>();        
+        List<String> locationList = new ArrayList<>();
         int pos = 0;
         while (pos < args.length) {
             String s = args[pos];
             if (s.startsWith("http") || s.startsWith("file")) {
-                locationList.add(s);                
+                locationList.add(s);
             } else {
                 break;
             }
@@ -115,13 +115,13 @@ public class BenchClient {
         if (args.length > (pos + 2)) {
             arrSizeToSend = args[(pos + 2)];
         }
-        
+
         String[] locations = new String[locationList.size()];
         locationList.toArray(locations);
 
         for (int i = 0; i < locations.length; i++) {
             String location = locations[i];
-            verbose("connecting to " + location);            
+            verbose("connecting to " + location);
             runTestsForSize(location, elementsToSend, testType, arrSizeToSend);
         }
         long benchmarkEnd = System.currentTimeMillis();
@@ -172,12 +172,12 @@ public class BenchClient {
         final char method = td.method;
         if (method == 'a') {
             if (direction == 'e') {
-                //test for the void 
+                //test for the void
                 td.setMethod('v');
                 runOneTest(td);
             }
             /*
-            // test for Base64 
+            // test for Base64
             td.setMethod('b');
             runOneTest(td);
             // test for Doubles
@@ -200,7 +200,7 @@ public class BenchClient {
             runOneTest(td);
         }
     }
-        
+
 
     public static void runOneTest(TestDescriptor td)
             throws Exception {
@@ -227,32 +227,32 @@ public class BenchClient {
             }
         }
 
-        Double[] darr = null;        
-        if (method == 'd') {            
+        Double[] darr = null;
+        if (method == 'd') {
             darr = new Double[totalInv];
             for (int i = 0; i < darr.length; i++) {
-                darr[i] = new Double(i);
+                darr[i] = Double.valueOf(i);
             }
         }
 
-        Integer[] iarr = null;           
-        if (method == 'i') {            
+        Integer[] iarr = null;
+        if (method == 'i') {
             iarr = new Integer[totalInv];
             for (int i = 0; i < iarr.length ; i++) {
-                iarr[i] = new Integer(i);
+                iarr[i] = Integer.valueOf(i);
             }
         }
 
-        String[] sarr = null;        
-        if (method == 's') {            
+        String[] sarr = null;
+        if (method == 's') {
             sarr = new String[totalInv];
             for (int i = 0; i < sarr.length; i++) {
                 sarr[i] = "s" + i;
             }
         }
 
-        MeshInterfaceObject[] marr = null;        
-        if (method == 'm') {            
+        MeshInterfaceObject[] marr = null;
+        if (method == 'm') {
             marr = new MeshInterfaceObject[totalInv];
             for (int i = 0; i < totalInv; i++) {
             	marr[i] = new MeshInterfaceObject();
@@ -262,8 +262,8 @@ public class BenchClient {
             }
         }
 
-        SimpleEvent[] earr = null;        
-        if (method == 'e') {            
+        SimpleEvent[] earr = null;
+        if (method == 'e') {
             earr = new SimpleEvent[totalInv];
             for (int i = 0; i < earr.length; i++) {
                 earr[i] = new SimpleEvent();
@@ -320,8 +320,8 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'd') {
-            	ArrayList<Double> da = new ArrayList<Double>();            	 
-            	new Util<Double>().copyList(darr, off, da, td.arrSizeToSend);            	
+            	ArrayList<Double> da = new ArrayList<>();
+            	new Util<Double>().copyList(darr, off, da, td.arrSizeToSend);
                 List<Double> uda = null;
                 int dlen = -1;
                 if (direction == 'e') {
@@ -349,7 +349,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'i') {
-            	ArrayList<Integer> ia = new ArrayList<Integer>();
+            	ArrayList<Integer> ia = new ArrayList<>();
             	new Util<Integer>().copyList(iarr, off, ia, td.arrSizeToSend);
                 List<Integer> uia = null;
                 int ulen = -1;
@@ -380,7 +380,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 's') {
-            	ArrayList<String> sa = new ArrayList<String>();
+            	ArrayList<String> sa = new ArrayList<>();
             	new Util<String>().copyList(sarr, off, sa, td.arrSizeToSend);
                 List<String> usa = null;
                 int slen = -1;
@@ -413,7 +413,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'm') {
-            	ArrayList<MeshInterfaceObject> ma = new ArrayList<MeshInterfaceObject>();
+            	ArrayList<MeshInterfaceObject> ma = new ArrayList<>();
             	new Util<MeshInterfaceObject>().copyList(marr, off, ma, td.arrSizeToSend);
                 List<MeshInterfaceObject> uma = null;
                 int slen = -1;
@@ -446,7 +446,7 @@ public class BenchClient {
                     }
                 }
             } else if (method == 'e') {
-            	ArrayList<SimpleEvent> ea = new ArrayList<SimpleEvent>();
+            	ArrayList<SimpleEvent> ea = new ArrayList<>();
             	new Util<SimpleEvent>().copyList(earr, off, ea, td.arrSizeToSend);
                 List<SimpleEvent> uea = null;
                 int slen = -1;
@@ -516,7 +516,7 @@ public class BenchClient {
     private static void verbose(String msg) {
     	if(VERBOSE) {
     		System.out.println("B1> " + msg);
-    	}	
+    	}
     }
 
     private static void fail(String msg) {
@@ -584,7 +584,7 @@ public class BenchClient {
             }
             this.serverName = serverName;
             this.serverLocation = location;
-            //this.direction =  direction;
+            //this.direction = direction;
             //this.method = method;
             this.elementsToSend = elementsToSend;
             //this.arrSizeToSend = arrSizeToSend;
@@ -621,7 +621,7 @@ public class BenchClient {
 
     }
 
-    public void echoVoid() throws java.lang.Exception {        
+    public void echoVoid() throws java.lang.Exception {
         port.echoVoid();
     }
 
@@ -629,25 +629,25 @@ public class BenchClient {
         return port.echoStrings(input);
     }
 
-    public int receiveBase64(byte[] input) throws java.lang.Exception {       
+    public int receiveBase64(byte[] input) throws java.lang.Exception {
         return port.receiveBase64(input);
-        
+
     }
 
     public int receiveDoubles(List<Double> input) throws java.lang.Exception {
-        
+
         return port.receiveDoubles(input);
     }
 
-    public List<Integer> sendInts(int input) throws java.lang.Exception {        
+    public List<Integer> sendInts(int input) throws java.lang.Exception {
         return port.sendInts(input);
     }
 
     public byte[] echoBase64(byte[] input) throws java.lang.Exception {
-        return port.echoBase64(input);        
+        return port.echoBase64(input);
     }
 
-    public int receiveStrings(List<String> input) throws java.lang.Exception {        
+    public int receiveStrings(List<String> input) throws java.lang.Exception {
         return port.receiveStrings(input);
     }
 
@@ -664,15 +664,15 @@ public class BenchClient {
     }
 
     public byte[] sendBase64(int input) throws java.lang.Exception {
-        
+
         return port.sendBase64(input);
     }
 
-    public List<Double> echoDoubles(List<Double> input) throws java.lang.Exception {       
+    public List<Double> echoDoubles(List<Double> input) throws java.lang.Exception {
         return port.echoDoubles(input);
     }
 
-    public List<String> sendStrings(int input) throws java.lang.Exception {        
+    public List<String> sendStrings(int input) throws java.lang.Exception {
         return port.sendStrings(input);
     }
 
@@ -716,13 +716,13 @@ public class BenchClient {
     public List<MeshInterfaceObject> sendMeshInterfaceObjects(int size) throws java.lang.Exception {
         SendMeshInterfaceObjectsRequest request = new SendMeshInterfaceObjectsRequest();
         request.setSize(size);
-        SendMeshInterfaceObjectsResponse response = port.sendMeshInterfaceObjects(request);        
+        SendMeshInterfaceObjectsResponse response = port.sendMeshInterfaceObjects(request);
         return response.getSendMeshInterfaceObjectsReturn().getItem();
     }
-    
+
     static class Util<E> {
     	public Util() {
-    		
+
     	}
     	public void copyList(E[] src, int off, ArrayList<E>des, int size) {
     		des.clear();
@@ -730,7 +730,7 @@ public class BenchClient {
     			E o = src[i+off];
     			des.add(o);
     		}
-    	}	
+    	}
     }
 }
 

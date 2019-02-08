@@ -56,12 +56,19 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.corba.common.WSDLCorbaFactory;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaBinding;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WSDLToCorbaBindingTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSDLToCorbaBindingTest {
     WSDLToCorbaBinding generator;
     WSDLWriter writer;
 
@@ -72,7 +79,7 @@ public class WSDLToCorbaBindingTest extends Assert {
         try {
             WSDLCorbaFactory wsdlfactory = WSDLCorbaFactory
                 .newInstance("org.apache.cxf.tools.corba.common.WSDLCorbaFactoryImpl");
-    
+
             writer = wsdlfactory.newWSDLWriter();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -84,17 +91,17 @@ public class WSDLToCorbaBindingTest extends Assert {
         System.setProperty("UseWSDLModelCaching", "true");
     }
 
-    
+
     private Element getElementNode(Document document, String elName) {
         Element root = document.getDocumentElement();
         for (Node nd = root.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType() && (elName.equals(nd.getNodeName()))) {
-                return (Element)nd;                
+                return (Element)nd;
             }
         }
         return null;
-    }    
-    
+    }
+
     @Test
     public void testSequenceType() throws Exception {
         try {
@@ -124,7 +131,7 @@ public class WSDLToCorbaBindingTest extends Assert {
         }
     }
 
-    
+
     @Test
     public void testFixedBindingGeneration() throws Exception {
         String fileName = getClass().getResource("/wsdl/fixed.wsdl").toString();
@@ -133,28 +140,28 @@ public class WSDLToCorbaBindingTest extends Assert {
 
         Definition model = generator.generateCORBABinding();
         Document document = writer.getDocument(model);
-        
+
         Element typemap = getElementNode(document, "corba:typeMapping");
         assertEquals(1, typemap.getElementsByTagName("corba:sequence").getLength());
         assertEquals(5, typemap.getElementsByTagName("corba:fixed").getLength());
-        
-        Element bindingElement = getElementNode(document, "binding");        
+
+        Element bindingElement = getElementNode(document, "binding");
         assertEquals(5, bindingElement.getElementsByTagName("corba:operation").getLength());
-        QName bName = new QName("http://schemas.apache.org/idl/fixed.idl", 
+        QName bName = new QName("http://schemas.apache.org/idl/fixed.idl",
                                 "YCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
-        Map<String, CorbaType> tmap = new HashMap<String, CorbaType>();
+        Map<String, CorbaType> tmap = new HashMap<>();
         for (CorbaType type : mapType.getStructOrExceptionOrUnion()) {
             tmap.put(type.getName(), type);
         }
-        
+
         Iterator<?> j = binding.getBindingOperations().iterator();
-        while (j.hasNext()) {            
+        while (j.hasNext()) {
             BindingOperation bindingOperation = (BindingOperation)j.next();
             assertEquals("YCORBABinding", binding.getQName().getLocalPart());
             assertEquals(1, bindingOperation.getExtensibilityElements().size());
-            
+
             checkFixedTypeOne(bindingOperation, tmap);
             bindingOperation = (BindingOperation)j.next();
             checkSequenceType(bindingOperation, tmap);
@@ -166,11 +173,11 @@ public class WSDLToCorbaBindingTest extends Assert {
             checkFixedTypeFour(bindingOperation, tmap);
         }
     }
-     
+
     private void checkSequenceType(BindingOperation bindingOperation,
                                    Map<String, CorbaType> mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
                 OperationType corbaOpType = (OperationType)extElement;
                 assertEquals(corbaOpType.getName(), "op_h");
                 assertEquals(3, corbaOpType.getParam().size());
@@ -183,14 +190,14 @@ public class WSDLToCorbaBindingTest extends Assert {
 
         }
     }
-    
+
     private void checkFixedTypeOne(BindingOperation bindingOperation,
                                    Map<String, CorbaType>  mapType) {
 
         assertEquals(bindingOperation.getBindingInput().getName(), "op_k");
         assertEquals(bindingOperation.getBindingOutput().getName(), "op_kResponse");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
                 OperationType corbaOpType = (OperationType)extElement;
                 assertEquals(corbaOpType.getName(), "op_k");
                 assertEquals(3, corbaOpType.getParam().size());
@@ -206,11 +213,11 @@ public class WSDLToCorbaBindingTest extends Assert {
             }
         }
     }
-    
+
     private void checkFixedTypeTwo(BindingOperation bindingOperation,
                                    Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
                 OperationType corbaOpType = (OperationType)extElement;
                 assertEquals(corbaOpType.getName(), "op_m");
                 assertEquals(3, corbaOpType.getParam().size());
@@ -225,11 +232,11 @@ public class WSDLToCorbaBindingTest extends Assert {
             }
         }
     }
-    
+
     private void checkFixedTypeThree(BindingOperation bindingOperation,
                                      Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
                 OperationType corbaOpType = (OperationType)extElement;
                 assertEquals(corbaOpType.getName(), "op_n");
                 assertEquals(3, corbaOpType.getParam().size());
@@ -244,11 +251,11 @@ public class WSDLToCorbaBindingTest extends Assert {
             }
         }
     }
-    
+
     private void checkFixedTypeFour(BindingOperation bindingOperation,
                                     Map<String, CorbaType>  mapType) {
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
                 OperationType corbaOpType = (OperationType)extElement;
                 assertEquals(corbaOpType.getName(), "extended_op_m");
                 assertEquals(3, corbaOpType.getParam().size());
@@ -262,8 +269,8 @@ public class WSDLToCorbaBindingTest extends Assert {
 
             }
         }
-    }       
-                     
+    }
+
     @Test
     public void testAllType() throws Exception {
         try {
@@ -274,7 +281,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             Definition model = generator.generateCORBABinding();
             Document document = writer.getDocument(model);
 
-            Element typemap = getElementNode(document, "corba:typeMapping");            
+            Element typemap = getElementNode(document, "corba:typeMapping");
             //assertNotNull(typemap);
             assertEquals(1, typemap.getElementsByTagName("corba:struct").getLength());
 
@@ -287,12 +294,12 @@ public class WSDLToCorbaBindingTest extends Assert {
             assertTrue("alltype.idl should be generated", f.exists());
         } finally {
             new File("alltype.idl").deleteOnExit();
-        }        
+        }
     }
-    
+
     @Test
     public void testComplexContentStructType() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/wsdl/content.wsdl").toString();
             generator.setWsdlFile(fileName);
@@ -301,7 +308,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             Definition model = generator.generateCORBABinding();
             Document document = writer.getDocument(model);
 
-            Element typemap = getElementNode(document, "corba:typeMapping");            
+            Element typemap = getElementNode(document, "corba:typeMapping");
             //assertNotNull(typemap);
             assertEquals(1, typemap.getElementsByTagName("corba:union").getLength());
             assertEquals(6, typemap.getElementsByTagName("corba:struct").getLength());
@@ -318,8 +325,8 @@ public class WSDLToCorbaBindingTest extends Assert {
         }
 
     }
-    
-        
+
+
     @Test
     public void testUnionType() throws Exception {
         try {
@@ -347,7 +354,7 @@ public class WSDLToCorbaBindingTest extends Assert {
 
     }
 
-    
+
     // next story to add Fault support
     @Test
     public void testExceptionCORBABindingGeneration() throws Exception {
@@ -355,30 +362,30 @@ public class WSDLToCorbaBindingTest extends Assert {
         generator.setWsdlFile(fileName);
         generator.addInterfaceName("TestException.ExceptionTest");
         Definition model = generator.generateCORBABinding();
-        
-        QName bName = new QName("http://schemas.apache.org/idl/exceptions.idl", 
+
+        QName bName = new QName("http://schemas.apache.org/idl/exceptions.idl",
                                 "TestException.ExceptionTestCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         assertNotNull(binding);
         assertEquals("TestException.ExceptionTestCORBABinding", binding.getQName().getLocalPart());
-        assertEquals("TestException.ExceptionTest", 
+        assertEquals("TestException.ExceptionTest",
                      binding.getPortType().getQName().getLocalPart());
         assertEquals(1, binding.getExtensibilityElements().size());
         assertEquals(1, binding.getBindingOperations().size());
-        
+
         for (ExtensibilityElement extElement : getExtensibilityElements(binding)) {
-            if (extElement.getElementType().getLocalPart().equals("binding")) {
+            if ("binding".equals(extElement.getElementType().getLocalPart())) {
                 BindingType bindingType = (BindingType)extElement;
                 assertEquals(bindingType.getRepositoryID(), "IDL:TestException/ExceptionTest:1.0");
             }
-        }        
+        }
         Iterator<?> j = binding.getBindingOperations().iterator();
-        while (j.hasNext()) {            
+        while (j.hasNext()) {
             BindingOperation bindingOperation = (BindingOperation)j.next();
             assertEquals(1, bindingOperation.getExtensibilityElements().size());
             assertEquals(bindingOperation.getBindingInput().getName(), "review_data");
             assertEquals(bindingOperation.getBindingOutput().getName(), "review_dataResponse");
-            
+
             Iterator<?> f = bindingOperation.getBindingFaults().values().iterator();
             boolean hasBadRecord = false;
             boolean hasMyException = false;
@@ -394,10 +401,10 @@ public class WSDLToCorbaBindingTest extends Assert {
             }
             assertTrue("Did not get expected TestException.BadRecord", hasBadRecord);
             assertTrue("Did not get expected MyException", hasMyException);
-            
+
             for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-                if (extElement.getElementType().getLocalPart().equals("operation")) {
-                    OperationType corbaOpType = (OperationType)extElement;                 
+                if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                    OperationType corbaOpType = (OperationType)extElement;
                     assertEquals(corbaOpType.getName(), "review_data");
                     assertEquals(1, corbaOpType.getParam().size());
                     assertEquals(2, corbaOpType.getRaises().size());
@@ -410,16 +417,16 @@ public class WSDLToCorbaBindingTest extends Assert {
                         } else if ("MyExceptionType".equals(localPart)) {
                             hasMyException = true;
                         } else {
-                            fail("Unexpected Raises: " + localPart); 
+                            fail("Unexpected Raises: " + localPart);
                         }
                     }
                     assertTrue("Did not find expected TestException.BadRecord", hasBadRecord);
                     assertTrue("Did not find expected MyException", hasMyException);
                 }
             }
-        }            
+        }
     }
-    
+
     @Test
     public void testCORBABindingGeneration() throws Exception {
         String fileName = getClass().getResource("/wsdl/simpleList.wsdl").toString();
@@ -427,47 +434,47 @@ public class WSDLToCorbaBindingTest extends Assert {
         generator.addInterfaceName("BasePortType");
 
         Definition model = generator.generateCORBABinding();
-        
+
         QName bName = new QName("http://schemas.apache.org/tests", "BaseCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         assertNotNull(binding);
         assertEquals("BaseCORBABinding", binding.getQName().getLocalPart());
-        assertEquals("BasePortType", 
+        assertEquals("BasePortType",
                      binding.getPortType().getQName().getLocalPart());
         assertEquals(1, binding.getExtensibilityElements().size());
         assertEquals(1, binding.getBindingOperations().size());
-        
+
         for (ExtensibilityElement extElement : getExtensibilityElements(binding)) {
-            if (extElement.getElementType().getLocalPart().equals("binding")) {
+            if ("binding".equals(extElement.getElementType().getLocalPart())) {
                 BindingType bindingType = (BindingType)extElement;
                 assertEquals(bindingType.getRepositoryID(), "IDL:BasePortType:1.0");
             }
         }
-        
+
         Iterator<?> j = binding.getBindingOperations().iterator();
-        while (j.hasNext()) {            
+        while (j.hasNext()) {
             BindingOperation bindingOperation = (BindingOperation)j.next();
             assertEquals(1, bindingOperation.getExtensibilityElements().size());
             assertEquals(bindingOperation.getBindingInput().getName(), "echoString");
             assertEquals(bindingOperation.getBindingOutput().getName(), "echoStringResponse");
-            
+
             for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-                if (extElement.getElementType().getLocalPart().equals("operation")) {
-                    OperationType corbaOpType = (OperationType)extElement;                 
+                if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                    OperationType corbaOpType = (OperationType)extElement;
                     assertEquals(corbaOpType.getName(), "echoString");
                     assertEquals(3, corbaOpType.getParam().size());
                     assertEquals(corbaOpType.getReturn().getName(), "return");
                     assertEquals(corbaOpType.getReturn().getIdltype(), CorbaConstants.NT_CORBA_STRING);
                     assertEquals(corbaOpType.getParam().get(0).getName(), "x");
                     assertEquals(corbaOpType.getParam().get(0).getMode().value(), "in");
-                    QName qname = 
+                    QName qname =
                         new QName("http://schemas.apache.org/tests/corba/typemap/", "StringEnum1", "ns1");
                     assertEquals(corbaOpType.getParam().get(0).getIdltype(), qname);
                 }
             }
-        }            
+        }
     }
-    
+
     @Test
     public void testCORBATypeMapGeneration() throws Exception {
         String fileName = getClass().getResource("/wsdl/simpleList.wsdl").toString();
@@ -475,14 +482,14 @@ public class WSDLToCorbaBindingTest extends Assert {
         generator.addInterfaceName("BasePortType");
 
         Definition model = generator.generateCORBABinding();
-        Document document = writer.getDocument(model);        
+        Document document = writer.getDocument(model);
 
-        Element typemap = getElementNode(document, "corba:typeMapping"); 
+        Element typemap = getElementNode(document, "corba:typeMapping");
         assertNotNull(typemap);
         assertEquals(2, typemap.getElementsByTagName("corba:sequence").getLength());
-        assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());        
+        assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());
     }
-    
+
     @Test
     public void testSimpleListIdl() throws Exception {
         try {
@@ -492,7 +499,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             generator.mapBindingToInterface("BasePortType", "SimpleListCORBABinding");
 
             Definition model = generator.generateCORBABinding();
-      
+
             WSDLToIDLAction idlgen = new WSDLToIDLAction();
             idlgen.setBindingName("SimpleListCORBABinding");
             idlgen.setOutputFile("simplelist.idl");
@@ -501,10 +508,10 @@ public class WSDLToCorbaBindingTest extends Assert {
             File f = new File("simplelist.idl");
             assertTrue("simplelist.idl should be generated", f.exists());
         } finally {
-            new File("simplelist.idl").deleteOnExit();            
+            new File("simplelist.idl").deleteOnExit();
         }
     }
-        
+
     @Test
     public void testMultipartTypeMapGeneration() throws Exception {
         String fileName = getClass().getResource("/wsdl/multipart.wsdl").toString();
@@ -512,12 +519,12 @@ public class WSDLToCorbaBindingTest extends Assert {
         generator.addInterfaceName("Test.MultiPart");
 
         Definition model = generator.generateCORBABinding();
-        Document document = writer.getDocument(model);        
-        Element typemap = getElementNode(document, "corba:typeMapping"); 
-        assertNotNull(typemap);        
-        assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());        
+        Document document = writer.getDocument(model);
+        Element typemap = getElementNode(document, "corba:typeMapping");
+        assertNotNull(typemap);
+        assertEquals(1, typemap.getElementsByTagName("corba:enum").getLength());
     }
-    
+
     @Test
     public void testMulitPartIdl() throws Exception {
         try {
@@ -535,10 +542,10 @@ public class WSDLToCorbaBindingTest extends Assert {
             File f = new File("multipart.idl");
             assertTrue("multipart.idl should be generated", f.exists());
         } finally {
-            new File("multipart.idl").deleteOnExit();            
+            new File("multipart.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testMultipartCORBABindingGeneration() throws Exception {
         String fileName = getClass().getResource("/wsdl/multipart.wsdl").toString();
@@ -546,31 +553,31 @@ public class WSDLToCorbaBindingTest extends Assert {
         generator.addInterfaceName("Test.MultiPart");
 
         Definition model = generator.generateCORBABinding();
-        
+
         QName bName = new QName("http://schemas.apache.org/tests", "Test.MultiPartCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         assertNotNull(binding);
         assertEquals("Test.MultiPartCORBABinding", binding.getQName().getLocalPart());
-        assertEquals("Test.MultiPart", 
+        assertEquals("Test.MultiPart",
                      binding.getPortType().getQName().getLocalPart());
         assertEquals(1, binding.getExtensibilityElements().size());
         assertEquals(32, binding.getBindingOperations().size());
-        
-        List<ExtensibilityElement> extElements = getExtensibilityElements(binding);             
+
+        List<ExtensibilityElement> extElements = getExtensibilityElements(binding);
         ExtensibilityElement extElement = extElements.get(0);
-        if (extElement.getElementType().getLocalPart().equals("binding")) {
+        if ("binding".equals(extElement.getElementType().getLocalPart())) {
             BindingType bindingType = (BindingType)extElement;
             assertEquals(bindingType.getRepositoryID(), "IDL:Test/MultiPart:1.0");
-        }        
-        
+        }
+
         getStringAttributeTest(binding);
         getTestIdTest(binding);
         setTestIdTest(binding);
-        testVoidTest(binding);        
+        testVoidTest(binding);
         testPrimitiveTypeTest(binding, "test_short", CorbaConstants.NT_CORBA_SHORT);
         testPrimitiveTypeTest(binding, "test_long", CorbaConstants.NT_CORBA_LONG);
         testPrimitiveTypeTest(binding, "test_longlong", CorbaConstants.NT_CORBA_LONGLONG);
-        testPrimitiveTypeTest(binding, "test_ushort", CorbaConstants.NT_CORBA_USHORT);        
+        testPrimitiveTypeTest(binding, "test_ushort", CorbaConstants.NT_CORBA_USHORT);
         testPrimitiveTypeTest(binding, "test_ulong", CorbaConstants.NT_CORBA_ULONG);
         testPrimitiveTypeTest(binding, "test_ulonglong", CorbaConstants.NT_CORBA_ULONGLONG);
         testPrimitiveTypeTest(binding, "test_float", CorbaConstants.NT_CORBA_FLOAT);
@@ -583,108 +590,108 @@ public class WSDLToCorbaBindingTest extends Assert {
         testPrimitiveTypeTest(binding, "test_positiveInteger", CorbaConstants.NT_CORBA_ULONGLONG);
         testPrimitiveTypeTest(binding, "test_negativeInteger", CorbaConstants.NT_CORBA_LONGLONG);
         testPrimitiveTypeTest(binding, "test_normalizedString", CorbaConstants.NT_CORBA_STRING);
-        testPrimitiveTypeTest(binding, "test_token", CorbaConstants.NT_CORBA_STRING);        
-        testPrimitiveTypeTest(binding, "test_language", CorbaConstants.NT_CORBA_STRING);        
+        testPrimitiveTypeTest(binding, "test_token", CorbaConstants.NT_CORBA_STRING);
+        testPrimitiveTypeTest(binding, "test_language", CorbaConstants.NT_CORBA_STRING);
         testPrimitiveTypeTest(binding, "test_Name", CorbaConstants.NT_CORBA_STRING);
         testPrimitiveTypeTest(binding, "test_NCName", CorbaConstants.NT_CORBA_STRING);
         testPrimitiveTypeTest(binding, "test_ID", CorbaConstants.NT_CORBA_STRING);
         testPrimitiveTypeTest(binding, "test_anyURI", CorbaConstants.NT_CORBA_STRING);
         testPrimitiveTypeTest(binding, "test_nick_name", CorbaConstants.NT_CORBA_STRING);
-    }    
-    
+    }
+
     private void getStringAttributeTest(Binding binding) {
-        BindingOperation bindingOp = 
-            binding.getBindingOperation("_get_string_attribute", "_get_string_attribute", 
-                                        "_get_string_attributeResponse");        
+        BindingOperation bindingOp =
+            binding.getBindingOperation("_get_string_attribute", "_get_string_attribute",
+                                        "_get_string_attributeResponse");
         assertEquals("_get_string_attribute", bindingOp.getName());
         assertEquals(1, bindingOp.getExtensibilityElements().size());
         assertEquals(bindingOp.getBindingInput().getName(), "_get_string_attribute");
         assertEquals(bindingOp.getBindingOutput().getName(), "_get_string_attributeResponse");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOp)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
-                OperationType corbaOpType = (OperationType)extElement;                 
-                assertEquals(corbaOpType.getName(), "_get_string_attribute");                
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                OperationType corbaOpType = (OperationType)extElement;
+                assertEquals(corbaOpType.getName(), "_get_string_attribute");
                 assertEquals(corbaOpType.getReturn().getName(), "return");
                 assertEquals(corbaOpType.getReturn().getIdltype(), CorbaConstants.NT_CORBA_STRING);
             }
         }
     }
-    
+
     private void getTestIdTest(Binding binding) {
-        BindingOperation bindingOp = binding.getBindingOperation("_get_test_id", 
-                                                "_get_test_id", "_get_test_idResponse");        
+        BindingOperation bindingOp = binding.getBindingOperation("_get_test_id",
+                                                "_get_test_id", "_get_test_idResponse");
         assertEquals("_get_test_id", bindingOp.getName());
         assertEquals(1, bindingOp.getExtensibilityElements().size());
         assertEquals(bindingOp.getBindingInput().getName(), "_get_test_id");
         assertEquals(bindingOp.getBindingOutput().getName(), "_get_test_idResponse");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOp)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
-                OperationType corbaOpType = (OperationType)extElement;                 
-                assertEquals(corbaOpType.getName(), "_get_test_id");                
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                OperationType corbaOpType = (OperationType)extElement;
+                assertEquals(corbaOpType.getName(), "_get_test_id");
                 assertEquals(corbaOpType.getReturn().getName(), "return");
                 assertEquals(corbaOpType.getReturn().getIdltype(), CorbaConstants.NT_CORBA_FLOAT);
             }
         }
     }
-    
+
     private void setTestIdTest(Binding binding) {
-        BindingOperation bindingOp = binding.getBindingOperation("_set_test_id", 
-                                                "_set_test_id", "_set_test_idResponse");        
+        BindingOperation bindingOp = binding.getBindingOperation("_set_test_id",
+                                                "_set_test_id", "_set_test_idResponse");
         assertEquals("_set_test_id", bindingOp.getName());
         assertEquals(1, bindingOp.getExtensibilityElements().size());
         assertEquals(bindingOp.getBindingInput().getName(), "_set_test_id");
         assertEquals(bindingOp.getBindingOutput().getName(), "_set_test_idResponse");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOp)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
-                OperationType corbaOpType = (OperationType)extElement;                 
-                assertEquals(corbaOpType.getName(), "_set_test_id");     
-                assertEquals(1, corbaOpType.getParam().size());                
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                OperationType corbaOpType = (OperationType)extElement;
+                assertEquals(corbaOpType.getName(), "_set_test_id");
+                assertEquals(1, corbaOpType.getParam().size());
                 assertEquals(corbaOpType.getParam().get(0).getName(), "_arg");
                 assertEquals(corbaOpType.getParam().get(0).getMode().value(), "in");
                 assertEquals(corbaOpType.getParam().get(0).getIdltype(), CorbaConstants.NT_CORBA_FLOAT);
             }
         }
     }
-    
+
     private void testVoidTest(Binding binding) {
-        BindingOperation bindingOp = binding.getBindingOperation("test_void", 
-                                                "test_void", "test_voidResponse");        
+        BindingOperation bindingOp = binding.getBindingOperation("test_void",
+                                                "test_void", "test_voidResponse");
         assertEquals("test_void", bindingOp.getName());
         assertEquals(1, bindingOp.getExtensibilityElements().size());
         assertEquals(bindingOp.getBindingInput().getName(), "test_void");
         assertEquals(bindingOp.getBindingOutput().getName(), "test_voidResponse");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOp)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
-                OperationType corbaOpType = (OperationType)extElement;                 
-                assertEquals(corbaOpType.getName(), "test_void");     
-                assertEquals(0, corbaOpType.getParam().size());                                
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                OperationType corbaOpType = (OperationType)extElement;
+                assertEquals(corbaOpType.getName(), "test_void");
+                assertEquals(0, corbaOpType.getParam().size());
             }
         }
-    }            
-     
+    }
+
     private void testPrimitiveTypeTest(Binding binding, String name, QName corbaType) {
-        BindingOperation bindingOp = binding.getBindingOperation(name, 
-                                                name, name + "Response");        
+        BindingOperation bindingOp = binding.getBindingOperation(name,
+                                                name, name + "Response");
         assertEquals(name, bindingOp.getName());
         assertEquals(1, bindingOp.getExtensibilityElements().size());
         assertEquals(bindingOp.getBindingInput().getName(), name);
         assertEquals(bindingOp.getBindingOutput().getName(), name + "Response");
         for (ExtensibilityElement extElement : getExtensibilityElements(bindingOp)) {
-            if (extElement.getElementType().getLocalPart().equals("operation")) {
-                OperationType corbaOpType = (OperationType)extElement;                 
-                assertEquals(corbaOpType.getName(), name);     
-                assertEquals(3, corbaOpType.getParam().size());                
+            if ("operation".equals(extElement.getElementType().getLocalPart())) {
+                OperationType corbaOpType = (OperationType)extElement;
+                assertEquals(corbaOpType.getName(), name);
+                assertEquals(3, corbaOpType.getParam().size());
                 assertEquals(corbaOpType.getParam().get(0).getName(), "x");
                 assertEquals(corbaOpType.getParam().get(0).getMode().value(), "in");
-                assertEquals(corbaOpType.getParam().get(0).getIdltype(), 
-                             corbaType);                               
+                assertEquals(corbaOpType.getParam().get(0).getIdltype(),
+                             corbaType);
                 assertEquals(corbaOpType.getReturn().getName(), "return");
                 assertEquals(corbaOpType.getReturn().getIdltype(), corbaType);
 
             }
         }
     }
-    
+
     @Test
     public void testArrayMapping() throws Exception {
         try {
@@ -693,8 +700,8 @@ public class WSDLToCorbaBindingTest extends Assert {
             generator.addInterfaceName("X");
 
             Definition model = generator.generateCORBABinding();
-            QName bName = new QName("http://schemas.apache.org/idl/anon.idl", 
-                                    "XCORBABinding", "tns");           
+            QName bName = new QName("http://schemas.apache.org/idl/anon.idl",
+                                    "XCORBABinding", "tns");
 
             Binding binding = model.getBinding(bName);
             assertNotNull(binding);
@@ -704,7 +711,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             assertEquals(1, binding.getBindingOperations().size());
 
             for (ExtensibilityElement extElement : getExtensibilityElements(binding)) {
-                if (extElement.getElementType().getLocalPart().equals("binding")) {
+                if ("binding".equals(extElement.getElementType().getLocalPart())) {
                     BindingType bindingType = (BindingType)extElement;
                     assertEquals(bindingType.getRepositoryID(), "IDL:X:1.0");
                 }
@@ -718,7 +725,7 @@ public class WSDLToCorbaBindingTest extends Assert {
                 assertEquals(bindingOperation.getBindingOutput().getName(), "op_aResponse");
 
                 for (ExtensibilityElement extElement : getExtensibilityElements(bindingOperation)) {
-                    if (extElement.getElementType().getLocalPart().equals("operation")) {
+                    if ("operation".equals(extElement.getElementType().getLocalPart())) {
                         OperationType corbaOpType = (OperationType)extElement;
                         assertEquals(corbaOpType.getName(), "op_a");
                         assertEquals(1, corbaOpType.getParam().size());
@@ -765,7 +772,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             assertEquals(1, binding.getBindingOperations().size());
 
             for (ExtensibilityElement extElement: getExtensibilityElements(binding)) {
-                if (extElement.getElementType().getLocalPart().equals("binding")) {
+                if ("binding".equals(extElement.getElementType().getLocalPart())) {
                     BindingType bindingType = (BindingType)extElement;
                     assertEquals(bindingType.getRepositoryID(), "IDL:X:1.0");
                 }
@@ -793,7 +800,7 @@ public class WSDLToCorbaBindingTest extends Assert {
                 assertEquals(bindingOperation.getBindingOutput().getName(), "op_aResponse");
 
                 for (ExtensibilityElement extElement: getExtensibilityElements(bindingOperation)) {
-                    if (extElement.getElementType().getLocalPart().equals("operation")) {
+                    if ("operation".equals(extElement.getElementType().getLocalPart())) {
                         OperationType corbaOpType = (OperationType)extElement;
                         assertEquals(corbaOpType.getName(), "op_a");
                         assertEquals(1, corbaOpType.getParam().size());
@@ -804,7 +811,7 @@ public class WSDLToCorbaBindingTest extends Assert {
                             "MixedArrayType", "ns1");
                         assertEquals(paramtype.getIdltype(), idltype);
                         assertEquals(paramtype.getMode().toString(), "IN");
-                    } else if (extElement.getElementType().getLocalPart().equals("typeMapping")) {
+                    } else if ("typeMapping".equals(extElement.getElementType().getLocalPart())) {
                         System.out.println("x");
                     }
                 }
@@ -822,7 +829,7 @@ public class WSDLToCorbaBindingTest extends Assert {
             new File("array.idl").deleteOnExit();
         }
     }
-        
+
     /**
      * @param typeMap
      */

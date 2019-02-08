@@ -39,7 +39,7 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
-public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletContext> 
+public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletContext>
     implements ServletContext {
 
     public Object getAttribute(String name) {
@@ -130,7 +130,7 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
     }
 
     public void log(String msg) {
-        get().log(msg);        
+        get().log(msg);
     }
 
     @SuppressWarnings("deprecation")
@@ -148,7 +148,7 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
 
     public void setAttribute(String name, Object object) {
         get().setAttribute(name, object);
-        
+
     }
 
     public boolean setInitParameter(String name, String value) {
@@ -216,7 +216,7 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
 
     public void addListener(String className) {
         get().addListener(className);
-        
+
     }
 
     public <T extends EventListener> void addListener(T t) {
@@ -237,7 +237,7 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
 
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
         get().setSessionTrackingModes(sessionTrackingModes);
-        
+
     }
 
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {

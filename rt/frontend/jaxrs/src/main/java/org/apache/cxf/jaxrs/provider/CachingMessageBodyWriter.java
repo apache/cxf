@@ -37,9 +37,9 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 @Provider
 public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<T>
     implements MessageBodyWriter<T> {
-    
+
     private List<MessageBodyWriter<T>> delegatingWriters;
-    
+
     public long getSize(T t, Class<?> type, Type gType, Annotation[] anns, MediaType mediaType) {
         return -1;
     }
@@ -47,9 +47,8 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
     public boolean isWriteable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingWriters != null) {
             return getDelegatingWriter(type, gType, anns, mt) != null;
-        } else {
-            return isProviderKeyNotSet();
         }
+        return isProviderKeyNotSet();
     }
 
     private MessageBodyWriter<T> getDelegatingWriter(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
@@ -60,43 +59,43 @@ public class CachingMessageBodyWriter<T> extends AbstractCachingMessageProvider<
         }
         return null;
     }
-    
+
     public void writeTo(T obj, Class<?> type, Type gType, Annotation[] anns, MediaType mt,
-                        MultivaluedMap<String, Object> theheaders, OutputStream os) 
+                        MultivaluedMap<String, Object> theheaders, OutputStream os)
         throws IOException, WebApplicationException {
         this.setObject(obj);
         getWriter(type, gType, anns, mt).writeTo(getObject(), type, gType, anns, mt, theheaders, os);
     }
-    
-    
+
+
     protected MessageBodyWriter<T> getWriter(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingWriters != null) {
             return getDelegatingWriter(type, gType, anns, mt);
         }
         MessageBodyWriter<T> w = null;
-        
+
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         try {
             @SuppressWarnings("unchecked")
             Class<T> actualType = (Class<T>)type;
             w = mc.getProviders().getMessageBodyWriter(actualType, gType, anns, mt);
         } finally {
-            mc.put(ACTIVE_JAXRS_PROVIDER_KEY, null); 
+            mc.put(ACTIVE_JAXRS_PROVIDER_KEY, null);
         }
-        
+
         if (w == null) {
-            org.apache.cxf.common.i18n.Message message = 
+            org.apache.cxf.common.i18n.Message message =
                 new org.apache.cxf.common.i18n.Message("NO_MSG_WRITER", BUNDLE, type);
             LOG.severe(message.toString());
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         return w;
     }
-    
+
     public void setDelegatingWriter(MessageBodyWriter<T> writer) {
         this.delegatingWriters = Collections.singletonList(writer);
     }
-    
+
     public void setDelegatingWriters(List<MessageBodyWriter<T>> writers) {
         this.delegatingWriters = writers;
     }

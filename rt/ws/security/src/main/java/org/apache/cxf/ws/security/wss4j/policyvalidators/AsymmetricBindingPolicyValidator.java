@@ -33,7 +33,6 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.policy.SP11Constants;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.model.AbstractToken;
-import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.AbstractTokenWrapper;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
 import org.apache.wss4j.policy.model.X509Token;
@@ -42,53 +41,53 @@ import org.apache.wss4j.policy.model.X509Token;
  * Validate an AsymmetricBinding policy.
  */
 public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.ASYMMETRIC_BINDING.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
-        boolean hasDerivedKeys = 
+        boolean hasDerivedKeys =
             parameters.getResults().getActionResults().containsKey(WSConstants.DKT);
-        
+
         for (AssertionInfo ai : ais) {
             AsymmetricBinding binding = (AsymmetricBinding)ai.getAssertion();
             ai.setAsserted(true);
 
             // Check the protection order
-            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai, 
+            if (!checkProtectionOrder(binding, parameters.getAssertionInfoMap(), ai,
                                       parameters.getResults().getResults())) {
                 continue;
             }
-            
+
             // Check various properties of the binding
-            if (!checkProperties(binding, ai, parameters.getAssertionInfoMap(), parameters.getResults(), 
+            if (!checkProperties(binding, ai, parameters.getAssertionInfoMap(), parameters.getResults(),
                                  parameters.getSignedResults(), parameters.getMessage())) {
                 continue;
             }
-            
+
             // Check various tokens of the binding
-            if (!checkTokens(binding, ai, parameters.getAssertionInfoMap(), hasDerivedKeys, 
+            if (!checkTokens(binding, ai, parameters.getAssertionInfoMap(), hasDerivedKeys,
                              parameters.getSignedResults(), parameters.getEncryptedResults())) {
                 continue;
             }
         }
     }
-    
+
     /**
      * Check various tokens of the binding
      */
     private boolean checkTokens(
-        AsymmetricBinding binding, 
+        AsymmetricBinding binding,
         AssertionInfo ai,
         AssertionInfoMap aim,
         boolean hasDerivedKeys,
@@ -98,7 +97,7 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
         boolean result = true;
         if (binding.getInitiatorToken() != null) {
             result &= checkInitiatorTokens(binding.getInitiatorToken(), binding, ai, aim, hasDerivedKeys,
-                                        signedResults, encryptedResults);            
+                                        signedResults, encryptedResults);
         }
         if (binding.getInitiatorSignatureToken() != null) {
             result &= checkInitiatorTokens(binding.getInitiatorSignatureToken(), binding, ai, aim,
@@ -120,15 +119,15 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             result &= checkRecipientTokens(binding.getRecipientEncryptionToken(), binding, ai, aim,
                                         hasDerivedKeys, signedResults, encryptedResults);
         }
-        
+
         return result;
     }
-    
+
     private boolean checkInitiatorTokens(
-        AbstractTokenWrapper wrapper, 
-        AsymmetricBinding binding, 
+        AbstractTokenWrapper wrapper,
+        AsymmetricBinding binding,
         AssertionInfo ai,
-        AssertionInfoMap aim, 
+        AssertionInfoMap aim,
         boolean hasDerivedKeys,
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults) {
@@ -156,25 +155,25 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
     }
-    
+
     private void unassertPolicy(AssertionInfoMap aim, QName q, String msg) {
         Collection<AssertionInfo> ais = aim.get(q);
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setNotAsserted(msg);
-            }    
+            }
         }
     }
 
     private boolean checkRecipientTokens(
-        AbstractTokenWrapper wrapper, 
-        AsymmetricBinding binding, 
+        AbstractTokenWrapper wrapper,
+        AsymmetricBinding binding,
         AssertionInfo ai,
-        AssertionInfoMap aim, 
+        AssertionInfoMap aim,
         boolean hasDerivedKeys,
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults) {
@@ -184,19 +183,9 @@ public class AsymmetricBindingPolicyValidator extends AbstractBindingPolicyValid
             ai.setNotAsserted("Message fails the DerivedKeys requirement");
             return false;
         }
-        assertToken(wrapper, aim);
+        assertDerivedKeys(wrapper.getToken(), aim);
 
         return true;
     }
-    
-    private void assertToken(AbstractTokenWrapper tokenWrapper, AssertionInfoMap aim) {
-        String namespace = tokenWrapper.getName().getNamespaceURI();
-        
-        AbstractToken token = tokenWrapper.getToken();
-        DerivedKeys derivedKeys = token.getDerivedKeys();
-        if (derivedKeys != null) {
-            PolicyUtils.assertPolicy(aim, new QName(namespace, derivedKeys.name()));
-        }
-    }
-    
+
 }

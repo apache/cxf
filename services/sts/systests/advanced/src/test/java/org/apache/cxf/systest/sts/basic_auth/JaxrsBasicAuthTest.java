@@ -27,17 +27,19 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF JAX-RS client sends BasicAuth via (1-way) TLS to a CXF provider.
- * The provider converts it into Username Token and dispatches it to an STS for validation 
+ * The provider converts it into Username Token and dispatches it to an STS for validation
  * (via TLS).
  */
 public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,7 +55,7 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -65,14 +67,14 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
 
         doubleIt("alice", "clarinet", false);
     }
-    
-    @org.junit.Test
+
+    @org.junit.Test(expected = RuntimeException.class)
     public void testBadBasicAuth() throws Exception {
 
         doubleIt("alice", "trombon", true);
     }
-    
-    @org.junit.Test
+
+    @org.junit.Test(expected = RuntimeException.class)
     public void testNoBasicAuth() throws Exception {
 
         doubleIt(null, null, true);
@@ -81,8 +83,8 @@ public class JaxrsBasicAuthTest extends AbstractBusClientServerTestBase {
     private static void doubleIt(String username, String password, boolean authFailureExpected) {
         final String configLocation = "org/apache/cxf/systest/sts/basic_auth/cxf-client.xml";
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
-        final int numToDouble = 25;  
-       
+        final int numToDouble = 25;
+
         WebClient client = null;
         if (username != null && password != null) {
             client = WebClient.create(address, username, password, configLocation);

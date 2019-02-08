@@ -33,7 +33,7 @@ import java.util.Arrays;
 class SimpleParameterizedType implements ParameterizedType {
     private Class<?> rawType;
     private Type[] parameters;
-    
+
     SimpleParameterizedType(Class<?> rawType, Type[] parameters) {
         this.rawType = rawType;
         this.parameters = parameters;
@@ -66,25 +66,25 @@ class SimpleParameterizedType implements ParameterizedType {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!(obj instanceof ParameterizedType)) {
             return false;
         }
-        
+
         ParameterizedType opt = null;
         try {
             opt = (ParameterizedType) obj;
         } catch (ClassCastException cce) {
             return false;
         }
-        
+
         if (opt.getOwnerType() != null) {
             return false;
         }
-        
+
         if (rawType != opt.getRawType()) {
             return false;
         }
-        
+
         return Arrays.equals(parameters, opt.getActualTypeArguments());
     }
 }

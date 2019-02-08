@@ -32,15 +32,15 @@ import org.apache.handler_test.HandlerTest;
 import org.apache.handler_test.HandlerTest1;
 
 /**
- * 
+ *
  */
 
-@WebServiceClient(name = "HandlerTestService", 
-                  targetNamespace = "http://apache.org/handler_test", 
+@WebServiceClient(name = "HandlerTestService",
+                  targetNamespace = "http://apache.org/handler_test",
                   wsdlLocation = "file:/D:/svn/cxf/trunk/testutils/src/main/resources/wsdl/handler_test.wsdl")
 @HandlerChain(file = "./handlers_invocation_testunused.xml", name = "TestHandlerChain")
 public class HandlerTestServiceWithAnnotation extends Service {
-    
+
     static {
         URL url = null;
         try {
@@ -54,8 +54,8 @@ public class HandlerTestServiceWithAnnotation extends Service {
     public static final QName SERVICE = new QName("http://apache.org/handler_test", "HandlerTestService");
     public static final QName SOAPPORT = new QName("http://apache.org/handler_test", "SoapPort");
     public static final QName SOAPPORT1 = new QName("http://apache.org/handler_test", "SoapPort1");
-    public static final URL WSDL_LOCATION;   
-    
+    public static final URL WSDL_LOCATION;
+
     public HandlerTestServiceWithAnnotation(URL wsdlLocation) {
         super(wsdlLocation, SERVICE);
     }

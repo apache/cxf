@@ -26,12 +26,12 @@ package org.apache.cxf.jaxrs.ext.search;
 
 public interface SearchConditionVisitor<T, E> {
     /*
-     * Accept a current SearchCondition object 
+     * Accept a current SearchCondition object
      */
     void visit(SearchCondition<T> sc);
-    
+
     /**
-     * Return a built query object 
+     * Return a built query object
      * @return the query
      */
     E getQuery();

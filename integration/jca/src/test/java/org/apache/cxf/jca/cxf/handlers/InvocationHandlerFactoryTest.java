@@ -28,20 +28,27 @@ import javax.security.auth.Subject;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class InvocationHandlerFactoryTest extends HandlerTestBase {
-    
+
     private CXFInvocationHandler handler;
-    
+
     private Subject testSubject;
-    
+
     public InvocationHandlerFactoryTest() {
         super();
     }
-    
-    
+
+
     @Before
     public void setUp() {
         super.setUp();
@@ -53,16 +60,16 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
             fail();
         }
     }
-    
+
     @Test
     public void testCreateHandlerChain() throws ResourceAdapterInternalException {
-      
+
         CXFInvocationHandler first = handler;
         CXFInvocationHandler last = null;
 
         assertNotNull("handler must not be null", handler);
         int count = 0;
-        Set<Class<?>> allHandlerTypes = new HashSet<Class<?>>();
+        Set<Class<?>> allHandlerTypes = new HashSet<>();
 
         while (handler != null) {
 
@@ -85,8 +92,8 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
         assertTrue("last handler must be an InvokingInvocationHandler",
                    last instanceof InvokingInvocationHandler);
 
-        Class<?>[] types 
-            = {ProxyInvocationHandler.class, 
+        Class<?>[] types
+            = {ProxyInvocationHandler.class,
                ObjectMethodInvocationHandler.class,
                InvokingInvocationHandler.class,
                SecurityTestHandler.class};
@@ -102,8 +109,8 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
         assertEquals(ObjectMethodInvocationHandler.class, handler.getNext().getClass());
         assertEquals(SecurityTestHandler.class, handler.getNext().getNext().getClass());
     }
-    
-    
+
+
     public static class SecurityTestHandler extends CXFInvocationHandlerBase {
 
         public SecurityTestHandler(CXFInvocationHandlerData data) {
@@ -111,10 +118,10 @@ public class InvocationHandlerFactoryTest extends HandlerTestBase {
         }
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            
+
             return invokeNext(proxy, method, args);
         }
-        
+
     }
-    
+
 }

@@ -56,38 +56,41 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class SelectMethodCandidatesTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+public class SelectMethodCandidatesTest {
+
     @Test
     public void testFindFromAbstractGenericClass() throws Exception {
         doTestGenericSuperType(BookEntity.class, "POST");
     }
-    
+
     @Test
     public void testFindFromAbstractGenericClass2() throws Exception {
         doTestGenericSuperType(BookEntity2.class, "POST");
     }
-    
+
     @Test
     public void testFindFromAbstractGenericInterface() throws Exception {
         doTestGenericSuperType(GenericEntityImpl.class, "POST");
     }
-    
+
     @Test
     public void testFindFromAbstractGenericInterface2() throws Exception {
         doTestGenericSuperType(GenericEntityImpl2.class, "POST");
     }
-    
+
     @Test
     public void testFindFromAbstractGenericImpl3() throws Exception {
         doTestGenericSuperType(GenericEntityImpl3.class, "POST");
     }
-    
+
     private static List<MediaType> sortMediaTypes(String mediaTypes) {
         return JAXRSUtils.sortMediaTypes(mediaTypes, JAXRSUtils.MEDIA_TYPE_Q_PARAM);
     }
@@ -99,7 +102,7 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentTypes = "text/xml";
         String acceptContentTypes = "text/xml";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, "text/xml");
         Exchange ex = new ExchangeImpl();
@@ -118,17 +121,17 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             "POST",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "postEntity",
                      ori.getMethodToInvoke().getName());
-        
+
         String value = "<Books><Book><name>The Book</name><id>2</id></Book></Books>";
         m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(ori, values, m);
@@ -148,17 +151,17 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         Message m = createMessage();
         m.put(Message.CONTENT_TYPE, "text/xml");
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/",
                                                             "POST",
-                                                            values, "text/xml", 
+                                                            values, "text/xml",
                                                             sortMediaTypes("*/*"));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "add",
                      ori.getMethodToInvoke().getName());
-        
+
         String value = "<concreteRestResource><name>The Book</name></concreteRestResource>";
         m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(ori, values, m);
@@ -167,7 +170,7 @@ public class SelectMethodCandidatesTest extends Assert {
         assertNotNull(book);
         assertEquals("The Book", book.getName());
     }
-    
+
     @Test
     public void testFindFromAbstractGenericClass3() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -176,7 +179,7 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentTypes = "text/xml";
         String acceptContentTypes = "text/xml";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, "text/xml");
         Exchange ex = new ExchangeImpl();
@@ -195,17 +198,17 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             "PUT",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "putEntity",
                      ori.getMethodToInvoke().getName());
-        
+
         String value = "<Chapter><title>The Book</title><id>2</id></Chapter>";
         m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(ori, values, m);
@@ -215,7 +218,7 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals(2L, c.getId());
         assertEquals("The Book", c.getTitle());
     }
-    
+
     @Test
     public void testDefaultMethod() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -224,7 +227,7 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentType = "text/xml";
         String acceptContentTypes = "text/xml";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, contentType);
         Exchange ex = new ExchangeImpl();
@@ -243,38 +246,38 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/service/all",
                                                             "PUT",
-                                                            values, 
-                                                            contentType, 
+                                                            values,
+                                                            contentType,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "all",
                      ori.getMethodToInvoke().getName());
         values.clear();
-        ori = findTargetResourceClass(resources, m, 
+        ori = findTargetResourceClass(resources, m,
                                                             "/service/all",
                                                             "GET",
-                                                            values, 
-                                                            contentType, 
+                                                            values,
+                                                            contentType,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "getAll",
                      ori.getMethodToInvoke().getName());
-        ori = findTargetResourceClass(resources, m, 
+        ori = findTargetResourceClass(resources, m,
                                       "/service",
                                       "GET",
-                                      values, 
-                                      contentType, 
+                                      values,
+                                      contentType,
                                       sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", "get",
             ori.getMethodToInvoke().getName());
     }
-    
+
     @Test
     public void testConsumesResource1() throws Exception {
         doTestConsumesResource(ConsumesResource1.class, "text/xml", "m2");
@@ -291,7 +294,7 @@ public class SelectMethodCandidatesTest extends Assert {
     public void testConsumesResource4() throws Exception {
         doTestConsumesResource(ConsumesResource4.class, "application/xml+bar", "m2");
     }
-    
+
     @Test
     public void testConsumesResource5() throws Exception {
         doTestConsumesResource(ConsumesResource5.class, "text/xml", "m2");
@@ -300,7 +303,7 @@ public class SelectMethodCandidatesTest extends Assert {
     private void doTestConsumesResource(Class<?> resourceClass, String expectedMethodName) throws Exception {
         doTestConsumesResource(resourceClass, null, expectedMethodName);
     }
-    private void doTestConsumesResource(Class<?> resourceClass, String ct, 
+    private void doTestConsumesResource(Class<?> resourceClass, String ct,
                                         String expectedMethodName) throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(resourceClass);
@@ -308,7 +311,7 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentType = ct == null ? "application/xml" : ct;
         String acceptContentTypes = "*/*";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, contentType);
         Exchange ex = new ExchangeImpl();
@@ -327,143 +330,143 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, 
-                                                            m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources,
+                                                            m,
                                                             "/",
                                                             "POST",
-                                                            values, 
-                                                            contentType, 
+                                                            values,
+                                                            contentType,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals(expectedMethodName,  ori.getMethodToInvoke().getName());
     }
-    
+
     @Test
     public void testResponseType1() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m1", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m1",
                                "application/xml", "application/xml", "m1");
     }
-    
+
     @Test
     public void testResponseType2() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m1", 
-                               "application/*,application/json", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m1",
+                               "application/*,application/json",
                                "application/json", "m1");
     }
     @Test
     public void testResponseType3() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m1", 
-                               "text/xml, application/xml;q=0.8,application/json;q=0.4", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m1",
+                               "text/xml, application/xml;q=0.8,application/json;q=0.4",
                                "application/xml", "m1");
     }
-    
+
     @Test
     public void testResponseType4() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m1", 
-                               "text/xml, application/xml;q=0.8,application/json;q=0.4", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m1",
+                               "text/xml, application/xml;q=0.8,application/json;q=0.4",
                                "application/xml", "m1");
     }
-    
+
     @Test
     public void testResponseType5() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m2", 
-                               "text/xml, application/xml;q=0.3,application/json;q=0.4", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m2",
+                               "text/xml, application/xml;q=0.3,application/json;q=0.4",
                                "application/json", "m2");
     }
-    
+
     @Test
     public void testResponseType6() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m3", 
-                               "text/*,application/json;q=0.4", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m3",
+                               "text/*,application/json;q=0.4",
                                "text/xml", "m3");
     }
-    
+
     @Test
     public void testResponseType7() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m3", 
-                               "text/*,application/json", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m3",
+                               "text/*,application/json",
                                "application/json", "m3");
     }
-    
+
     @Test
     public void testResponseType8() throws Exception {
-        doTestProducesResource(ResponseMediaTypeResource.class, "/m4", 
+        doTestProducesResource(ResponseMediaTypeResource.class, "/m4",
                                "application/*", "application/xml", "m4");
     }
-    
+
     @Test
     public void testProducesResource1() throws Exception {
-        doTestProducesResource(ProducesResource1.class, "/", 
-                               "text/plain, application/xml", 
+        doTestProducesResource(ProducesResource1.class, "/",
+                               "text/plain, application/xml",
                                "application/xml", "m2");
     }
-    
+
     @Test
     public void testProducesResource2() throws Exception {
-        doTestProducesResource(ProducesResource1.class, "/", 
-                               "text/plain, application/xml;q=0.8", 
+        doTestProducesResource(ProducesResource1.class, "/",
+                               "text/plain, application/xml;q=0.8",
                                "text/plain", "m1");
     }
-    
+
     @Test
     public void testProducesResource3() throws Exception {
-        doTestProducesResource(ProducesResource2.class, "/", 
-                               "application/*", 
+        doTestProducesResource(ProducesResource2.class, "/",
+                               "application/*",
                                "application/json", "m1");
     }
-    
+
     @Test
     public void testProducesResource4() throws Exception {
-        doTestProducesResource(ProducesResource2.class, "/", 
-                               "application/xml,application/json;q=0.9", 
+        doTestProducesResource(ProducesResource2.class, "/",
+                               "application/xml,application/json;q=0.9",
                                "application/xml", "m2");
     }
-    
+
     @Test
     public void testProducesResource5() throws Exception {
-        doTestProducesResource(ProducesResource2.class, "/", 
-                               "application/xml;q=0.3,application/json;q=0.5", 
+        doTestProducesResource(ProducesResource2.class, "/",
+                               "application/xml;q=0.3,application/json;q=0.5",
                                "application/json", "m1");
     }
 
     @Test
     public void testProducesResource6() throws Exception {
-        doTestProducesResource(ProducesResource3.class, "/", 
-                               "application/xml,application/json", 
+        doTestProducesResource(ProducesResource3.class, "/",
+                               "application/xml,application/json",
                                "application/xml", "m2");
     }
 
     @Test
     public void testProducesResource7() throws Exception {
-        doTestProducesResource(ProducesResource4.class, "/", 
-                               "application/xml,", 
+        doTestProducesResource(ProducesResource4.class, "/",
+                               "application/xml,",
                                "application/xml", "m1");
     }
 
     @Test
     public void testProducesResource8() throws Exception {
-        doTestProducesResource(ProducesResource5.class, "/", 
-                               "application/*,text/html", 
+        doTestProducesResource(ProducesResource5.class, "/",
+                               "application/*,text/html",
                                "text/html", "m1");
     }
 
     @Test
     public void testProducesResource9() throws Exception {
-        doTestProducesResource(ProducesResource5.class, "/", 
-                               "application/*,text/html;q=0.3", 
+        doTestProducesResource(ProducesResource5.class, "/",
+                               "application/*,text/html;q=0.3",
                                "text/html", "m1");
     }
 
     @Test
     public void testProducesResource10() throws Exception {
-        doTestProducesResource(ProducesResource6.class, "/", 
-                               "application/*,text/html", 
+        doTestProducesResource(ProducesResource6.class, "/",
+                               "application/*,text/html",
                                "text/html", "m1");
     }
 
-    private void doTestProducesResource(Class<?> resourceClass, 
+    private void doTestProducesResource(Class<?> resourceClass,
                                         String path,
                                         String acceptContentTypes,
                                         String expectedResponseType,
@@ -473,7 +476,7 @@ public class SelectMethodCandidatesTest extends Assert {
         sf.create();
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentType = "*/*";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, contentType);
         Exchange ex = new ExchangeImpl();
@@ -492,34 +495,34 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources
             = JAXRSUtils.selectResourceClass(resources, path, m);
-     
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, m, "GET", 
-                                                values, contentType, 
+
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, m, "GET",
+                                                values, contentType,
                                                 sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals(expectedMethodName,  ori.getMethodToInvoke().getName());
         assertEquals(expectedResponseType, m.getExchange().get(Message.CONTENT_TYPE));
     }
-    
+
     @Test
     public void testRootResourcesWithSameName() throws Exception {
         doTestRootResourcesWithSameName("/a/books", "put", RootResource.class);
         doTestRootResourcesWithSameName("/a1/books", "put", RootResource.class);
     }
-    
+
     @Test
     public void testRootResourcesWithSameName2() throws Exception {
         doTestRootResourcesWithSameName("/a/books/1", "put", RootResource2.class);
         doTestRootResourcesWithSameName("/c/thebooks", "put2", RootResource2.class);
         doTestRootResourcesWithSameName("/b/books", "put", RootResource3.class);
     }
-    
-    
-    private void doTestRootResourcesWithSameName(String path, String methodName, Class<?> expectedRoot) 
+
+
+    private void doTestRootResourcesWithSameName(String path, String methodName, Class<?> expectedRoot)
         throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(RootResource.class, RootResource2.class, RootResource3.class);
@@ -528,22 +531,22 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals(3, resources.size());
         String contentTypes = "text/xml";
         String acceptContentTypes = "text/xml";
-        
+
         Message m = prepareMessage();
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             path,
                                                             "PUT",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", methodName,
                      ori.getMethodToInvoke().getName());
-        
+
         assertSame(expectedRoot, ori.getClassResourceInfo().getServiceClass());
     }
-    
+
     private Message prepareMessage() {
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, "text/xml");
@@ -565,7 +568,7 @@ public class SelectMethodCandidatesTest extends Assert {
         ex.put(Endpoint.class, e);
         return m;
     }
-    
+
     private void doTestGenericSuperType(Class<?> serviceClass, String methodName) throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(serviceClass);
@@ -573,7 +576,7 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentTypes = "text/xml";
         String acceptContentTypes = "text/xml";
-        
+
         Message m = new MessageImpl();
         m.put(Message.CONTENT_TYPE, "text/xml");
         Exchange ex = new ExchangeImpl();
@@ -592,17 +595,17 @@ public class SelectMethodCandidatesTest extends Assert {
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, m, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, m,
                                                             "/books",
                                                             methodName,
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", methodName.toLowerCase() + "Entity",
                      ori.getMethodToInvoke().getName());
-        
+
         String value = "<Book><name>The Book</name><id>2</id></Book>";
         m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(ori, values, m);
@@ -612,22 +615,22 @@ public class SelectMethodCandidatesTest extends Assert {
         assertEquals(2L, book.getId());
         assertEquals("The Book", book.getName());
     }
-    
+
     @Test
     public void testFindTargetSubResource() throws Exception {
         doTestFindTargetSubResource("/1/2/3/d/resource", "resourceMethod");
     }
-    
+
     @Test
     public void testFindTargetSubResource2() throws Exception {
         doTestFindTargetSubResource("/1/2/3/d/resource/sub", "subresource");
     }
-    
+
     @Test
     public void testFindTargetSubResource3() throws Exception {
         doTestFindTargetSubResource("/1/2/3/d/resource2/2/2", "resourceMethod2");
     }
-    
+
     @Test
     public void testFindTargetSubResource4() throws Exception {
         doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "subresource2", true);
@@ -636,12 +639,12 @@ public class SelectMethodCandidatesTest extends Assert {
     public void testFindTargetSubResource5() throws Exception {
         doTestFindTargetSubResource("/1/2/3/d/resource2/1/2", "resourceMethod2");
     }
-    
+
     public void doTestFindTargetSubResource(String path, String method) throws Exception {
         doTestFindTargetSubResource(path, method, false);
     }
-    
-    public void doTestFindTargetSubResource(String path, String method, boolean setKeepSubProp) 
+
+    public void doTestFindTargetSubResource(String path, String method, boolean setKeepSubProp)
         throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
@@ -649,20 +652,20 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentTypes = "*/*";
         String acceptContentTypes = "text/xml,*/*";
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, 
-                                                            createMessage(), 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources,
+                                                            createMessage(),
                                                             path,
                                                             "GET",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes),
                                                             setKeepSubProp);
         assertNotNull(ori);
         assertEquals("resourceMethod needs to be selected", method,
                      ori.getMethodToInvoke().getName());
     }
-    
+
     @Test
     public void testSelectUsingQualityFactors() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -671,145 +674,145 @@ public class SelectMethodCandidatesTest extends Assert {
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         String contentTypes = "*/*";
         String acceptContentTypes = "application/xml;q=0.5,application/json";
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(),
                                                             "/1/2/3/d/resource1",
                                                             "GET",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             sortMediaTypes(acceptContentTypes));
-        
+
         assertNotNull(ori);
         assertEquals("jsonResource needs to be selected", "jsonResource",
                      ori.getMethodToInvoke().getName());
     }
-    
+
     @Test
     public void testFindTargetResourceClassWithTemplates() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
         sf.create();
-        
+
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
 
         String contentTypes = "*/*";
         String acceptContentTypes = "application/xml";
 
-        //If acceptContentTypes does not specify a specific Mime type, the  
+        //If acceptContentTypes does not specify a specific Mime type, the
         //method is declared with a most specific ProduceMime type is selected.
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), 
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(),
                                                             "/1/2/3/d",
                                                             "GET",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
             Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
-        
+
         assertNotNull(ori);
-        assertEquals("listMethod needs to be selected", "listMethod", 
+        assertEquals("listMethod needs to be selected", "listMethod",
                      ori.getMethodToInvoke().getName());
-        
-        
+
+
         acceptContentTypes = "application/xml,application/json;q=0.8";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                                             "/1/2/3/d/1",
                                                             "GET",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
                                                             JAXRSUtils.parseMediaTypes(acceptContentTypes));
         assertNotNull(ori);
-        assertEquals("readMethod needs to be selected", "readMethod", 
+        assertEquals("readMethod needs to be selected", "readMethod",
                      ori.getMethodToInvoke().getName());
-        
-        
+
+
         contentTypes = "application/xml";
         acceptContentTypes = "application/xml";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                                             "/1/2/3/d/1",
                                                             "GET",
-                                                            values, contentTypes, 
+                                                            values, contentTypes,
             Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("readMethod needs to be selected", "readMethod", 
+        assertEquals("readMethod needs to be selected", "readMethod",
                      ori.getMethodToInvoke().getName());
-        
+
         contentTypes = "application/json";
         acceptContentTypes = "application/json";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/1/bar/baz/baz",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
             Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("readMethod2 needs to be selected", "readMethod2", 
+        assertEquals("readMethod2 needs to be selected", "readMethod2",
                      ori.getMethodToInvoke().getName());
-        
+
         contentTypes = "application/json";
         acceptContentTypes = "application/json";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/1",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
             Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("unlimitedPath needs to be selected", "unlimitedPath", 
+        assertEquals("unlimitedPath needs to be selected", "unlimitedPath",
                      ori.getMethodToInvoke().getName());
-        
-        ori = findTargetResourceClass(resources, null, 
+
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/1/2",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
             Collections.singletonList(MediaType.valueOf(acceptContentTypes)));
         assertNotNull(ori);
-        assertEquals("limitedPath needs to be selected", "limitedPath", 
+        assertEquals("limitedPath needs to be selected", "limitedPath",
                      ori.getMethodToInvoke().getName());
-        
+
     }
-    
+
     @Test
     public void testSelectBar() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.TestResource.class);
         sf.create();
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
-        
+
         String contentTypes = "*/*";
         String acceptContentTypes = "application/bar,application/foo;q=0.8";
-        
-        MetadataMap<String, String> values = new MetadataMap<String, String>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, null, 
+
+        MetadataMap<String, String> values = new MetadataMap<>();
+        OperationResourceInfo ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/custom",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
                                       sortMediaTypes(acceptContentTypes));
-        
+
         assertNotNull(ori);
         assertEquals("readBar", ori.getMethodToInvoke().getName());
         acceptContentTypes = "application/foo,application/bar;q=0.8";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/custom",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
                                       sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
-        
+
         acceptContentTypes = "application/foo;q=0.5,application/bar";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/custom",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
                                       sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readBar", ori.getMethodToInvoke().getName());
-        
+
         acceptContentTypes = "application/foo,application/bar;q=0.5";
-        ori = findTargetResourceClass(resources, null, 
+        ori = findTargetResourceClass(resources, null,
                                       "/1/2/3/d/custom",
                                       "GET",
-                                      values, contentTypes, 
+                                      values, contentTypes,
                                       sortMediaTypes(acceptContentTypes));
         assertNotNull(ori);
         assertEquals("readFoo", ori.getMethodToInvoke().getName());
-        
+
     }
     private Message createMessage() {
         return createMessage(false);
@@ -841,41 +844,41 @@ public class SelectMethodCandidatesTest extends Assert {
     }
     private OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
                                                           Message message,
-                                                          String path, 
+                                                          String path,
                                                           String httpMethod,
                                                           MultivaluedMap<String, String> values,
-                                                          String requestContentType, 
+                                                          String requestContentType,
                                                           List<MediaType> acceptContentTypes) {
         return findTargetResourceClass(resources, message, path, httpMethod, values, requestContentType,
-                                       acceptContentTypes, false); 
-        
+                                       acceptContentTypes, false);
+
     }
     //CHECKSTYLE:OFF
     private OperationResourceInfo findTargetResourceClass(List<ClassResourceInfo> resources,
                                                           Message message,
-                                                          String path, 
+                                                          String path,
                                                           String httpMethod,
                                                           MultivaluedMap<String, String> values,
-                                                          String requestContentType, 
+                                                          String requestContentType,
                                                           List<MediaType> acceptContentTypes,
                                                           boolean setKeepSubProp) {
     //CHECKSTYLE:ON
-        message = message == null ? new MessageImpl() : message; 
-        Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources 
+        message = message == null ? new MessageImpl() : message;
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> mResources
             = JAXRSUtils.selectResourceClass(resources, path, message);
-         
+
         if (mResources != null) {
-            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources, 
-                                                                    createMessage(setKeepSubProp), 
-                                                                    httpMethod, 
-                                                                    values, 
-                                                                    requestContentType, 
+            OperationResourceInfo ori = JAXRSUtils.findTargetMethod(mResources,
+                                                                    createMessage(setKeepSubProp),
+                                                                    httpMethod,
+                                                                    values,
+                                                                    requestContentType,
                                                                     acceptContentTypes);
             if (ori != null) {
                 return ori;
             }
         }
-         
+
         return null;
     }
     @Path("{a}")
@@ -885,10 +888,10 @@ public class SelectMethodCandidatesTest extends Assert {
         @PUT
         @Path("books")
         public void put() {
-            
+
         }
     }
-    
+
     @Path("{b}")
     @Produces("text/xml")
     @Consumes("text/xml")
@@ -896,16 +899,16 @@ public class SelectMethodCandidatesTest extends Assert {
         @PUT
         @Path("books/1")
         public void put() {
-            
+
         }
-        
+
         @PUT
         @Path("thebooks")
         public void put2() {
-            
+
         }
     }
-    
+
     @Path("b")
     @Produces("text/xml")
     @Consumes("text/xml")
@@ -913,70 +916,70 @@ public class SelectMethodCandidatesTest extends Assert {
         @PUT
         @Path("books")
         public void put() {
-            
+
         }
     }
-    
+
     public static class ConsumesResource1 {
         @POST
         @Consumes({"application/xml", "text/*" })
         public void m1() {
-            
+
         }
         @POST
         @Consumes({"application/xml", "text/xml" })
         public void m2() {
-            
+
         }
     }
     public static class ConsumesResource2 {
         @POST
         @Consumes({"application/*", "text/xml" })
         public void m2() {
-            
+
         }
         @POST
         @Consumes({"text/*", "application/xml" })
         public void m1() {
-            
+
         }
     }
     public static class ConsumesResource3 {
         @POST
         @Consumes({"application/*" })
         public void m2() {
-            
+
         }
         @POST
         @Consumes({"application/xml" })
         public void m1() {
-            
+
         }
     }
     public static class ConsumesResource4 {
         @POST
         @Consumes({"application/xml", "application/xml+*" })
         public void m1() {
-            
+
         }
         @POST
         @Consumes({"application/*", "application/xml+bar" })
         public void m2() {
-            
+
         }
     }
     public static class ConsumesResource5 {
         @POST
         @Consumes("text/*")
         public void m1() {
-        }       
-        
+        }
+
         @POST
         @Consumes("text/xml;qs=0.7")
         public void m2() {
         }
     }
-    
+
     public static class ResponseMediaTypeResource {
         @GET
         @Path("m1")
@@ -1003,7 +1006,7 @@ public class SelectMethodCandidatesTest extends Assert {
             return null;
         }
     }
-    
+
     public static class ProducesResource1 {
         @GET
         @Produces({"text/*" })

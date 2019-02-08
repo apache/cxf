@@ -24,29 +24,29 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 
 /**
- * A Binding provides interceptors and message creation logic for a 
+ * A Binding provides interceptors and message creation logic for a
  * specific protocol binding.
  */
 public interface Binding extends InterceptorProvider {
-    
+
     /**
      * Create a Message for this Binding.
      * @return the Binding message
      */
     Message createMessage();
-    
+
     /**
      * Create a Message form the message.
-     * 
+     *
      * @param m the message used for creating a binding message
      * @return the Binding message
-     */ 
+     */
     Message createMessage(Message m);
-    
+
     /**
      * Get the BindingInfo for this binding.
      *
-     * @return the BingdingInfo Object     
+     * @return the BingdingInfo Object
      */
     BindingInfo getBindingInfo();
 }

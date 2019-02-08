@@ -26,12 +26,13 @@ import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 
 public class IdentityClaimsParser implements ClaimsParser {
-    
-    public static final String IDENTITY_CLAIMS_DIALECT = 
+
+    public static final String IDENTITY_CLAIMS_DIALECT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity";
 
     private static final Logger LOG = LogUtils.getL7dLogger(IdentityClaimsParser.class);
@@ -43,7 +44,7 @@ public class IdentityClaimsParser implements ClaimsParser {
     public static Claim parseClaimType(Element claimType) {
         String claimLocalName = claimType.getLocalName();
         String claimNS = claimType.getNamespaceURI();
-        
+
         if ("ClaimType".equals(claimLocalName) || "ClaimValue".equals(claimLocalName)) {
             String claimTypeUri = claimType.getAttributeNS(null, "Uri");
             String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
@@ -52,13 +53,13 @@ public class IdentityClaimsParser implements ClaimsParser {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
                 LOG.log(
-                    Level.WARNING, 
+                    Level.WARNING,
                     "Cannot create URI from the given ClaimType attribute value " + claimTypeUri,
                     e
                 );
             }
             requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
-            
+
             if ("ClaimValue".equals(claimLocalName)) {
                 Node valueNode = claimType.getFirstChild();
                 if (valueNode != null) {
@@ -74,10 +75,10 @@ public class IdentityClaimsParser implements ClaimsParser {
                     return null;
                 }
             }
-            
+
             return requestClaim;
         }
-        
+
         LOG.fine("Found unknown element: " + claimLocalName + " " + claimNS);
         return null;
     }

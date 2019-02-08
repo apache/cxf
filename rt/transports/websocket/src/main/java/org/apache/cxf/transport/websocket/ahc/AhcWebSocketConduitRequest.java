@@ -31,7 +31,7 @@ class AhcWebSocketConduitRequest {
     private String contentType;
     private String id;
     private int receiveTimeout;
-    
+
     AhcWebSocketConduitRequest(URI uri, String method) {
         this.uri = uri;
         this.method = method;

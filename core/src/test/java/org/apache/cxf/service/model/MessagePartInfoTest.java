@@ -22,18 +22,22 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MessagePartInfoTest extends Assert {
-    
-        
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class MessagePartInfoTest {
+
+
     private MessagePartInfo messagePartInfo;
-        
+
     @Before
     public void setUp() throws Exception {
-        
+
         MessageInfo msg = new MessageInfo(null,
                                           MessageInfo.Type.INPUT,
                                           new QName("http://apache.org/hello_world_soap_http/types",
@@ -42,7 +46,7 @@ public class MessagePartInfoTest extends Assert {
             "http://apache.org/hello_world_soap_http", "testMessagePart"), msg);
         messagePartInfo.setElement(true);
     }
-    
+
     @Test
     public void testName() throws Exception {
         assertEquals(messagePartInfo.getName().getLocalPart(), "testMessagePart");
@@ -53,7 +57,7 @@ public class MessagePartInfoTest extends Assert {
         assertEquals(messagePartInfo.getName().getLocalPart(), "testMessagePart1");
         assertEquals(messagePartInfo.getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http1");
-        
+
     }
 
     @Test
@@ -66,7 +70,7 @@ public class MessagePartInfoTest extends Assert {
                      "http://apache.org/hello_world_soap_http/types");
         assertNull(messagePartInfo.getTypeQName());
     }
-    
+
     @Test
     public void testType() {
         messagePartInfo.setTypeQName(new QName(

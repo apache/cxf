@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -53,7 +54,7 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Constants;
 
 public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
-    
+
     private boolean removeSignature = true;
     private boolean persistSignature = true;
     private boolean keyInfoMustBeAvailable = true;
@@ -62,17 +63,17 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
      * a collection of compiled regular expression patterns for the subject DN
      */
     private final Collection<Pattern> subjectDNPatterns = new ArrayList<>();
-    
+
     public void setRemoveSignature(boolean remove) {
         this.removeSignature = remove;
     }
-    
+
     public void setPersistSignature(boolean persist) {
         this.persistSignature = persist;
     }
-    
+
     protected void checkSignature(Message message) {
-        
+
         Document doc = getDocument(message);
         if (doc == null) {
             return;
@@ -83,17 +84,17 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         if (signatureElement == null) {
             throwFault("XML Signature is not available", null);
         }
-        
-        String cryptoKey = null; 
+
+        String cryptoKey = null;
         String propKey = null;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;
         } else {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
-            propKey = SecurityConstants.SIGNATURE_PROPERTIES;    
+            propKey = SecurityConstants.SIGNATURE_PROPERTIES;
         }
-        
+
         Crypto crypto = null;
         try {
             CryptoLoader loader = new CryptoLoader();
@@ -105,7 +106,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         Reference ref = null;
         try {
             XMLSignature signature = new XMLSignature(signatureElement, "", true);
-            
+
             if (sigProps != null) {
                 SignedInfo sInfo = signature.getSignedInfo();
                 if (sigProps.getSignatureAlgo() != null
@@ -117,7 +118,7 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                     throwFault("Signature C14n Algorithm is not supported", null);
                 }
             }
-            
+
             ref = getReference(signature);
             Element signedElement = validateReference(root, ref);
             if (signedElement.hasAttributeNS(null, "ID")) {
@@ -126,14 +127,14 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             if (signedElement.hasAttributeNS(null, "Id")) {
                 signedElement.setIdAttributeNS(null, "Id", true);
             }
-            
+
             X509Certificate cert = null;
             PublicKey publicKey = null;
-            
-            
-            // See also WSS4J SAMLUtil.getCredentialFromKeyInfo 
+
+
+            // See also WSS4J SAMLUtil.getCredentialFromKeyInfo
             KeyInfo keyInfo = signature.getKeyInfo();
-            
+
             if (keyInfo != null) {
                 cert = keyInfo.getX509Certificate();
                 if (cert != null) {
@@ -143,15 +144,15 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                     if (publicKey != null) {
                         valid = signature.checkSignatureValue(publicKey);
                     }
-                } 
+                }
             } else if (!keyInfoMustBeAvailable) {
                 String user = getUserName(crypto, message);
                 cert = RSSecurityUtils.getCertificates(crypto, user)[0];
                 publicKey = cert.getPublicKey();
                 valid = signature.checkSignatureValue(cert);
             }
-            
-            // validate trust 
+
+            // validate trust
             new TrustValidator().validateTrust(crypto, cert, publicKey, getSubjectContraints(message));
             if (valid && persistSignature) {
                 if (signature.getKeyInfo() != null) {
@@ -180,22 +181,21 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                 root = actualBody;
             }
         }
-        message.setContent(XMLStreamReader.class, 
+        message.setContent(XMLStreamReader.class,
                            new W3CDOMStreamReader(root));
         message.setContent(InputStream.class, null);
-        
+
     }
-    
+
     protected String getUserName(Crypto crypto, Message message) {
         SecurityContext sc = message.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
             return sc.getUserPrincipal().getName();
-        } else {
-            return RSSecurityUtils.getUserName(crypto, null);
         }
-        
+        return RSSecurityUtils.getUserName(crypto, null);
+
     }
-    
+
     private Element getActualBody(Element envelopingSigElement) {
         Element objectNode = getNode(envelopingSigElement, Constants.SignatureSpecNS, "Object", 0);
         if (objectNode == null) {
@@ -206,21 +206,21 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             throwFault("No signed data is found", null);
         }
         return node;
-       
+
     }
-    
+
     private Element getSignatureElement(Element sigParentElement) {
-        if (isEnveloping(sigParentElement)) {    
+        if (isEnveloping(sigParentElement)) {
             return sigParentElement;
         }
         return DOMUtils.getFirstChildWithName(sigParentElement, Constants.SignatureSpecNS, "Signature");
     }
-    
+
     protected boolean isEnveloping(Element root) {
         return Constants.SignatureSpecNS.equals(root.getNamespaceURI())
                 && "Signature".equals(root.getLocalName());
     }
-    
+
     protected Reference getReference(XMLSignature sig) {
         int count = sig.getSignedInfo().getLength();
         if (count != 1) {
@@ -233,31 +233,31 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         }
         return null;
     }
-    
+
     protected Element validateReference(Element root, Reference ref) {
         boolean enveloped = false;
-        
+
         String refId = ref.getURI();
-        
+
         if (!refId.startsWith("#") || refId.length() <= 1) {
             throwFault("Only local Signature References are supported", null);
         }
-        
+
         Element signedEl = getSignedElement(root, ref);
         if (signedEl != null) {
             enveloped = signedEl == root;
         } else {
             throwFault("Signature Reference ID is invalid", null);
         }
-        
-        
+
+
         Transforms transforms = null;
         try {
             transforms = ref.getTransforms();
         } catch (XMLSecurityException ex) {
             throwFault("Signature transforms can not be obtained", ex);
         }
-        
+
         boolean c14TransformConfirmed = false;
         String c14TransformExpected = sigProps != null ? sigProps.getSignatureC14nTransform() : null;
         boolean envelopedConfirmed = false;
@@ -268,9 +268,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
                     envelopedConfirmed = true;
                 } else if (c14TransformExpected != null && c14TransformExpected.equals(tr.getURI())) {
                     c14TransformConfirmed = true;
-                } 
+                }
             } catch (Exception ex) {
-                throwFault("Problem accessing Transform instance", ex);    
+                throwFault("Problem accessing Transform instance", ex);
             }
         }
         if (enveloped && !envelopedConfirmed) {
@@ -279,9 +279,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         if (c14TransformExpected != null && !c14TransformConfirmed) {
             throwFault("Transform Canonicalization is not supported", null);
         }
-        
+
         if (sigProps != null && sigProps.getSignatureDigestAlgo() != null) {
-            Element dm = 
+            Element dm =
                 DOMUtils.getFirstChildWithName(ref.getElement(), Constants.SignatureSpecNS, "DigestMethod");
             if (dm != null && !dm.getAttribute("Algorithm").equals(
                 sigProps.getSignatureDigestAlgo())) {
@@ -290,26 +290,25 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         }
         return signedEl;
     }
-    
+
     private Element getSignedElement(Element root, Reference ref) {
         String rootId = root.getAttribute("ID");
         String expectedID = ref.getURI().substring(1);
-        
+
         if (!expectedID.equals(rootId)) {
             return XMLUtils.findElementById(root, expectedID, true);
-        } else {
-            return root;
         }
+        return root;
     }
-    
+
     public void setSignatureProperties(SignatureProperties properties) {
         this.sigProps = properties;
     }
-    
+
     public void setKeyInfoMustBeAvailable(boolean use) {
         this.keyInfoMustBeAvailable = use;
     }
-    
+
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
      * of a certificate
@@ -326,9 +325,9 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
             }
         }
     }
-    
+
     private Collection<Pattern> getSubjectContraints(Message msg) throws PatternSyntaxException {
-        String certConstraints = 
+        String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         // Check the message property first. If this is not null then use it. Otherwise pick up
         // the constraints set as a property
@@ -343,5 +342,5 @@ public class AbstractXmlSigInHandler extends AbstractXmlSecInHandler {
         }
         return subjectDNPatterns;
     }
-    
+
 }

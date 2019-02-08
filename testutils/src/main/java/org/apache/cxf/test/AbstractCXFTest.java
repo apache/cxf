@@ -39,7 +39,6 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.MapNamespaceContext;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
 
@@ -47,17 +46,16 @@ import org.junit.Before;
  * A basic test case meant for helping users unit test their services.
  * @see TestUtilities
  */
-@org.junit.Ignore
-public class AbstractCXFTest extends Assert {
-    
+public abstract class AbstractCXFTest {
+
     protected TestUtilities testUtilities;
     protected Bus bus;
-    
+
     protected AbstractCXFTest() {
         testUtilities = new TestUtilities(getClass());
         testUtilities.addDefaultNamespaces();
     }
-    
+
     @Before
     public void setUpBus() throws Exception {
         if (bus == null) {
@@ -65,17 +63,17 @@ public class AbstractCXFTest extends Assert {
             testUtilities.setBus(bus);
         }
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-    
+
     @After
-    public void shutdownBus() {       
+    public void shutdownBus() {
         if (bus != null) {
             bus.shutdown(false);
             bus = null;
-        } 
+        }
         BusFactory.setDefaultBus(null);
     }
 
@@ -84,19 +82,19 @@ public class AbstractCXFTest extends Assert {
         return BusFactory.newInstance().createBus();
     }
 
-    protected byte[] invokeBytes(String address, 
+    protected byte[] invokeBytes(String address,
                                  String transport,
                                  String message) throws Exception {
         return testUtilities.invokeBytes(address, transport, message);
     }
-    
-    protected Node invoke(String address, 
+
+    protected Node invoke(String address,
                           String transport,
                           String message) throws Exception {
         return testUtilities.invoke(address, transport, message);
     }
 
-    protected Node invoke(String address, 
+    protected Node invoke(String address,
                           String transport,
                           byte[] message) throws Exception {
         return testUtilities.invoke(address, transport, message);
@@ -104,9 +102,9 @@ public class AbstractCXFTest extends Assert {
 
     /**
      * Assert that the following XPath query selects one or more nodes.
-     * 
+     *
      * @param xpath
-     * @throws Exception 
+     * @throws Exception
      */
     public NodeList assertValid(String xpath, Node node) throws Exception {
         return testUtilities.assertValid(xpath, node);
@@ -114,16 +112,16 @@ public class AbstractCXFTest extends Assert {
 
     /**
      * Assert that the following XPath query selects a boolean value.
-     * 
+     *
      * @param xpath
-     * @throws Exception 
+     * @throws Exception
      */
     public void assertValidBoolean(String xpath, Node node) throws Exception {
         testUtilities.assertValidBoolean(xpath, node);
     }
     /**
      * Assert that the following XPath query selects no nodes.
-     * 
+     *
      * @param xpath
      */
     public NodeList assertInvalid(String xpath, Node node) throws Exception {
@@ -133,7 +131,7 @@ public class AbstractCXFTest extends Assert {
     /**
      * Assert that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
@@ -141,19 +139,19 @@ public class AbstractCXFTest extends Assert {
     public void assertXPathEquals(String xpath, String value, Node node) throws Exception {
         testUtilities.assertXPathEquals(xpath, value, node);
     }
-    
+
 
     /**
      * Assert that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
      */
     public void assertXPathEquals(String xpath, QName value, Node node) throws Exception {
         testUtilities.assertXPathEquals(xpath, value, node);
-    }    
+    }
 
     /**
      * Assert that this node is not a SOAP fault part.
@@ -163,17 +161,17 @@ public class AbstractCXFTest extends Assert {
     public void assertNoFault(Node node) throws Exception {
         testUtilities.assertNoFault(node);
     }
-    
+
     /**
      * Add a namespace that will be used for XPath expressions.
-     * 
+     *
      * @param ns Namespace name.
      * @param uri The namespace uri.
      */
     public void addNamespace(String ns, String uri) {
         testUtilities.addNamespace(ns, uri);
     }
-    
+
     public NamespaceContext getNamespaceContext() {
         return new MapNamespaceContext(testUtilities.getNamespaces());
     }
@@ -201,7 +199,7 @@ public class AbstractCXFTest extends Assert {
     protected Document getWSDLDocument(Server server) throws WSDLException {
         return testUtilities.getWSDLDocument(server);
     }
-    
+
     public static class TestMessageObserver extends TestUtilities.TestMessageObserver {
 
         public TestMessageObserver() {

@@ -35,9 +35,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ClientServiceConfigTest extends AbstractAegisTest {
     EndpointImpl impl;
-    
+
     @Before
     public void before() throws Exception {
         super.setUp();
@@ -70,7 +72,7 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         factory.setDataBinding(new AegisDatabinding());
         factory.setAddress("local://JaxWsEcho");
         Echo client = factory.create(Echo.class);
-        Holder<String> sholder = new Holder<String>();
+        Holder<String> sholder = new Holder<>();
         client.echo("Channa Doll", sholder);
         assertEquals("Channa Doll", sholder.value);
     }

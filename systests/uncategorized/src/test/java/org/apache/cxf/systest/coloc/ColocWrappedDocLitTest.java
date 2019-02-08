@@ -22,6 +22,7 @@ package org.apache.cxf.systest.coloc;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.junit.Test;
 
 
@@ -37,7 +38,7 @@ public class ColocWrappedDocLitTest extends AbstractWrappedDocLitTest {
     protected String getTransportURI() {
         return TRANSPORT_URI;
     }
-    
+
     @Test
     public void testDummy() { }
 }

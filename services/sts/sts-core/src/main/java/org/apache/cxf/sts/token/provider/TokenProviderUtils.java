@@ -21,15 +21,15 @@ package org.apache.cxf.sts.token.provider;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -40,6 +40,7 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -51,13 +52,13 @@ import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurity
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 public final class TokenProviderUtils {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(TokenProviderUtils.class);
-    
+
     private TokenProviderUtils() {
         // complete
     }
-    
+
     /**
      * Extract an address from a Participants EPR DOM element
      */
@@ -65,17 +66,18 @@ public final class TokenProviderUtils {
         if (participants instanceof Element) {
             String localName = ((Element)participants).getLocalName();
             String namespace = ((Element)participants).getNamespaceURI();
-            
+
             if (STSConstants.WSA_NS_05.equals(namespace) && "EndpointReference".equals(localName)) {
                 LOG.fine("Found EndpointReference element");
-                Element address = 
-                    DOMUtils.getFirstChildWithName((Element)participants, 
+                Element address =
+                    DOMUtils.getFirstChildWithName((Element)participants,
                             STSConstants.WSA_NS_05, "Address");
                 if (address != null) {
                     LOG.fine("Found address element");
                     return address.getTextContent();
                 }
-            } else if ((STSConstants.WSP_NS.equals(namespace) || STSConstants.WSP_NS_04.equals(namespace))
+            } else if ((STSConstants.WSP_NS.equals(namespace) || STSConstants.WSP_NS_04.equals(namespace)
+                || STSConstants.WSP_NS_06.equals(namespace))
                 && "URI".equals(localName)) {
                 return ((Element)participants).getTextContent();
             }
@@ -84,7 +86,7 @@ public final class TokenProviderUtils {
         } else if (participants instanceof JAXBElement<?>) {
             JAXBElement<?> jaxbElement = (JAXBElement<?>) participants;
             QName participantsName = jaxbElement.getName();
-            if (STSConstants.WSA_NS_05.equals(participantsName.getNamespaceURI()) 
+            if (STSConstants.WSA_NS_05.equals(participantsName.getNamespaceURI())
                 && "EndpointReference".equals(participantsName.getLocalPart())) {
                 LOG.fine("Found EndpointReference element");
                 EndpointReferenceType endpointReference = (EndpointReferenceType)jaxbElement.getValue();
@@ -95,7 +97,7 @@ public final class TokenProviderUtils {
             }
             LOG.fine("Participants element does not exist or could not be parsed");
         }
-        
+
         return null;
     }
 
@@ -103,12 +105,12 @@ public final class TokenProviderUtils {
      * Encrypt a Token element using the given arguments.
      */
     public static Element encryptToken(
-        Element element, 
-        String id, 
+        Element element,
+        String id,
         STSPropertiesMBean stsProperties,
         EncryptionProperties encryptionProperties,
         KeyRequirements keyRequirements,
-        WebServiceContext context
+        Map<String, Object> messageContext
     ) throws WSSecurityException {
         String name = encryptionProperties.getEncryptionName();
         if (name == null) {
@@ -118,14 +120,14 @@ public final class TokenProviderUtils {
             LOG.fine("No encryption alias is configured");
             return element;
         }
-        
+
         // Get the encryption algorithm to use
         String encryptionAlgorithm = keyRequirements.getEncryptionAlgorithm();
         if (encryptionAlgorithm == null) {
             // If none then default to what is configured
             encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
         } else {
-            List<String> supportedAlgorithms = 
+            List<String> supportedAlgorithms =
                 encryptionProperties.getAcceptedEncryptionAlgorithms();
             if (!supportedAlgorithms.contains(encryptionAlgorithm)) {
                 encryptionAlgorithm = encryptionProperties.getEncryptionAlgorithm();
@@ -140,7 +142,7 @@ public final class TokenProviderUtils {
             // If none then default to what is configured
             keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
         } else {
-            List<String> supportedAlgorithms = 
+            List<String> supportedAlgorithms =
                 encryptionProperties.getAcceptedKeyWrapAlgorithms();
             if (!supportedAlgorithms.contains(keyWrapAlgorithm)) {
                 keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
@@ -149,10 +151,14 @@ public final class TokenProviderUtils {
                 }
             }
         }
-        
-        WSSecEncrypt builder = new WSSecEncrypt();
-        if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(name)) {
-            X509Certificate cert = getReqSigCert(context.getMessageContext());
+
+        Document doc = element.getOwnerDocument();
+        DocumentFragment frag = doc.createDocumentFragment();
+        frag.appendChild(element);
+
+        WSSecEncrypt builder = new WSSecEncrypt(doc);
+        if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(name)) {
+            X509Certificate cert = getReqSigCert(messageContext);
             builder.setUseThisCert(cert);
         } else {
             builder.setUserInfo(name);
@@ -161,43 +167,40 @@ public final class TokenProviderUtils {
         builder.setSymmetricEncAlgorithm(encryptionAlgorithm);
         builder.setKeyEncAlgo(keyWrapAlgorithm);
         builder.setEmbedEncryptedKey(true);
-        
+
         WSEncryptionPart encryptionPart = new WSEncryptionPart(id, "Element");
         encryptionPart.setElement(element);
-        
-        Document doc = element.getOwnerDocument();
-        doc.appendChild(element);
-                                 
-        builder.prepare(element.getOwnerDocument(), stsProperties.getEncryptionCrypto());
+
+        builder.prepare(stsProperties.getEncryptionCrypto());
         builder.encryptForRef(null, Collections.singletonList(encryptionPart));
-        
-        return doc.getDocumentElement();
+
+        return (Element)frag.getFirstChild();
     }
-    
+
     /**
      * Get the X509Certificate associated with the signature that was received. This cert is to be used
      * for encrypting the issued token.
      */
-    public static X509Certificate getReqSigCert(MessageContext context) {
+    public static X509Certificate getReqSigCert(Map<String, Object> messageContext) {
         @SuppressWarnings("unchecked")
-        List<WSHandlerResult> results = 
-            (List<WSHandlerResult>) context.get(WSHandlerConstants.RECV_RESULTS);
+        List<WSHandlerResult> results =
+            (List<WSHandlerResult>) messageContext.get(WSHandlerConstants.RECV_RESULTS);
         // DOM
         X509Certificate cert = WSS4JUtils.getReqSigCert(results);
         if (cert != null) {
             return cert;
         }
-        
+
         // Streaming
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingEventList = 
-            (List<SecurityEvent>) context.get(SecurityEvent.class.getName() + ".in");
+        final List<SecurityEvent> incomingEventList =
+            (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
-                if (WSSecurityEventConstants.SignedPart == incomingEvent.getSecurityEventType()
-                    || WSSecurityEventConstants.SignedElement 
+                if (WSSecurityEventConstants.SIGNED_PART == incomingEvent.getSecurityEventType()
+                    || WSSecurityEventConstants.SignedElement
                         == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                    org.apache.xml.security.stax.securityToken.SecurityToken token =
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
                     try {
                         if (token != null && token.getX509Certificates() != null
@@ -211,7 +214,7 @@ public final class TokenProviderUtils {
                 }
             }
         }
-        
+
         return null;
     }
 }

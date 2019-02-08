@@ -30,17 +30,17 @@ public class WSAddressingFeature extends AbstractFeature {
         NON_ANONYMOUS,
         ANONYMOUS,
     }
-    
+
     public interface WSAddressingFeatureApplier {
         void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus);
     }
-    
+
     boolean allowDuplicates = true;
     boolean usingAddressingAdvisory = true;
     boolean required;
     MessageIdCache cache;
     AddressingResponses responses = AddressingResponses.ALL;
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         bus.getExtension(WSAddressingFeatureApplier.class).initializeProvider(this, provider, bus);
@@ -49,7 +49,7 @@ public class WSAddressingFeature extends AbstractFeature {
     public void setAllowDuplicates(boolean allow) {
         allowDuplicates = allow;
     }
-    
+
     public boolean isAllowDuplicates() {
         return allowDuplicates;
     }
@@ -57,19 +57,19 @@ public class WSAddressingFeature extends AbstractFeature {
     public void setUsingAddressingAdvisory(boolean advisory) {
         usingAddressingAdvisory = advisory;
     }
-    
+
     public boolean isUsingAddressingAdvisory() {
         return usingAddressingAdvisory;
     }
-    
+
 
     public boolean isAddressingRequired() {
         return required;
     }
     public void setAddressingRequired(boolean r) {
-        required = r; 
+        required = r;
     }
-    
+
     /**
      * Returns the cache used to enforce duplicate message IDs when
      * {@link #isAllowDuplicates()} returns {@code false}.
@@ -101,5 +101,5 @@ public class WSAddressingFeature extends AbstractFeature {
     public AddressingResponses getResponses() {
         return responses;
     }
-    
+
 }

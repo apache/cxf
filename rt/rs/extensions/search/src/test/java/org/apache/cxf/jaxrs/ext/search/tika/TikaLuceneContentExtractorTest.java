@@ -42,34 +42,36 @@ import org.apache.lucene.util.Version;
 import org.apache.tika.parser.pdf.PDFParser;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TikaLuceneContentExtractorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class TikaLuceneContentExtractorTest {
     private TikaLuceneContentExtractor extractor;
     private Directory directory;
     private IndexWriter writer;
     private SearchConditionParser< SearchBean > parser;
-    
+
     @Before
     public void setUp() throws Exception {
         final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
         directory = new RAMDirectory();
-        
+
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
-        writer = new IndexWriter(directory, config);    
+        writer = new IndexWriter(directory, config);
         writer.commit();
-        
-        parser = new FiqlParser<SearchBean>(SearchBean.class);
+
+        parser = new FiqlParser<>(SearchBean.class);
         extractor = new TikaLuceneContentExtractor(new PDFParser());
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesSearchCriteria() throws Exception {
         final Document document = extractor.extract(getClass().getResourceAsStream("/files/testPDF.pdf"));
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -84,11 +86,11 @@ public class TikaLuceneContentExtractorTest extends Assert {
     public void testExtractedTextContentMatchesTypesAndDateSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("modified", Date.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
         // testPDF.pdf 'modified' is set to '2007-09-14T09:02:31Z'
@@ -102,16 +104,16 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("modified=gt=2007-09-16T09:02:31", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("modified=lt=2007-09-01T09:02:31", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesTypesAndIntegerSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("xmpTPg:NPages", Integer.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -121,16 +123,16 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesTypesAndByteSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("xmpTPg:NPages", Byte.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -140,16 +142,16 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesTypesAndLongSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("xmpTPg:NPages", Long.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -159,16 +161,16 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("xmpTPg:NPages=gt=1", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("xmpTPg:NPages=lt=1", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesTypesAndDoubleSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("xmpTPg:NPages", Double.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -178,16 +180,16 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("xmpTPg:NPages=gt=1.0", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("xmpTPg:NPages=lt=1.0", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesTypesAndFloatSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata("contents")
             .withField("xmpTPg:NPages", Float.class);
-        
+
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -197,7 +199,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(0, getHits("xmpTPg:NPages=gt=1.0", documentMetadata.getFieldTypes()).length);
         assertEquals(0, getHits("xmpTPg:NPages=lt=1.0", documentMetadata.getFieldTypes()).length);
     }
-    
+
     @Test
     public void testContentSourceMatchesSearchCriteria() throws Exception {
         final LuceneDocumentMetadata documentMetadata = new LuceneDocumentMetadata()
@@ -206,7 +208,7 @@ public class TikaLuceneContentExtractorTest extends Assert {
         final Document document = extractor.extract(
             getClass().getResourceAsStream("/files/testPDF.pdf"), documentMetadata);
         assertNotNull("Document should not be null", document);
-        
+
         writer.addDocument(document);
         writer.commit();
 
@@ -214,32 +216,32 @@ public class TikaLuceneContentExtractorTest extends Assert {
         assertEquals(1, getHits("source==testPDF.pdf").length);
         assertEquals(0, getHits("source==testPDF").length);
     }
-    
+
     private ScoreDoc[] getHits(final String expression) throws IOException {
         return getHits(expression, new HashMap<String, Class<?>>());
     }
-    
+
     private ScoreDoc[] getHits(final String expression, final Map< String, Class<?> > fieldTypes) throws IOException {
         IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);        
+        IndexSearcher searcher = new IndexSearcher(reader);
 
         try {
-            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+            LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
             visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(parser.parse(expression));
-    
+
             ScoreDoc[] hits = searcher.search(visitor.getQuery(), null, 1000).scoreDocs;
             assertNotNull(hits);
-            
-            return hits;            
+
+            return hits;
         } finally {
             reader.close();
         }
     }
-    
+
     @After
     public void tearDown() throws Exception {
-        writer.close();        
+        writer.close();
         directory.close();
     }
 }

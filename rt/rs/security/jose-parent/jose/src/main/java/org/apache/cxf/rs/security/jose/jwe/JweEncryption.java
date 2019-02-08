@@ -24,6 +24,6 @@ public class JweEncryption extends AbstractJweEncryption {
                          ContentEncryptionProvider contentEncryptionAlgo) {
         super(contentEncryptionAlgo, keyEncryptionAlgorithm);
     }
-    
-    
+
+
 }

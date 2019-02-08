@@ -68,7 +68,7 @@ public class FileWriterUtil {
         }
         return new OutputStreamWriter(new BufferedOutputStream(osc.createOutputStream(fn)), encoding);
     }
-    
+
     public Writer getWriter(String packageName, String fileName) throws IOException {
         return getWriter(getFileToWrite(packageName, fileName));
     }

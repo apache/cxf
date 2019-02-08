@@ -37,15 +37,20 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ManagedClientServerTest.class);
     public static final String JMX_PORT = allocatePort(ManagedClientServerTest.class, 1);
-    
-    
+
+
     private final QName portName =
         new QName("http://apache.org/hello_world_soap_http",
                   "SoapPort");
@@ -120,9 +125,9 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
         reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);
         assertEquals(response, reply);
-        
+
         mbs.invoke(name, "destroy", new Object[0], new String[0]);
-        
+
         try {
             mbs.getMBeanInfo(name);
             fail("destroy failed to unregister MBean.");

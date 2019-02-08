@@ -40,9 +40,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.Resource;
 
 public class SpringBusFactory extends BusFactory {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SpringBusFactory.class);
-    
+
     private final ApplicationContext context;
     private NamespaceHandlerResolver resolver;
 
@@ -58,7 +58,7 @@ public class SpringBusFactory extends BusFactory {
         context = null;
         this.resolver = r;
     }
-    
+
     private static NamespaceHandlerResolver tryFindNamespaceHandler(ApplicationContext ctx) {
         try {
             SpringBeanLocator sbl = new SpringBeanLocator(ctx);
@@ -66,8 +66,8 @@ public class SpringBusFactory extends BusFactory {
             if (r != null && !r.isEmpty()) {
                 return r.get(0);
             }
-        } catch (Throwable t) {
-            //ignore
+        } catch (Exception t) {
+            LOG.log(Level.FINEST, "Could not find NamespaceHandlerResolver",  t);
         }
         return null;
     }
@@ -78,11 +78,11 @@ public class SpringBusFactory extends BusFactory {
     public void setNamespaceHandlerResolver(NamespaceHandlerResolver r) {
         resolver = r;
     }
-        
+
     public Bus createBus() {
         return createBus((String)null);
     }
-    
+
     private boolean defaultBusNotExists() {
         if (null != context) {
             return !context.containsBean(Bus.DEFAULT_BUS_ID);
@@ -93,11 +93,11 @@ public class SpringBusFactory extends BusFactory {
     public Bus createBus(String cfgFile) {
         return createBus(cfgFile, defaultBusNotExists());
     }
-    
-    public Bus createBus(String cfgFiles[]) {
+
+    public Bus createBus(String[] cfgFiles) {
         return createBus(cfgFiles, defaultBusNotExists());
     }
-        
+
     protected Bus finishCreatingBus(ConfigurableApplicationContext bac) {
         final Bus bus = (Bus)bac.getBean(Bus.DEFAULT_BUS_ID);
 
@@ -106,29 +106,29 @@ public class SpringBusFactory extends BusFactory {
             bus.setExtension((BusApplicationContext)bac, BusApplicationContext.class);
         }
         possiblySetDefaultBus(bus);
-        
-        initializeBus(bus);        
-        
+
+        initializeBus(bus);
+
         registerApplicationContextLifeCycleListener(bus, bac);
-        
+
         if (bus instanceof SpringBus && defaultBusNotExists()) {
             ((SpringBus)bus).setCloseContext(true);
         }
         return bus;
     }
-    
+
     public Bus createBus(String cfgFile, boolean includeDefaults) {
         if (cfgFile == null) {
             return createBus((String[])null, includeDefaults);
         }
         return createBus(new String[] {cfgFile}, includeDefaults);
-    }    
-    
-    public Bus createBus(String cfgFiles[], boolean includeDefaults) {
+    }
+
+    public Bus createBus(String[] cfgFiles, boolean includeDefaults) {
         try {
-            String userCfgFile 
+            String userCfgFile
                 = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_NAME);
-            String sysCfgFileUrl 
+            String sysCfgFileUrl
                 = SystemPropertyAction.getPropertyOrNull(Configurer.USER_CFG_FILE_PROPERTY_URL);
             final Resource r = BusApplicationContext.findResource(Configurer.DEFAULT_USER_CFG_FILE);
 
@@ -141,7 +141,7 @@ public class SpringBusFactory extends BusFactory {
                         }
                     });
             }
-            if (context == null && userCfgFile == null && cfgFiles == null && sysCfgFileUrl == null 
+            if (context == null && userCfgFile == null && cfgFiles == null && sysCfgFileUrl == null
                 && (r == null || !exists) && includeDefaults) {
                 return new org.apache.cxf.bus.CXFBusFactory().createBus();
             }
@@ -151,9 +151,9 @@ public class SpringBusFactory extends BusFactory {
             throw new RuntimeException(ex);
         }
     }
-    
-    protected ConfigurableApplicationContext createApplicationContext(String cfgFiles[], boolean includeDefaults) {
-        try {      
+
+    protected ConfigurableApplicationContext createApplicationContext(String[] cfgFiles, boolean includeDefaults) {
+        try {
             return new BusApplicationContext(cfgFiles, includeDefaults, context, resolver);
         } catch (BeansException ex) {
             LogUtils.log(LOG, Level.WARNING, "INITIAL_APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);
@@ -162,39 +162,38 @@ public class SpringBusFactory extends BusFactory {
                 Thread.currentThread().setContextClassLoader(
                     BusApplicationContext.class.getClassLoader());
                 try {
-                    return new BusApplicationContext(cfgFiles, includeDefaults, context);        
+                    return new BusApplicationContext(cfgFiles, includeDefaults, context);
                 } finally {
                     Thread.currentThread().setContextClassLoader(contextLoader);
                 }
-            } else {
-                throw ex;
             }
+            throw ex;
         }
     }
-    
+
     public Bus createBus(URL url) {
         return createBus(url, defaultBusNotExists());
     }
     public Bus createBus(URL[] urls) {
         return createBus(urls, defaultBusNotExists());
     }
-    
+
     public Bus createBus(URL url, boolean includeDefaults) {
         if (url == null) {
             return createBus((URL[])null, includeDefaults);
         }
         return createBus(new URL[] {url}, includeDefaults);
     }
-    
+
     public Bus createBus(URL[] urls, boolean includeDefaults) {
-        try {      
+        try {
             return finishCreatingBus(createAppContext(urls, includeDefaults));
         } catch (BeansException ex) {
             LogUtils.log(LOG, Level.WARNING, "APP_CONTEXT_CREATION_FAILED_MSG", ex, (Object[])null);
             throw new RuntimeException(ex);
         }
     }
-    
+
     protected ConfigurableApplicationContext createAppContext(URL[] urls, boolean includeDefaults) {
         return new BusApplicationContext(urls, includeDefaults, context, resolver);
     }
@@ -204,7 +203,7 @@ public class SpringBusFactory extends BusFactory {
         if (null != lm) {
             lm.registerLifeCycleListener(new BusApplicationContextLifeCycleListener(bac));
         }
-    } 
+    }
 
     static class BusApplicationContextLifeCycleListener implements BusLifeCycleListener {
         private ConfigurableApplicationContext bac;
@@ -222,6 +221,6 @@ public class SpringBusFactory extends BusFactory {
         public void postShutdown() {
             bac.close();
         }
-        
+
     }
 }

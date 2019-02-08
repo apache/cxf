@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -41,7 +42,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUt
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.WrapperElement;
 
 public class WrapperStyleNameCollisionValidator extends ServiceValidator {
-    public static final Logger LOG = LogUtils.getL7dLogger(WrapperStyleNameCollisionValidator.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(WrapperStyleNameCollisionValidator.class);
 
     public WrapperStyleNameCollisionValidator() {
     }
@@ -80,12 +81,12 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         return false;
     }
     private boolean checkBare(ToolContext context, String opName) {
-        String o[] = context.getArray(ToolConstants.CFG_BAREMETHODS);
+        String[] o = context.getArray(ToolConstants.CFG_BAREMETHODS);
         return checkArray(o, opName);
     }
     private boolean isValidOperation(OperationInfo operation) {
         ToolContext context = service.getProperty(ToolContext.class.getName(), ToolContext.class);
-        
+
         boolean c = context.optionSet(ToolConstants.CFG_AUTORESOLVE);
 
         boolean valid = false;
@@ -96,7 +97,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
         String operationName = operation.getName().getLocalPart();
         operationName = ProcessorUtil.mangleNameToVariableName(operationName);
 
-        
+
         JAXWSBinding binding = operation.getExtensor(JAXWSBinding.class);
         if (binding != null) {
             if (!binding.isEnableWrapperStyle()) {
@@ -122,9 +123,9 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                 operationName = binding.getMethodName();
             }
         }
-        
+
         valid |= checkBare(context, operationName);
-        
+
         if (valid) {
             return true;
         }
@@ -141,11 +142,11 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             output = operation.getOutput().getFirstMessagePart();
         }
         if (!c) {
-            Map<String, QName> names = new HashMap<String, QName>();
+            Map<String, QName> names = new HashMap<>();
             if (input != null) {
-                for (WrapperElement element : ProcessorUtil.getWrappedElement(context, 
+                for (WrapperElement element : ProcessorUtil.getWrappedElement(context,
                                                                               input.getElementQName())) {
-                    
+
                     String mappedName = mapElementName(operation,
                                                       operation.getUnwrappedOperation().getInput(),
                                                       element);
@@ -154,12 +155,11 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                             || names.get(mappedName).equals(element.getSchemaTypeName()))) {
                         handleErrors(names.get(mappedName), element);
                         return false;
-                    } else {
-                        names.put(mappedName, element.getSchemaTypeName());
                     }
+                    names.put(mappedName, element.getSchemaTypeName());
                 }
             }
-    
+
             if (output != null) {
                 List<WrapperElement> els = ProcessorUtil.getWrappedElement(context, output.getElementQName());
                 if (els.size() > 1) {
@@ -167,14 +167,15 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                         String mappedName = mapElementName(operation,
                                                            operation.getUnwrappedOperation().getOutput(),
                                                            element);
+                        
+                        QName mn = names.get(mappedName);
                         if (names.containsKey(mappedName)
-                            &&  !(names.get(mappedName) == element.getSchemaTypeName()
-                                || names.get(mappedName).equals(element.getSchemaTypeName()))) {
+                            &&  !(mn == element.getSchemaTypeName()
+                                || (mn != null && mn.equals(element.getSchemaTypeName())))) {
                             handleErrors(names.get(mappedName), element);
                             return false;
-                        } else {
-                            names.put(mappedName, element.getSchemaTypeName());
                         }
+                        names.put(mappedName, element.getSchemaTypeName());
                     }
                 }
             }
@@ -197,7 +198,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
     }
 
     private void handleErrors(QName e1, WrapperElement e2) {
-        Message msg = new Message("WRAPPER_STYLE_NAME_COLLISION", LOG, 
+        Message msg = new Message("WRAPPER_STYLE_NAME_COLLISION", LOG,
                                   e2.getElementName(), e1, e2.getSchemaTypeName());
         addErrorMessage(msg.toString());
     }

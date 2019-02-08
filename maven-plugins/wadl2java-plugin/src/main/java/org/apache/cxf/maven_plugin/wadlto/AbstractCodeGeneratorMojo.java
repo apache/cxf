@@ -32,9 +32,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.maven_plugin.common.DocumentArtifact;
 import org.apache.cxf.maven_plugin.common.ForkOnceCodeGenerator;
@@ -99,8 +100,8 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     @Parameter(property = "cxf.useCompileClasspath", defaultValue = "false")
     boolean useCompileClasspath;
-    
-    
+
+
     /**
      * Disables the scanning of the wadlRoot/testWadlRoot directories configured above.
      * By default, we scan for *.wadl (see include/exclude params as well) in the wadlRoot
@@ -122,13 +123,13 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      * *.wadl
      */
     @Parameter
-    String includes[];
+    String[] includes;
 
     /**
      * A list of wadl files to exclude. Can contain ant-style wildcards and double wildcards.
      */
     @Parameter
-    String excludes[];
+    String[] excludes;
 
     /**
      * Allows running the JavaToWs in a separate process.
@@ -138,6 +139,12 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     String fork;
     
+    /**
+     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
+     */
+    @Parameter
+    String additionalJvmArgs;
+
     /**
      * The Maven session.
      */
@@ -149,7 +156,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
      */
     @Parameter(readonly = true, required = true, property = "plugin.artifacts")
     private List<Artifact> pluginArtifacts;
-    
+
 
     /**
      * Sets the Java executable to use when fork parameter is <code>true</code>.
@@ -157,22 +164,17 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
     @Parameter(defaultValue = "${java.home}/bin/java")
     private String javaExecutable;
 
-    /**
-     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
-     */
-    @Parameter
-    private String additionalJvmArgs;
     
     @Component
     private RepositorySystem repositorySystem;
-    
-    
+
+
     private ClassLoader resourceClassLoader;
 
-    
+
     private Artifact resolveRemoteWadlArtifact(Artifact artifact)
         throws MojoExecutionException {
-        
+
         /**
          * First try to find the artifact in the reactor projects of the maven session.
          * So an artifact that is not yet built can be resolved
@@ -180,7 +182,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         List<MavenProject> rProjects = mavenSession.getProjects();
         for (MavenProject rProject : rProjects) {
             if (artifact.getGroupId().equals(rProject.getGroupId())
-                && artifact.getArtifactId().equals(rProject.getArtifactId()) 
+                && artifact.getArtifactId().equals(rProject.getArtifactId())
                 && artifact.getVersion().equals(rProject.getVersion())) {
                 Set<Artifact> artifacts = rProject.getArtifacts();
                 for (Artifact pArtifact : artifacts) {
@@ -190,7 +192,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                 }
             }
         }
-        
+
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact(artifact);
         request.setResolveRoot(true).setResolveTransitively(false);
@@ -198,14 +200,17 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         request.setMirrors(mavenSession.getRequest().getMirrors());
         request.setProxies(mavenSession.getRequest().getProxies());
         request.setLocalRepository(mavenSession.getLocalRepository());
-        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());            
+        request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());
         ArtifactResolutionResult result = repositorySystem.resolve(request);
-            
-        return result.getOriginatingArtifact();
+        Artifact resolvedArtifact = result.getOriginatingArtifact();
+        if (resolvedArtifact == null && !CollectionUtils.isEmpty(result.getArtifacts())) {
+            resolvedArtifact = result.getArtifacts().iterator().next();
+        }
+        return resolvedArtifact;
     }
 
     protected void downloadRemoteDocs(List<WadlOption> effectiveOptions) throws MojoExecutionException {
-        
+
         for (WadlOption option : effectiveOptions) {
             DocumentArtifact wadlA = option.getWadlArtifact();
             if (wadlA == null) {
@@ -213,7 +218,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             }
             Artifact wadlArtifact = repositorySystem.createArtifact(wadlA.getGroupId(),
                                                                     wadlA.getArtifactId(),
-                                                                    wadlA.getVersion(), 
+                                                                    wadlA.getVersion(),
                                                                     wadlA.getType());
 
             wadlArtifact = resolveRemoteWadlArtifact(wadlArtifact);
@@ -225,12 +230,12 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         }
     }
 
-    
-    
+
+
     private void addPluginArtifact(Set<URI> artifactsPath) {
         //for Maven 2.x, the actual artifact isn't in the list....  need to try and find it
         URL url = getClass().getResource(getClass().getSimpleName() + ".class");
-        
+
         try {
             if ("jar".equals(url.getProtocol())) {
                 String s = url.getPath();
@@ -255,24 +260,24 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     }
 
-    protected void forkOnce(Set<URI> classPath, List<WadlOption> effectiveOptions) 
+    protected void forkOnce(Set<URI> classPath, List<WadlOption> effectiveOptions)
         throws MojoExecutionException {
-        List<WadlOption> toDo = new LinkedList<WadlOption>();
-        List<List<String>> wargs = new LinkedList<List<String>>();
+        List<WadlOption> toDo = new LinkedList<>();
+        List<List<String>> wargs = new LinkedList<>();
         for (WadlOption option : effectiveOptions) {
             File outputDirFile = option.getOutputDir();
             outputDirFile.mkdirs();
             URI basedir = project.getBasedir().toURI();
             for (URI wadlURI : option.getWadlURIs(basedir, getResourceLoader())) {
                 File doneFile = getDoneFile(basedir, wadlURI);
-    
+
                 if (!shouldRun(option, doneFile, wadlURI)) {
                     continue;
                 }
                 doneFile.delete();
-                
+
                 toDo.add(option);
-                
+
                 wargs.add(option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
                                                                    .isDebugEnabled()));
             }
@@ -280,8 +285,8 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         if (wargs.isEmpty()) {
             return;
         }
-        
-        Set<URI> artifactsPath = new LinkedHashSet<URI>();
+
+        Set<URI> artifactsPath = new LinkedHashSet<>();
         for (Artifact a : pluginArtifacts) {
             File file = a.getFile();
             if (file == null) {
@@ -293,12 +298,12 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         }
         addPluginArtifact(artifactsPath);
         artifactsPath.addAll(classPath);
-        
-        String args[] = createForkOnceArgs(wargs);
+
+        String[] args = createForkOnceArgs(wargs);
         runForked(artifactsPath, ForkOnceCodeGenerator.class, args);
-        
+
         for (WadlOption option : toDo) {
-            File dirs[] = option.getDeleteDirs();
+            File[] dirs = option.getDeleteDirs();
             if (dirs != null) {
                 for (int idx = 0; idx < dirs.length; ++idx) {
                     deleteDir(dirs[idx]);
@@ -363,29 +368,29 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         }
         return resourceClassLoader;
     }
-    
-    protected Bus callCodeGenerator(WadlOption option, 
+
+    protected Bus callCodeGenerator(WadlOption option,
                               Bus bus,
                               Set<URI> classPath) throws MojoExecutionException {
         File outputDirFile = option.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
-        
+
         for (URI wadlURI : option.getWadlURIs(basedir, getResourceLoader())) {
             File doneFile = getDoneFile(basedir, wadlURI);
-    
+
             if (!shouldRun(option, doneFile, wadlURI)) {
                 return bus;
             }
             doneFile.delete();
-    
+
             List<String> list = option.generateCommandLine(outputDirFile, basedir, wadlURI, getLog()
                                                                .isDebugEnabled());
-            String[] args = list.toArray(new String[list.size()]);
+            String[] args = list.toArray(new String[0]);
             getLog().debug("Calling wadl2java with args: " + Arrays.toString(args));
-            
+
             if (!"false".equals(fork)) {
-                Set<URI> artifactsPath = new LinkedHashSet<URI>();
+                Set<URI> artifactsPath = new LinkedHashSet<>();
                 for (Artifact a : pluginArtifacts) {
                     File file = a.getFile();
                     if (file == null) {
@@ -397,9 +402,9 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                 }
                 addPluginArtifact(artifactsPath);
                 artifactsPath.addAll(classPath);
-                
+
                 runForked(artifactsPath, WADLToJava.class, args);
-    
+
             } else {
                 if (bus == null) {
                     bus = BusFactory.newInstance().createBus();
@@ -410,10 +415,10 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
                 } catch (Throwable e) {
                     getLog().debug(e);
                     throw new MojoExecutionException(e.getMessage(), e);
-                }  
+                }
             }
-            
-    
+
+
             try {
                 doneFile.createNewFile();
             } catch (Throwable e) {
@@ -449,15 +454,15 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         }
 
         cmd.createArg().setLine(additionalJvmArgs);
-        
+
         File file = null;
         try {
-            //file = new File("/tmp/test.jar"); 
+            //file = new File("/tmp/test.jar");
             file = FileUtils.createTempFile("cxf-codegen", ".jar");
 
             JarArchiver jar = new JarArchiver();
             jar.setDestFile(file.getAbsoluteFile());
-            
+
             Manifest manifest = new Manifest();
             Attribute attr = new Attribute();
             attr.setName("Class-Path");
@@ -467,7 +472,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
             }
             attr.setValue(b.toString());
             manifest.getMainSection().addConfiguredAttribute(attr);
-            
+
             attr = new Attribute();
             attr.setName("Main-Class");
             attr.setValue(cls.getName());
@@ -475,16 +480,16 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
             jar.addConfiguredManifest(manifest);
             jar.createArchive();
-            
+
             cmd.createArg().setValue("-jar");
             cmd.createArg().setValue(file.getAbsolutePath());
 
-            
+
         } catch (Exception e1) {
             throw new MojoExecutionException("Could not create runtime jar", e1);
         }
         cmd.addArguments(args);
-        
+
 
         CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
         CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
@@ -532,7 +537,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     private File getDoneFile(URI basedir, URI wadlURI) {
         String doneFileName = wadlURI.toString();
-        
+
         // Strip the basedir from the doneFileName
         if (doneFileName.startsWith(basedir.toString())) {
             doneFileName = doneFileName.substring(basedir.toString().length());
@@ -548,7 +553,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     /**
      * Determine if code should be generated from the given wadl
-     * 
+     *
      * @param wadlOption
      * @param doneFile
      * @param wadlURI
@@ -571,7 +576,7 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
         } else {
-            File files[] = wadlOption.getDependencies();
+            File[] files = wadlOption.getDependencies();
             if (files != null) {
                 for (int z = 0; z < files.length; ++z) {
                     if (files[z].lastModified() > doneFile.lastModified()) {
@@ -585,15 +590,17 @@ public abstract class AbstractCodeGeneratorMojo extends AbstractMojo {
 
     /**
      * Recursively delete the given directory
-     * 
+     *
      * @param f
      * @return
      */
     protected boolean deleteDir(File f) {
         if (f.isDirectory()) {
-            File files[] = f.listFiles();
-            for (int idx = 0; idx < files.length; ++idx) {
-                deleteDir(files[idx]);
+            File[] files = f.listFiles();
+            if (files != null) {
+                for (int idx = 0; idx < files.length; ++idx) {
+                    deleteDir(files[idx]);
+                }
             }
         }
 

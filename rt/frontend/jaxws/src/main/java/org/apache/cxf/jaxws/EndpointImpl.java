@@ -78,10 +78,10 @@ import org.apache.cxf.transport.http_jaxws_spi.JAXWSHttpSpiTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
-public class EndpointImpl extends javax.xml.ws.Endpoint 
+public class EndpointImpl extends javax.xml.ws.Endpoint
     implements InterceptorProvider, Configurable, AutoCloseable {
     /**
-     * This property controls whether the 'publishEndpoint' permission is checked 
+     * This property controls whether the 'publishEndpoint' permission is checked
      * using only the AccessController (i.e. when SecurityManager is not installed).
      * By default this check is not done as the system property is not set.
      */
@@ -90,11 +90,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     public static final String CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER =
         "org.apache.cxf.jaxws.checkPublishEndpointPermissionWithSecurityManager";
-    
+
     private static final WebServicePermission PUBLISH_PERMISSION =
         new WebServicePermission("publishEndpoint");
     private static final Logger LOG = LogUtils.getL7dLogger(EndpointImpl.class);
-    
+
     private Bus bus;
     private Object implementor;
     private Server server;
@@ -112,21 +112,21 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private QName endpointName;
     private QName serviceName;
     private Class<?> implementorClass;
-    
+
     private List<String> schemaLocations;
     private List<Feature> features;
-    private List<Interceptor<? extends Message>> in 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> out 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outFault  
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> in
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> out
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> outFault
+        = new ModCountCopyOnWriteArrayList<>();
     private List<Interceptor<? extends Message>> inFault
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+        = new ModCountCopyOnWriteArrayList<>();
     @SuppressWarnings("rawtypes")
-    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
+    private List<Handler> handlers = new ModCountCopyOnWriteArrayList<>();
     private EndpointContext endpointContext;
-    
+
     /**
      * Flag indicating internal state of this instance.  If true,
      * the instance can have {@link #publish(String, Object)} called
@@ -137,16 +137,16 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Object implementor) {
         this(BusFactory.getThreadDefaultBus(), implementor);
     }
-   
-    public EndpointImpl(Bus b, Object implementor, 
+
+    public EndpointImpl(Bus b, Object implementor,
                         JaxWsServerFactoryBean sf) {
         this.bus = b;
         this.serverFactory = sf;
         this.implementor = implementor;
     }
-    
+
     /**
-     * 
+     *
      * @param b
      * @param i The implementor object.
      * @param bindingUri The URI of the Binding being used. Optional.
@@ -156,7 +156,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl) {
         this(b, i, bindingUri, wsdl, null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature f[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature[] f) {
         bus = b;
         implementor = i;
         this.bindingUri = bindingUri;
@@ -166,25 +166,25 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             ((JaxWsServiceFactoryBean)serverFactory.getServiceFactory()).setWsFeatures(Arrays.asList(f));
         }
     }
-        
+
     public EndpointImpl(Bus b, Object i, String bindingUri) {
         this(b, i, bindingUri, (String)null);
     }
-    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature features[]) {
+    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature[] features) {
         this(b, i, bindingUri, (String)null, features);
     }
-   
+
     public EndpointImpl(Bus bus, Object implementor) {
         this(bus, implementor, (String) null);
     }
-    
+
     public void setBus(Bus b) {
         bus = b;
     }
     public Bus getBus() {
         return bus;
     }
-    
+
     public Binding getBinding() {
         return ((JaxWsEndpointImpl) getEndpoint()).getJaxwsBinding();
     }
@@ -200,12 +200,12 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public Service getService() {
         return service;
     }
-    
+
     public JaxWsServiceFactoryBean getServiceFactory() {
         return serviceFactory;
     }
 
-    
+
     @Override
     public Object getImplementor() {
         return implementor;
@@ -229,7 +229,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             return server.getEndpoint();
         }
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         return properties;
     }
@@ -258,7 +258,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setServiceFactory(JaxWsServiceFactoryBean sf) {
         serviceFactory = sf;
     }
-    
+
     public void setMetadata(List<Source> metadata) {
         checkPublishable();
         this.metadata = metadata;
@@ -267,7 +267,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     @Override
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
-        
+
         if (server != null) {
             server.getEndpoint().putAll(properties);
         }
@@ -279,8 +279,8 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             server.destroy();
             server = null;
         }
-    }    
-   
+    }
+
     public String getBeanName() {
         return endpointName.toString() + ".jaxws-endpoint";
     }
@@ -288,11 +288,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public JaxWsServerFactoryBean getServerFactory() {
         return serverFactory;
     }
-    
+
     protected void setServerFactory(JaxWsServerFactoryBean bean) {
         this.serverFactory = bean;
     }
-    
+
     protected void checkProperties() {
         if (properties != null) {
             if (properties.containsKey("javax.xml.ws.wsdl.description")) {
@@ -306,7 +306,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             }
         }
     }
-    
+
     /**
      * Performs the publication action by setting up a {@link Server}
      * instance based on this endpoint's configuration.
@@ -316,7 +316,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
      * @throws IllegalStateException if the endpoint cannot be published/republished
      * @throws SecurityException if permission checking is enabled and policy forbids publishing
      * @throws WebServiceException if there is an error publishing the endpoint
-     * 
+     *
      * @see #checkPublishPermission()
      * @see #checkPublishable()
      * @see #getServer(String)
@@ -324,9 +324,9 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     protected void doPublish(String addr) {
         checkPublishPermission();
         checkPublishable();
-        
+
         ServerImpl serv = null;
-        
+
         ClassLoaderHolder loader = null;
         try {
             if (bus != null) {
@@ -336,7 +336,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 }
             }
             serv = getServer(addr);
-            if (addr != null) {            
+            if (addr != null) {
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
                 if (endpointInfo.getAddress() == null || !endpointInfo.getAddress().contains(addr)) {
                     endpointInfo.setAddress(addr);
@@ -371,7 +371,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             } catch (Exception e) {
                 // Nothing we can do.
             }
-            
+
             throw new WebServiceException(ex);
         } finally {
             if (loader != null) {
@@ -379,11 +379,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             }
         }
     }
-    
+
     public ServerImpl getServer() {
         return getServer(null);
     }
-    
+
     public synchronized ServerImpl getServer(String addr) {
         if (server == null) {
             checkProperties();
@@ -396,25 +396,25 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                         loader = ClassLoaderUtils.setThreadContextClassloader(newLoader);
                     }
                 }
-    
+
                 // Initialize the endpointName so we can do configureObject
                 QName origEpn = endpointName;
                 if (endpointName == null) {
                     JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(getImplementorClass());
                     endpointName = implInfo.getEndpointName();
                 }
-                
+
                 if (serviceFactory != null) {
                     serverFactory.setServiceFactory(serviceFactory);
                 }
-    
+
                 /*if (serviceName != null) {
                     serverFactory.getServiceFactory().setServiceName(serviceName);
                 }*/
-    
+
                 configureObject(this);
                 endpointName = origEpn;
-                
+
                 // Set up the server factory
                 serverFactory.setAddress(addr);
                 serverFactory.setStart(false);
@@ -429,36 +429,36 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 } else {
                     serverFactory.setProperties(properties);
                 }
-                
+
                 // Be careful not to override any serverfactory settings as a user might
                 // have supplied their own.
                 if (getWsdlLocation() != null) {
                     serverFactory.setWsdlURL(getWsdlLocation());
                 }
-                
+
                 if (bindingUri != null) {
                     serverFactory.setBindingId(bindingUri);
                 }
-    
+
                 if (serviceName != null) {
                     serverFactory.getServiceFactory().setServiceName(serviceName);
                 }
-                
+
                 if (implementorClass != null) {
                     serverFactory.setServiceClass(implementorClass);
                 }
-                
+
                 if (executor != null) {
                     serverFactory.getServiceFactory().setExecutor(executor);
                 }
-                if (handlers.size() > 0) {
+                if (!handlers.isEmpty()) {
                     serverFactory.addHandlers(handlers);
                 }
-    
+
                 configureObject(serverFactory);
-                
+
                 server = serverFactory.create();
-                
+
                 org.apache.cxf.endpoint.Endpoint endpoint = getEndpoint();
                 if (in != null) {
                     endpoint.getInInterceptors().addAll(in);
@@ -472,20 +472,20 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 if (outFault != null) {
                     endpoint.getOutFaultInterceptors().addAll(outFault);
                 }
-                
+
                 if (properties != null) {
                     endpoint.putAll(properties);
                 }
-                
+
                 configureObject(endpoint.getService());
                 configureObject(endpoint);
                 this.service = endpoint.getService();
-                
+
                 if (getWsdlLocation() == null) {
                     //hold onto the wsdl location so cache won't clear till we go away
                     setWsdlLocation(serverFactory.getWsdlURL());
                 }
-                
+
                 if (serviceName == null) {
                     setServiceName(serverFactory.getServiceFactory().getServiceQName());
                 }
@@ -500,24 +500,24 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         }
         return (ServerImpl) server;
     }
-    
+
     org.apache.cxf.endpoint.Endpoint getEndpoint() {
         return getServer(null).getEndpoint();
     }
-    
+
     private void configureObject(Object instance) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
             configurer.configureBean(instance);
         }
     }
-    
+
     protected void checkPublishPermission() {
         SecurityManager sm = System.getSecurityManager();
         boolean checkPublishEndpointPermissionWithSecurityManager
-            = Boolean.valueOf(
+            = Boolean.parseBoolean(
                       SystemPropertyAction.getProperty(
-                                         CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER, 
+                                         CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY_WITH_SECURITY_MANAGER,
                                          "true"));
         if (checkPublishEndpointPermissionWithSecurityManager && sm != null) {
             sm.checkPermission(PUBLISH_PERMISSION);
@@ -525,7 +525,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             AccessController.checkPermission(PUBLISH_PERMISSION);
         }
     }
-    
+
     /**
      * Checks the value of {@link #publishable} and throws
      * an {@link IllegalStateException} if the value is {@code false}.
@@ -542,7 +542,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void publish() {
         publish(getAddress());
     }
-    
+
     public String getAddress() {
         return address;
     }
@@ -550,7 +550,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setAddress(String address) {
         this.address = address;
     }
-    
+
     /**
     * The published endpoint url is used for excplicitely specifying the url of the
     * endpoint that would show up the generated wsdl definition, when the service is
@@ -560,7 +560,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public String getPublishedEndpointUrl() {
         return publishedEndpointUrl;
     }
-    
+
     public void setPublishedEndpointUrl(String publishedEndpointUrl) {
         this.publishedEndpointUrl = publishedEndpointUrl;
     }
@@ -596,15 +596,15 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setBindingUri(String binding) {
         this.bindingUri = binding;
     }
-    
+
     public String getBindingUri() {
         return this.bindingUri;
     }
-    
+
     public void setDataBinding(DataBinding dataBinding) {
         serverFactory.setDataBinding(dataBinding);
     }
-    
+
     public DataBinding getDataBinding() {
         return serverFactory.getDataBinding();
     }
@@ -636,7 +636,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         }
         return new DoubleAddInterceptorList(out, server.getEndpoint().getOutInterceptors());
     }
-    
+
     class DoubleAddInterceptorList implements List<Interceptor<? extends Message>> {
         List<Interceptor<? extends Message>> orig;
         List<Interceptor<? extends Message>> other;
@@ -755,7 +755,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         return features;
     }
@@ -775,19 +775,19 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setImplementorClass(Class<?> implementorClass) {
         this.implementorClass = implementorClass;
     }
-    
-    public void setTransportId(String transportId) {        
+
+    public void setTransportId(String transportId) {
         serverFactory.setTransportId(transportId);
     }
-    
+
     public String getTransportId() {
         return serverFactory.getTransportId();
     }
-    
+
     public void setBindingConfig(BindingConfiguration config) {
         serverFactory.setBindingConfig(config);
     }
-    
+
     public BindingConfiguration getBindingConfig() {
         return serverFactory.getBindingConfig();
     }
@@ -799,19 +799,19 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public void setSchemaLocations(List<String> schemaLocations) {
         this.schemaLocations = schemaLocations;
     }
-    
+
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         if (!isPublished()) {
             throw new WebServiceException(new org.apache.cxf.common.i18n.Message("ENDPOINT_NOT_PUBLISHED",
                                                                                  LOG).toString());
         }
 
-        if (getBinding() instanceof HTTPBinding) {        
+        if (getBinding() instanceof HTTPBinding) {
             throw new UnsupportedOperationException(new org.apache.cxf.common.i18n.Message(
                                                         "GET_ENDPOINTREFERENCE_UNSUPPORTED_BINDING",
                                                         LOG).toString());
-        }        
-        
+        }
+
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
         builder.address(address);
         builder.serviceName(serviceName);
@@ -821,8 +821,8 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 builder.referenceParameter(referenceParameter);
             }
         }
-        builder.wsdlDocumentLocation(wsdlLocation);        
-        
+        builder.wsdlDocumentLocation(wsdlLocation);
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
@@ -836,13 +836,12 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                                                                 Element... referenceParameters) {
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
-        } else {
-            throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
-                "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
-                .getName()).toString());
         }
+        throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
+            "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
+            .getName()).toString());
     }
-    
+
     public void setEndpointContext(EndpointContext ctxt) {
         endpointContext = ctxt;
     }
@@ -860,6 +859,6 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     @Override
     public void close() throws Exception {
         stop();
-    }    
+    }
 
 }

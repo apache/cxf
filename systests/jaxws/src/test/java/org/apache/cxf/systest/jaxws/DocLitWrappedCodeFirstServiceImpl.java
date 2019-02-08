@@ -44,19 +44,19 @@ import org.apache.cxf.systest.jaxws.types.BarImpl;
 @GZIP(threshold = 10)
 @FastInfoset(force = true)
 public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirstService {
-    public static final String DATA[] = new String[] {"string1", "string2", "string3"};
-    
+    public static final String[] DATA = new String[] {"string1", "string2", "string3"};
+
     @Resource
     WebServiceContext context;
-    
+
     public DocLitWrappedCodeFirstServiceImpl() {
-        
+
     }
-    
+
     public int thisShouldNotBeInTheWSDL(int i) {
         return i;
     }
-    
+
     public String[] arrayOutput() {
         if (context == null) {
             throw new RuntimeException("No CONTEXT!!!");
@@ -81,7 +81,7 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         }
         return buf.toString();
     }
-    
+
     public int[] echoIntArray(int[] ar, Exchange ex) {
         if (context == null) {
             throw new RuntimeException("No CONTEXT!!!");
@@ -102,7 +102,7 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         }
         return buf.toString();
     }
-    
+
     public String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y) {
         if (context == null) {
             throw new RuntimeException("No CONTEXT!!!");
@@ -122,10 +122,10 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         buf.append(Integer.toString(y));
         return buf.toString();
     }
-    
+
     public String multiInOut(Holder<String> a, Holder<String> b, Holder<String> c, Holder<String> d,
                              Holder<String> e, Holder<String> f, Holder<String> g) {
-        String ret = b.value + d.value + e.value; 
+        String ret = b.value + d.value + e.value;
         a.value = "a";
         b.value = "b";
         c.value = "c";
@@ -135,14 +135,14 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         g.value = "g";
         return ret;
     }
-    
+
     public void singleInOut(Holder<Boolean> created) {
         if (created.value == null) {
             created.value = false;
         } else {
             created.value = true;
         }
-            
+
     }
 
     public List<Foo> listObjectOutput() {
@@ -152,7 +152,7 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         b.setName("b");
         return Arrays.asList(a, b);
     }
-    
+
     public Set<Foo> getFooSet() {
         return new LinkedHashSet<Foo>(listObjectOutput());
     }
@@ -166,11 +166,11 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         c.setName("c");
         Foo d = new Foo();
         d.setName("d");
-        
+
         return Arrays.asList(new Foo[] {a, b}, new Foo[] {c, d});
     }
-   
-    public int throwException(int i) 
+
+    public int throwException(int i)
         throws ServiceTestFault, CustomException, ComplexException {
         switch (i) {
         case -1:
@@ -190,11 +190,14 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
             ex.setInts(new int[] {1, 2, 3});
             throw ex;
         }
+        case -4: {
+            throw new RuntimeException("RuntimeException!!");
+        }
         default:
             throw new ServiceTestFault(new ServiceTestFault.ServiceTestDetails(i));
         }
     }
-    
+
     public String echo(String msg) {
         return msg;
     }
@@ -215,11 +218,10 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-    
+
     public String echoStringNotReallyAsync(String s) {
         return s;
     }
@@ -242,8 +244,8 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     }
 
     public CXF2411Result<CXF2411SubClass> doCXF2411() {
-        CXF2411Result<CXF2411SubClass> ret = new CXF2411Result<CXF2411SubClass>();
-        CXF2411SubClass content[] = new CXF2411SubClass[1];
+        CXF2411Result<CXF2411SubClass> ret = new CXF2411Result<>();
+        CXF2411SubClass[] content = new CXF2411SubClass[1];
         content[0] = new CXF2411SubClass();
         ret.setContent(content);
         return ret;
@@ -252,5 +254,5 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     public String doBug2692(String name) {
         return name;
     }
-    
+
 }

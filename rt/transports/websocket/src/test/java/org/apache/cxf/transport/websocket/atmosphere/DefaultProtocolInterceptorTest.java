@@ -25,54 +25,63 @@ import java.util.Map;
 
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereRequestImpl;
+import org.atmosphere.cpr.AtmosphereResource;
+import org.atmosphere.cpr.AtmosphereResourceImpl;
 import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.AtmosphereResponseImpl;
+import org.atmosphere.cpr.FrameworkConfig;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * 
+ *
  */
-public class DefaultProtocolInterceptorTest extends Assert {
+public class DefaultProtocolInterceptorTest {
 
     @Test
     public void testCreateResponseWithHeadersFiltering() throws Exception {
         DefaultProtocolInterceptor dpi = new DefaultProtocolInterceptor();
-        AtmosphereRequest request = AtmosphereRequest.newInstance();
-        AtmosphereResponse response = AtmosphereResponse.newInstance();
+        AtmosphereRequest request = AtmosphereRequestImpl.newInstance();
+        AtmosphereResponse response = AtmosphereResponseImpl.newInstance();
+        AtmosphereResourceImpl resource = new AtmosphereResourceImpl();
+        resource.transport(AtmosphereResource.TRANSPORT.WEBSOCKET);
+        request.localAttributes().put(FrameworkConfig.ATMOSPHERE_RESOURCE, resource);
         response.request(request);
         String payload = "hello cxf";
         String contentType = "text/plain";
         response.headers().put("Content-Type", contentType);
 
         byte[] transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType},
                           payload, transformed);
 
         response.headers().put("X-fruit", "peach");
         response.headers().put("X-vegetable", "tomato");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType},
                           payload, transformed);
 
         dpi.includedheaders("X-f.*");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"},
                           payload, transformed);
 
         dpi.includedheaders("X-.*");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach", "X-vegetable", "tomato"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach", "X-vegetable", "tomato"},
                           payload, transformed);
 
         dpi.excludedheaders(".*able");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"},
                           payload, transformed);
     }
 

@@ -27,14 +27,17 @@ are available at
 To view the Swagger document using Swagger-UI, use your Browser to 
 open the Swagger-UI page at
 
-  http://localhost:9000/?url=/swagger.json
+  http://localhost:9000/api-docs?url=/swagger.json
 
 or
 
-  http://localhost:9000/?url=/swagger.yaml
+  http://localhost:9000/api-docs?url=/swagger.yaml
 
+or access it from the CXF Services page:
 
-To remove the target dir, run mvn clean".
+  http://localhost:9000/services
+  and follow a Swagger link.
+  
 
 
 

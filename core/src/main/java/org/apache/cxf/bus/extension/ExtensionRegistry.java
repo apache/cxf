@@ -26,21 +26,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Static registry of extensions that are loaded in addition to the 
- * extensions the Bus will automatically detect.  Mostly used by 
+ * Static registry of extensions that are loaded in addition to the
+ * extensions the Bus will automatically detect.  Mostly used by
  * the OSGi bundle activator to detect extensions in bundles outside
- * the CXF bundle. 
+ * the CXF bundle.
  */
 public final class ExtensionRegistry {
-    private static ConcurrentMap<String, Extension> extensions 
-        = new ConcurrentHashMap<String, Extension>(16, 0.75f, 4);
+    private static ConcurrentMap<String, Extension> extensions
+        = new ConcurrentHashMap<>(16, 0.75f, 4);
 
     private ExtensionRegistry() {
         //singleton
     }
-    
+
     public static Map<String, Extension> getRegisteredExtensions() {
-        Map<String, Extension> exts = new HashMap<String, Extension>(extensions.size());
+        Map<String, Extension> exts = new HashMap<>(extensions.size());
         for (Map.Entry<String, Extension> ext : extensions.entrySet()) {
             exts.put(ext.getKey(), ext.getValue().cloneNoObject());
         }

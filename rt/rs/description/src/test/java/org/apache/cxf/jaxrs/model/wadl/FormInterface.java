@@ -34,25 +34,25 @@ public interface FormInterface {
     @Path("/form1")
     @POST
     void form1(MultivaluedMap<String, String> map);
-    
+
     @Path("/form2")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     String form2(@FormParam("field1") String f1, @FormParam("field2") String f2);
-    
+
     @Path("/form3/{id}")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_PLAIN)
     String form3(@HeaderParam("headerId") String headerId,
-                 @PathParam("id") String id, 
+                 @PathParam("id") String id,
                  @FormParam("field1") String f1, @FormParam("field2") String f2);
-    
+
     @Path("/form4/{id}")
     @POST
     @Consumes("multipart/form-data")
     @Produces(MediaType.TEXT_PLAIN)
-    String form4(@PathParam("id") String id, 
+    String form4(@PathParam("id") String id,
                  @Multipart("field1") String f1, @Multipart("field2") String f2);
 }

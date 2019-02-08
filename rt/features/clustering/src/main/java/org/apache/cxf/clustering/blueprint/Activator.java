@@ -27,14 +27,18 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            @Override
-            public Object createNamespaceHandler() {
-                return new ClusteringBPNamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/clustering");
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+                @Override
+                public Object createNamespaceHandler() {
+                    return new ClusteringBPNamespaceHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, factory,
+                                                "http://cxf.apache.org/clustering");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
 
     }
 

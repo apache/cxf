@@ -62,9 +62,9 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
         this(JAXBUtils.namespaceURIToPackage(qn.getNamespaceURI())
             + "." + JAXBUtils.nameToIdentifier(qn.getLocalPart(), JAXBUtils.IdentifierType.CLASS), qn);
     }
-    
+
     /**
-     * Constructs a JAXBAssertionBuilder from the specified class name and schema type. 
+     * Constructs a JAXBAssertionBuilder from the specified class name and schema type.
      * @param className the name of the class to which the schema type is mapped
      * @param qn the schema type
      * @throws JAXBException
@@ -74,9 +74,9 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
     public JaxbAssertionBuilder(String className, QName qn) throws JAXBException, ClassNotFoundException {
         this((Class<T>)ClassLoaderUtils.loadClass(className, JaxbAssertionBuilder.class), qn);
     }
-    
+
     /**
-    * Constructs a JAXBAssertionBuilder from the specified class and schema type. 
+    * Constructs a JAXBAssertionBuilder from the specified class and schema type.
     * @param type the class to which the schema type is mapped
     * @param qn the schema type
     * @throws JAXBException
@@ -86,17 +86,17 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
         this.type = type;
         supportedTypes = Collections.singletonList(qn);
     }
-       
+
     private synchronized JAXBContext getContext() throws JAXBException {
         if (context == null || classes == null) {
-            CachedContextAndSchemas ccs 
+            CachedContextAndSchemas ccs
                 = JAXBContextCache.getCachedContextAndSchemas(type);
             classes = ccs.getClasses();
             context = ccs.getContext();
         }
         return context;
     }
-    
+
     protected Unmarshaller getUnmarshaller() {
         try {
             Unmarshaller um = getContext().createUnmarshaller();
@@ -106,8 +106,8 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
             throw new RuntimeException(e);
         }
     }
-    
-    
+
+
     public Assertion build(Element element, AssertionBuilderFactory factory) {
         QName name = new QName(element.getNamespaceURI(), element.getLocalName());
         JaxbAssertion<T> assertion = buildAssertion();
@@ -117,26 +117,26 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
         assertion.setData(getData(element));
         return assertion;
     }
-    
+
     public QName[] getKnownElements() {
-        return supportedTypes.toArray(new QName[supportedTypes.size()]);
+        return supportedTypes.toArray(new QName[0]);
     }
 
     protected JaxbAssertion<T> buildAssertion() {
         return new JaxbAssertion<T>();
     }
-    
+
     protected boolean getOptionality(Element element) {
         boolean optional = false;
         String value = element.getAttributeNS(
-                           Constants.Q_ELEM_OPTIONAL_ATTR.getNamespaceURI(), 
+                           Constants.Q_ELEM_OPTIONAL_ATTR.getNamespaceURI(),
                            Constants.Q_ELEM_OPTIONAL_ATTR.getLocalPart());
         if (Boolean.valueOf(value)) {
             optional = true;
         }
         return optional;
     }
-    
+
     @SuppressWarnings("unchecked")
     protected T getData(Element element) {
         Object obj = null;
@@ -151,14 +151,14 @@ public class JaxbAssertionBuilder<T> implements AssertionBuilder<Element> {
         if (obj instanceof JAXBElement<?>) {
             JAXBElement<?> el = (JAXBElement<?>)obj;
             obj = el.getValue();
-        } 
+        }
         if (null != obj && LOG.isLoggable(Level.FINE)) {
             LOG.fine("Unmarshaled element into object of type: " + obj.getClass().getName()
                  + "    value: " + obj);
         }
         return (T)obj;
     }
-    
-    
+
+
 
 }

@@ -26,48 +26,49 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.wsdl.WSDLManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class ReflectionServiceFactorBeanTest extends Assert {
+public class ReflectionServiceFactorBeanTest {
     protected IMocksControl control;
-    
+
     @Before
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
     }
-    
-    @After 
+
+    @After
     public void tearDown() throws Exception {
         control.verify();
     }
-    
+
     @Test
     public void testEmptyWsdlAndNoServiceClass() throws Exception {
         final String dummyWsdl = "target/dummy.wsdl";
         ReflectionServiceFactoryBean bean = new ReflectionServiceFactoryBean();
         Bus bus = control.createMock(Bus.class);
-        
+
         WSDLManager wsdlmanager = control.createMock(WSDLManager.class);
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andReturn(wsdlmanager);
         EasyMock.expect(wsdlmanager.getDefinition(dummyWsdl))
             .andThrow(new WSDLException("PARSER_ERROR", "Problem parsing '" + dummyWsdl + "'."));
         EasyMock.expect(bus.getExtension(FactoryBeanListenerManager.class)).andReturn(null);
-        
+
         control.replay();
-        
+
         bean.setWsdlURL(dummyWsdl);
         bean.setServiceName(new QName("http://cxf.apache.org/hello_world_soap_http", "GreeterService"));
         bean.setBus(bus);
-        
+
         try {
             bean.create();
             fail("no valid wsdl nor service class specified");

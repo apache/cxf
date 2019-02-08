@@ -61,13 +61,18 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Tests the operation of MessageCallback for one-way messages to the server.
  */
 public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(MessageCallbackOnewayTest.class);
-    private static final String GREETER_ADDRESS  = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-    private static final Long RETRANSMISSION_INTERVAL = new Long(2000);
+    private static final String GREETER_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
+    private static final Long RETRANSMISSION_INTERVAL = Long.valueOf(2000);
 
     private static final Logger LOG = LogUtils.getLogger(MessageCallbackOnewayTest.class);
 
@@ -76,7 +81,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     private Bus greeterBus;
     private Greeter greeter;
     private RecordingMessageCallback callback;
-    
+
     @After
     public void tearDown() throws Exception {
         try {
@@ -91,14 +96,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         }
         Thread.sleep(100);
     }
-    
+
     /**
      * Checks that all callbacks are received, that messages are accepted in order, and that each message is accepted
      * before it is acknowledged (order of acknowledgements doesn't really matter).
      */
     private void verifyCallbacks() {
         List<Callback> cbs = callback.getCallbacks();
-        Set<Long> acks = new HashSet<Long>();
+        Set<Long> acks = new HashSet<>();
         long nextNum = 1;
         for (Callback cb: cbs) {
             if (cb.isAccept()) {
@@ -112,19 +117,19 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    @Test    
+    @Test
     public void testAtLeastOnce() throws Exception {
         testOnewayAtLeastOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testAtLeastOnceAsyncExecutor() throws Exception {
         testOnewayAtLeastOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayAtLeastOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/atleastonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
@@ -136,19 +141,19 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         verifyCallbacks();
     }
 
-    @Test    
+    @Test
     public void testAtMostOnce() throws Exception {
         testOnewayAtMostOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testAtMostOnceAsyncExecutor() throws Exception {
         testOnewayAtMostOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayAtMostOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/atmostonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
@@ -156,24 +161,24 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         callback.waitDone(8, 3000, 60000);
         verifyCallbacks();
     }
 
-    @Test    
+    @Test
     public void testExactlyOnce() throws Exception {
         testOnewayExactlyOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testExactlyOnceAsyncExecutor() throws Exception {
         testOnewayExactlyOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayExactlyOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/exactlyonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
@@ -181,24 +186,24 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         callback.waitDone(8, 3000, 60000);
         verifyCallbacks();
     }
 
-    @Test    
+    @Test
     public void testExactlyOnceInOrder() throws Exception {
         testOnewayExactlyOnceInOrder(null);
     }
-    
-    @Test    
+
+    @Test
     public void testExactlyOnceInOrderAsyncExecutor() throws Exception {
         testOnewayExactlyOnceInOrder(Executors.newSingleThreadExecutor());
     }
 
     private void testOnewayExactlyOnceInOrder(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/exactlyonce-inorder.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
@@ -206,7 +211,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         callback.waitDone(8, 3000, 60000);
         verifyCallbacks();
     }
@@ -219,14 +224,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         initGreeterBus(bf, cfgResource);
         initProxy(executor);
     }
-    
+
     private void initServer(SpringBusFactory bf, String cfgResource) {
-        String derbyHome = System.getProperty("derby.system.home"); 
+        String derbyHome = System.getProperty("derby.system.home");
         try {
             synchronized (GreeterProvider.CALL_ARGS) {
                 GreeterProvider.CALL_ARGS.clear();
             }
-            System.setProperty("derby.system.home", derbyHome + "-server");   
+            System.setProperty("derby.system.home", derbyHome + "-server");
             serverBus = bf.createBus(cfgResource);
             BusFactory.setDefaultBus(serverBus);
             LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
@@ -240,7 +245,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     private void initGreeterBus(SpringBusFactory bf,
                                 String cfgResource) {
         greeterBus = bf.createBus(cfgResource);
@@ -248,13 +253,13 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
     }
 
-    private void initProxy(Executor executor) {        
+    private void initProxy(Executor executor) {
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
             gs.setExecutor(executor);
         }
-   
+
         greeter = gs.getGreeterPort();
         try {
             updateAddressPort(greeter, PORT);
@@ -264,14 +269,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         LOG.fine("Created greeter client.");
 
         ConnectionHelper.setKeepAliveConnection(greeter, false);
-        
+
         callback = new RecordingMessageCallback();
         ((BindingProvider)greeter).getRequestContext().put(RMMessageConstants.RM_CLIENT_CALLBACK, callback);
     }
-    
+
     private void stopClient() {
         if (null != greeterBus) {
-            
+
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
             if (greeter != null) {
@@ -282,7 +287,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             greeterBus = null;
         }
     }
-    
+
     private void stopServer() {
         if (null != endpoint) {
             LOG.info("Stopping Greeter endpoint");
@@ -303,8 +308,8 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                 wsdlLocation = "/wsdl/greeter_control.wsdl")
     @ServiceMode(Mode.PAYLOAD)
     public static class GreeterProvider implements Provider<Source> {
-        
-        public static final List<String> CALL_ARGS = new ArrayList<String>();
+
+        public static final List<String> CALL_ARGS = new ArrayList<>();
 
         public Source invoke(Source obj) {
 
@@ -317,8 +322,8 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
             if (el instanceof Document) {
                 el = ((Document)el).getDocumentElement();
             }
-            
-            Map<String, String> ns = new HashMap<String, String>();
+
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://cxf.apache.org/greeter_control/types");
             XPathUtils xp = new XPathUtils(ns);
             String s = (String)xp.getValue("/ns:greetMe/ns:requestType",
@@ -333,24 +338,23 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                     CALL_ARGS.add(s);
                 }
                 return null;
-            } else {
-                synchronized (CALL_ARGS) {
-                    CALL_ARGS.add(s);
-                }
-                String resp =
-                    "<greetMeResponse "
-                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
-                        + "<responseType>" + s.toUpperCase() + "</responseType>"
-                    + "</greetMeResponse>";
-                return new StreamSource(new StringReader(resp));
             }
+            synchronized (CALL_ARGS) {
+                CALL_ARGS.add(s);
+            }
+            String resp =
+                "<greetMeResponse "
+                    + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                    + "<responseType>" + s.toUpperCase() + "</responseType>"
+                + "</greetMeResponse>";
+            return new StreamSource(new StringReader(resp));
         }
     }
-    
+
     private static class RecordingMessageCallback implements MessageCallback {
-        
-        private List<Callback> callbacks = new ArrayList<Callback>();
-        
+
+        private List<Callback> callbacks = new ArrayList<>();
+
         @Override
         public void messageAccepted(String seqId, long msgNum) {
             synchronized (callbacks) {
@@ -366,14 +370,14 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                 callbacks.notifyAll();
             }
         }
-        
+
         public List<Callback> getCallbacks() {
             return callbacks;
         }
-        
+
         /**
          * Wait for expected number of callbacks.
-         * 
+         *
          * @param count expected number of callbacks
          * @param delay extra time to wait after expected number received (in case more are coming)
          * @param timeout maximum time to wait, in milliseconds
@@ -384,26 +388,26 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                 while (callbacks.size() < count) {
                     long remain = start + timeout - System.currentTimeMillis();
                     if (remain <= 0) {
-                        fail("Expected " + count + " callbacks, only got " + callbacks.size()); 
+                        fail("Expected " + count + " callbacks, only got " + callbacks.size());
                     }
                     try {
                         callbacks.wait(remain);
                     } catch (InterruptedException e) { /* ignored */ }
                 }
                 try {
-                    callbacks.wait((long)delay);
+                    callbacks.wait(delay);
                 } catch (InterruptedException e) { /* ignored */ }
                 if (callbacks.size() > count) {
-                    fail("Expected " + count + " callbacks, got " + callbacks.size()); 
+                    fail("Expected " + count + " callbacks, got " + callbacks.size());
                 }
             }
         }
     }
-    
+
     private static class Callback {
         private final boolean accept;
         private final long msgNumber;
-        
+
         Callback(boolean acc, long msgNum) {
             accept = acc;
             msgNumber = msgNum;

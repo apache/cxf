@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.sts.common;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,42 +33,42 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  * A custom ClaimsHandler implementation for use in the tests.
  */
 public class CustomUserClaimsHandler implements ClaimsHandler {
-    
-    private static List<URI> knownURIs = new ArrayList<URI>();
-    
+
+    private static List<String> knownURIs = new ArrayList<>();
+
     static {
-        knownURIs.add(ClaimTypes.FIRSTNAME);
+        knownURIs.add(ClaimTypes.FIRSTNAME.toString());
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return knownURIs;
-    }    
-    
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
-        if (claims != null && claims.size() > 0) {
+
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());
-                if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
-                    
+                if (ClaimTypes.FIRSTNAME.toString().equals(requestClaim.getClaimType())) {
+
                     if (parameters.getPrincipal().getName().equalsIgnoreCase("alice")) {
                         claim.addValue("aliceClaim");
                     } else if (parameters.getPrincipal().getName().equalsIgnoreCase("bob")) {
                         claim.addValue("bobClaim");
                     }
-                }                
+                }
                 claimCollection.add(claim);
             }
             return claimCollection;
         }
-        
-        
+
+
         return null;
     }
 
 
-        
+
 }

@@ -21,6 +21,8 @@ package org.apache.cxf.jaxrs.client;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,7 +41,6 @@ import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.UpfrontConduitSelector;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
@@ -50,43 +51,43 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSClientFactoryBean.class);
-    
-    private String username;
-    private String password;
-    private boolean inheritHeaders; 
-    private MultivaluedMap<String, String> headers;
-    private ClientState initialState;
-    private boolean threadSafe;
-    private long timeToKeepState;
-    private Class<?> serviceClass;
-    private ClassLoader proxyLoader;
-    
+
+    protected static final Logger LOG = LogUtils.getL7dLogger(JAXRSClientFactoryBean.class);
+
+    protected String username;
+    protected String password;
+    protected boolean inheritHeaders;
+    protected MultivaluedMap<String, String> headers;
+    protected ClientState initialState;
+    protected boolean threadSafe;
+    protected long timeToKeepState;
+    protected Class<?> serviceClass;
+    protected ClassLoader proxyLoader;
+
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
     }
-    
+
     public JAXRSClientFactoryBean(JAXRSServiceFactoryBean serviceFactory) {
         super(serviceFactory);
         serviceFactory.setEnableStaticResolution(true);
-        
+
     }
-    
+
     /**
      * Sets the custom class loader to be used for creating proxies.
      * By default the class loader of the given serviceClass will be used.
-     * 
+     *
      * @param loader
      */
     public void setClassLoader(ClassLoader loader) {
         proxyLoader = loader;
     }
-    
+
     /**
-     * Indicates if a single proxy or WebClient instance can be reused 
+     * Indicates if a single proxy or WebClient instance can be reused
      * by multiple threads.
-     *   
+     *
      * @param threadSafe if true then multiple threads can invoke on
      *        the same proxy or WebClient instance.
      */
@@ -97,7 +98,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     /**
      * Sets the time a thread-local client state will be kept.
      * This property is ignored for thread-unsafe clients
-     * @param secondsToKeepState
+     * @param time secondsToKeepState
      */
     public void setSecondsToKeepState(long time) {
         this.timeToKeepState = time;
@@ -112,16 +113,16 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets the username. 
-     * Setting the username and password is a simple way to 
+     * Sets the username.
+     * Setting the username and password is a simple way to
      * create a Basic Authentication token.
-     * 
+     *
      * @param username the user name
      */
-    public void setUsername(String username) {        
+    public void setUsername(String username) {
         this.username = username;
     }
-    
+
     /**
      * Gets the password
      * @return the password
@@ -131,27 +132,27 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets the password. 
-     * Setting the username and password is a simple way to 
+     * Sets the password.
+     * Setting the username and password is a simple way to
      * create a Basic Authentication token.
-     * 
+     *
      * @param password the password
      */
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
     /**
      * Indicates if the headers set by a current proxy will be inherited
      * when a subresource proxy is created
      * vice versa.
-     * 
+     *
      * @param ih if set to true then the current headers will be inherited
      */
     public void setInheritHeaders(boolean ih) {
         inheritHeaders = ih;
     }
-    
+
     /**
      * Sets the resource class
      * @param cls the resource class
@@ -159,42 +160,41 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public void setResourceClass(Class<?> cls) {
         setServiceClass(cls);
     }
-    
+
     /**
-     * Sets the resource class, may be called from a Spring handler 
-     * @param cls the resource class
+     * Sets the service class, may be called from a Spring handler
+     * @param cls the service class
      */
     public void setServiceClass(Class<?> cls) {
         this.serviceClass = cls;
         serviceFactory.setResourceClass(cls);
     }
-    
+
     /**
-     * Returns the service class 
-     * @param cls the service class
+     * Returns the service class.
      */
     public Class<?> getServiceClass() {
         return serviceClass;
     }
-    
+
     /**
      * Sets the headers new proxy or WebClient instances will be
      * initialized with.
-     * 
+     *
      * @param map the headers
      */
     public void setHeaders(Map<String, String> map) {
-        headers = new MetadataMap<String, String>();
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String[] values = entry.getValue().split(",");
+        headers = new MetadataMap<>();
+        map.forEach((key, value) -> {
+            String[] values = value.split(",");
             for (String v : values) {
                 if (v.length() != 0) {
-                    headers.add(entry.getKey(), v);
+                    headers.add(key, v);
                 }
             }
-        }
+        });
     }
-    
+
     /**
      * Gets the initial headers
      * @return the headers
@@ -202,7 +202,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public Map<String, List<String>> getHeaders() {
         return headers;
     }
-    
+
     /**
      * Creates a WebClient instance
      * @return WebClient instance
@@ -215,7 +215,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
         Service service = new JAXRSServiceImpl(serviceAddress, getServiceName());
         getServiceFactory().setService(service);
-        
+
         try {
             Endpoint ep = createEndpoint();
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_CLIENT_CREATE, ep);
@@ -223,10 +223,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             WebClient client = actualState == null ? new WebClient(getAddress())
                 : new WebClient(actualState);
             initClient(client, ep, actualState == null);
-    
+
             notifyLifecycleManager(client);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, client, ep);
-            
+
             return client;
         } catch (Exception ex) {
             LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
@@ -234,27 +234,26 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
 
-    private void notifyLifecycleManager(Object client) {
+    protected void notifyLifecycleManager(Object client) {
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
         if (null != mgr) {
             mgr.clientCreated(new FrontendClientAdapter(WebClient.getConfig(client)));
         }
-    }    
-    
-    private ClientState getActualState() {
+    }
+
+    protected ClientState getActualState() {
         if (threadSafe) {
             initialState = new ThreadLocalClientState(getAddress(), timeToKeepState);
         }
         if (initialState != null) {
             return headers != null
                 ? initialState.newState(URI.create(getAddress()), headers, null) : initialState;
-        } else {
-            return null;
         }
+        return null;
     }
-    
+
     /**
-     * Creates a proxy
+     * Creates a proxy.
      * @param cls the proxy class
      * @param varValues optional list of values which will be used to substitute
      *        template variables specified in the class-level JAX-RS Path annotations
@@ -263,24 +262,23 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public <T> T create(Class<T> cls, Object... varValues) {
         return cls.cast(createWithValues(varValues));
     }
-    
+
     /**
      * Create a Client instance. Proxies and WebClients are Clients.
      * @return the client
      */
-    public Client create() { 
+    public Client create() {
         if (serviceClass == WebClient.class) {
             return createWebClient();
-        } else {
-            return createWithValues();
         }
+        return createWithValues();
     }
-    
+
     /**
      * Create a Client instance. Proxies and WebClients are Clients.
      * @param varValues optional list of values which will be used to substitute
      *        template variables specified in the class-level JAX-RS Path annotations
-     *        
+     *
      * @return the client
      */
     public Client createWithValues(Object... varValues) {
@@ -305,24 +303,18 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             } else {
                 cri = serviceFactory.getClassResourceInfo().get(0);
             }
-            
+
             boolean isRoot = cri.getURITemplate() != null;
-            ClientProxyImpl proxyImpl = null;
             ClientState actualState = getActualState();
-            if (actualState == null) {
-                proxyImpl = 
-                    new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot, 
-                                        inheritHeaders, varValues);
-            } else {
-                proxyImpl = 
-                    new ClientProxyImpl(actualState, proxyLoader, cri, isRoot, 
-                                        inheritHeaders, varValues);
-            }
-            initClient(proxyImpl, ep, actualState == null);    
-            
-            ClassLoader theLoader = proxyLoader == null ? cri.getServiceClass().getClassLoader() : proxyLoader;
-            Class<?>[] ifaces = new Class[]{Client.class, InvocationHandlerAware.class, cri.getServiceClass()};
+            ClientProxyImpl proxyImpl = createClientProxy(cri, isRoot, actualState, varValues);
+            initClient(proxyImpl, ep, actualState == null);
+
+            final Class<?> serviceClassFinal = cri.getServiceClass();
+            ClassLoader theLoader = AccessController.doPrivileged((PrivilegedAction<ClassLoader>) () ->
+                    proxyLoader == null ? serviceClassFinal.getClassLoader() : proxyLoader);
+            Class<?>[] ifaces = new Class<?>[]{Client.class, InvocationHandlerAware.class, cri.getServiceClass()};
             Client actualClient = (Client)ProxyHelper.getProxy(theLoader, ifaces, proxyImpl);
+            proxyImpl.setProxyClient(actualClient);
             notifyLifecycleManager(actualClient);
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.CLIENT_CREATED, actualClient, ep);
             return actualClient;
@@ -340,7 +332,18 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
             throw new RuntimeException(ex);
         }
-        
+
+    }
+
+    protected ClientProxyImpl createClientProxy(ClassResourceInfo cri, boolean isRoot,
+                                                ClientState actualState, Object[] varValues) {
+        if (actualState == null) {
+            return new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
+                                    inheritHeaders, varValues);
+        } else {
+            return new ClientProxyImpl(actualState, proxyLoader, cri, isRoot,
+                                    inheritHeaders, varValues);
+        }
     }
 
     protected ConduitSelector getConduitSelector(Endpoint ep) {
@@ -351,16 +354,16 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         cs.setEndpoint(ep);
         return cs;
     }
-    
+
     protected void initClient(AbstractClient client, Endpoint ep, boolean addHeaders) {
-        
+
         if (username != null) {
             AuthorizationPolicy authPolicy = new AuthorizationPolicy();
             authPolicy.setUserName(username);
             authPolicy.setPassword(password);
             ep.getEndpointInfo().addExtensor(authPolicy);
         }
-        
+
         client.getConfiguration().setConduitSelector(getConduitSelector(ep));
         client.getConfiguration().setBus(getBus());
         client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
@@ -370,17 +373,17 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         client.getConfiguration().getInFaultInterceptors().addAll(getInFaultInterceptors());
 
         applyFeatures(client);
-        
+
         if (headers != null && addHeaders) {
             client.headers(headers);
         }
-        ClientProviderFactory factory = ClientProviderFactory.createInstance(getBus()); 
+        ClientProviderFactory factory = ClientProviderFactory.createInstance(getBus());
         setupFactory(factory, ep);
-        
+
         final Map<String, Object> theProperties = super.getProperties();
         final boolean encodeClientParameters = PropertyUtils.isTrue(theProperties, "url.encode.client.parameters");
         if (encodeClientParameters) {
-            final String encodeClientParametersList = theProperties == null ? null 
+            final String encodeClientParametersList = theProperties == null ? null
                 : (String)getProperties().get("url.encode.client.parameters.list");
             factory.registerUserProvider(new ParamConverterProvider() {
 
@@ -390,21 +393,20 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                     if (cls == String.class
                         && AnnotationUtils.getAnnotation(anns, HeaderParam.class) == null
                         && AnnotationUtils.getAnnotation(anns, CookieParam.class) == null) {
-                        return (ParamConverter<T>)new UrlEncodingParamConverter(encodeClientParametersList);
-                    } else {
-                        return null;
+                        return (ParamConverter<T>) new UrlEncodingParamConverter(encodeClientParametersList);
                     }
+                    return null;
                 }
-            
+
             });
         }
     }
-    
+
     protected void applyFeatures(AbstractClient client) {
         if (getFeatures() != null) {
-            for (Feature feature : getFeatures()) {
+            getFeatures().forEach(feature -> {
                 feature.initialize(client.getConfiguration(), getBus());
-            }
+            });
         }
     }
 
@@ -415,6 +417,4 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     public void setInitialState(ClientState initialState) {
         this.initialState = initialState;
     }
-
-    
-} 
+}

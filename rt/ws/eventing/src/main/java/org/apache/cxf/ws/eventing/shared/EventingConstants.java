@@ -44,7 +44,7 @@ public final class EventingConstants {
     public static final String EVENTING_2011_03_NAMESPACE = "http://www.w3.org/2011/03/ws-evt";
 
     public static final String RESPONSE_RENEW = "RenewResponse";
-    
+
     public static final String WRAPPED_SINK_PORT_TYPE = "WrappedSinkPortType";
 
     public static final String RESPONSE_SUBSCRIBE = "SubscribeResponse";

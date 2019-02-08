@@ -26,29 +26,29 @@ import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 
 
-@javax.jws.WebService(serviceName = "SOAPService", 
+@javax.jws.WebService(serviceName = "SOAPService",
                       portName = "SoapPort",
                       endpointInterface = "org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType",
                       targetNamespace = "http://apache.org/hello_world_doc_lit_bare",
                       wsdlLocation = "testutils/doc_lit_bare.wsdl")
 public class PutLastTradedPriceImpl implements PutLastTradedPricePortType {
-   
+
     public void sayHi(Holder<TradePriceData> inout) {
         inout.value.setTickerPrice(4.5f);
         inout.value.setTickerSymbol("APACHE");
-    }   
+    }
     public void putLastTradedPrice(TradePriceData body) {
         //System.out.println("-----TradePriceData TickerPrice : ----- " + body.getTickerPrice());
         //System.out.println("-----TradePriceData TickerSymbol : ----- " + body.getTickerSymbol());
 
     }
-    
+
     public String bareNoParam() {
         return "testResponse";
     }
     public String nillableParameter(BigDecimal theRequest) {
         return null;
     }
-   
+
 
 }

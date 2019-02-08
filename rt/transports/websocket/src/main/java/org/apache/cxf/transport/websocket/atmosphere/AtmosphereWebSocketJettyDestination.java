@@ -21,6 +21,8 @@ package org.apache.cxf.transport.websocket.atmosphere;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,8 +33,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
@@ -41,49 +45,92 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
 import org.atmosphere.cpr.ApplicationConfig;
 import org.atmosphere.cpr.AtmosphereFramework;
-import org.atmosphere.cpr.AtmosphereRequest;
+import org.atmosphere.cpr.AtmosphereRequestImpl;
 import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResponse;
+import org.atmosphere.cpr.AtmosphereResponseImpl;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
-import org.atmosphere.util.Utils;
+import org.atmosphere.util.VoidServletConfig;
 import org.eclipse.jetty.server.Request;
+import org.springframework.util.ClassUtils;
 
 
 /**
- * 
+ *
  */
-public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination implements 
+public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination implements
     WebSocketDestinationService {
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketJettyDestination.class);
     private AtmosphereFramework framework;
-    
+    private final Map<String, String> initParams = new HashMap<>();
+
     public AtmosphereWebSocketJettyDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                     JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+                                     JettyHTTPServerEngineFactory serverEngineFactory)
+        throws IOException {
+        super(bus, registry, ei, 
+              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
+              serverEngineFactory);
+
         framework = new AtmosphereFramework(false, true);
         framework.setUseNativeImplementation(false);
-        framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
+        addInitParameter(framework, initParams, ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
+        addInitParameter(framework, initParams, ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
+        addInitParameter(framework, initParams, ApplicationConfig.WEBSOCKET_SUPPORT, "true");
+        addInitParameter(framework, initParams, ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
+        // workaround for atmosphere's jsr356 initialization requiring servletConfig
+        addInitParameter(framework, initParams, ApplicationConfig.WEBSOCKET_SUPPRESS_JSR356, "true");
         AtmosphereUtils.addInterceptors(framework, bus);
-        framework.addAtmosphereHandler("/", new DestinationHandler());
-        framework.init();
+        framework.addAtmosphereHandler("/", new DestinationHandler());        
     }
     
+    protected void activate() {
+        super.activate();
+
+        if (handler.getServletContext().getAttribute("org.eclipse.jetty.util.DecoratedObjectFactory") == null) {
+            try {
+                Class<?> dcc = ClassUtils.forName("org.eclipse.jetty.util.DecoratedObjectFactory", 
+                                                  getClass().getClassLoader());
+                handler.getServletContext().setAttribute("org.eclipse.jetty.util.DecoratedObjectFactory",
+                                                         dcc.newInstance());
+            } catch (ClassNotFoundException | LinkageError | InstantiationException | IllegalAccessException e) {
+                //ignore, old version of Jetty
+            }            
+        }
+        ServletConfig config = new VoidServletConfig(initParams) {
+            @Override
+            public ServletContext getServletContext() {
+                return handler.getServletContext();
+            }
+        };
+
+        try {
+            framework.init(config);
+        } catch (ServletException e) {
+            throw new Fault(new Message("Could not initialize WebSocket Framework", LOG, e.getMessage()), e);
+        }
+    }
+    
+    private static void addInitParameter(AtmosphereFramework fw, Map<String, String> initParams,
+                                  String name, String value) {
+        fw.addInitParameter(name,  value);
+        initParams.put(name,  value);
+    }
     @Override
     public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
-
-    @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
+    
+    private static String getNonWSAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("ws")) {
             address = "http" + address.substring(2);
         }
         return address;
+    }
+
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return getNonWSAddress(endpointInfo);
     }
 
 
@@ -94,7 +141,7 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         }
         return new URL(getAddress(endpointInfo)).getPath();
     }
-    
+
     @Override
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new AtmosphereJettyWebSocketHandler(jhd, cmExact);
@@ -115,22 +162,21 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         AtmosphereJettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
             super(jhd, cmExact);
         }
-        
+
         @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request,
                            HttpServletResponse response) throws IOException, ServletException {
-            if (Utils.webSocketEnabled(request)) {
+            if (AtmosphereUtils.useAtmosphere(request)) {
                 try {
-                    framework.doCometSupport(AtmosphereRequest.wrap(request), 
-                                             AtmosphereResponse.wrap(response));
+                    framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
+                                             AtmosphereResponseImpl.wrap(response));
                     baseRequest.setHandled(true);
                 } catch (ServletException e) {
                     throw new IOException(e);
                 }
                 return;
-            } else {
-                super.handle(target, baseRequest, request, response);
             }
+            super.handle(target, baseRequest, request, response);
         }
     }
 
@@ -140,14 +186,14 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         public void onRequest(final AtmosphereResource resource) throws IOException {
             LOG.fine("onRequest");
             try {
-                invokeInternal(null, 
+                invokeInternal(null,
                     resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Failed to invoke service", e);
             }
         }
     }
-    
+
     // used for internal tests
     AtmosphereFramework getAtmosphereFramework() {
         return framework;

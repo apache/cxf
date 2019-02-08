@@ -21,24 +21,27 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.Date;
 import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class BeanspectorTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class BeanspectorTest {
+
     @Test
     public void testSimpleBean() throws SearchParseException {
-        Beanspector<SimpleBean> bean = new Beanspector<SimpleBean>(new SimpleBean());
+        Beanspector<SimpleBean> bean = new Beanspector<>(new SimpleBean());
         Set<String> getters = bean.getGettersNames();
         assertEquals(3, getters.size());
         assertTrue(getters.contains("class"));
         assertTrue(getters.contains("a"));
         assertTrue(getters.contains("promised"));
-        
+
         Set<String> setters = bean.getSettersNames();
-        assertEquals(1, setters.size());
-        assertTrue(getters.contains("a"));
+        assertEquals(2, setters.size());
+        assertTrue(setters.contains("a"));
+        assertTrue(setters.contains("fluent"));
     }
     
     @Test
@@ -76,7 +79,7 @@ public class BeanspectorTest extends Assert {
     public void testMismatchedAccessorTypes() throws SearchParseException {
         new Beanspector<MismatchedTypes>(MismatchedTypes.class);
     }
-    
+
     @Ignore
     static class MismatchedTypes {
         public Date getFoo() {
@@ -88,19 +91,23 @@ public class BeanspectorTest extends Assert {
     }
     @Ignore
     static class SimpleBean {
-        
+
         public boolean isPromised() {
             return true;
         }
-        
+
         public String getA() {
             return "a";
         }
 
         public void setA(String val) {
         }
+        
+        public SimpleBean setFluent(String val) {
+            return this;
+        }
     }
-    
+   
     @Ignore 
     static class OverriddenSimpleBean extends SimpleBean {
         

@@ -25,11 +25,13 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transport.jms.util.DestinationResolver;
 import org.apache.cxf.transport.jms.util.JMSDestinationResolver;
+import org.apache.cxf.transport.jms.util.JndiHelper;
 
 @NoJSR250Annotations
 public class JMSConfiguration {
@@ -64,21 +66,23 @@ public class JMSConfiguration {
     private String durableSubscriptionName;
 
     private String targetDestination;
-    
+
     /**
      * Destination name to listen on for reply messages
      */
     private String replyDestination;
     private volatile Destination replyDestinationDest;
-    
+
     /**
-     * Destination name to send out as replyTo address in the message 
+     * Destination name to send out as replyTo address in the message
      */
     private String replyToDestination;
+    private volatile Destination replyToDestinationDest;
+    
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
-    
+
     /**
      *  Default to use conduitIdSelector as it allows to receive using a listener
      *  which improves performance.
@@ -87,14 +91,14 @@ public class JMSConfiguration {
     private boolean useConduitIdSelector = true;
     private String conduitSelectorPrefix;
     private boolean jmsProviderTibcoEms;
+    private boolean oneSessionPerConnection;
 
     private TransactionManager transactionManager;
 
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
-
-
+    private int retryInterval = 5000;
 
     public void ensureProperlyConfigured() {
         ConnectionFactory cf = getConnectionFactory();
@@ -105,7 +109,7 @@ public class JMSConfiguration {
             throw new IllegalArgumentException("targetDestination may not be null");
         }
     }
-    
+
     public Properties getJndiEnvironment() {
         return jndiEnvironment;
     }
@@ -280,11 +284,11 @@ public class JMSConfiguration {
     public void setPubSubDomain(boolean pubSubDomain) {
         this.pubSubDomain = pubSubDomain;
     }
-    
+
     public boolean isReplyPubSubDomain() {
         return replyPubSubDomain;
     }
-    
+
     public void setReplyPubSubDomain(boolean replyPubSubDomain) {
         this.replyPubSubDomain = replyPubSubDomain;
     }
@@ -308,11 +312,11 @@ public class JMSConfiguration {
     public boolean isCreateSecurityContext() {
         return createSecurityContext;
     }
-    
+
     public void setCreateSecurityContext(boolean b) {
         this.createSecurityContext = b;
     }
-    
+
     /**
      * For compatibility with old spring based code
      * @param transactionManager
@@ -364,14 +368,34 @@ public class JMSConfiguration {
             synchronized (this) {
                 factory = connectionFactory;
                 if (factory == null) {
-                    factory = JMSFactory.getConnectionFactoryFromJndi(this);
+                    factory = getConnectionFactoryFromJndi();
                     connectionFactory = factory;
                 }
             }
         }
         return factory;
     }
-    
+
+    /**
+     * Retrieve connection factory from JNDI
+     *
+     * @param jmsConfig
+     * @param jndiConfig
+     * @return
+     */
+    private ConnectionFactory getConnectionFactoryFromJndi() {
+        if (getJndiEnvironment() == null || getConnectionFactoryName() == null) {
+            return null;
+        }
+        try {
+            return new JndiHelper(getJndiEnvironment()).
+                lookup(getConnectionFactoryName(), ConnectionFactory.class);
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public String getDurableSubscriptionClientId() {
         return durableSubscriptionClientId;
     }
@@ -409,6 +433,14 @@ public class JMSConfiguration {
         this.jmsProviderTibcoEms = jmsProviderTibcoEms;
     }
 
+    public boolean isOneSessionPerConnection() {
+        return oneSessionPerConnection;
+    }
+
+    public void setOneSessionPerConnection(boolean oneSessionPerConnection) {
+        this.oneSessionPerConnection = oneSessionPerConnection;
+    }
+
     public static Destination resolveOrCreateDestination(final Session session,
                                                          final DestinationResolver resolver,
                                                          final String replyToDestinationName,
@@ -418,36 +450,60 @@ public class JMSConfiguration {
         }
         return resolver.resolveDestinationName(session, replyToDestinationName, pubSubDomain);
     }
-    
+
     public Destination getReplyToDestination(Session session, String userDestination) throws JMSException {
-        if (userDestination == null) {
+        if (userDestination != null) {
+            return destinationResolver.resolveDestinationName(session, userDestination, replyPubSubDomain);
+        }
+        if (replyToDestination == null) {
             return getReplyDestination(session);
         }
-        return destinationResolver.resolveDestinationName(session, userDestination, replyPubSubDomain);
-    }
-    
-    public Destination getReplyDestination(Session session) throws JMSException {
-        Destination result = replyDestinationDest;
+        Destination result = replyToDestinationDest;
         if (result == null) {
             synchronized (this) {
-                result = replyDestinationDest;
+                result = replyToDestinationDest;
                 if (result == null) {
-                    result = replyDestination == null 
-                        ? session.createTemporaryQueue()
-                        : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
-                    replyDestinationDest = result;
+                    result = destinationResolver.resolveDestinationName(session, replyToDestination, replyPubSubDomain);
+                    replyToDestinationDest = result;
                 }
             }
         }
         return result;
     }
 
+    public Destination getReplyDestination(Session session) throws JMSException {
+        if (this.replyDestinationDest == null) {
+            synchronized (this) {
+                if (this.replyDestinationDest == null) {
+                    this.replyDestinationDest = getReplyDestinationInternal(session);
+                }
+            }
+        }
+        return this.replyDestinationDest;
+    }
+
+    private Destination getReplyDestinationInternal(Session session) throws JMSException {
+        return replyDestination == null
+            ? session.createTemporaryQueue()
+            : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
+    }
+    
+    public void resetCachedReplyDestination() {
+        synchronized (this) {
+            this.replyDestinationDest = null;
+        }
+    }
+
+
     public Destination getTargetDestination(Session session) throws JMSException {
         return destinationResolver.resolveDestinationName(session, targetDestination, pubSubDomain);
     }
 
     public Destination getReplyDestination(Session session, String replyToName) throws JMSException {
-        return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
+        if (replyToName != null) {
+            return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
+        }
+        return getReplyDestination(session);
     }
 
     public TransactionManager getTransactionManager() {
@@ -456,6 +512,14 @@ public class JMSConfiguration {
 
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
+    }
+
+    public int getRetryInterval() {
+        return this.retryInterval;
+    }
+    
+    public void setRetryInterval(int retryInterval) {
+        this.retryInterval = retryInterval;
     }
 
 }

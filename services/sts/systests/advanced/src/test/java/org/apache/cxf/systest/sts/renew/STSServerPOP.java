@@ -46,8 +46,8 @@ public class STSServerPOP extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
-    public static void main(String args[]) {
+
+    public static void main(String[] args) {
         new STSServerPOP().run();
     }
 }

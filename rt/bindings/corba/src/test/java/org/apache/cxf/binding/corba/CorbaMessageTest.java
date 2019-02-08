@@ -23,37 +23,40 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.types.CorbaPrimitiveHandler;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.message.Message;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.NVList;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaMessageTest extends Assert {
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaMessageTest {
 
     private static ORB orb;
     private Message message;
-    
+
     @Before
     public void setUp() throws Exception {
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
         IMocksControl control = EasyMock.createNiceControl();
         message = control.createMock(Message.class);
     }
-    
+
     @Test
     public void testGetCorbaMessageAttributes() {
         CorbaMessage msg = new CorbaMessage(message);
-                        
+
         QName param1Name = new QName("param1");
         QName param1IdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "long", CorbaConstants.NP_WSDL_CORBA);
         TypeCode param1TypeCode = orb.get_primitive_tc(TCKind.tk_long);
@@ -62,7 +65,7 @@ public class CorbaMessageTest extends Assert {
                                                                  param1TypeCode,
                                                                  null);
         CorbaStreamable p1 = msg.createStreamableObject(param1, param1Name);
-        
+
         QName param2Name = new QName("param2");
         QName param2IdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "string", CorbaConstants.NP_WSDL_CORBA);
         TypeCode param2TypeCode = orb.get_primitive_tc(TCKind.tk_string);
@@ -71,15 +74,15 @@ public class CorbaMessageTest extends Assert {
                                                                  param2TypeCode,
                                                                  null);
         CorbaStreamable p2 = msg.createStreamableObject(param2, param2Name);
-        
+
         msg.addStreamableArgument(p1);
         msg.addStreamableArgument(p2);
-        
+
         CorbaStreamable[] arguments = msg.getStreamableArguments();
         assertTrue(arguments.length == 2);
         assertNotNull(arguments[0]);
         assertNotNull(arguments[1]);
-        
+
         QName param3Name = new QName("param3");
         QName param3IdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "short", CorbaConstants.NP_WSDL_CORBA);
         TypeCode param3TypeCode = orb.get_primitive_tc(TCKind.tk_short);
@@ -88,7 +91,7 @@ public class CorbaMessageTest extends Assert {
                                                                  param3TypeCode,
                                                                  null);
         CorbaStreamable p3 = msg.createStreamableObject(param3, param3Name);
-        
+
         QName param4Name = new QName("param4");
         QName param4IdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "float", CorbaConstants.NP_WSDL_CORBA);
         TypeCode param4TypeCode = orb.get_primitive_tc(TCKind.tk_float);
@@ -97,30 +100,30 @@ public class CorbaMessageTest extends Assert {
                                                                  param4TypeCode,
                                                                  null);
         CorbaStreamable p4 = msg.createStreamableObject(param4, param4Name);
-        
+
         CorbaStreamable[] args = new CorbaStreamable[2];
         args[0] =  p3;
-        args[1] = p4;        
+        args[1] = p4;
         msg.setStreamableArguments(args);
-        
+
         arguments = msg.getStreamableArguments();
         assertTrue(arguments.length == 4);
         assertNotNull(arguments[0]);
         assertNotNull(arguments[1]);
         assertNotNull(arguments[2]);
         assertNotNull(arguments[3]);
-        
-        NVList list = orb.create_list(2);        
+
+        NVList list = orb.create_list(2);
         Any value = orb.create_any();
         value.insert_Streamable(p1);
         list.add_value(p1.getName(), value, p1.getMode());
         value.insert_Streamable(p2);
         list.add_value(p2.getName(), value, p2.getMode());
-                
+
         msg.setList(list);
         NVList resultList = msg.getList();
-        assertTrue(resultList.count() == 2);        
-        
+        assertTrue(resultList.count() == 2);
+
         QName returnName = new QName("param2");
         QName returnIdlType = new QName(CorbaConstants.NU_WSDL_CORBA, "boolean",
                                         CorbaConstants.NP_WSDL_CORBA);
@@ -129,11 +132,11 @@ public class CorbaMessageTest extends Assert {
                                                                       returnIdlType,
                                                                       returnTypeCode, null);
         CorbaStreamable ret = msg.createStreamableObject(returnValue, returnName);
-        
+
         msg.setStreamableReturn(ret);
         CorbaStreamable retVal = msg.getStreamableReturn();
         assertNotNull(retVal);
-        
+
         // NEED TO DO TEST FOR EXCEPTIONS
         /*Exception ex = new CorbaBindingException("TestException");
         msg.s.setException(ex);

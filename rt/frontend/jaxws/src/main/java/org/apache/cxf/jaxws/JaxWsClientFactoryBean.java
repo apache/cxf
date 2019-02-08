@@ -46,7 +46,7 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
     }
 
     protected SoapBindingConfiguration createSoapBindingConfig() {
-        JaxWsSoapBindingConfiguration bc  
+        JaxWsSoapBindingConfiguration bc
             = new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory());
         if (transportId != null) {
             bc.setTransportURI(transportId);
@@ -56,7 +56,7 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
 
     @Override
     public void setBindingId(String bind) {
-        if (SOAPBinding.SOAP11HTTP_BINDING.equals(bind) 
+        if (SOAPBinding.SOAP11HTTP_BINDING.equals(bind)
             || SOAPBinding.SOAP11HTTP_MTOM_BINDING.equals(bind)) {
             super.setBindingId("http://schemas.xmlsoap.org/wsdl/soap/");
         } else if (SOAPBinding.SOAP12HTTP_BINDING.equals(bind)
@@ -65,7 +65,7 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
         } else {
             super.setBindingId(bind);
         }
-        
+
         if (SOAPBinding.SOAP11HTTP_BINDING.equals(bind)
             || SOAPBinding.SOAP12HTTP_BINDING.equals(bind)) {
             setBindingConfig(new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory()));
@@ -75,5 +75,5 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
             ((JaxWsSoapBindingConfiguration)getBindingConfig()).setMtomEnabled(true);
         }
     }
-    
+
 }

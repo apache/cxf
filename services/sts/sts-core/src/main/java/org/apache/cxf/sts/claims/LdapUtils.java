@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.claims;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import javax.naming.directory.SearchControls;
 import javax.security.auth.x500.X500Principal;
 
 import org.apache.cxf.helpers.CastUtils;
-
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextOperations;
@@ -39,12 +39,13 @@ import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.AbstractContextMapper;
 import org.springframework.ldap.filter.AndFilter;
 import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.ldap.filter.Filter;
 
 public final class LdapUtils {
-    
+
     private LdapUtils() {
     }
-    
+
     public static boolean isDN(String user) {
         try {
             new X500Principal(user);
@@ -55,16 +56,16 @@ public final class LdapUtils {
             return false;
         }
     }
-    
-    public static Map<String, Attribute> getAttributesOfEntry(LdapTemplate ldapTemplate, String baseDN, 
+
+    public static Map<String, Attribute> getAttributesOfEntry(LdapTemplate ldapTemplate, String baseDN,
         String objectClass, String filterAttributeName, String filterAttributeValue,
         String[] searchAttributes) {
-        
+
         Map<String, Attribute> ldapAttributes = null;
-        
-        AttributesMapper mapper = 
-            new AttributesMapper() {
-                public Object mapFromAttributes(Attributes attrs) throws NamingException {
+
+        AttributesMapper<Map<String, Attribute>> mapper =
+            new AttributesMapper<Map<String, Attribute>>() {
+                public Map<String, Attribute> mapFromAttributes(Attributes attrs) throws NamingException {
                     Map<String, Attribute> map = new HashMap<>();
                     NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
                     while (attrEnum.hasMore()) {
@@ -74,80 +75,93 @@ public final class LdapUtils {
                     return map;
                 }
             };
-        
+
         List<?> result = null;
         AndFilter filter = new AndFilter();
         filter.and(
                 new EqualsFilter("objectclass", objectClass)).and(
                         new EqualsFilter(filterAttributeName, filterAttributeValue));
-        
+
         result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
-        if (result != null && result.size() > 0) {
+        if (result != null && !result.isEmpty()) {
             ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
         }
-        
+
         return ldapAttributes;
     }
-    
+
     public static List<String> getAttributeOfEntries(
-        LdapTemplate ldapTemplate, String baseDN, 
+        LdapTemplate ldapTemplate, String baseDN,
         String objectClass, String filterAttributeName, String filterAttributeValue,
+        String searchAttribute) {
+
+        List<Filter> filters =
+            Collections.singletonList(new EqualsFilter(filterAttributeName, filterAttributeValue));
+        return getAttributeOfEntries(ldapTemplate, baseDN, objectClass, filters, searchAttribute);
+    }
+
+    public static List<String> getAttributeOfEntries(
+        LdapTemplate ldapTemplate, String baseDN,
+        String objectClass, List<Filter> filters,
         String searchAttribute) {
 
         List<String> ldapAttributes = null;
 
-        AttributesMapper mapper = 
-            new AttributesMapper() {
-                public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                    NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
-                    while (attrEnum.hasMore()) {
-                        return (String) attrEnum.next().get();
-                    }
-                    return null;
+        AttributesMapper<Object> mapper =
+            new AttributesMapper<Object>() {
+            public Object mapFromAttributes(Attributes attrs) throws NamingException {
+                NamingEnumeration<? extends Attribute> attrEnum = attrs.getAll();
+                while (attrEnum.hasMore()) {
+                    return attrEnum.next().get();
                 }
-            };
-        
-        String[] searchAttributes = new String[] {searchAttribute};  
-        
+                return null;
+            }
+        };
+
+        String[] searchAttributes = new String[] {searchAttribute};
+
         List<?> result = null;
         AndFilter filter = new AndFilter();
-        filter.and(
-            new EqualsFilter("objectclass", objectClass)).and(
-                new EqualsFilter(filterAttributeName, filterAttributeValue));
+        filter.and(new EqualsFilter("objectclass", objectClass));
+        if (filters != null) {
+            for (Filter f : filters) {
+                filter.and(f);
+            }
+        }
 
         result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
-        if (result != null && result.size() > 0) {
+        if (result != null && !result.isEmpty()) {
             ldapAttributes = CastUtils.cast((List<?>)result);
         }
 
         return ldapAttributes;
     }
-    
-    public static Name getDnOfEntry(LdapTemplate ldapTemplate, String baseDN, 
+
+    public static Name getDnOfEntry(LdapTemplate ldapTemplate, String baseDN,
         String objectClass, String filterAttributeName, String filterAttributeValue) {
 
-        ContextMapper mapper = 
-            new AbstractContextMapper() {
-                public Object doMapFromContext(DirContextOperations ctx) {
+        ContextMapper<Name> mapper =
+            new AbstractContextMapper<Name>() {
+                public Name doMapFromContext(DirContextOperations ctx) {
                     return ctx.getDn();
                 }
             };
-        
+
         AndFilter filter = new AndFilter();
         filter.and(
             new EqualsFilter("objectclass", objectClass)).and(
                 new EqualsFilter(filterAttributeName, filterAttributeValue));
 
-        List<?> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
+        List<Name> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, mapper);
-        
-        if (result != null && result.size() > 0) {
+
+        if (result != null && !result.isEmpty()) {
             //not only the first one....
-            return (Name)result.get(0);
+            return result.get(0);
         }
         return null;
     }
-    
+
 }

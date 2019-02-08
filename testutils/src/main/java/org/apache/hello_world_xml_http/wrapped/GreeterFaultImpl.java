@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 
-@javax.jws.WebService(serviceName = "XMLService", 
+@javax.jws.WebService(serviceName = "XMLService",
                       portName = "XMLFaultPort",
                       endpointInterface = "org.apache.hello_world_xml_http.wrapped.Greeter",
                       targetNamespace = "http://apache.org/hello_world_xml_http/wrapped",
@@ -34,9 +34,9 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class GreeterFaultImpl implements Greeter {
     public static final String RUNTIME_EXCEPTION_MESSAGE = "test throw out runtime exception";
-    private static final Logger LOG = LogUtils.getL7dLogger(GreeterFaultImpl.class); 
+    private static final Logger LOG = LogUtils.getL7dLogger(GreeterFaultImpl.class);
 
-    public String greetMe(String me) {        
+    public String greetMe(String me) {
         return "Hello " + me;
     }
 

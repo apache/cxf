@@ -19,10 +19,9 @@
 
 package org.apache.cxf.transport.http.osgi;
 
-import java.util.Properties;
-
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
@@ -39,51 +38,53 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class HTTPTransportActivator implements BundleActivator {
     private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = "org.apache.cxf.osgi.http.transport.disable";
-    private ServiceTracker httpServiceTracker;
-    
+    private ServiceTracker<HttpService, ?> httpServiceTracker;
+
     public void start(final BundleContext context) throws Exception {
-        
+
         ConfigAdminHttpConduitConfigurer conduitConfigurer = new ConfigAdminHttpConduitConfigurer();
-        
-        registerService(context, ManagedServiceFactory.class, conduitConfigurer, 
+
+        registerService(context, ManagedServiceFactory.class, conduitConfigurer,
                         ConfigAdminHttpConduitConfigurer.FACTORY_PID);
-        registerService(context, HTTPConduitConfigurer.class, conduitConfigurer, 
+        registerService(context, HTTPConduitConfigurer.class, conduitConfigurer,
                         "org.apache.cxf.http.conduit-configurer");
-        
+
         if (PropertyUtils.isTrue(context.getProperty(DISABLE_DEFAULT_HTTP_TRANSPORT))) {
-            //TODO: Review if it also makes sense to support "http.transport.disable" 
+            //TODO: Review if it also makes sense to support "http.transport.disable"
             //      directly in the CXF_CONFIG_SCOPE properties file
             return;
         }
-        
+
         DestinationRegistry destinationRegistry = new DestinationRegistryImpl();
         HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
-        
+
         HttpServiceTrackerCust customizer = new HttpServiceTrackerCust(destinationRegistry, context);
-        httpServiceTracker = new ServiceTracker(context, HttpService.class.getName(), customizer);
+        httpServiceTracker = new ServiceTracker<>(context, HttpService.class, customizer);
         httpServiceTracker.open();
 
         context.registerService(DestinationRegistry.class.getName(), destinationRegistry, null);
         context.registerService(HTTPTransportFactory.class.getName(), transportFactory, null);
-        
+
         BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            
+
             @Override
             public Object createNamespaceHandler() {
                 return new HttpBPHandler();
             }
         };
         NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/transports/http/configuration");  
+                                            "http://cxf.apache.org/transports/http/configuration");
     }
 
-    private ServiceRegistration registerService(BundleContext context, Class<?> serviceInterface,
-                                        Object serviceObject, String servicePid) {
-        Properties servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID,  servicePid);  
-        return context.registerService(serviceInterface.getName(), serviceObject, servProps);
+    private <T> ServiceRegistration<T> registerService(BundleContext context, Class<T> serviceInterface,
+                                        T serviceObject, String servicePid) {
+        return context.registerService(serviceInterface, serviceObject,
+                                       CollectionUtils.singletonDictionary(Constants.SERVICE_PID, servicePid));
     }
 
     public void stop(BundleContext context) throws Exception {
+        if (httpServiceTracker != null) {
+            httpServiceTracker.close();
+        }
     }
 }

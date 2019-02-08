@@ -12,7 +12,7 @@ have a single response for a request that has multiple subscribers.
 Please review the README in the samples directory before
 continuing.
 
-This demo uses ActiveMQ as the JMS implementation for 
+This demo uses ActiveMQ Artemis as the JMS implementation for
 illustration purposes only.
   
   

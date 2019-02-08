@@ -18,12 +18,11 @@
  */
 package org.apache.cxf.jca.core.resourceadapter;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 
 
-public class ResourceBeanTest extends Assert {
+public class ResourceBeanTest {
 
 
     @Test
@@ -31,6 +30,6 @@ public class ResourceBeanTest extends Assert {
         ResourceBean rb = new ResourceBean();
         rb.setDisableConsoleLogging(true);
     }
-    
+
 
 }

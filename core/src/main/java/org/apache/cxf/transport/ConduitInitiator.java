@@ -33,8 +33,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public interface ConduitInitiator {
     /**
      * Initiate an outbound Conduit.
-     * 
-     * @param targetInfo the endpoint info of the target 
+     *
+     * @param targetInfo the endpoint info of the target
      * @return a suitable new or pre-existing Conduit
      */
     Conduit getConduit(EndpointInfo targetInfo,
@@ -42,7 +42,7 @@ public interface ConduitInitiator {
 
     /**
      * Initiate an outbound Conduit.
-     * 
+     *
      * @param localInfo the endpoint info for a local endpoint on which the
      * the configuration should be based
      * @param target the target EPR
@@ -51,7 +51,7 @@ public interface ConduitInitiator {
     Conduit getConduit(EndpointInfo localInfo,
                        EndpointReferenceType target,
                        Bus bus) throws IOException;
-    
+
     Set<String> getUriPrefixes();
     List<String> getTransportIds();
 }

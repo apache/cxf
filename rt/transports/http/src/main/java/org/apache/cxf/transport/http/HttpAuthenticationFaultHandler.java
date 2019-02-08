@@ -34,13 +34,13 @@ import org.apache.cxf.phase.Phase;
 public class HttpAuthenticationFaultHandler extends AbstractPhaseInterceptor<Message> {
     String authenticationType;
     String realm;
-    
+
     public HttpAuthenticationFaultHandler() {
         super(Phase.UNMARSHAL);
         this.authenticationType = "Basic";
         this.realm = "CXF service";
     }
-    
+
     @Override
     public void handleMessage(Message message) throws Fault {
         // Nothing
@@ -56,8 +56,9 @@ public class HttpAuthenticationFaultHandler extends AbstractPhaseInterceptor<Mes
             resp.setHeader("WWW-Authenticate", authenticationType + " realm=\"" + realm + "\"");
             resp.setContentType("text/plain");
             try {
-                resp.getWriter().write(ex.getMessage());
-                resp.getWriter().flush();
+                resp.getOutputStream().write(ex.getMessage().getBytes());
+                resp.getOutputStream().flush();
+                message.getInterceptorChain().setFaultObserver(null); //avoid return soap fault
                 message.getInterceptorChain().abort();
             } catch (IOException e) {
                 // TODO
@@ -68,8 +69,9 @@ public class HttpAuthenticationFaultHandler extends AbstractPhaseInterceptor<Mes
     public void setAuthenticationType(String authenticationType) {
         this.authenticationType = authenticationType;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
+
 }

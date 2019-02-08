@@ -27,19 +27,19 @@ import javax.wsdl.xml.WSDLWriter;
 
 /**
  * This class is a copy of the WSDLFactoryImpl from the wsdl4j implementation
- * It overwrites the newWSDLWriter method to return a SchemaWriter 
+ * It overwrites the newWSDLWriter method to return a SchemaWriter
  */
 public class SchemaFactoryImpl extends SchemaFactory {
     WSDLFactory factory;
-    
+
     public SchemaFactoryImpl() throws WSDLException {
         factory = WSDLFactory.newInstance();
     }
-    
+
     /**
      * Create a new instance of a Definition, with an instance of a
      * PopulatedExtensionRegistry as its ExtensionRegistry.
-     * 
+     *
      */
     public Definition newDefinition() {
         Definition def = factory.newDefinition();
@@ -48,7 +48,7 @@ public class SchemaFactoryImpl extends SchemaFactory {
         def.setExtensionRegistry(extReg);
 
         return def;
-    }    
+    }
 
     /**
      * Create a new instance of a SchemaWriter.

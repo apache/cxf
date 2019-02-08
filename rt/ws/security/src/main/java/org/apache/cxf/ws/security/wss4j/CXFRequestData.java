@@ -32,9 +32,9 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.validate.Validator;
 
 public class CXFRequestData extends RequestData {
-    
+
     private static Map<QName, String> validatorKeys = new HashMap<>();
-    
+
     static {
         validatorKeys.put(WSConstants.SAML_TOKEN, SecurityConstants.SAML1_TOKEN_VALIDATOR);
         validatorKeys.put(WSConstants.SAML2_TOKEN, SecurityConstants.SAML2_TOKEN_VALIDATOR);
@@ -45,7 +45,7 @@ public class CXFRequestData extends RequestData {
         validatorKeys.put(WSConstants.SECURITY_CONTEXT_TOKEN_05_02, SecurityConstants.SCT_TOKEN_VALIDATOR);
         validatorKeys.put(WSConstants.SECURITY_CONTEXT_TOKEN_05_12, SecurityConstants.SCT_TOKEN_VALIDATOR);
     }
-    
+
     public CXFRequestData() {
     }
 
@@ -63,7 +63,7 @@ public class CXFRequestData extends RequestData {
                                                                  CXFRequestData.class)
                                                                  .newInstance();
                 } else if (o != null) {
-                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                    throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                   "Cannot load Validator: " + o);
                 }
             } catch (RuntimeException t) {

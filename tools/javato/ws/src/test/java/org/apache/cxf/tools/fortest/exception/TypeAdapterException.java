@@ -22,14 +22,14 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class TypeAdapterException extends Exception {
     private static final long serialVersionUID = 1L;
-    
+
     private MyClass1 adapted;
-    
+
     @XmlJavaTypeAdapter(Cl1ToCl2Adapter.class)
     public MyClass1 getAdapted() {
         return this.adapted;
     }
-    
+
     public void setAdapted(MyClass1 adapted) {
         this.adapted = adapted;
     }

@@ -25,19 +25,19 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class SoapBinding extends AbstractBasicInterceptorProvider implements Binding {
-    
+
     private SoapVersion version;
     private BindingInfo bindingInfo;
-    
+
     public SoapBinding(BindingInfo info) {
         this(info, Soap11.getInstance());
     }
-    
+
     public SoapBinding(BindingInfo info, SoapVersion v) {
-        version = v; 
+        version = v;
         bindingInfo = info;
     }
-    
+
     public BindingInfo getBindingInfo() {
         return bindingInfo;
     }
@@ -49,7 +49,7 @@ public class SoapBinding extends AbstractBasicInterceptorProvider implements Bin
     public SoapVersion getSoapVersion() {
         return version;
     }
-    
+
     public Message createMessage() {
         SoapMessage soapMessage = new SoapMessage(version);
         soapMessage.put(Message.CONTENT_TYPE, soapMessage.getVersion().getContentType());
@@ -58,11 +58,11 @@ public class SoapBinding extends AbstractBasicInterceptorProvider implements Bin
 
     public Message createMessage(Message m) {
         SoapMessage soapMessage = new SoapMessage(m);
-        if (m.getExchange() != null) { 
+        if (m.getExchange() != null) {
             if (m.getExchange().getInMessage() instanceof SoapMessage) {
                 soapMessage.setVersion(((SoapMessage)m.getExchange().getInMessage()).getVersion());
             } else {
-                soapMessage.setVersion(version);                
+                soapMessage.setVersion(version);
             }
         } else {
             soapMessage.setVersion(version);
@@ -71,7 +71,7 @@ public class SoapBinding extends AbstractBasicInterceptorProvider implements Bin
         if (!soapMessage.containsKey(Message.CONTENT_TYPE)) {
             soapMessage.put(Message.CONTENT_TYPE, soapMessage.getVersion().getContentType());
         }
-        
+
         return soapMessage;
     }
 

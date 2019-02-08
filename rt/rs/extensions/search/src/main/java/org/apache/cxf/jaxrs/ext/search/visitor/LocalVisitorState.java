@@ -26,10 +26,10 @@ package org.apache.cxf.jaxrs.ext.search.visitor;
  */
 public class LocalVisitorState<T> implements VisitorState<T> {
     private T value;
-    
+
     public LocalVisitorState() {
     }
-    
+
     public T get() {
         return value;
     }
@@ -42,5 +42,5 @@ public class LocalVisitorState<T> implements VisitorState<T> {
 
     public void set(T v) {
         this.value = v;
-    }    
+    }
 }

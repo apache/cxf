@@ -30,6 +30,7 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 
@@ -50,7 +51,7 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
     @Before
     public void setUpBus() throws Exception {
         super.setUpBus();
-        
+
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
         bindingFactory.setBus(bus);
         bus.getExtension(BindingFactoryManager.class)
@@ -65,9 +66,9 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
         dfm.registerDestinationFactory(SoapBindingConstants.SOAP11_BINDING_ID, soapDF);
         dfm.registerDestinationFactory(SoapBindingConstants.SOAP12_BINDING_ID, soapDF);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
-        
+
         localTransport = new LocalTransportFactory();
-        localTransport.setUriPrefixes(new HashSet<String>(Arrays.asList("http", "local")));
+        localTransport.setUriPrefixes(new HashSet<>(Arrays.asList("http", "local")));
         dfm.registerDestinationFactory(LocalTransportFactory.TRANSPORT_ID, localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", localTransport);

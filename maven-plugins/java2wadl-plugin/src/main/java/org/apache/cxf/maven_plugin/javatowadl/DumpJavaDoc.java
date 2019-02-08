@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.maven_plugin.javatowadl;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import com.sun.javadoc.ClassDoc;
@@ -31,14 +33,14 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
 public final class DumpJavaDoc {
-    
+
     private DumpJavaDoc() {
-        
+
     }
-    
+
     public static boolean start(RootDoc root) throws IOException {
         String dumpFileName = readOptions(root.options());
-        FileOutputStream fos = new FileOutputStream(dumpFileName);
+        OutputStream os = Files.newOutputStream(Paths.get(dumpFileName));
         Properties javaDocMap = new Properties();
         for (ClassDoc classDoc : root.classes()) {
             javaDocMap.put(classDoc.toString(), classDoc.commentText());
@@ -48,31 +50,31 @@ public final class DumpJavaDoc {
                     Parameter[] parameters = method.parameters();
                     for (int i = 0; i < parameters.length; ++i) {
                         if (parameters[i].name().equals(paramTag.parameterName())) {
-                            javaDocMap.put(method.qualifiedName() + ".paramCommentTag." + i, 
+                            javaDocMap.put(method.qualifiedName() + ".paramCommentTag." + i,
                                    paramTag.parameterComment());
                         }
                     }
                 }
-                Tag retTags[] = method.tags("return");
+                Tag[] retTags = method.tags("return");
                 if (retTags != null && retTags.length == 1) {
                     Tag retTag = method.tags("return")[0];
-                    javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag", 
+                    javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag",
                                    retTag.text());
                 }
             }
-                
+
         }
-        javaDocMap.store(fos, "");
-        fos.flush();
-        fos.close();
+        javaDocMap.store(os, "");
+        os.flush();
+        os.close();
         return true;
     }
-    
+
     private static String readOptions(String[][] options) {
         String tagName = null;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 tagName = opt[1];
             }
         }
@@ -86,17 +88,16 @@ public final class DumpJavaDoc {
         return 0;
     }
 
-    public static boolean validOptions(String options[][], DocErrorReporter reporter) {
+    public static boolean validOptions(String[][] options, DocErrorReporter reporter) {
         boolean foundTagOption = false;
         for (int i = 0; i < options.length; i++) {
             String[] opt = options[i];
-            if (opt[0].equals("-dumpJavaDocFile")) {
+            if ("-dumpJavaDocFile".equals(opt[0])) {
                 if (foundTagOption) {
                     reporter.printError("Only one -dumpJavaDocFile option allowed.");
                     return false;
-                } else {
-                    foundTagOption = true;
                 }
+                foundTagOption = true;
             }
         }
         if (!foundTagOption) {

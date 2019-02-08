@@ -37,6 +37,9 @@ import org.apache.cxf.xkms.model.xkms.StatusType;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.X509DataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,8 +47,6 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 
@@ -53,13 +54,13 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 public class ValidatorCRLTest extends BasicIntegrationTest {
     private static final String PATH_TO_RESOURCES = "/data/xkms/certificates/";
 
-    private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF = 
+    private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF =
         new org.apache.cxf.xkms.model.xmldsig.ObjectFactory();
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(ValidatorCRLTest.class);
-    
+
     @Configuration
     public Option[] getConfig() {
         return new Option[] {
@@ -68,7 +69,7 @@ public class ValidatorCRLTest extends BasicIntegrationTest {
             editConfigurationFilePut("etc/org.apache.cxf.xkms.cfg", "xkms.enableRevocation", "true")
         };
     }
-    
+
     @Test
     public void testValidCertWithCRL() throws CertificateException {
         X509Certificate wss40Certificate = readCertificate("wss40.cer");
@@ -82,7 +83,7 @@ public class ValidatorCRLTest extends BasicIntegrationTest {
         Assert.assertEquals(ReasonEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_ISSUER_TRUST.value(), result
             .getValidReason().get(1));
     }
-    
+
     @Test
     public void testRevokedCertificate() throws CertificateException {
         X509Certificate wss40Certificate = readCertificate("wss40rev.cer");
@@ -133,12 +134,12 @@ public class ValidatorCRLTest extends BasicIntegrationTest {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate)cf.generateCertificate(inputStream);
     }
-    
+
     private StatusType doValidate(ValidateRequestType request) {
         try {
             return xkmsService.validate(request).getKeyBinding().get(0).getStatus();
         } catch (Exception e) {
-            // Avoid serialization problems for some exceptions when transported by pax exam 
+            // Avoid serialization problems for some exceptions when transported by pax exam
             LOG.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }

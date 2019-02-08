@@ -31,26 +31,26 @@ public class UnionDeferredAction implements SchemaDeferredAction {
     protected Union union;
     protected Unionbranch unionBranch;
     protected XmlSchemaElement element;
-    
-    
+
+
     public UnionDeferredAction(Union unionType, Unionbranch unionBranchType, XmlSchemaElement elem) {
         union = unionType;
         unionBranch = unionBranchType;
-        element = elem;        
+        element = elem;
     }
-    
+
     public UnionDeferredAction(Union unionType) {
-        union = unionType;         
+        union = unionType;
     }
-    
+
     public UnionDeferredAction(Unionbranch unionBranchType) {
-        unionBranch = unionBranchType;         
+        unionBranch = unionBranchType;
     }
-    
+
     public UnionDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (unionBranch != null) {
             unionBranch.setIdltype(ctype.getQName());
@@ -60,9 +60,9 @@ public class UnionDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }        
+        }
     }
-        
+
 }
 
 

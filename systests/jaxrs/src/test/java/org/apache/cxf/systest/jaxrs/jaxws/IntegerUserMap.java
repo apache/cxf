@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class IntegerUserMap {
     @XmlElement(nillable = false, name = "entry")
-    List<IntegerUserEntry> entries = new ArrayList<IntegerUserEntry>();
+    List<IntegerUserEntry> entries = new ArrayList<>();
 
     public List<IntegerUserEntry> getEntries() {
         return entries;

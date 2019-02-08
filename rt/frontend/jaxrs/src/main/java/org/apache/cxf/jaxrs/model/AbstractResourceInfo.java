@@ -25,25 +25,18 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
@@ -52,26 +45,7 @@ public abstract class AbstractResourceInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractResourceInfo.class);
     private static final String FIELD_PROXY_MAP = "jaxrs-field-proxy-map";
     private static final String SETTER_PROXY_MAP = "jaxrs-setter-proxy-map";
-    
-    private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<String>();
-    static {
-        // JAX-RS 1.0-1.1
-        STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(UriInfo.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(HttpHeaders.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(Request.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(Providers.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getName());
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletRequest");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletResponse");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.ServletContext");
-        // JAX-RS 2.0
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceContext");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceInfo");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.core.Configuration");
-    }
-    
+
     protected boolean root;
     protected Class<?> resourceClass;
     protected Class<?> serviceClass;
@@ -81,19 +55,19 @@ public abstract class AbstractResourceInfo {
     private Bus bus;
     private boolean constructorProxiesAvailable;
     private boolean contextsAvailable;
-    
+
     protected AbstractResourceInfo(Bus bus) {
         this.bus = bus;
     }
 
-    protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
+    protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass,
                                    boolean isRoot, boolean checkContexts, Bus bus) {
         this(resourceClass, serviceClass, isRoot, checkContexts, null, bus, null);
     }
-    
-    protected AbstractResourceInfo(Class<?> resourceClass, 
-                                   Class<?> serviceClass, 
-                                   boolean isRoot, 
+
+    protected AbstractResourceInfo(Class<?> resourceClass,
+                                   Class<?> serviceClass,
+                                   boolean isRoot,
                                    boolean checkContexts,
                                    Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                                    Bus bus,
@@ -106,8 +80,8 @@ public abstract class AbstractResourceInfo {
             findContexts(serviceClass, provider, constructorProxies);
         }
     }
-    
-    private void findContexts(Class<?> cls, Object provider, 
+
+    private void findContexts(Class<?> cls, Object provider,
                               Map<Class<?>, ThreadLocalProxy<?>> constructorProxies) {
         findContextFields(cls, provider);
         findContextSetterMethods(cls, provider);
@@ -116,42 +90,43 @@ public abstract class AbstractResourceInfo {
             proxies.put(serviceClass, constructorProxies);
             constructorProxiesAvailable = true;
         }
-        
-        
-        contextsAvailable = contextFields != null && !contextFields.isEmpty() 
+
+
+        contextsAvailable = contextFields != null && !contextFields.isEmpty()
             || contextMethods != null && !contextMethods.isEmpty()
             || constructorProxiesAvailable;
     }
-    
+
     public boolean contextsAvailable() {
         return contextsAvailable;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-    
+
     public void setResourceClass(Class<?> rClass) {
         resourceClass = rClass;
         if (serviceClass.isInterface() && resourceClass != null && !resourceClass.isInterface()) {
             findContexts(resourceClass, null, null);
         }
     }
-    
+
     public Class<?> getServiceClass() {
         return serviceClass;
     }
-    
+
     private void findContextFields(Class<?> cls, Object provider) {
         if (cls == Object.class || cls == null) {
             return;
         }
-        for (Field f : cls.getDeclaredFields()) {
+        for (Field f : ReflectionUtil.getDeclaredFields(cls)) {
             for (Annotation a : f.getAnnotations()) {
-                if (a.annotationType() == Context.class) {
+                if (a.annotationType() == Context.class
+                    && (f.getType().isInterface() || f.getType() == Application.class)) {
                     contextFields = addContextField(contextFields, f);
-                    if (f.getType().isInterface()) {
-                        checkContextClass(f.getType());
+                    checkContextClass(f.getType());
+                    if (!InjectionUtils.VALUE_CONTEXTS.contains(f.getType().getName())) {
                         addToMap(getFieldProxyMap(true), f, getFieldThreadLocalProxy(f, provider));
                     }
                 }
@@ -159,7 +134,7 @@ public abstract class AbstractResourceInfo {
         }
         findContextFields(cls.getSuperclass(), provider);
     }
-    
+
     private static ThreadLocalProxy<?> getFieldThreadLocalProxy(Field f, Object provider) {
         if (provider != null) {
             Object proxy = null;
@@ -175,18 +150,17 @@ public abstract class AbstractResourceInfo {
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
-        } else {
-            return InjectionUtils.createThreadLocalProxy(f.getType());
         }
+        return InjectionUtils.createThreadLocalProxy(f.getType());
     }
-    
+
     private static ThreadLocalProxy<?> getMethodThreadLocalProxy(Method m, Object provider) {
         if (provider != null) {
             Object proxy = null;
             synchronized (provider) {
                 try {
-                    proxy = InjectionUtils.extractFromMethod(provider, 
-                                                             InjectionUtils.getGetterFromSetter(m), 
+                    proxy = InjectionUtils.extractFromMethod(provider,
+                                                             InjectionUtils.getGetterFromSetter(m),
                                                              false);
                 } catch (Throwable t) {
                     // continue
@@ -197,11 +171,10 @@ public abstract class AbstractResourceInfo {
                 }
             }
             return (ThreadLocalProxy<?>)proxy;
-        } else {
-            return InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
         }
+        return InjectionUtils.createThreadLocalProxy(m.getParameterTypes()[0]);
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> Map<Class<?>, Map<T, ThreadLocalProxy<?>>> getProxyMap(String prop, boolean create) {
         Object property = null;
@@ -209,46 +182,45 @@ public abstract class AbstractResourceInfo {
             property = bus.getProperty(prop);
             if (property == null && create) {
                 Map<Class<?>, Map<T, ThreadLocalProxy<?>>> map
-                    = new ConcurrentHashMap<Class<?>, Map<T, ThreadLocalProxy<?>>>(2);
+                    = new ConcurrentHashMap<>(2);
                 bus.setProperty(prop, map);
                 property = map;
             }
         }
         return (Map<Class<?>, Map<T, ThreadLocalProxy<?>>>)property;
     }
-    
+
     public Map<Class<?>, ThreadLocalProxy<?>> getConstructorProxies() {
         if (constructorProxiesAvailable) {
             return getConstructorProxyMap(false).get(serviceClass);
-        } else {
-            return null;
         }
+        return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> getConstructorProxyMap(boolean create) {
         Object property = bus.getProperty(CONSTRUCTOR_PROXY_MAP);
         if (property == null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> map
-                = new ConcurrentHashMap<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>(2);
+                = new ConcurrentHashMap<>(2);
             bus.setProperty(CONSTRUCTOR_PROXY_MAP, map);
             property = map;
         }
         return (Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>>)property;
     }
-    
+
     private Map<Class<?>, Map<Field, ThreadLocalProxy<?>>> getFieldProxyMap(boolean create) {
         return getProxyMap(FIELD_PROXY_MAP, create);
     }
-    
+
     private Map<Class<?>, Map<Method, ThreadLocalProxy<?>>> getSetterProxyMap(boolean create) {
         return getProxyMap(SETTER_PROXY_MAP, create);
     }
-    
+
     private void findContextSetterMethods(Class<?> cls, Object provider) {
-        
+
         for (Method m : cls.getMethods()) {
-        
+
             if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
                 continue;
             }
@@ -268,58 +240,57 @@ public abstract class AbstractResourceInfo {
             findContextSetterMethods(superCls, provider);
         }
     }
-    
+
     private void checkContextMethod(Method m, Object provider) {
         Class<?> type = m.getParameterTypes()[0];
-        if (type.isInterface() || type == Application.class) {        
+        if (type.isInterface() || type == Application.class) {
             checkContextClass(type);
             addContextMethod(type, m, provider);
         }
     }
     private void checkContextClass(Class<?> type) {
-        if (!STANDARD_CONTEXT_CLASSES.contains(type.getName())) {
-            LOG.fine("Injecting a custom context " + type.getName() 
+        if (!InjectionUtils.STANDARD_CONTEXT_CLASSES.contains(type.getName())) {
+            LOG.fine("Injecting a custom context " + type.getName()
                      + ", ContextProvider is required for this type");
         }
     }
-    
-    @SuppressWarnings("unchecked")
+
     public Map<Class<?>, Method> getContextMethods() {
         Map<Class<?>, Method> methods = contextMethods == null ? null : contextMethods.get(getServiceClass());
-        return methods == null ? Collections.EMPTY_MAP 
+        return methods == null ? Collections.emptyMap()
                                       : Collections.unmodifiableMap(methods);
     }
-    
+
     private void addContextMethod(Class<?> contextClass, Method m, Object provider) {
         if (contextMethods == null) {
-            contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
+            contextMethods = new HashMap<>();
         }
         addToMap(contextMethods, contextClass, m);
-        if (m.getParameterTypes()[0] != Application.class) {
+        if (!InjectionUtils.VALUE_CONTEXTS.contains(m.getParameterTypes()[0].getName())) {
             addToMap(getSetterProxyMap(true), m, getMethodThreadLocalProxy(m, provider));
         }
     }
-    
+
     public boolean isRoot() {
         return root;
     }
-    
+
     public Class<?> getResourceClass() {
         return resourceClass;
     }
-    
+
     public List<Field> getContextFields() {
         return getList(contextFields);
     }
-    
+
     public ThreadLocalProxy<?> getContextFieldProxy(Field f) {
         return getProxy(getFieldProxyMap(true), f);
     }
-    
+
     public ThreadLocalProxy<?> getContextSetterProxy(Method m) {
         return getProxy(getSetterProxyMap(true), m);
     }
-    
+
     public abstract boolean isSingleton();
 
     @SuppressWarnings("rawtypes")
@@ -340,13 +311,13 @@ public abstract class AbstractResourceInfo {
             }
         }
     }
-    
+
     public void clearThreadLocalProxies() {
         clearProxies(getFieldProxyMap(false));
         clearProxies(getSetterProxyMap(false));
         clearProxies(getConstructorProxyMap(false));
     }
-    
+
     private <T> void clearProxies(Map<Class<?>, Map<T, ThreadLocalProxy<?>>> tlps) {
         Map<T, ThreadLocalProxy<?>> proxies = tlps == null ? null : tlps.get(getServiceClass());
         if (proxies == null) {
@@ -358,15 +329,15 @@ public abstract class AbstractResourceInfo {
             }
         }
     }
-    
+
     private Map<Class<?>, List<Field>> addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
         if (theFields == null) {
-            theFields = new HashMap<Class<?>, List<Field>>();
+            theFields = new HashMap<>();
         }
-        
+
         List<Field> fields = theFields.get(serviceClass);
         if (fields == null) {
-            fields = new ArrayList<Field>();
+            fields = new ArrayList<>();
             theFields.put(serviceClass, fields);
         }
         if (!fields.contains(f)) {
@@ -374,13 +345,13 @@ public abstract class AbstractResourceInfo {
         }
         return theFields;
     }
-    
+
     private <T, V> void addToMap(Map<Class<?>, Map<T, V>> proxyMap,
-                                 T f, 
+                                 T f,
                                  V proxy) {
         Map<T, V> proxies = proxyMap.get(serviceClass);
         if (proxies == null) {
-            proxies = new ConcurrentHashMap<T, V>();
+            proxies = new ConcurrentHashMap<>();
             proxyMap.put(serviceClass, proxies);
         }
         if (!proxies.containsKey(f)) {
@@ -397,10 +368,10 @@ public abstract class AbstractResourceInfo {
         }
         return ret;
     }
-    
+
     private <T> ThreadLocalProxy<?> getProxy(Map<Class<?>, Map<T, ThreadLocalProxy<?>>> proxies,
                                              T key) {
-        
+
         Map<?, ThreadLocalProxy<?>> theMap = proxies == null ? null : proxies.get(getServiceClass());
         ThreadLocalProxy<?> ret = null;
         if (theMap != null) {

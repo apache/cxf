@@ -25,35 +25,39 @@ import java.util.List;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaBindingTest extends Assert {
-    
+import static org.junit.Assert.assertNotNull;
+
+
+public class CorbaBindingTest {
+
     private ORB orb;
-    
+
     @Before
     public void setUp() throws Exception {
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
     }
-    
-    public void tearDown() {   
+
+    @After
+    public void tearDown() {
         if (orb != null) {
             try {
                 orb.destroy();
             } catch (Exception ex) {
                 // Do nothing.  Throw an Exception?
             }
-        } 
+        }
     }
-           
+
     @Test
     public void testCorbaBinding() {
         CorbaBinding binding = new CorbaBinding();
@@ -69,17 +73,17 @@ public class CorbaBindingTest extends Assert {
         message.put(ORB.class, orb);
         assertNotNull(message);
         ORB corbaORB = message.get(ORB.class);
-        assertNotNull(corbaORB);        
+        assertNotNull(corbaORB);
         MessageImpl mesage = new MessageImpl();
         mesage.put(ORB.class, orb);
-        Message msg = binding.createMessage(mesage);        
-        assertNotNull(msg);                
+        Message msg = binding.createMessage(mesage);
+        assertNotNull(msg);
         ORB corbaOrb = msg.get(ORB.class);
         assertNotNull(corbaOrb);
         /*List<Interceptor> infault = binding.getInFaultInterceptors();
         assertEquals(1, infault.size());
         List<Interceptor> outfault = binding.getOutFaultInterceptors();
-        assertEquals(1, fault.size());*/    
-    }        
-            
+        assertEquals(1, fault.size());*/
+    }
+
 }

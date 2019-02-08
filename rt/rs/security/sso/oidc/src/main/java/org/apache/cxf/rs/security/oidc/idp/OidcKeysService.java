@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
@@ -32,15 +33,29 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public class OidcKeysService {
 
     private volatile JsonWebKeys keySet;
-    
+    private WebClient keyServiceClient;
+
     @GET
     @Produces("application/json")
     public JsonWebKeys getPublicVerificationKeys() {
         if (keySet == null) {
-            Properties props = JwsUtils.loadSignatureInProperties(true);
-            keySet = JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
+            if (keyServiceClient == null) {
+                keySet = getFromLocalStore();
+            } else {
+                keySet = keyServiceClient.get(JsonWebKeys.class);
+            }
+
         }
         return keySet;
     }
-    
+
+    private static JsonWebKeys getFromLocalStore() {
+        Properties props = JwsUtils.loadSignatureInProperties(true);
+        return JwsUtils.loadPublicVerificationKeys(JAXRSUtils.getCurrentMessage(), props);
+    }
+
+    public void setKeyServiceClient(WebClient keyServiceClient) {
+        this.keyServiceClient = keyServiceClient;
+    }
+
 }

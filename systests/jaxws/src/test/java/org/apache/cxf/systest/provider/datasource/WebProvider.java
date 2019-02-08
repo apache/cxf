@@ -23,7 +23,7 @@ import javax.xml.ws.WebServiceContext;
 
 public interface WebProvider {
     WebServiceContext getWebServiceContext();
-    
+
     void publish(String url);
 
 }

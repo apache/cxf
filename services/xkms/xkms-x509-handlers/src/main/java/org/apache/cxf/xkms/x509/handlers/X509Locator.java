@@ -72,7 +72,7 @@ public class X509Locator implements Locator {
 
     public X509Certificate findCertificate(List<UseKeyWithType> ids) throws CertificateException {
         X509Certificate cert = null;
-        if (ids.size() == 0) {
+        if (ids.isEmpty()) {
             throw new IllegalArgumentException("No UseKeyWithType elements found");
         }
         if (ids.size() == 1) {
@@ -93,7 +93,7 @@ public class X509Locator implements Locator {
         }
         return cert;
     }
-    
+
     private String getIdForApplication(Applications application, List<UseKeyWithType> ids) {
         for (UseKeyWithType id : ids) {
             if (application.getUri().equalsIgnoreCase(id.getApplication())) {
@@ -102,7 +102,7 @@ public class X509Locator implements Locator {
         }
         return null;
     }
-    
+
     private List<UseKeyWithType> parse(LocateRequestType request) {
         List<UseKeyWithType> keyIDs = new ArrayList<>();
         if (request == null) {

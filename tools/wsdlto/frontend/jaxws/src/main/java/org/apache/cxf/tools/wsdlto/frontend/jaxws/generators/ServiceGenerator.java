@@ -54,7 +54,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
         if (env.optionSet(ToolConstants.CFG_GEN_SERVICE)
             || env.optionSet(ToolConstants.CFG_ALL)) {
             return false;
-        } 
+        }
         return env.optionSet(ToolConstants.CFG_GEN_ANT)
             || env.optionSet(ToolConstants.CFG_GEN_TYPES)
             || env.optionSet(ToolConstants.CFG_GEN_CLIENT)
@@ -69,15 +69,15 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        
+
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
- 
+
             ClassCollector collector = penv.get(ClassCollector.class);
-            
+
             Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
-            
-            if (serviceClasses.size() == 0) {
+
+            if (serviceClasses.isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
@@ -86,15 +86,15 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 }
                 return;
             }
-            
+
             for (JavaServiceClass js : serviceClasses.values()) {
                 if (js.getHandlerChains() != null) {
                     HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
                     handlerGen.setJavaInterface(js);
                     handlerGen.generate(getEnvironment());
-    
+
                     JAnnotation annot = handlerGen.getHandlerAnnotation();
-                                   
+
                     if (handlerGen.getHandlerAnnotation() != null) {
                         boolean existHandlerAnno = false;
                         for (JAnnotation jann : js.getAnnotations()) {
@@ -107,9 +107,9 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                             js.addImport("javax.jws.HandlerChain");
                         }
                     }
-                    
+
                 }
-    
+
                 Set<String> portNames = new HashSet<>();
                 for (JavaPort port : js.getPorts()) {
                     if (!port.getPackageName().equals(js.getPackageName())
@@ -122,13 +122,13 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     js.addImport(BindingProvider.class.getName());
                     js.addImport(Client.class.getName());
                 }
-    
+
                 String url = (String)env.get(ToolConstants.CFG_WSDLURL);
                 String location = (String)env.get(ToolConstants.CFG_WSDLLOCATION);
                 if (location == null) {
                     location = url;
                 }
-                
+
                 String serviceSuperclass = (String)env.get("service.superclass");
                 String simpleServiceName = serviceSuperclass.substring(serviceSuperclass.lastIndexOf('.') + 1);
                 for (String s : collector.getGeneratedFileInfo()) {
@@ -138,15 +138,15 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                     }
                 }
                 clearAttributes();
-                
+
                 boolean useGetResource = false;
                 try {
                     new URL(location);
                 } catch (MalformedURLException e) {
                     useGetResource = true;
                 }
-                
-                setAttributes("cxfPortClassnames", portNames.toArray(new String[portNames.size()]));
+
+                setAttributes("cxfPortClassnames", portNames.toArray(new String[0]));
                 setAttributes("service", js);
                 setAttributes("wsdlLocation", location);
                 setAttributes("useGetResource", useGetResource);
@@ -158,17 +158,17 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 setCommonAttributes();
 
                 String target = (String)env.get("service.target");
-                setAttributes("service-target", target);
+                setAttributes("serviceTarget", target);
                 if ("jaxws22".equals(target)) {
                     setAttributes("jaxws22", true);
                 }
-    
-                doWrite(SERVICE_TEMPLATE, parseOutputName(js.getPackageName(), 
+
+                doWrite(SERVICE_TEMPLATE, parseOutputName(js.getPackageName(),
                                                           js.getName()));
             }
         }
     }
-    
+
     public void register(final ClassCollector collector, String packageName, String fileName) {
         collector.addServiceClassName(packageName, fileName, packageName + "." + fileName);
     }

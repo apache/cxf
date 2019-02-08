@@ -19,6 +19,7 @@
 
 package org.apache.cxf.staxutils;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -32,68 +33,68 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     private boolean doDocEvents = true;
 
     private int depth;
-    private int current = XMLStreamReader.START_DOCUMENT;
+    private int current = XMLStreamConstants.START_DOCUMENT;
     private boolean filter = true;
     private boolean advanceAtEnd = true;
-    
+
     public FragmentStreamReader(XMLStreamReader reader) {
         super(reader);
-    }    
+    }
     public FragmentStreamReader(XMLStreamReader reader, boolean doDocEvents) {
         super(reader);
         this.doDocEvents = doDocEvents;
         if (!doDocEvents) {
             depth = getDepth();
             current = reader.getEventType();
-            if (current != XMLStreamReader.START_DOCUMENT) {
+            if (current != XMLStreamConstants.START_DOCUMENT) {
                 startElement = true;
             }
         }
-    }    
-   
+    }
+
     public int getEventType() {
         return current;
     }
-    
+
     public boolean isCharacters() {
-        return current == XMLStreamReader.CHARACTERS;
+        return current == XMLStreamConstants.CHARACTERS;
     }
 
     public boolean isEndElement() {
-        return current == XMLStreamReader.END_ELEMENT;
+        return current == XMLStreamConstants.END_ELEMENT;
     }
 
     public boolean isStartElement() {
-        return current == XMLStreamReader.START_ELEMENT;
+        return current == XMLStreamConstants.START_ELEMENT;
     }
 
     public boolean isWhiteSpace() {
-        return current == XMLStreamReader.CHARACTERS && reader.isWhiteSpace();
-    }    
+        return current == XMLStreamConstants.CHARACTERS && reader.isWhiteSpace();
+    }
 
     public boolean hasNext() throws XMLStreamException {
-        
+
         if (endDoc) {
             return false;
         }
-        
+
         return reader.hasNext();
     }
-    
+
     public final int next() throws XMLStreamException {
         if (!startElement) {
             depth = getDepth();
-            
+
             current = reader.getEventType();
-            
+
             if (filter) {
                 while (current != START_ELEMENT && depth >= getDepth() && super.hasNext()) {
                     current = super.next();
                 }
-                
+
                 filter = false;
             }
-            
+
             startElement = true;
             current = START_ELEMENT;
         } else if (middle) {
@@ -110,7 +111,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
             if (advanceAtEnd) {
                 super.next();
             }
-            
+
             endDoc = true;
             current = END_DOCUMENT;
         } else {
@@ -131,6 +132,6 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
      */
     public void setAdvanceAtEnd(boolean a) {
         this.advanceAtEnd = a;
-    }    
+    }
 
 }

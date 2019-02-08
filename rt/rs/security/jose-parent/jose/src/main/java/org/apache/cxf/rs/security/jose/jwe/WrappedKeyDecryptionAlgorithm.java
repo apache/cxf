@@ -33,32 +33,31 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private Key cekDecryptionKey;
     private boolean unwrap;
     private KeyAlgorithm supportedAlgo;
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo) {    
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo) {
         this(cekDecryptionKey, supportedAlgo, true);
     }
-    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo, boolean unwrap) {    
+    public WrappedKeyDecryptionAlgorithm(Key cekDecryptionKey, KeyAlgorithm supportedAlgo, boolean unwrap) {
         this.cekDecryptionKey = cekDecryptionKey;
         this.supportedAlgo = supportedAlgo;
         this.unwrap = unwrap;
     }
     public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         KeyProperties keyProps = new KeyProperties(getKeyEncryptionAlgorithm(jweDecryptionInput));
-        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(jweDecryptionInput); 
+        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(jweDecryptionInput);
         if (spec != null) {
             keyProps.setAlgoSpec(spec);
         }
         if (!unwrap) {
             keyProps.setBlockSize(getKeyCipherBlockSize());
-            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput), 
+            return CryptoUtils.decryptBytes(getEncryptedContentEncryptionKey(jweDecryptionInput),
                                             getCekDecryptionKey(), keyProps);
-        } else {
-            return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput), 
-                                               getContentEncryptionAlgorithm(jweDecryptionInput), 
-                                               getCekDecryptionKey(), 
-                                               keyProps).getEncoded();
         }
+        return CryptoUtils.unwrapSecretKey(getEncryptedContentEncryptionKey(jweDecryptionInput),
+                                           getContentEncryptionAlgorithm(jweDecryptionInput),
+                                           getCekDecryptionKey(),
+                                           keyProps).getEncoded();
     }
-    
+
     protected Key getCekDecryptionKey() {
         return cekDecryptionKey;
     }
@@ -71,7 +70,7 @@ public class WrappedKeyDecryptionAlgorithm implements KeyDecryptionProvider {
         return AlgorithmUtils.toJavaName(keyAlgo);
     }
     protected void validateKeyEncryptionAlgorithm(String keyAlgo) {
-        if (keyAlgo == null 
+        if (keyAlgo == null
             || !supportedAlgo.getJwaName().equals(keyAlgo)) {
             reportInvalidKeyAlgorithm(keyAlgo);
         }

@@ -53,16 +53,16 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * outgoing responses, the exposed version is determined by the exposed version of the corresponding request.
  */
 public final class VersionTransformer {
-        
+
     /**
      * Constructor.
      */
     private VersionTransformer() {
     }
-    
+
     /**
      * Check if a namespace URI represents a supported version of WS-ReliableMessaging.
-     * 
+     *
      * @param uri
      * @return <code>true</code> if supported, <code>false</code> if not
      */
@@ -70,10 +70,10 @@ public final class VersionTransformer {
         return RM10Constants.NAMESPACE_URI.equals(uri)
             || RM11Constants.NAMESPACE_URI.equals(uri);
     }
-    
+
     /**
      * Convert CreateSequenceType to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -88,10 +88,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert CreateSequenceType to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -108,7 +108,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Expires to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -125,7 +125,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Expires to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -141,7 +141,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Identifier to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -158,7 +158,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Identifier to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -174,7 +174,7 @@ public final class VersionTransformer {
 
     /**
      * Convert 200502 wsrm:Identifier with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -190,7 +190,7 @@ public final class VersionTransformer {
 
     /**
      * Convert 200502 wsrm:Identifier with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -203,10 +203,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:CreateSequenceType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -222,10 +222,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:CreateSequenceType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -241,10 +241,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:CreateSequenceResponseType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -261,10 +261,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:CreateSequenceResponseType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if exposed is <code>null</code>)
      */
@@ -284,7 +284,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Offer to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -303,7 +303,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:Offer to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -318,10 +318,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:CreateSequenceResponseType to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -336,10 +336,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:CreateSequenceResponseType to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -357,7 +357,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:AcceptType to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -375,7 +375,7 @@ public final class VersionTransformer {
 
     /**
      * Convert wsrm:AcceptType to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -389,10 +389,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:SequenceType to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -405,10 +405,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -420,10 +420,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -435,10 +435,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 Expires with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -450,10 +450,10 @@ public final class VersionTransformer {
         internal.setValue(exposed.getValue());
         return internal;
     }
-    
+
     /**
      * Convert 200502 Expires with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -465,10 +465,10 @@ public final class VersionTransformer {
         internal.setValue(exposed.getValue());
         return internal;
     }
-    
+
     /**
      * Convert 200502 AcceptType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -480,10 +480,10 @@ public final class VersionTransformer {
         internal.setAcksTo(org.apache.cxf.ws.addressing.VersionTransformer.convert(exposed.getAcksTo()));
         return internal;
     }
-    
+
     /**
      * Convert 200502 AcceptType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -495,10 +495,10 @@ public final class VersionTransformer {
         internal.setAcksTo(exposed.getAcksTo());
         return internal;
     }
-    
+
     /**
      * Convert 200502 OfferType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -511,10 +511,10 @@ public final class VersionTransformer {
         internal.setIdentifier(convert(exposed.getIdentifier()));
         return internal;
     }
-    
+
     /**
      * Convert 200502 OfferType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (may be <code>null</code>)
      * @return converted (<code>null</code> if internal is <code>null</code>)
      */
@@ -527,10 +527,10 @@ public final class VersionTransformer {
         internal.setIdentifier(convert(exposed.getIdentifier()));
         return internal;
     }
-    
+
     /**
      * Convert wsrm:SequenceType to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -543,10 +543,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert TerminateSequenceType to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -559,10 +559,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert TerminateSequenceType to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -575,10 +575,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:SequenceAcknowledgement to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -601,10 +601,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:SequenceAcknowledgement to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -627,10 +627,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceAcknowledgement with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -653,10 +653,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceAcknowledgement with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -679,10 +679,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert wsrm:SequenceAcknowledgement to 200502 version with 200508 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -695,10 +695,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert wsrm:SequenceAcknowledgement to 200502 version with 200408 WS-Addressing namespace.
-     * 
+     *
      * @param internal (non-<code>null</code>)
      * @return converted
      */
@@ -711,10 +711,10 @@ public final class VersionTransformer {
         putAll(internal.getOtherAttributes(), exposed.getOtherAttributes());
         return exposed;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceAcknowledgement with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -726,10 +726,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 wsrm:SequenceAcknowledgement with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -741,10 +741,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 TerminateSequenceType with 200508 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */
@@ -756,10 +756,10 @@ public final class VersionTransformer {
         putAll(exposed.getOtherAttributes(), internal.getOtherAttributes());
         return internal;
     }
-    
+
     /**
      * Convert 200502 TerminateSequenceType with 200408 WS-Addressing namespace to internal form.
-     * 
+     *
      * @param exposed (non-<code>null</code>)
      * @return converted
      */

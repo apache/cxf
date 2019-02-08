@@ -32,6 +32,7 @@ import org.apache.cxf.xkms.model.xkms.QueryKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.repo.CertificateRepo;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import org.junit.Test;
  */
 public class X509LocatorTest {
 
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
 
     @Test

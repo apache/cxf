@@ -38,13 +38,17 @@ public final class NamespaceHandlerRegisterer {
         try {
             Object handler = factory.createNamespaceHandler();
             for (String namespace : namespaces) {
-                Dictionary<String, String> properties = new Hashtable<String, String>();
+                Dictionary<String, String> properties = new Hashtable<>();
                 properties.put("osgi.service.blueprint.namespace", namespace);
                 bc.registerService(NamespaceHandler.class.getName(), handler, properties);
-                LOG.info("Registered blueprint namespace handler for " + namespace);
+                LOG.fine("Registered blueprint namespace handler for " + namespace);
             }
         } catch (Throwable e) {
-            LOG.log(Level.WARNING, "Aries Blueprint packages not available. So namespaces will not be registered", e);
+            if (e instanceof NoClassDefFoundError) {
+                LOG.log(Level.INFO, "Aries Blueprint packages not available. So namespaces will not be registered");
+            } else {
+                LOG.log(Level.WARNING, "Unexpected exception when trying to install Aries Blueprint namespaces", e);
+            }
         }
     }
 

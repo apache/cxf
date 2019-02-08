@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.logging.Logger;
@@ -35,7 +36,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private AlgorithmParameterSpec signatureSpec;
     private SignatureAlgorithm supportedAlgo;
     private X509Certificate cert;
-    
+
     public PublicKeyJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
@@ -48,8 +49,8 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     public PublicKeyJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgorithm) {
         this(cert, null, supportedAlgorithm);
     }
-    public PublicKeyJwsSignatureVerifier(X509Certificate cert, 
-                                         AlgorithmParameterSpec spec, 
+    public PublicKeyJwsSignatureVerifier(X509Certificate cert,
+                                         AlgorithmParameterSpec spec,
                                          SignatureAlgorithm supportedAlgo) {
         if (cert != null) {
             this.key = cert.getPublicKey();
@@ -62,9 +63,9 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         try {
-            return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
-                                               signature, 
-                                               key, 
+            return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText),
+                                               signature,
+                                               key,
                                                AlgorithmUtils.toJavaName(checkAlgorithm(
                                                                               headers.getSignatureAlgorithm())),
                                                signatureSpec);
@@ -96,5 +97,39 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
 
     public X509Certificate getX509Certificate() {
         return cert;
+    }
+    @Override
+    public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
+        Signature sig = CryptoUtils.getVerificationSignature(key,
+                                    AlgorithmUtils.toJavaName(checkAlgorithm(
+                                                              headers.getSignatureAlgorithm())),
+                                    signatureSpec);
+        return new PublicKeyJwsVerificationSignature(sig);
+    }
+    
+    private class PublicKeyJwsVerificationSignature implements JwsVerificationSignature {
+        private Signature sig;
+        PublicKeyJwsVerificationSignature(Signature sig) {
+            this.sig = sig;
+        }
+
+        @Override
+        public void update(byte[] src, int off, int len) {
+            try {
+                sig.update(src, off, len);
+            } catch (Exception ex) {
+                throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
+            }
+        }
+
+        @Override
+        public boolean verify(byte[] signatureBytes) {
+            try {
+                return sig.verify(signatureBytes);
+            } catch (Exception ex) {
+                throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
+            }
+        }
+        
     }
 }

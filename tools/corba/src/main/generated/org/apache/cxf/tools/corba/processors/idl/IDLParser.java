@@ -5,7 +5,7 @@ package org.apache.cxf.tools.corba.processors.idl;
 import java.io.*;
 import java.util.Vector;
 import java.util.Hashtable;
- 
+
 import antlr.TokenBuffer;
 import antlr.TokenStreamException;
 import antlr.TokenStreamIOException;
@@ -30,40 +30,40 @@ public final class IDLParser extends antlr.LLkParser       implements IDLTokenTy
  {
 
 protected IDLParser(TokenBuffer tokenBuf, int k) {
-  super(tokenBuf,k);
+  super(tokenBuf, k);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());
 }
 
 public IDLParser(TokenBuffer tokenBuf) {
-  this(tokenBuf,4);
+  this(tokenBuf, 4);
 }
 
 protected IDLParser(TokenStream lexer, int k) {
-  super(lexer,k);
+  super(lexer, k);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());
 }
 
 public IDLParser(TokenStream lexer) {
-  this(lexer,4);
+  this(lexer, 4);
 }
 
 public IDLParser(ParserSharedInputState state) {
-  super(state,4);
+  super(state, 4);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());
 }
 
 	public void specification() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST specification_AST = null;
-		
+
 		try {      // for error handling
 			{
 			_loop3:
@@ -75,7 +75,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop3;
 				}
-				
+
 			} while (true);
 			}
 			{
@@ -89,7 +89,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt5>=1 ) { break _loop5; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt5++;
 			} while (true);
 			}
@@ -106,13 +106,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = specification_AST;
 	}
-	
+
 	public final void import_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST import_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp1_AST = null;
 			tmp1_AST = astFactory.create(LT(1));
@@ -134,13 +134,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = import_dcl_AST;
 	}
-	
+
 	public final void definition() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST definition_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -354,13 +354,13 @@ public IDLParser(ParserSharedInputState state) {
 				}
 				returnAST = definition_AST;
 			}
-			
+
 	public final void type_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST type_dcl_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_typedef:
@@ -457,13 +457,13 @@ public IDLParser(ParserSharedInputState state) {
 			}
 			returnAST = type_dcl_AST;
 		}
-		
+
 	public final void const_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST const_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp16_AST = null;
 			tmp16_AST = astFactory.create(LT(1));
@@ -489,13 +489,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = const_dcl_AST;
 	}
-	
+
 	public final void except_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST except_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp18_AST = null;
 			tmp18_AST = astFactory.create(LT(1));
@@ -520,13 +520,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = except_dcl_AST;
 	}
-	
+
 	public final void interf() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interf_AST = null;
-		
+
 		try {      // for error handling
 			{
 			if (((LA(1) >= LITERAL_abstract && LA(1) <= LITERAL_interface)) && (LA(2)==LITERAL_interface||LA(2)==IDENT) && (LA(3)==LCURLY||LA(3)==COLON||LA(3)==IDENT) && (_tokenSet_11.member(LA(4)))) {
@@ -540,7 +540,7 @@ public IDLParser(ParserSharedInputState state) {
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
-			
+
 			}
 			interf_AST = (AST)currentAST.root;
 		}
@@ -555,14 +555,14 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interf_AST;
 	}
-	
+
 	public final void module() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST module_AST = null;
 		AST d_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp21_AST = null;
 			tmp21_AST = astFactory.create(LT(1));
@@ -588,13 +588,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = module_AST;
 	}
-	
+
 	public final void value() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -641,13 +641,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_AST;
 	}
-	
+
 	public final void type_id_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST type_id_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp24_AST = null;
 			tmp24_AST = astFactory.create(LT(1));
@@ -670,13 +670,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = type_id_dcl_AST;
 	}
-	
+
 	public final void type_prefix_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST type_prefix_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp25_AST = null;
 			tmp25_AST = astFactory.create(LT(1));
@@ -699,13 +699,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = type_prefix_dcl_AST;
 	}
-	
+
 	public final void event() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -746,13 +746,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_AST;
 	}
-	
+
 	public final void component() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST component_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp26_AST = null;
 			tmp26_AST = astFactory.create(LT(1));
@@ -793,13 +793,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = component_AST;
 	}
-	
+
 	public final void home_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST home_dcl_AST = null;
-		
+
 		try {      // for error handling
 			home_header();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -818,13 +818,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = home_dcl_AST;
 	}
-	
+
 	public final void identifier() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST identifier_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp27_AST = null;
 			tmp27_AST = astFactory.create(LT(1));
@@ -843,13 +843,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = identifier_AST;
 	}
-	
+
 	public final void definition_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST definition_list_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt20=0;
@@ -862,7 +862,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt20>=1 ) { break _loop20; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt20++;
 			} while (true);
 			}
@@ -879,13 +879,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = definition_list_AST;
 	}
-	
+
 	public final void interface_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interface_dcl_AST = null;
-		
+
 		try {      // for error handling
 			{
 			{
@@ -964,13 +964,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interface_dcl_AST;
 	}
-	
+
 	public final void forward_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST forward_dcl_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1019,13 +1019,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = forward_dcl_AST;
 	}
-	
+
 	public final void interface_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interface_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp36_AST = null;
 			tmp36_AST = astFactory.create(LT(1));
@@ -1046,13 +1046,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interface_inheritance_spec_AST;
 	}
-	
+
 	public final void interface_body() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interface_body_AST = null;
-		
+
 		try {      // for error handling
 			{
 			_loop31:
@@ -1064,7 +1064,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop31;
 				}
-				
+
 			} while (true);
 			}
 			interface_body_AST = (AST)currentAST.root;
@@ -1080,13 +1080,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interface_body_AST;
 	}
-	
+
 	public final void export() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST export_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1180,13 +1180,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = export_AST;
 	}
-	
+
 	public final void attr_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST attr_dcl_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_readonly:
@@ -1220,13 +1220,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = attr_dcl_AST;
 	}
-	
+
 	public final void op_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST op_dcl_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1320,13 +1320,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = op_dcl_AST;
 	}
-	
+
 	public final void scoped_name_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST scoped_name_list_AST = null;
-		
+
 		try {      // for error handling
 			scoped_name();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -1341,7 +1341,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop38;
 				}
-				
+
 			} while (true);
 			}
 			scoped_name_list_AST = (AST)currentAST.root;
@@ -1357,13 +1357,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = scoped_name_list_AST;
 	}
-	
+
 	public final void interface_name() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interface_name_AST = null;
-		
+
 		try {      // for error handling
 			scoped_name();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -1380,13 +1380,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interface_name_AST;
 	}
-	
+
 	public final void scoped_name() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST scoped_name_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1423,7 +1423,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop42;
 				}
-				
+
 			} while (true);
 			}
 			scoped_name_AST = (AST)currentAST.root;
@@ -1439,13 +1439,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = scoped_name_AST;
 	}
-	
+
 	public final void value_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_dcl_AST = null;
-		
+
 		try {      // for error handling
 			value_header();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -1460,7 +1460,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop54;
 				}
-				
+
 			} while (true);
 			}
 			match(RCURLY);
@@ -1477,13 +1477,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_dcl_AST;
 	}
-	
+
 	public final void value_abs_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_abs_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp51_AST = null;
 			tmp51_AST = astFactory.create(LT(1));
@@ -1528,13 +1528,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_abs_dcl_AST;
 	}
-	
+
 	public final void value_box_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_box_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp53_AST = null;
 			tmp53_AST = astFactory.create(LT(1));
@@ -1557,13 +1557,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_box_dcl_AST;
 	}
-	
+
 	public final void value_custom_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_custom_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp54_AST = null;
 			tmp54_AST = astFactory.create(LT(1));
@@ -1584,13 +1584,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_custom_dcl_AST;
 	}
-	
+
 	public final void value_forward_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_forward_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp55_AST = null;
 			tmp55_AST = astFactory.create(LT(1));
@@ -1611,13 +1611,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_forward_dcl_AST;
 	}
-	
+
 	public final void type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case SCOPEOP:
@@ -1670,13 +1670,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = type_spec_AST;
 	}
-	
+
 	public final void value_abs_full_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_abs_full_dcl_AST = null;
-		
+
 		try {      // for error handling
 			value_inheritance_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -1691,7 +1691,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop51;
 				}
-				
+
 			} while (true);
 			}
 			match(RCURLY);
@@ -1708,13 +1708,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_abs_full_dcl_AST;
 	}
-	
+
 	public final void value_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1766,13 +1766,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_inheritance_spec_AST;
 	}
-	
+
 	public final void value_header() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_header_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp58_AST = null;
 			tmp58_AST = astFactory.create(LT(1));
@@ -1795,13 +1795,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_header_AST;
 	}
-	
+
 	public final void value_element() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_element_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -1871,13 +1871,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_element_AST;
 	}
-	
+
 	public final void value_value_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_value_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp59_AST = null;
 			tmp59_AST = astFactory.create(LT(1));
@@ -1917,7 +1917,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop63;
 				}
-				
+
 			} while (true);
 			}
 			value_value_inheritance_spec_AST = (AST)currentAST.root;
@@ -1933,13 +1933,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_value_inheritance_spec_AST;
 	}
-	
+
 	public final void value_interface_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_interface_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp62_AST = null;
 			tmp62_AST = astFactory.create(LT(1));
@@ -1958,7 +1958,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop66;
 				}
-				
+
 			} while (true);
 			}
 			value_interface_inheritance_spec_AST = (AST)currentAST.root;
@@ -1974,13 +1974,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_interface_inheritance_spec_AST;
 	}
-	
+
 	public final void value_name() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_name_AST = null;
-		
+
 		try {      // for error handling
 			scoped_name();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -1997,13 +1997,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_name_AST;
 	}
-	
+
 	public final void state_member() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST state_member_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -2047,13 +2047,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = state_member_AST;
 	}
-	
+
 	public final void init_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST init_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp67_AST = null;
 			tmp67_AST = astFactory.create(LT(1));
@@ -2113,13 +2113,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = init_dcl_AST;
 	}
-	
+
 	public final void declarators() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST declarators_AST = null;
-		
+
 		try {      // for error handling
 			declarator();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2134,7 +2134,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop127;
 				}
-				
+
 			} while (true);
 			}
 			declarators_AST = (AST)currentAST.root;
@@ -2150,13 +2150,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = declarators_AST;
 	}
-	
+
 	public final void init_param_decls() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST init_param_decls_AST = null;
-		
+
 		try {      // for error handling
 			init_param_decl();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2171,7 +2171,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop77;
 				}
-				
+
 			} while (true);
 			}
 			init_param_decls_AST = (AST)currentAST.root;
@@ -2187,13 +2187,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = init_param_decls_AST;
 	}
-	
+
 	public final void raises_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST raises_expr_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp73_AST = null;
 			tmp73_AST = astFactory.create(LT(1));
@@ -2216,13 +2216,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = raises_expr_AST;
 	}
-	
+
 	public final void init_param_decl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST init_param_decl_AST = null;
-		
+
 		try {      // for error handling
 			init_param_attribute();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2243,13 +2243,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = init_param_decl_AST;
 	}
-	
+
 	public final void init_param_attribute() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST init_param_attribute_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp76_AST = null;
 			tmp76_AST = astFactory.create(LT(1));
@@ -2268,13 +2268,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = init_param_attribute_AST;
 	}
-	
+
 	public final void param_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST param_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_float:
@@ -2334,13 +2334,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = param_type_spec_AST;
 	}
-	
+
 	public final void simple_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST simple_declarator_AST = null;
-		
+
 		try {      // for error handling
 			identifier();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2357,13 +2357,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = simple_declarator_AST;
 	}
-	
+
 	public final void const_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST const_type_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_char:
@@ -2466,13 +2466,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = const_type_AST;
 	}
-	
+
 	public final void const_exp() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST const_exp_AST = null;
-		
+
 		try {      // for error handling
 			or_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2489,13 +2489,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = const_exp_AST;
 	}
-	
+
 	public final void integer_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST integer_type_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_long:
@@ -2530,13 +2530,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = integer_type_AST;
 	}
-	
+
 	public final void char_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST char_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp77_AST = null;
 			tmp77_AST = astFactory.create(LT(1));
@@ -2555,13 +2555,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = char_type_AST;
 	}
-	
+
 	public final void wide_char_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST wide_char_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp78_AST = null;
 			tmp78_AST = astFactory.create(LT(1));
@@ -2580,13 +2580,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = wide_char_type_AST;
 	}
-	
+
 	public final void boolean_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST boolean_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp79_AST = null;
 			tmp79_AST = astFactory.create(LT(1));
@@ -2605,13 +2605,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = boolean_type_AST;
 	}
-	
+
 	public final void floating_pt_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST floating_pt_type_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_float:
@@ -2662,13 +2662,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = floating_pt_type_AST;
 	}
-	
+
 	public final void string_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST string_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp84_AST = null;
 			tmp84_AST = astFactory.create(LT(1));
@@ -2710,13 +2710,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = string_type_AST;
 	}
-	
+
 	public final void wide_string_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST wide_string_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp87_AST = null;
 			tmp87_AST = astFactory.create(LT(1));
@@ -2758,13 +2758,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = wide_string_type_AST;
 	}
-	
+
 	public final void fixed_pt_const_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST fixed_pt_const_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp90_AST = null;
 			tmp90_AST = astFactory.create(LT(1));
@@ -2783,13 +2783,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = fixed_pt_const_type_AST;
 	}
-	
+
 	public final void octet_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST octet_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp91_AST = null;
 			tmp91_AST = astFactory.create(LT(1));
@@ -2808,13 +2808,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = octet_type_AST;
 	}
-	
+
 	public final void or_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST or_expr_AST = null;
-		
+
 		try {      // for error handling
 			xor_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2832,7 +2832,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop87;
 				}
-				
+
 			} while (true);
 			}
 			or_expr_AST = (AST)currentAST.root;
@@ -2848,13 +2848,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = or_expr_AST;
 	}
-	
+
 	public final void xor_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST xor_expr_AST = null;
-		
+
 		try {      // for error handling
 			and_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2872,7 +2872,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop90;
 				}
-				
+
 			} while (true);
 			}
 			xor_expr_AST = (AST)currentAST.root;
@@ -2888,13 +2888,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = xor_expr_AST;
 	}
-	
+
 	public final void and_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST and_expr_AST = null;
-		
+
 		try {      // for error handling
 			shift_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2912,7 +2912,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop93;
 				}
-				
+
 			} while (true);
 			}
 			and_expr_AST = (AST)currentAST.root;
@@ -2928,13 +2928,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = and_expr_AST;
 	}
-	
+
 	public final void shift_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST shift_expr_AST = null;
-		
+
 		try {      // for error handling
 			add_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -2972,7 +2972,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop97;
 				}
-				
+
 			} while (true);
 			}
 			shift_expr_AST = (AST)currentAST.root;
@@ -2988,13 +2988,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = shift_expr_AST;
 	}
-	
+
 	public final void add_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST add_expr_AST = null;
-		
+
 		try {      // for error handling
 			mult_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -3032,7 +3032,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop101;
 				}
-				
+
 			} while (true);
 			}
 			add_expr_AST = (AST)currentAST.root;
@@ -3048,13 +3048,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = add_expr_AST;
 	}
-	
+
 	public final void mult_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST mult_expr_AST = null;
-		
+
 		try {      // for error handling
 			unary_expr();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -3100,7 +3100,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop105;
 				}
-				
+
 			} while (true);
 			}
 			mult_expr_AST = (AST)currentAST.root;
@@ -3116,13 +3116,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = mult_expr_AST;
 	}
-	
+
 	public final void unary_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST unary_expr_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case PLUS:
@@ -3203,13 +3203,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = unary_expr_AST;
 	}
-	
+
 	public final void primary_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST primary_expr_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case SCOPEOP:
@@ -3269,13 +3269,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = primary_expr_AST;
 	}
-	
+
 	public final void literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST literal_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case INT:
@@ -3354,13 +3354,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = literal_AST;
 	}
-	
+
 	public final void integer_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST integer_literal_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case INT:
@@ -3407,13 +3407,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = integer_literal_AST;
 	}
-	
+
 	public final void string_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST string_literal_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt285=0;
@@ -3428,7 +3428,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt285>=1 ) { break _loop285; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt285++;
 			} while (true);
 			}
@@ -3445,13 +3445,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = string_literal_AST;
 	}
-	
+
 	public final void wide_string_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST wide_string_literal_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt288=0;
@@ -3466,7 +3466,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt288>=1 ) { break _loop288; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt288++;
 			} while (true);
 			}
@@ -3483,13 +3483,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = wide_string_literal_AST;
 	}
-	
+
 	public final void character_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST character_literal_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp112_AST = null;
 			tmp112_AST = astFactory.create(LT(1));
@@ -3508,13 +3508,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = character_literal_AST;
 	}
-	
+
 	public final void wide_character_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST wide_character_literal_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp113_AST = null;
 			tmp113_AST = astFactory.create(LT(1));
@@ -3533,13 +3533,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = wide_character_literal_AST;
 	}
-	
+
 	public final void fixed_pt_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST fixed_pt_literal_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp114_AST = null;
 			tmp114_AST = astFactory.create(LT(1));
@@ -3558,15 +3558,15 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = fixed_pt_literal_AST;
 	}
-	
+
 	public final void floating_pt_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST floating_pt_literal_AST = null;
-		Token  f = null;
+		Token f = null;
 		AST f_AST = null;
-		
+
 		try {      // for error handling
 			f = LT(1);
 			f_AST = astFactory.create(f);
@@ -3585,13 +3585,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = floating_pt_literal_AST;
 	}
-	
+
 	public final void boolean_literal() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST boolean_literal_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_TRUE:
@@ -3629,13 +3629,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = boolean_literal_AST;
 	}
-	
+
 	public final void positive_int_const() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST positive_int_const_AST = null;
-		
+
 		try {      // for error handling
 			const_exp();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -3652,13 +3652,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = positive_int_const_AST;
 	}
-	
+
 	public final void type_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST type_declarator_AST = null;
-		
+
 		try {      // for error handling
 			type_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -3677,13 +3677,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = type_declarator_AST;
 	}
-	
+
 	public final void struct_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST struct_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp117_AST = null;
 			tmp117_AST = astFactory.create(LT(1));
@@ -3708,13 +3708,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = struct_type_AST;
 	}
-	
+
 	public final void union_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST union_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp120_AST = null;
 			tmp120_AST = astFactory.create(LT(1));
@@ -3744,13 +3744,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = union_type_AST;
 	}
-	
+
 	public final void enum_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST enum_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp126_AST = null;
 			tmp126_AST = astFactory.create(LT(1));
@@ -3775,13 +3775,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = enum_type_AST;
 	}
-	
+
 	public final void constr_forward_decl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST constr_forward_decl_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_struct:
@@ -3823,13 +3823,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = constr_forward_decl_AST;
 	}
-	
+
 	public final void simple_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST simple_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_float:
@@ -3885,13 +3885,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = simple_type_spec_AST;
 	}
-	
+
 	public final void constr_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST constr_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_struct:
@@ -3932,13 +3932,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = constr_type_spec_AST;
 	}
-	
+
 	public final void base_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST base_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_char:
@@ -4033,13 +4033,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = base_type_spec_AST;
 	}
-	
+
 	public final void template_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST template_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_sequence:
@@ -4087,13 +4087,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = template_type_spec_AST;
 	}
-	
+
 	public final void any_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST any_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp131_AST = null;
 			tmp131_AST = astFactory.create(LT(1));
@@ -4112,13 +4112,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = any_type_AST;
 	}
-	
+
 	public final void object_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST object_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp132_AST = null;
 			tmp132_AST = astFactory.create(LT(1));
@@ -4137,13 +4137,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = object_type_AST;
 	}
-	
+
 	public final void value_base_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST value_base_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp133_AST = null;
 			tmp133_AST = astFactory.create(LT(1));
@@ -4162,13 +4162,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = value_base_type_AST;
 	}
-	
+
 	public final void sequence_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST sequence_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp134_AST = null;
 			tmp134_AST = astFactory.create(LT(1));
@@ -4193,13 +4193,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = sequence_type_AST;
 	}
-	
+
 	public final void fixed_pt_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST fixed_pt_type_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp137_AST = null;
 			tmp137_AST = astFactory.create(LT(1));
@@ -4225,13 +4225,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = fixed_pt_type_AST;
 	}
-	
+
 	public final void declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST declarator_AST = null;
-		
+
 		try {      // for error handling
 			if ((LA(1)==IDENT) && (LA(2)==SEMI||LA(2)==COMMA)) {
 				simple_declarator();
@@ -4246,7 +4246,7 @@ public IDLParser(ParserSharedInputState state) {
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
-			
+
 		}
 		catch (RecognitionException ex) {
 			if (inputState.guessing==0) {
@@ -4259,13 +4259,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = declarator_AST;
 	}
-	
+
 	public final void complex_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST complex_declarator_AST = null;
-		
+
 		try {      // for error handling
 			array_declarator();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4282,13 +4282,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = complex_declarator_AST;
 	}
-	
+
 	public final void array_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST array_declarator_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp141_AST = null;
 			tmp141_AST = astFactory.create(LT(1));
@@ -4305,7 +4305,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt176>=1 ) { break _loop176; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt176++;
 			} while (true);
 			}
@@ -4322,13 +4322,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = array_declarator_AST;
 	}
-	
+
 	public final void signed_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST signed_int_AST = null;
-		
+
 		try {      // for error handling
 			if ((LA(1)==LITERAL_short)) {
 				signed_short_int();
@@ -4348,7 +4348,7 @@ public IDLParser(ParserSharedInputState state) {
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
-			
+
 		}
 		catch (RecognitionException ex) {
 			if (inputState.guessing==0) {
@@ -4361,13 +4361,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = signed_int_AST;
 	}
-	
+
 	public final void unsigned_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST unsigned_int_AST = null;
-		
+
 		try {      // for error handling
 			if ((LA(1)==LITERAL_unsigned) && (LA(2)==LITERAL_short)) {
 				unsigned_short_int();
@@ -4387,7 +4387,7 @@ public IDLParser(ParserSharedInputState state) {
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
-			
+
 		}
 		catch (RecognitionException ex) {
 			if (inputState.guessing==0) {
@@ -4400,13 +4400,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = unsigned_int_AST;
 	}
-	
+
 	public final void signed_short_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST signed_short_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp142_AST = null;
 			tmp142_AST = astFactory.create(LT(1));
@@ -4425,13 +4425,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = signed_short_int_AST;
 	}
-	
+
 	public final void signed_long_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST signed_long_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp143_AST = null;
 			tmp143_AST = astFactory.create(LT(1));
@@ -4450,13 +4450,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = signed_long_int_AST;
 	}
-	
+
 	public final void signed_longlong_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST signed_longlong_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp144_AST = null;
 			tmp144_AST = astFactory.create(LT(1));
@@ -4479,13 +4479,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = signed_longlong_int_AST;
 	}
-	
+
 	public final void unsigned_short_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST unsigned_short_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp146_AST = null;
 			tmp146_AST = astFactory.create(LT(1));
@@ -4508,13 +4508,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = unsigned_short_int_AST;
 	}
-	
+
 	public final void unsigned_long_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST unsigned_long_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp148_AST = null;
 			tmp148_AST = astFactory.create(LT(1));
@@ -4537,13 +4537,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = unsigned_long_int_AST;
 	}
-	
+
 	public final void unsigned_longlong_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST unsigned_longlong_int_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp150_AST = null;
 			tmp150_AST = astFactory.create(LT(1));
@@ -4570,13 +4570,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = unsigned_longlong_int_AST;
 	}
-	
+
 	public final void member_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST member_list_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt150=0;
@@ -4589,7 +4589,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt150>=1 ) { break _loop150; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt150++;
 			} while (true);
 			}
@@ -4606,13 +4606,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = member_list_AST;
 	}
-	
+
 	public final void member() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST member_AST = null;
-		
+
 		try {      // for error handling
 			type_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4632,13 +4632,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = member_AST;
 	}
-	
+
 	public final void switch_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST switch_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case LITERAL_long:
@@ -4696,13 +4696,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = switch_type_spec_AST;
 	}
-	
+
 	public final void switch_body() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST switch_body_AST = null;
-		
+
 		try {      // for error handling
 			case_stmt_list();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4719,13 +4719,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = switch_body_AST;
 	}
-	
+
 	public final void case_stmt_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST case_stmt_list_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt157=0;
@@ -4738,7 +4738,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					if ( _cnt157>=1 ) { break _loop157; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
-				
+
 				_cnt157++;
 			} while (true);
 			}
@@ -4755,13 +4755,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = case_stmt_list_AST;
 	}
-	
+
 	public final void case_stmt() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST case_stmt_AST = null;
-		
+
 		try {      // for error handling
 			{
 			int _cnt160=0;
@@ -4812,13 +4812,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = case_stmt_AST;
 	}
-	
+
 	public final void element_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST element_spec_AST = null;
-		
+
 		try {      // for error handling
 			type_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4837,13 +4837,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = element_spec_AST;
 	}
-	
+
 	public final void enumerator_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST enumerator_list_AST = null;
-		
+
 		try {      // for error handling
 			enumerator();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4858,7 +4858,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop165;
 				}
-				
+
 			} while (true);
 			}
 			enumerator_list_AST = (AST)currentAST.root;
@@ -4874,13 +4874,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = enumerator_list_AST;
 	}
-	
+
 	public final void enumerator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST enumerator_AST = null;
-		
+
 		try {      // for error handling
 			identifier();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -4897,13 +4897,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = enumerator_AST;
 	}
-	
+
 	public final void opt_pos_int() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST opt_pos_int_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -4937,13 +4937,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = opt_pos_int_AST;
 	}
-	
+
 	public final void fixed_array_size() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST fixed_array_size_AST = null;
-		
+
 		try {      // for error handling
 			match(LBRACK);
 			positive_int_const();
@@ -4962,13 +4962,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = fixed_array_size_AST;
 	}
-	
+
 	public final void readonly_attr_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST readonly_attr_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp163_AST = null;
 			tmp163_AST = astFactory.create(LT(1));
@@ -4995,13 +4995,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = readonly_attr_spec_AST;
 	}
-	
+
 	public final void attr_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST attr_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp165_AST = null;
 			tmp165_AST = astFactory.create(LT(1));
@@ -5024,13 +5024,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = attr_spec_AST;
 	}
-	
+
 	public final void opt_member_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST opt_member_list_AST = null;
-		
+
 		try {      // for error handling
 			{
 			_loop182:
@@ -5042,7 +5042,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop182;
 				}
-				
+
 			} while (true);
 			}
 			opt_member_list_AST = (AST)currentAST.root;
@@ -5058,13 +5058,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = opt_member_list_AST;
 	}
-	
+
 	public final void op_attribute() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST op_attribute_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp166_AST = null;
 			tmp166_AST = astFactory.create(LT(1));
@@ -5083,13 +5083,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = op_attribute_AST;
 	}
-	
+
 	public final void op_type_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST op_type_spec_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case SCOPEOP:
@@ -5140,13 +5140,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = op_type_spec_AST;
 	}
-	
+
 	public final void parameter_dcls() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST parameter_dcls_AST = null;
-		
+
 		try {      // for error handling
 			match(LPAREN);
 			{
@@ -5183,13 +5183,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = parameter_dcls_AST;
 	}
-	
+
 	public final void context_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST context_expr_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp170_AST = null;
 			tmp170_AST = astFactory.create(LT(1));
@@ -5212,13 +5212,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = context_expr_AST;
 	}
-	
+
 	public final void param_dcl_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST param_dcl_list_AST = null;
-		
+
 		try {      // for error handling
 			param_dcl();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -5233,7 +5233,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop193;
 				}
-				
+
 			} while (true);
 			}
 			param_dcl_list_AST = (AST)currentAST.root;
@@ -5249,13 +5249,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = param_dcl_list_AST;
 	}
-	
+
 	public final void param_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST param_dcl_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -5306,13 +5306,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = param_dcl_AST;
 	}
-	
+
 	public final void string_literal_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST string_literal_list_AST = null;
-		
+
 		try {      // for error handling
 			string_literal();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -5327,7 +5327,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop200;
 				}
-				
+
 			} while (true);
 			}
 			string_literal_list_AST = (AST)currentAST.root;
@@ -5343,13 +5343,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = string_literal_list_AST;
 	}
-	
+
 	public final void imported_scope() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST imported_scope_AST = null;
-		
+
 		try {      // for error handling
 			switch ( LA(1)) {
 			case SCOPEOP:
@@ -5384,13 +5384,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = imported_scope_AST;
 	}
-	
+
 	public final void readonly_attr_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST readonly_attr_declarator_AST = null;
-		
+
 		try {      // for error handling
 			simple_declarator();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -5416,7 +5416,7 @@ public IDLParser(ParserSharedInputState state) {
 					else {
 						break _loop214;
 					}
-					
+
 				} while (true);
 				}
 				break;
@@ -5440,13 +5440,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = readonly_attr_declarator_AST;
 	}
-	
+
 	public final void attr_declarator() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST attr_declarator_AST = null;
-		
+
 		try {      // for error handling
 			simple_declarator();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -5498,14 +5498,14 @@ public IDLParser(ParserSharedInputState state) {
 					else {
 						break _loop221;
 					}
-					
+
 				} while (true);
 				}
 			}
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
-			
+
 			}
 			attr_declarator_AST = (AST)currentAST.root;
 		}
@@ -5520,13 +5520,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = attr_declarator_AST;
 	}
-	
+
 	public final void attr_raises_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST attr_raises_expr_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -5578,13 +5578,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = attr_raises_expr_AST;
 	}
-	
+
 	public final void get_excep_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST get_excep_expr_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp180_AST = null;
 			tmp180_AST = astFactory.create(LT(1));
@@ -5605,13 +5605,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = get_excep_expr_AST;
 	}
-	
+
 	public final void set_excep_expr() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST set_excep_expr_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp181_AST = null;
 			tmp181_AST = astFactory.create(LT(1));
@@ -5632,13 +5632,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = set_excep_expr_AST;
 	}
-	
+
 	public final void exception_list() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST exception_list_AST = null;
-		
+
 		try {      // for error handling
 			match(LPAREN);
 			scoped_name();
@@ -5654,7 +5654,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop229;
 				}
-				
+
 			} while (true);
 			}
 			match(RPAREN);
@@ -5671,13 +5671,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = exception_list_AST;
 	}
-	
+
 	public final void component_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST component_dcl_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -5733,13 +5733,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = component_dcl_AST;
 	}
-	
+
 	public final void component_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST component_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp187_AST = null;
 			tmp187_AST = astFactory.create(LT(1));
@@ -5760,13 +5760,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = component_inheritance_spec_AST;
 	}
-	
+
 	public final void supported_interface_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST supported_interface_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp188_AST = null;
 			tmp188_AST = astFactory.create(LT(1));
@@ -5785,7 +5785,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop237;
 				}
-				
+
 			} while (true);
 			}
 			supported_interface_spec_AST = (AST)currentAST.root;
@@ -5801,13 +5801,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = supported_interface_spec_AST;
 	}
-	
+
 	public final void component_body() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST component_body_AST = null;
-		
+
 		try {      // for error handling
 			{
 			_loop241:
@@ -5819,7 +5819,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop241;
 				}
-				
+
 			} while (true);
 			}
 			component_body_AST = (AST)currentAST.root;
@@ -5835,13 +5835,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = component_body_AST;
 	}
-	
+
 	public final void component_export() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST component_export_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -5907,13 +5907,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = component_export_AST;
 	}
-	
+
 	public final void provides_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST provides_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp196_AST = null;
 			tmp196_AST = astFactory.create(LT(1));
@@ -5936,13 +5936,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = provides_dcl_AST;
 	}
-	
+
 	public final void uses_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST uses_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp197_AST = null;
 			tmp197_AST = astFactory.create(LT(1));
@@ -5987,13 +5987,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = uses_dcl_AST;
 	}
-	
+
 	public final void emits_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST emits_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp199_AST = null;
 			tmp199_AST = astFactory.create(LT(1));
@@ -6016,13 +6016,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = emits_dcl_AST;
 	}
-	
+
 	public final void publishes_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST publishes_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp200_AST = null;
 			tmp200_AST = astFactory.create(LT(1));
@@ -6045,13 +6045,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = publishes_dcl_AST;
 	}
-	
+
 	public final void consumes_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST consumes_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp201_AST = null;
 			tmp201_AST = astFactory.create(LT(1));
@@ -6074,13 +6074,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = consumes_dcl_AST;
 	}
-	
+
 	public final void interface_type() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST interface_type_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -6118,13 +6118,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = interface_type_AST;
 	}
-	
+
 	public final void home_header() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST home_header_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp203_AST = null;
 			tmp203_AST = astFactory.create(LT(1));
@@ -6203,13 +6203,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = home_header_AST;
 	}
-	
+
 	public final void home_body() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST home_body_AST = null;
-		
+
 		try {      // for error handling
 			match(LCURLY);
 			{
@@ -6222,7 +6222,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop261;
 				}
-				
+
 			} while (true);
 			}
 			match(RCURLY);
@@ -6239,13 +6239,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = home_body_AST;
 	}
-	
+
 	public final void home_inheritance_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST home_inheritance_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp207_AST = null;
 			tmp207_AST = astFactory.create(LT(1));
@@ -6266,13 +6266,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = home_inheritance_spec_AST;
 	}
-	
+
 	public final void primary_key_spec() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST primary_key_spec_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp208_AST = null;
 			tmp208_AST = astFactory.create(LT(1));
@@ -6293,13 +6293,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = primary_key_spec_AST;
 	}
-	
+
 	public final void home_export() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST home_export_AST = null;
-		
+
 		try {      // for error handling
 			{
 			switch ( LA(1)) {
@@ -6370,13 +6370,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = home_export_AST;
 	}
-	
+
 	public final void factory_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST factory_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp211_AST = null;
 			tmp211_AST = astFactory.create(LT(1));
@@ -6419,13 +6419,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = factory_dcl_AST;
 	}
-	
+
 	public final void finder_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST finder_dcl_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp214_AST = null;
 			tmp214_AST = astFactory.create(LT(1));
@@ -6468,13 +6468,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = finder_dcl_AST;
 	}
-	
+
 	public final void event_abs() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_abs_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp217_AST = null;
 			tmp217_AST = astFactory.create(LT(1));
@@ -6515,13 +6515,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_abs_AST;
 	}
-	
+
 	public final void event_custom() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_custom_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp218_AST = null;
 			tmp218_AST = astFactory.create(LT(1));
@@ -6544,13 +6544,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_custom_AST;
 	}
-	
+
 	public final void event_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_dcl_AST = null;
-		
+
 		try {      // for error handling
 			event_header();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -6587,13 +6587,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_dcl_AST;
 	}
-	
+
 	public final void event_header() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_header_AST = null;
-		
+
 		try {      // for error handling
 			AST tmp219_AST = null;
 			tmp219_AST = astFactory.create(LT(1));
@@ -6614,13 +6614,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_header_AST;
 	}
-	
+
 	public final void event_abs_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_abs_dcl_AST = null;
-		
+
 		try {      // for error handling
 			value_inheritance_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -6635,7 +6635,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop275;
 				}
-				
+
 			} while (true);
 			}
 			match(RCURLY);
@@ -6652,13 +6652,13 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_abs_dcl_AST;
 	}
-	
+
 	public final void event_elem_dcl() throws RecognitionException, TokenStreamException {
-		
+
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST event_elem_dcl_AST = null;
-		
+
 		try {      // for error handling
 			value_inheritance_spec();
 			astFactory.addASTChild(currentAST, returnAST);
@@ -6673,7 +6673,7 @@ public IDLParser(ParserSharedInputState state) {
 				else {
 					break _loop281;
 				}
-				
+
 			} while (true);
 			}
 			match(RCURLY);
@@ -6690,8 +6690,8 @@ public IDLParser(ParserSharedInputState state) {
 		}
 		returnAST = event_elem_dcl_AST;
 	}
-	
-	
+
+
 	public static final String[] _tokenNames = {
 		"<0>",
 		"EOF",
@@ -6811,11 +6811,11 @@ public IDLParser(ParserSharedInputState state) {
 		"a hexadecimal digit",
 		"an escaped identifer"
 	};
-	
+
 	protected void buildTokenTypeASTClassMap() {
 		tokenTypeToASTClassMap=null;
 	};
-	
+
 	private static final long[] mk_tokenSet_0() {
 		long[] data = { 630510544968749024L, 67657736L, 0L, 0L};
 		return data;
@@ -7176,5 +7176,5 @@ public IDLParser(ParserSharedInputState state) {
 		return data;
 	}
 	public static final BitSet _tokenSet_71 = new BitSet(mk_tokenSet_71());
-	
+
 	}

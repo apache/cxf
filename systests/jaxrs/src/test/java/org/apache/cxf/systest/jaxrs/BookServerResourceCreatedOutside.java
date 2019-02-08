@@ -23,7 +23,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase {
 
     public static final String PORT = allocatePort(BookServerResourceCreatedOutside.class);
@@ -44,7 +44,7 @@ public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase 
         server.destroy();
         server = null;
     }
-    
+
     public static void main(String[] args) {
         try {
             BookServerResourceCreatedOutside s = new BookServerResourceCreatedOutside();

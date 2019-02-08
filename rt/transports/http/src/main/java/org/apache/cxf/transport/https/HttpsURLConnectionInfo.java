@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.transport.https;
 
 import java.io.IOException;
@@ -37,36 +37,36 @@ import org.apache.cxf.transport.http.HttpURLConnectionInfo;
 public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
 
     /**
-     * This field contains the cipherSuite enabled in the 
+     * This field contains the cipherSuite enabled in the
      * HTTPS URLconnection.
      */
     protected String enabledCipherSuite;
-    
+
     /**
      * This field contains the certificates that were used to
      * authenticate the connection to the peer.
      */
     protected Certificate[] localCertificates;
-    
+
     /**
      * This field contains the Principal that authenticated to the
      * peer.
      */
     protected Principal localPrincipal;
-    
+
     /**
      * This field contains the certificates the server presented
      * to authenticate.
      */
     protected Certificate[] serverCertificates;
-    
+
     /**
-     * This field contains the Principal that represents the 
+     * This field contains the Principal that represents the
      * authenticated peer.
      */
     protected Principal peerPrincipal;
 
-    
+
     public HttpsURLConnectionInfo(URI uri,
                                   String method,
                                   String cipherSuite,
@@ -81,13 +81,13 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
         serverCertificates = serverCerts;
         peerPrincipal = peer;
     }
-    
 
-    
+
+
     /**
      * This constructor is used to create the info object
-     * representing the this HttpsURLConnection. Connection parameter is 
-     * of supertype HttpURLConnection, which allows internal cast to 
+     * representing the this HttpsURLConnection. Connection parameter is
+     * of supertype HttpURLConnection, which allows internal cast to
      * potentially divergent subtype (Https) implementations.
      */
     public HttpsURLConnectionInfo(HttpURLConnection connection)
@@ -96,10 +96,10 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
         if (connection instanceof HttpsURLConnection) {
             HttpsURLConnection conn = (HttpsURLConnection) connection;
             enabledCipherSuite = conn.getCipherSuite();
-            localCertificates  = conn.getLocalCertificates();
-            localPrincipal     = conn.getLocalPrincipal();
+            localCertificates = conn.getLocalCertificates();
+            localPrincipal = conn.getLocalPrincipal();
             serverCertificates = conn.getServerCertificates();
-            peerPrincipal      = conn.getPeerPrincipal();
+            peerPrincipal = conn.getPeerPrincipal();
         } else {
             Exception ex = null;
             try {
@@ -110,7 +110,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
                 localCertificates = (Certificate[]) method.invoke(connection, (Object[]) null);
                 method = connection.getClass().getMethod("getServerCertificates", (Class[]) null);
                 serverCertificates = (Certificate[]) method.invoke(connection, (Object[]) null);
-                
+
                 //TODO Obtain localPrincipal and peerPrincipal using the com.sun.net.ssl api
             } catch (Exception e) {
                 ex = e;
@@ -124,7 +124,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
                                                       + connection.getClass().getName());
                     ioe.initCause(ex);
                     throw ioe;
-                    
+
                 }
             }
         }
@@ -137,7 +137,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
     public String getEnabledCipherSuite() {
         return enabledCipherSuite;
     }
-    
+
     /**
      * This method returns the certificates that were used to
      * authenticate to the peer.
@@ -145,7 +145,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
     public Certificate[] getLocalCertificates() {
         return localCertificates;
     }
-    
+
     /**
      * This method returns the Princpal that authenticated to
      * the peer.
@@ -153,7 +153,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
     public Principal getLocalPrincipal() {
         return localPrincipal;
     }
-    
+
     /**
      * This method returns the certificates presented by the
      * peer for authentication.
@@ -161,7 +161,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
     public Certificate[] getServerCertificates() {
         return serverCertificates;
     }
-    
+
     /**
      * This method returns the Principal that represents the
      * authenticated peer.

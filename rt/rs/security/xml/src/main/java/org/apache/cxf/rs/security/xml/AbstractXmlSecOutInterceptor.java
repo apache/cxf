@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -47,19 +48,19 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
     protected static final String SIG_PREFIX = "ds";
     protected static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
     protected static final String ENC_PREFIX = "xenc";
-    protected static final String WSU_NS = 
+    protected static final String WSU_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractXmlSecOutInterceptor.class);
-    
+
     static {
         WSProviderConfig.init();
     }
-    
+
     public AbstractXmlSecOutInterceptor() {
         super(Phase.WRITE);
-    } 
+    }
 
     public void handleMessage(Message message) throws Fault {
         if (message.getExchange().get(Throwable.class) != null) {
@@ -71,8 +72,8 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
                 return;
             }
             Document finalDoc = processDocument(message, doc);
-            
-            message.setContent(List.class, 
+
+            message.setContent(List.class,
                 new MessageContentsList(new DOMSource(finalDoc)));
         } catch (Exception ex) {
             StringWriter sw = new StringWriter();
@@ -81,40 +82,39 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
             throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
     }
-    
+
     protected abstract Document processDocument(Message message, Document doc)
-        throws Exception; 
-    
-    
-    
+        throws Exception;
+
+
+
     private Object getRequestBody(Message message) {
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return null;
-        } else {
-            return objs.get(0);
         }
+        return objs.get(0);
     }
-    
+
     @SuppressWarnings("unchecked")
     private Document getDomDocument(Message m) throws Exception {
-        
+
         Object body = getRequestBody(m);
         if (body == null) {
             return null;
         }
-        
+
         if (body instanceof Document) {
             return (Document)body;
         }
         if (body instanceof DOMSource) {
             return (Document)((DOMSource)body).getNode();
         }
-        
+
         ProviderFactory pf = ProviderFactory.getInstance(m);
-        
-        Object providerObject = pf.createMessageBodyWriter(body.getClass(), 
-                                   body.getClass(), new Annotation[]{}, 
+
+        Object providerObject = pf.createMessageBodyWriter(body.getClass(),
+                                   body.getClass(), new Annotation[]{},
                                    MediaType.APPLICATION_XML_TYPE, m);
         if (!(providerObject instanceof JAXBElementProvider)) {
             return null;
@@ -122,11 +122,11 @@ public abstract class AbstractXmlSecOutInterceptor extends AbstractPhaseIntercep
         JAXBElementProvider<Object> provider = (JAXBElementProvider<Object>)providerObject;
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         m.setContent(XMLStreamWriter.class, writer);
-        provider.writeTo(body, 
+        provider.writeTo(body,
                          body.getClass(), new Annotation[]{},
                          MediaType.APPLICATION_XML_TYPE,
                          (MultivaluedMap<String, Object>)m.get(Message.PROTOCOL_HEADERS), null);
         return writer.getDocument();
     }
-    
+
 }

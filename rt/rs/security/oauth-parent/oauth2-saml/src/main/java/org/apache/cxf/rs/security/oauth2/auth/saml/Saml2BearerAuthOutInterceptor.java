@@ -32,7 +32,7 @@ public class Saml2BearerAuthOutInterceptor extends SamlFormOutInterceptor {
         form.param(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         form.param(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedToken);
     }
-    
+
     @Override
     protected String encodeToken(String token) throws Base64Exception {
         return Base64UrlUtility.encode(token);

@@ -38,7 +38,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
-public class LogicalHandlerInInterceptor 
+public class LogicalHandlerInInterceptor
     extends AbstractJAXWSHandlerInterceptor<Message> {
 
     public LogicalHandlerInInterceptor(Binding binding) {
@@ -46,6 +46,7 @@ public class LogicalHandlerInInterceptor
         addAfter(SOAPHandlerInterceptor.class.getName());
     }
 
+    @Override
     public void handleMessage(Message message) {
         if (binding.getHandlerChain().isEmpty()) {
             return;
@@ -54,24 +55,24 @@ public class LogicalHandlerInInterceptor
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
         }
-        
+
         LogicalMessageContextImpl lctx = new LogicalMessageContextImpl(message);
         invoker.setLogicalMessageContext(lctx);
         boolean requestor = isRequestor(message);
         if (!requestor) {
             setupBindingOperationInfo(message.getExchange(), lctx);
         }
-        
+
         if (!invoker.invokeLogicalHandlers(requestor, lctx)) {
             if (!requestor) {
-                //server side 
+                //server side
                 handleAbort(message, null);
             } else {
-                //Client side inbound, thus no response expected, do nothing, the close will  
+                //Client side inbound, thus no response expected, do nothing, the close will
                 //be handled by MEPComplete later
             }
         }
- 
+
         //If this is the inbound and end of MEP, call MEP completion
         if (!isOutbound(message) && isMEPComlete(message)) {
             onCompletion(message);
@@ -86,7 +87,7 @@ public class LogicalHandlerInInterceptor
             Endpoint e = message.getExchange().getEndpoint();
             Message responseMsg = new MessageImpl();
             responseMsg.setExchange(message.getExchange());
-            responseMsg = e.getBinding().createMessage(responseMsg);            
+            responseMsg = e.getBinding().createMessage(responseMsg);
 
             message.getExchange().setOutMessage(responseMsg);
             XMLStreamReader reader = message.getContent(XMLStreamReader.class);
@@ -98,15 +99,11 @@ public class LogicalHandlerInInterceptor
                 .getOutInterceptorChain(message.getExchange());
             responseMsg.setInterceptorChain(chain);
             responseMsg.put("LogicalHandlerInterceptor.INREADER", reader);
-              
+
             chain.doIntercept(responseMsg);
-        }        
+        }
     }
-    
-    public void handleFault(Message message) {
-        // TODO
-    }
-    
+
     protected QName getOpQName(Exchange ex, Object data) {
         LogicalMessageContextImpl sm = (LogicalMessageContextImpl)data;
         Source src = sm.getMessage().getPayload();

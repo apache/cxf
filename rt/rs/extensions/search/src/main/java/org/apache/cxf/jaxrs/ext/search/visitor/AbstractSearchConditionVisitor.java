@@ -36,18 +36,18 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 
 public abstract class AbstractSearchConditionVisitor <T, E> implements SearchConditionVisitor<T, E> {
-    
+
     private Map<String, String> fieldMap;
     private Map<String, Class<?>> primitiveFieldTypeMap;
     private PropertyValidator<Object> validator;
     private ParamConverterProvider converterProvider;
     private boolean wildcardStringMatch;
-    
+
     protected AbstractSearchConditionVisitor(Map<String, String> fieldMap) {
         this.fieldMap = fieldMap;
         this.converterProvider = new DefaultParamConverterProvider();
     }
-    
+
     protected String getRealPropertyName(String name) {
         if (fieldMap != null && fieldMap.containsKey(name)) {
             return fieldMap.get(name);
@@ -56,21 +56,21 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     }
 
     protected Class<?> getPrimitiveFieldClass(String name, Class<?> valueCls) {
-        return getPrimitiveFieldClass(name, valueCls, null).getCls(); 
-    }    
-    
+        return getPrimitiveFieldClass(name, valueCls, null).getCls();
+    }
+
     protected ClassValue getPrimitiveFieldClass(String name, Class<?> valueCls, Object value) {
         return getPrimitiveFieldClass(null, name, valueCls, valueCls, value);
     }
-    
-    protected ClassValue getPrimitiveFieldClass(PrimitiveStatement ps, String name, Class<?> valueCls, 
+
+    protected ClassValue getPrimitiveFieldClass(PrimitiveStatement ps, String name, Class<?> valueCls,
                                                 Type type, Object value) {
-        return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, new HashSet<String>());
+        return doGetPrimitiveFieldClass(ps, name, valueCls, type, value, new HashSet<>());
     }
-    
+
     @SuppressWarnings("rawtypes")
     private ClassValue doGetPrimitiveFieldClass(PrimitiveStatement ps,
-                                                String name, Class<?> valueCls, Type type, Object value, 
+                                                String name, Class<?> valueCls, Type type, Object value,
                                                 Set<String> set) {
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(valueCls);
         Class<?> actualCls = isCollection ? InjectionUtils.getActualType(type) : valueCls;
@@ -87,7 +87,7 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
                     } else {
                         nextPart = Character.toUpperCase(nextPart.charAt(0)) + nextPart.substring(1);
                     }
-                    
+
                     Method m = actualCls.getMethod("get" + nextPart, new Class[]{});
                     if (isCollection) {
                         value = ((Collection)value).iterator().next();
@@ -106,16 +106,16 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
             Collection coll = (Collection)value;
             value = coll.isEmpty() ? null : coll.iterator().next();
             valueCls = actualCls;
-            if (ps instanceof CollectionCheckStatement) { 
+            if (ps instanceof CollectionCheckStatement) {
                 collInfo = ((CollectionCheckStatement)ps).getCollectionCheckInfo();
             }
         }
-        
+
         Class<?> cls = null;
         if (primitiveFieldTypeMap != null) {
             cls = primitiveFieldTypeMap.get(name);
         }
-        if (cls == null) {  
+        if (cls == null) {
             cls = valueCls;
         }
         return new ClassValue(cls, value, collInfo, set);
@@ -124,25 +124,25 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     public void setPrimitiveFieldTypeMap(Map<String, Class<?>> primitiveFieldTypeMap) {
         this.primitiveFieldTypeMap = primitiveFieldTypeMap;
     }
-    
+
     public SearchConditionVisitor<T, E> visitor() {
         return this;
     }
-    
+
     protected class ClassValue {
         private Class<?> cls;
         private Object value;
         private CollectionCheckInfo collInfo;
-        
+
         private Set<String> collectionProps;
-        public ClassValue(Class<?> cls, 
+        public ClassValue(Class<?> cls,
                           Object value,
                           CollectionCheckInfo collInfo,
                           Set<String> collectionProps) {
             this.cls = cls;
             this.value = value;
             this.collInfo = collInfo;
-            this.collectionProps = collectionProps;       
+            this.collectionProps = collectionProps;
         }
         public Class<?> getCls() {
             return cls;
@@ -156,22 +156,22 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
         public void setValue(Object value) {
             this.value = value;
         }
-        
+
         public CollectionCheckInfo getCollectionCheckInfo() {
             return collInfo;
         }
-        
+
         public boolean isCollection(String name) {
             return collectionProps != null && collectionProps.contains(name);
         }
     }
-    
+
     protected void validatePropertyValue(String name, Object value) {
         if (validator != null) {
             validator.validate(name, value);
         }
     }
-    
+
     public void setValidator(PropertyValidator<Object> validator) {
         this.validator = validator;
     }
@@ -183,11 +183,11 @@ public abstract class AbstractSearchConditionVisitor <T, E> implements SearchCon
     public void setWildcardStringMatch(boolean wildcardStringMatch) {
         this.wildcardStringMatch = wildcardStringMatch;
     }
-    
+
     public void setFieldTypeConverter(final ParamConverterProvider provider) {
         this.converterProvider = provider;
     }
-    
+
     public ParamConverterProvider getFieldTypeConverter() {
         return converterProvider;
     }

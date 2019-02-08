@@ -75,7 +75,7 @@ public class TemporaryCredentialsController {
                 provider);
             accessor = new OAuthAccessor(consumer);
 
-            Map<String, String> parameters = new HashMap<String, String>();
+            Map<String, String> parameters = new HashMap<>();
             parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, oAuthParams.getSignatureMethod());
             parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
             parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
@@ -96,7 +96,7 @@ public class TemporaryCredentialsController {
             oAuthParams.setOauthTokenSecret(accessor.tokenSecret);
             Cookie cId = new Cookie("clientID", oAuthParams.getClientID());
             Cookie cSec = new Cookie("clientSecret", oAuthParams.getClientSecret());
-            Cookie tokenSec = new Cookie("tokenSec", accessor.tokenSecret); 
+            Cookie tokenSec = new Cookie("tokenSec", accessor.tokenSecret);
             response.addCookie(cId);
             response.addCookie(cSec);
             response.addCookie(tokenSec);

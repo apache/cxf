@@ -27,15 +27,15 @@ public class JwtToken {
     private JwsHeaders jwsHeaders;
     private JweHeaders jweHeaders;
     private JwtClaims claims;
-    
+
     public JwtToken(JwtClaims claims) {
-        this(new JwsHeaders() { }, new JweHeaders() { }, claims);
+        this(new JwsHeaders(), new JweHeaders(), claims);
     }
     public JwtToken(JwsHeaders jwsHeaders, JwtClaims claims) {
-        this(jwsHeaders, new JweHeaders() { }, claims);
+        this(jwsHeaders, new JweHeaders(), claims);
     }
     public JwtToken(JweHeaders jweHeaders, JwtClaims claims) {
-        this(new JwsHeaders() { }, jweHeaders, claims);
+        this(new JwsHeaders(), jweHeaders, claims);
     }
     public JwtToken(JwsHeaders jwsHeaders, JweHeaders jweHeaders, JwtClaims claims) {
         this.jwsHeaders = jwsHeaders;
@@ -60,12 +60,12 @@ public class JwtToken {
     public Object getClaim(String name) {
         return claims.getClaim(name);
     }
-    public int hashCode() { 
+    public int hashCode() {
         return jwsHeaders.hashCode() + 37 * claims.hashCode() + 37 * jweHeaders.hashCode();
     }
-    
+
     public boolean equals(Object obj) {
-        return obj instanceof JwtToken 
+        return obj instanceof JwtToken
             && ((JwtToken)obj).jwsHeaders.equals(this.jwsHeaders)
             && ((JwtToken)obj).jweHeaders.equals(this.jweHeaders)
             && ((JwtToken)obj).claims.equals(this.claims);

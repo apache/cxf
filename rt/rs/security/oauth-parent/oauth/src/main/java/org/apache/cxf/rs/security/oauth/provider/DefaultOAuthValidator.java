@@ -27,11 +27,10 @@ import net.oauth.OAuthException;
 import net.oauth.OAuthMessage;
 import net.oauth.OAuthProblemException;
 import net.oauth.SimpleOAuthValidator;
-
 import org.apache.cxf.rs.security.oauth.data.Token;
 
 /**
- * The utility OAuth validator which is primarily used 
+ * The utility OAuth validator which is primarily used
  * by the runtime to validate that the issued tokens have not expired.
  * Note that the runtime does validate OAuth signatures separately.
  */
@@ -40,23 +39,22 @@ public class DefaultOAuthValidator extends SimpleOAuthValidator {
     public DefaultOAuthValidator() {
     }
 
-    public void checkSingleParameter(OAuthMessage message) throws OAuthException, IOException, 
+    public void checkSingleParameter(OAuthMessage message) throws OAuthException, IOException,
         URISyntaxException {
         super.checkSingleParameters(message);
     }
 
-    public void validateToken(Token token, OAuthDataProvider provider) 
+    public void validateToken(Token token, OAuthDataProvider provider)
         throws OAuthProblemException {
         if (token == null) {
             throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
-        } else {
-            Long issuedAt = token.getIssuedAt();
-            Long lifetime = token.getLifetime();
-            if (lifetime != -1
-                && (issuedAt + lifetime < (System.currentTimeMillis() / 1000))) {
-                provider.removeToken(token);
-                throw new OAuthProblemException(OAuth.Problems.TOKEN_EXPIRED);
-            }
+        }
+        Long issuedAt = token.getIssuedAt();
+        Long lifetime = token.getLifetime();
+        if (lifetime != -1
+            && (issuedAt + lifetime < (System.currentTimeMillis() / 1000))) {
+            provider.removeToken(token);
+            throw new OAuthProblemException(OAuth.Problems.TOKEN_EXPIRED);
         }
     }
 }

@@ -35,7 +35,7 @@ import org.apache.cxf.phase.Phase;
 
 public class StaxSchemaValidationOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(StaxSchemaValidationOutInterceptor.class);
-        
+
     public StaxSchemaValidationOutInterceptor() {
         super(Phase.PRE_MARSHAL);
     }
@@ -46,11 +46,11 @@ public class StaxSchemaValidationOutInterceptor extends AbstractPhaseInterceptor
         try {
             setSchemaInMessage(message, writer);
         } catch (XMLStreamException e) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("SCHEMA_ERROR", LOG), 
+            throw new Fault(new org.apache.cxf.common.i18n.Message("SCHEMA_ERROR", LOG),
                             e);
         }
     }
-    
+
     private void setSchemaInMessage(Message message, XMLStreamWriter writer) throws XMLStreamException  {
         if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
             try {

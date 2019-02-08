@@ -29,8 +29,8 @@ public class BookServerSecuritySpringNoAnnotations extends AbstractSpringServer 
     public BookServerSecuritySpringNoAnnotations() {
         super("/jaxrs_security_no_annotations", PORT);
     }
-    
-    public static void main(String args[]) {
+
+    public static void main(String[] args) {
         try {
             BookServerSecuritySpringNoAnnotations s = new BookServerSecuritySpringNoAnnotations();
             s.start();

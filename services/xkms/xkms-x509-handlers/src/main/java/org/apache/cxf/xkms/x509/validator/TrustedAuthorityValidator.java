@@ -54,14 +54,14 @@ public class TrustedAuthorityValidator implements Validator {
 
     CertificateRepo certRepo;
     boolean enableRevocation = true;
-    
+
     public TrustedAuthorityValidator(CertificateRepo certRepo) {
         this.certRepo = certRepo;
     }
-    
+
     /**
      * Checks if a certificate is signed by a trusted authority.
-     * 
+     *
      * @param x509Certificate to check
      * @return the validity state of the certificate
      */
@@ -79,10 +79,10 @@ public class TrustedAuthorityValidator implements Validator {
             pkixParams.addCertStore(CertStore.getInstance("Collection", intermediateParams));
             pkixParams.addCertStore(CertStore.getInstance("Collection", certificateParams));
             pkixParams.setRevocationEnabled(false);
-            
+
             CertPathBuilder builder = CertPathBuilder.getInstance("PKIX");
             CertPath certPath = builder.build(pkixParams).getCertPath();
-            
+
             // Now validate the CertPath (including CRL checking)
             if (enableRevocation) {
                 List<X509CRL> crls = certRepo.getCRLs();
@@ -92,10 +92,10 @@ public class TrustedAuthorityValidator implements Validator {
                     pkixParams.addCertStore(CertStore.getInstance("Collection", crlParams));
                 }
             }
-                
+
             CertPathValidator validator = CertPathValidator.getInstance("PKIX");
             validator.validate(certPath, pkixParams);
-            
+
         } catch (InvalidAlgorithmParameterException e) {
             LOG.log(Level.WARNING,
                     "Invalid algorithm parameter by certificate chain validation. "
@@ -148,5 +148,5 @@ public class TrustedAuthorityValidator implements Validator {
     public void setEnableRevocation(boolean enableRevocation) {
         this.enableRevocation = enableRevocation;
     }
-    
+
 }

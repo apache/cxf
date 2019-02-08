@@ -23,7 +23,7 @@ import javax.jws.soap.SOAPBinding;
 
 @SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC,
              use = javax.jws.soap.SOAPBinding.Use.LITERAL)
-@WebService(portName = "DemoPort", targetNamespace = "http://apache.org/cxf", 
+@WebService(portName = "DemoPort", targetNamespace = "http://apache.org/cxf",
             serviceName = "DemoService", name = "Demo")
 interface Demo {
     void sayHi();

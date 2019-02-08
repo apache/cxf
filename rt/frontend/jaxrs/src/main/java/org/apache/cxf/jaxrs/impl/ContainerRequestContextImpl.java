@@ -33,11 +33,11 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
-public class ContainerRequestContextImpl extends AbstractRequestContextImpl 
+public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     implements ContainerRequestContext {
 
     private static final String ENDPOINT_ADDRESS_PROPERTY = "org.apache.cxf.transport.endpoint.address";
-    
+
     private boolean preMatch;
     public ContainerRequestContextImpl(Message message, boolean preMatch, boolean responseContext) {
         super(message, responseContext);
@@ -68,6 +68,10 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
 
     @Override
     public boolean hasEntity() {
+        // Is Content-Length is explicitly set to 0 ?
+        if (HttpUtils.isPayloadEmpty(getHeaders())) {
+            return false;
+        }
         try {
             return !IOUtils.isEmpty(getEntityStream());
         } catch (IOException ex) {
@@ -95,21 +99,24 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
             if (!requestUriString.startsWith(baseUriString)) {
                 setRequestUri(requestUri, URI.create("/"));
                 return;
-            } else {
-                requestUriString = requestUriString.substring(baseUriString.length());
-                if (requestUriString.isEmpty()) {
-                    requestUriString = "/";
-                }
-                requestUri = URI.create(requestUriString);
             }
-                
+            requestUriString = requestUriString.substring(baseUriString.length());
+            if (requestUriString.isEmpty()) {
+                requestUriString = "/";
+            }
+            requestUri = URI.create(requestUriString);
+
         }
         doSetRequestUri(requestUri);
     }
-    
-    public void doSetRequestUri(URI requestUri) throws IllegalStateException {
+
+    protected void doSetRequestUri(URI requestUri) throws IllegalStateException {
         checkNotPreMatch();
-        HttpUtils.resetRequestURI(m, requestUri.toString());
+        HttpUtils.resetRequestURI(m, requestUri.getRawPath());
+        String query = requestUri.getRawQuery();
+        if (query != null) {
+            m.put(Message.QUERY_STRING, query);
+        }
     }
 
     @Override
@@ -126,6 +133,10 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     public void setSecurityContext(SecurityContext sc) {
         checkContext();
         m.put(SecurityContext.class, sc);
+        if (sc instanceof org.apache.cxf.security.SecurityContext) {
+            m.put(org.apache.cxf.security.SecurityContext.class,
+                  (org.apache.cxf.security.SecurityContext)sc);
+        }
     }
 
     private void checkNotPreMatch() {
@@ -133,8 +144,8 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
             throw new IllegalStateException();
         }
     }
-    
-    @Override 
+
+    @Override
     public void setMethod(String method) throws IllegalStateException {
         checkNotPreMatch();
         super.setMethod(method);

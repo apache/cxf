@@ -47,15 +47,18 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest {
     public static final String PORT = allocatePort(JAXRSClientServerValidationTest.class);
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
             sf.setResourceClasses(BookStoreWithValidation.class);
-            sf.setResourceProvider(BookStoreWithValidation.class, 
+            sf.setResourceProvider(BookStoreWithValidation.class,
                 new SingletonResourceProvider(new BookStoreWithValidation()));
             sf.setProvider(new ValidationExceptionMapper() {
                 @Override
@@ -71,7 +74,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             in.setProvider(new BeanValidationProvider(new JAXRSParameterNameProvider()));
             sf.setInInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
                 in));
-             
+
             sf.setOutInterceptors(Arrays.< Interceptor< ? extends Message > >asList(
                 new JAXRSBeanValidationOutInterceptor()));
 
@@ -90,7 +93,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -98,70 +101,80 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Before
     public void setUp() {
         final Response r = createWebClient("/bookstore/books").delete();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
-       
+
     @Test
     public void testThatPatternValidationFails() throws Exception {
         final Response r = createWebClient("/bookstore/books/blabla").get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatNotNullValidationFails()  {
         final Response r = createWebClient("/bookstore/books").post(new Form());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+    @Test
+    public void testThatNotNullValidationSkipped()  {
+        final Response r = createWebClient("/bookstore/booksNoValidate").post(new Form());
+        assertEquals(200, r.getStatus());
+    }
+    @Test
+    public void testThatNotNullValidationNotSkipped()  {
+        final Response r = createWebClient("/bookstore/booksValidate").post(new Form());
+        assertEquals(400, r.getStatus());
+    }
+
     @Test
     public void testThatSizeValidationFails()  {
         final Response r = createWebClient("/bookstore/books").post(new Form().param("id", ""));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatMinValidationFails()  {
         final Response r = createWebClient("/bookstore/books").query("page", "0").get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatNoValidationConstraintsAreViolated()  {
         final Response r = createWebClient("/bookstore/books").query("page", "2").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatNoValidationConstraintsAreViolatedWithDefaultValue()  {
         final Response r = createWebClient("/bookstore/books").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatNoValidationConstraintsAreViolatedWithBook()  {
         final Response r = createWebClient("/bookstore/books/direct").type("text/xml").post(
               new BookWithValidation("BeanVal", "1"));
         assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatValidationConstraintsAreViolatedWithBook()  {
         final Response r = createWebClient("/bookstore/books/direct").type("text/xml").post(
               new BookWithValidation("BeanVal"));
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatValidationConstraintsAreViolatedWithBooks()  {
         final Response r = createWebClient("/bookstore/books/directmany").type("text/xml").postCollection(
               Collections.singletonList(new BookWithValidation("BeanVal")), BookWithValidation.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatResponseValidationForOneBookFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
@@ -170,7 +183,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         r = createWebClient("/bookstore/books/1234").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatResponseValidationForOneBookNotFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
@@ -179,7 +192,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         r = createWebClient("/bookstore/books/1234").get();
         assertEquals(200, r.getStatus());
     }
-    
+
     @Test
     public void testThatResponseValidationForOneBookSubNotFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
@@ -188,7 +201,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         r = createWebClient("/bookstore/sub/books/1234").get();
         assertEquals(200, r.getStatus());
     }
-    
+
     @Test
     public void testThatResponseValidationForNullBookFails()  {
         Response r = createWebClient("/bookstore/books").post(new Form().param("id", "1234").param("name", "cxf"));
@@ -197,7 +210,7 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         r = createWebClient("/bookstore/books/1235").get();
         assertEquals(500, r.getStatus());
     }
-    
+
     @Test
     public void testThatResponseValidationForOneResponseBookFails()  {
         Response r = createWebClient("/bookstore/booksResponse/1234").get();
@@ -209,13 +222,13 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         r = createWebClient("/bookstore/booksResponse/1234").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
-    
+
 
     @Test
     public void testThatResponseValidationForBookPassesWhenNoConstraintsAreDefined()  {
         Response r = createWebClient("/bookstore/booksResponseNoValidation/1234").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         r = createWebClient("/bookstore/books").post(new Form().param("id", "1234"));
         assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
 
@@ -239,12 +252,12 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
             .post(new BookWithValidation("BeanVal", "1"));
         assertEquals(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(), r.getStatus());
     }
-    
+
     @Override
     protected String getPort() {
         return PORT;
-    }   
-    
-    
+    }
+
+
 }
 

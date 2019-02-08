@@ -27,7 +27,7 @@ import org.apache.cxf.tools.common.ToolContext;
 public abstract class AbstractProcessor {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractProcessor.class);
     protected ToolContext context;
-    
+
     public AbstractProcessor(ToolContext c) {
         this.context = c;
     }

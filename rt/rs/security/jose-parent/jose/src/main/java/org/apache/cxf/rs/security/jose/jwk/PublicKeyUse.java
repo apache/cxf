@@ -22,7 +22,7 @@ package org.apache.cxf.rs.security.jose.jwk;
 public enum PublicKeyUse {
     SIGN(JsonWebKey.PUBLIC_KEY_USE_SIGN),
     ENCRYPT(JsonWebKey.PUBLIC_KEY_USE_ENCRYPT);
-    
+
     private final String use;
     PublicKeyUse(String use) {
         this.use = use;
@@ -32,9 +32,9 @@ public enum PublicKeyUse {
             return null;
         }
         if (JsonWebKey.PUBLIC_KEY_USE_SIGN.equals(use)) {
-            return SIGN; 
+            return SIGN;
         } else if (JsonWebKey.PUBLIC_KEY_USE_ENCRYPT.equals(use)) {
-            return ENCRYPT; 
+            return ENCRYPT;
         } else {
             return valueOf(use);
         }
@@ -42,5 +42,5 @@ public enum PublicKeyUse {
     public String toString() {
         return use;
     }
-    
+
 }

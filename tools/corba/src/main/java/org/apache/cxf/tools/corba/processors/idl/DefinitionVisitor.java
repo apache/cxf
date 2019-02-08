@@ -26,7 +26,7 @@ import antlr.collections.AST;
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class DefinitionVisitor extends VisitorBase {
-    
+
     public DefinitionVisitor(Scope scope,
                              Definition defn,
                              XmlSchema schemaRef,
@@ -41,7 +41,7 @@ public class DefinitionVisitor extends VisitorBase {
         //                | <interface> ";"
         //                | <module> ";"
         //                | <value> ";"
-        
+
         switch (node.getType()) {
         case IDLTokenTypes.LITERAL_custom:
         case IDLTokenTypes.LITERAL_valuetype: {
@@ -93,7 +93,7 @@ public class DefinitionVisitor extends VisitorBase {
                                                                wsdlVisitor);
             typeDclVisitor.visit(node);
         }
-        
+
         }
     }
 
@@ -150,5 +150,5 @@ public class DefinitionVisitor extends VisitorBase {
         }
         return defn;
     }
-    
+
 }

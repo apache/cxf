@@ -34,16 +34,16 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 /**
- * 
+ *
  */
 public class ElementDataReader implements DataReader<Element> {
-    
+
     private AegisElementDataReader reader;
     private AegisDatabinding databinding;
-    
+
     ElementDataReader(AegisDatabinding binding) {
         databinding = binding;
-        reader = new AegisElementDataReader(binding.getAegisContext()); 
+        reader = new AegisElementDataReader(binding.getAegisContext());
     }
 
     /**
@@ -77,7 +77,7 @@ public class ElementDataReader implements DataReader<Element> {
         }
     }
 
-    /** 
+    /**
      * {@inheritDoc}
      * */
     public void setAttachments(Collection<Attachment> attachments) {

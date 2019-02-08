@@ -28,7 +28,7 @@ import org.apache.cxf.feature.AbstractFeature;
 
 /**
  * This class provides configuration options to the JavaScript client generator.
- * Attach this feature to control namespace mapping and other options. 
+ * Attach this feature to control namespace mapping and other options.
  * <pre>
  * <![CDATA[
     <jaxws:endpoint ...>

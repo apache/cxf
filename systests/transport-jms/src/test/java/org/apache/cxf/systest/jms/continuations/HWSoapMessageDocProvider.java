@@ -40,7 +40,7 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.DOMUtils;
 
-@WebServiceProvider(serviceName = "HelloWorldService", 
+@WebServiceProvider(serviceName = "HelloWorldService",
             portName = "HelloWorldPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "/org/apache/cxf/systest/jms/continuations/jms_test.wsdl")
@@ -49,33 +49,33 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_soap_http", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_soap_http", "greetMe");
-    
-    @Resource 
+
+    @Resource
     WebServiceContext ctx;
-    
+
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
-    
+
     public HWSoapMessageDocProvider() {
-       
+
         try {
-            MessageFactory factory = MessageFactory.newInstance();            
+            MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralResp.xml");
-            greetMeResponse =  factory.createMessage(null, is);
+            greetMeResponse = factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     public SOAPMessage invoke(SOAPMessage request) {
         try {
             final MessageContext messageContext = ctx.getMessageContext();
 
-            ContinuationProvider contProvider = 
+            ContinuationProvider contProvider =
                 (ContinuationProvider) messageContext.get(ContinuationProvider.class.getName());
             final Continuation continuation = contProvider.getContinuation();
-            
+
             if (continuation.isNew()) {
                 continuation.suspend(5000);
                 new Thread(new Runnable() {
@@ -96,10 +96,10 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
             }
         } catch (SOAPFaultException e) {
             throw e;
-        } 
-        
+        }
+
     }
-    
+
     public SOAPMessage resumeMessage(SOAPMessage request) {
         if (IncomingMessageCounterInterceptor.getMessageCount() != 1) {
             throw new RuntimeException("IncomingMessageCounterInterceptor get invoked twice");
@@ -108,8 +108,8 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
-        SOAPMessage response = null;        
+
+        SOAPMessage response = null;
         try {
             SOAPBody body = request.getSOAPBody();
             Node n = body.getFirstChild();

@@ -64,7 +64,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Constructor.
-     * 
+     *
      * @param mapCodec the MAPCodec to use
      */
     public VersionTransformer(MAPCodec mapCodec) {
@@ -73,7 +73,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Encode message in exposed version.
-     * 
+     *
      * @param exposeAs specifies the WS-Addressing version to expose
      * @param value the value to encode
      * @param localName the localName for the header
@@ -90,7 +90,8 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
             if (NATIVE_VERSION.equals(exposeAs)) {
                 codec.encodeMAP(message, value, new QName(exposeAs, localName), clz,
                                 marshaller, mustUnderstand);
-            } else if (Names200408.WSA_NAMESPACE_NAME.equals(exposeAs)) {
+            } else if (org.apache.cxf.ws.addressing.VersionTransformer.Names200408
+                            .WSA_NAMESPACE_NAME.equals(exposeAs)) {
                 if (AttributedURIType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convert((AttributedURIType)value), new QName(exposeAs, localName),
@@ -98,24 +99,27 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
                 } else if (EndpointReferenceType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convert((EndpointReferenceType)value), new QName(exposeAs, localName),
-                                    Names200408.EPR_TYPE, marshaller, mustUnderstand);
+                                    org.apache.cxf.ws.addressing.VersionTransformer.Names200408.EPR_TYPE,
+                                    marshaller, mustUnderstand);
                 } else if (RelatesToType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convert((RelatesToType)value), new QName(exposeAs, localName),
                                     Relationship.class, marshaller, mustUnderstand);
                 }
-            } else if (Names200403.WSA_NAMESPACE_NAME.equals(exposeAs)) {
+            } else if (org.apache.cxf.ws.addressing.VersionTransformer.Names200403
+                            .WSA_NAMESPACE_NAME.equals(exposeAs)) {
                 if (AttributedURIType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convertTo200403((AttributedURIType)value),
                                     new QName(exposeAs, localName),
-                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class, 
+                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
                                     marshaller, mustUnderstand);
                 } else if (EndpointReferenceType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convertTo200403((EndpointReferenceType)value), new QName(exposeAs,
                                                                                              localName),
-                                    Names200403.EPR_TYPE, marshaller, mustUnderstand);
+                                    org.apache.cxf.ws.addressing.VersionTransformer.Names200403.EPR_TYPE,
+                                    marshaller, mustUnderstand);
                 } else if (RelatesToType.class.equals(clz)) {
                     codec.encodeMAP(message,
                                     convertTo200403((RelatesToType)value), new QName(exposeAs, localName),
@@ -128,7 +132,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Decodes a MAP from a exposed version.
-     * 
+     *
      * @param encodedAs specifies the encoded version
      * @param clz the class
      * @param headerElement the SOAP header element
@@ -149,17 +153,19 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
             if (AttributedURIType.class.equals(clz)) {
                 ret = clz.cast(convert(codec.decodeMAP(AttributedURI.class, headerElement, unmarshaller)));
             } else if (EndpointReferenceType.class.equals(clz)) {
-                ret = clz.cast(convert(codec.decodeMAP(Names200408.EPR_TYPE, headerElement, unmarshaller)));
+                ret = clz.cast(convert(codec.decodeMAP(Names200408.EPR_TYPE,
+                                                       headerElement, unmarshaller)));
             } else if (RelatesToType.class.equals(clz)) {
                 ret = clz.cast(convert(codec.decodeMAP(Relationship.class, headerElement, unmarshaller)));
             }
-        } else if (Names200403.WSA_NAMESPACE_NAME.equals(encodedAs)) {
+        } else if (org.apache.cxf.ws.addressing.VersionTransformer.Names200403.WSA_NAMESPACE_NAME.equals(encodedAs)) {
             if (AttributedURIType.class.equals(clz)) {
                 ret = clz.cast(convert(codec
                     .decodeMAP(org.apache.cxf.ws.addressing.v200403.AttributedURI.class, headerElement,
                                unmarshaller)));
             } else if (EndpointReferenceType.class.equals(clz)) {
-                ret = clz.cast(convert(codec.decodeMAP(Names200403.EPR_TYPE, headerElement, unmarshaller)));
+                ret = clz.cast(convert(codec.decodeMAP(Names200403.EPR_TYPE,
+                                                       headerElement, unmarshaller)));
             } else if (RelatesToType.class.equals(clz)) {
                 ret = clz.cast(convert(codec
                     .decodeMAP(org.apache.cxf.ws.addressing.v200403.Relationship.class, headerElement,
@@ -173,61 +179,26 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
      * Augment the set of headers understood by the protocol binding with the 2004/08 header QNames.
      */
     static {
-        Set<QName> headers = new HashSet<QName>();
+        Set<QName> headers = new HashSet<>();
         headers.addAll(Names.HEADERS);
-        Names200408.addHeaders(headers);
-        Names200403.addHeaders(headers);
+        
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_REPLYTO_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
+        headers.add(new QName(Names200408.WSA_NAMESPACE_NAME, Names.WSA_RELATESTO_NAME));
+
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_REPLYTO_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
+        headers.add(new QName(Names200403.WSA_NAMESPACE_NAME, Names.WSA_RELATESTO_NAME));
+
         HEADERS = Collections.unmodifiableSet(headers);
-    }
-
-    /**
-     * Holder for 2004/08 Names
-     */
-    public static final class Names200408 
-        extends org.apache.cxf.ws.addressing.VersionTransformer.Names200408 {
-
-        protected Names200408() {
-        }
-
-        /**
-         * Adds 2004/08 headers to set.
-         * 
-         * @param headers set of headers
-         */
-        private static void addHeaders(Set<QName> headers) {
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_REPLYTO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
-        }
-    }
-
-    /**
-     * Adds 2004/03 headers to set.
-     * 
-     * @param headers set of headers
-     */
-    public static final class Names200403 
-        extends org.apache.cxf.ws.addressing.VersionTransformer.Names200403 {
-
-        protected Names200403() {
-        }
-
-        /**
-         * Adds 2004/08 headers to set.
-         * 
-         * @param headers set of headers
-         */
-        private static void addHeaders(Set<QName> headers) {
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_FROM_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_TO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_REPLYTO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_FAULTTO_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_ACTION_NAME));
-            headers.add(new QName(WSA_NAMESPACE_NAME, Names.WSA_MESSAGEID_NAME));
-        }
     }
 
 }

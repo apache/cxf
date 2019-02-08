@@ -29,21 +29,21 @@ public class StructDeferredAction implements SchemaDeferredAction {
 
     protected MemberType member;
     protected XmlSchemaElement element;
-    
-    
+
+
     public StructDeferredAction(MemberType memberType, XmlSchemaElement elem) {
         member = memberType;
-        element = elem;        
+        element = elem;
     }
-    
+
     public StructDeferredAction(MemberType memberType) {
-        member = memberType;         
+        member = memberType;
     }
-    
+
     public StructDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (member != null) {
             member.setIdltype(ctype.getQName());
@@ -53,9 +53,9 @@ public class StructDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }        
+        }
     }
-       
+
 }
 
 

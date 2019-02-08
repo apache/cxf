@@ -27,6 +27,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
@@ -36,9 +37,9 @@ import org.apache.cxf.ws.security.sts.provider.STSException;
  * JAXB UsernameTokenType/BinarySecurityTokenType, a DOM Element or a String.
  */
 public class ReceivedToken {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(ReceivedToken.class);
-    
+
     private Object token;
     private boolean isBinarySecurityToken;
     private boolean isUsernameToken;
@@ -47,9 +48,9 @@ public class ReceivedToken {
     private STATE state = STATE.NONE;
     private Principal principal;
     private Set<Principal> roles;
-    
+
     public enum STATE { VALID, INVALID, CANCELLED, EXPIRED, NONE };
-    
+
     public ReceivedToken(Object receivedToken) throws STSException {
         if (receivedToken instanceof JAXBElement<?>) {
             QName parentName = ((JAXBElement<?>)receivedToken).getName();
@@ -60,7 +61,7 @@ public class ReceivedToken {
                 LOG.fine("Found a BinarySecurityToken");
                 isBinarySecurityToken = true;
             } else if (QNameConstants.SECURITY_TOKEN_REFERENCE.equals(parentName)) {
-                LOG.fine("Found SecurityTokenReference");                
+                LOG.fine("Found SecurityTokenReference");
             } else {
                 LOG.fine("Found unknown token object: " + parentName);
                 throw new STSException(
@@ -81,7 +82,7 @@ public class ReceivedToken {
             );
         }
     }
-    
+
     public Object getToken() {
         return token;
     }
@@ -89,7 +90,7 @@ public class ReceivedToken {
     public void setToken(Object token) {
         this.token = token;
     }
-    
+
     public boolean isBinarySecurityToken() {
         return isBinarySecurityToken;
     }
@@ -105,7 +106,7 @@ public class ReceivedToken {
     public void setUsernameToken(boolean usernameToken) {
         this.isUsernameToken = usernameToken;
     }
-    
+
     public boolean isDOMElement() {
         return isDOMElement;
     }
@@ -113,7 +114,7 @@ public class ReceivedToken {
     public void setDOMElement(boolean domElement) {
         this.isDOMElement = domElement;
     }
-    
+
     public String getTokenContext() {
         return tokenContext;
     }
@@ -137,7 +138,7 @@ public class ReceivedToken {
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Set<Principal> getRoles() {
         return roles;
     }
@@ -145,5 +146,5 @@ public class ReceivedToken {
     public void setRoles(Set<Principal> roles) {
         this.roles = roles;
     }
-    
+
 }

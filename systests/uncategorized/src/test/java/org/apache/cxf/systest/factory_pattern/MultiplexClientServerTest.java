@@ -44,15 +44,17 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MultiplexClientServerTest.class);
-    public static final String FACTORY_ADDRESS = 
+    public static final String FACTORY_ADDRESS =
         "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
-    
-    public static class Server extends AbstractBusTestServerBase {        
+
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         NumberFactoryImpl implementor;
         protected void run() {
@@ -87,18 +89,18 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         createStaticBus("org/apache/cxf/systest/factory_pattern/cxf_multiplex.xml");
         // requires ws-a support to propagate reference parameters
-        Map<String, String> props = new HashMap<String, String>();    
+        Map<String, String> props = new HashMap<>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
-            props.put("org.apache.activemq.default.directory.prefix", 
+            props.put("org.apache.activemq.default.directory.prefix",
                       System.getProperty("org.apache.activemq.default.directory.prefix"));
         }
         if (System.getProperty("java.util.logging.config.file") != null) {
-            props.put("java.util.logging.config.file", 
+            props.put("java.util.logging.config.file",
                   System.getProperty("java.util.logging.config.file"));
         }
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null, true));
-        
+
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }
@@ -108,43 +110,43 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
             ((Closeable)o).close();
         }
     }
-    
+
     @Test
     public void testWithGetPortExtensionHttp() throws Exception {
-        
+
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
         updateAddressPort(factory, PORT);
-        
+
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
-        
+
         W3CEndpointReference numberTwoRef = factory.create("20");
         assertNotNull("reference", numberTwoRef);
-           
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+
+        Number num = serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
-        
+
         close(num);
-        
+
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
-        
+
         close(num);
         close(factory);
     }
-    
+
     @Test
     public void testWithGetPortExtensionOverJMS() throws Exception {
-        
+
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
         updateAddressPort(factory, PORT);
-        
+
 
         // use values >= 30 to create JMS eprs - see NumberFactoryImpl.create
-        
+
         // verify it is JMS, 999 for JMS will throw a fault
         W3CEndpointReference ref = factory.create("999");
         String s = NumberService.WSDL_LOCATION.toString();
@@ -152,8 +154,8 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         NumberService numService = new NumberService();
 
         assertNotNull("reference", ref);
-        ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);    
-        Number num =  serviceImpl.getPort(ref, Number.class); 
+        ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
+        Number num = serviceImpl.getPort(ref, Number.class);
         try {
             num.isEven().isEven();
             fail("there should be a fault on val 999");
@@ -162,12 +164,12 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
                        expected.getMessage().indexOf("999") != -1);
         }
         ClientProxy.getClient(num).getConduit().close();
-        
+
         ref = factory.create("37");
         assertNotNull("reference", ref);
-        num =  serviceImpl.getPort(ref, Number.class);
+        num = serviceImpl.getPort(ref, Number.class);
         assertTrue("37 is not even", !num.isEven().isEven());
-        
+
         ClientProxy.getClient(num).getConduit().close();
         ClientProxy.getClient(factory).getConduit().close();
     }

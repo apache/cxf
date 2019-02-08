@@ -22,7 +22,6 @@ import java.util.Properties;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.StaticSTSProperties;
@@ -41,26 +40,31 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for creating SecurityContextTokens.
  */
-public class SCTProviderTest extends org.junit.Assert {
-    
+public class SCTProviderTest {
+
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     /**
      * Create a SecurityContextToken
      */
     @org.junit.Test
     public void testCreateSCT() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -68,20 +72,20 @@ public class SCTProviderTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ConversationConstants.WSC_NS_05_12));
         assertFalse(tokenString.contains(ConversationConstants.WSC_NS_05_02));
     }
-    
+
     /**
      * Create a SecurityContextToken with a different namespace
      */
     @org.junit.Test
     public void testCreateSCTDifferentNamespace() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_02);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_02));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -89,7 +93,7 @@ public class SCTProviderTest extends org.junit.Assert {
         assertTrue(tokenString.contains(ConversationConstants.WSC_NS_05_02));
         assertFalse(tokenString.contains(ConversationConstants.WSC_NS_05_12));
     }
-    
+
     /**
      * Create a SecurityContextToken that returns (and doesn't return) Entropy
      */
@@ -97,36 +101,36 @@ public class SCTProviderTest extends org.junit.Assert {
     public void testCreateSCTReturnEntropy() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
         assertTrue(((SCTProvider)sctTokenProvider).isReturnEntropy());
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(providerResponse.getEntropy() != null && providerResponse.getEntropy().length > 0);
-        
+
         ((SCTProvider)sctTokenProvider).setReturnEntropy(false);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertTrue(providerResponse.getEntropy() == null);
+        assertNull(providerResponse.getEntropy());
     }
-    
+
     /**
      * Create a SecurityContextToken and test that it's stored in the cache
      */
     @org.junit.Test
     public void testCreateSCTCache() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         Element token = (Element)providerResponse.getToken();
@@ -135,58 +139,57 @@ public class SCTProviderTest extends org.junit.Assert {
         assertNotNull(tokenStore.getToken(identifier));
         assertNull(tokenStore.getToken(identifier + "1234"));
     }
-    
+
     /**
      * Create a SecurityContextToken and test the KeySize
      */
     @org.junit.Test
     public void testCreateSCTKeySize() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
         assertTrue(256L == providerResponse.getKeySize());
-        
+
         // Test a custom KeySize
         KeyRequirements keyRequirements = providerParameters.getKeyRequirements();
         keyRequirements.setKeySize(192);
         providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(192L == providerResponse.getKeySize());
-        
+
         // Test a bad KeySize - it will just use the default keysize
         keyRequirements.setKeySize(64);
         providerResponse = sctTokenProvider.createToken(providerParameters);
         assertTrue(256L == providerResponse.getKeySize());
     }
-    
-    
+
+
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -195,23 +198,23 @@ public class SCTProviderTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

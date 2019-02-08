@@ -37,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,6 +48,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -59,7 +61,9 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
 import org.xml.sax.InputSource;
+
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.jaxb.JAXBBeanInfo;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -98,7 +102,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     public static final String VALIDATION_EVENT_HANDLER = "jaxb-validation-event-handler";
     public static final String SET_VALIDATION_EVENT_HANDLER = "set-jaxb-validation-event-handler";
     public static final String WRITER_VALIDATION_EVENT_HANDLER = "jaxb-writer-validation-event-handler";
-    
+
     public static final String SCHEMA_RESOURCE = "SCHEMRESOURCE";
     public static final String MTOM_THRESHOLD = "org.apache.cxf.jaxb.mtomThreshold";
 
@@ -110,14 +114,14 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
 
-    private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {Node.class,
+    private static final Class<?>[] SUPPORTED_READER_FORMATS = new Class<?>[] {Node.class,
                                                                                XMLEventReader.class,
                                                                                XMLStreamReader.class};
-    private static final Class<?> SUPPORTED_WRITER_FORMATS[] = new Class<?>[] {OutputStream.class,
+    private static final Class<?>[] SUPPORTED_WRITER_FORMATS = new Class<?>[] {OutputStream.class,
                                                                                Node.class,
                                                                                XMLEventWriter.class,
                                                                                XMLStreamWriter.class};
-    
+
     private static class DelayedDOMResult extends DOMResult {
         private final URL resource;
         private final String publicId;
@@ -143,7 +147,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return nd;
         }
     }
-    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
+    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<>();
     static {
         URIResolver resolver = new URIResolver();
         try {
@@ -191,17 +195,19 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     JAXBContext context;
     Set<Class<?>> contextClasses;
-    Collection<Object> typeRefs = new ArrayList<Object>();
+    Collection<Object> typeRefs = new ArrayList<>();
 
     Class<?> cls;
 
-    private Map<String, Object> contextProperties = new HashMap<String, Object>();
-    private List<XmlAdapter<?, ?>> adapters = new ArrayList<XmlAdapter<?, ?>>();
-    private Map<String, Object> marshallerProperties = new HashMap<String, Object>();
-    private Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
+    private Map<String, Object> contextProperties = new HashMap<>();
+    private List<XmlAdapter<?, ?>> adapters = new ArrayList<>();
+    private Map<String, Object> marshallerProperties = new HashMap<>();
+    private Map<String, Object> unmarshallerProperties = new HashMap<>();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
+    private Object escapeHandler;
+    private Object noEscapeHandler;
 
     private boolean unwrapJAXBElement = true;
     private boolean scanPackages = true;
@@ -215,7 +221,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
     public JAXBDataBinding(Class<?>... classes) throws JAXBException {
-        contextClasses = new LinkedHashSet<Class<?>>();
+        contextClasses = new LinkedHashSet<>();
         contextClasses.addAll(Arrays.asList(classes));
         setContext(createJAXBContext(contextClasses)); //NOPMD - specifically allow this
     }
@@ -240,34 +246,54 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         this();
         setContext(context);
     }
-
+    
     public JAXBContext getContext() {
         return context;
     }
 
     public final void setContext(JAXBContext ctx) {
         context = ctx;
+        //create default MininumEscapeHandler
+        escapeHandler = JAXBUtils.createMininumEscapeHandler(ctx.getClass());
+        noEscapeHandler = JAXBUtils.createNoEscapeHandler(ctx.getClass());
     }
 
+    public Object getEscapeHandler() {
+        return escapeHandler;
+    }
+    
+    public void setEscapeHandler(Object handler) {
+        escapeHandler = handler;
+    }
+    
+    public void applyEscapeHandler(boolean escape, Consumer<Object> consumer) {
+        if (escape) {
+            consumer.accept(escapeHandler);
+        } else if (noEscapeHandler != null) {
+            consumer.accept(noEscapeHandler);
+        }
+    }
+    
+    
     @SuppressWarnings("unchecked")
     public <T> DataWriter<T> createWriter(Class<T> c) {
 
         Integer mtomThresholdInt = Integer.valueOf(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
             DataWriterImpl<XMLStreamWriter> r
-                = new DataWriterImpl<XMLStreamWriter>(this);
+                = new DataWriterImpl<>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == OutputStream.class) {
-            DataWriterImpl<OutputStream> r = new DataWriterImpl<OutputStream>(this);
+            DataWriterImpl<OutputStream> r = new DataWriterImpl<>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == XMLEventWriter.class) {
-            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<XMLEventWriter>(this);
+            DataWriterImpl<XMLEventWriter> r = new DataWriterImpl<>(this, true);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         } else if (c == Node.class) {
-            DataWriterImpl<Node> r = new DataWriterImpl<Node>(this);
+            DataWriterImpl<Node> r = new DataWriterImpl<>(this, false);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
         }
@@ -307,8 +333,8 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return;
         }
 
-        contextClasses = new LinkedHashSet<Class<?>>();
-        
+        contextClasses = new LinkedHashSet<>();
+
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             JAXBContextInitializer initializer
                 = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
@@ -345,7 +371,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
             boolean schemasFromCache = false;
             Collection<DOMSource> schemas = getSchemas();
-            if (schemas == null || schemas.size() == 0) {
+            if (schemas == null || schemas.isEmpty()) {
                 schemas = cachedContextAndSchemas.getSchemas();
                 if (schemas != null) {
                     schemasFromCache = true;
@@ -353,9 +379,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             } else {
                 schemasFromCache = true;
             }
-            Set<DOMSource> bi = new LinkedHashSet<DOMSource>();
+            Set<DOMSource> bi = new LinkedHashSet<>();
             if (schemas == null) {
-                schemas = new LinkedHashSet<DOMSource>();
+                schemas = new LinkedHashSet<>();
                 try {
                     for (DOMResult r : generateJaxbSchemas()) {
                         DOMSource src = new DOMSource(r.getNode(), r.getSystemId());
@@ -372,7 +398,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                     throw new ServiceConstructionException("SCHEMA_GEN_EXC", LOG, e);
                 }
             }
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new HashSet<>();
             for (DOMSource r : schemas) {
                 ids.add(r.getSystemId());
             }
@@ -468,9 +494,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             JAXBContextCache.scanPackages(classes);
         }
         addWsAddressingTypes(classes);
-        
-        return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,  
-                                                          contextProperties, 
+
+        return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,
+                                                          contextProperties,
                                                           typeRefs, true);
     }
 
@@ -620,15 +646,15 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,
                                              List<String> elTypeNames, List<Class<?>> partClasses) {
-        List<Method> getMethods = new ArrayList<Method>(partNames.size());
-        List<Method> setMethods = new ArrayList<Method>(partNames.size());
-        List<Method> jaxbMethods = new ArrayList<Method>(partNames.size());
-        List<Field> fields = new ArrayList<Field>(partNames.size());
+        List<Method> getMethods = new ArrayList<>(partNames.size());
+        List<Method> setMethods = new ArrayList<>(partNames.size());
+        List<Method> jaxbMethods = new ArrayList<>(partNames.size());
+        List<Field> fields = new ArrayList<>(partNames.size());
 
-        Method allMethods[] = wrapperType.getMethods();
+        Method[] allMethods = wrapperType.getMethods();
         String packageName = PackageUtils.getPackageName(wrapperType);
 
-        //if wrappertype class is generated by ASM,getPackage() always return null
+        //if wrappertype class is generated by ASM, getPackage() always return null
         if (wrapperType.getPackage() != null) {
             packageName = wrapperType.getPackage().getName();
         }
@@ -641,7 +667,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         } catch (Exception e) {
             //ignore, probably won't need it
         }
-        Method allOFMethods[];
+        Method[] allOFMethods;
         if (objectFactory != null) {
             allOFMethods = objectFactory.getClass().getMethods();
         } else {
@@ -782,10 +808,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
 
         return createWrapperHelper(wrapperType,
-                                 setMethods.toArray(new Method[setMethods.size()]),
-                                 getMethods.toArray(new Method[getMethods.size()]),
-                                 jaxbMethods.toArray(new Method[jaxbMethods.size()]),
-                                 fields.toArray(new Field[fields.size()]),
+                                 setMethods.toArray(new Method[0]),
+                                 getMethods.toArray(new Method[0]),
+                                 jaxbMethods.toArray(new Method[0]),
+                                 fields.toArray(new Field[0]),
                                  objectFactory);
     }
 
@@ -798,6 +824,12 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                 && partName.equals(el.name())) {
                 return field;
             }
+
+            XmlElementRef xmlElementRefAnnotation = field.getAnnotation(XmlElementRef.class);
+            if (xmlElementRefAnnotation != null && partName.equals(xmlElementRefAnnotation.name())) {
+                return field;
+            }
+
             if (field.getName().equals(fieldName)) {
                 return field;
             }
@@ -806,9 +838,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     }
 
 
-    private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method setMethods[],
-                                                     Method getMethods[], Method jaxbMethods[],
-                                                     Field fields[], Object objectFactory) {
+    private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+                                                     Method[] getMethods, Method[] jaxbMethods,
+                                                     Field[] fields, Object objectFactory) {
 
         WrapperHelper wh = compileWrapperHelper(wrapperType, setMethods, getMethods, jaxbMethods, fields,
                                                 objectFactory);
@@ -820,9 +852,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         return wh;
     }
 
-    private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method setMethods[],
-                                                      Method getMethods[], Method jaxbMethods[],
-                                                      Field fields[], Object objectFactory) {
+    private static WrapperHelper compileWrapperHelper(Class<?> wrapperType, Method[] setMethods,
+                                                      Method[] getMethods, Method[] jaxbMethods,
+                                                      Field[] fields, Object objectFactory) {
         return WrapperHelperCompiler.compileWrapperHelper(wrapperType, setMethods, getMethods,
                                                           jaxbMethods, fields, objectFactory);
     }

@@ -43,26 +43,26 @@ public class Option implements TokenConsumer {
 
     public Option(Element el) {
         this.element = el;
-        
-        
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID,
                                                                      "associatedArgument");
-        if (elemList != null && elemList.size() > 0) {            
+        if (elemList != null && !elemList.isEmpty()) {
             argument = elemList.get(0);
         }
-        
-        elemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                       Tool.TOOL_SPEC_PUBLIC_ID, 
+
+        elemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                       Tool.TOOL_SPEC_PUBLIC_ID,
                                                        "annotation");
-        if (elemList != null && elemList.size() > 0) {            
+        if (elemList != null && !elemList.isEmpty()) {
             annotation = elemList.get(0);
         }
 
         if (annotation == null && argument != null) {
-            elemList =  DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
+            elemList = DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
 
-            if (elemList != null && elemList.size() > 0) {
+            if (elemList != null && !elemList.isEmpty()) {
                 annotation = elemList.get(0);
             }
         }
@@ -91,7 +91,7 @@ public class Option implements TokenConsumer {
         }
 
         // go through each switch to see if we can match one to the arg.
-        List<Element> switches = 
+        List<Element> switches =
             DOMUtils.findAllElementsByTagNameNS(element, Tool.TOOL_SPEC_PUBLIC_ID, "switch");
 
         boolean accepted = false;
@@ -109,7 +109,7 @@ public class Option implements TokenConsumer {
                 // Add ourselves to the result document
                 Element optionEl = result.getOwnerDocument()
                     .createElementNS("http://cxf.apache.org/Xutil/Command", "option");
- 
+
                 optionEl.setAttribute("name", getName());
 
                 // Add argument value to result
@@ -149,7 +149,7 @@ public class Option implements TokenConsumer {
                 errors.add(new ErrorVisitor.UserError(switchArg + " has invalid character!"));
             }
             if (!isInEnumArgumentValue(value)) {
-                errors.add(new ErrorVisitor.UserError(switchArg + " " 
+                errors.add(new ErrorVisitor.UserError(switchArg + " "
                                                       + value + " not in the enumeration value list!"));
             }
         } else {
@@ -159,13 +159,13 @@ public class Option implements TokenConsumer {
     }
 
     private boolean hasInvalidCharacter(String argValue) {
-        
-        List<Element> list = 
+
+        List<Element> list =
             DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
         //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
         String valuetypeStr = null;
 
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             valueType = list.get(0);
             valuetypeStr = valueType.getFirstChild().getNodeValue();
 
@@ -183,13 +183,13 @@ public class Option implements TokenConsumer {
         }
         return false;
     }
-    
+
     private boolean isInEnumArgumentValue(String argValue) {
         boolean result = true;
-        List<Element> list = 
+        List<Element> list =
             DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "valueenum");
-        
-        
+
+
         //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valueenum");
         if (list != null && list.size() == 1) {
             result = false;
@@ -211,10 +211,9 @@ public class Option implements TokenConsumer {
         for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '.') {
                 continue;
-            } else {
-                if (!Character.isJavaIdentifierPart(value.charAt(i))) {
-                    return false;
-                }
+            }
+            if (!Character.isJavaIdentifierPart(value.charAt(i))) {
+                return false;
             }
         }
         return true;
@@ -223,13 +222,12 @@ public class Option implements TokenConsumer {
     private boolean isNamingSpacePackageString(String value) {
         if (value.indexOf("=") < 0) {
             return isIdentifyString(value);
-        } else {
-            String packageName = value.substring(value.indexOf("=") + 1, value.length());
-            return isIdentifyString(packageName);
         }
+        String packageName = value.substring(value.indexOf("=") + 1, value.length());
+        return isIdentifyString(packageName);
     }
 
-    
+
     public boolean isSatisfied(ErrorVisitor errors) {
         if (errors.getErrors().size() > 0) {
             return false;
@@ -289,8 +287,8 @@ public class Option implements TokenConsumer {
 
     public String getPrimarySwitch() {
         //NodeList switches = element.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "switch");
-        
-        List<Element> switches = 
+
+        List<Element> switches =
             DOMUtils.findAllElementsByTagNameNS(element, Tool.TOOL_SPEC_PUBLIC_ID, "switch");
 
         // options must have atleast one switch, as enforced by schema, so no

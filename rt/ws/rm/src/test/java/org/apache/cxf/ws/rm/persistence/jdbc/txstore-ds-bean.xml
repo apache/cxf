@@ -24,8 +24,11 @@
             <ref bean="testStore"/>
         </wsrm-mgr:store>
     </wsrm-mgr:rmManager>
-    <bean id="testStore" class="org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore">
+    <bean id="testStore" class="org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore" init-method="init" destroy-method="destroy">
         <property name="dataSource" ref="testStoreDS"/>
     </bean>
-    <bean id="testStoreDS" class="org.apache.cxf.ws.rm.persistence.jdbc.RMTxStoreConfigurationTest$TestDataSource"/>
+    <bean id="testStoreDS" class="org.apache.derby.jdbc.EmbeddedDataSource">
+    	<property name="databaseName" value="target/wsrmdb1"/>
+    	<property name="createDatabase" value="create"/>
+    </bean>
 </beans>

@@ -26,7 +26,7 @@ import org.apache.cxf.tools.common.ToolErrorListener;
 public class JAXBBindErrorListener implements ErrorListener {
     private boolean isVerbose;
     private ToolErrorListener listener;
-    
+
     public JAXBBindErrorListener(boolean verbose, ToolErrorListener l) {
         isVerbose = verbose;
         listener = l;
@@ -50,7 +50,7 @@ public class JAXBBindErrorListener implements ErrorListener {
 
     public void info(org.xml.sax.SAXParseException exception) {
         if (this.isVerbose) {
-            System.out.println("JAXB Info: " + exception.toString() 
+            System.out.println("JAXB Info: " + exception.toString()
                                + " in schema " + exception.getSystemId());
         }
     }
@@ -61,12 +61,12 @@ public class JAXBBindErrorListener implements ErrorListener {
                 //this is from within JAXB as it tries to validate the schemas
                 //Xerces has issues with schema imports that don't have a
                 //schemaLocation (or a schemaLocation that is not fully resolvable)
-                //and emits strange warnings that are completely not 
+                //and emits strange warnings that are completely not
                 //correct so we'll try and skip them.
                 return;
             }
         }
-        
+
         if (this.isVerbose) {
             System.out.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
@@ -76,9 +76,9 @@ public class JAXBBindErrorListener implements ErrorListener {
                           exception.getColumnNumber(),
                           mapMessage(exception.getLocalizedMessage()),
                           exception);
-        
+
     }
-    
+
     private String mapMessage(String msg) {
         //this is kind of a hack to map the JAXB error message into
         //something more appropriate for CXF.  If JAXB changes their

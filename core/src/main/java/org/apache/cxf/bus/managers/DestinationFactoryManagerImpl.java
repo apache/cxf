@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.managers;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -40,21 +41,21 @@ import org.apache.cxf.transport.TransportFinder;
 @NoJSR250Annotations(unlessNull = "bus")
 public final class DestinationFactoryManagerImpl implements DestinationFactoryManager {
 
-    private static final ResourceBundle BUNDLE 
+    private static final ResourceBundle BUNDLE
         = BundleUtils.getBundle(DestinationFactoryManagerImpl.class);
 
     Map<String, DestinationFactory> destinationFactories;
-    Set<String> failed = new CopyOnWriteArraySet<String>();
-    Set<String> loaded = new CopyOnWriteArraySet<String>();
+    Set<String> failed = new CopyOnWriteArraySet<>();
+    Set<String> loaded = new CopyOnWriteArraySet<>();
     Properties factoryNamespaceMappings;
 
     private Bus bus;
 
     public DestinationFactoryManagerImpl() {
-        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>(8, 0.75f, 4);
+        destinationFactories = new ConcurrentHashMap<>(8, 0.75f, 4);
     }
     public DestinationFactoryManagerImpl(Bus b) {
-        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>(8, 0.75f, 4);
+        destinationFactories = new ConcurrentHashMap<>(8, 0.75f, 4);
         setBus(b);
     }
 
@@ -66,7 +67,7 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
         this.destinationFactories = destinationFactories;
         setBus(b);
     }
-    
+
     @Resource
     public void setBus(Bus b) {
         bus = b;
@@ -108,10 +109,11 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
      *
      * @param namespace the namespace.
      */
+    @Override
     public DestinationFactory getDestinationFactory(String namespace) throws BusException {
         DestinationFactory factory = destinationFactories.get(namespace);
         if (factory == null && !failed.contains(namespace)) {
-            factory = new TransportFinder<DestinationFactory>(bus,
+            factory = new TransportFinder<>(bus,
                     destinationFactories,
                     loaded,
                     DestinationFactory.class)
@@ -124,13 +126,17 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
         return factory;
     }
 
-    public DestinationFactory getDestinationFactoryForUri(String uri) {       
-        DestinationFactory factory = new TransportFinder<DestinationFactory>(bus,
+    @Override
+    public DestinationFactory getDestinationFactoryForUri(String uri) {
+        return new TransportFinder<DestinationFactory>(bus,
                 destinationFactories,
                 loaded,
                 DestinationFactory.class).findTransportForURI(uri);
-        
-        return factory;
     }
     
+    @Override
+    public Set<String> getRegisteredDestinationFactoryNames() {
+        return destinationFactories == null ? Collections.emptySet() 
+                : Collections.unmodifiableSet(destinationFactories.keySet());
+    }
 }

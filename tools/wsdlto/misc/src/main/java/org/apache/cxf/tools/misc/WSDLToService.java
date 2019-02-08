@@ -45,7 +45,7 @@ public class WSDLToService extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     public void execute(boolean exitOnFinish) {
@@ -104,7 +104,7 @@ public class WSDLToService extends AbstractCXFToolContainer {
     }
 
     public static void main(String[] pargs) {
-        
+
         CommandInterfaceUtils.commandCommonMain();
         try {
             ToolRunner.runTool(WSDLToService.class, WSDLToService.class

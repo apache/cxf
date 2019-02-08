@@ -37,15 +37,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-@Path("/bookstore") 
+@Path("/bookstore")
 @Api(value = "/bookstore", description = "Sample JAX-RS service with Swagger documentation")
 public class BookStoreSwagger2 {
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
     @ApiOperation(
-        value = "Get books", 
-        notes = "Get books", 
-        response = Book.class, 
+        value = "Get books",
+        notes = "Get books",
+        response = Book.class,
         responseContainer = "List"
     )
     public Response getBooks(
@@ -57,25 +57,25 @@ public class BookStoreSwagger2 {
             )
         ).build();
     }
-    
+
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/{id}")
     @GET
     @ApiOperation(
-        value = "Get book by Id", 
+        value = "Get book by Id",
         notes = "Get book by Id",
         response = Book.class
     )
     public Book getBook(@ApiParam(value = "id", required = true) @PathParam("id") Long id) {
         return new Book("Book", id);
     }
-    
+
     @Path("/{id}")
     @DELETE
     @ApiOperation(
-        value = "Delete book", 
+        value = "Delete book",
         notes = "Delete book"
-    )    
+    )
     public Response delete(@ApiParam(value = "id", required = true) @PathParam("id") String id) {
         return Response.ok().build();
     }

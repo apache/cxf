@@ -31,7 +31,7 @@ public class XmlSigInInterceptor extends AbstractXmlSigInHandler implements Phas
 
     public XmlSigInInterceptor() {
     }
-    
+
     public void handleFault(Message message) {
     }
 
@@ -59,5 +59,5 @@ public class XmlSigInInterceptor extends AbstractXmlSigInHandler implements Phas
         return Phase.UNMARSHAL;
     }
 
-    
+
 }

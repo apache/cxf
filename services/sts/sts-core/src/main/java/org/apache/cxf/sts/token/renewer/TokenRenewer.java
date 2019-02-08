@@ -31,17 +31,17 @@ public interface TokenRenewer {
      * boolean for enabling/disabling verification of proof of possession.
      */
     void setVerifyProofOfPossession(boolean verifyProofOfPossession);
-    
+
     /**
      * boolean for enabling/disabling renewal after expiry.
      */
     void setAllowRenewalAfterExpiry(boolean allowRenewalAfterExpiry);
-    
+
     /**
      * Return true if this TokenRenewer implementation is able to renew a token.
      */
     boolean canHandleToken(ReceivedToken renewTarget);
-    
+
     /**
      * Return true if this TokenRenewer implementation is able to renew a token in the given realm.
      */
@@ -51,5 +51,5 @@ public interface TokenRenewer {
      * Renew a token given a TokenRenewerParameters
      */
     TokenRenewerResponse renewToken(TokenRenewerParameters tokenParameters);
-    
+
 }

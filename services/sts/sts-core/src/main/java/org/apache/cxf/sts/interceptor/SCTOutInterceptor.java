@@ -36,9 +36,9 @@ public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public SCTOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
-        
+
         AddressingProperties inProps = (AddressingProperties)message
             .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
         AddressingProperties outProps = (AddressingProperties)message
@@ -53,5 +53,5 @@ public class SCTOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
             message.put(JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND, outProps);
         }
     }
-    
+
 }

@@ -29,18 +29,19 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.message.Message;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class FormUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class FormUtilsTest {
 
     private static final String HTTP_PARAM1 = "httpParam1";
     private static final String HTTP_PARAM2 = "httpParam2";
     private static final String HTTP_PARAM_VALUE1 = "httpValue1";
     private static final String HTTP_PARAM_VALUE2 = "httpValue2";
-    
+
     private static final String FORM_PARAM1 = "formParam1";
     private static final String FORM_PARAM2 = "formParam2";
     private static final String FORM_PARAM_VALUE1 = "formValue1";
@@ -54,23 +55,24 @@ public class FormUtilsTest extends Assert {
         mockObjects(null);
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
-        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(), 
+        MultivaluedMap<String, String> params = new MetadataMap<>();
+        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);
-        
+
         assertEquals(2, params.size());
         assertEquals(HTTP_PARAM_VALUE1, params.get(HTTP_PARAM1).iterator().next());
-        assertEquals(HTTP_PARAM_VALUE2, params.get(HTTP_PARAM2).iterator().next());        
+        assertEquals(HTTP_PARAM_VALUE2, params.get(HTTP_PARAM2).iterator().next());
     }
 
+    @Test
     public void populateMapFromStringFromHTTPWithProp() {
         mockObjects("false");
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
-        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(), 
+        MultivaluedMap<String, String> params = new MetadataMap<>();
+        FormUtils.populateMapFromString(params, mockMessage, null, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);
-        
+
         assertEquals(0, params.size());
     }
 
@@ -79,23 +81,23 @@ public class FormUtilsTest extends Assert {
         mockObjects(null);
         EasyMock.replay(mockMessage, mockRequest);
 
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> params = new MetadataMap<>();
         String postBody = FORM_PARAM1 + "=" + FORM_PARAM_VALUE1 + "&" + FORM_PARAM2 + "=" + FORM_PARAM_VALUE2;
-        FormUtils.populateMapFromString(params, mockMessage, postBody, StandardCharsets.UTF_8.name(), 
+        FormUtils.populateMapFromString(params, mockMessage, postBody, StandardCharsets.UTF_8.name(),
                                         false, mockRequest);
-        
+
         assertEquals(2, params.size());
         assertEquals(FORM_PARAM_VALUE1, params.get(FORM_PARAM1).iterator().next());
-        assertEquals(FORM_PARAM_VALUE2, params.get(FORM_PARAM2).iterator().next());        
+        assertEquals(FORM_PARAM_VALUE2, params.get(FORM_PARAM2).iterator().next());
     }
 
-    
+
     private void mockObjects(String formPropertyValue) {
         mockMessage = EasyMock.createMock(Message.class);
         EasyMock.expect(mockMessage.getContextualProperty(FormUtils.FORM_PARAMS_FROM_HTTP_PARAMS))
             .andReturn(formPropertyValue).anyTimes();
         EasyMock.expect(mockMessage.getExchange()).andReturn(null).anyTimes();
-        
+
         mockRequest = EasyMock.createMock(HttpServletRequest.class);
         String[] httpParamNames = {HTTP_PARAM1, HTTP_PARAM2};
         Enumeration<String> httpParamsEnum = Collections.enumeration(Arrays.asList(httpParamNames));
@@ -103,6 +105,6 @@ public class FormUtilsTest extends Assert {
         EasyMock.expect(mockRequest.getParameterValues(HTTP_PARAM1)).andReturn(new String[] {HTTP_PARAM_VALUE1})
             .anyTimes();
         EasyMock.expect(mockRequest.getParameterValues(HTTP_PARAM2)).andReturn(new String[] {HTTP_PARAM_VALUE2})
-            .anyTimes();        
+            .anyTimes();
     }
 }

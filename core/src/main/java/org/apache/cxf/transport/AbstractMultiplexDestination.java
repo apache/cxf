@@ -29,6 +29,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
+
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
 public abstract class AbstractMultiplexDestination extends AbstractDestination implements
@@ -42,26 +43,26 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
     }
 
     /**
-     * Builds an new endpoint reference using the current target reference as a template. 
+     * Builds an new endpoint reference using the current target reference as a template.
      * The supplied id is endcoded using a reference parameter.
      * This requires the ws-a interceptors to propagate the reference parameters
      * on subsequent invokes using the returned reference.
      * @param id the id to encode in the new reference
      * @return the new reference with the id encoded as a reference parameter
      * @see org.apache.cxf.transport.MultiplexDestination#getAddressWithId(java.lang.String)
-      
+
      */
     public EndpointReferenceType getAddressWithId(String id) {
         EndpointReferenceType epr = EndpointReferenceUtils.duplicate(
             EndpointReferenceUtils.mint(reference, bus));
         ReferenceParametersType newParams = new org.apache.cxf.ws.addressing.ObjectFactory()
             .createReferenceParametersType();
-        
+
         ReferenceParametersType existingParams = epr.getReferenceParameters();
         if (null != existingParams) {
             newParams.getAny().addAll(existingParams.getAny());
         }
-        
+
         newParams.getAny().add(new JAXBElement<String>(MULTIPLEX_ID_QNAME, String.class, id));
         epr.setReferenceParameters(newParams);
         return epr;
@@ -69,7 +70,7 @@ public abstract class AbstractMultiplexDestination extends AbstractDestination i
 
     /**
      * Obtain id from reference parameters of the ws-a to address
-     * Requires the existance of ws-a interceptors on dispatch path to provide access 
+     * Requires the existance of ws-a interceptors on dispatch path to provide access
      * to the ws-a headers
      * @param contextMap the current invocation or message context
      * @return the id from the reference parameters of the  ws-a-to address or null if not found

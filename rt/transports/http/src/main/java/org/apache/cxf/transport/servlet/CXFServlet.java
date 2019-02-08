@@ -42,10 +42,10 @@ public class CXFServlet extends CXFNonSpringServlet
     implements ApplicationListener<ContextRefreshedEvent> {
     private static final long serialVersionUID = -5922443981969455305L;
     private static final String BUS_PARAMETER = "bus";
-    
+
     private boolean busCreated;
-    private XmlWebApplicationContext createdContext; 
-    
+    private XmlWebApplicationContext createdContext;
+
     public CXFServlet() {
     }
 
@@ -53,11 +53,11 @@ public class CXFServlet extends CXFNonSpringServlet
     protected void loadBus(ServletConfig servletConfig) {
         ApplicationContext wac = WebApplicationContextUtils.
             getWebApplicationContext(servletConfig.getServletContext());
-        
+
         if (wac instanceof AbstractApplicationContext) {
             addListener((AbstractApplicationContext)wac);
         }
-        
+
         String configLocation = servletConfig.getInitParameter("config-location");
         if (configLocation == null) {
             try {
@@ -76,8 +76,8 @@ public class CXFServlet extends CXFNonSpringServlet
         if (wac != null) {
             String busParam = servletConfig.getInitParameter(BUS_PARAMETER);
             String busName = busParam == null ? "cxf" : busParam.trim();
-            
-            setBus((Bus)wac.getBean(busName, Bus.class));
+
+            setBus(wac.getBean(busName, Bus.class));
         } else {
             busCreated = true;
             setBus(BusFactory.newInstance().createBus());
@@ -100,7 +100,7 @@ public class CXFServlet extends CXFNonSpringServlet
      * Try to create a spring application context from the config location.
      * Will first try to resolve the location using the servlet context.
      * If that does not work then the location is given as is to spring
-     * 
+     *
      * @param ctx
      * @param sc
      * @param configLocation
@@ -111,7 +111,7 @@ public class CXFServlet extends CXFNonSpringServlet
                                                    String location) {
         XmlWebApplicationContext ctx2 = new XmlWebApplicationContext();
         createdContext = ctx2;
-        
+
         ctx2.setServletConfig(servletConfig);
         Resource r = ctx2.getResource(location);
         try {
@@ -133,15 +133,15 @@ public class CXFServlet extends CXFNonSpringServlet
             }
         } catch (IOException e) {
             //ignore
-        }        
+        }
         if (ctx != null) {
             ctx2.setParent(ctx);
-            String names[] = ctx.getBeanNamesForType(Bus.class);
+            String[] names = ctx.getBeanNamesForType(Bus.class);
             if (names == null || names.length == 0) {
                 ctx2.setConfigLocations(new String[] {"classpath:/META-INF/cxf/cxf.xml",
-                                                      location});                
+                                                      location});
             } else {
-                ctx2.setConfigLocations(new String[] {location});                                
+                ctx2.setConfigLocations(new String[] {location});
             }
         } else {
             ctx2.setConfigLocations(new String[] {"classpath:/META-INF/cxf/cxf.xml",

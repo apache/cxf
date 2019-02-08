@@ -22,8 +22,6 @@ package org.apache.cxf.sts.token.provider;
 import java.security.Principal;
 import java.util.Map;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
@@ -42,7 +40,7 @@ public class TokenProviderParameters {
     private STSPropertiesMBean stsProperties;
     private EncryptionProperties encryptionProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private ClaimCollection requestedPrimaryClaims;
     private ClaimCollection requestedSecondaryClaims;
     private KeyRequirements keyRequirements;
@@ -53,7 +51,7 @@ public class TokenProviderParameters {
     private TokenStore tokenStore;
     private String realm;
     private boolean encryptToken;
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -69,7 +67,7 @@ public class TokenProviderParameters {
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
     }
-        
+
     public String getAppliesToAddress() {
         return appliesToAddress;
     }
@@ -85,7 +83,7 @@ public class TokenProviderParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -101,7 +99,7 @@ public class TokenProviderParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
@@ -109,35 +107,27 @@ public class TokenProviderParameters {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
 
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
@@ -165,5 +155,13 @@ public class TokenProviderParameters {
     public void setEncryptToken(boolean encryptToken) {
         this.encryptToken = encryptToken;
     }
-    
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
+    }
+
 }

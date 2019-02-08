@@ -44,7 +44,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 
 
-public class HttpConduitBeanDefinitionParser 
+public class HttpConduitBeanDefinitionParser
     extends AbstractBeanDefinitionParser {
 
     private static final String HTTP_NS =
@@ -55,40 +55,40 @@ public class HttpConduitBeanDefinitionParser
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         bean.setAbstract(true);
-        mapElementToJaxbProperty(element, bean, 
-                new QName(HTTP_NS, "client"), "client", 
+        mapElementToJaxbProperty(element, bean,
+                new QName(HTTP_NS, "client"), "client",
                 HTTPClientPolicy.class);
-        mapElementToJaxbProperty(element, bean, 
-                new QName(HTTP_NS, "proxyAuthorization"), "proxyAuthorization", 
+        mapElementToJaxbProperty(element, bean,
+                new QName(HTTP_NS, "proxyAuthorization"), "proxyAuthorization",
                 ProxyAuthorizationPolicy.class);
-        mapElementToJaxbProperty(element, bean, 
-                new QName(HTTP_NS, "authorization"), "authorization", 
+        mapElementToJaxbProperty(element, bean,
+                new QName(HTTP_NS, "authorization"), "authorization",
                 AuthorizationPolicy.class);
-        
+
         mapSpecificElements(element, bean);
     }
 
     /**
      * This method specifically maps the "trustDecider" and "basicAuthSupplier"
      * elements to properties on the HttpConduit.
-     * 
+     *
      * @param parent This should represent "conduit".
      * @param bean   The bean parser.
      */
     private void mapSpecificElements(
-        Element               parent, 
+        Element               parent,
         BeanDefinitionBuilder bean
-    ) { 
+    ) {
         Node n = parent.getFirstChild();
         while (n != null) {
-            if (Node.ELEMENT_NODE != n.getNodeType() 
+            if (Node.ELEMENT_NODE != n.getNodeType()
                 || !HTTP_NS.equals(n.getNamespaceURI())) {
                 n = n.getNextSibling();
                 continue;
             }
             String elementName = n.getLocalName();
             // Schema should require that no more than one each of these exist.
-            if ("trustDecider".equals(elementName)) {                
+            if ("trustDecider".equals(elementName)) {
                 mapBeanOrClassElement((Element)n, bean, MessageTrustDecider.class);
             } else if ("authSupplier".equals(elementName)) {
                 mapBeanOrClassElement((Element)n, bean, HttpAuthSupplier.class);
@@ -96,42 +96,43 @@ public class HttpConduitBeanDefinitionParser
                 mapBeanOrClassElement((Element)n, bean, HttpAuthSupplier.class);
             } else if ("tlsClientParameters".equals(elementName)) {
                 mapTLSClientParameters((Element)n, bean);
-            }          
+            }
             n = n.getNextSibling();
         }
-        
+
     }
-    
+
     /**
      * Inject the "setTlsClientParameters" method with
      * a TLSClientParametersConfig object initialized with the JAXB
      * generated type unmarshalled from the selected node.
      */
     public void mapTLSClientParameters(Element e, BeanDefinitionBuilder bean) {
-        BeanDefinitionBuilder paramsbean 
+        BeanDefinitionBuilder paramsbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.TLSClientParametersTypeInternal.class);
-        
+
         // read the attributes
         NamedNodeMap as = e.getAttributes();
         for (int i = 0; i < as.getLength(); i++) {
             Attr a = (Attr) as.item(i);
             if (a.getNamespaceURI() == null) {
                 String aname = a.getLocalName();
-                if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname) 
+                if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname)
                     || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
                     || "disableCNCheck".equals(aname)
-                    || "jsseProvider".equals(aname) 
+                    || "enableRevocation".equals(aname)
+                    || "jsseProvider".equals(aname)
                     || "secureSocketProtocol".equals(aname)
                     || "sslCacheTimeout".equals(aname)) {
                     paramsbean.addPropertyValue(aname, a.getValue());
                 }
             }
         }
-        
+
         // read the child elements
         Node n = e.getFirstChild();
         while (n != null) {
-            if (Node.ELEMENT_NODE != n.getNodeType() 
+            if (Node.ELEMENT_NODE != n.getNodeType()
                 || !SECURITY_NS.equals(n.getNamespaceURI())) {
                 n = n.getNextSibling();
                 continue;
@@ -144,18 +145,18 @@ public class HttpConduitBeanDefinitionParser
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("keyManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                              KeyManagersType.class);
                 }
             } else if ("trustManagers".equals(ename)) {
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("trustManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
-                                             TrustManagersType.class);                    
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
+                                             TrustManagersType.class);
                 }
             } else if ("cipherSuites".equals(ename)) {
-                mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                          CipherSuites.class);
             } else if ("cipherSuitesFilter".equals(ename)) {
                 mapElementToJaxbProperty((Element)n, paramsbean, ename,
@@ -172,73 +173,63 @@ public class HttpConduitBeanDefinitionParser
             n = n.getNextSibling();
         }
 
-        BeanDefinitionBuilder jaxbbean 
+        BeanDefinitionBuilder jaxbbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSClientParametersConfig.class);
         jaxbbean.getRawBeanDefinition().setFactoryMethodName("createTLSClientParametersFromType");
         jaxbbean.addConstructorArgValue(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsClientParameters", jaxbbean.getBeanDefinition());
     }
-    
+
     /**
      * This method finds the class or bean associated with the named element
      * and sets the bean property that is associated with the same name as
      * the element.
      * <p>
-     * The element has either a "class" attribute or "bean" attribute, but 
+     * The element has either a "class" attribute or "bean" attribute, but
      * not both.
-     * 
+     *
      * @param element      The element.
      * @param bean         The Bean Definition Parser.
      * @param elementClass The Class a bean or class is supposed to be.
      */
     protected void mapBeanOrClassElement(
-        Element               element, 
+        Element               element,
         BeanDefinitionBuilder bean,
         Class<?>              elementClass
     ) {
         String elementName = element.getLocalName();
-    
+
         String classProperty = element.getAttribute("class");
-        if (classProperty != null && !classProperty.equals("")) {
+        if (classProperty != null && !classProperty.isEmpty()) {
             try {
-                Object obj = 
+                Object obj =
                     ClassLoaderUtils.loadClass(
                             classProperty, getClass()).newInstance();
                 if (!elementClass.isInstance(obj)) {
                     throw new IllegalArgumentException(
-                        "Element '" + elementName + "' must be of type " 
+                        "Element '" + elementName + "' must be of type "
                         + elementClass.getName() + ".");
                 }
                 bean.addPropertyValue(elementName, obj);
-            } catch (IllegalAccessException ex) {
+            } catch (IllegalAccessException | ClassNotFoundException | InstantiationException ex) {
                 throw new IllegalArgumentException(
-                    "Element '" + elementName + "' could not load " 
-                    + classProperty
-                    + " - " + ex);
-            } catch (ClassNotFoundException ex) {
-                throw new IllegalArgumentException(
-                    "Element '" + elementName + "' could not load " 
-                    + classProperty
-                    + " - " + ex);
-            } catch (InstantiationException ex) {
-                throw new IllegalArgumentException(
-                    "Element '" + elementName + "' could not load " 
+                    "Element '" + elementName + "' could not load "
                     + classProperty
                     + " - " + ex);
             }
         }
         String beanref = element.getAttribute("bean");
-        if (beanref != null && !beanref.equals("")) {
-            if (classProperty != null && !classProperty.equals("")) {
+        if (beanref != null && !beanref.isEmpty()) {
+            if (classProperty != null && !classProperty.isEmpty()) {
                 throw new IllegalArgumentException(
                         "Element '" + elementName + "' cannot have both "
                         + "\"bean\" and \"class\" attributes.");
-                                
+
             }
             bean.addPropertyReference(elementName, beanref);
-        } else if (classProperty == null || classProperty.equals("")) {
+        } else if (classProperty == null || classProperty.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Element '" + elementName 
+                    "Element '" + elementName
                     + "' requires at least one of the "
                     + "\"bean\" or \"class\" attributes.");
         }

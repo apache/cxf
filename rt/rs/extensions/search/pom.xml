@@ -27,12 +27,15 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <hibernate.em.version>4.1.0.Final</hibernate.em.version>
-        <hsqldb.version>1.8.0.10</hsqldb.version>
+        <cxf.module.name>org.apache.cxf.rs.search</cxf.module.name>
+        <cxf.osgi.import>
+            javax.persistence*;resolution:=optional,
+            org.apache.tika.*;resolution:=optional
+        </cxf.osgi.import>
     </properties>
     <dependencies>
         <dependency>
@@ -50,6 +53,12 @@
                     <artifactId>validation-api</artifactId>
                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -80,6 +89,12 @@
            <artifactId>hbase-client</artifactId>
            <optional>true</optional>
            <scope>provided</scope>
+           <exclusions>
+               <exclusion>
+                    <groupId>jdk.tools</groupId>
+                    <artifactId>jdk.tools</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -89,7 +104,15 @@
                 <exclusion>
                     <groupId>org.apache.poi</groupId>
                     <artifactId>poi-ooxml</artifactId>                
-                </exclusion>       
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -112,20 +135,13 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>${hibernate.em.version}</version>
+            <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
-            <!-- Conflicts with Apache Tika dependencies -->
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>                
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
-            <groupId>hsqldb</groupId>
+            <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>${hsqldb.version}</version>
+            <version>${cxf.hsqldb.version}</version>
             <scope>test</scope>
         </dependency>
         <!--

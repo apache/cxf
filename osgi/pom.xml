@@ -27,12 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>bundle</module>
         <module>itests</module>
-        <module>itests-felix</module>
+        <!--module>itests-felix</module-->
         <module>karaf</module>
+        <module>repository</module>
     </modules>
 </project>

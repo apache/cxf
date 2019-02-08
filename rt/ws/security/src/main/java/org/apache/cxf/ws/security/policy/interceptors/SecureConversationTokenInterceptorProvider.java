@@ -43,12 +43,12 @@ import org.apache.wss4j.policy.model.SecureConversationToken;
 import org.apache.wss4j.policy.model.SupportingTokens;
 
 /**
- * 
+ *
  */
 public class SecureConversationTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
     private static final long serialVersionUID = 8739057200687855383L;
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(SecureConversationTokenInterceptorProvider.class);
 
 
@@ -57,12 +57,15 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
                             SP12Constants.SECURE_CONVERSATION_TOKEN,
                             SP12Constants.BOOTSTRAP_POLICY,
                             SP11Constants.BOOTSTRAP_POLICY));
-        this.getOutInterceptors().add(new SecureConversationOutInterceptor());
-        this.getOutFaultInterceptors().add(new SecureConversationOutInterceptor());
-        this.getInInterceptors().add(new SecureConversationInInterceptor());
-        this.getInFaultInterceptors().add(new SecureConversationInInterceptor());
+        SecureConversationOutInterceptor outInterceptor = new SecureConversationOutInterceptor();
+        this.getOutInterceptors().add(outInterceptor);
+        this.getOutFaultInterceptors().add(outInterceptor);
+
+        SecureConversationInInterceptor inInterceptor = new SecureConversationInInterceptor();
+        this.getInInterceptors().add(inInterceptor);
+        this.getInFaultInterceptors().add(inInterceptor);
     }
-    
+
     static String setupClient(STSClient client,
                             SoapMessage message,
                             AssertionInfoMap aim,
@@ -71,7 +74,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         if (itok.getBootstrapPolicy() == null || itok.getBootstrapPolicy().getPolicy() == null) {
             throw new Fault("The SecureConversationToken does not define a BootstrapPolicy", LOG);
         }
-        
+
         client.setTrust(NegotiationUtils.getTrust10(aim));
         client.setTrust(NegotiationUtils.getTrust13(aim));
         Policy pol = itok.getBootstrapPolicy().getPolicy();
@@ -81,17 +84,17 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         All all = new All();
         all.addPolicyComponent(NegotiationUtils.getAddressingPolicy(aim, false));
         ea.addPolicyComponent(all);
-        
+
         if (endorse) {
-            SupportingTokens st = 
-                new SupportingTokens(SPConstants.SPVersion.SP12, 
+            SupportingTokens st =
+                new SupportingTokens(SPConstants.SPVersion.SP12,
                                      SP12Constants.ENDORSING_SUPPORTING_TOKENS,
                                      new Policy());
             st.addToken(itok);
             all.addPolicyComponent(st);
         }
         pol = p.merge(pol);
-        
+
         client.setPolicy(pol);
         client.setSoap11(message.getVersion() == Soap11.getInstance());
         client.setSecureConv(true);
@@ -110,7 +113,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         mapSecurityProps(message, ctx);
         return s;
     }
-    
+
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             Object v = message.getContextualProperty(s + ".sct");
@@ -122,5 +125,5 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             }
         }
     }
-    
+
 }

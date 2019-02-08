@@ -27,9 +27,8 @@ import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")
 public class BookServiceWrappedImpl implements BookServiceWrapped {
-    long currentId = 1;
-    Map<Long, Book> books = new HashMap<Long, Book>();
-    
+    Map<Long, Book> books = new HashMap<>();
+
     public BookServiceWrappedImpl() {
         Book book = createBook();
         System.out.println("Register the Book's id " + book.getId());
@@ -38,7 +37,7 @@ public class BookServiceWrappedImpl implements BookServiceWrapped {
 
     public Book getBook(long bookid) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("getBook -> " + me.getKey() + " : " 
+            System.out.println("getBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("The Book's id " + bookid);
@@ -51,7 +50,7 @@ public class BookServiceWrappedImpl implements BookServiceWrapped {
         }
         return b;
     }
-    
+
     final Book createBook() {
         Book b = new Book();
         b.setName("CXF in Action");

@@ -52,7 +52,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
 
     /**
      * Mediate a message dispatch.
-     * 
+     *
      * @param message the current message
      * @throws Fault
      */
@@ -64,10 +64,10 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         }
 
     }
-    
+
     /**
      * Ensure the SOAP version is set for this message.
-     * 
+     *
      * @param message the current message
      */
     private void ensureVersion(SoapMessage message) {
@@ -77,53 +77,56 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
             soapVersion = ((SoapMessage)message.getExchange().getInMessage()).getVersion();
             message.setVersion(soapVersion);
         }
-        
+
         if (soapVersion == null) {
             soapVersion = Soap11.getInstance();
             message.setVersion(soapVersion);
         }
-        
+
         message.put(Message.CONTENT_TYPE, soapVersion.getContentType());
     }
-    
+
     /**
      * Ensure the SOAP header is set for this message.
-     * 
+     *
      * @param message the current message
      */
     private void ensureMimeHeaders(SoapMessage message) {
         if (message.get(MIME_HEADERS) == null) {
             message.put(MIME_HEADERS, new HashMap<String, List<String>>());
         }
+        String cte = (String)message.getContextualProperty(Message.CONTENT_TRANSFER_ENCODING);
+        if (cte != null) {
+            //root part MUST be binary
+            message.put(Message.CONTENT_TRANSFER_ENCODING, "binary");
+            message.put("soap.attachement.content.transfer.encoding", cte);
+        }
     }
-    
+
     private void setSoapAction(SoapMessage message) {
         BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
-        
+
         // The soap action is set on the wrapped operation.
         if (boi != null && boi.isUnwrapped()) {
             boi = boi.getWrappedOperation();
         }
-        
+
         String action = getSoapAction(message, boi);
-        
+
         if (message.getVersion() instanceof Soap11) {
-            Map<String, List<String>> reqHeaders 
-                = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            if (reqHeaders == null) {
-                reqHeaders = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, List<String>> tempReqHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, List<String>> reqHeaders
+                    = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            if (reqHeaders != null) {
+                tempReqHeaders.putAll(reqHeaders);
             }
-            
-            if (reqHeaders.size() == 0) {
-                message.put(Message.PROTOCOL_HEADERS, reqHeaders);
+            if (!tempReqHeaders.containsKey(SoapBindingConstants.SOAP_ACTION)) {
+                tempReqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
             }
-            
-            if (!reqHeaders.containsKey(SoapBindingConstants.SOAP_ACTION)) {            
-                reqHeaders.put(SoapBindingConstants.SOAP_ACTION, Collections.singletonList(action));
-            }
+            message.put(Message.PROTOCOL_HEADERS, tempReqHeaders);
         } else if (message.getVersion() instanceof Soap12 && !"\"\"".equals(action)) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
-            
+
             if (ct.indexOf("action=\"") == -1) {
                 ct = new StringBuilder().append(ct)
                     .append("; action=").append(action).toString();
@@ -135,7 +138,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
     private String getSoapAction(SoapMessage message, BindingOperationInfo boi) {
         // allow an interceptor to override the SOAPAction if need be
         String action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
-        
+
         // Fall back on the SOAPAction in the operation info
         if (action == null) {
             if (boi == null) {
@@ -145,11 +148,11 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
                 action = soi == null ? "\"\"" : soi.getAction() == null ? "\"\"" : soi.getAction();
             }
         }
-        
+
         if (!action.startsWith("\"")) {
             action = new StringBuilder().append("\"").append(action).append("\"").toString();
         }
-        
+
         return action;
     }
 

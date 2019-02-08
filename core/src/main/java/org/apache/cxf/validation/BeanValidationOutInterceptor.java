@@ -32,7 +32,7 @@ public class BeanValidationOutInterceptor extends AbstractValidationInterceptor 
     public BeanValidationOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
@@ -40,28 +40,28 @@ public class BeanValidationOutInterceptor extends AbstractValidationInterceptor 
             Object entity = unwrapEntity(arguments.get(0));
             BeanValidationProvider theProvider = getOutProvider(message);
             if (isEnforceOnlyBeanConstraints()) {
-                theProvider.validateReturnValue(entity);    
+                theProvider.validateReturnValue(entity);
             } else {
                 theProvider.validateReturnValue(resourceInstance, method, entity);
             }
-        }        
+        }
     }
-    
+
     protected Object unwrapEntity(Object entity) {
         return entity;
     }
-    
+
     protected BeanValidationProvider getOutProvider(Message message) {
         BeanValidationProvider provider = message.getExchange().get(BeanValidationProvider.class);
         return provider == null ? getProvider(message) : provider;
     }
-    
+
     public boolean isEnforceOnlyBeanConstraints() {
         return enforceOnlyBeanConstraints;
     }
     public void setEnforceOnlyBeanConstraints(boolean enforceOnlyBeanConstraints) {
         this.enforceOnlyBeanConstraints = enforceOnlyBeanConstraints;
     }
-        
-    
+
+
 }

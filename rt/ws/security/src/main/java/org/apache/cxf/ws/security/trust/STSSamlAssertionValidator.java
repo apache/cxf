@@ -19,6 +19,10 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -26,27 +30,16 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 
 /**
- * This class validates a SAML Assertion by invoking the SamlAssertionValidator in WSS4J. It 
+ * This class validates a SAML Assertion by invoking the SamlAssertionValidator in WSS4J. It
  * overrides the signature verification, so that if the signature is not trusted, it just sets
  * a boolean. The STSTokenValidator can parse this tag and dispatch the Assertion to the STS
  * for validation.
  */
 public class STSSamlAssertionValidator extends SamlAssertionValidator {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(STSSamlAssertionValidator.class);
+
     private boolean trustVerificationSucceeded;
-    
-    /**
-     * Validate the credential argument. It must contain a non-null AssertionWrapper. 
-     * A Crypto and a CallbackHandler implementation is also required to be set.
-     * 
-     * @param credential the Credential to be validated
-     * @param data the RequestData associated with the request
-     * @throws WSSecurityException on a failed validation
-     */
-    public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        return super.validate(credential, data);
-    }
-    
+
     /**
      * Try to verify trust on the assertion. If it fails, then set a boolean and return.
      * @param assertion The signed Assertion
@@ -64,11 +57,13 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
             trustVerificationSucceeded = true;
             return credential;
         } catch (WSSecurityException ex) {
+            LOG.log(Level.WARNING, "Local trust verification of SAML assertion failed: " + ex.getMessage(),
+                    ex);
             trustVerificationSucceeded = false;
             return null;
         }
     }
-    
+
     /**
      * Return if trust verification on the signature of the assertion succeeded.
      * @return if trust verification on the signature of the assertion succeeded
@@ -76,5 +71,5 @@ public class STSSamlAssertionValidator extends SamlAssertionValidator {
     public boolean isTrustVerificationSucceeded() {
         return trustVerificationSucceeded;
     }
-    
+
 }

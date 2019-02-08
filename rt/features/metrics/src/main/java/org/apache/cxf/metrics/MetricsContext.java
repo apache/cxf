@@ -27,17 +27,17 @@ import org.apache.cxf.message.Exchange;
  * Class to hold all the various metric pieces for a given context (Endpoint, Customer, Operation, etc...)
  */
 public interface MetricsContext {
-    
+
     /**
      * Will be called at the start of invoke (or when added to a started MessageMetrics).  This is
-     * when the metrics should increment "inFlight" counts and other stats.   There is no need to 
+     * when the metrics should increment "inFlight" counts and other stats.   There is no need to
      * record a "start time" as the invoke time will be passed into the stop method.
      */
     void start(Exchange m);
-    
+
     /**
      * Called when the invocation is complete.
-     * 
+     *
      * @param timeInNS
      * @param inSize
      * @param outSize

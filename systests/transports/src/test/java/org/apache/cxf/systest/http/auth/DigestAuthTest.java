@@ -33,28 +33,30 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPException;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class DigestAuthTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(DigestServer.class);
 
-    private final QName serviceName = 
+    private final QName serviceName =
         new QName("http://apache.org/hello_world", "SOAPService");
-    private final QName mortimerQ = 
+    private final QName mortimerQ =
         new QName("http://apache.org/hello_world", "Mortimer");
-    public DigestAuthTest() {
-    }
-    
+
     @BeforeClass
     public static void startServer() throws Exception {
         launchServer(DigestServer.class, true);
         createStaticBus();
     }
-    
-    @Test    
+
+    @Test
     public void testDigestAuth() throws Exception {
         URL wsdl = getClass().getResource("../greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -64,12 +66,12 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
 
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
-        
+
         TestUtil.setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
-        
+
         Client client = ClientProxy.getClient(mortimer);
-        
-        HTTPConduit http = 
+
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setAuthorizationType("Digest");
@@ -78,12 +80,12 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         http.setAuthorization(authPolicy);
 
         String answer = mortimer.sayHi();
-        assertEquals("Unexpected answer: " + answer, 
+        assertEquals("Unexpected answer: " + answer,
                 "Hi", answer);
 
     }
-    
-    @Test    
+
+    @Test
     public void testNoAuth() throws Exception {
         URL wsdl = getClass().getResource("../greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -93,7 +95,7 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
 
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
-        
+
         TestUtil.setAddress(mortimer, "http://localhost:" + PORT + "/digestauth/greeter");
 
         try {
@@ -101,9 +103,9 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
             Assert.fail("Unexpected reply (" + answer + "). Should throw exception");
         } catch (Exception e) {
             Throwable cause = e.getCause();
-            Assert.assertEquals(HTTPException.class, cause.getClass());
+            assertEquals(HTTPException.class, cause.getClass());
             HTTPException he = (HTTPException)cause;
-            Assert.assertEquals(401, he.getResponseCode());
+            assertEquals(401, he.getResponseCode());
         }
     }
 

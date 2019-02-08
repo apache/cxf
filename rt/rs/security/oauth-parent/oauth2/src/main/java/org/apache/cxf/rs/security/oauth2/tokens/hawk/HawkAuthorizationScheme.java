@@ -33,12 +33,12 @@ import org.apache.cxf.rt.security.crypto.HmacUtils;
 public class HawkAuthorizationScheme {
     private static final String SEPARATOR = "\n";
     private static final String HAWK_1_HEADER = "hawk.1.header";
-    
+
     private HttpRequestProperties props;
     private String macKey;
     private String timestamp;
     private String nonce;
-    
+
     public HawkAuthorizationScheme(HttpRequestProperties props,
                                   AccessToken token) {
         this.props = props;
@@ -46,7 +46,7 @@ public class HawkAuthorizationScheme {
         this.timestamp = Long.toString(System.currentTimeMillis());
         this.nonce = generateNonce();
     }
-    
+
     public HawkAuthorizationScheme(HttpRequestProperties props,
                                   Map<String, String> schemeParams) {
         this.props = props;
@@ -54,36 +54,36 @@ public class HawkAuthorizationScheme {
         this.timestamp = schemeParams.get(OAuthConstants.HAWK_TOKEN_TIMESTAMP);
         this.nonce = schemeParams.get(OAuthConstants.HAWK_TOKEN_NONCE);
     }
-    
+
     public String getMacKey() {
         return macKey;
     }
-    
+
     public String getTimestamp() {
         return timestamp;
     }
-    
+
     public String getNonce() {
         return nonce;
     }
-    
+
     public String toAuthorizationHeader(String macAlgo, String macSecret) {
-        
+
         String data = getNormalizedRequestString();
-        String signature = HmacUtils.encodeHmacString(macSecret, 
-                                                      HmacAlgorithm.toHmacAlgorithm(macAlgo).getJavaName(), 
+        String signature = HmacUtils.encodeHmacString(macSecret,
+                                                      HmacAlgorithm.toHmacAlgorithm(macAlgo).getJavaName(),
                                                       data);
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append(OAuthConstants.HAWK_AUTHORIZATION_SCHEME).append(" ");
         addParameter(sb, OAuthConstants.HAWK_TOKEN_ID, macKey, false);
         addParameter(sb, OAuthConstants.HAWK_TOKEN_TIMESTAMP, timestamp, false);
         addParameter(sb, OAuthConstants.HAWK_TOKEN_NONCE, nonce, false);
         addParameter(sb, OAuthConstants.HAWK_TOKEN_SIGNATURE, signature, true);
-        
+
         return sb.toString();
     }
-    
+
     private static void addParameter(StringBuilder sb, String name, String value, boolean last) {
         sb.append(name).append('=')
           .append('\"').append(value).append('\"');
@@ -91,37 +91,33 @@ public class HawkAuthorizationScheme {
             sb.append(',');
         }
     }
-    
+
     public String getNormalizedRequestString() {
         String requestURI = props.getRequestPath();
         if (!StringUtils.isEmpty(props.getRequestQuery())) {
             requestURI += "?" + normalizeQuery(props.getRequestQuery());
         }
-        
-        
-        String value = HAWK_1_HEADER + SEPARATOR 
-            + timestamp + SEPARATOR 
+
+
+        return HAWK_1_HEADER + SEPARATOR
+            + timestamp + SEPARATOR
             + nonce + SEPARATOR
             + props.getHttpMethod().toUpperCase() + SEPARATOR
-            + requestURI + SEPARATOR 
-            + props.getHostName() + SEPARATOR 
+            + requestURI + SEPARATOR
+            + props.getHostName() + SEPARATOR
             + props.getPort() + SEPARATOR
             + "" + SEPARATOR
             + "" + SEPARATOR;
-
-        return value;
     }
-    
-    private static String normalizeQuery(String query) {  
+
+    private static String normalizeQuery(String query) {
         return query;
     }
-    
+
     private static String generateNonce() {
         byte[] randomBytes = new byte[20];
         new SecureRandom().nextBytes(randomBytes);
-        String random = Base64Utility.encode(randomBytes);
-        
-        return random;
+        return Base64Utility.encode(randomBytes);
     }
 
 }

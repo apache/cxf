@@ -20,10 +20,13 @@ package org.apache.cxf.rt.security.claims;
 
 import java.net.URI;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ClaimTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
+
+public class ClaimTest {
 
     @Test
     public void testCloneNull() {
@@ -34,7 +37,7 @@ public class ClaimTest extends Assert {
             // expected
         }
     }
-    
+
     @Test
     public void testCloneAllEquals() {
         Claim claim = new Claim();
@@ -47,7 +50,7 @@ public class ClaimTest extends Assert {
         assertEquals(claim, clone);
         assertEquals(claim, new Claim(clone)); // Clone from clone by using clone constructor
     }
-    
+
     @Test
     public void testCloneTypeOnlySetEquals() {
         Claim claim = new Claim();
@@ -56,7 +59,7 @@ public class ClaimTest extends Assert {
         assertEquals(claim, clone);
         assertEquals(claim, new Claim(clone)); // Clone from clone by using clone constructor
     }
-    
+
     @Test
     public void testCloneValuesOnlySetEquals() {
         Claim claim = new Claim();
@@ -66,7 +69,7 @@ public class ClaimTest extends Assert {
         assertEquals(claim, clone);
         assertEquals(claim, new Claim(clone)); // Clone from clone by using clone constructor
     }
-    
+
     @Test
     public void testCloneUnset() {
         Claim claim = new Claim();
@@ -74,7 +77,7 @@ public class ClaimTest extends Assert {
         assertEquals(claim, clone);
         assertEquals(claim, new Claim(clone)); // Clone from clone by using clone constructor
     }
-    
+
     @Test
     public void testCloneAndModifyValuesNotEquals() {
         Claim claim = new Claim();
@@ -94,7 +97,7 @@ public class ClaimTest extends Assert {
         assertEquals(claim.isOptional(), clone.isOptional());
         assertNotEquals(claim.getValues(), clone.getValues());
     }
-    
+
     @Test
     public void testCloneAndModifyTypeNotEquals() {
         Claim claim = new Claim();

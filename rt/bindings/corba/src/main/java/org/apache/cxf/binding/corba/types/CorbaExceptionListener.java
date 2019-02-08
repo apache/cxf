@@ -41,7 +41,7 @@ public class CorbaExceptionListener extends AbstractCorbaTypeListener {
 
     public CorbaExceptionListener(CorbaObjectHandler handler,
                                   CorbaTypeMap map,
-                                  ORB orbRef, 
+                                  ORB orbRef,
                                   ServiceInfo serviceInfo) {
         super(handler);
         orb = orbRef;
@@ -58,7 +58,7 @@ public class CorbaExceptionListener extends AbstractCorbaTypeListener {
                 CorbaHandlerUtils.getTypeListener(name,
                                                   exMembers.get(memberCount).getIdltype(),
                                                   typeMap,
-                                                  orb, 
+                                                  orb,
                                                   sInfo);
             currentTypeListener.setNamespaceContext(ctx);
             ((CorbaExceptionHandler)handler).addMember(currentTypeListener.getCorbaObject());

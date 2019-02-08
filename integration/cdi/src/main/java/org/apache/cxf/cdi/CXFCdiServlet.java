@@ -31,33 +31,33 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 /**
- * Apache CXF servlet with CDI 1.1 integration support 
+ * Apache CXF servlet with CDI 1.1 integration support
  */
 public class CXFCdiServlet extends CXFNonSpringServlet {
     private static final long serialVersionUID = -2890970731778523861L;
     private boolean busCreated;
-    
+
     @Override @Inject
     public void setBus(final Bus bus) {
         super.setBus(bus);
     }
-    
+
     @Override
     protected void loadBus(ServletConfig servletConfig) {
         Bus bus = null;
-        
-        final BeanManager beanManager = CDI.current().getBeanManager();        
+
+        final BeanManager beanManager = CDI.current().getBeanManager();
         if (beanManager != null) {
             final Set< Bean< ? > > candidates = beanManager.getBeans(CdiBusBean.CXF);
-            
+
             if (!candidates.isEmpty()) {
-                final Bean< ? > candidate = candidates.iterator().next();
-                
-                bus = (Bus)beanManager.getReference(candidate, Bus.class, 
-                    beanManager.createCreationalContext(candidate));                
+                final Bean< ? > candidate = beanManager.resolve(candidates);
+
+                bus = (Bus)beanManager.getReference(candidate, Bus.class,
+                    beanManager.createCreationalContext(candidate));
             }
-        } 
-        
+        }
+
         if (bus != null) {
             setBus(bus);
         } else {

@@ -19,7 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -30,8 +30,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.https.SSLUtils;
@@ -39,9 +40,12 @@ import org.apache.cxf.transport.https.SSLUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookHttpsServer.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus("org/apache/cxf/systest/jaxrs/security/jaxrs-https-server.xml");
@@ -51,70 +55,73 @@ public class JAXRS20HttpsBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetBook() throws Exception {
-        
+
         ClientBuilder builder = ClientBuilder.newBuilder();
-        
-        KeyStore trustStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks",
-                                       "password");
-        
-        builder.trustStore(trustStore);
+
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
+            KeyStore trustStore = loadStore(keystore, "password");
+            builder.trustStore(trustStore);
+        }
         builder.hostnameVerifier(new AllowAllHostnameVerifier());
-        
-        KeyStore keyStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks",
-            "password");
-        builder.keyStore(keyStore, "password");
-        
+
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", this.getClass())) {
+            KeyStore keyStore = loadStore(keystore, "password");
+            builder.keyStore(keyStore, "password");
+        }
+
         Client client = builder.build();
         client.register(new LoggingFeature());
-        
+
         WebTarget target = client.target("https://localhost:" + PORT + "/bookstore/securebooks/123");
         Book b = target.request().accept(MediaType.APPLICATION_XML_TYPE).get(Book.class);
         assertEquals(123, b.getId());
     }
-    
+
     @Test
     public void testGetBookSslContext() throws Exception {
-        
+
         ClientBuilder builder = ClientBuilder.newBuilder();
-        
+
         SSLContext sslContext = createSSLContext();
         builder.sslContext(sslContext);
-        
+
         builder.hostnameVerifier(new AllowAllHostnameVerifier());
-        
-        
+
+
         Client client = builder.build();
-        
+
         WebTarget target = client.target("https://localhost:" + PORT + "/bookstore/securebooks/123");
         Book b = target.request().accept(MediaType.APPLICATION_XML_TYPE).get(Book.class);
         assertEquals(123, b.getId());
     }
-    
-    private KeyStore loadStore(String trustStoreFile, String password) throws Exception {
+
+    private KeyStore loadStore(InputStream inputStream, String password) throws Exception {
         KeyStore store = KeyStore.getInstance("JKS");
-        store.load(new FileInputStream(trustStoreFile), password.toCharArray());
+        store.load(inputStream, password.toCharArray());
         return store;
     }
-    
+
     private SSLContext createSSLContext() throws Exception {
         TLSClientParameters tlsParams = new TLSClientParameters();
-        
-        KeyStore trustStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks",
-            "password");
-        
-        TrustManagerFactory tmf = 
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(trustStore);
-        tlsParams.setTrustManagers(tmf.getTrustManagers());
-        
-        KeyStore keyStore = loadStore("src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks",
-            "password");
-        
-        KeyManagerFactory kmf = 
-            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, "password".toCharArray());
-        tlsParams.setKeyManagers(kmf.getKeyManagers());
-        
+
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
+            KeyStore trustStore = loadStore(keystore, "password");
+
+            TrustManagerFactory tmf =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+            tlsParams.setTrustManagers(tmf.getTrustManagers());
+        }
+
+        try (InputStream keystore = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", this.getClass())) {
+            KeyStore keyStore = loadStore(keystore, "password");
+
+            KeyManagerFactory kmf =
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, "password".toCharArray());
+            tlsParams.setKeyManagers(kmf.getKeyManagers());
+        }
+
         return SSLUtils.getSSLContext(tlsParams);
     }
 }

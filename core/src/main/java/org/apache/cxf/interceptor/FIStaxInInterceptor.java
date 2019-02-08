@@ -37,16 +37,16 @@ import org.apache.cxf.phase.Phase;
  */
 public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String FI_GET_SUPPORTED = "org.apache.cxf.fastinfoset.get.supported";
-    
+
     public FIStaxInInterceptor() {
         this(Phase.POST_STREAM);
     }
-    
+
     public FIStaxInInterceptor(String phase) {
         super(phase);
         addBefore(StaxInInterceptor.class.getName());
     }
-    
+
     protected boolean isRequestor(Message message) {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
@@ -58,7 +58,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         parser.setInputStream(in);
         return parser;
     }
-    
+
     public void handleMessage(Message message) {
         if (message.getContent(XMLStreamReader.class) != null
             || !isHttpVerbSupported(message)) {
@@ -66,35 +66,34 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         String ct = (String)message.get(Message.CONTENT_TYPE);
-        if (ct != null && ct.indexOf("fastinfoset") != -1 
+        if (ct != null && ct.indexOf("fastinfoset") != -1
             && message.getContent(InputStream.class) != null
             && message.getContent(XMLStreamReader.class) == null) {
             message.setContent(XMLStreamReader.class, getParser(message.getContent(InputStream.class)));
             //add the StaxInEndingInterceptor which will close the reader
             message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
-            
+
             ct = ct.replace("fastinfoset", "xml");
             if (ct.contains("application/xml")) {
-                ct = ct.replace("application/xml", "text/xml"); 
+                ct = ct.replace("application/xml", "text/xml");
             }
             message.put(Message.CONTENT_TYPE, ct);
-            
+
             message.getExchange().put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
             if (isRequestor(message)) {
-                //record the fact that is worked so future requests will 
+                //record the fact that is worked so future requests will
                 //automatically be FI enabled
                 Endpoint ep = message.getExchange().getEndpoint();
                 ep.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
             }
         }
     }
-    
+
     protected boolean isHttpVerbSupported(Message message) {
         if (isGET(message)) {
-            return isRequestor(message) 
-                && MessageUtils.isTrue(message.getContextualProperty(FI_GET_SUPPORTED));
-        } else {
-            return true;
+            return isRequestor(message)
+                && MessageUtils.getContextualBoolean(message, FI_GET_SUPPORTED, false);
         }
+        return true;
     }
 }

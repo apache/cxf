@@ -19,16 +19,16 @@
 package org.apache.cxf.jaxrs;
 
 public class Customer2 extends Customer {
-    
+
     public Customer2() {
-        
+
     }
-    
+
     public Customer2(String name) {
         if (Character.isLowerCase(((CharSequence)name).charAt(0))) {
             throw new IllegalArgumentException();
         }
-        //CHECKSTYLE:OFF    
+        //CHECKSTYLE:OFF
         setName(name);
         //CHECKSTYLE:ON
     }

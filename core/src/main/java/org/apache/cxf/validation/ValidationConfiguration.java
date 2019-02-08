@@ -30,16 +30,16 @@ public class ValidationConfiguration {
     private ParameterNameProvider parameterNameProvider;
     private MessageInterpolator messageInterpolator;
     private TraversableResolver traversableResolver;
-    private ConstraintValidatorFactory constraintValidatorFactory; 
+    private ConstraintValidatorFactory constraintValidatorFactory;
     private Map<String, String> properties = Collections.emptyMap();
-    
+
     public ValidationConfiguration() {
-        
+
     }
     public ValidationConfiguration(ParameterNameProvider parameterNameProvider) {
         this.parameterNameProvider = parameterNameProvider;
     }
-    
+
     public ParameterNameProvider getParameterNameProvider() {
         return parameterNameProvider;
     }

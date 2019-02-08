@@ -19,9 +19,13 @@
 
 package org.apache.cxf.tools.common.toolspec;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.w3c.dom.Document;
+
 import org.apache.cxf.tools.common.ToolException;
+
 public interface ToolContext {
 
     /**

@@ -28,24 +28,24 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * This class implements most of the <tt>Set</tt> interface, backed by a 
+ * This class implements most of the <tt>Set</tt> interface, backed by a
  * sorted Array.  This makes iterators very fast, lookups are log(n), but
  * adds are fairly expensive.
- * 
+ *
  * This class is also threadsafe, but without synchronizations.   Lookups
  * and iterators will iterate over the state of the Set when the iterator
  * was created.
  *
  * If no data is stored in the Set, it uses very little memory.  The backing
  * array is created on demand.
- * 
+ *
  * This class is primarly useful for stuff that will be setup at startup, but
  * then iterated over MANY times during runtime.
- *   
+ *
  * @param <T>
  */
 public final class SortedArraySet<T> implements SortedSet<T> {
-    final AtomicReference<T[]> data = new AtomicReference<T[]>();
+    final AtomicReference<T[]> data = new AtomicReference<>();
 
     public void clear() {
         data.set(null);
@@ -64,12 +64,12 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         T[] tmp = data.get();
         return tmp == null ? 0 : tmp.length;
     }
-    
+
     @SuppressWarnings("unchecked")
     private T[] newArray(int size) {
         return (T[])new Object[size];
     }
-    
+
     public boolean add(T o) {
         if (!contains(o)) {
             T[] tmp = data.get();
@@ -83,7 +83,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
                 tmp2[tmp2.length - 1] = o;
                 Arrays.sort(tmp2);
             }
-            
+
             if (!data.compareAndSet(tmp, tmp2)) {
                 return add(o);
             }
@@ -133,13 +133,13 @@ public final class SortedArraySet<T> implements SortedSet<T> {
 
     public boolean remove(Object o) {
         T[] tmp = data.get();
-        
+
         if (tmp == null) {
             return false;
         }
         int idx = Arrays.binarySearch(tmp, o);
         if (idx != -1) {
-            if (tmp.length == 1 
+            if (tmp.length == 1
                 && !data.compareAndSet(tmp, null)) {
                 return remove(o);
             }
@@ -175,7 +175,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
             }
             return a;
         }
-        
+
         if (a.length < tmp.length) {
             a = (X[])java.lang.reflect.Array.
                 newInstance(a.getClass().getComponentType(), tmp.length);
@@ -199,18 +199,18 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         return Arrays.toString(data.get());
     }
     public int hashCode() {
-        return Arrays.hashCode(data.get()); 
+        return Arrays.hashCode(data.get());
     }
-    
+
 
     private class SASIterator<X> implements Iterator<X> {
         final X[] data;
         int idx;
-        
+
         SASIterator(X[] d) {
             data = d;
         }
-        
+
         public boolean hasNext() {
             return data != null && idx != data.length;
         }
@@ -224,7 +224,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
 
         public void remove() {
             if (idx > 0) {
-                SortedArraySet.this.remove(data[idx - 1]);
+                SortedArraySet.this.remove((Object)data[idx - 1]);
             }
         }
     }
@@ -241,7 +241,7 @@ public final class SortedArraySet<T> implements SortedSet<T> {
         }
         return tmp[0];
     }
-    
+
     public T last() {
         T[] tmp = data.get();
         if (tmp == null || tmp.length == 0) {

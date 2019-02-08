@@ -26,34 +26,33 @@ import java.io.PrintStream;
 import org.apache.cxf.helpers.FileUtils;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class ToolTestBase extends Assert {
+public abstract class ToolTestBase {
 
-    protected PrintStream oldStdErr; 
-    protected PrintStream oldStdOut; 
-    
-    protected ByteArrayOutputStream errOut = new ByteArrayOutputStream(); 
-    protected ByteArrayOutputStream stdOut = new ByteArrayOutputStream(); 
+    protected PrintStream oldStdErr;
+    protected PrintStream oldStdOut;
+
+    protected ByteArrayOutputStream errOut = new ByteArrayOutputStream();
+    protected ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
 
     @Before
-    public void setUp() { 
+    public void setUp() {
         CommandInterfaceUtils.setTestInProgress(true);
-        oldStdErr = System.err; 
+        oldStdErr = System.err;
         oldStdOut = System.out;
-        
+
         System.setErr(new PrintStream(errOut));
         System.setOut(new PrintStream(stdOut));
     }
 
     @After
-    public void tearDown() { 
-        
+    public void tearDown() {
+
         System.setErr(oldStdErr);
         System.setOut(oldStdOut);
     }
-    
+
     protected String getStdOut() {
         return new String(stdOut.toByteArray());
     }
@@ -64,12 +63,12 @@ public abstract class ToolTestBase extends Assert {
     protected String getLocation(String wsdlFile) throws Exception {
         File output = new File(getClass().getResource(".").toURI());
         output = new File(output, "resources");
-        
+
         if (!output.exists()) {
-            FileUtils.mkDir(output);            
+            FileUtils.mkDir(output);
         }
-        
+
         return new File(output, wsdlFile).toString();
-    }    
+    }
 }
 

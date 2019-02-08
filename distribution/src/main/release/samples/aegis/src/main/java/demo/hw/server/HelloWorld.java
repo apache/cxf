@@ -21,7 +21,7 @@ package demo.hw.server;
 import org.w3c.dom.Document;
 
 public interface HelloWorld {
-    
+
     String sayHi(String text);
     Document getADocument();
 }

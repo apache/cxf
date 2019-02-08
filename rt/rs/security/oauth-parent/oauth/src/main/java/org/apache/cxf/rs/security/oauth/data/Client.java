@@ -30,10 +30,10 @@ public class Client {
     private String logoUri;
     private String callbackURI;
     private String loginName;
-        
+
     private AccessToken preAuthorizedToken;
 
-    public Client(String consumerId, 
+    public Client(String consumerId,
                   String secretKey,
                   String applicationName,
                   String applicationURI) {
@@ -42,7 +42,7 @@ public class Client {
         this.applicationURI = applicationURI;
         this.applicationName = applicationName;
     }
-    
+
     public Client(String consumerId, String secretKey) {
         this(consumerId, secretKey, null, null);
     }
@@ -83,7 +83,7 @@ public class Client {
 
     /**
      * Gets the public URI of the third-party application.
-     * For example, this property can be used to validate 
+     * For example, this property can be used to validate
      * request token callbacks
      * @return the application URI
      */
@@ -112,7 +112,7 @@ public class Client {
     public String getApplicationDescription() {
         return applicationDescription;
     }
-    
+
     /**
      * Sets the uri pointing to a client logo image.
      * At the moment it must be a relative URI
@@ -127,14 +127,14 @@ public class Client {
     }
 
     /**
-     * Gets the optional login name; can be used 
-     * for enforcing the RBAC rules 
+     * Gets the optional login name; can be used
+     * for enforcing the RBAC rules
      * @return the login name
      */
     public String getLoginName() {
         return loginName == null ? consumerKey : loginName;
     }
-    
+
     /**
      * Sets the optional login name
      * @param name the login name
@@ -142,7 +142,7 @@ public class Client {
     public void setLoginName(String name) {
         this.loginName = name;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -33,7 +33,7 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
     OutputStream flowThroughStream;
     long count;
     long limit = Long.MAX_VALUE;
-    
+
     public CacheAndWriteOutputStream(OutputStream stream) {
         super();
         if (stream == null) {
@@ -41,7 +41,7 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
         }
         flowThroughStream = stream;
     }
-    
+
     public void setCacheLimit(long l) {
         limit = l;
     }
@@ -50,17 +50,17 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
         flowThroughStream.flush();
         flowThroughStream.close();
     }
-   
+
     protected void postClose() throws IOException {
         flowThroughStream.flush();
         flowThroughStream.close();
     }
-    
+
     public OutputStream getFlowThroughStream() {
         return flowThroughStream;
     }
-    
-    
+
+
     @Override
     protected void onWrite() throws IOException {
         // does nothing
@@ -74,7 +74,7 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
         }
         count++;
     }
-    
+
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         flowThroughStream.write(b, off, len);
@@ -83,7 +83,7 @@ public class CacheAndWriteOutputStream extends CachedOutputStream {
         }
         count += len;
     }
-    
+
     @Override
     public void write(byte[] b) throws IOException {
         flowThroughStream.write(b);

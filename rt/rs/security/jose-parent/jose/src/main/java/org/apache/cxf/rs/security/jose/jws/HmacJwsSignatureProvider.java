@@ -31,7 +31,7 @@ import org.apache.cxf.rt.security.crypto.HmacUtils;
 public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
-    
+
     public HmacJwsSignatureProvider(byte[] key, SignatureAlgorithm algo) {
         this(key, null, algo);
     }
@@ -49,10 +49,10 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
             throw new JwsException(JwsException.Error.INVALID_KEY, ex);
         }
     }
-    
+
     protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {
         final String sigAlgo = headers.getSignatureAlgorithm().getJwaName();
-        final Mac mac = HmacUtils.getInitializedMac(key, 
+        final Mac mac = HmacUtils.getInitializedMac(key,
                                                     AlgorithmUtils.toJavaName(sigAlgo),
                                                     hmacSpec);
         return new JwsSignature() {
@@ -66,7 +66,7 @@ public class HmacJwsSignatureProvider extends AbstractJwsSignatureProvider {
             public byte[] sign() {
                 return mac.doFinal();
             }
-            
+
         };
     }
     @Override

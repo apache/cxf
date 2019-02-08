@@ -19,26 +19,30 @@
 
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.List;
+
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 /**
  * AuthorizationCodeDataProvider is the {@link OAuthDataProvider} which
- * can additionally persist the authorization code grant information 
+ * can additionally persist the authorization code grant information
  */
 public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
 
     /**
      * Creates a temporarily code grant which will capture the
      * information about the {@link Client} requesting the access to
-     * the resource owner's resources 
+     * the resource owner's resources
      * @param reg information about the client code grant request
      * @return new code grant
      * @see AuthorizationCodeRegistration
      * @see ServerAuthorizationCodeGrant
      * @throws OAuthServiceException
      */
-    ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg) 
+    ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException;
 
     /**
@@ -49,4 +53,14 @@ public interface AuthorizationCodeDataProvider extends OAuthDataProvider {
      * @see ServerAuthorizationCodeGrant
      */
     ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException;
+
+    /**
+     * Return the list of code grants associated with a given client
+     * @param client the client
+     * @param subject the user subject, can be null
+     * @return the list of grants
+     * @throws OAuthServiceException
+     * @see ServerAuthorizationCodeGrant
+     */
+    List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject subject) throws OAuthServiceException;
 }

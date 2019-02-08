@@ -24,16 +24,18 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class DataBindingMarshallerPropertiesTest extends TestBase {
-    @Test 
+    @Test
     public void testInitializeUnmarshallerProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
-        Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
+        Map<String, Object> unmarshallerProperties = new HashMap<>();
         unmarshallerProperties.put("someproperty", "somevalue");
         db.setUnmarshallerProperties(unmarshallerProperties);
-        
+
         db.initialize(service);
-        
+
         assertTrue("somevalue".equals(db.getUnmarshallerProperties().get("someproperty")));
     }
 }

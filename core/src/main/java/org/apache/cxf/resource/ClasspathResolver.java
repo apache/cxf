@@ -31,7 +31,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 @NoJSR250Annotations
 public class ClasspathResolver implements ResourceResolver {
 
-    public <T> T resolve(String resourceName, Class<T> resourceType) { 
+    public <T> T resolve(String resourceName, Class<T> resourceType) {
         if (resourceName == null) {
             return null;
         }
@@ -40,9 +40,9 @@ public class ClasspathResolver implements ResourceResolver {
             return resourceType.cast(url);
         }
         return null;
-    } 
+    }
 
-    public InputStream getAsStream(String name) { 
+    public InputStream getAsStream(String name) {
         return ClassLoader.getSystemResourceAsStream(name);
-    } 
+    }
 }

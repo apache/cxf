@@ -68,7 +68,7 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
             .get(Message.PROTOCOL_HEADERS));
         if (protocolHeaders != null) {
-            List<String> contentEncoding = HttpHeaderHelper.getHeader(protocolHeaders, 
+            List<String> contentEncoding = HttpHeaderHelper.getHeader(protocolHeaders,
                                                                       HttpHeaderHelper.CONTENT_ENCODING);
             if (contentEncoding == null) {
                 contentEncoding = protocolHeaders.get(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);
@@ -88,14 +88,14 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
 
                     // remove content encoding header as we've now dealt with it
                     for (String key : protocolHeaders.keySet()) {
-                        if (key.equalsIgnoreCase("Content-Encoding")) {
+                        if ("Content-Encoding".equalsIgnoreCase(key)) {
                             protocolHeaders.remove(key);
                             break;
                         }
                     }
-                    
+
                     if (isRequestor(message)) {
-                        //record the fact that is worked so future requests will 
+                        //record the fact that is worked so future requests will
                         //automatically be FI enabled
                         Endpoint ep = message.getExchange().getEndpoint();
                         ep.put(GZIPOutInterceptor.USE_GZIP_KEY, GZIPOutInterceptor.UseGzip.YES);

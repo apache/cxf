@@ -31,8 +31,6 @@ import javax.xml.ws.BindingProvider;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
-
 
 public final class Client {
 
@@ -77,7 +75,7 @@ public final class Client {
 
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
 
-        BindingProvider  bp = null;
+        BindingProvider bp = null;
 
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;
@@ -85,13 +83,10 @@ public final class Client {
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSCorrelationID("JMS_QUEUE_SAMPLE_CORRELATION_ID");
             requestHeader.setJMSExpiration(3600000L);
-            JMSPropertyType propType = new JMSPropertyType();
-            propType.setName("Test.Prop");
-            propType.setValue("mustReturn");
-            requestHeader.getProperty().add(propType);
+            requestHeader.putProperty("Test.Prop", "mustReturn");
             requestContext.put("org.apache.cxf.jms.client.request.headers", requestHeader);
             //To override the default receive timeout.
-            requestContext.put("org.apache.cxf.jms.client.timeout", new Long(1000));
+            requestContext.put("org.apache.cxf.jms.client.timeout", Long.valueOf(1000));
         }
 
         System.out.println("Invoking sayHi with JMS Context information ...");
@@ -108,7 +103,7 @@ public final class Client {
             }
 
             if ("JMS_QUEUE_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID())
-                && responseHdr.getProperty() != null) {
+                && !responseHdr.getPropertyKeys().isEmpty()) {
                 System.out.println("Received expected contents in response context");
             } else {
                 System.out.println("Received wrong contents in response context");

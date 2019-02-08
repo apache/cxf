@@ -52,7 +52,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
 
     Bus bus;
     String busName;
-    
+
     public BusWiringBeanFactoryPostProcessor() {
     }
 
@@ -71,7 +71,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
             cctx.getBeanFactory().registerSingleton(name, b);
             b.setApplicationContext(context);
         }
-        return (Bus)context.getBean(name, Bus.class);
+        return context.getBean(name, Bus.class);
     }
     private Object getBusForName(String name,
                                  ConfigurableListableBeanFactory factory,
@@ -88,9 +88,9 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
             BeanDefinition bd = factory.getBeanDefinition(name);
             bd.getPropertyValues().addPropertyValue("busConfig", new RuntimeBeanReference(cn));
         }
-        return new RuntimeBeanReference(name);        
+        return new RuntimeBeanReference(name);
     }
-    
+
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
         Object inject = bus;
         if (inject == null) {
@@ -103,7 +103,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         }
         for (String beanName : factory.getBeanDefinitionNames()) {
             BeanDefinition beanDefinition = factory.getBeanDefinition(beanName);
-            BusWiringType type 
+            BusWiringType type
                 = (BusWiringType)beanDefinition.getAttribute(AbstractBeanDefinitionParser.WIRE_BUS_ATTRIBUTE);
             if (type == null) {
                 continue;
@@ -138,14 +138,14 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
      * argument set, then re-insert all its generic arguments, then re-insert all its indexed arguments with
      * their indices incremented by 1, and finally set the first indexed argument (at index 0) to the given
      * value.
-     * 
+     *
      * @param constructorArgs the argument definition to modify.
      * @param valueToInsert the value to insert as the first argument.
      */
     private void insertConstructorArg(ConstructorArgumentValues constructorArgs, Object valueToInsert) {
-        List<ValueHolder> genericArgs = new ArrayList<ValueHolder>(CastUtils
+        List<ValueHolder> genericArgs = new ArrayList<>(CastUtils
             .<ValueHolder> cast(constructorArgs.getGenericArgumentValues()));
-        Map<Integer, ValueHolder> indexedArgs = new HashMap<Integer, ValueHolder>(CastUtils
+        Map<Integer, ValueHolder> indexedArgs = new HashMap<>(CastUtils
             .<Integer, ValueHolder> cast(constructorArgs.getIndexedArgumentValues()));
 
         constructorArgs.clear();
@@ -157,7 +157,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         }
         constructorArgs.addIndexedArgumentValue(0, valueToInsert);
     }
-    
+
     public static Bus addDefaultBus(ApplicationContext ctx) {
         if (!ctx.containsBean(Bus.DEFAULT_BUS_ID)) {
             Bus b = getBusForName(Bus.DEFAULT_BUS_ID, ctx, true);

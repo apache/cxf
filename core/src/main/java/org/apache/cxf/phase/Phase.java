@@ -20,9 +20,9 @@
 package org.apache.cxf.phase;
 
 public class Phase implements Comparable<Object> {
-    
+
     // can be removed from once defined as default value in configuration metadata for bus
-  
+
     public static final String SETUP = "setup";
     public static final String SETUP_ENDING = "setup-ending";
     public static final String PRE_LOGICAL = "pre-logical";
@@ -54,7 +54,7 @@ public class Phase implements Comparable<Object> {
     public static final String WRITE_ENDING = "write-ending";
     public static final String SEND = "send";
     public static final String SEND_ENDING = "send-ending";
-   
+
     public static final String RECEIVE = "receive";
     public static final String READ = "read";
     public static final String PROTOCOL = "protocol";
@@ -64,19 +64,19 @@ public class Phase implements Comparable<Object> {
     public static final String PRE_INVOKE = "pre-invoke";
     public static final String INVOKE = "invoke";
     public static final String POST_INVOKE = "post-invoke";
-    
-    
+
+
     private String name;
     private int priority;
-    
+
     public Phase() {
     }
-    
+
     public Phase(String n, int p) {
         this.name = n;
         this.priority = p;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -89,7 +89,7 @@ public class Phase implements Comparable<Object> {
     public void setPriority(int p) {
         this.priority = p;
     }
-    
+
     public int hashCode() {
         return priority;
     }
@@ -98,7 +98,7 @@ public class Phase implements Comparable<Object> {
             return false;
         }
         Phase p = (Phase)o;
-        
+
         return p.priority == priority
             && p.name.equals(name);
     }
@@ -106,15 +106,15 @@ public class Phase implements Comparable<Object> {
     public int compareTo(Object o) {
         if (o instanceof Phase) {
             Phase p = (Phase)o;
-            
+
             if (priority == p.priority) {
-                return name.compareTo(p.name); 
+                return name.compareTo(p.name);
             }
             return priority - p.priority;
         }
         return 1;
     }
-    
+
     public String toString() {
         return "Phase(" + getName() + ")";
     }

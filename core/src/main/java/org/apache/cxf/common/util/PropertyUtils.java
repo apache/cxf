@@ -29,19 +29,18 @@ import org.apache.cxf.message.Message;
 public final class PropertyUtils {
     private PropertyUtils() {
     }
-    
+
     public static boolean isTrue(Map<String, Object> props, String key) {
         if (props == null || key == null) {
             return false;
-        } else {
-            return isTrue(props.get(key));
         }
+        return isTrue(props.get(key));
     }
-    
+
     /**
      * It might seem odd to return 'true' if a property == FALSE, but it
      * is required sometimes.
-     * 
+     *
      * @param props
      * @param key
      * @return false if value is either the String "false" or Boolean.FALSE.  Otherwise returns
@@ -50,11 +49,10 @@ public final class PropertyUtils {
     public static boolean isFalse(Map<String, Object> props, String key) {
         if (props == null || key == null) {
             return false;
-        } else {
-            return isFalse(props.get(key));
         }
+        return isFalse(props.get(key));
     }
-    
+
     /**
      * Returns true if a value is either the String "true" (regardless of case)  or Boolean.TRUE.
      * @param property
@@ -67,10 +65,10 @@ public final class PropertyUtils {
 
         return Boolean.TRUE.equals(property) || "true".equalsIgnoreCase(property.toString());
     }
-    
+
     /**
      * It might seem odd to return 'true' if a property == FALSE, but it is required sometimes.
-     * 
+     *
      * Returns false if a value is either the String "false" (regardless of case)  or Boolean.FALSE.
      * @param property
      * @return false if value is either the String "false" or Boolean.FALSE.  Otherwise returns
@@ -83,7 +81,7 @@ public final class PropertyUtils {
 
         return Boolean.FALSE.equals(property) || "false".equalsIgnoreCase(property.toString());
     }
-    
+
     public static Long getLong(Message message, String key) {
         Object o = message.getContextualProperty(key);
         if (o instanceof Long) {
@@ -95,7 +93,7 @@ public final class PropertyUtils {
         }
         return null;
     }
-    
+
     public static Integer getInteger(Message message, String key) {
         Object o = message.getContextualProperty(key);
         if (o instanceof Integer) {

@@ -25,11 +25,13 @@ under the License.
 						http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 						http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+
 	<!-- Services -->
 	<jaxws:server 
 		id="testServer" 
 		serviceClass="org.apache.cxf.systest.jaxb.validators.HelloWorld"
-		address="http://localhost:9000/Hello">
+		address="http://localhost:${testutil.ports.CustomValidatorJAXBTest}/Hello">
 		<jaxws:serviceBean>
 			<bean class="org.apache.cxf.systest.jaxb.validators.HelloWorldImpl"/>
 		</jaxws:serviceBean>
@@ -48,7 +50,7 @@ under the License.
 	<jaxws:client 
 		id="testClient" 
 		serviceClass="org.apache.cxf.systest.jaxb.validators.HelloWorld"
-		address="http://localhost:9000/Hello">
+		address="http://localhost:${testutil.ports.CustomValidatorJAXBTest}/Hello">
 	</jaxws:client>
 	
 				

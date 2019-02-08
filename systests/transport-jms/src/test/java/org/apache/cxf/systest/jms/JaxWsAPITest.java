@@ -27,6 +27,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.SOAPService2;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class JaxWsAPITest extends AbstractVmJMSTest {
         startBusAndJMS(JaxWsAPITest.class);
         publish(new GreeterImplDoc());
     }
-    
+
     @Test
     public void testGreeterUsingJaxWSAPI() throws Exception {
         QName serviceName = new QName("http://apache.org/hello_world_doc_lit", "SOAPService2");

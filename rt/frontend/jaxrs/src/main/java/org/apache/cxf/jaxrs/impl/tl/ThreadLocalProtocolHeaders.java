@@ -26,7 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 
-public class ThreadLocalProtocolHeaders extends AbstractThreadLocalProxy<ProtocolHeaders> 
+public class ThreadLocalProtocolHeaders extends AbstractThreadLocalProxy<ProtocolHeaders>
     implements ProtocolHeaders {
 
 
@@ -37,7 +37,7 @@ public class ThreadLocalProtocolHeaders extends AbstractThreadLocalProxy<Protoco
     public List<String> getRequestHeader(String name) {
         return get().getRequestHeader(name);
     }
-    
+
     public String getRequestHeaderValue(String name) {
         return get().getRequestHeaderValue(name);
     }

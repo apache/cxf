@@ -41,7 +41,7 @@ public final class NameUtil {
 
     private NameUtil() {
     }
-    
+
     static {
         for (int t0 = 0; t0 < 5; t0++) {
             for (int t1 = 0; t1 < 5; t1++) {
@@ -150,7 +150,7 @@ public final class NameUtil {
         return toWordList(s, false);
     }
     public static List<String> toWordList(String s, boolean allowUnderscore) {
-        List<String> ss = new ArrayList<String>();
+        List<String> ss = new ArrayList<>();
         int n = s.length();
         for (int i = 0; i < n;) {
             while (i < n) {
@@ -266,5 +266,5 @@ public final class NameUtil {
 
     public static String mangleNameToVariableName(String name) {
         return toMixedCaseName(toWordList(name), false);
-    }    
+    }
 }

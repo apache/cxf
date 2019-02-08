@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
@@ -138,7 +138,7 @@ public class ServiceProcessor extends AbstractProcessor {
         if (sclz != null) {
             return;
         }
-        
+
         for (JavaServiceClass sc : model.getServiceClasses().values()) {
             if (sc.getServiceName().equals(service.getName().getLocalPart())) {
                 sclz = sc;
@@ -150,39 +150,39 @@ public class ServiceProcessor extends AbstractProcessor {
             String name = NameUtil.mangleNameToClassName(service.getName().getLocalPart());
             String namespace = service.getName().getNamespaceURI();
             String packageName = ProcessorUtil.parsePackageName(namespace, context.mapPackageName(namespace));
-    
-    
+
+
             //customizing
             JAXWSBinding serviceBinding = null;
             if (service.getDescription() != null) {
                 serviceBinding = service.getDescription().getExtensor(JAXWSBinding.class);
             }
             JAXWSBinding serviceBinding2 = service.getExtensor(JAXWSBinding.class);
-    
-            //TODO : Handle service customized class
+
+            //Handle service customized class
             if (serviceBinding != null) {
                 if (serviceBinding.getPackage() != null) {
                     jaxwsBinding.setPackage(serviceBinding.getPackage());
                 }
-    
+
                 if (serviceBinding.isEnableAsyncMapping()) {
                     jaxwsBinding.setEnableAsyncMapping(true);
                 }
-    
+
                 if (serviceBinding.isEnableMime()) {
                     jaxwsBinding.setEnableMime(true);
                 }
                 jaxwsBinding.setEnableWrapperStyle(serviceBinding.isEnableWrapperStyle());
-    
+
                 if (serviceBinding.getJaxwsClass() != null
                     && serviceBinding.getJaxwsClass().getClassName() != null) {
-                    name = serviceBinding.getJaxwsClass().getClassName();  
+                    name = serviceBinding.getJaxwsClass().getClassName();
                     if (name.contains(".")) {
                         jaxwsBinding.setPackage(name.substring(0, name.lastIndexOf('.')));
                         name = name.substring(name.lastIndexOf('.') + 1);
                     }
-                    
-                    sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());          
+
+                    sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());
                 }
                 sclz.setPackageJavaDoc(serviceBinding.getPackageJavaDoc());
             }
@@ -190,21 +190,21 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (serviceBinding2.getPackage() != null) {
                     jaxwsBinding.setPackage(serviceBinding2.getPackage());
                 }
-    
+
                 if (serviceBinding2.isEnableAsyncMapping()) {
                     jaxwsBinding.setEnableAsyncMapping(true);
                 }
-    
+
                 if (serviceBinding2.isEnableMime()) {
                     jaxwsBinding.setEnableMime(true);
                 }
-    
+
                 if (serviceBinding2.isEnableWrapperStyle()) {
                     jaxwsBinding.setEnableWrapperStyle(true);
                 }
                 if (serviceBinding2.getJaxwsClass() != null
                     && serviceBinding2.getJaxwsClass().getClassName() != null) {
-                    name = serviceBinding2.getJaxwsClass().getClassName();                
+                    name = serviceBinding2.getJaxwsClass().getClassName();
                     if (name.contains(".")) {
                         jaxwsBinding.setPackage(name.substring(0, name.lastIndexOf('.')));
                         name = name.substring(name.lastIndexOf('.') + 1);
@@ -214,14 +214,14 @@ public class ServiceProcessor extends AbstractProcessor {
                     && serviceBinding2.getJaxwsClass().getComments() != null) {
                     jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
                 }
-                if (!serviceBinding2.getPackageJavaDoc().equals("")) {
+                if (!serviceBinding2.getPackageJavaDoc().isEmpty()) {
                     sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
                 }
             }
-            
+
             sclz.setServiceName(service.getName().getLocalPart());
             sclz.setNamespace(namespace);
-    
+
             if (jaxwsBinding.getPackage() != null) {
                 packageName = jaxwsBinding.getPackage();
             }
@@ -233,11 +233,11 @@ public class ServiceProcessor extends AbstractProcessor {
             int count = 0;
             while (collector.containServiceClass(packageName, checkName)) {
                 checkName = name + (++count);
-            }        
+            }
             name = checkName;
             sclz.setName(name);
             collector.addServiceClassName(packageName, name, packageName + "." + name);
-    
+
             Element handler = (Element)context.get(ToolConstants.HANDLER_CHAIN);
             sclz.setHandlerChains(handler);
         }
@@ -248,7 +248,7 @@ public class ServiceProcessor extends AbstractProcessor {
             JavaPort javaport = processPort(model, service, port);
             sclz.addPort(javaport);
         }
-        
+
         sclz.setClassJavaDoc(jaxwsBinding.getClassJavaDoc());
         if (StringUtils.isEmpty(sclz.getClassJavaDoc())) {
             sclz.setClassJavaDoc(service.getDocumentation());
@@ -262,7 +262,7 @@ public class ServiceProcessor extends AbstractProcessor {
         JavaInterface intf = PortTypeProcessor.getInterface(context, si, binding.getInterface());
         JavaPort jport = new JavaPort(NameUtil.mangleNameToClassName(port.getName().getLocalPart()));
         jport.setPackageName(intf.getPackageName());
-        
+
         jport.setPortName(port.getName().getLocalPart());
         jport.setBindingAdress(port.getAddress());
         jport.setBindingName(binding.getName().getLocalPart());
@@ -298,7 +298,7 @@ public class ServiceProcessor extends AbstractProcessor {
             jport.setMethodName(bind.getMethodName());
             jport.setJavaDoc(bind.getMethodJavaDoc());
         }
-        
+
         return jport;
     }
     private void processBindings(JavaModel model) {
@@ -345,6 +345,11 @@ public class ServiceProcessor extends AbstractProcessor {
                 jf = jf2;
             }
         }
+
+        if (jf == null) {
+            throw new ToolException("No Java Interface available");
+        }
+
         if (isSoapBinding()) {
             SoapBinding soapBinding = (SoapBinding)bindingObj;
             if (SOAPBindingUtil.getSoapStyle(soapBinding.getStyle()) == null) {
@@ -371,7 +376,7 @@ public class ServiceProcessor extends AbstractProcessor {
 
                     if (SOAPBindingUtil.getSoapStyle(soapStyle) == null && this.bindingObj == null) {
                         org.apache.cxf.common.i18n.Message msg =
-                            new  org.apache.cxf.common.i18n.Message("BINDING_STYLE_NOT_DEFINED",
+                            new org.apache.cxf.common.i18n.Message("BINDING_STYLE_NOT_DEFINED",
                                                                          LOG);
                         throw new ToolException(msg);
                     }
@@ -399,7 +404,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 JAXWSBinding infBinding = opinfo.getInterface().getExtensor(JAXWSBinding.class);
                 boolean enableMime = enableOpMime;
                 boolean enableWrapperStyle = true;
-                
+
                 if (infBinding != null && infBinding.isSetEnableWrapperStyle()) {
                     enableWrapperStyle = infBinding.isEnableWrapperStyle();
                 }
@@ -445,10 +450,10 @@ public class ServiceProcessor extends AbstractProcessor {
         parameter.setHeader(true);
         JAnnotation parameterAnnotation = parameter.getAnnotation("WebParam");
         parameterAnnotation.addElement(new JAnnotationElement("header", true, true));
-        parameterAnnotation.addElement(new JAnnotationElement("name", 
+        parameterAnnotation.addElement(new JAnnotationElement("name",
                                                                      parameter.getQName().getLocalPart()));
         parameterAnnotation.addElement(new JAnnotationElement("partName", parameter.getPartName()));
-        parameterAnnotation.addElement(new JAnnotationElement("targetNamespace", 
+        parameterAnnotation.addElement(new JAnnotationElement("targetNamespace",
                                                                      parameter.getTargetNamespace()));
     }
 
@@ -461,7 +466,7 @@ public class ServiceProcessor extends AbstractProcessor {
             inbindings = operation.getInput().getExtensors(ExtensibilityElement.class);
         }
         if (inbindings == null) {
-            inbindings = new ArrayList<ExtensibilityElement>();
+            inbindings = new ArrayList<>();
         }
 
         String use = null;
@@ -482,7 +487,7 @@ public class ServiceProcessor extends AbstractProcessor {
             List<ExtensibilityElement> outbindings =
                 operation.getOutput().getExtensors(ExtensibilityElement.class);
             if (outbindings == null) {
-                outbindings = new ArrayList<ExtensibilityElement>();
+                outbindings = new ArrayList<>();
             }
             for (ExtensibilityElement ext : outbindings) {
                 if (SOAPBindingUtil.isSOAPHeader(ext)) {
@@ -497,7 +502,7 @@ public class ServiceProcessor extends AbstractProcessor {
                             found = true;
                         }
                     }
-                    if (jm.getReturn().getName() != null 
+                    if (jm.getReturn().getName() != null
                         && jm.getReturn().getName().equals(soapHeader.getPart())) {
                         found = true;
                     }
@@ -557,18 +562,17 @@ public class ServiceProcessor extends AbstractProcessor {
     private static String getJavaTypeForMimeType(MIMEPart mPart) {
         if (mPart.getExtensibilityElements().size() > 1) {
             return "javax.activation.DataHandler";
-        } else {
-            ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
-            if (extElement instanceof MIMEContent) {
-                MIMEContent mimeContent = (MIMEContent)extElement;
-                if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
-                    return "java.awt.Image";
-                } else if ("text/xml".equals(mimeContent.getType())
-                           || "application/xml".equals(mimeContent.getType())) {
-                    return "javax.xml.transform.Source";
-                }  else {
-                    return "javax.activation.DataHandler";
-                }
+        }
+        ExtensibilityElement extElement = (ExtensibilityElement)mPart.getExtensibilityElements().get(0);
+        if (extElement instanceof MIMEContent) {
+            MIMEContent mimeContent = (MIMEContent)extElement;
+            if ("image/jpeg".equals(mimeContent.getType()) || "image/gif".equals(mimeContent.getType())) {
+                return "java.awt.Image";
+            } else if ("text/xml".equals(mimeContent.getType())
+                       || "application/xml".equals(mimeContent.getType())) {
+                return "javax.xml.transform.Source";
+            }  else {
+                return "javax.activation.DataHandler";
             }
         }
         return "javax.activation.DataHandler";
@@ -631,7 +635,7 @@ public class ServiceProcessor extends AbstractProcessor {
     }
 
     private Map<String, Object> getSoapOperationProp(BindingOperationInfo bop) {
-        Map<String, Object> soapOPProp = new HashMap<String, Object>();
+        Map<String, Object> soapOPProp = new HashMap<>();
         if (bop.getExtensor(ExtensibilityElement.class) != null) {
             for (ExtensibilityElement ext : bop.getExtensors(ExtensibilityElement.class)) {
                 if (SOAPBindingUtil.isSOAPOperation(ext)) {
@@ -758,9 +762,8 @@ public class ServiceProcessor extends AbstractProcessor {
         for (OperationInfo operation : service.getInterface().getOperations()) {
             if (operationName.equals(operation.getName()) && isIn) {
                 return operation.getInput();
-            } else {
-                return operation.getOutput();
             }
+            return operation.getOutput();
         }
         return null;
     }

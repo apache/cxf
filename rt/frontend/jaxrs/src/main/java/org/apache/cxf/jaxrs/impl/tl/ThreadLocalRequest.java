@@ -27,7 +27,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
-public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request> 
+public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request>
     implements Request {
 
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
@@ -53,5 +53,4 @@ public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request>
     public ResponseBuilder evaluatePreconditions() {
         return get().evaluatePreconditions();
     }
-
 }

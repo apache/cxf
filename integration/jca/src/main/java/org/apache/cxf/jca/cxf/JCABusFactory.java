@@ -47,24 +47,24 @@ import org.apache.cxf.jca.servant.EJBServantConfig;
 
 
 public class JCABusFactory {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(JCABusFactory.class);
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JCABusFactory.class);
-    
+
     private Bus bus;
-    private List<Server> servantsCache = new ArrayList<Server>();
+    private List<Server> servantsCache = new ArrayList<>();
     private ClassLoader appserverClassLoader;
     private ManagedConnectionFactoryImpl mcf;
     private Object raBootstrapContext;
-    
+
 
     public JCABusFactory(ManagedConnectionFactoryImpl aMcf) {
         this.mcf = aMcf;
     }
-    
+
     protected synchronized void init() throws ResourceException {
-        
+
         LOG.info("Initializing the CXF Bus ...");
         new UriHandlerInit();
         ClassLoader original = Thread.currentThread().getContextClassLoader();
@@ -73,44 +73,43 @@ public class JCABusFactory {
 
             // ensure resourceadapter: url handler can be found by URLFactory
             Thread.currentThread().setContextClassLoader(cl);
-            
+
             //TODO Check for the managed connection factory properties
-            //TODO We may need get the configuration file from properties 
-            
+            //TODO We may need get the configuration file from properties
+
             BusFactory bf = BusFactory.newInstance();
             bus = bf.createBus();
             initializeServants();
         } catch (Exception ex) {
             if (ex instanceof ResourceAdapterInternalException) {
                 throw (ResourceException)ex;
-            } else {
-                throw new ResourceAdapterInternalException(
-                                  new Message("FAIL_TO_INITIALIZE_JCABUSFACTORY", BUNDLE).toString(), ex);
             }
+            throw new ResourceAdapterInternalException(
+                              new Message("FAIL_TO_INITIALIZE_JCABUSFACTORY", BUNDLE).toString(), ex);
         } finally {
             Thread.currentThread().setContextClassLoader(original);
         }
     }
 
-    
+
     protected void initializeServants() throws ResourceException {
-        if (isMonitorEJBServicePropertiesEnabled()) {            
+        if (isMonitorEJBServicePropertiesEnabled()) {
             LOG.info("Ejb service properties auto-detect enabled. ");
             startPropertiesMonitorWorker();
-        } else {            
+        } else {
             URL propsUrl = mcf.getEJBServicePropertiesURLInstance();
             if (propsUrl != null) {
                 initializeServantsFromProperties(loadProperties(propsUrl));
             }
         }
     }
-    
+
     private void initializeServantsFromProperties(Properties ejbServants) throws ResourceException {
-        
+
         deregisterServants(bus);
         LOG.info("Initializing EJB endpoints from properties file...");
-        
-        try {           
+
+        try {
             Enumeration<?> keys = ejbServants.keys();
             while (keys.hasMoreElements()) {
                 String theJNDIName = (String)keys.nextElement();
@@ -120,7 +119,7 @@ public class JCABusFactory {
                 ejbEndpoint.setEjbServantBaseURL(mcf.getEJBServantBaseURL());
                 ejbEndpoint.setWorkManager(getWorkManager());
                 Server servant = ejbEndpoint.publish();
-                
+
                 synchronized (servantsCache) {
                     if (servant != null) {
                         servantsCache.add(servant);
@@ -131,16 +130,16 @@ public class JCABusFactory {
             e.printStackTrace();
             throw new ResourceException(new Message("FAIL_TO_START_EJB_SERVANTS", BUNDLE).toString(), e);
         }
-        
+
     }
-    
+
 
     private void startPropertiesMonitorWorker() throws ResourceException {
         Integer pollIntervalInteger = mcf.getEJBServicePropertiesPollInterval();
         int pollInterval = pollIntervalInteger.intValue();
-        
+
         LOG.info("Ejb service properties poll interval is: [" + pollInterval + " seconds]");
-        
+
         EJBServicePropertiesMonitorWorker worker = new EJBServicePropertiesMonitorWorker(pollInterval);
         if (getWorkManager() != null) {
             getWorkManager().startWork(worker, CXFWorkAdapter.DEFAULT_START_TIME_OUT, null, worker);
@@ -180,7 +179,7 @@ public class JCABusFactory {
             servantsCache.clear();
         }
     }
-    
+
     protected Properties loadProperties(URL propsUrl) throws ResourceException {
         Properties props = null;
         InputStream istream = null;
@@ -206,7 +205,7 @@ public class JCABusFactory {
 
         return props;
     }
-    
+
 
     protected List<Server> getRegisteredServants() {
         return servantsCache;
@@ -231,18 +230,18 @@ public class JCABusFactory {
     public void setBus(Bus b) {
         bus = b;
     }
-   
+
     public void create(ClassLoader classLoader, Object context) throws ResourceException {
         this.appserverClassLoader = classLoader;
         this.raBootstrapContext = context;
         init();
     }
-    
+
     private class EJBServicePropertiesMonitorWorker extends CXFWorkAdapter implements Work {
         private long previousModificationTime;
         private final int pollIntervalSeconds;
         private final File propsFile;
-        
+
         //The release() method will be called on separate thread while the run() is processing.
         private volatile boolean continuing = true;
 
@@ -258,14 +257,14 @@ public class JCABusFactory {
                         LOG.info("ejbServicePropertiesFile modified, initializing/updating servants");
                         initializeServantsFromProperties(loadProperties(propsFile.toURI().toURL()));
                     }
-                    Thread.sleep((long)pollIntervalSeconds * 1000L);
+                    Thread.sleep(pollIntervalSeconds * 1000L);
                 } catch (Exception e) {
                     LOG.info("MonitorThread: failed to initialiseServantsFromProperties "
                               + "with properties absolute path=" + propsFile.getAbsolutePath());
                 }
             } while (continuing);
         }
-        
+
         public void release() {
             this.continuing = false;
         }
@@ -295,8 +294,8 @@ public class JCABusFactory {
         }
         return null;
     }
-    
-    
 
-    
+
+
+
 }

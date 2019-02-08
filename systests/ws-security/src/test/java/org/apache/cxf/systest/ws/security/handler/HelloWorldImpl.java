@@ -22,7 +22,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService(name = "HelloWorld", targetNamespace = "http://cxf.apache.org/wsse/handler/helloworld", 
+@WebService(name = "HelloWorld", targetNamespace = "http://cxf.apache.org/wsse/handler/helloworld",
             endpointInterface = "org.apache.cxf.systest.ws.security.handler.HelloWorld")
 public class HelloWorldImpl implements HelloWorld {
     @WebMethod

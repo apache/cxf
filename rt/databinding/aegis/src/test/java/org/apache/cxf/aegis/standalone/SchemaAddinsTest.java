@@ -26,11 +26,13 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SchemaAddinsTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+
+public class SchemaAddinsTest {
     private TestUtilities testUtilities;
 
     @Before

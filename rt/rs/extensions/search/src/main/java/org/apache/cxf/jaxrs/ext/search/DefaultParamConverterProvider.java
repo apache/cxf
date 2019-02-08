@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -34,84 +35,84 @@ import org.apache.lucene.document.DateTools.Resolution;
  * Default ParamConverterProvider with support of primitive Java type converters including Date.
  */
 public class DefaultParamConverterProvider implements ParamConverterProvider {
-    private final Map< Class< ? >, ParamConverter< ? > > converters = 
-            new HashMap< Class< ? >, ParamConverter< ? > >();
-    
+    private final Map< Class< ? >, ParamConverter< ? > > converters =
+            new HashMap<>();
+
     /**
-     * Date type converter. 
+     * Date type converter.
      */
     private static class DateParamConverter implements ParamConverter< Date > {
         @Override
         public Date fromString(final String value) {
             return SearchUtils.dateFromStringWithDefaultFormats(value);
         }
-        
+
         @Override
         public String toString(final Date value) {
             return value != null ? DateTools.dateToString(value, Resolution.MILLISECOND) : null;
         }
     }
-    
+
     /**
-     * Long type converter. 
+     * Long type converter.
      */
     private static class LongParamConverter implements ParamConverter< Long > {
         @Override
         public Long fromString(final String value) {
             return Long.valueOf(value);
         }
-        
+
         @Override
         public String toString(final Long value) {
             return Long.toString(value);
         }
     }
-    
+
     /**
-     * Double type converter. 
+     * Double type converter.
      */
     private static class DoubleParamConverter implements ParamConverter< Double > {
         @Override
         public Double fromString(final String value) {
             return Double.valueOf(value);
         }
-        
+
         @Override
         public String toString(final Double value) {
             return Double.toString(value);
         }
     }
-    
+
     /**
-     * Float type converter. 
+     * Float type converter.
      */
     private static class FloatParamConverter implements ParamConverter< Float > {
         @Override
         public Float fromString(final String value) {
             return Float.valueOf(value);
         }
-        
+
         @Override
         public String toString(final Float value) {
             return Float.toString(value);
         }
     }
-    
+
     /**
-     * Integer type converter. 
+     * Integer type converter.
      */
     private static class IntegerParamConverter implements ParamConverter< Integer > {
         @Override
         public Integer fromString(final String value) {
             return Integer.valueOf(value);
         }
-        
+
         @Override
         public String toString(final Integer value) {
             return Integer.toString(value);
         }
     }
-    
+
     public DefaultParamConverterProvider() {
         converters.put(Date.class, new DateParamConverter());
         converters.put(Long.class, new LongParamConverter());
@@ -119,18 +120,18 @@ public class DefaultParamConverterProvider implements ParamConverterProvider {
         converters.put(Float.class, new FloatParamConverter());
         converters.put(Integer.class, new IntegerParamConverter());
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType, 
+    public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType,
             final Annotation[] annotations) {
-        
-        for (final Class< ? > type: converters.keySet()) {
-            if (type.isAssignableFrom(rawType)) {
-                return (ParamConverter<T>)converters.get(type);                        
+
+        for (final Entry<Class<?>, ParamConverter<?>> entry: converters.entrySet()) {
+            if (entry.getKey().isAssignableFrom(rawType)) {
+                return (ParamConverter<T>)entry.getValue();
             }
         }
-        
+
         return null;
     }
 }

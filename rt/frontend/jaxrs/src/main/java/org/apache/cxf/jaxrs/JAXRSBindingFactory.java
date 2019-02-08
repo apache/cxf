@@ -39,16 +39,16 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.transport.Destination;
 
 /**
- * The CXF BindingFactory implementation which is used to register 
+ * The CXF BindingFactory implementation which is used to register
  * CXF JAX-RS interceptors with the runtime.
  */
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class JAXRSBindingFactory extends AbstractBindingFactory {
     public static final String JAXRS_BINDING_ID = "http://apache.org/cxf/binding/jaxrs";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSBindingFactory.class);
 
-    
+
     public JAXRSBindingFactory() {
     }
     public JAXRSBindingFactory(Bus b) {
@@ -59,15 +59,15 @@ public class JAXRSBindingFactory extends AbstractBindingFactory {
         JAXRSBinding binding = new JAXRSBinding(bi);
 
         binding.getInInterceptors().add(new JAXRSInInterceptor());
-        
+
         binding.getOutInterceptors().add(new JAXRSOutInterceptor());
-        
+
         binding.getOutFaultInterceptors().add(new JAXRSDefaultFaultOutInterceptor());
-        
+
         return binding;
     }
-    
-    
+
+
 
     /*
      * The concept of Binding can not be applied to JAX-RS. Here we use
@@ -78,7 +78,7 @@ public class JAXRSBindingFactory extends AbstractBindingFactory {
         info.setName(new QName(JAXRSBindingFactory.JAXRS_BINDING_ID, "binding"));
         return info;
     }
-    
+
     public void addListener(Destination d, Endpoint e) {
         synchronized (d) {
             if (d.getMessageObserver() != null) {

@@ -32,19 +32,19 @@ import org.apache.cxf.io.CachedOutputStream;
  * Input stream wrapper to support rewinding to start of input.
  */
 public class RewindableInputStream extends FilterInputStream {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RewindableInputStream.class);
-    
+
     private static final long MEMORY_SIZE_LIMIT = 0x10000;
-    
+
     private static final int COPY_BLOCK_SIZE = 0x4000;
-    
+
     /** Cached output stream - <code>null</code> if none used. */
     private final CachedOutputStream cachedStream;
-    
+
     /**
      * Constructs rewindable input stream
-     * 
+     *
      * @param is stream supporting mark
      */
     public RewindableInputStream(InputStream is) {
@@ -52,10 +52,10 @@ public class RewindableInputStream extends FilterInputStream {
         mark(0);
         cachedStream = null;
     }
-    
+
     /**
      * Internal constructor from cached output stream.
-     * 
+     *
      * @param os
      * @throws IOException
      */
@@ -63,7 +63,7 @@ public class RewindableInputStream extends FilterInputStream {
         super(os.getInputStream());
         cachedStream = os;
     }
-    
+
     /**
      * @param is
      * @return
@@ -77,7 +77,7 @@ public class RewindableInputStream extends FilterInputStream {
         CachedOutputStream.copyStream(is, os, COPY_BLOCK_SIZE);
         return new RewindableInputStream(os);
     }
-    
+
     /**
      * Rewind to start of input.
      */
@@ -89,7 +89,7 @@ public class RewindableInputStream extends FilterInputStream {
         }
         mark(0);
     }
-    
+
     /**
      * Release resources.
      */

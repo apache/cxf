@@ -28,27 +28,27 @@ import javax.ws.rs.core.Response;
 
 /**
  * This resource issues a temporary request token to the Client
- * which will be later authorised and exchanged for the access token 
+ * which will be later authorised and exchanged for the access token
  */
 @Path("/initiate")
 public class RequestTokenService extends AbstractOAuthService {
 
     private RequestTokenHandler handler = new RequestTokenHandler();
-    
+
     public void setRequestTokenHandler(RequestTokenHandler h) {
         this.handler = h;
     }
-    
+
     @GET
     @Produces("application/x-www-form-urlencoded")
     public Response getRequestTokenWithGET() {
         return getRequestToken();
     }
-    
+
     @POST
     @Produces("application/x-www-form-urlencoded")
     public Response getRequestToken() {
-        return handler.handle(getMessageContext(), 
+        return handler.handle(getMessageContext(),
                               getDataProvider(),
                               getValidator());
     }

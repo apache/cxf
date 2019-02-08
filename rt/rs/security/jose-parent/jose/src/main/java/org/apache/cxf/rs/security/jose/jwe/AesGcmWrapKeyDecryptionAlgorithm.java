@@ -32,22 +32,22 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesGcmWrapKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
     protected static final Logger LOG = LogUtils.getL7dLogger(AesGcmWrapKeyDecryptionAlgorithm.class);
-    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey) {
         this(encodedKey, null);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(String encodedKey, KeyAlgorithm supportedAlgo) {
         this(CryptoUtils.decodeSequence(encodedKey), supportedAlgo);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey) {
         this(secretKey, KeyAlgorithm.A128GCMKW);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(byte[] secretKey, KeyAlgorithm supportedAlgo) {
         this(CryptoUtils.createSecretKeySpec(secretKey, AlgorithmUtils.AES), supportedAlgo);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey) {
         this(secretKey, null);
     }
-    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey, KeyAlgorithm supportedAlgo) {    
+    public AesGcmWrapKeyDecryptionAlgorithm(SecretKey secretKey, KeyAlgorithm supportedAlgo) {
         super(secretKey, supportedAlgo);
     }
     @Override

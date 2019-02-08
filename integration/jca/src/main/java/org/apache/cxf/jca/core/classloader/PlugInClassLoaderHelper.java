@@ -29,10 +29,10 @@ import org.apache.cxf.jca.jarloader.JarLoader;
 
 
 public final class PlugInClassLoaderHelper {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(PlugInClassLoaderHelper.class);
-    private static Map<String, byte[]> nonClassesMap = new HashMap<String, byte[]>();
-   
+    private static Map<String, byte[]> nonClassesMap = new HashMap<>();
+
 
     private PlugInClassLoaderHelper() {
         // singleton
@@ -47,11 +47,11 @@ public final class PlugInClassLoaderHelper {
             return false;
         }
     }
-   
+
     public static byte[] getResourceAsBytes(String name) throws IOException {
         // check nonClassCache for properties etc..
         if (!name.endsWith(".class") && nonClassesMap.containsKey(name)) {
-            return nonClassesMap.get(name);            
+            return nonClassesMap.get(name);
         }
 
         // first check file path directorys, then check jars
@@ -62,37 +62,35 @@ public final class PlugInClassLoaderHelper {
             } catch (java.net.MalformedURLException mue) {
                 throw new IOException(mue.getMessage());
             }
-        } else {
-            // something with !/
-            // check for a nested directory reference
-            if (isNestedDirectoryReference(name)) {
-                throw new IOException(
-                        "Accessing contents of directories within jars is currently not supported");
-            } else {
-                String enclosingJar = name.substring(0, name.lastIndexOf("!/") + 2);
-                String resourceName = name.substring(name.lastIndexOf("!/") + 2);
-                Map<?, ?> jarMap = JarLoader.getJarContents(enclosingJar);
+        }
+        // something with !/
+        // check for a nested directory reference
+        if (isNestedDirectoryReference(name)) {
+            throw new IOException(
+                    "Accessing contents of directories within jars is currently not supported");
+        }
+        String enclosingJar = name.substring(0, name.lastIndexOf("!/") + 2);
+        String resourceName = name.substring(name.lastIndexOf("!/") + 2);
+        Map<?, ?> jarMap = JarLoader.getJarContents(enclosingJar);
 
-                if (null != jarMap && jarMap.containsKey(resourceName)) {
-                    byte bytes[] = (byte[])jarMap.get(resourceName);
+        if (null != jarMap && jarMap.containsKey(resourceName)) {
+            byte[] bytes = (byte[])jarMap.get(resourceName);
 
-                    // this class will not be looked for again
-                    // once it is loaded so to save memory we
-                    // remove it form the map, if it is not a
-                    // class we add it to the nonClasses cache,
-                    // this is only true for in memory cache.
-                    // REVISIT - this needs to be more specific,
-                    // some classes Home|Remote interfaces are
-                    // loaded multiple times - see remote class
-                    // downloading for the moment disable this
-                    // jarMap.remove(resourceName);
-                    //
-                    if (!name.endsWith(".class")) {
-                        nonClassesMap.put(name, bytes);
-                    }
-                    return bytes;                    
-                }
+            // this class will not be looked for again
+            // once it is loaded so to save memory we
+            // remove it form the map, if it is not a
+            // class we add it to the nonClasses cache,
+            // this is only true for in memory cache.
+            // REVISIT - this needs to be more specific,
+            // some classes Home|Remote interfaces are
+            // loaded multiple times - see remote class
+            // downloading for the moment disable this
+            // jarMap.remove(resourceName);
+            //
+            if (!name.endsWith(".class")) {
+                nonClassesMap.put(name, bytes);
             }
+            return bytes;
         }
 
         // failed to locate the resource

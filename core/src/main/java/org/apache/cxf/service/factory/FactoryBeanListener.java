@@ -20,7 +20,7 @@
 package org.apache.cxf.service.factory;
 
 /**
- * 
+ *
  */
 public interface FactoryBeanListener {
     enum Event {
@@ -29,7 +29,7 @@ public interface FactoryBeanListener {
          * for setting up any state the listener may need to maintain.
          */
         START_CREATE,
-        
+
         /**
          * Event fired at the very end of processing.   One parameter is passed
          * in which is the Service object that was created.
@@ -42,104 +42,104 @@ public interface FactoryBeanListener {
          * of the URL of the wsdl.
          */
         CREATE_FROM_WSDL,
-        
+
         /**
          * Called at the start of processing when it detects that the service
          * is to be created based on a Java class.  One Class<?> parameter
          * of the class that is being analyzed.
          */
         CREATE_FROM_CLASS,
-        
+
         /**
          * Called after the wsdl is loaded/parsed.   Single parameter of the
          * WSS4J Definition of the WSDL.
          */
         WSDL_LOADED,
-        
+
         /**
          * Called after the Service is set into the Factory after which the getService()
          * call will return a valid value.  One parameter of the Service object.
          */
-        SERVICE_SET, 
-        
-        
+        SERVICE_SET,
+
+
         /**
          * OperationInfo, Method
          */
         INTERFACE_OPERATION_BOUND,
-        
+
         /**
          * OperationInfo, Method, MessageInfo
          */
         OPERATIONINFO_IN_MESSAGE_SET,
         OPERATIONINFO_OUT_MESSAGE_SET,
-        
+
         /**
          * OperationInfo, Class<? extends Throwable>, FaultInfo
          */
         OPERATIONINFO_FAULT,
-        
+
         /**
          * InterfaceInfo, Class<?>
          */
         INTERFACE_CREATED,
-        
+
         /**
          * DataBinding
          */
         DATABINDING_INITIALIZED,
-        
+
         /**
          * EndpointInfo, Endpoint, Class
          */
         ENDPOINT_CREATED,
-        
-        /**
-         * Server, targetObject, Class
-         */
-        PRE_SERVER_CREATE, 
 
         /**
          * Server, targetObject, Class
          */
-        SERVER_CREATED, 
-        
+        PRE_SERVER_CREATE,
+
+        /**
+         * Server, targetObject, Class
+         */
+        SERVER_CREATED,
+
         /**
          * BindingInfo, BindingOperationInfo, Implementation Method
          */
         BINDING_OPERATION_CREATED,
-        
+
         /**
          * BindingInfo
          */
-        BINDING_CREATED, 
-        
+        BINDING_CREATED,
+
         /**
          * Endpoint
          */
-        PRE_CLIENT_CREATE, 
+        PRE_CLIENT_CREATE,
 
         /**
          * Endpoint, Client
          */
-        CLIENT_CREATED, 
-        
+        CLIENT_CREATED,
+
         /**
-         * EndpointInfo, Endpoint, SEI Class, Class 
+         * EndpointInfo, Endpoint, SEI Class, Class
          */
         ENDPOINT_SELECTED,
-        
+
         /**
          * EndpointInfo
          */
-        ENDPOINTINFO_CREATED, 
-        
+        ENDPOINTINFO_CREATED,
+
         /**
          * Class[], InvokationHandler, Proxy
          */
         PROXY_CREATED,
     };
-    
+
 
     void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object ... args);
 }

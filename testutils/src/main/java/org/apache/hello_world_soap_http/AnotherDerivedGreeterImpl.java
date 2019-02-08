@@ -43,7 +43,7 @@ public class AnotherDerivedGreeterImpl implements GreeterEndpointInterface {
 
     private static final Logger LOG =
         Logger.getLogger(DerivedGreeterImpl.class.getName());
-    private final Map<String, Integer> invocationCount = new HashMap<String, Integer>();
+    private final Map<String, Integer> invocationCount = new HashMap<>();
 
     public AnotherDerivedGreeterImpl() {
         invocationCount.put("sayHi", 0);
@@ -56,10 +56,9 @@ public class AnotherDerivedGreeterImpl implements GreeterEndpointInterface {
     public int getInvocationCount(String method) {
         if (invocationCount.containsKey(method)) {
             return invocationCount.get(method).intValue();
-        } else {
-            System.out.println("No invocation count for method: " + method);
-            return 0;
         }
+        System.out.println("No invocation count for method: " + method);
+        return 0;
     }
 
     /**
@@ -187,16 +186,15 @@ public class AnotherDerivedGreeterImpl implements GreeterEndpointInterface {
     }
 
     public String testNillable(String nillElem, int intElem) {
-        // TODO Auto-generated method stub
         return null;
-    }    
-    
+    }
+
     public Response<TestNillableResponse> testNillableAsync(String nillElem,
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;

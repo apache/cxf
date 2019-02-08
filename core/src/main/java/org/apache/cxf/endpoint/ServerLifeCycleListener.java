@@ -21,5 +21,5 @@ package org.apache.cxf.endpoint;
 
 public interface ServerLifeCycleListener {
     void startServer(Server server);
-    void stopServer(Server server); 
+    void stopServer(Server server);
 }

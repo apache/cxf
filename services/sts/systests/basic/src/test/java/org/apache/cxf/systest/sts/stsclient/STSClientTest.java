@@ -24,26 +24,31 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some tests for STSClient configuration.
  */
 public class STSClientTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -52,14 +57,11 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-transport.xml");
+        assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -73,22 +75,22 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
         URL busFile = STSClientTest.class.getResource("cxf-client-name.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = STSClientTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testDefaultSTSClient() throws Exception {
 
@@ -96,22 +98,22 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
         URL busFile = STSClientTest.class.getResource("cxf-default-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = STSClientTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

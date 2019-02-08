@@ -24,7 +24,7 @@ import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(serviceName = "MyService", 
+@WebService(serviceName = "MyService",
             portName = "MyPort",
             targetNamespace = "http://mynamespace.com/",
             endpointInterface = "org.apache.cxf.jaxws.service.HelloInterface")
@@ -33,9 +33,9 @@ public class Hello3 implements HelloInterface {
     public String sayHi(String text) {
         return text;
     }
-    
+
     public List<String> getGreetings() {
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("Hello");
         strings.add("Bonjour");
         return strings;
@@ -45,19 +45,16 @@ public class Hello3 implements HelloInterface {
     }
 
     public String[] getStringArray(String[] strs) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public List<String> getStringList(List<String> list) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     @WebMethod
     public String addNumbers(int arg0, int arg1) throws AddNumbersException {
-        // TODO Auto-generated method stub
         return null;
     }
 

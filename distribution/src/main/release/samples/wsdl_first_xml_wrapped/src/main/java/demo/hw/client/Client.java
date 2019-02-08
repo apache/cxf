@@ -32,13 +32,13 @@ public final class Client {
     public static final QName SERVICE_NAME = new QName("http://apache.org/hello_world_xml_http/wrapped",
             "XMLService");
 
-    public static final QName PORT_NAME = 
+    public static final QName PORT_NAME =
         new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLPort");
 
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length == 0) {
             System.out.println("please specify wsdl");
@@ -79,7 +79,7 @@ public final class Client {
         } catch (PingMeFault ex) {
             System.out.println("Expected exception: " + ex.getMessage());
         }
-    
+
         System.exit(0);
     }
 

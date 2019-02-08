@@ -31,30 +31,32 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 
 
 public class JwtClaims extends JsonMapObject {
-    
+
+    private static final long serialVersionUID = 6274136637301800283L;
+
     public JwtClaims() {
     }
-    
+
     public JwtClaims(Map<String, Object> values) {
         super(values);
     }
-    
+
     public void setIssuer(String issuer) {
         setClaim(JwtConstants.CLAIM_ISSUER, issuer);
     }
-    
+
     public String getIssuer() {
         return (String)getClaim(JwtConstants.CLAIM_ISSUER);
     }
-    
+
     public void setSubject(String subject) {
         setClaim(JwtConstants.CLAIM_SUBJECT, subject);
     }
-    
+
     public String getSubject() {
         return (String)getClaim(JwtConstants.CLAIM_SUBJECT);
     }
-    
+
     /**
      * Set a single audience value which will be serialized as a String
      * @param audience the audience
@@ -62,7 +64,7 @@ public class JwtClaims extends JsonMapObject {
     public void setAudience(String audience) {
         setClaim(JwtConstants.CLAIM_AUDIENCE, audience);
     }
-    
+
     /**
      * Get a single audience value. If the audience claim value is an array then the
      * first value will be returned.
@@ -72,11 +74,10 @@ public class JwtClaims extends JsonMapObject {
         List<String> audiences = getAudiences();
         if (!StringUtils.isEmpty(audiences)) {
             return audiences.get(0);
-        } else {
-            return null;
         }
+        return null;
     }
-    
+
     /**
      * Set an array of audiences
      * @param audiences the audiences array
@@ -84,7 +85,7 @@ public class JwtClaims extends JsonMapObject {
     public void setAudiences(List<String> audiences) {
         setClaim(JwtConstants.CLAIM_AUDIENCE, audiences);
     }
-    
+
     /**
      * Get an array of audiences
      * @return the audiences array
@@ -96,47 +97,47 @@ public class JwtClaims extends JsonMapObject {
         } else if (audiences instanceof String) {
             return Collections.singletonList((String)audiences);
         }
-        
-        return null;
+
+        return Collections.emptyList();
     }
-    
+
     public void setExpiryTime(Long expiresIn) {
         setClaim(JwtConstants.CLAIM_EXPIRY, expiresIn);
     }
-    
+
     public Long getExpiryTime() {
         return getLongProperty(JwtConstants.CLAIM_EXPIRY);
     }
-    
+
     public void setNotBefore(Long notBefore) {
         setClaim(JwtConstants.CLAIM_NOT_BEFORE, notBefore);
     }
-    
+
     public Long getNotBefore() {
         return getLongProperty(JwtConstants.CLAIM_NOT_BEFORE);
     }
-    
+
     public void setIssuedAt(Long issuedAt) {
         setClaim(JwtConstants.CLAIM_ISSUED_AT, issuedAt);
     }
-    
+
     public Long getIssuedAt() {
         return getLongProperty(JwtConstants.CLAIM_ISSUED_AT);
     }
-    
+
     public void setTokenId(String id) {
         setClaim(JwtConstants.CLAIM_JWT_ID, id);
     }
-    
+
     public String getTokenId() {
         return (String)getClaim(JwtConstants.CLAIM_JWT_ID);
     }
-    
+
     public JwtClaims setClaim(String name, Object value) {
         setProperty(name, value);
         return this;
     }
-    
+
     public Object getClaim(String name) {
         return getProperty(name);
     }

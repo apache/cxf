@@ -21,10 +21,11 @@ package org.apache.cxf.tools.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class FileWriterUtilTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class FileWriterUtilTest {
 
     private void cleanDir(File dir) {
         try {
@@ -43,7 +44,7 @@ public class FileWriterUtilTest extends Assert {
 
     @Test
     public void testGetFile() throws Exception {
-        FileWriterUtil fileWriter = null;    
+        FileWriterUtil fileWriter = null;
         String tmpDir = System.getProperty("java.io.tmpdir");
         File targetDir = new File(tmpDir + File.separator + "target");
         try {
@@ -52,9 +53,8 @@ public class FileWriterUtilTest extends Assert {
             fileWriter.getWriter("com.iona.test", "A.java");
             String packPath = "/com/iona/test/A.java".replace('/', File.separatorChar);
             String path = targetDir.getAbsolutePath() + packPath;
-            assertNotNull(new File(path).getName());           
+            assertNotNull(new File(path).getName());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);
@@ -70,10 +70,9 @@ public class FileWriterUtilTest extends Assert {
 
         try {
             targetDir.mkdirs();
-            fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null); 
-            assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));  
+            fileWriter = new FileWriterUtil(targetDir.getAbsolutePath(), null);
+            assertNotNull(fileWriter.getWriter("com.iona.test.SAMPLE", "A.java"));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             cleanDir(targetDir);

@@ -37,6 +37,12 @@ import org.apache.cxf.wsdl11.WSDLRuntimeException;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class CodeGenOptionTest extends AbstractCodeGenTest {
 
 
@@ -158,18 +164,18 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         }
         fail();
     }
-    
+
     /**
      * Performs the WSDLList option test for the specified list of parameters.
-     * 
+     *
      * @param wsdlURL The url of the wsdlList. Can be null.
      * @param wsdls
      * @throws IOException
      * @throws ToolException
      */
-    private void doWSDLListOptionTest(String wsdlURL, List<String> wsdls) 
+    private void doWSDLListOptionTest(String wsdlURL, List<String> wsdls)
         throws IOException, ToolException {
-        
+
         File file = null;
         if (wsdlURL == null) {
             // Creating a file containing a list of wsdls URLs in a temp folder
@@ -179,13 +185,13 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
                 writer.println(wsdl);
             }
             writer.close();
-            
+
             wsdlURL = file.getPath();
         }
-    
+
         env.put(ToolConstants.CFG_WSDLURL, wsdlURL);
         processor.setContext(env);
-        
+
         try {
             processor.execute();
         } finally {
@@ -293,8 +299,94 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         }
         return count;
     }
-    
-    
+
+    /**
+     * Tests that, when 'suppress-generated-date' option is set, javadocs
+     * won't contain the current date in all the generated java classes.
+     */
+    @Test
+    public void testSuppressGeneratedDatePresentOption() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_SUPPRESS_GENERATED_DATE, "true");
+        env.put(ToolConstants.CFG_COMPILE, null);
+        env.put(ToolConstants.CFG_CLASSDIR, null);
+        processor.setContext(env);
+        processor.execute();
+
+        File dir = new File(output, "org");
+        assertTrue("org directory is not found", dir.exists());
+        dir = new File(dir, "apache");
+        assertTrue("apache directory is not found", dir.exists());
+        assertTrue("apache directory is not found", dir.exists());
+        dir = new File(dir, "cxf");
+        assertTrue("cxf directory is not found", dir.exists());
+        dir = new File(dir, "w2j");
+        assertTrue("w2j directory is not found", dir.exists());
+        dir = new File(dir, "hello_world_soap_http");
+        assertTrue("hello_world_soap_http directory is not found", dir.exists());
+        File types = new File(dir, "types");
+        assertTrue("types directory is not found", dir.exists());
+
+        String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir, "Greeter.java")));
+        assertFalse(currentDatePresent(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
+        assertFalse(currentDatePresent(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
+        assertFalse(currentDatePresent(str));
+    }
+
+    /**
+     * Tests that, when 'suppress-generated-date' option is not present, javadocs
+     * will contain the current date in all the generated java classes.
+     */
+    @Test
+    public void testSuppressGeneratedDateNotPresentOption() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_MARK_GENERATED, "true");
+        env.put(ToolConstants.CFG_COMPILE, null);
+        env.put(ToolConstants.CFG_CLASSDIR, null);
+        processor.setContext(env);
+        processor.execute();
+
+        File dir = new File(output, "org");
+        assertTrue("org directory is not found", dir.exists());
+        dir = new File(dir, "apache");
+        assertTrue("apache directory is not found", dir.exists());
+        dir = new File(dir, "cxf");
+        assertTrue("cxf directory is not found", dir.exists());
+        dir = new File(dir, "w2j");
+        assertTrue("w2j directory is not found", dir.exists());
+        dir = new File(dir, "hello_world_soap_http");
+        assertTrue("hello_world_soap_http directory is not found", dir.exists());
+        File types = new File(dir, "types");
+        assertTrue("types directory is not found", dir.exists());
+
+        String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir, "Greeter.java")));
+        assertTrue(currentDatePresent(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
+        assertFalse(currentDatePresent(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
+        assertFalse(currentDatePresent(str));
+    }
+
+    private boolean currentDatePresent(String str) {
+        String[] lines = str.split(System.getProperty("line.separator"));
+        boolean expectDate = false;
+
+        for (String line : lines) {
+            if (expectDate) {
+                if (line.contains("Generated source version")) {
+                    break;
+                } else {
+                    return true;
+                }
+            }
+            expectDate = line.contains("This class was generated by");
+        }
+
+        return false;
+    }
+
     @Test
     public void testResourceURLForWsdlLocation() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -347,7 +439,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir,
                                                                                "SOAPService.java")));
         assertTrue(str, str.contains("getResource"));
-        
+
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
         for (Method m : clz.getMethods()) {
             String s = m.getName();

@@ -34,72 +34,72 @@ import org.apache.cxf.transport.jms.wsdl.TopicReplyToNameType;
 public final class JMSEndpointWSDLUtil {
     private JMSEndpointWSDLUtil() {
     }
-        
+
     /**
      * Retrieve JMS spec configs from wsdl and write them to the JMSEndpoint
-     * If a property is already set on the JMSEndpoint it will not be overwritten 
-     * 
+     * If a property is already set on the JMSEndpoint it will not be overwritten
+     *
      * @param endpoint
      * @param ei
      */
     static void retrieveWSDLInformation(JMSEndpoint endpoint, EndpointInfo ei) {
         // TODO We could have more than one parameter
-        JndiContextParameterType jndiContextParameterType = 
+        JndiContextParameterType jndiContextParameterType =
             getWSDLExtensor(ei, JndiContextParameterType.class);
         if (jndiContextParameterType != null) {
             endpoint.putJndiParameter(jndiContextParameterType.getName().trim(),
                                       jndiContextParameterType.getValue().trim());
         }
-        
-        JndiConnectionFactoryNameType jndiConnectionFactoryNameType 
+
+        JndiConnectionFactoryNameType jndiConnectionFactoryNameType
             = getWSDLExtensor(ei, JndiConnectionFactoryNameType.class);
         if (jndiConnectionFactoryNameType != null) {
             endpoint.setJndiConnectionFactoryName(jndiConnectionFactoryNameType.getValue().trim());
         }
-        
-        JndiInitialContextFactoryType jndiInitialContextFactoryType 
+
+        JndiInitialContextFactoryType jndiInitialContextFactoryType
             = getWSDLExtensor(ei, JndiInitialContextFactoryType.class);
         if (jndiInitialContextFactoryType != null) {
-            endpoint.setJndiInitialContextFactory(jndiInitialContextFactoryType.getValue().trim()); 
+            endpoint.setJndiInitialContextFactory(jndiInitialContextFactoryType.getValue().trim());
         }
-        
+
         JndiURLType jndiURLType = getWSDLExtensor(ei, JndiURLType.class);
         if (jndiURLType != null) {
             endpoint.setJndiURL(jndiURLType.getValue().trim());
         }
-        
+
         DeliveryModeType deliveryModeType = getWSDLExtensor(ei, DeliveryModeType.class);
         if (deliveryModeType != null) {
             String deliveryMode = deliveryModeType.getValue().trim();
             endpoint.setDeliveryMode(org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType
                                      .valueOf(deliveryMode));
         }
-        
+
         PriorityType priorityType = getWSDLExtensor(ei, PriorityType.class);
         if (priorityType != null) {
             endpoint.setPriority(priorityType.getValue());
         }
-        
+
         TimeToLiveType timeToLiveType = getWSDLExtensor(ei, TimeToLiveType.class);
         if (timeToLiveType != null) {
-            endpoint.setTimeToLive(timeToLiveType.getValue()); 
+            endpoint.setTimeToLive(timeToLiveType.getValue());
         }
-        
+
         ReplyToNameType replyToNameType = getWSDLExtensor(ei, ReplyToNameType.class);
         if (replyToNameType != null) {
             endpoint.setReplyToName(replyToNameType.getValue());
         }
-        
+
         TopicReplyToNameType topicReplyToNameType = getWSDLExtensor(ei, TopicReplyToNameType.class);
         if (topicReplyToNameType != null) {
             endpoint.setTopicReplyToName(topicReplyToNameType.getValue());
         }
     }
-    
+
     public static <T> T getWSDLExtensor(EndpointInfo ei, Class<T> cls) {
         ServiceInfo si = ei.getService();
         BindingInfo bi = ei.getBinding();
-        
+
         Object o = ei.getExtensor(cls);
         if (o == null && si != null) {
             o = si.getExtensor(cls);
@@ -107,7 +107,7 @@ public final class JMSEndpointWSDLUtil {
         if (o == null && bi != null) {
             o = bi.getExtensor(cls);
         }
-        
+
         if (o == null) {
             return null;
         }

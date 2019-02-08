@@ -24,31 +24,33 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class NettyHttpServerEngineFactoryTest
-        extends Assert {
+
+public class NettyHttpServerEngineFactoryTest {
     Bus bus;
-    
+
     @BeforeClass
     public static void classUp() {
-        // Get rid of any notion of a default bus set by other 
+        // Get rid of any notion of a default bus set by other
         // rogue tests.
         BusFactory.setDefaultBus(null);
     }
-    
+
     @AfterClass
     public static void classDown() {
         // Clean up.
         BusFactory.setDefaultBus(null);
     }
-    
+
     @After
     public void tearDown() {
         if (bus != null) {
@@ -60,14 +62,14 @@ public class NettyHttpServerEngineFactoryTest
     @Test
     public void testTransportFactoryHasEngineFactory() throws Exception {
         bus = BusFactory.getDefaultBus(true);
-        
+
         assertNotNull("Cannot get bus", bus);
-        
+
         // Make sure we got the Transport Factory.
-        DestinationFactoryManager destFM = 
+        DestinationFactoryManager destFM =
             bus.getExtension(DestinationFactoryManager.class);
         assertNotNull("Cannot get DestinationFactoryManager", destFM);
-        DestinationFactory destF = 
+        DestinationFactory destF =
             destFM.getDestinationFactory(
                     "http://cxf.apache.org/transports/http");
         assertNotNull("No DestinationFactory", destF);
@@ -78,7 +80,7 @@ public class NettyHttpServerEngineFactoryTest
             bus.getExtension(NettyHttpServerEngineFactory.class);
         assertNotNull("EngineFactory is not configured.", factory);
     }
-    
+
 
 
 }

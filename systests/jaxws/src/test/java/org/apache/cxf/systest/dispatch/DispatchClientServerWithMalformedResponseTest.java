@@ -36,28 +36,34 @@ import javax.xml.ws.Service;
 
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class DispatchClientServerWithMalformedResponseTest extends AbstractBusClientServerTestBase {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_soap_http", "SOAPDispatchService");
-    private static final QName PORT_NAME 
+    private static final QName PORT_NAME
         = new QName("http://apache.org/hello_world_soap_http", "SoapDispatchPort");
 
-    private static String greeterPort = 
-        TestUtil.getPortNumber(DispatchClientServerWithMalformedResponseTest.class); 
+    private static String greeterPort =
+        TestUtil.getPortNumber(DispatchClientServerWithMalformedResponseTest.class);
     private int asyncHandlerInvokedCount;
-    
-    public static class Server extends AbstractBusTestServerBase {        
+
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run() {
             setBus(BusFactory.getDefaultBus());
@@ -90,7 +96,7 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @org.junit.Before
     public void setUp() {
         BusFactory.setThreadDefaultBus(getStaticBus());
@@ -98,7 +104,7 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         BusFactory.getThreadDefaultBus().getInInterceptors().add(new LoggingInInterceptor());
         BusFactory.getThreadDefaultBus().getInInterceptors().add(new MalformedResponseInterceptor());
     }
-    
+
     private void waitForFuture(Future<?> fd) throws Exception {
         int count = 0;
         while (!fd.isDone()) {
@@ -109,8 +115,8 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
             Thread.sleep(20);
         }
     }
-    
-   
+
+
     @Test
     public void testSOAPMessageWithMalformedResponse() throws Exception {
 
@@ -123,11 +129,11 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         Dispatch<SOAPMessage> disp = service
             .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
-        
-        
+
+
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
@@ -138,10 +144,10 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
         assertNotNull(f);
         waitForFuture(f);
         assertEquals("AsyncHandler shouldn't get invoked more than once", asyncHandlerInvokedCount, 1);
-       
+
     }
-    
-   
+
+
 
     class TestSOAPMessageHandler implements AsyncHandler<SOAPMessage> {
 

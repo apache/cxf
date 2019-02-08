@@ -24,7 +24,7 @@ package org.apache.cxf.sts.claims;
  * realm.
  */
 public interface ClaimsMapper {
-    
+
     /**
      * Map a collection of claims in the source realm to the target realm
      * @param sourceRealm the source realm of the Principal

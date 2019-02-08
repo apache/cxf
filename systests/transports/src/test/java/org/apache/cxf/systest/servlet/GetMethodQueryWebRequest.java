@@ -23,21 +23,20 @@ import com.meterware.httpunit.GetMethodWebRequest;
 //Customer WebRequest for sending the "http://localhost/xxx?wsdl" request
 public class GetMethodQueryWebRequest extends GetMethodWebRequest {
     private String urlString;
-    
-    public GetMethodQueryWebRequest(String urlStr) {        
+
+    public GetMethodQueryWebRequest(String urlStr) {
         super(urlStr);
-        urlString = urlStr;        
+        urlString = urlStr;
     }
-    
+
     public String getQueryString() {
         int pos = urlString.indexOf('?');
         if (pos > 0) {
             return urlString.substring(pos + 1);
-        } else {
-            return "";
-        }                
+        }
+        return "";
     }
-    
-    
+
+
 
 }

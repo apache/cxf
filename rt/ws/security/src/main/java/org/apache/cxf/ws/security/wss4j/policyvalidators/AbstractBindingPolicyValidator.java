@@ -26,7 +26,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.common.util.StringUtils;
+
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -57,9 +57,9 @@ import org.apache.wss4j.policy.model.X509Token;
  * Some abstract functionality for validating a security binding.
  */
 public abstract class AbstractBindingPolicyValidator implements SecurityPolicyValidator {
-    
+
     private static final QName SIG_QNAME = new QName(WSConstants.SIG_NS, WSConstants.SIG_LN);
-    
+
     /**
      * Validate a Timestamp
      * @param includeTimestamp whether a Timestamp must be included or not
@@ -75,24 +75,24 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         List<WSSecurityEngineResult> signedResults,
         Message message
     ) {
-        List<WSSecurityEngineResult> timestampResults = 
+        List<WSSecurityEngineResult> timestampResults =
             results.getActionResults().get(WSConstants.TS);
-        
+
         // Check whether we received a timestamp and compare it to the policy
         if (includeTimestamp && (timestampResults == null || timestampResults.size() != 1)) {
             return false;
         } else if (!includeTimestamp) {
             return timestampResults == null || timestampResults.isEmpty();
         }
-        
+
         // At this point we received a (required) Timestamp. Now check that it is integrity protected.
         if (transportBinding) {
             return true;
         } else if (!signedResults.isEmpty()) {
-            Timestamp timestamp = 
+            Timestamp timestamp =
                 (Timestamp)timestampResults.get(0).get(WSSecurityEngineResult.TAG_TIMESTAMP);
             for (WSSecurityEngineResult signedResult : signedResults) {
-                List<WSDataRef> dataRefs = 
+                List<WSDataRef> dataRefs =
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 for (WSDataRef dataRef : dataRefs) {
                     if (timestamp.getElement() == dataRef.getProtectedElement()) {
@@ -101,10 +101,10 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Validate the entire header and body signature property.
      */
@@ -112,42 +112,42 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         List<WSSecurityEngineResult> signedResults
     ) {
         for (WSSecurityEngineResult signedResult : signedResults) {
-            List<WSDataRef> dataRefs = 
+            List<WSDataRef> dataRefs =
                     CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
             if (dataRefs != null) {
                 for (WSDataRef dataRef : dataRefs) {
                     String xpath = dataRef.getXpath();
                     if (xpath != null) {
-                        String[] nodes = StringUtils.split(xpath, "/");
+                        String[] nodes = xpath.split("/");
                         // envelope/Body || envelope/Header/header || envelope/Header/wsse:Security/header
                         if (nodes.length < 3 || nodes.length > 5) {
                             return false;
                         }
-                        
+
                         if (!(nodes[2].contains("Header") || nodes[2].contains("Body"))) {
                             return false;
                         }
-                        
+
                         if (nodes.length == 5 && !nodes[3].contains("Security")) {
                             return false;
                         }
-                        
+
                         if (nodes.length == 4 && nodes[2].contains("Body")) {
                             return false;
                         }
-                        
+
                     }
                 }
             }
         }
         return true;
     }
-    
+
     /**
      * Check various properties set in the policy of the binding
      */
     protected boolean checkProperties(
-        AbstractSymmetricAsymmetricBinding binding, 
+        AbstractSymmetricAsymmetricBinding binding,
         AssertionInfo ai,
         AssertionInfoMap aim,
         WSHandlerResult results,
@@ -162,7 +162,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         String namespace = binding.getName().getNamespaceURI();
         PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.INCLUDE_TIMESTAMP));
-        
+
         // Check the EntireHeaderAndBodySignatures property
         if (binding.isOnlySignEntireHeadersAndBody()
             && !validateEntireHeaderAndBodySignatures(signedResults)) {
@@ -171,7 +171,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
             return false;
         }
         PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
-        
+
         // Check whether the signatures were encrypted or not
         if (binding.isEncryptSignature() && !isSignatureEncrypted(results.getResults())) {
             ai.setNotAsserted("The signature is not protected");
@@ -179,7 +179,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ENCRYPT_SIGNATURE));
         PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.PROTECT_TOKENS));
-        
+
         /*
         // Check ProtectTokens
         if (binding.isTokenProtection() && !isTokenProtected(results, signedResults)) {
@@ -187,29 +187,29 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
             return false;
         }
         */
-        
+
         return true;
     }
-    
+
     /**
      * Check the Protection Order of the binding
      */
     protected boolean checkProtectionOrder(
-        AbstractSymmetricAsymmetricBinding binding, 
+        AbstractSymmetricAsymmetricBinding binding,
         AssertionInfoMap aim,
         AssertionInfo ai,
         List<WSSecurityEngineResult> results
     ) {
         ProtectionOrder protectionOrder = binding.getProtectionOrder();
         String namespace = binding.getName().getNamespaceURI();
-        
+
         if (protectionOrder == ProtectionOrder.EncryptBeforeSigning) {
             if (!binding.isProtectTokens() && isSignedBeforeEncrypted(results)) {
                 ai.setNotAsserted("Not encrypted before signed");
                 return false;
             }
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.ENCRYPT_BEFORE_SIGNING));
-        } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) { 
+        } else if (protectionOrder == ProtectionOrder.SignBeforeEncrypting) {
             if (isEncryptedBeforeSigned(results)) {
                 ai.setNotAsserted("Not signed before encrypted");
                 return false;
@@ -218,7 +218,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return true;
     }
-    
+
     /**
      * Check to see if a signature was applied before encryption.
      * Note that results are stored in the reverse order.
@@ -227,9 +227,9 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         boolean signed = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            List<WSDataRef> el = 
+            List<WSDataRef> el =
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-            
+
             // Don't count an endorsing signature
             if (actInt.intValue() == WSConstants.SIGN && el != null
                 && !(el.size() == 1 && el.get(0).getName().equals(SIG_QNAME))) {
@@ -241,7 +241,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return false;
     }
-    
+
     /**
      * Check to see if encryption was applied before signature.
      * Note that results are stored in the reverse order.
@@ -250,9 +250,9 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         boolean encrypted = false;
         for (WSSecurityEngineResult result : results) {
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            List<WSDataRef> el = 
+            List<WSDataRef> el =
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-            
+
             if (actInt.intValue() == WSConstants.ENCR && el != null) {
                 encrypted = true;
             }
@@ -264,12 +264,12 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return false;
     }
-    
+
     /**
      * Check the derived key requirement.
      */
     protected boolean checkDerivedKeys(
-        AbstractTokenWrapper tokenWrapper, 
+        AbstractTokenWrapper tokenWrapper,
         boolean hasDerivedKeys,
         List<WSSecurityEngineResult> signedResults,
         List<WSSecurityEngineResult> encryptedResults
@@ -280,7 +280,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         if (!(token instanceof X509Token && isDerivedKeys)) {
             return true;
         }
-        if (tokenWrapper instanceof EncryptionToken 
+        if (tokenWrapper instanceof EncryptionToken
             && !hasDerivedKeys && !encryptedResults.isEmpty()) {
             return false;
         } else if (tokenWrapper instanceof SignatureToken
@@ -292,7 +292,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return true;
     }
-    
+
     /**
      * Check whether the token protection policy is followed. In other words, check that the
      * signature token was itself signed.
@@ -302,13 +302,13 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         List<WSSecurityEngineResult> signedResults
     ) {
         for (WSSecurityEngineResult result : signedResults) {
-            
+
             // Get the Token result that was used for the signature
             WSSecurityEngineResult tokenResult = findCorrespondingToken(result, results);
             if (tokenResult == null) {
                 return false;
             }
-            
+
             // Now go through what was signed and see if the token itself was signed
             List<WSDataRef> sl =
                 CastUtils.cast((List<?>)result.get(
@@ -331,7 +331,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return true;
     }
-    
+
     /**
      * Find the token corresponding to either the X509Certificate or PublicKey used to sign
      * the "signatureResult" argument.
@@ -341,37 +341,37 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         List<WSSecurityEngineResult> results
     ) {
         // See what was used to sign this result
-        X509Certificate cert = 
+        X509Certificate cert =
             (X509Certificate)signatureResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        PublicKey publicKey = 
+        PublicKey publicKey =
             (PublicKey)signatureResult.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-        
+
         for (WSSecurityEngineResult token : results) {
             Integer actInt = (Integer)token.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt == WSConstants.SIGN) {
                 continue;
             }
-            
-            BinarySecurity binarySecurity = 
+
+            BinarySecurity binarySecurity =
                 (BinarySecurity)token.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-            PublicKey foundPublicKey = 
+            PublicKey foundPublicKey =
                 (PublicKey)token.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
             if (binarySecurity instanceof X509Security
                 || binarySecurity instanceof PKIPathSecurity) {
-                X509Certificate foundCert = 
+                X509Certificate foundCert =
                     (X509Certificate)token.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
                 if (foundCert.equals(cert)) {
                     return token;
                 }
             } else if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                SamlAssertionWrapper assertionWrapper = 
+                SamlAssertionWrapper assertionWrapper =
                     (SamlAssertionWrapper)token.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
                 if (samlKeyInfo != null) {
                     X509Certificate[] subjectCerts = samlKeyInfo.getCerts();
                     PublicKey subjectPublicKey = samlKeyInfo.getPublicKey();
-                    if ((cert != null && subjectCerts != null 
+                    if ((cert != null && subjectCerts != null
                         && cert.equals(subjectCerts[0]))
                         || (subjectPublicKey != null && subjectPublicKey.equals(publicKey))) {
                         return token;
@@ -379,11 +379,11 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
                 }
             } else if (publicKey != null && publicKey.equals(foundPublicKey)) {
                 return token;
-            } 
+            }
         }
         return null;
     }
-    
+
     /**
      * Check whether the primary Signature (and all SignatureConfirmation) elements were encrypted
      */
@@ -394,13 +394,13 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
             Integer actInt = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.SIGN && !foundPrimarySignature) {
                 foundPrimarySignature = true;
-                Element sigElement = 
+                Element sigElement =
                     (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (sigElement == null || !isElementEncrypted(sigElement, results)) {
                     return false;
                 }
             } else if (actInt.intValue() == WSConstants.SC) {
-                Element sigElement = 
+                Element sigElement =
                     (Element)result.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                 if (sigElement == null || !isElementEncrypted(sigElement, results)) {
                     return false;
@@ -409,7 +409,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return true;
     }
-    
+
     /**
      * Return true if the given Element was encrypted
      */
@@ -417,7 +417,7 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         for (WSSecurityEngineResult wser : results) {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ENCR) {
-                List<WSDataRef> el = 
+                List<WSDataRef> el =
                     CastUtils.cast((List<?>)wser.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 if (el != null) {
                     for (WSDataRef r : el) {
@@ -431,5 +431,11 @@ public abstract class AbstractBindingPolicyValidator implements SecurityPolicyVa
         }
         return false;
     }
-    
+
+    protected void assertDerivedKeys(AbstractToken token, AssertionInfoMap aim) {
+        DerivedKeys derivedKeys = token.getDerivedKeys();
+        if (derivedKeys != null) {
+            PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(), derivedKeys.name()));
+        }
+    }
 }

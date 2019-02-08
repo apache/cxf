@@ -22,11 +22,11 @@ package org.apache.cxf.tools.corba.common.idltypes;
 import java.io.PrintWriter;
 
 public final class IdlAnonFixed extends IdlFixedBase {
-    
+
     private IdlAnonFixed(IdlScopeBase parent, int digits, int scale) {
         super(parent, "", digits, scale);
     }
-    
+
     public static IdlAnonFixed create(IdlScopeBase parent, int digits, int scale) {
         return new IdlAnonFixed(parent, digits, scale);
     }
@@ -44,5 +44,5 @@ public final class IdlAnonFixed extends IdlFixedBase {
     public void write(PrintWriter pw) {
         // intentionally empty
     }
-    
+
 }

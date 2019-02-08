@@ -24,16 +24,16 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange;
 
 public abstract class AbstractSequence {
-    
+
     protected final Identifier id;
     protected SequenceAcknowledgement acknowledgement;
     private final ProtocolVariation protocol;
-    
+
     protected AbstractSequence(Identifier i, ProtocolVariation p) {
         id = i;
         protocol = p;
     }
-    
+
     /**
      * @return the sequence identifier
      */
@@ -48,30 +48,29 @@ public abstract class AbstractSequence {
     public String toString() {
         return id.getValue();
     }
-    
+
     public boolean equals(Object other) {
         if (other == this) {
-            return true;            
+            return true;
         }
         if (other instanceof AbstractSequence) {
             AbstractSequence otherSeq = (AbstractSequence)other;
             return otherSeq.getIdentifier().getValue().equals(getIdentifier().getValue());
-        }        
+        }
         return false;
     }
-    
+
     public int hashCode() {
         return getIdentifier().getValue().hashCode();
     }
-    
+
     public static boolean identifierEquals(Identifier id1, Identifier id2) {
         if (null == id1) {
             return null == id2;
-        } else {
-            return null != id2 && id1.getValue().equals(id2.getValue());
         }
+        return null != id2 && id1.getValue().equals(id2.getValue());
     }
-    
+
     public synchronized boolean isAcknowledged(long m) {
         for (AcknowledgementRange r : acknowledgement.getAcknowledgementRange()) {
             if (m >= r.getLower().longValue() && r.getUpper().longValue() >= m) {
@@ -80,5 +79,5 @@ public abstract class AbstractSequence {
         }
         return false;
     }
-   
+
 }

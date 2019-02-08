@@ -38,7 +38,7 @@ public class GreeterImpl implements Greeter {
         String ret = null;
         if (port.get(0).getAny() instanceof Element) {
             Element ele = (Element)port.get(0).getAny();
-            ret =  ele.getFirstChild().getTextContent();
+            ret = ele.getFirstChild().getTextContent();
         }
         if (port.get(1).getAny() instanceof Element) {
             Element ele = (Element)port.get(1).getAny();
@@ -49,10 +49,10 @@ public class GreeterImpl implements Greeter {
 
     public String sayHi1(List<org.apache.hello_world_soap_http.any_types.SayHi1.Port> port) {
         return port.get(0).getRequestType() + port.get(1).getRequestType();
-        
+
     }
 
-    
-    
+
+
 
 }

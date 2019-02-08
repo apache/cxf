@@ -41,42 +41,42 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 
-public class ScopedNameVisitor extends VisitorBase {        
+public class ScopedNameVisitor extends VisitorBase {
     private static boolean exceptionMode;
-    private static XmlSchemaPrimitiveMap xmlSchemaPrimitiveMap = new XmlSchemaPrimitiveMap();          
+    private static XmlSchemaPrimitiveMap xmlSchemaPrimitiveMap = new XmlSchemaPrimitiveMap();
 
     public ScopedNameVisitor(Scope scope,
                              Definition defn,
                              XmlSchema schemaRef,
                              WSDLASTVisitor wsdlVisitor) {
-        super(scope, defn, schemaRef, wsdlVisitor);             
+        super(scope, defn, schemaRef, wsdlVisitor);
     }
-    
+
     public void setExceptionMode(boolean value) {
         exceptionMode = value;
     }
     public static boolean accept(Scope scope,
                                  Definition defn,
                                  XmlSchema schemaRef,
-                                 AST node,                                 
+                                 AST node,
                                  WSDLASTVisitor wsdlVisitor) {
         return accept(scope, defn, schemaRef, node, wsdlVisitor, false);
-    }    
-    
+    }
+
     // when accepting a "name" (for example, name of a field in a struct), we may need
-    // to relax the strict checking for forward decls and schema types to not count for 
+    // to relax the strict checking for forward decls and schema types to not count for
     // exact parent scope names
     public static boolean accept(Scope scope,
                                  Definition defn,
                                  XmlSchema schemaRef,
-                                 AST node,                                 
+                                 AST node,
                                  WSDLASTVisitor wsdlVisitor,
                                  boolean asName) {
         boolean result = false;
         if (PrimitiveTypesVisitor.accept(node)) {
-            result = true; 
+            result = true;
         } else if (isforwardDeclared(scope, node, wsdlVisitor, asName)) {
-            result = true;          
+            result = true;
         } else if (ObjectReferenceVisitor.accept(scope,
                                                  schemaRef,
                                                  defn,
@@ -95,15 +95,15 @@ public class ScopedNameVisitor extends VisitorBase {
         //                 | <scoped_name> "::" <identifier>
 
         XmlSchemaType stype = null;
-        CorbaType ctype = null;        
+        CorbaType ctype = null;
         if (PrimitiveTypesVisitor.accept(node)) {
-            // primitive type            
+            // primitive type
             PrimitiveTypesVisitor primitiveVisitor =
                 new PrimitiveTypesVisitor(null, definition, schema, schemas);
             primitiveVisitor.visit(node);
-            
+
             stype = primitiveVisitor.getSchemaType();
-            ctype = primitiveVisitor.getCorbaType();            
+            ctype = primitiveVisitor.getCorbaType();
         } else if (isforwardDeclared(getScope(), node, wsdlVisitor)) {
             // forward declaration
             Scope scope = forwardDeclared(getScope(),
@@ -121,7 +121,7 @@ public class ScopedNameVisitor extends VisitorBase {
             objRefVisitor.visit(node);
 
             stype = objRefVisitor.getSchemaType();
-            ctype = objRefVisitor.getCorbaType();           
+            ctype = objRefVisitor.getCorbaType();
         } else {
             VisitorTypeHolder holder = new VisitorTypeHolder();
             boolean found = findSchemaType(getScope(),
@@ -140,30 +140,30 @@ public class ScopedNameVisitor extends VisitorBase {
                                            + qname
                                            + " not found in typeMap]");
             }
-        }       
-        
+        }
+
         setSchemaType(stype);
-        setCorbaType(ctype);        
-        
+        setCorbaType(ctype);
+
     }
 
     private static CorbaType getCorbaSchemaType(XmlSchema xmlSchema,
                                                     TypeMappingType typeMap,
                                                     XmlSchemaType stype,
-                                                    Scope scopedName) {       
+                                                    Scope scopedName) {
         CorbaType ctype = null;
         if (stype.getQName().equals(Constants.XSD_STRING)) {
             ctype = new CorbaType();
             ctype.setName(CorbaConstants.NT_CORBA_STRING.getLocalPart());
             ctype.setQName(CorbaConstants.NT_CORBA_STRING);
             ctype.setType(Constants.XSD_STRING);
-        } else {                    
+        } else {
             QName qname = stype.getQName();
             ctype = findCorbaTypeForSchemaType(typeMap, qname, scopedName);
         }
         return ctype;
     }
-         
+
     protected static boolean isforwardDeclared(Scope scope, AST node, WSDLASTVisitor wsdlVisitor) {
         return isforwardDeclared(scope, node, wsdlVisitor, false);
     }
@@ -197,10 +197,10 @@ public class ScopedNameVisitor extends VisitorBase {
             Scope scopedName = null;
             if (isFullyScopedName(node)) {
                 scopedName = getFullyScopedName(new Scope(), node);
-            } else {                
+            } else {
                 scopedName = new Scope(new Scope(), node);
             }
-                        
+
             if (scopedNames.getScope(scopedName) != null) {
                 isForward = true;
             }
@@ -208,8 +208,8 @@ public class ScopedNameVisitor extends VisitorBase {
 
         return isForward;
     }
-     
-    
+
+
     protected static Scope forwardDeclared(Scope scope,
                                            Definition defn,
                                            XmlSchema schemaRef,
@@ -240,7 +240,7 @@ public class ScopedNameVisitor extends VisitorBase {
                     if (ObjectReferenceVisitor.accept(scope, xmlSchema, defn, node, wsdlVisitor)) {
                         // checks if its a forward
                         Visitor visitor = new ObjectReferenceVisitor(scope, defn, xmlSchema, wsdlVisitor);
-                        visitor.visit(node);                    
+                        visitor.visit(node);
                     }
                     result = scopedName;
                 }
@@ -271,7 +271,7 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         return result;
     }
-    
+
     protected static boolean findSchemaType(Scope scope,
                                             Definition defn,
                                             XmlSchema schemaRef,
@@ -279,7 +279,7 @@ public class ScopedNameVisitor extends VisitorBase {
                                             WSDLASTVisitor wsdlVisitor,
                                             VisitorTypeHolder holder) {
         return findSchemaType(scope, defn, schemaRef, node, wsdlVisitor, holder, false);
-    }    
+    }
     protected static boolean findSchemaType(Scope scope,
                                             Definition defn,
                                             XmlSchema schemaRef,
@@ -287,10 +287,10 @@ public class ScopedNameVisitor extends VisitorBase {
                                             WSDLASTVisitor wsdlVisitor,
                                             VisitorTypeHolder holder,
                                             boolean checkExact) {
-                                                
+
         boolean result = false;
-        Scope currentScope = scope;        
-        
+        Scope currentScope = scope;
+
         // checks from innermost local scope outwards
         if ((node.getFirstChild() == null)
             || (node.getFirstChild() != null && node.getFirstChild().getType() != IDLTokenTypes.SCOPEOP)) {
@@ -298,7 +298,7 @@ public class ScopedNameVisitor extends VisitorBase {
                 // A name can be used in an unqualified form within a particular
                 // scope;
                 // it will be resolved by successvely n searching farther out in
-                // enclosing scopes, while taking into consideration 
+                // enclosing scopes, while taking into consideration
                 // inheritance relationships among interfaces.
                 Scope scopedName = null;
                 if (isFullyScopedName(node)) {
@@ -308,11 +308,11 @@ public class ScopedNameVisitor extends VisitorBase {
                 }
                 result = findScopeSchemaType(scopedName, schemaRef, wsdlVisitor, holder);
 
-                // Search inherited scopes for the type        
+                // Search inherited scopes for the type
                 if (!result) {
                     result = findSchemaTypeInInheritedScope(scope, defn, schemaRef,
                                                             node, wsdlVisitor, holder);
-                    
+
                 }
                 if (checkExact && currentScope.equals(new Scope(currentScope.getParent(), node))) {
                     return false;
@@ -321,9 +321,9 @@ public class ScopedNameVisitor extends VisitorBase {
                 currentScope = currentScope.getParent();
             }
         }
-        
-        
-        
+
+
+
         if (!result) {
             // Global scope is our last chance to resolve the node
             result = findSchemaTypeInGlobalScope(scope,
@@ -335,7 +335,7 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         return result;
     }
-    
+
     private static boolean findSchemaTypeInGlobalScope(Scope scope,
                                                        Definition defn,
                                                        XmlSchema currentSchema,
@@ -346,7 +346,7 @@ public class ScopedNameVisitor extends VisitorBase {
         TypeMappingType typeMap = wsdlVisitor.getTypeMap();
         ModuleToNSMapper mapper = wsdlVisitor.getModuleToNSMapper();
         WSDLSchemaManager manager = wsdlVisitor.getManager();
-        
+
         Scope scopedName = new Scope(scope, node);
         String name = node.toString();
         if (isFullyScopedName(node)) {
@@ -395,37 +395,37 @@ public class ScopedNameVisitor extends VisitorBase {
         return result;
     }
 
-    
+
     // Searches all the inherited interfaces for the type.
     private static boolean findSchemaTypeInInheritedScope(Scope scope, Definition defn, XmlSchema schemaRef,
                                                           AST node, WSDLASTVisitor wsdlVisitor,
                                                           VisitorTypeHolder holder) {
 
-        boolean result = false;                
+        boolean result = false;
         List<Scope> baseScopes = wsdlVisitor.getInheritedScopeMap().get(scope);
         if (baseScopes != null) {
-            List<Scope> scopeList = new ArrayList<Scope>();
+            List<Scope> scopeList = new ArrayList<>();
             for (Scope scopeName : baseScopes) {
                 scopeList.add(scopeName);
             }
-            result = findSchemaTypeInBaseScope(scopeList, scope, defn, 
+            result = findSchemaTypeInBaseScope(scopeList, scope, defn,
                                                schemaRef, node, wsdlVisitor, holder);
         }
         return result;
     }
-    
+
     // Does a breath depth search first.
-    public static boolean findSchemaTypeInBaseScope(List<Scope> scopeList, Scope scope, 
+    public static boolean findSchemaTypeInBaseScope(List<Scope> scopeList, Scope scope,
                                                     Definition defn, XmlSchema schemaRef,
                                                     AST node, WSDLASTVisitor wsdlVisitor,
                                                     VisitorTypeHolder holder) {
-        List<Scope> inheritedList = new ArrayList<Scope>();
+        List<Scope> inheritedList = new ArrayList<>();
         boolean result = false;
-        
-        if (scopeList != null) {            
+
+        if (scopeList != null) {
             for (Scope scopeName : scopeList) {
                 inheritedList.add(scopeName);
-            }        
+            }
             for (Scope inheritScope : scopeList) {
                 Scope scopedName = new Scope(inheritScope, node);
                 result = findScopeSchemaType(scopedName, schemaRef, wsdlVisitor, holder);
@@ -443,7 +443,7 @@ public class ScopedNameVisitor extends VisitorBase {
             }
 
             if (!inheritedList.isEmpty()) {
-                List<Scope> baseList = new ArrayList<Scope>();
+                List<Scope> baseList = new ArrayList<>();
                 for (Scope scopeName : inheritedList) {
                     baseList.add(scopeName);
                 }
@@ -454,12 +454,12 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         return result;
     }
-    
+
     // Searches this scope for the schema type.
-    private static boolean findScopeSchemaType(Scope scopedName, XmlSchema schemaRef, 
-                                           WSDLASTVisitor wsdlVisitor, 
+    private static boolean findScopeSchemaType(Scope scopedName, XmlSchema schemaRef,
+                                           WSDLASTVisitor wsdlVisitor,
                                            VisitorTypeHolder holder) {
-        
+
         XmlSchemaCollection schemas = wsdlVisitor.getSchemas();
         TypeMappingType typeMap = wsdlVisitor.getTypeMap();
         ModuleToNSMapper mapper = wsdlVisitor.getModuleToNSMapper();
@@ -515,14 +515,14 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         return result;
     }
-    
-    
-    
-    public static CorbaType findCorbaTypeForSchemaType(TypeMappingType typeMap, 
+
+
+
+    public static CorbaType findCorbaTypeForSchemaType(TypeMappingType typeMap,
                                                            QName schemaTypeName,
                                                            Scope scopedName) {
         CorbaType result = null;
-        for (CorbaType type : typeMap.getStructOrExceptionOrUnion()) {         
+        for (CorbaType type : typeMap.getStructOrExceptionOrUnion()) {
             if ((type instanceof Sequence)
                 || (type instanceof Array)
                 || (type.getType() == null)
@@ -532,8 +532,8 @@ public class ScopedNameVisitor extends VisitorBase {
                 if (type.getQName().getLocalPart().equals(schemaTypeName.getLocalPart())) {
                     result = type;
                     break;
-                }               
-                
+                }
+
                 // If we are using the module to ns mapping, then the name of the type in schema
                 // and in the typemap are actually different.  We should then compare with the scoped
                 // name that we are given.
@@ -548,7 +548,7 @@ public class ScopedNameVisitor extends VisitorBase {
             }
         }
         return result;
-    }  
+    }
 
     public static CorbaType findCorbaType(TypeMappingType typeMap, QName typeName) {
         CorbaType result = null;
@@ -559,15 +559,15 @@ public class ScopedNameVisitor extends VisitorBase {
             }
         }
         return result;
-    }     
-    
+    }
+
     protected static boolean isFullyScopedName(AST node) {
         return node.getType() == IDLTokenTypes.IDENT
             && node.getFirstChild() != null
             && ((node.getFirstChild().getType() == IDLTokenTypes.SCOPEOP)
                 || (node.getFirstChild().getType() == IDLTokenTypes.IDENT));
     }
-    
+
     protected static Scope getFullyScopedName(Scope currentScope, AST node) {
         Scope scopedName = new Scope();
         if (!currentScope.toString().equals(node.getText())) {
@@ -579,7 +579,7 @@ public class ScopedNameVisitor extends VisitorBase {
             scopedName = new Scope(scopedName, scopeNode);
         }
         while (scopeNode.getNextSibling() != null) {
-            scopeNode = scopeNode.getNextSibling(); 
+            scopeNode = scopeNode.getNextSibling();
             scopedName = new Scope(scopedName, scopeNode);
         }
         return scopedName;
@@ -601,8 +601,7 @@ public class ScopedNameVisitor extends VisitorBase {
                     populateAliasSchemaType(corbaType, wsdlVisitor, holder);
                 }
             } else if (((corbaType instanceof Sequence) || (corbaType instanceof Anonsequence))
-                       && ((corbaType.getType().equals(Constants.XSD_BASE64))
-                           || (corbaType.getType().equals(Constants.XSD_BASE64)))) {
+                       && ((corbaType.getType().equals(Constants.XSD_BASE64)))) {
                 //special case of sequence of octets
                 result = true;
                 if (holder != null) {
@@ -645,5 +644,5 @@ public class ScopedNameVisitor extends VisitorBase {
         }
         holder.setSchemaType(stype);
     }
-        
+
 }

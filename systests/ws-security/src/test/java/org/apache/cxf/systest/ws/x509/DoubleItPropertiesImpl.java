@@ -23,29 +23,29 @@ import javax.jws.WebService;
 import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.feature.Features;
-
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")    
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 
 @EndpointProperties({
-    @EndpointProperty(key = "security.encryption.username", value = "alice"),
-    @EndpointProperty(key = "security.encryption.properties", value = "alice.properties"),
-    @EndpointProperty(key = "security.signature.properties", value = "bob.properties"),
-    @EndpointProperty(key = "security.callback-handler", 
+    @EndpointProperty(key = SecurityConstants.ENCRYPT_USERNAME, value = "alice"),
+    @EndpointProperty(key = SecurityConstants.ENCRYPT_PROPERTIES, value = "alice.properties"),
+    @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "bob.properties"),
+    @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
                       value = "org.apache.cxf.systest.ws.common.KeystorePasswordCallback")
 })
 public class DoubleItPropertiesImpl implements DoubleItPortType {
-    
+
     public int doubleIt(int numberToDouble) throws DoubleItFault {
         if (numberToDouble == 0) {
             throw new DoubleItFault("0 can't be doubled!");
         }
         return numberToDouble * 2;
     }
-    
+
 }

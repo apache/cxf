@@ -31,14 +31,14 @@ import javax.xml.bind.JAXBException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.common.ToolException; 
+import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.corba.common.ProcessorEnvironment;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.common.WSDLUtils;
 
 public class WSDLToCorbaProcessor extends WSDLToProcessor {
 
-    protected static final Logger LOG = LogUtils.getL7dLogger(WSDLToCorbaProcessor.class);    
+    protected static final Logger LOG = LogUtils.getL7dLogger(WSDLToCorbaProcessor.class);
     WSDLToCorbaBinding wsdlToCorbaBinding;
     WSDLToIDLAction idlAction;
     Definition definition;
@@ -46,7 +46,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
     String outputfile;
     String outputdir = ".";
     String wsdlOutput;
-    String idlOutput;    
+    String idlOutput;
     ProcessorEnvironment env;
 
     public void process() throws ToolException {
@@ -71,14 +71,14 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             setOutputFile();
             String filename = getFileBase(env.get("wsdlurl").toString());
             if ((wsdlOutput == null) && (wsdlToCorbaBinding != null)) {
-                wsdlOutput = new String(filename + "-corba.wsdl");
+                wsdlOutput = filename + "-corba.wsdl";
             }
             if ((idlOutput == null) && (idlAction != null)) {
-                idlOutput = new String(filename + ".idl");
+                idlOutput = filename + ".idl";
             }
 
             if (wsdlToCorbaBinding != null) {
-                wsdltoCorba();             
+                wsdltoCorba();
                 def = wsdlToCorbaBinding.generateCORBABinding();
                 writeToWSDL(def);
             }
@@ -88,17 +88,17 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
                 writeToIDL(def);
             }
         } catch (ToolException ex) {
-            throw ex;      
+            throw ex;
         } catch (JAXBException ex) {
-            throw new ToolException(ex);            
+            throw new ToolException(ex);
         } catch (Exception ex) {
             throw new ToolException(ex);
-        }                
+        }
     }
 
     private void writeToWSDL(Definition def) throws ToolException {
-        
-        
+
+
         try {
             WSDLUtils.writeWSDL(def, outputdir, wsdlOutput);
         } catch (Throwable t) {
@@ -111,7 +111,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
 
     }
 
-    
+
 
     public void wsdltoCorba() {
 
@@ -121,15 +121,15 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
         if (env.optionSet(ToolConstants.CFG_PORTTYPE)) {
             wsdlToCorbaBinding.addInterfaceName(env.get("porttype").toString());
         }
-        if ((env.optionSet(ToolConstants.CFG_PORTTYPE)) 
+        if ((env.optionSet(ToolConstants.CFG_PORTTYPE))
             && env.optionSet(ToolConstants.CFG_BINDING)) {
             wsdlToCorbaBinding.mapBindingToInterface(env.get("porttype").toString(), env.get("binding")
                 .toString());
-        }            
-        if ((!env.optionSet(ToolConstants.CFG_PORTTYPE)) 
+        }
+        if ((!env.optionSet(ToolConstants.CFG_PORTTYPE))
             && !env.optionSet(ToolConstants.CFG_BINDING)) {
-            wsdlToCorbaBinding.setAllBindings(true);            
-        }  
+            wsdlToCorbaBinding.setAllBindings(true);
+        }
         if (env.optionSet(ToolConstants.CFG_WSDLURL)) {
             wsdlToCorbaBinding.setWsdlFile(env.get("wsdlurl").toString());
         }
@@ -142,8 +142,8 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
         if (env.optionSet(ToolCorbaConstants.CFG_ADDRESSFILE)) {
             wsdlToCorbaBinding.setAddressFile(env.get("addressfile").toString());
         }
-        
-        
+
+
         // need to add wrapped
         wsdlToCorbaBinding.setOutputDirectory(getOutputDir());
         wsdlToCorbaBinding.setOutputFile(wsdlOutput);
@@ -167,25 +167,25 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
                 } else {
                     //try to get the binding name from the wsdlToCorbaBinding
                     java.util.List<String> bindingNames = wsdlToCorbaBinding.getGeneratedBindingNames();
-                    if ((bindingNames != null) && (bindingNames.size() > 0)) {
+                    if ((bindingNames != null) && (!bindingNames.isEmpty())) {
                         idlAction.setBindingName(bindingNames.get(0));
                         if (bindingNames.size() > 1) {
                             System.err.println("Warning: Generating idl only for the binding "
                                                + bindingNames.get(0));
                         }
                     } else {
-                        // generate idl for all bindings.                    
+                        // generate idl for all bindings.
                         idlAction.setGenerateAllBindings(true);
                     }
                 }
-                
+
             } else {
                 idlAction.setGenerateAllBindings(true);
             }
         }
         if (env.optionSet(ToolConstants.CFG_WSDLURL)) {
             String name = env.get("wsdlurl").toString();
-            idlAction.setWsdlFile(name);           
+            idlAction.setWsdlFile(name);
         }
         if (env.optionSet(ToolConstants.CFG_VERBOSE)) {
             idlAction.setVerboseOn(Boolean.TRUE);
@@ -208,7 +208,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
     private void setOutputFile() {
         wsdlOutput = (String)env.get(ToolCorbaConstants.CFG_WSDLOUTPUTFILE);
         idlOutput = (String)env.get(ToolCorbaConstants.CFG_IDLOUTPUTFILE);
-        if ((wsdlOutput == null) && (idlOutput == null)) {        
+        if ((wsdlOutput == null) && (idlOutput == null)) {
             LOG.log(Level.WARNING,
                     "Using default wsdl/idl filenames...");
         }
@@ -222,9 +222,9 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
             fileBase = tok.nextToken();
         }
         if (fileBase.endsWith(".wsdl")) {
-            fileBase = new String(fileBase.substring(0, fileBase.length() - 5));
+            fileBase = fileBase.substring(0, fileBase.length() - 5);
         }
         return fileBase;
     }
-    
+
 }

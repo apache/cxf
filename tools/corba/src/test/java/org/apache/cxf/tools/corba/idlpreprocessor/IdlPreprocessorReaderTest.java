@@ -29,9 +29,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class IdlPreprocessorReaderTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class IdlPreprocessorReaderTest {
 
     private URL findTestResource(String spec) {
         String location = "/idlpreprocessor/" + spec;
@@ -48,6 +52,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testResolvedInA() throws Exception {
         final String location = "A.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -55,6 +60,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMultiFileResolve() throws Exception {
         final String location = "B.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -62,6 +68,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testIfElseHandling() throws Exception {
         final String location = "C.idl";
         final IdlPreprocessorReader includeReader = createPreprocessorReader(location);
@@ -69,6 +76,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         assertExpectedPreprocessingResult(expectedResultLocation, includeReader);
     }
 
+    @Test
     public void testMaximumIncludeDepthIsDetected() throws IOException {
         final String location = "MaximumIncludeDepthExceeded.idl";
         try {
@@ -81,6 +89,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         }
     }
 
+    @Test
     public void testUnresolvableInclude() throws IOException {
         final String location = "UnresolvableInclude.idl";
         try {
@@ -93,9 +102,10 @@ public class IdlPreprocessorReaderTest extends TestCase {
             assertTrue(ex.getUrl().getPath().endsWith("/UnresolvableInclude.idl"));
         }
     }
-    
+
+    @Test
     public void testDefaultIncludeResolver() throws Exception {
-        final String location = "B.idl"; 
+        final String location = "B.idl";
         // uses <> notation for include
         final URL orig = findTestResource(location);
         final File origFile = new File(orig.toURI());
@@ -103,7 +113,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
                                   .substring(0, origFile.getAbsolutePath().indexOf(location)));
         final DefaultIncludeResolver includeResolver = new DefaultIncludeResolver(dir);
         final DefineState defineState = new DefineState(new HashMap<String, String>());
-        
+
         final IdlPreprocessorReader includeReader = new IdlPreprocessorReader(orig,
                                                                              location,
                                                                              includeResolver,
@@ -116,11 +126,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         final URL orig = findTestResource(location);
         final ClassPathIncludeResolver includeResolver = new ClassPathIncludeResolver();
         final DefineState defineState = new DefineState(new HashMap<String, String>());
-        final IdlPreprocessorReader preprocessor = new IdlPreprocessorReader(orig,
-                                                                             location,
-                                                                             includeResolver,
-                                                                             defineState);
-        return preprocessor;
+        return new IdlPreprocessorReader(orig, location, includeResolver, defineState);
     }
 
     private void assertExpectedPreprocessingResult(final String expectedResultLocation,

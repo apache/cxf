@@ -108,7 +108,7 @@ public class SourceSequence extends AbstractSequence {
      * Returns true if this sequence was constructed from an offer for an
      * inbound sequence includes in the CreateSequenceRequest in response to
      * which the sequence with the specified identifier was created.
-     * 
+     *
      * @param id the sequence identifier
      * @return true if the sequence was constructed from an offer.
      */
@@ -118,7 +118,7 @@ public class SourceSequence extends AbstractSequence {
 
     /**
      * Returns true if any messages other than the number supplied are waiting for acknowledgment.
-     * 
+     *
      * @param num message number to check
      * @return true if all messages have been acknowledged.
      */
@@ -126,7 +126,7 @@ public class SourceSequence extends AbstractSequence {
         if (currentMessageNumber != num) {
             return true;
         }
-        if (acknowledgement.getAcknowledgementRange().size() == 0) {
+        if (acknowledgement.getAcknowledgementRange().isEmpty()) {
             return false;
         }
         if (acknowledgement.getAcknowledgementRange().size() == 1) {
@@ -139,7 +139,7 @@ public class SourceSequence extends AbstractSequence {
     /**
      * Returns true if a last message had been sent for this sequence and if all
      * messages for this sequence have been acknowledged.
-     * 
+     *
      * @return true if all messages have been acknowledged.
      */
     public boolean allAcknowledged() {
@@ -157,7 +157,7 @@ public class SourceSequence extends AbstractSequence {
     /**
      * Used by the RM source to cache received acknowledgements for this
      * sequence.
-     * 
+     *
      * @param acknowledgement an acknowledgement for this sequence
      */
     public void setAcknowledged(SequenceAcknowledgement a) throws RMException {
@@ -184,7 +184,7 @@ public class SourceSequence extends AbstractSequence {
 
     /**
      * Returns the source associated with this source sequence.
-     * 
+     *
      * @return the source.
      */
     public Source getSource() {
@@ -201,7 +201,7 @@ public class SourceSequence extends AbstractSequence {
 
     /**
      * Returns true if the sequence is expired.
-     * 
+     *
      * @return true if the sequence is expired.
      */
 
@@ -225,7 +225,7 @@ public class SourceSequence extends AbstractSequence {
 
     /**
      * Returns the next message number and increases the message number.
-     * 
+     *
      * @return the next message number.
      */
     long nextMessageNumber() {
@@ -238,7 +238,7 @@ public class SourceSequence extends AbstractSequence {
      * response to the message with the specified message number in the sequence
      * specified by the by the identifier, and are used to decide if this
      * message should be the last in this sequence.
-     * 
+     *
      * @return the next message number.
      */
     public long nextMessageNumber(Identifier inSeqId, long inMsgNumber, boolean last) {
@@ -249,14 +249,14 @@ public class SourceSequence extends AbstractSequence {
             currentMessageNumber++;
             if (last) {
                 lastMessage = true;
-            } else { 
+            } else {
                 checkLastMessage(inSeqId, inMsgNumber);
-            } 
+            }
             result = currentMessageNumber;
         }
         return result;
     }
-    
+
     SequenceAcknowledgement getAcknowledgement() {
         return acknowledgement;
     }
@@ -268,16 +268,16 @@ public class SourceSequence extends AbstractSequence {
      * that originate from the sequnce source (i.e. TerminateSequence and
      * LastMessage, but not AckRequested or SequenceAcknowledgement as these are
      * orignate from the sequence destination).
-     * 
+     *
      * @param to
      */
-    synchronized void setTarget(EndpointReferenceType to) {
+    public synchronized void setTarget(EndpointReferenceType to) {
         if (target == null && !ContextUtils.isGenericAddress(to)) {
             target = to;
         }
     }
 
-    synchronized EndpointReferenceType getTarget() {
+    public synchronized EndpointReferenceType getTarget() {
         return target;
     }
 

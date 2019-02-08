@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -114,16 +115,16 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class SoapBindingFactory extends AbstractWSDLBindingFactory {
-    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
+    public static final Collection<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays.asList(
         "http://schemas.xmlsoap.org/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap12/",
         "http://schemas.xmlsoap.org/wsdl/soap/http",
         "http://www.w3.org/2003/05/soap/bindings/HTTP/",
-        "http://www.w3.org/2010/soapjms/"        
-    );
-    
-    
+        "http://www.w3.org/2010/soapjms/"
+    ));
+
+
     public static final String SOAP_11_BINDING = "http://schemas.xmlsoap.org/wsdl/soap/";
     public static final String SOAP_12_BINDING = "http://schemas.xmlsoap.org/wsdl/soap12/";
 
@@ -132,11 +133,11 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
     public SoapBindingFactory() {
     }
-    
+
     public SoapBindingFactory(Bus b) {
         super(b, DEFAULT_NAMESPACES);
     }
-    
+
     public BindingInfo createBindingInfo(ServiceInfo si, String bindingid, Object conf) {
         SoapBindingConfiguration config;
         if (conf instanceof SoapBindingConfiguration) {
@@ -155,9 +156,9 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         info.setName(config.getBindingName(si));
         info.setStyle(config.getStyle());
-       
+
         info.setTransportURI(config.getTransportURI());
-        
+
         if (config.isMtomEnabled()) {
             info.setProperty(Message.MTOM_ENABLED, Boolean.TRUE);
         }
@@ -243,13 +244,13 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             if (b.getInput() != null) {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getInput().getExtensors(SoapHeaderInfo.class);
-                if (headerInfos != null && headerInfos.size() > 0) {
-                    bodyParts = new ArrayList<String>();
+                if (headerInfos != null && !headerInfos.isEmpty()) {
+                    bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getInput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());
                     }
 
-                    for (SoapHeaderInfo headerInfo : headerInfos) { 
+                    for (SoapHeaderInfo headerInfo : headerInfos) {
                         SoapHeader soapHeader = SOAPBindingUtil.createSoapHeader(extensionRegistry,
                                                                                  BindingInput.class,
                                                                                  isSoap12);
@@ -279,12 +280,12 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             if (b.getOutput() != null) {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getOutput().getExtensors(SoapHeaderInfo.class);
-                if (headerInfos != null && headerInfos.size() > 0) {
-                    bodyParts = new ArrayList<String>();
+                if (headerInfos != null && !headerInfos.isEmpty()) {
+                    bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getOutput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());
                     }
-                    for (SoapHeaderInfo headerInfo : headerInfos) { 
+                    for (SoapHeaderInfo headerInfo : headerInfos) {
                         SoapHeader soapHeader = SOAPBindingUtil.createSoapHeader(extensionRegistry,
                                                                              BindingOutput.class,
                                                                              isSoap12);
@@ -318,7 +319,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                               BindingMessageInfo unwrappedBMsg,
                               MessageInfo msg,
                               SoapBindingConfiguration config) {
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> parts = new ArrayList<>();
         for (MessagePartInfo part : msg.getMessageParts()) {
             if (config.isHeader(op, part)) {
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
@@ -334,15 +335,12 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     }
 
     public Binding createBinding(BindingInfo binding) {
-        // TODO what about the mix style/use?
-
-
         // The default style should be doc-lit wrapped.
         String parameterStyle = SoapBindingConstants.PARAMETER_STYLE_WRAPPED;
         String bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;
 
         boolean hasWrapped = false;
-        
+
         org.apache.cxf.binding.soap.SoapBinding sb = null;
         SoapVersion version = null;
         if (binding instanceof SoapBindingInfo) {
@@ -356,7 +354,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
             boolean hasRPC = false;
             boolean hasDoc = false;
-            
+
             // Operation wide style, what to do with the mixed style/use?
             for (BindingOperationInfo boi : sbi.getOperations()) {
                 String st = sbi.getStyle(boi.getOperationInfo());
@@ -374,7 +372,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                     hasWrapped = true;
                 }
             }
-            
+
             if (Boolean.TRUE.equals(binding.getService().getProperty("soap.force.doclit.bare"))) {
                 hasDoc = true;
                 hasRPC = false;
@@ -385,7 +383,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 throw new RuntimeException("WSI-BP prohibits RPC and Document style "
                                            + "operations in same service.");
             }
-            
+
             //jms
             if (sbi.getTransportURI().equals(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID)) {
                 sb.getInInterceptors().add(new SoapJMSInInterceptor());
@@ -396,11 +394,12 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         sb.getOutFaultInterceptors().add(new StaxOutInterceptor());
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
+        sb.getOutFaultInterceptors().add(new AttachmentOutInterceptor());
 
         sb.getInInterceptors().add(new AttachmentInInterceptor());
         sb.getInInterceptors().add(new StaxInInterceptor());
         sb.getInInterceptors().add(new SoapActionInInterceptor());
-        
+
         sb.getOutInterceptors().add(new AttachmentOutInterceptor());
         sb.getOutInterceptors().add(new StaxOutInterceptor());
         sb.getOutInterceptors().add(SoapHeaderOutFilterInterceptor.INSTANCE);
@@ -413,7 +412,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             //sb.getInInterceptors().add(new BareInInterceptor());
             sb.getInInterceptors().add(new DocLiteralInInterceptor());
             if (hasWrapped) {
-                sb.getOutInterceptors().add(new WrappedOutInterceptor());                    
+                sb.getOutInterceptors().add(new WrappedOutInterceptor());
             }
             sb.getOutInterceptors().add(new BareOutInterceptor());
         } else {
@@ -440,7 +439,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             sb.getInFaultInterceptors().add(new Soap12FaultInInterceptor());
             sb.getOutFaultInterceptors().add(new Soap12FaultOutInterceptor());
         }
-        
+
         if (binding.getService() != null) {
             for (EndpointInfo ei : binding.getService().getEndpoints()) {
                 if (ei.getAddress() != null && ei.getAddress().startsWith("soap.udp")) {
@@ -457,10 +456,10 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         WSAddressingFeature add = new WSAddressingFeature();
         add.setAddressingRequired(true);
         add.initialize(p, bus);
-        
+
         // UDP has a strict size limit on messages (<64K) so we'll try to shrink the
         // message a little by putting the WSA namespace into the
-        // the soap:env which allows it to not be written on every header 
+        // the soap:env which allows it to not be written on every header
         // element as well as disable the output stream optimizations (doesn't really
         // matter on such small messages anyway) to make sure we pickup those
         // namespaces that are declared there.
@@ -473,9 +472,9 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 String ns = p.getNamespaceURI();
                 Map<String, String> nsMap = message.getEnvelopeNs();
                 if (nsMap == null) {
-                    nsMap = new HashMap<String, String>();
+                    nsMap = new HashMap<>();
                 } else {
-                    nsMap = new HashMap<String, String>(nsMap);
+                    nsMap = new HashMap<>(nsMap);
                 }
                 message.put("soap.env.ns.map", nsMap);
                 if (!nsMap.containsValue(ns)
@@ -488,7 +487,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         // don't send the optional ReplyTo headers if we don't need to either
         ei.setProperty("ws-addressing.write.optional.replyto", Boolean.FALSE);
     }
-    
+
     protected void addMessageFromBinding(ExtensibilityElement ext, BindingOperationInfo bop,
                                          boolean isInput) {
         SoapHeader header = SOAPBindingUtil.getSoapHeader(ext);
@@ -496,24 +495,24 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         ServiceInfo serviceInfo = bop.getBinding().getService();
 
         if (header != null && header.getMessage() == null) {
-            throw new RuntimeException("Problem with WSDL: soap:header element" 
+            throw new RuntimeException("Problem with WSDL: soap:header element"
                 + " for operation " + bop.getName() + " under binding " + bop.getBinding().getName()
                 + " does not contain a valid message attribute.");
         }
-        
+
         if (header != null && serviceInfo.getMessage(header.getMessage()) == null) {
             Definition def = (Definition)serviceInfo.getProperty(WSDLServiceBuilder.WSDL_DEFINITION);
             SchemaCollection schemas = serviceInfo.getXmlSchemaCollection();
 
             if (def != null && schemas != null) {
                 QName qn = header.getMessage();
-                
+
                 javax.wsdl.Message msg = findMessage(qn, def);
                 if (msg != null) {
                     addOutOfBandParts(bop, msg, schemas, isInput, header.getPart());
                     serviceInfo.refresh();
                 } else {
-                    throw new RuntimeException("Problem with WSDL: soap:header element" 
+                    throw new RuntimeException("Problem with WSDL: soap:header element"
                         + " for operation " + bop.getName()
                         + " is referring to an undefined wsdl:message element: " + qn);
                 }
@@ -523,7 +522,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     private javax.wsdl.Message findMessage(QName qn, Definition def) {
         javax.wsdl.Message msg = def.getMessage(qn);
         if (msg == null) {
-            msg = findMessage(qn, def, new ArrayList<Definition>());
+            msg = findMessage(qn, def, new ArrayList<>());
         }
         return msg;
     }
@@ -577,7 +576,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 }
             }
         }
-        
+
         if (isInput) {
             type = MessageInfo.Type.INPUT;
             minfo = bop.getOperationInfo().getInput();
@@ -596,7 +595,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         if (unwrapped == null) {
             return;
         }
-        
+
         nextId = 0;
         if (isInput) {
             minfo = unwrapped.getInput();
@@ -632,15 +631,15 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                               int nextId,
                               String partNameFilter) {
         for (Part part : cast(msg.getParts().values(), Part.class)) {
-            
+
             if (StringUtils.isEmpty(partNameFilter)
                 || part.getName().equals(partNameFilter)) {
-            
+
                 if (StringUtils.isEmpty(part.getName())) {
                     throw new RuntimeException("Problem with WSDL: part element in message "
-                                               + msg.getQName().getLocalPart() 
+                                               + msg.getQName().getLocalPart()
                                                + " does not specify a name.");
-                }                
+                }
                 QName pqname = new QName(minfo.getName().getNamespaceURI(), part.getName());
                 MessagePartInfo pi = minfo.getMessagePart(pqname);
                 if (pi != null
@@ -648,11 +647,11 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                     continue;
                 }
                 pi = minfo.addOutOfBandMessagePart(pqname);
-                
+
                 if (!minfo.getName().equals(msg.getQName())) {
                     pi.setMessageContainer(new MessageInfo(minfo.getOperation(), null, msg.getQName()));
                 }
-                
+
                 if (part.getTypeName() != null) {
                     pi.setTypeQName(part.getTypeName());
                     pi.setElement(false);
@@ -718,7 +717,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     private void initializeMessage(SoapBindingInfo bi, BindingOperationInfo boi, BindingMessageInfo bmsg) {
         MessageInfo msg = bmsg.getMessageInfo();
 
-        List<MessagePartInfo> messageParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> messageParts = new ArrayList<>();
         messageParts.addAll(msg.getMessageParts());
 
         List<SoapHeader> headers =
@@ -729,10 +728,10 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 headerInfo.setUse(header.getUse());
                 if (StringUtils.isEmpty(header.getPart())) {
                     throw new RuntimeException("Problem with WSDL: soap:header element in operation "
-                                               + boi.getName().getLocalPart() 
+                                               + boi.getName().getLocalPart()
                                                + " does not specify a part.");
                 }
-                MessagePartInfo part = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), 
+                MessagePartInfo part = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
                                                                     header.getPart()));
                 if (part != null && header.getMessage() != null
                     && !part.getMessageInfo().getName().equals(header.getMessage())) {
@@ -758,7 +757,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         SoapBodyInfo bodyInfo = new SoapBodyInfo();
         SoapBody soapBody = SOAPBindingUtil.getSoapBody(bmsg.getExtensors(ExtensibilityElement.class));
-        
+
         List<?> parts = null;
         if (soapBody == null) {
             MIMEMultipartRelated mmr = bmsg.getExtensor(MIMEMultipartRelated.class);
@@ -774,7 +773,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         // Initialize the body parts.
         List<MessagePartInfo> attParts = null;
         if (parts != null) {
-            List<MessagePartInfo> bodyParts = new ArrayList<MessagePartInfo>();
+            List<MessagePartInfo> bodyParts = new ArrayList<>();
             for (Iterator<?> itr = parts.iterator(); itr.hasNext();) {
                 Object part = itr.next();
                 if (part instanceof MIMEPart) {
@@ -792,8 +791,8 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
         bmsg.addExtensor(bodyInfo);
     }
-    
-    private List<MessagePartInfo> handleMimePart(MIMEPart mpart, 
+
+    private List<MessagePartInfo> handleMimePart(MIMEPart mpart,
                                                  List<MessagePartInfo> attParts,
                                                  MessageInfo msg,
                                                  BindingMessageInfo bmsg,
@@ -809,12 +808,12 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 partName = mc.getPart();
 
                 if (attParts == null) {
-                    attParts = new LinkedList<MessagePartInfo>();
+                    attParts = new LinkedList<>();
                 }
 
                 if (StringUtils.isEmpty(partName)) {
                     throw new RuntimeException("Problem with WSDL: mime content element in operation "
-                                               + bmsg.getBindingOperation().getName().getLocalPart() 
+                                               + bmsg.getBindingOperation().getName().getLocalPart()
                                                + " does not specify a part.");
                 }
 
@@ -840,17 +839,17 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
                 SoapHeaderInfo headerInfo = new SoapHeaderInfo();
                 headerInfo.setUse(header.getUse());
-                
+
                 if (StringUtils.isEmpty(header.getPart())) {
                     throw new RuntimeException("Problem with WSDL: soap:header element in operation "
-                                               + bmsg.getBindingOperation().getName().getLocalPart() 
+                                               + bmsg.getBindingOperation().getName().getLocalPart()
                                                + " does not specify a part.");
                 }
-                
+
                 MessagePartInfo mpi =
-                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(), 
+                    msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
                                                  header.getPart()));
-                
+
                 if (mpi != null && header.getMessage() != null
                     && !mpi.getMessageInfo().getName().equals(header.getMessage())) {
                     mpi = null;
@@ -873,7 +872,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
         }
         return attParts;
     }
-    
+
     private void addSoapBodyPart(MessageInfo msg, List<MessagePartInfo> bodyParts, String partName) {
         MessagePartInfo mpi = msg.getMessagePart(new QName(msg.getName().getNamespaceURI(),
                                                            partName));
@@ -884,9 +883,9 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
     public synchronized void addListener(Destination d, Endpoint e) {
         synchronized (d) {
             MessageObserver mo = d.getMessageObserver();
-            if (d.getAddress() != null 
-                && d.getAddress().getAddress() != null 
-                && d.getAddress().getAddress().getValue() != null 
+            if (d.getAddress() != null
+                && d.getAddress().getAddress() != null
+                && d.getAddress().getAddress().getValue() != null
                 && d.getAddress().getAddress().getValue().startsWith("soap.udp")) {
                 //soap.udp REQUIRES usage of WS-Addressing... we need to turn this on
                 setupUDP(e, e.getEndpointInfo());
@@ -898,7 +897,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
 
             if (mo instanceof ChainInitiationObserver) {
                 ChainInitiationObserver cio = (ChainInitiationObserver) mo;
-                
+
                 Binding b = e.getBinding();
                 Binding b2 = cio.getEndpoint().getBinding();
                 if (b == b2) {
@@ -911,50 +910,50 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 } else if (o == null) {
                     o = Boolean.FALSE;
                 }
-                if (b instanceof org.apache.cxf.binding.soap.SoapBinding 
+                if (b instanceof org.apache.cxf.binding.soap.SoapBinding
                     && b2 instanceof org.apache.cxf.binding.soap.SoapBinding
                     && ((org.apache.cxf.binding.soap.SoapBinding)b).getSoapVersion()
                         .equals(((org.apache.cxf.binding.soap.SoapBinding)b2).getSoapVersion())
                     && Boolean.FALSE.equals(o)) {
-                    
-                    throw new RuntimeException("Soap " 
+
+                    throw new RuntimeException("Soap "
                                                + ((org.apache.cxf.binding.soap.SoapBinding)b)
                                                    .getSoapVersion().getVersion()
                                                + " endpoint already registered on address "
                                                + e.getEndpointInfo().getAddress());
                 }
-                
+
                 MultipleEndpointObserver newMO = new MultipleEndpointObserver(getBus()) {
                     @Override
                     protected Message createMessage(Message message) {
                         return new SoapMessage(message);
                     }
                 };
-    
+
                 newMO.getBindingInterceptors().add(new AttachmentInInterceptor());
                 newMO.getBindingInterceptors().add(new StaxInInterceptor());
-    
+
                 // This will not work if one of the endpoints disables message
                 // processing. But, if you've disabled message processing, you
                 // probably aren't going to use this feature.
-                
+
                 newMO.getBindingInterceptors().add(new ReadHeadersInterceptor(getBus(), (SoapVersion)null));
                 newMO.getBindingInterceptors().add(new StartBodyInterceptor());
                 newMO.getBindingInterceptors().add(new CheckFaultInterceptor());
-    
+
                 // Add in a default selection interceptor
                 newMO.getRoutingInterceptors().add(new EndpointSelectionInterceptor());
-    
+
                 newMO.getEndpoints().add(cio.getEndpoint());
-    
+
                 mo = newMO;
             }
-    
+
             if (mo instanceof MultipleEndpointObserver) {
                 MultipleEndpointObserver meo = (MultipleEndpointObserver) mo;
                 meo.getEndpoints().add(e);
             }
-    
+
             d.setMessageObserver(mo);
         }
     }

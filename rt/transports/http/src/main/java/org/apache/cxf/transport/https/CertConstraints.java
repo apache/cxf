@@ -21,7 +21,6 @@ package org.apache.cxf.transport.https;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,21 +32,21 @@ import java.util.regex.Pattern;
  * a definition in schema and is so generated.
  */
 public class CertConstraints {
-    
+
     public enum Combinator { ANY, ALL };
 
     private static class DNConstraints {
-        
+
         /**
          * the matching combinator (ANY or ALL)
          */
         private final Combinator combinator;
-        
+
         /**
          * a collection of compiled regular expression patterns
          */
-        private final Collection<Pattern> dnPatterns = new ArrayList<java.util.regex.Pattern>();
-        
+        private final Collection<Pattern> dnPatterns = new ArrayList<>();
+
         /**
          * Creates a DNConstraints from a list of Strings
          */
@@ -64,7 +63,7 @@ public class CertConstraints {
                 dnPatterns.add(Pattern.compile(expression));
             }
         }
-        
+
         /**
          * @return      true if the DN name matches all patterns in the DNConstraints,
          *              if the combinator is ALL, or any such pattern, if the combinator is
@@ -106,17 +105,17 @@ public class CertConstraints {
             }
         }
     }
-    
+
     /**
      * The DNConstraints on the SubjectDN
      */
     private final DNConstraints subjectDNConstraints;
-    
+
     /**
      * The DNConstraints on the IssuerDN
      */
     private final DNConstraints issuerDNConstraints;
-    
+
     /**
      * Create a CertificateConstraints from a CertificateConstraintsType specification
      */
@@ -126,12 +125,12 @@ public class CertConstraints {
         final java.util.List<String> issuerConstraints,
         final Combinator issuerConstraintsCombinator
     ) throws java.util.regex.PatternSyntaxException {
-        this.subjectDNConstraints = 
+        this.subjectDNConstraints =
             new DNConstraints(subjectConstraints, subjectConstraintsCombinator);
-        this.issuerDNConstraints = 
+        this.issuerDNConstraints =
             new DNConstraints(issuerConstraints, issuerConstraintsCombinator);
     }
-    
+
     /**
      * @return      true if the certificate's SubjectDN matches the constraints defined in the
      *              subject DNConstraints and the certificate's IssuerDN matches the issuer
@@ -140,7 +139,7 @@ public class CertConstraints {
     public boolean matches(
         final java.security.cert.X509Certificate cert
     ) {
-        return 
+        return
             this.subjectDNConstraints.matches(cert.getSubjectX500Principal())
             && this.issuerDNConstraints.matches(cert.getIssuerX500Principal());
     }

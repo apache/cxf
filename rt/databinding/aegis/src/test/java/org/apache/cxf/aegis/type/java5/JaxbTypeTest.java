@@ -39,6 +39,11 @@ import org.apache.ws.commons.schema.constants.Constants;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JaxbTypeTest extends AbstractAegisTest {
     private TypeMapping tm;
     private Service service;
@@ -47,7 +52,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
- 
+
         Server s = createService(JaxbService.class);
         service = s.getEndpoint().getService();
         databinding = (AegisDatabinding) service.getDataBinding();
@@ -67,7 +72,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
 
         Iterator<QName> elements = info.getElements().iterator();
         assertTrue(elements.hasNext());
-        QName element = elements.next();
+        QName element = elements.next(); //1st element of 3 expected
         assertTrue(elements.hasNext());
 
         AegisType custom = info.getType(element);
@@ -76,10 +81,28 @@ public class JaxbTypeTest extends AbstractAegisTest {
             assertTrue(custom instanceof StringType);
         } else if ("elementProperty".equals(element.getLocalPart())) {
             assertTrue(custom instanceof CustomStringType);
+        } else if ("Annotated".equals(element.getLocalPart())) {
+            assertTrue(custom instanceof StringType);
         } else {
             fail("Unexpected element name: " + element.getLocalPart());
         }
-        element = elements.next();
+
+        assertTrue(elements.hasNext());
+        element = elements.next(); //2nd element of 3 expected
+        assertTrue(elements.hasNext());
+
+        custom = info.getType(element);
+
+        if ("bogusProperty".equals(element.getLocalPart())) {
+            assertTrue(custom instanceof StringType);
+        } else if ("elementProperty".equals(element.getLocalPart())) {
+            assertTrue(custom instanceof CustomStringType);
+        } else if ("Annotated".equals(element.getLocalPart())) {
+            assertTrue(custom instanceof StringType);
+        } else {
+            fail("Unexpected element name: " + element.getLocalPart());
+        }
+        element = elements.next();  //3rd element of 3 expected
         assertFalse(elements.hasNext());
 
         custom = info.getType(element);
@@ -88,6 +111,8 @@ public class JaxbTypeTest extends AbstractAegisTest {
             assertTrue(custom instanceof StringType);
         } else if ("elementProperty".equals(element.getLocalPart())) {
             assertTrue(custom instanceof CustomStringType);
+        } else if ("Annotated".equals(element.getLocalPart())) {
+            assertTrue(custom instanceof StringType);
         } else {
             fail("Unexpected element name: " + element.getLocalPart());
         }
@@ -164,6 +189,10 @@ public class JaxbTypeTest extends AbstractAegisTest {
         assertValid(
                     "//xsd:complexType[@name='JaxbBean1']/xsd:sequence/xsd:element"
                     + "[@name='bogusProperty']",
+                    wsdl);
+        assertValid(
+                    "//xsd:complexType[@name='JaxbBean1']/xsd:sequence/xsd:element"
+                    + "[@name='Annotated']",
                     wsdl);
 
         assertValid(

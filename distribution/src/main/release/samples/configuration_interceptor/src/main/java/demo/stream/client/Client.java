@@ -21,32 +21,39 @@ package demo.stream.client;
 
 import java.net.URL;
 import javax.xml.namespace.QName;
+
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
+import demo.stream.interceptor.StreamInterceptor;
 
 
 public final class Client {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
 
 
     private Client() {
-    } 
+    }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         URL wsdlURL = Client.class.getResource("/wsdl/hello_world.wsdl");
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
-        String resp; 
+
+        org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);
+        client.getInInterceptors().add(new StreamInterceptor());
+        client.getInFaultInterceptors().add(new StreamInterceptor());
 
         System.out.println("Invoking sayHi...");
-        resp = port.sayHi();
+        String resp = port.sayHi();
         System.out.println("Server responded with: " + resp);
         System.out.println();
-      
-        System.exit(0); 
+
+        System.exit(0);
     }
 
 }

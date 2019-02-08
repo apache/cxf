@@ -99,7 +99,7 @@ public class NettyServletContext implements ServletContext {
 
     public void addInitParameter(String name, String value) {
         if (this.initParameters == null) {
-            this.initParameters = new HashMap<String, String>();
+            this.initParameters = new HashMap<>();
         }
         this.initParameters.put(name, value);
     }
@@ -143,7 +143,7 @@ public class NettyServletContext implements ServletContext {
     @Override
     public void setAttribute(String name, Object object) {
         if (this.attributes == null) {
-            this.attributes = new HashMap<String, Object>();
+            this.attributes = new HashMap<>();
         }
         this.attributes.put(name, object);
     }

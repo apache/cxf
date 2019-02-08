@@ -38,11 +38,11 @@ import org.apache.ws.commons.schema.constants.Constants;
  * A simple databinding implementation which reads and writes Source objects.
  */
 public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBinding {
-    
+
     public static final String PREFERRED_FORMAT = "source-preferred-format";
 
     final Class<?> preferred;
-    
+
     public SourceDataBinding() {
         super();
         preferred = null;
@@ -69,7 +69,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
             } .walk();
         }
     }
-    
+
 
     @SuppressWarnings("unchecked")
     public <T> DataReader<T> createReader(Class<T> cls) {
@@ -83,7 +83,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
     }
 
     public Class<?>[] getSupportedReaderFormats() {
-        return new Class[] {XMLStreamReader.class, Node.class};
+        return new Class<?>[] {XMLStreamReader.class, Node.class};
     }
 
     @SuppressWarnings("unchecked")
@@ -92,13 +92,12 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
             return (DataWriter<T>) new XMLStreamDataWriter();
         } else if (cls == Node.class) {
             return (DataWriter<T>) new NodeDataWriter();
-        } else {
-            throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
         }
+        throw new UnsupportedOperationException("The type " + cls.getName() + " is not supported.");
     }
 
     public Class<?>[] getSupportedWriterFormats() {
-        return new Class[] {XMLStreamWriter.class, Node.class};
+        return new Class<?>[] {XMLStreamWriter.class, Node.class};
     }
 
 }

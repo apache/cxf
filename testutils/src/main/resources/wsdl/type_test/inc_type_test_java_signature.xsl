@@ -43,6 +43,9 @@
         <xsl:variable name="class_name">
             <xsl:value-of select="concat('Test', $the_name)"/>
         </xsl:variable>
+        <xsl:if test="@itst:noValidation='1'">
+            <xsl:text>&#10;    @org.apache.cxf.annotations.SchemaValidation(type = org.apache.cxf.annotations.SchemaValidation.SchemaValidationType.NONE) </xsl:text>
+        </xsl:if>
         <xsl:text>&#10;    public </xsl:text>
         <xsl:apply-templates select="." mode="javaType"/>
         <xsl:text> </xsl:text>

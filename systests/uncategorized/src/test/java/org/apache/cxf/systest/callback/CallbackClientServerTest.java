@@ -29,20 +29,24 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 import org.apache.callback.SOAPService;
 import org.apache.callback.ServerPortType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     public static final String CB_PORT = allocatePort(CallbackClientServerTest.class);
-    
-    private static final QName SERVICE_NAME 
+
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/callback", "SOAPService");
 
-    private static final QName PORT_NAME 
+    private static final QName PORT_NAME
         = new QName("http://apache.org/callback", "SOAPPort");
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
@@ -52,23 +56,23 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testCallback() throws Exception {
 
-                    
+
         Object implementor = new CallbackImpl();
         String address = "http://localhost:" + CB_PORT + "/CallbackContext/CallbackPort";
         Endpoint ep = Endpoint.publish(address, implementor);
-    
+
         URL wsdlURL = getClass().getResource("/wsdl/basic_callback_test.wsdl");
-    
+
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getPort(PORT_NAME, ServerPortType.class);
         updateAddressPort(port, PORT);
-   
 
-        EndpointReference w3cEpr = ep.getEndpointReference();              
+
+        EndpointReference w3cEpr = ep.getEndpointReference();
         String resp = port.registerCallback((W3CEndpointReference)w3cEpr);
         assertEquals("registerCallback called", resp);
-        ep.stop(); 
+        ep.stop();
     }
-    
-    
+
+
 }

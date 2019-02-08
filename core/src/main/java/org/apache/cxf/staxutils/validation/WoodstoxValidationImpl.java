@@ -31,14 +31,14 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * 
+ *
  */
 public class WoodstoxValidationImpl {
     private static final Logger LOG = LogUtils.getL7dLogger(WoodstoxValidationImpl.class);
-    
+
     private Stax2ValidationUtils utils;
 
-    
+
     public WoodstoxValidationImpl() {
         try {
             utils = new Stax2ValidationUtils();
@@ -60,7 +60,7 @@ public class WoodstoxValidationImpl {
         }
     }
 
-    public void setupValidation(XMLStreamWriter writer, 
+    public void setupValidation(XMLStreamWriter writer,
                                 Endpoint endpoint,
                                 ServiceInfo serviceInfo) throws XMLStreamException {
         if (utils != null && writer != null && !utils.setupValidation(writer, endpoint, serviceInfo)) {

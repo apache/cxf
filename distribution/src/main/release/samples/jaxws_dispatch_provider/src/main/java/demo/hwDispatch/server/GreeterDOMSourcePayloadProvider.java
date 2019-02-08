@@ -41,15 +41,17 @@ public class GreeterDOMSourcePayloadProvider implements Provider<DOMSource> {
         DOMSource response = new DOMSource();
         try {
             System.out.println("Incoming Client Request as a DOMSource data in PAYLOAD Mode");
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             StreamResult result = new StreamResult(System.out);
             transformer.transform(request, result);
             System.out.println("\n");
-            
-            InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp3.xml");
-            
-            SOAPMessage greetMeResponse =  MessageFactory.newInstance().createMessage(null, is);
-            is.close();            
+
+            SOAPMessage greetMeResponse = null;
+            try (InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp3.xml")) {
+                greetMeResponse = MessageFactory.newInstance().createMessage(null, is);
+            }
             response.setNode(greetMeResponse.getSOAPBody().extractContentAsDocument());
         } catch (Exception ex) {
             ex.printStackTrace();

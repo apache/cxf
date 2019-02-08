@@ -28,27 +28,27 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 
-@ManagedResource(componentName = "WorkQueueManager", 
-                 description = "The CXF manangement of work queues ", 
+@ManagedResource(componentName = "WorkQueueManager",
+                 description = "The CXF manangement of work queues ",
                  currencyTimeLimit = 15, persistPolicy = "OnUpdate", persistPeriod = 200)
-                 
-public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {    
+
+public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
     static final String NAME_VALUE = "Bus.WorkQueueManager";
     static final String TYPE_VALUE = "WorkQueueManager";
-    
+
     private WorkQueueManagerImpl wqManager;
     private Bus bus;
-    
+
     public WorkQueueManagerImplMBeanWrapper(WorkQueueManagerImpl wq) {
-        wqManager = wq;        
+        wqManager = wq;
         bus = wq.getBus();
     }
-    
+
     @ManagedOperation(currencyTimeLimit = 30)
     public void shutdown(boolean processRemainingWorkItems) {
-        wqManager.shutdown(processRemainingWorkItems); 
+        wqManager.shutdown(processRemainingWorkItems);
     }
-      
+
     public ObjectName getObjectName() throws JMException {
         StringBuilder buffer = new StringBuilder();
 
@@ -61,5 +61,5 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }
-    
+
 }

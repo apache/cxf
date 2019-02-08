@@ -67,7 +67,7 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
             return helper.getDerivedKey(headers);
         }
     }
-    
+
     protected static class EcdhHelper {
         private ECPublicKey peerPublicKey;
         private String ecurve;
@@ -92,27 +92,26 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
             ECPublicKey publicKey = (ECPublicKey)pair.getPublic();
             ECPrivateKey privateKey = (ECPrivateKey)pair.getPrivate();
             ContentAlgorithm jwtAlgo = ContentAlgorithm.valueOf(ctAlgo);
-        
+
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
             headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
-            headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(publicKey, ecurve));
-            
-            return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes, 
+            headers.setJsonWebKey("epk", JwkUtils.fromECPublicKey(publicKey, ecurve));
+
+            return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes,
                                        jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
-            
+
         }
         private byte[] toApuBytes(String apuString) {
             if (apuString != null) {
                 return toBytes(apuString);
-            } else {
-                return CryptoUtils.generateSecureRandomBytes(512 / 8);    
             }
-            
+            return CryptoUtils.generateSecureRandomBytes(512 / 8);
+
         }
         private byte[] toBytes(String str) {
             return str == null ? null : StringUtils.toBytesUTF8(str);
         }
-        
+
     }
-    
+
 }

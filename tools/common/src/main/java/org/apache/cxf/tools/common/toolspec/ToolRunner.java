@@ -30,7 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 public final class ToolRunner {
-    private static final Logger LOG = LogUtils.getL7dLogger(ToolRunner.class);
+    
     private ToolRunner() {
         // utility class - never constructed
     }
@@ -39,7 +39,7 @@ public final class ToolRunner {
                                boolean validate, String[] args) throws Exception {
         runTool(clz, toolspecStream, validate, args, true);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz, InputStream toolspecStream,
                                boolean validate, String[] args, OutputStream os) throws Exception {
         runTool(clz, toolspecStream, validate, args, true, null, os);
@@ -57,7 +57,7 @@ public final class ToolRunner {
                                boolean exitOnFinish) throws Exception {
         runTool(clz, toolspecStream, validate, args, true, null, null);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz,
                                InputStream toolspecStream,
                                boolean validate,
@@ -66,7 +66,7 @@ public final class ToolRunner {
                                ToolContext context) throws Exception {
         runTool(clz, toolspecStream, validate, args, exitOnFinish, context, null);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz,
                                InputStream toolspecStream,
                                boolean validate,
@@ -74,11 +74,12 @@ public final class ToolRunner {
                                boolean exitOnFinish,
                                ToolContext context,
                                OutputStream os) throws Exception {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
         ToolContainer container = null;
 
         try {
-            Constructor<? extends ToolContainer> cons 
+            Constructor<? extends ToolContainer> cons
                 = clz.getConstructor(
                                      new Class[] {
                                          ToolSpec.class
@@ -88,8 +89,9 @@ public final class ToolRunner {
                                             new ToolSpec(toolspecStream, validate)
                                         });
         } catch (Exception ex) {
-            Message message = new Message("CLZ_CANNOT_BE_CONSTRUCTED", LOG, clz.getName());
-            LOG.log(Level.SEVERE, message.toString());
+            Logger log = LogUtils.getL7dLogger(ToolRunner.class);
+            Message message = new Message("CLZ_CANNOT_BE_CONSTRUCTED", log, clz.getName());
+            log.log(Level.SEVERE, message.toString());
             throw new ToolException(message, ex);
         }
 

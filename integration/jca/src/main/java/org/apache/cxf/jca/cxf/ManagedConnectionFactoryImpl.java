@@ -30,7 +30,6 @@ import javax.resource.spi.ManagedConnection;
 import javax.security.auth.Subject;
 
 import org.apache.cxf.Bus;
-//import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -38,14 +37,14 @@ import org.apache.cxf.jca.core.resourceadapter.AbstractManagedConnectionFactoryI
 import org.apache.cxf.jca.core.resourceadapter.AbstractManagedConnectionImpl;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 
-public class ManagedConnectionFactoryImpl 
+public class ManagedConnectionFactoryImpl
     extends AbstractManagedConnectionFactoryImpl
     implements CXFManagedConnectionFactory {
 
     private static final long serialVersionUID = -891927761318109853L;
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedConnectionFactoryImpl.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ManagedConnectionFactoryImpl.class);
-    
+
     protected JCABusFactory jcaBusFactory;
 
     public ManagedConnectionFactoryImpl() {
@@ -61,7 +60,7 @@ public class ManagedConnectionFactoryImpl
     public void setLogLevel(String logLevel) {
         setProperty(LOG_LEVEL, logLevel);
     }
-    
+
     public void setEJBServicePropertiesURL(String name) {
         setProperty(EJB_SERVICE_PROPERTIES_URL, name);
     }
@@ -73,11 +72,11 @@ public class ManagedConnectionFactoryImpl
     public void setEJBServicePropertiesPollInterval(Integer pollInterval) {
         setProperty(MONITOR_POLL_INTERVAL, pollInterval.toString());
     }
-   
+
     public String getLogLevel() {
         return getPluginProps().getProperty(LOG_LEVEL);
     }
-        
+
     public String getEJBServicePropertiesURL() {
         return getPluginProps().getProperty(EJB_SERVICE_PROPERTIES_URL);
     }
@@ -87,18 +86,18 @@ public class ManagedConnectionFactoryImpl
     }
 
     public Integer getEJBServicePropertiesPollInterval() {
-        return Integer.valueOf(getPluginProps().getProperty(MONITOR_POLL_INTERVAL, 
+        return Integer.valueOf(getPluginProps().getProperty(MONITOR_POLL_INTERVAL,
                                                         DEFAULT_MONITOR_POLL_INTERVAL));
     }
-   
+
     public URL getEJBServicePropertiesURLInstance() throws ResourceException {
         return getPropsURL(getEJBServicePropertiesURL());
     }
-    
+
     public String getEJBServantBaseURL() throws ResourceException {
         return getPluginProps().getProperty(EJB_SERVANT_BASE_URL);
     }
-    
+
     public void setEJBServantBaseURL(String url) throws ResourceException {
         setProperty(EJB_SERVANT_BASE_URL, url);
     }
@@ -106,7 +105,7 @@ public class ManagedConnectionFactoryImpl
     // compliance: WL9 checks
     // need to ensure multiple instances with same config properties are equal
     // multiple instances with same config do not make sense to me
-   
+
 
     protected void validateReference(AbstractManagedConnectionImpl conn, javax.security.auth.Subject subj) {
     }
@@ -127,7 +126,7 @@ public class ManagedConnectionFactoryImpl
         return new ConnectionFactoryImpl(this, connMgr);
     }
 
-    public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo connReqInfo) 
+    public ManagedConnection createManagedConnection(Subject subject, ConnectionRequestInfo connReqInfo)
         throws ResourceException {
         LOG.info("create connection, subject=" + subject + " connReqInfo=" + connReqInfo);
         init(Thread.currentThread().getContextClassLoader());

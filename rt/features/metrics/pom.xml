@@ -3,13 +3,17 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <artifactId>cxf-rt-features-metrics</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Metrics Feature</name>
     <description>Apache CXF Metrics Feature</description>
+
+    <properties>
+        <cxf.module.name>org.apache.cxf.metrics</cxf.module.name>
+    </properties>
 
     <dependencies>
         <dependency>

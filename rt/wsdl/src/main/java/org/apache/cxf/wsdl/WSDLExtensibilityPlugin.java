@@ -20,12 +20,13 @@
 package org.apache.cxf.wsdl;
 
 import java.util.Map;
+
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 
 public interface WSDLExtensibilityPlugin {
-    void setExtensionRegistry(final ExtensionRegistry registry);
+    void setExtensionRegistry(ExtensionRegistry registry);
 
-    ExtensibilityElement createExtension(final Map<String, Object> args) throws WSDLException;
+    ExtensibilityElement createExtension(Map<String, Object> args) throws WSDLException;
 }

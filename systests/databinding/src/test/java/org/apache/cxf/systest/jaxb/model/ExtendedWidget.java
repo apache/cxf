@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 @XmlType(name = "extendedwidget", namespace = "http://cxf.org.apache/model")
@@ -38,7 +38,7 @@ public class ExtendedWidget extends Widget {
     private boolean extended = true;
 
     /**
-     * 
+     *
      */
     public ExtendedWidget() {
         super();
@@ -72,7 +72,7 @@ public class ExtendedWidget extends Widget {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -82,7 +82,7 @@ public class ExtendedWidget extends Widget {
             ExtendedWidget w = (ExtendedWidget)obj;
             ret = new EqualsBuilder().appendSuper(true).append(extended, w.extended).isEquals();
         }
-        
+
         return ret;
     }
 
@@ -92,7 +92,7 @@ public class ExtendedWidget extends Widget {
     }
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override

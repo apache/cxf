@@ -42,7 +42,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     private static final String PORT = NoSpringServletServer.PORT;
@@ -57,7 +60,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         serverBus = server.getBus();
         createStaticBus();
     }
-    
+
     @AfterClass
     public static void shutdownServer() throws Exception {
         if (server != null) {
@@ -91,7 +94,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         String reply = hello.sayHi(" Willem");
         assertEquals("Get the wrongreply ", reply, "get Willem");
     }
-    
+
     @Test
     public void testStartAndStopServer() throws Exception {
         stopServer();
@@ -107,7 +110,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         startServer();
         testHelloService();
     }
-    
+
     private void stopServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();
@@ -115,7 +118,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
             serv.stop();
         }
     }
-    
+
     private void startServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();
@@ -129,7 +132,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         WebConversation client = new WebConversation();
         WebResponse res = client.getResponse(serviceURL + "/services");
         WebLink[] links = res.getLinks();
-        Set<String> s = new HashSet<String>();
+        Set<String> s = new HashSet<>();
         for (WebLink l : links) {
             s.add(l.getURLString());
         }

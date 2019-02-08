@@ -21,7 +21,7 @@ package org.apache.cxf.tracing;
 public final class TracerHeaders {
     public static final String HEADER_SPAN_ID = "org.apache.cxf.tracing.header.span_id";
     public static final String DEFAULT_HEADER_SPAN_ID = "X-Span-Id";
-    
+
     private TracerHeaders() {
     }
 }

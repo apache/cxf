@@ -21,6 +21,11 @@ package org.apache.cxf.rs.security.oauth2.tokens.refresh;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OrderColumn;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -29,29 +34,30 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * Simple Refresh Token implementation
  */
+@Entity
 public class RefreshToken extends ServerAccessToken {
-    
+
     private static final long serialVersionUID = 2837120382251693874L;
-    private List<String> accessTokens = new LinkedList<String>();
-    
-    public RefreshToken(Client client, 
+    private List<String> accessTokens = new LinkedList<>();
+
+    public RefreshToken(Client client,
                         long lifetime) {
-        super(client, 
-              OAuthConstants.REFRESH_TOKEN_TYPE, 
-              OAuthUtils.generateRandomTokenKey(), 
-              lifetime, 
-              OAuthUtils.getIssuedAt());
+        super(client,
+                OAuthConstants.REFRESH_TOKEN_TYPE,
+                OAuthUtils.generateRandomTokenKey(),
+                lifetime,
+                OAuthUtils.getIssuedAt());
     }
-    
-    public RefreshToken(Client client, 
-                             String tokenKey,
-                             long lifetime, 
-                             long issuedAt) {
-        super(client, 
-              OAuthConstants.REFRESH_TOKEN_TYPE, 
-              tokenKey, 
-              lifetime, 
-              issuedAt);
+
+    public RefreshToken(Client client,
+                        String tokenKey,
+                        long lifetime,
+                        long issuedAt) {
+        super(client,
+                OAuthConstants.REFRESH_TOKEN_TYPE,
+                tokenKey,
+                lifetime,
+                issuedAt);
     }
 
     public RefreshToken(ServerAccessToken token,
@@ -60,10 +66,13 @@ public class RefreshToken extends ServerAccessToken {
         super(validateTokenType(token, OAuthConstants.REFRESH_TOKEN_TYPE), key);
         this.accessTokens = accessTokens;
     }
+
     public RefreshToken() {
-        
+
     }
-    
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getAccessTokens() {
         return accessTokens;
     }
@@ -71,12 +80,12 @@ public class RefreshToken extends ServerAccessToken {
     public void setAccessTokens(List<String> accessTokens) {
         this.accessTokens = accessTokens;
     }
-    
+
     public void addAccessToken(String token) {
-        accessTokens.add(token);
+        getAccessTokens().add(token);
     }
-    
+
     public boolean removeAccessToken(String token) {
-        return accessTokens.remove(token);
+        return getAccessTokens().remove(token);
     }
 }

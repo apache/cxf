@@ -24,8 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Can be used to add custom XML processing 
- * instructions to out-bound XML messages 
+ * Can be used to add custom XML processing
+ * instructions to out-bound XML messages
  */
 @Target({ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

@@ -50,29 +50,30 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
- * Unit test for testing DocLiteralInInterceptor to use Source Data Binding 
- * 
+ * Unit test for testing DocLiteralInInterceptor to use Source Data Binding
+ *
  */
-public class DocLiteralInInterceptorTest extends Assert {
-    
+public class DocLiteralInInterceptorTest {
+
     private static final String NS = "http://cxf.apache.org/wsdl-first/types";
     protected IMocksControl control;
-    
+
     @Before
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
     }
-    
-    @After 
+
+    @After
     public void tearDown() throws Exception {
         control.verify();
     }
@@ -81,10 +82,10 @@ public class DocLiteralInInterceptorTest extends Assert {
     public void testUnmarshalSourceData() throws Exception {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getClass()
             .getResourceAsStream("resources/multiPartDocLitBareReq.xml"));
-        
+
         assertEquals(XMLStreamConstants.START_ELEMENT, reader.nextTag());
-        
-        XMLStreamReader filteredReader = new PartialXMLStreamReader(reader, 
+
+        XMLStreamReader filteredReader = new PartialXMLStreamReader(reader,
              new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
 
         // advance the xml reader to the message parts
@@ -93,34 +94,34 @@ public class DocLiteralInInterceptorTest extends Assert {
 
         Message m = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
-        
+
         Service service = control.createMock(Service.class);
         exchange.put(Service.class, service);
         EasyMock.expect(service.getDataBinding()).andReturn(new SourceDataBinding());
         EasyMock.expect(service.size()).andReturn(0).anyTimes();
         EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
-        
+
         Endpoint endpoint = control.createMock(Endpoint.class);
         exchange.put(Endpoint.class, endpoint);
-        
+
         OperationInfo operationInfo = new OperationInfo();
         operationInfo.setProperty("operation.is.synthetic", Boolean.TRUE);
-        MessageInfo messageInfo = new MessageInfo(operationInfo, Type.INPUT, 
+        MessageInfo messageInfo = new MessageInfo(operationInfo, Type.INPUT,
                                                   new QName("http://foo.com", "bar"));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo1"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo2"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo3"), null));
         messageInfo.addMessagePart(new MessagePartInfo(new QName("http://foo.com", "partInfo4"), null));
-        
+
         for (MessagePartInfo mpi : messageInfo.getMessageParts()) {
             mpi.setMessageContainer(messageInfo);
         }
-        
+
         operationInfo.setInput("inputName", messageInfo);
-        
+
         BindingOperationInfo boi = new BindingOperationInfo(null, operationInfo);
         exchange.put(BindingOperationInfo.class, boi);
-        
+
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         BindingInfo binding = control.createMock(BindingInfo.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
@@ -129,40 +130,40 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
         EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        
+
         ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
         EasyMock.expect(endpointInfo.getService()).andReturn(serviceInfo).anyTimes();
-        
+
         EasyMock.expect(serviceInfo.getName()).andReturn(new QName("http://foo.com", "service")).anyTimes();
         InterfaceInfo interfaceInfo = control.createMock(InterfaceInfo.class);
         EasyMock.expect(serviceInfo.getInterface()).andReturn(interfaceInfo).anyTimes();
         EasyMock.expect(interfaceInfo.getName())
             .andReturn(new QName("http://foo.com", "interface")).anyTimes();
-        
+
         EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
         EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
-        
-        List<OperationInfo> operations = new ArrayList<OperationInfo>();
+
+        List<OperationInfo> operations = new ArrayList<>();
         EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
-        
+
         m.setExchange(exchange);
         m.put(Message.SCHEMA_VALIDATION_ENABLED, false);
         m.setContent(XMLStreamReader.class, reader);
 
         control.replay();
-        
+
         new DocLiteralInInterceptor().handleMessage(m);
-        
+
         MessageContentsList params = (MessageContentsList)m.getContent(List.class);
-        
+
         assertEquals(4, params.size());
-        assertEquals("StringDefaultInputElem", 
+        assertEquals("StringDefaultInputElem",
                      ((DOMSource)params.get(0)).getNode().getFirstChild().getNodeName());
-        assertEquals("IntParamInElem", 
-                     ((DOMSource)params.get(1)).getNode().getFirstChild().getNodeName());        
+        assertEquals("IntParamInElem",
+                     ((DOMSource)params.get(1)).getNode().getFirstChild().getNodeName());
     }
-    
-        
+
+
     @Test
     public void testUnmarshalSourceDataWrapped() throws Exception {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getClass()
@@ -206,7 +207,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         messageInfoWrapper.addMessagePart(new MessagePartInfo(new QName(NS, "GetPerson"), null));
         messageInfoWrapper.getMessagePart(0).setConcreteName(new QName(NS, "GetPerson"));
         operationInfoWrapper.setInput("inputName", messageInfoWrapper);
-        operationInfoWrapper.setUnwrappedOperation(operationInfo);       
+        operationInfoWrapper.setUnwrappedOperation(operationInfo);
 
         ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
 
@@ -233,7 +234,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();
         EasyMock.expect(endpointInfo.getProperty("URI", URI.class)).andReturn(new URI("dummy")).anyTimes();
 
-        List<OperationInfo> operations = new ArrayList<OperationInfo>();
+        List<OperationInfo> operations = new ArrayList<>();
         EasyMock.expect(interfaceInfo.getOperations()).andReturn(operations).anyTimes();
 
         m.setExchange(exchange);
@@ -248,16 +249,16 @@ public class DocLiteralInInterceptorTest extends Assert {
 
         // we expect a wrapped document
         assertEquals(1, params.size());
-        
-        Map<String, String> ns = new HashMap<String, String>();
+
+        Map<String, String> ns = new HashMap<>();
         ns.put("ns", NS);
 
         XPathUtils xu = new XPathUtils(ns);
-        assertEquals("hello", xu.getValueString("//ns:GetPerson/ns:personId", 
+        assertEquals("hello", xu.getValueString("//ns:GetPerson/ns:personId",
                                                 ((DOMSource)params.get(0)).getNode().getFirstChild()));
-        assertEquals("1234", xu.getValueString("//ns:GetPerson/ns:ssn", 
+        assertEquals("1234", xu.getValueString("//ns:GetPerson/ns:ssn",
                                                ((DOMSource)params.get(0)).getNode().getFirstChild()));
 
     }
-    
+
 }

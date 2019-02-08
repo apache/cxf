@@ -32,8 +32,8 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rt.security.claims.Claim;
@@ -77,41 +77,44 @@ import org.apache.cxf.ws.security.sts.provider.model.ValidateTargetType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * In this test, a token (UsernameToken or SAMLToken) is validated and transformed into a SAML Assertion.
  */
-public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+public class ValidateTokenTransformationUnitTest {
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    private static final QName QNAME_WST_STATUS = 
+    private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
-    
+
     /**
      * Test to successfully validate a UsernameToken and transform it into a SAML Assertion.
      */
     @org.junit.Test
     public void testUsernameTokenTransformation() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         validateOperation.setTokenProviders(providerList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -122,80 +125,80 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(usernameTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+        RequestSecurityTokenResponseType response =
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
-    
+
     /**
-     * Test to successfully validate a UsernameToken (which was issued in realm "A") and 
+     * Test to successfully validate a UsernameToken (which was issued in realm "A") and
      * transform it into a SAML Assertion in Realm "B".
      */
     @org.junit.Test
     public void testUsernameTokenTransformationRealm() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         UsernameTokenValidator validator = new UsernameTokenValidator();
         validator.setUsernameTokenRealmCodec(new CustomUsernameTokenRealmCodec());
         validatorList.add(validator);
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -208,60 +211,60 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         stsProperties.setRealmParser(new CustomRealmParser());
         stsProperties.setIdentityMapper(new CustomIdentityMapper());
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(usernameTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Validate a token - this will fail as the tokenProvider doesn't understand how to handle
         // realm "B"
         try {
-            validateOperation.validate(request, webServiceContext);
+            validateOperation.validate(request, principal, msgCtx);
         } catch (STSException ex) {
             // expected
         }
-        
+
         samlTokenProvider.setRealmMap(createSamlRealms());
-        RequestSecurityTokenResponseType response = validateOperation.validate(request, webServiceContext);
+        RequestSecurityTokenResponseType response = validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -277,7 +280,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     public void testUsernameTokenTransformationClaims() throws Exception {
         runUsernameTokenTransformationClaims(false);
     }
-    
+
     /**
      * Test to successfully validate a UsernameToken and transform it into a SAML Assertion.
      * Required claims are a child of SecondaryParameters element
@@ -286,8 +289,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     public void testUsernameTokenTransformationClaimsSecondaryParameters() throws Exception {
         runUsernameTokenTransformationClaims(true);
     }
-    
-    
+
+
     /**
      * Test to successfully validate a SAML 2 Token issued by realm "A" and
      * transform it into a SAML 2 token (realm "B")
@@ -299,7 +302,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         throws Exception {
         runValidateSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentity(true);
     }
-    
+
     /**
      * Test to successfully validate a SAML 2 Token issued by realm "A" and
      * transform it into a SAML 2 token (realm "B")
@@ -314,8 +317,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     }
 
 
-    
-    
+
+
     /**
      * Test to successfully validate a SAML 2 Token issued by realm "A" and
      * transform it into a SAML 2 token (realm "B")
@@ -324,22 +327,22 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testValidateSaml2TokenOnBehalfOfSaml2DifferentRealmFederateClaims() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         Map<String, RealmProperties> realms = createSamlRealms();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList =
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -349,12 +352,12 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         validateOperation.setServices(Collections.singletonList(service));
-        
+
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         relationshipList.add(rs);
-        
+
         // Add STSProperties object
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         STSPropertiesMBean stsProperties = createSTSPropertiesMBean(crypto);
@@ -362,40 +365,40 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         stsProperties.setIdentityMapper(new CustomIdentityMapper());
         stsProperties.setRelationships(relationshipList);
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)new CustomClaimsHandler()));
         validateOperation.setClaimsManager(claimsManager);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Add a ClaimsType
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
-        
+
         Document doc = DOMUtils.createDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
-        
-        JAXBElement<ClaimsType> claimsTypeJaxb = 
+
+        JAXBElement<ClaimsType> claimsTypeJaxb =
             new JAXBElement<ClaimsType>(
                 QNameConstants.CLAIMS, ClaimsType.class, claimsType
             );
         request.getAny().add(claimsTypeJaxb);
-        
+
         //request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+        Element samlToken =
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -404,40 +407,39 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(samlString.contains("alice"));
         assertTrue(samlString.contains("doe"));
         assertTrue(samlString.contains(SAML2Constants.CONF_BEARER));
-        
+
         // Add SAML token as ValidateTarget element
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(samlToken);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
-        
+
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
-        // run the test
-        RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+
+        // Validate a token
+        RequestSecurityTokenResponseType response =
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -445,31 +447,31 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("DOE"));  //claim changed (to uppercase)
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
-    
-    
-    
+
+
+
     /**
      * Test to successfully validate a UsernameToken and transform it into a SAML Assertion with claims.
      */
     private void runUsernameTokenTransformationClaims(boolean useSecondaryParameters) throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
-       
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
+
+        List<AttributeStatementProvider> customProviderList =
+            new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -480,62 +482,62 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         validateOperation.setClaimsManager(claimsManager);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        Object claims = 
+        Object claims =
             useSecondaryParameters ? createClaimsElementInSecondaryParameters() : createClaimsElement();
-            
+
         request.getAny().add(claims);
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(usernameTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("ted");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("ted"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+        RequestSecurityTokenResponseType response =
+            validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -543,27 +545,27 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
         assertTrue(tokenString.contains(ClaimTypes.LASTNAME.toString()));
     }
-    
-    
+
+
     private void runValidateSaml2TokenOnBehalfOfSaml2DifferentRealmFederateIdentity(
             boolean useGlobalIdentityMapper) throws WSSecurityException {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         Map<String, RealmProperties> realms = createSamlRealms();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList =
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
         validateOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -573,58 +575,58 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         validateOperation.setServices(Collections.singletonList(service));
-        
+
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         rs.setType(Relationship.FED_TYPE_IDENTITY);
         rs.setIdentityMapper(new CustomIdentityMapper());
         relationshipList.add(rs);
-        
+
         // Add STSProperties object
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         STSPropertiesMBean stsProperties = createSTSPropertiesMBean(crypto);
         stsProperties.setRealmParser(new CustomRealmParser());
         if (useGlobalIdentityMapper) {
             stsProperties.setIdentityMapper(new CustomIdentityMapper());
-        } else { 
+        } else {
             stsProperties.setRelationships(relationshipList);
-        }    
+        }
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)new CustomClaimsHandler()));
         validateOperation.setClaimsManager(claimsManager);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
-                QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
+                QNameConstants.TOKEN_TYPE, String.class, WSS4JConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Add a ClaimsType
         ClaimsType claimsType = new ClaimsType();
         claimsType.setDialect(STSConstants.IDT_NS_05_05);
-        
+
         Document doc = DOMUtils.createDocument();
         Element claimType = createClaimsType(doc);
         claimsType.getAny().add(claimType);
-        
-        JAXBElement<ClaimsType> claimsTypeJaxb = 
+
+        JAXBElement<ClaimsType> claimsTypeJaxb =
             new JAXBElement<ClaimsType>(
                 QNameConstants.CLAIMS, ClaimsType.class, claimsType
             );
         request.getAny().add(claimsTypeJaxb);
-        
+
         //request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // create a SAML Token via the SAMLTokenProvider which contains claims
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
+        Element samlToken =
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms);
         Document docToken = samlToken.getOwnerDocument();
         samlToken = (Element)docToken.appendChild(samlToken);
@@ -633,40 +635,39 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(samlString.contains("alice"));
         assertTrue(samlString.contains("doe"));
         assertTrue(samlString.contains(SAML2Constants.CONF_BEARER));
-        
+
         // Add SAML token as ValidateTarget element
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(samlToken);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
-        
+
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
-        // run the test
-        RequestSecurityTokenResponseType response = 
-            validateOperation.validate(request, webServiceContext);
+
+        // Validate a token
+        RequestSecurityTokenResponseType response =
+            validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -674,8 +675,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains("doe"));  //claim unchanged but requested
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
-    
-    
+
+
     /*
      * Create a security context object
      */
@@ -689,7 +690,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     private Relationship createRelationship() {
         Relationship rs = new Relationship();
         ClaimsMapper claimsMapper = new CustomClaimsMapper();
@@ -699,8 +700,8 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         rs.setType(Relationship.FED_TYPE_CLAIMS);
         return rs;
     }
-    
-    
+
+
     /*
      * Create STSPropertiesMBean object
      */
@@ -714,10 +715,10 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         return stsProperties;
     }
-    
+
     private Map<String, RealmProperties> createSamlRealms() {
         // Create Realms
-        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> samlRealms = new HashMap<>();
         RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
@@ -726,13 +727,13 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         samlRealms.put("B", samlRealm);
         return samlRealms;
     }
-    
+
     /**
      * Return true if the response has a valid status, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
@@ -746,91 +747,85 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         }
         return false;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
+
     private JAXBElement<UsernameTokenType> createUsernameToken(String name, String password) {
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue(name);
         usernameToken.setUsername(username);
-        
+
         // Add a password
         PasswordString passwordString = new PasswordString();
         passwordString.setValue(password);
-        passwordString.setType(WSConstants.PASSWORD_TEXT);
-        JAXBElement<PasswordString> passwordType = 
+        passwordString.setType(WSS4JConstants.PASSWORD_TEXT);
+        JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, passwordString
             );
         usernameToken.getAny().add(passwordType);
-        
-        JAXBElement<UsernameTokenType> tokenType = 
-            new JAXBElement<UsernameTokenType>(
+
+        return new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
-        return tokenType;
     }
-    
+
     /*
      * Mock up a DOM Element containing some claims
      */
     private JAXBElement<ClaimsType> createClaimsElement() {
-        Document doc = DOMUtils.createDocument();
-        
-        Element claimType = createClaimsType(doc);        
-       
+        Document doc = DOMUtils.getEmptyDocument();
+
+        Element claimType = createClaimsType(doc);
+
         ClaimsType claims = new ClaimsType();
         claims.setDialect(STSConstants.IDT_NS_05_05);
         claims.getAny().add(claimType);
-        
-        JAXBElement<ClaimsType> claimsType =
-            new JAXBElement<ClaimsType>(
+
+        return new JAXBElement<ClaimsType>(
                     QNameConstants.CLAIMS, ClaimsType.class, claims
             );
-        
-        return claimsType;
     }
-    
+
     /*
      * Mock up a SecondaryParameters DOM Element containing some claims
      */
     private Element createClaimsElementInSecondaryParameters() {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element secondary = doc.createElementNS(STSConstants.WST_NS_05_12, "SecondaryParameters");
-        secondary.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
-        
+        secondary.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.WST_NS_05_12);
+
         Element claims = doc.createElementNS(STSConstants.WST_NS_05_12, "Claims");
         claims.setAttributeNS(null, "Dialect", STSConstants.IDT_NS_05_05);
-        
+
         Element claimType = createClaimsType(doc);
-        
+
         claims.appendChild(claimType);
         secondary.appendChild(claims);
 
         return secondary;
     }
-    
+
     private Element createClaimsType(Document doc) {
         Element claimType = doc.createElementNS(STSConstants.IDT_NS_05_05, "ClaimType");
         claimType.setAttributeNS(
             null, "Uri", ClaimTypes.LASTNAME.toString()
         );
-        claimType.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
-        
+        claimType.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns", STSConstants.IDT_NS_05_05);
+
         return claimType;
     }
-    
+
     /*
      * Mock up an SAML assertion element
      */
@@ -838,44 +833,44 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
             String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler,
             Map<String, RealmProperties> realms
     ) throws WSSecurityException {
-        
+
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = 
-            new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList =
+            new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                     tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
         if (realms != null) {
             providerParameters.setRealm("A");
         }
-        
+
         // Set the ClaimsManager
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
-        
+
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim requestClaim = new Claim();
         requestClaim.setClaimType(ClaimTypes.LASTNAME);
         requestClaim.setOptional(false);
         requestedClaims.add(requestClaim);
         providerParameters.setRequestedSecondaryClaims(requestedClaims);
-        
+
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
     }
-    
+
     private TokenProviderParameters createProviderParameters(
-            String tokenType, String keyType, Crypto crypto, 
+            String tokenType, String keyType, Crypto crypto,
             String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -892,8 +887,7 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 
@@ -909,6 +903,6 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
 
         return parameters;
     }
-    
-    
+
+
 }

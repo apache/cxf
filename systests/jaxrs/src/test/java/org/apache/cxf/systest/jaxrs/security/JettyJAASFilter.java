@@ -39,11 +39,10 @@ public class JettyJAASFilter extends JAASAuthenticationFilter {
                         throw new RuntimeException(e);
                     }
                     return true;
-                } else {
-                    return false;
                 }
+                return false;
             }
         };
     }
-    
+
 }

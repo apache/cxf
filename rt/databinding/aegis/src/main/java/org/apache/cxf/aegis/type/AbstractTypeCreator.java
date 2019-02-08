@@ -89,7 +89,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         info.setDescription("field " + f.getName() + " in  " + f.getDeclaringClass());
         return info;
     }
-    
+
     public TypeClassInfo createBasicClassInfo(Type type) {
         TypeClassInfo info = new TypeClassInfo();
         Class<?> typeClass = TypeUtil.getTypeClass(type, false);
@@ -104,7 +104,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
     public AegisType createTypeForClass(TypeClassInfo info) {
-        
+
         Class<?> javaClass = TypeUtil.getTypeRelatedClass(info.getType());
         AegisType result = null;
         boolean newType = true;
@@ -127,7 +127,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             result = getTypeMapping().getType(javaClass);
         } else {
             AegisType type = getTypeMapping().getType(info.getType());
-            if (type == null 
+            if (type == null
                 || (info.getTypeName() != null && !type.getSchemaType().equals(info.getTypeName()))) {
                 if (info.getTypeName() != null) {
                     type = getTypeMapping().getType(info.getTypeName());
@@ -203,10 +203,10 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
             return type;
         } catch (InstantiationException e) {
-            throw new DatabindingException("Couldn't instantiate type classs " 
+            throw new DatabindingException("Couldn't instantiate type classs "
                                            + info.getAegisTypeClass().getName(), e);
         } catch (IllegalAccessException e) {
-            throw new DatabindingException("Couldn't access type classs " 
+            throw new DatabindingException("Couldn't access type classs "
                                            + info.getAegisTypeClass().getName(), e);
         }
     }
@@ -222,11 +222,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         } else {
             type.setMinOccurs(typeConfiguration.getDefaultMinOccurs());
         }
-        
+
         if (info.getMaxOccurs() != -1) {
             type.setMaxOccurs(info.getMaxOccurs());
         }
-        
+
         type.setFlat(info.isFlat());
 
         return type;
@@ -266,7 +266,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         if (info.getMaxOccurs() != -1) {
             type.setMaxOccurs(info.getMaxOccurs());
         }
-        
+
         type.setFlat(info.isFlat());
 
         return type;
@@ -310,8 +310,8 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected QName createMapQName(TypeClassInfo info, AegisType keyType, AegisType valueType) {
         String name = keyType.getSchemaType().getLocalPart() + '2' + valueType.getSchemaType().getLocalPart();
-        
-        
+
+
         Class<?> cls = TypeUtil.getTypeRelatedClass(info.getType());
         name += cls.getSimpleName();
 
@@ -373,7 +373,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     /**
      * Create a AegisType for a Method parameter.
-     * 
+     *
      * @param m the method to create a type for
      * @param index The parameter index. If the index is less than zero, the
      *            return type is used.
@@ -393,7 +393,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     /**
      * Create type information for a PropertyDescriptor.
-     * 
+     *
      * @param pd the propertydescriptor
      */
     public AegisType createType(PropertyDescriptor pd) {
@@ -404,7 +404,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     /**
      * Create type information for a <code>Field</code>.
-     * 
+     *
      * @param f the field to create a type from
      */
     public AegisType createType(Field f) {
@@ -412,11 +412,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         info.setDescription("field " + f.getName() + " in " + f.getDeclaringClass());
         return createTypeForClass(info);
     }
-    
+
     /**
      * Create an Aegis type from a reflected type description.
      * This will only work for the restricted set of collection
-     * types supported by Aegis. 
+     * types supported by Aegis.
      * @param t the reflected type.
      * @return the type
      */
@@ -425,7 +425,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         info.setType(t);
         info.setDescription("reflected type " + t.toString());
         return createTypeForClass(info);
-        
+
     }
 
     public AegisType createType(Class<?> clazz) {

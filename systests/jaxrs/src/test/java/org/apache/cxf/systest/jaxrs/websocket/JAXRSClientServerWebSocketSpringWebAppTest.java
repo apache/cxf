@@ -32,6 +32,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * JAXRSClientServerWebSocket test with jaxrs:server using the jetty webapp server.
  */
@@ -43,7 +45,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
     public static void startServers() throws Exception {
         startServers(PORT);
     }
-    
+
     protected static void startServers(String port) throws Exception {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(port));
 
@@ -63,13 +65,13 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         server.setHandler(handlers);
         server.start();
     }
-    
+
     @AfterClass
     public static void stopServers() throws Exception {
         server.stop();
         server.destroy();
     }
-    
+
     @Test
     public void testGetBookHTTP() throws Exception {
         String address = "http://localhost:" + getPort() + getContext() + "/http/web/bookstore/books/1";
@@ -78,7 +80,7 @@ public class JAXRSClientServerWebSocketSpringWebAppTest extends JAXRSClientServe
         Book book = wc.get(Book.class);
         assertEquals(1L, book.getId());
     }
-    
+
     protected String getPort() {
         return PORT;
     }

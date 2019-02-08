@@ -28,25 +28,25 @@ import org.apache.cxf.message.Message;
 import org.apache.neethi.Assertion;
 
 /**
- * 
+ *
  */
 public interface PolicyInterceptorProvider extends InterceptorProvider {
     /**
      * Returns a collection of QNames describing the xml schema types of the assertions that
      * this interceptor implements.
-     * 
+     *
      * @return collection of QNames of known assertion types
      */
     Collection<QName> getAssertionTypes();
 
     /**
-     * Return false if the message does not contain enough contextual configuration to preemtively 
+     * Return false if the message does not contain enough contextual configuration to preemtively
      * support the given assertion.  Otherwise, return true.  If false, the PolicyEngine.supportsAlternative
-     * method will not select this policy and will attempt a different alternative. 
-     * 
-     * Example: If the context does not contain login information, an assertion that requires it 
-     * could return false to allow the Alternative selection algorithms to try a different alternative. 
-     * @param msg The contextual message, may be null if no message is in context at this point 
+     * method will not select this policy and will attempt a different alternative.
+     *
+     * Example: If the context does not contain login information, an assertion that requires it
+     * could return false to allow the Alternative selection algorithms to try a different alternative.
+     * @param msg The contextual message, may be null if no message is in context at this point
      * @param assertion
      * @return
      */

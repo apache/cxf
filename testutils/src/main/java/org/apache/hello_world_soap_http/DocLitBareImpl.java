@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
+
 import org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 
@@ -31,30 +32,30 @@ public class DocLitBareImpl implements PutLastTradedPricePortType {
     int sayHiCount;
     int putLastTradedPriceCount;
     int bareNoParamCallCount;
-    
+
     public void sayHi(Holder<TradePriceData> inout) {
         ++sayHiCount;
         inout.value.setTickerPrice(4.5f);
         inout.value.setTickerSymbol("APACHE");
     }
-    
+
     public void putLastTradedPrice(TradePriceData body) {
         ++putLastTradedPriceCount;
     }
-    
+
     public int getSayHiInvocationCount() {
-        return sayHiCount; 
+        return sayHiCount;
     }
-    
+
     public int getPutLastTradedPriceCount() {
-        return putLastTradedPriceCount; 
+        return putLastTradedPriceCount;
     }
-    
+
     public String bareNoParam() {
         bareNoParamCallCount++;
         return "testSuccess";
     }
-    
+
     public int getBareNoParamCount() {
         return bareNoParamCallCount;
     }

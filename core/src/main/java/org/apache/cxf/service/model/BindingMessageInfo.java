@@ -26,7 +26,7 @@ public class BindingMessageInfo extends AbstractPropertiesHolder {
     MessageInfo msg;
     BindingOperationInfo op;
     private List<MessagePartInfo> messageParts;
-    
+
     public BindingMessageInfo() {
     }
 
@@ -35,11 +35,11 @@ public class BindingMessageInfo extends AbstractPropertiesHolder {
         msg = m;
         messageParts = msg.getMessageParts();
     }
-    
+
     public MessageInfo getMessageInfo() {
         return msg;
     }
-    
+
     public BindingOperationInfo getBindingOperation() {
         return op;
     }

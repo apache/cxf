@@ -28,13 +28,13 @@ import org.apache.cxf.rs.security.oauth.data.RequestTokenRegistration;
 import org.apache.cxf.rs.security.oauth.data.Token;
 
 /**
- * OAuth provider responsible for persisting the information about 
+ * OAuth provider responsible for persisting the information about
  * OAuth consumers, request and access tokens.
  */
 public interface OAuthDataProvider {
 
     /**
-     * Returns the previously registered third-party {@link Client} 
+     * Returns the previously registered third-party {@link Client}
      * @param clientId the client id
      * @return Client
      * @throws OAuthServiceException
@@ -44,7 +44,7 @@ public interface OAuthDataProvider {
     /**
      * Creates a temporarily request token which will capture the
      * information about the {@link Client} attempting to access or
-     * modify the resource owner's resource 
+     * modify the resource owner's resource
      * @param reg RequestTokenRegistration
      * @return new request token
      * @see RequestTokenRegistration
@@ -64,18 +64,18 @@ public interface OAuthDataProvider {
      * Sets the verifier confirming the resource owner's agreement for
      * the {@link Client} to perform the action as represented by
      * the provided {@link RequestToken}. The runtime will report
-     * this verifier to the client who will exchange it for 
+     * this verifier to the client who will exchange it for
      * a new {@link AccessToken}
-     *    
+     *
      * @param data AuthorizationInput
      * @return the generated verifier
      * @throws OAuthServiceException
      */
     String finalizeAuthorization(AuthorizationInput data) throws OAuthServiceException;
-    
+
     /**
      * Creates a new {@link AccessToken}
-     * @param reg {@link AccessTokenRegistration} instance which captures 
+     * @param reg {@link AccessTokenRegistration} instance which captures
      *        a request token approved by the resource owner
      * @return new AccessToken
      * @throws OAuthServiceException
@@ -84,7 +84,7 @@ public interface OAuthDataProvider {
 
     /**
      * Returns the {@link AccessToken}
-     * @param accessToken the token key 
+     * @param accessToken the token key
      * @return AccessToken
      * @throws OAuthServiceException
      */
@@ -96,5 +96,5 @@ public interface OAuthDataProvider {
      * @throws OAuthServiceException
      */
     void removeToken(Token token) throws OAuthServiceException;
-    
+
 }

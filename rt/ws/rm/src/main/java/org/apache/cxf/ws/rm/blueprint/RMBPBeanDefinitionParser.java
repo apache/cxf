@@ -36,18 +36,18 @@ import org.osgi.service.blueprint.reflect.Metadata;
 
 /**
  * This class provides some common functions used by the two BP bean definition parsers
- * in this package. 
- * 
+ * in this package.
+ *
  */
 public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
     protected static final String RM_NS = "http://cxf.apache.org/ws/rm/manager";
 
     private Class<?> beanClass;
-    
+
     public RMBPBeanDefinitionParser(Class<?> beanClass) {
         this.beanClass = beanClass;
     }
-    
+
     protected Metadata parse(Element element, ParserContext context) {
         MutableBeanMetadata bean = context.createMetadata(MutableBeanMetadata.class);
 
@@ -62,17 +62,17 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
                 new QName(RM_NS, "deliveryAssurance"), "deliveryAssurance", DeliveryAssuranceType.class);
         mapElementToJaxbProperty(context, bean, element,
                 new QName(RM_NS, "sourcePolicy"), "sourcePolicy", SourcePolicyType.class);
-        mapElementToJaxbProperty(context, bean, element, 
+        mapElementToJaxbProperty(context, bean, element,
                 new QName(RM_NS, "destinationPolicy"), "destinationPolicy", DestinationPolicyType.class);
         mapElementToJaxbProperty(context, bean, element, new QName(RM_NS, "RM10AddressingNamespace"),
                 "RM10AddressingNamespace", RM10AddressingNamespaceType.class);
-        mapElementToJaxbProperty(context, bean, element, 
-                new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
+        mapElementToJaxbProperty(context, bean, element,
+                new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"),
                 "RMAssertion",
                 org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
         // TODO: handle
 //        mapElementToJaxbProperty(context, bean, element,
-//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
+//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"),
 //                "RMAssertion",
 //                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
 
@@ -80,7 +80,7 @@ public class RMBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
         parseChildElements(element, context, bean);
 
         bean.setId(beanClass.getName() + context.generateId());
-        
+
         if (beanClass.equals(RMManager.class)) {
             bean.addProperty("bus", getBusRef(context, bus));
             bean.setDestroyMethod("shutdown");

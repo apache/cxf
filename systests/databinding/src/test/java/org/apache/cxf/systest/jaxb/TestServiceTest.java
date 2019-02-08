@@ -28,23 +28,27 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.systest.jaxb.model.ExtendedWidget;
 import org.apache.cxf.systest.jaxb.model.Widget;
+import org.apache.cxf.systest.jaxb.service.PropertyOrderException;
 import org.apache.cxf.systest.jaxb.service.TestService;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = { "classpath:extrajaxbclass.xml" })
 public class TestServiceTest extends AbstractJUnit4SpringContextTests {
     static final String PORT = TestUtil.getPortNumber(TestServiceTest.class);
-
+    private static TestLoggingEventSender fault = new TestLoggingEventSender();
     private TestUtilities testUtilities;
 
     public TestServiceTest() {
@@ -63,16 +67,46 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
     @Test
     public void testExtraSubClassWithJaxbFromEndpoint() throws Throwable {
         Widget expected = new ExtendedWidget(42, "blah", "blah", true, true);
-            
+
         TestService testClient = getTestClient();
         ((BindingProvider)testClient).getRequestContext()
-            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                  "http://localhost:" + PORT + "/service/TestEndpoint");
         Widget widgetFromService = testClient.getWidgetById(42);
 
         Assert.assertEquals(expected, widgetFromService);
     }
 
+    @Test
+    public void testExceptionPropertyOrder() throws Throwable {
+        ((Bus)applicationContext.getBean("cxf")).getOutFaultInterceptors().add(new LoggingOutInterceptor(fault));
+        TestService testClient = getTestClient();
+        ((BindingProvider)testClient).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                              "http://localhost:" + PORT
+                                                                  + "/service/TestEndpoint");
+        try {
+            testClient.echo("Exception");
+        } catch (PropertyOrderException e) {
+            Assert.assertTrue("Expect <message> element is before <data> element :" + fault.getMessage(),
+                              fault.getMessage().indexOf("</message><data") > -1);
+        }
+    }
+
+    
+    static class TestLoggingEventSender implements LogEventSender {
+        private String logMessage;
+
+        public String getMessage() {
+            return logMessage;
+        }
+        public void clearMessage() {
+            logMessage = null;
+        }
+        @Override
+        public void send(LogEvent event) {
+            logMessage = event.getPayload();
+        }
+    }
     
     @Test
     public void testSchema() throws Exception {
@@ -80,13 +114,13 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
         String s = IOUtils.toString(url.openStream());
         Assert.assertTrue(s, s.contains("application/octet-stream"));
     }
-    
+
     @Test
     public void testAutoFaultBeanProperties() throws Exception {
         testUtilities.setBus((Bus)applicationContext.getBean("cxf"));
         testUtilities.addDefaultNamespaces();
         testUtilities.addNamespace("ts", "http://cxf.org.apache/service");
-        Server s = testUtilities.getServerForService(new QName("http://cxf.org.apache/service", 
+        Server s = testUtilities.getServerForService(new QName("http://cxf.org.apache/service",
                                                                "TestServiceService"));
         Document wsdl = testUtilities.getWSDLDocument(s);
         testUtilities.assertInvalid("//xsd:complexType[@name='TestServiceException']"

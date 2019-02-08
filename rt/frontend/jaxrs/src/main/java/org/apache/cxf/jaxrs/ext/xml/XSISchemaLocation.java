@@ -24,24 +24,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can be used to simplify adding 
+ * This annotation can be used to simplify adding
  * xsi:schemaLocation attributes
  */
 @Target({ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface XSISchemaLocation {
     /**
-     * Schema location 
+     * Schema location
      * By default it is assumed to be relative to a base URI of the web application
      */
     String value();
-    
+
     /**
-     * If the location is relative and this property is set to true then 
+     * If the location is relative and this property is set to true then
      * the location will be resolved against the base URI of the web application
      */
     boolean resolve() default true;
-    
+
     /**
      * Can be used to get xsi:noNamespaceSchemaLocation produced.
      * By default, xsi:schemaLocation will be set.

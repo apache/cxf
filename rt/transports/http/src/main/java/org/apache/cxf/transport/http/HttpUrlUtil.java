@@ -19,11 +19,11 @@
 package org.apache.cxf.transport.http;
 
 public final class HttpUrlUtil {
-    
+
     private HttpUrlUtil() {
         // Util class
     }
-    
+
     public static boolean checkContextPath(String urlName, String target) {
         String pathString = urlName;
         if (!pathString.endsWith("/")) {

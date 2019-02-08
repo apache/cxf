@@ -23,31 +23,33 @@ import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class ToolContextTest extends Assert {
+
+public class ToolContextTest {
 
     ToolContext context = new ToolContext();
 
     @Before
-    public void setUp() {        
+    public void setUp() {
         context.setParameters(new HashMap<String, Object>());
     }
-    
+
     @Test
     public void testGetQName() throws Exception {
         assertNull(context.getQName(ToolConstants.CFG_SERVICENAME));
-        
+
         context.put(ToolConstants.CFG_SERVICENAME, "SoapService");
-        QName qname = context.getQName(ToolConstants.CFG_SERVICENAME);        
+        QName qname = context.getQName(ToolConstants.CFG_SERVICENAME);
         assertEquals(new QName(null, "SoapService"), qname);
-        
+
         qname = context.getQName(ToolConstants.CFG_SERVICENAME, "http://cxf.org");
         assertEquals(new QName("http://cxf.org", "SoapService"), qname);
-        
+
         context.put(ToolConstants.CFG_SERVICENAME, "http://apache.org=SoapService");
         qname = context.getQName(ToolConstants.CFG_SERVICENAME);
         assertEquals(new QName("http://apache.org", "SoapService"), qname);

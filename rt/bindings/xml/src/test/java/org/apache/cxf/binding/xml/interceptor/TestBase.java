@@ -37,6 +37,7 @@ import org.apache.cxf.binding.xml.XMLBindingFactory;
 import org.apache.cxf.binding.xml.wsdl11.XMLWSDLExtensionLoader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -51,27 +52,29 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public class TestBase extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public class TestBase {
 
     protected PhaseInterceptorChain chain;
 
     protected Message xmlMessage;
-    
+
     protected Bus bus;
 
     protected IMocksControl control;
-    
+
     protected ServiceInfo serviceInfo;
-    
+
     @Before
     public void setUp() throws Exception {
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
         Phase phase3 = new Phase("phase3", 3);
@@ -85,6 +88,10 @@ public class TestBase extends Assert {
         messageImpl.setInterceptorChain(chain);
         messageImpl.setExchange(exchange);
         xmlMessage = messageImpl;
+        if (JavaUtils.isJava11Compatible()) {
+            //we need this property with JDK11 and easymock4
+            System.setProperty("org.easymock.cglib.experimental_asm7", "true");
+        }
     }
 
     @After
@@ -112,26 +119,26 @@ public class TestBase extends Assert {
         }
         return null;
     }
-    
+
     protected void common(String wsdl, QName portName, Class<?>... jaxbClasses) throws Exception {
         control = EasyMock.createNiceControl();
-        
+
         bus = control.createMock(Bus.class);
-        
+
         WSDLManagerImpl manager = new WSDLManagerImpl();
         XMLWSDLExtensionLoader.registerExtensors(manager);
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(manager);
-        
+
         BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        
-        control.replay();        
-        
+
+        control.replay();
+
         assertNotNull(bus.getExtension(WSDLManager.class));
-        
-        WSDLServiceFactory factory = 
+
+        WSDLServiceFactory factory =
             new WSDLServiceFactory(bus, getClass().getResource(wsdl).toString(),
                                    new QName(portName.getNamespaceURI(), "XMLService"));
 
@@ -153,13 +160,13 @@ public class TestBase extends Assert {
         EasyMock.expect(endpoint.getBinding()).andStubReturn(xmlBinding);
         EasyMock.expect(endpoint.getService()).andStubReturn(service);
         EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        
+
 
         control.replay();
 
         xmlMessage.getExchange().put(Endpoint.class, endpoint);
         xmlMessage.getExchange().put(org.apache.cxf.service.Service.class, service);
-        
+
 
     }
 }

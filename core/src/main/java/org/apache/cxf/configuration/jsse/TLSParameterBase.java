@@ -36,7 +36,7 @@ public class TLSParameterBase {
     protected KeyManager[]    keyManagers;
     protected TrustManager[]  trustManagers;
     protected String          provider;
-    protected List<String>    ciphersuites = new ArrayList<String>();
+    protected List<String>    ciphersuites = new ArrayList<>();
     protected FiltersType     cipherSuiteFilters;
     protected CertificateConstraintsType certConstraints;
     protected SecureRandom    secureRandom;
@@ -48,10 +48,10 @@ public class TLSParameterBase {
      */
     public final void setJsseProvider(String prov) {
         provider = prov;
-    }   
+    }
 
     /**
-     * Return the JSSE provider.  
+     * Return the JSSE provider.
      */
     public String getJsseProvider() {
         return provider;
@@ -79,7 +79,7 @@ public class TLSParameterBase {
     public final void setTrustManagers(TrustManager[] trustMgrs) {
         trustManagers = trustMgrs;
     }
-    
+
     /**
      * Returns the TrustManagers associated with the endpoint.
      */
@@ -94,27 +94,27 @@ public class TLSParameterBase {
     public final void setCipherSuites(List<String> cs) {
         ciphersuites = cs;
     }
-    
+
     /**
      * Returns the CipherSuites associated with this endpoint.
      */
     public List<String> getCipherSuites() {
         if (ciphersuites == null) {
-            ciphersuites = new ArrayList<String>();
+            ciphersuites = new ArrayList<>();
         }
         return ciphersuites;
     }
 
     /**
-     * This parameter sets the filter to include and/or exclude the 
+     * This parameter sets the filter to include and/or exclude the
      * cipher suites to use from the set list or system defaults.
      */
     public final void setCipherSuitesFilter(FiltersType filters) {
         cipherSuiteFilters = filters;
     }
-    
+
     /**
-     * Returns the cipher suites filter 
+     * Returns the cipher suites filter
      */
     public FiltersType getCipherSuitesFilter() {
         return cipherSuiteFilters;
@@ -127,14 +127,14 @@ public class TLSParameterBase {
     public final void setSecureRandom(SecureRandom random) {
         secureRandom = random;
     }
-    
+
     /**
      * Get the certificate constraints type
      */
     public CertificateConstraintsType getCertConstraints() {
         return certConstraints;
     }
-    
+
     /**
      * Set the certificate constraints type
      */
@@ -164,7 +164,7 @@ public class TLSParameterBase {
     public String getSecureSocketProtocol() {
         return protocol;
     }
-    
+
     /**
      * This parameter configures the cert alias used on server side
      * this is useful when keystore has multiple certs
@@ -172,7 +172,7 @@ public class TLSParameterBase {
     public final void setCertAlias(String ctAlias) {
         certAlias = ctAlias;
     }
-    
+
     /**
      * This parameter retrieves the cert alias specified on server side
      */

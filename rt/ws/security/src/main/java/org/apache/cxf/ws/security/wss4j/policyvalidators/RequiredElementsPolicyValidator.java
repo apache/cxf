@@ -22,12 +22,16 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.wss4j.policy.SP11Constants;
@@ -38,17 +42,17 @@ import org.apache.wss4j.policy.model.RequiredElements;
  * Validate a RequiredElements policy
  */
 public class RequiredElementsPolicyValidator implements SecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.REQUIRED_ELEMENTS.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.REQUIRED_ELEMENTS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -56,9 +60,15 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
         for (AssertionInfo ai : ais) {
             RequiredElements rp = (RequiredElements)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
                 XPathFactory factory = XPathFactory.newInstance();
+                try {
+                    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+                } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+                    // ignore
+                }
+
                 for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
                     Map<String, String> namespaces = xPath.getPrefixNamespaceMap();
                     String expression = xPath.getXPath();
@@ -68,9 +78,11 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
                         xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                     }
                     NodeList list;
+                    Element header = parameters.getSoapHeader();
+                    header = (Element)DOMUtils.getDomElement(header);
                     try {
-                        list = (NodeList)xpath.evaluate(expression, 
-                                                                 parameters.getSoapHeader(),
+                        list = (NodeList)xpath.evaluate(expression,
+                                                                 header,
                                                                  XPathConstants.NODESET);
                         if (list.getLength() == 0) {
                             ai.setNotAsserted("No header element matching XPath " + expression + " found.");
@@ -82,5 +94,5 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
             }
         }
     }
-    
+
 }

@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
-public class JarLoaderTest extends Assert {
+
+public class JarLoaderTest {
     private static final Logger LOG = LogUtils.getLogger(JarLoaderTest.class);
     private URL exampleRarURL;
 
@@ -38,8 +41,8 @@ public class JarLoaderTest extends Assert {
     @Before
     public void setUp() throws Exception {
         exampleRarURL = getClass().getClassLoader().getResource("blackbox-notx.rar");
-    }    
-        
+    }
+
     @Test
     public void testGetBytesFromImputStream() throws Exception {
         byte[] bytes = JarLoader.getBytesFromInputStream(exampleRarURL
@@ -52,7 +55,7 @@ public class JarLoaderTest extends Assert {
     @Test
     public void testGetJarContents() throws Exception {
         String urlPath = exampleRarURL.toString();
-        
+
         LOG.info("URLPath: " + urlPath);
 
         Map<?, ?> map = JarLoader.getJarContents(urlPath + "!/blackbox-notx.jar!/");

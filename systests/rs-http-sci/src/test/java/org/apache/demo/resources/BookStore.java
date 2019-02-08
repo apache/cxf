@@ -31,5 +31,5 @@ public class BookStore {
     @Produces(MediaType.APPLICATION_JSON)
     public Book getBook(@PathParam("bookId") String id) {
         return new Book("Book with id " + id, id);
-    }    
+    }
 }

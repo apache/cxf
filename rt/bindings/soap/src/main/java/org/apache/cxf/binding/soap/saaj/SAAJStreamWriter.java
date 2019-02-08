@@ -18,86 +18,150 @@
  */
 package org.apache.cxf.binding.soap.saaj;
 
+import java.util.Iterator;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.OverlayW3CDOMStreamWriter;
+import org.apache.cxf.staxutils.W3CNamespaceContext;
+
+import static org.apache.cxf.binding.soap.saaj.SAAJUtils.adjustPrefix;
+
 
 public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     private final SOAPPart part;
+    private final SOAPEnvelope envelope;
+    private String uri;
+
 
     public SAAJStreamWriter(SOAPPart part) {
         super(part);
         this.part = part;
+        Node nd = part.getFirstChild();
+        if (nd == null) {
+            isOverlaid = false;
+        }
+        envelope = null;
     }
     public SAAJStreamWriter(SOAPPart part, Element current) {
         super(part, current);
         this.part = part;
+        envelope = null;
+    }
+    public SAAJStreamWriter(SOAPEnvelope env, DocumentFragment frag) {
+        super(env.getOwnerDocument(), frag);
+        this.part = null;
+        this.envelope = env;
+        isOverlaid = false;
+    }
+    public SAAJStreamWriter(SOAPEnvelope env, Element cur) {
+        super(env.getOwnerDocument(), cur);
+        this.part = null;
+        this.envelope = env;
+        isOverlaid = false;
     }
 
-    private SOAPElement adjustPrefix(SOAPElement e, String prefix) {
-        if (prefix == null) {
-            prefix = "";
-        }
-        try {
-            String s = e.getPrefix();
-            if (!prefix.equals(s)) {
-                e.setPrefix(prefix);
-                e.removeNamespaceDeclaration(s);
+    @Override
+    public String getPrefix(String nsuri) throws XMLStreamException {
+        if (isOverlaid && part != null && getCurrentNode() == null) {
+            Node nd = part.getFirstChild();
+            while (nd != null) {
+                if (nd instanceof Element) {
+                    Iterator<String> it = new W3CNamespaceContext((Element)nd).getPrefixes(nsuri);
+                    if (it.hasNext()) {
+                        return it.next();
+                    }
+                    nd = null;
+                } else {
+                    nd = nd.getNextSibling();
+                }
             }
-        } catch (Throwable t) {
-            //likely old old version of SAAJ, we'll just try our best
         }
-        return e;
+        return super.getPrefix(nsuri);
     }
+    private String getEnvelopeURI() throws SOAPException {
+        if (uri == null) {
+            uri = getEnvelope().getElementName().getURI();
+        }
+        return uri;
+    }
+    private SOAPEnvelope getEnvelope() throws SOAPException {
+        if (envelope == null) {
+            return part.getEnvelope();
+        }
+        return envelope;
+    }
+
     protected void adjustOverlaidNode(Node nd2, String pfx) {
         String namespace = nd2.getNamespaceURI();
         try {
-            if (namespace != null 
-                && namespace.equals(part.getEnvelope().getElementName().getURI())) {
-                adjustPrefix((SOAPElement)nd2, pfx);
+            if (namespace != null
+                && namespace.equals(getEnvelopeURI())) {
+                adjustPrefix((Element)nd2, pfx);
+                if ("Envelope".equals(nd2.getLocalName())) {
+                    adjustPrefix(getEnvelope().getHeader(), pfx);
+                }
             }
         } catch (SOAPException e) {
             //ignore, fallback
         }
         super.adjustOverlaidNode(nd2, pfx);
     }
-    
+
     protected void createAndAddElement(String prefix, String local, String namespace) {
+        if (part == null) {
+            super.createAndAddElement(prefix, local, namespace);
+            return;
+        }
         try {
-            if (namespace != null 
-                && namespace.equals(part.getEnvelope().getElementName().getURI())) {
+            if (namespace != null
+                && namespace.equals(getEnvelopeURI())) {
                 if ("Envelope".equals(local)) {
-                    setChild(adjustPrefix(part.getEnvelope(), prefix), false);
-                    adjustPrefix(part.getEnvelope().getHeader(), prefix);
+                    setChild(adjustPrefix(getEnvelope(), prefix), false);
+                    adjustPrefix(getEnvelope().getHeader(), prefix);
+                    adjustPrefix(getEnvelope().getBody(), prefix);
+                    if (getEnvelope().getHeader() != null) {
+                        getEnvelope().removeChild(getEnvelope().getHeader());
+                    }
+                    if (getEnvelope().getBody() != null) {
+                        getEnvelope().removeChild(getEnvelope().getBody());
+                    }
+
                     return;
                 } else if ("Body".equals(local)) {
-                    setChild(adjustPrefix(part.getEnvelope().getBody(), prefix), false);
+                    if (getEnvelope().getBody() == null) {
+                        getEnvelope().addBody();
+                    }
+                    setChild(adjustPrefix(getEnvelope().getBody(), prefix), false);
                     return;
                 } else if ("Header".equals(local)) {
-                    if (part.getEnvelope().getHeader() == null) {
-                        part.getEnvelope().addHeader();
+                    if (getEnvelope().getHeader() == null) {
+                        getEnvelope().addHeader();
                     }
-                    setChild(adjustPrefix(part.getEnvelope().getHeader(), prefix), false);
+                    setChild(adjustPrefix(getEnvelope().getHeader(), prefix), false);
                     return;
                 } else if ("Fault".equals(local)) {
-                    SOAPFault f = part.getEnvelope().getBody().getFault();
+                    SOAPFault f = getEnvelope().getBody().getFault();
                     if (f == null) {
-                        Element el = part.createElementNS(namespace, 
+                        Element el = getDocument().createElementNS(namespace,
                                              StringUtils.isEmpty(prefix) ? local : prefix + ":" + local);
-                        part.getEnvelope().getBody().appendChild(el);
-                        f = part.getEnvelope().getBody().getFault();
+                        getEnvelope().getBody().appendChild(el);
+                        f = getEnvelope().getBody().getFault();
                         if (f == null) {
-                            f = part.getEnvelope().getBody().addFault();
+                            f = getEnvelope().getBody().addFault();
                         }
                     }
                     setChild(adjustPrefix(f, prefix), false);
@@ -127,7 +191,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         super.createAndAddElement(prefix, local, namespace);
     }
-    
+
     @Override
     protected Element createElementNS(String ns, String pfx, String local) {
         Element cur = getCurrentNode();
@@ -159,6 +223,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                     el = ((SOAPElement)cur).addChildElement(local, "", "");
                 } else {
                     el = ((SOAPElement)cur).addChildElement(local, pfx == null ? "" : pfx, ns);
+                    adjustPrefix(el, pfx);
                 }
                 cur.removeChild(el);
                 return el;
@@ -168,5 +233,5 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         return super.createElementNS(ns, pfx, local);
     }
-    
+
 }

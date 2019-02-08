@@ -22,20 +22,21 @@ package org.apache.cxf.jaxrs.impl;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class PathSegmentImplTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class PathSegmentImplTest {
+
     @Test
-    public void testPlainPathSegment() { 
+    public void testPlainPathSegment() {
         PathSegment ps = new PathSegmentImpl("bar");
         assertEquals("bar", ps.getPath());
         assertEquals(0, ps.getMatrixParameters().size());
     }
-    
+
     @Test
-    public void testPathSegmentWithMatrixParams() { 
+    public void testPathSegmentWithMatrixParams() {
         PathSegment ps = new PathSegmentImpl("bar;a=1;a=2;b=3%202", false);
         assertEquals("bar", ps.getPath());
         MultivaluedMap<String, String> params = ps.getMatrixParameters();
@@ -45,9 +46,9 @@ public class PathSegmentImplTest extends Assert {
         assertEquals("2", params.get("a").get(1));
         assertEquals("3%202", params.getFirst("b"));
     }
-    
+
     @Test
-    public void testPathSegmentWithDecodedMatrixParams() { 
+    public void testPathSegmentWithDecodedMatrixParams() {
         PathSegment ps = new PathSegmentImpl("bar%20foo;a=1%202");
         assertEquals("bar foo", ps.getPath());
         MultivaluedMap<String, String> params = ps.getMatrixParameters();

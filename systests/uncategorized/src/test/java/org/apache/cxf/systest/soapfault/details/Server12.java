@@ -29,11 +29,11 @@ public class Server12 extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server12.class);
 
 
-    protected void run()  {    
+    protected void run()  {
         Object implementor = new GreeterImpl12();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         // enable the options of stack trace and the exception cause message
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("exceptionMessageCauseEnabled", "true");
         properties.put("faultStackTraceEnabled", "true");
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();

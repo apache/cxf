@@ -31,13 +31,13 @@ public class AttachmentImpl implements Attachment {
 
     private DataHandler dataHandler;
     private String id;
-    private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<>();
     private boolean xop;
 
     public AttachmentImpl(String idParam) {
         this.id = idParam;
     }
-    
+
     public AttachmentImpl(String idParam, DataHandler handlerParam) {
         this.id = idParam;
         this.dataHandler = handlerParam;
@@ -65,7 +65,7 @@ public class AttachmentImpl implements Attachment {
         String value = headers.get(name);
         return value == null ? headers.get(name.toLowerCase()) : value;
     }
-    
+
     public Iterator<String> getHeaderNames() {
         return headers.keySet().iterator();
     }

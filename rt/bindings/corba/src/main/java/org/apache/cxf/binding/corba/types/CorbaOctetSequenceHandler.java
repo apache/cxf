@@ -29,7 +29,7 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
 
     private byte[] value;
     private boolean isBase64Octets;
-    
+
     public CorbaOctetSequenceHandler(QName primName,
                                      QName primIdlType,
                                      TypeCode primTC,
@@ -37,11 +37,11 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
         super(primName, primIdlType, primTC, primType);
         isBase64Octets = getType().getType().equals(W3CConstants.NT_SCHEMA_BASE64);
     }
-    
+
     public byte[] getValue() {
         return value;
-    }    
-    
+    }
+
     public void setValue(byte[] obj) {
         value = obj;
     }
@@ -55,7 +55,7 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
         }
         return result;
     }
-    
+
     public void setValueFromData(String data) {
         try {
             if (isBase64Octets) {
@@ -67,7 +67,7 @@ public class CorbaOctetSequenceHandler extends CorbaObjectHandler {
             throw new CorbaBindingException("Not able to parse the octet sequence", ex);
         }
     }
-    
+
     public void clear() {
         value = null;
     }

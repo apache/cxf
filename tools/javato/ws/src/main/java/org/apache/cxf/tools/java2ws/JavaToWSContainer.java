@@ -51,15 +51,21 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
             //checkParams(errors);
             if (!hasInfoOption()) {
                 ToolContext env = new ToolContext();
-                env.setParameters(getParametersMap(new HashSet<String>()));
+                env.setParameters(getParametersMap(new HashSet<>()));
+
+                // check for custom compiler object to pass on
+                if (getContext() != null && getContext().get(ToolConstants.COMPILER) != null) {
+                    env.put(ToolConstants.COMPILER, getContext().get(ToolConstants.COMPILER));
+                }
+
                 if (env.get(ToolConstants.CFG_OUTPUTDIR) == null) {
                     env.put(ToolConstants.CFG_OUTPUTDIR, ".");
                 }
-                
+
                 if (env.get(ToolConstants.CFG_SOURCEDIR) == null) {
                     env.put(ToolConstants.CFG_SOURCEDIR, ".");
                 }
-                
+
                 if (isVerboseOn()) {
                     env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
                 }
@@ -83,13 +89,13 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
             }
             throw ex;
         } catch (Exception ex) {
-            
+
             // Try to find an exception with a message on the stack
             Throwable e = ex;
             while ((e.getMessage() == null || "".equals(e.getMessage())) && e.getCause() != null) {
                 e = e.getCause();
             }
-        
+
             err.println("Error: " + e.toString());
             err.println();
             if (isVerboseOn()) {
@@ -108,15 +114,15 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
         Processor processor = new JavaToWSDLProcessor();
         processor.setEnvironment(env);
         processor.process();
-        
-        
+
+
         if (ft.equals(ToolConstants.JAXWS_FRONTEND)) {
             if (env.optionSet(ToolConstants.CFG_SERVER) || env.optionSet(ToolConstants.CFG_CLIENT)) {
                 processor = new JAXWSFrontEndProcessor();
                 processor.setEnvironment(env);
                 processor.process();
             }
-        } else {               
+        } else {
             processor = new SimpleFrontEndProcessor();
             processor.setEnvironment(env);
             processor.process();
@@ -129,20 +135,20 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
 
         if (doc.hasParameter(ToolConstants.CFG_FRONTEND)) {
             String ft = doc.getParameter(ToolConstants.CFG_FRONTEND);
-            if (!ToolConstants.JAXWS_FRONTEND.equals(ft) 
+            if (!ToolConstants.JAXWS_FRONTEND.equals(ft)
                 && !ToolConstants.SIMPLE_FRONTEND.equals(ft)) {
                 Message msg = new Message("INVALID_FRONTEND", LOG, new Object[] {ft});
                 errs.add(new ErrorVisitor.UserError(msg.toString()));
             }
-            
-            if (ToolConstants.SIMPLE_FRONTEND.equals(ft) 
-                && doc.getParameter(ToolConstants.CFG_DATABINDING) != null 
+
+            if (ToolConstants.SIMPLE_FRONTEND.equals(ft)
+                && doc.getParameter(ToolConstants.CFG_DATABINDING) != null
                 && !ToolConstants.
                 AEGIS_DATABINDING.equals(doc.getParameter(ToolConstants.CFG_DATABINDING))) {
                 Message msg = new Message("INVALID_DATABINDING_FOR_SIMPLE", LOG);
                 errs.add(new ErrorVisitor.UserError(msg.toString()));
             }
-            
+
         }
 
         if (doc.hasParameter(ToolConstants.CFG_WRAPPERBEAN)) {
@@ -152,8 +158,8 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
                 errs.add(new ErrorVisitor.UserError(msg.toString()));
             }
         }
-        
-        
+
+
         if (errs.getErrors().size() > 0) {
             Message msg = new Message("PARAMETER_MISSING", LOG);
             throw new ToolException(msg, new BadUsageException(getUsage(), errs));

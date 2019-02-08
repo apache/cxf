@@ -46,7 +46,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         this.name = ToolConstants.IMPL_GENERATOR;
     }
 
-    public boolean passthrough() {       
+    public boolean passthrough() {
         return !(env.optionSet(ToolConstants.CFG_GEN_IMPL)
             || env.optionSet(ToolConstants.CFG_IMPL)
             || env.optionSet(ToolConstants.CFG_ALL));
@@ -60,11 +60,11 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
-    
+
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-                
+
             Map<String, JavaServiceClass> services = javaModel.getServiceClasses();
-    
+
             JavaServiceClass service = null;
             if (!services.values().isEmpty()) {
                 for (JavaServiceClass javaservice : services.values()) {
@@ -72,7 +72,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
                     for (JavaPort jport : javaservice.getPorts()) {
                         JavaInterface intf = interfaces.get(jport.getInterfaceClass());
                         outputImpl(intf, service, jport.getPortName(), penv);
-                        
+
                     }
                 }
             } else {
@@ -88,9 +88,9 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         setAttributes("intf", intf);
 
         setAttributes("service", service);
-  
+
         setAttributes("port", port);
-        
+
         setCommonAttributes();
 
         if (StringUtils.isEmpty(port)) {
@@ -99,14 +99,14 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
         String name = getImplName(port, service == null ? "" : service.getName(), intf, penv);
 
         setAttributes("implName", name);
-        
+
         doWrite(IMPL_TEMPLATE, parseOutputName(intf.getPackageName(), name));
     }
-    
+
     private String getImplName(String port, String service, JavaInterface intf, ToolContext penv) {
         Map<String, String> nm = CastUtils.cast((Map<?, ?>)penv.get(ToolConstants.CFG_IMPL_CLASS));
         if (nm == null) {
-            nm = new HashMap<String, String>();
+            nm = new HashMap<>();
             penv.put(ToolConstants.CFG_IMPL_CLASS, nm);
         }
         String name = nm.get(service + "/" + port);

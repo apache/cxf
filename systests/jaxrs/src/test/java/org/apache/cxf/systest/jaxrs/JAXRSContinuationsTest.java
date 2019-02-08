@@ -23,6 +23,7 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
     public static final String PORT = BookContinuationServer.PORT;
@@ -32,13 +33,13 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
         createStaticBus();
         assertTrue("server did not launch correctly",
                    launchServer(BookContinuationServer.class));
-                   
-                   
+
+
     }
-    
-    
+
+
     protected String getPort() {
         return PORT;
     }
-    
+
 }

@@ -22,7 +22,7 @@ package org.apache.cxf.sts.token.realm;
 import java.util.List;
 
 /**
- * 
+ *
  */
 public interface RealmSupport {
 
@@ -31,4 +31,3 @@ public interface RealmSupport {
     String getHandlerRealm();
 
 }
- 

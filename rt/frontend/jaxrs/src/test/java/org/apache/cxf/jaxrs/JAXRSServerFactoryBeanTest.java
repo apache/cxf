@@ -29,10 +29,13 @@ import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.message.MessageImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXRSServerFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+public class JAXRSServerFactoryBeanTest {
 
     @Test
     public void testRegisterProviders() {
@@ -40,46 +43,44 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         bean.setAddress("http://localhost:8080/rest");
         bean.setStart(false);
         bean.setResourceClasses(BookStore.class);
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         Object provider1 = new CustomExceptionMapper();
         providers.add(provider1);
         Object provider2 = new RuntimeExceptionMapper();
         providers.add(provider2);
         bean.setProviders(providers);
         Server s = bean.create();
-        
-        ServerProviderFactory factory = 
+
+        ServerProviderFactory factory =
             (ServerProviderFactory)s.getEndpoint().get(ServerProviderFactory.class.getName());
-        
-        ExceptionMapper<Exception> mapper1 = 
+
+        ExceptionMapper<Exception> mapper1 =
             factory.createExceptionMapper(Exception.class, new MessageImpl());
         assertNotNull(mapper1);
-        ExceptionMapper<RuntimeException> mapper2 = 
+        ExceptionMapper<RuntimeException> mapper2 =
             factory.createExceptionMapper(RuntimeException.class, new MessageImpl());
         assertNotNull(mapper2);
         assertNotSame(mapper1, mapper2);
         assertSame(provider1, mapper1);
         assertSame(provider2, mapper2);
-        
-        
+
+
     }
-    
-    
+
+
     private static class CustomExceptionMapper implements ExceptionMapper<Exception> {
 
         public Response toResponse(Exception exception) {
-            // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
+
     private static class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
-            // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
 }

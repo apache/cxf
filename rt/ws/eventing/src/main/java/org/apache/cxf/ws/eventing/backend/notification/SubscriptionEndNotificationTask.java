@@ -20,7 +20,7 @@
 package org.apache.cxf.ws.eventing.backend.notification;
 
 
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.eventing.LanguageSpecificStringType;
 import org.apache.cxf.ws.eventing.SubscriptionEnd;

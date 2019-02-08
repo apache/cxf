@@ -24,13 +24,13 @@ import java.util.Map;
 public interface IdentityCache {
 
     void add(String user, String realm, Map<String, String> identities);
-    
+
     Map<String, String> get(String user, String realm);
-    
+
     void remove(String user, String realm);
-    
+
     void clear();
-    
+
     int size();
-    
+
 }

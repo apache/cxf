@@ -20,8 +20,8 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
-
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,13 +40,13 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class JMSTransportFactory extends AbstractTransportFactory implements ConduitInitiator,
     DestinationFactory {
 
-    public static final List<String> DEFAULT_NAMESPACES 
-        = Arrays.asList(
+    public static final List<String> DEFAULT_NAMESPACES
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/transports/jms",
             "http://cxf.apache.org/transports/jms/configuration"
-        );
+        ));
 
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("jms://");
         URI_PREFIXES.add("jms:");
@@ -56,7 +56,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     public JMSTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
-    
+
     public Conduit getConduit(EndpointInfo endpointInfo, Bus b) throws IOException {
         return getConduit(endpointInfo, endpointInfo.getTarget(), b);
     }
@@ -77,7 +77,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
         JMSConfiguration jmsConf = JMSConfigFactory.createFromEndpointInfo(bus, endpointInfo, null);
         return new JMSDestination(bus, endpointInfo, jmsConf);
     }
-    
+
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
     }

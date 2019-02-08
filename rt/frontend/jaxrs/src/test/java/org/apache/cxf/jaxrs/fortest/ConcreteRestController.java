@@ -20,5 +20,5 @@ package org.apache.cxf.jaxrs.fortest;
 
 
 public class ConcreteRestController extends AbstractRestController<ConcreteRestResource> {
-    
-} 
+
+}

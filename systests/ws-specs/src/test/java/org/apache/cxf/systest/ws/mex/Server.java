@@ -32,10 +32,10 @@ public class Server extends AbstractBusTestServerBase {
         setBus(BusFactory.getDefaultBus());
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/addmex";
-        
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
 
         ep.publish(address);
@@ -44,7 +44,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.stop();
         ep = null;
     }
-    
+
     private String getWsdl() {
         try {
             java.net.URL wsdl = getClass()
@@ -54,7 +54,7 @@ public class Server extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
         return null;
-    }    
+    }
 
     public static void main(String[] args) {
         try {
@@ -67,6 +67,6 @@ public class Server extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
-    
+
+
 }

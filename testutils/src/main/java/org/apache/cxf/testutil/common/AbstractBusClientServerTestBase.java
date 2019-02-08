@@ -19,7 +19,6 @@
 
 package org.apache.cxf.testutil.common;
 
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -35,10 +34,13 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 
+import static org.junit.Assert.assertTrue;
+
+
 public abstract class AbstractBusClientServerTestBase extends AbstractClientServerTestBase {
 
-    protected static Bus staticBus; 
-    protected Bus bus; 
+    protected static Bus staticBus;
+    protected Bus bus;
 
     public void createBus(String config) throws Exception {
         if (config != null) {
@@ -48,11 +50,11 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         }
         BusFactory.setDefaultBus(bus);
     }
-    
+
     public void createBus() throws Exception {
         createBus(null);
     }
-    
+
     public static Bus getStaticBus() {
         return staticBus;
     }
@@ -69,21 +71,21 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     public static Bus createStaticBus() throws Exception {
         return createStaticBus(null);
     }
-    
+
     @After
     public void deleteBus() throws Exception {
         if (null != bus) {
             bus.shutdown(true);
             bus = null;
         }
-    } 
+    }
     @AfterClass
     public static void deleteStaticBus() throws Exception {
         if (null != staticBus) {
             staticBus.shutdown(true);
             staticBus = null;
         }
-    } 
+    }
 
 
     protected Bus getBus() {
@@ -96,19 +98,19 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     protected void setBus(Bus b) {
         bus = b;
     }
-    
+
     protected HttpURLConnection getHttpConnection(String target) throws Exception {
-        URL url = new URL(target);        
-        
-        URLConnection connection = url.openConnection();            
-        
+        URL url = new URL(target);
+
+        URLConnection connection = url.openConnection();
+
         assertTrue(connection instanceof HttpURLConnection);
-        return (HttpURLConnection)connection;        
+        return (HttpURLConnection)connection;
     }
 
     protected boolean runClient(Runnable clientImpl, long timeOut, TimeUnit timeUnit)
         throws InterruptedException {
-        FutureTask<?> client = new FutureTask<Object>(clientImpl, null);
+        FutureTask<?> client = new FutureTask<>(clientImpl, null);
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         tpe.execute(client);

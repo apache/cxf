@@ -27,22 +27,22 @@ import java.util.List;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
-    
+
     private String propertyName;
     private Object propertyValue;
     private Type propertyType;
     private T condition;
     private ConditionType cType;
     private Beanspector<T> beanspector;
-    
-    public PrimitiveSearchCondition(String propertyName, 
+
+    public PrimitiveSearchCondition(String propertyName,
                                     Object propertyValue,
                                     ConditionType ct,
                                     T condition) {
-        this(propertyName, propertyValue, propertyValue.getClass(), ct, condition);    
+        this(propertyName, propertyValue, propertyValue.getClass(), ct, condition);
     }
-    
-    public PrimitiveSearchCondition(String propertyName, 
+
+    public PrimitiveSearchCondition(String propertyName,
                                     Object propertyValue,
                                     Type propertyType,
                                     ConditionType ct,
@@ -53,13 +53,13 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         this.condition = condition;
         this.cType = ct;
         if (propertyName != null) {
-            this.beanspector = SearchBean.class.isAssignableFrom(condition.getClass()) 
+            this.beanspector = SearchBean.class.isAssignableFrom(condition.getClass())
                 ? null : new Beanspector<T>(condition);
         }
     }
-    
+
     public List<T> findAll(Collection<T> pojos) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (T pojo : pojos) {
             if (isMet(pojo)) {
                 result.add(pojo);
@@ -79,15 +79,15 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     protected String getPropertyName() {
         return propertyName;
     }
-    
+
     protected Object getPropertyValue() {
         return propertyValue;
     }
-    
+
     protected Type getPropertyType() {
         return propertyType;
     }
-    
+
     public List<SearchCondition<T>> getSearchConditions() {
         return null;
     }
@@ -99,11 +99,10 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     public boolean isMet(T pojo) {
         if (isPrimitive(pojo)) {
             return compare(pojo, cType, propertyValue);
-        } else {
-            Object lValue = getValue(propertyName, pojo);
-            Object rValue = getPrimitiveValue(propertyName, propertyValue);
-            return lValue == null ? false : compare(lValue, cType, rValue);
         }
+        Object lValue = getValue(propertyName, pojo);
+        Object rValue = getPrimitiveValue(propertyName, propertyValue);
+        return lValue == null ? false : compare(lValue, cType, rValue);
     }
 
     private Object getValue(String getter, T pojo) {
@@ -114,7 +113,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         } else {
             thePropertyName = getter;
         }
-        
+
         Object value;
         try {
             if (beanspector != null) {
@@ -127,15 +126,15 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             return null;
         }
     }
-    
+
     public String toSQL(String table, String... columns) {
         return SearchUtils.toSQL(this, table, columns);
     }
 
     public void accept(SearchConditionVisitor<T, ?> visitor) {
-        visitor.visit(this);    
+        visitor.visit(this);
     }
-   
+
     private boolean isPrimitive(T pojo) {
         return pojo.getClass().getName().startsWith("java.lang");
     }
@@ -206,13 +205,12 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
             } else {
                 return lval.contains(rval);
             }
-        } else {
-            return lval.equals(rval);
         }
+        return lval.equals(rval);
     }
-    
+
     protected static Object getPrimitiveValue(String name, Object value) {
-        
+
         int index = name.indexOf(".");
         if (index != -1) {
             String[] names = name.split("\\.");
@@ -232,8 +230,8 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
                 }
             }
             return getPrimitiveValue(name, value);
-        } 
+        }
         return value;
-        
+
     }
 }

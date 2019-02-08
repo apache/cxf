@@ -36,6 +36,7 @@ import org.apache.hello_world_doc_lit.HTTPGreeterImpl;
 import org.apache.hello_world_doc_lit.JMSGreeterImpl;
 import org.apache.hello_world_doc_lit.MultiTransportService;
 import org.apache.hello_world_doc_lit.PingMeFault;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -65,7 +66,7 @@ public class MultiTransportClientServerTest {
         ep1.getFeatures().add(cff);
         ep1.publish();
     }
-    
+
     @AfterClass
     public static void stopServers() throws Exception {
         bus.shutdown(false);

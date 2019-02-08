@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.inheritance.ws2.common.pack1.ContentBean1;
 import org.apache.cxf.aegis.inheritance.ws2.common.pack2.ContentBean2;
 
 public class WS2Impl implements WS2 {
-    private Map<String, ParentBean> map = new HashMap<String, ParentBean>();
+    private Map<String, ParentBean> map = new HashMap<>();
 
     public WS2Impl() {
         ParentBean x = new ParentBean("X", new ContentBean1("data1-X"));

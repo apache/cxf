@@ -25,13 +25,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 
+ *
  */
 public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
     T value;
     boolean done;
     Throwable throwable;
-    
+
     /**
      * Currently unused
      */
@@ -57,7 +57,7 @@ public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
         }
         return value;
     }
-    public T get(long timeout, TimeUnit unit) 
+    public T get(long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
         return value;
     }
@@ -71,5 +71,5 @@ public class ServerAsyncResponse<T> implements javax.xml.ws.Response<T> {
     public Map<String, Object> getContext() {
         return null;
     }
-    
+
 }

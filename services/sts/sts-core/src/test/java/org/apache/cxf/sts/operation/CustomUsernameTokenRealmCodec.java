@@ -25,7 +25,7 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  * This class defines a pluggable way to return a realm associated with a UsernameToken.
  */
 public class CustomUsernameTokenRealmCodec implements UsernameTokenRealmCodec {
-    
+
     /**
      * Get the realm associated with the UsernameToken parameter
      * @param usernameToken a WSS4J UsernameToken object
@@ -37,5 +37,5 @@ public class CustomUsernameTokenRealmCodec implements UsernameTokenRealmCodec {
         }
         return null;
     }
-    
+
 }

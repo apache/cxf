@@ -30,7 +30,7 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
  * Holder for SequenceFault information.
  */
 public class SequenceFault extends Exception {
-    
+
     private static final long serialVersionUID = 1144842362378723203L;
     private boolean sender;
     private QName faultCode;
@@ -40,19 +40,19 @@ public class SequenceFault extends Exception {
     public SequenceFault(String message) {
         super(message);
     }
-    
+
     public boolean isSender() {
         return sender;
     }
-    
+
     public void setSender(boolean s) {
         sender = s;
     }
-    
+
     public String getReason() {
         return getMessage();
     }
-    
+
     public QName getFaultCode() {
         return faultCode;
     }
@@ -63,7 +63,7 @@ public class SequenceFault extends Exception {
 
     /**
      * Set detail content as arbitrary element.
-     * 
+     *
      * @param d (<code>null</code> if none)
      */
     public void setDetail(Element d) {
@@ -72,7 +72,7 @@ public class SequenceFault extends Exception {
 
     /**
      * Set detail content as Identifier.
-     * 
+     *
      * @param d (<code>null</code> if none)
      */
     public void setDetail(Identifier d) {
@@ -81,17 +81,17 @@ public class SequenceFault extends Exception {
 
     /**
      * Set detail content as SequenceAcknowledgement.
-     * 
+     *
      * @param d (<code>null</code> if none)
      */
     public void setDetail(SequenceAcknowledgement d) {
         detail = d;
     }
-    
+
     /**
      * Get Fault detail object, which may be an {@link Element}, an {@link Identifier}, or a
      * {@link SequenceAcknowledgement}.
-     * 
+     *
      * @return detail object (<code>null</code> if none)
      */
     public Object getDetail() {
@@ -100,7 +100,7 @@ public class SequenceFault extends Exception {
 
     /**
      * Get extra element appended to main fault detail.
-     * 
+     *
      * @return element (<code>null</code> if none)
      */
     public Element getExtraDetail() {
@@ -109,7 +109,7 @@ public class SequenceFault extends Exception {
 
     /**
      * Set extra element appended to main fault detail.
-     * 
+     *
      * @param ex (<code>null</code> if none)
      */
     public void setExtraDetail(Element ex) {

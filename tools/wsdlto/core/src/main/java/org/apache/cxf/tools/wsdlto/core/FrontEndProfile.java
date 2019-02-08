@@ -21,12 +21,13 @@ package org.apache.cxf.tools.wsdlto.core;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.cxf.tools.common.FrontEndGenerator;
 import org.apache.cxf.tools.common.Processor;
 import org.apache.cxf.tools.common.toolspec.ToolContainer;
 
 public class FrontEndProfile {
-    List<FrontEndGenerator> generators = new ArrayList<FrontEndGenerator>();
+    List<FrontEndGenerator> generators = new ArrayList<>();
     Processor processor;
     Class<? extends ToolContainer> containerClz;
     String toolspec;
@@ -47,11 +48,11 @@ public class FrontEndProfile {
     public String getToolspec() {
         return this.toolspec;
     }
-    
+
     public List<FrontEndGenerator> getGenerators() {
         return generators;
     }
-    
+
     public void registerGenerator(FrontEndGenerator generator) {
         generators.add(generator);
     }

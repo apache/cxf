@@ -26,10 +26,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ChapterNoAnnotations {
     private String title;
     private long id;
-    
+
     public ChapterNoAnnotations() {
     }
-    
+
     public void setTitle(String n) {
         title = n;
     }
@@ -37,14 +37,14 @@ public class ChapterNoAnnotations {
     public String getTitle() {
         return title;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
     public ChapterNoAnnotations getItself() {
         return this;
     }

@@ -30,12 +30,13 @@ import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 
 
 public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
-    
+
 
     public ServerFactoryBeanDefinitionParser() {
         this(BPServerFactoryBean.class);
@@ -43,10 +44,10 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
     public ServerFactoryBeanDefinitionParser(Class<?> cls) {
         super(cls);
     }
-    
+
     @Override
-    protected void mapAttribute(MutableBeanMetadata bean, 
-                                Element e, String name, 
+    protected void mapAttribute(MutableBeanMetadata bean,
+                                Element e, String name,
                                 String val, ParserContext context) {
         if ("endpointName".equals(name) || "serviceName".equals(name)) {
             QName q = parseQName(e, val);
@@ -71,10 +72,10 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
             || "features".equals(name) || "schemaLocations".equals(name)) {
             bean.addProperty(name, this.parseListData(ctx, bean, el));
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
-    
+
 
     @Override
     public Metadata parse(Element element, ParserContext context) {
@@ -83,7 +84,7 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
         bean.setDestroyMethod("destroy");
 
         // We don't really want to delay the registration of our Server
-        bean.setActivation(MutableBeanMetadata.ACTIVATION_EAGER);
+        bean.setActivation(ComponentMetadata.ACTIVATION_EAGER);
         return bean;
     }
 
@@ -100,8 +101,8 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
     protected boolean hasBusProperty() {
         return true;
     }
-    
-    
+
+
     @NoJSR250Annotations
     public static class BPServerFactoryBean extends ServerFactoryBean {
 
@@ -116,7 +117,7 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
         public Server getServer() {
             return server;
         }
-        
+
         public void init() {
             create();
         }
@@ -134,5 +135,5 @@ public class ServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionPar
             }
         }
     }
-    
+
 }

@@ -45,7 +45,7 @@ import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 
 public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLMessageInInterceptor.class);
-    
+
     public XMLMessageInInterceptor() {
         this(Phase.UNMARSHAL);
     }
@@ -104,9 +104,9 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
         }
     }
 
-    private BindingOperationInfo getBindingOperationInfo(boolean isRequestor, 
-                                                         QName startQName, 
-                                                         BindingInfo bi, 
+    private BindingOperationInfo getBindingOperationInfo(boolean isRequestor,
+                                                         QName startQName,
+                                                         BindingInfo bi,
                                                          XMLStreamReader xsr) {
 
         for (BindingOperationInfo boi : bi.getOperations()) {
@@ -116,7 +116,7 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
             } else {
                 bmi = boi.getOutput();
             }
-            
+
             if (hasRootNode(bmi, startQName)) {
                 //Consume The rootNode tag
                 try {
@@ -125,13 +125,12 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_READ_EXC", LOG));
                 }
                 return boi;
-            } else {
-                Collection<MessagePartInfo> bodyParts = bmi.getMessageParts();
-                if (bodyParts.size() == 1) {
-                    MessagePartInfo p = bodyParts.iterator().next();
-                    if (p.getConcreteName().equals(startQName)) {
-                        return boi;
-                    }
+            }
+            Collection<MessagePartInfo> bodyParts = bmi.getMessageParts();
+            if (bodyParts.size() == 1) {
+                MessagePartInfo p = bodyParts.iterator().next();
+                if (p.getConcreteName().equals(startQName)) {
+                    return boi;
                 }
             }
         }
@@ -145,7 +144,7 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
                 }
                 return boi;
             }
-        } 
+        }
         return null;
     }
 

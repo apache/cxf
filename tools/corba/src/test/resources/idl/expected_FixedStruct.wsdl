@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/FixedStruct" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://cxf.apache.org/bindings/corba/idl/FixedStruct">
+    <corba:typeMapping xmlns:corba="http://cxf.apache.org/bindings/corba" targetNamespace="http://cxf.apache.org/bindings/corba/idl/FixedStruct/typemap">
+        <corba:anonstring xmlns:tns="http://cxf.apache.org/bindings/corba/idl/FixedStruct" bound="5" name="fixeds._Anon1_FixedStruct" type="tns:fixeds._Anon1_FixedStruct" />
+        <corba:anonfixed xmlns:tns="http://cxf.apache.org/bindings/corba/idl/FixedStruct" digits="5" name="fixeds._Anon2_FixedStruct" scale="2" type="tns:fixeds._Anon2_FixedStruct"/>
+        <corba:struct xmlns:tns="http://cxf.apache.org/bindings/corba/idl/FixedStruct" name="fixeds.FixedStruct" repositoryID="IDL:fixeds/FixedStruct:1.0" type="tns:fixeds.FixedStruct">
+            <corba:member xmlns="http://cxf.apache.org/bindings/corba/idl/FixedStruct/typemap" idltype="fixeds._Anon1_FixedStruct" name="oddString" />
+            <corba:member xmlns="http://cxf.apache.org/bindings/corba/idl/FixedStruct/typemap" idltype="fixeds._Anon2_FixedStruct" name="oddFixed" />
+        </corba:struct>
+    </corba:typeMapping>
+    <wsdl:types>
+        <xs:schema xmlns="http://cxf.apache.org/bindings/corba/idl/FixedStruct" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/FixedStruct">
+            <xs:complexType name="fixeds.FixedStruct">
+                <xs:sequence>
+                    <xs:element name="oddString" type="fixeds._Anon1_FixedStruct" />
+                    <xs:element name="oddFixed" type="fixeds._Anon2_FixedStruct" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="fixeds._Anon1_FixedStruct">
+                <xs:restriction base="xs:string">
+                    <xs:maxLength value="5" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="fixeds._Anon2_FixedStruct">
+                <xs:restriction base="xs:decimal">
+                    <xs:totalDigits value="5" />
+                    <xs:fractionDigits fixed="true" value="2" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="testFixeds">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="aFixedStruct" type="fixeds.FixedStruct" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="testFixedsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="return" type="fixeds.FixedStruct" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="testFixeds">
+        <wsdl:part element="tns:testFixeds" name="inparameter">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="testFixedsResponse">
+        <wsdl:part element="tns:testFixedsResponse" name="outparameter">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="fixeds.FunctionTest">
+        <wsdl:operation name="testFixeds">
+            <wsdl:input message="tns:testFixeds" name="testFixedsRequest">
+            </wsdl:input>
+            <wsdl:output message="tns:testFixedsResponse" name="testFixedsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="fixeds.FunctionTestCORBABinding" type="tns:fixeds.FunctionTest">
+        <corba:binding xmlns:corba="http://cxf.apache.org/bindings/corba" repositoryID="IDL:fixeds/FunctionTest:1.0" />
+        <wsdl:operation name="testFixeds">
+            <corba:operation xmlns:corba="http://cxf.apache.org/bindings/corba" name="testFixeds">
+                <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/FixedStruct/typemap" idltype="fixeds.FixedStruct" mode="in" name="aFixedStruct" />
+                <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/FixedStruct/typemap" idltype="fixeds.FixedStruct" name="return" />
+            </corba:operation>
+            <wsdl:input name="testFixedsRequest">
+            </wsdl:input>
+            <wsdl:output name="testFixedsResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="fixeds.FunctionTestCORBAService">
+        <wsdl:port binding="tns:fixeds.FunctionTestCORBABinding" name="fixeds.FunctionTestCORBAPort">
+            <corba:address xmlns:corba="http://cxf.apache.org/bindings/corba" location="IOR:" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

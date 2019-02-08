@@ -24,7 +24,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 /**
- * ClientSecretVerifier which checks the passwords against hashes  
+ * ClientSecretVerifier which checks the passwords against hashes
  */
 public class ClientSecretHashVerifier implements ClientSecretVerifier {
     private String hashAlgorithm = MessageDigestUtils.ALGO_SHA_256;

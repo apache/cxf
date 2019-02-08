@@ -47,14 +47,14 @@ import org.ietf.jgss.Oid;
 
 public abstract class AbstractSpnegoAuthSupplier {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractSpnegoAuthSupplier.class);
-    
+
     /**
      * Can be set on the client properties. If set to true then the kerberos oid is used
      * instead of the default spnego OID
      */
     private static final String PROPERTY_USE_KERBEROS_OID = "auth.spnego.useKerberosOid";
     private static final String PROPERTY_REQUIRE_CRED_DELEGATION = "auth.spnego.requireCredDelegation";
-    
+
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
     private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
 
@@ -64,7 +64,7 @@ public abstract class AbstractSpnegoAuthSupplier {
     private Configuration loginConfig;
     private Oid serviceNameType;
     private boolean useCanonicalHostname;
-    
+
     public String getAuthorization(AuthorizationPolicy authPolicy,
                                    URI currentURI,
                                    Message message) {
@@ -73,16 +73,13 @@ public abstract class AbstractSpnegoAuthSupplier {
         }
         try {
             String spn = getCompleteServicePrincipalName(currentURI);
-            
-            boolean useKerberosOid = MessageUtils.isTrue(
-                message.getContextualProperty(PROPERTY_USE_KERBEROS_OID));
+
+            boolean useKerberosOid = MessageUtils.getContextualBoolean(message, PROPERTY_USE_KERBEROS_OID);
             Oid oid = new Oid(useKerberosOid ? KERBEROS_OID : SPNEGO_OID);
 
             byte[] token = getToken(authPolicy, spn, oid, message);
             return HttpAuthHeader.AUTH_TYPE_NEGOTIATE + " " + Base64Utility.encode(token);
-        } catch (LoginException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (GSSException e) {
+        } catch (LoginException | GSSException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -90,29 +87,29 @@ public abstract class AbstractSpnegoAuthSupplier {
     /**
      * Create and return a service ticket token for a given service principal
      * name
-     * 
+     *
      * @param authPolicy
      * @param spn
      * @return service ticket token
      * @throws GSSException
      * @throws LoginException
      */
-    private byte[] getToken(AuthorizationPolicy authPolicy, 
-                            String spn, 
+    private byte[] getToken(AuthorizationPolicy authPolicy,
+                            String spn,
                             Oid oid,
-                            Message message) throws GSSException, 
+                            Message message) throws GSSException,
         LoginException {
-        
-        GSSCredential delegatedCred = 
+
+        GSSCredential delegatedCred =
             (GSSCredential)message.getContextualProperty(GSSCredential.class.getName());
-        
+
         Subject subject = null;
         if (authPolicy != null && delegatedCred == null) {
             String contextName = authPolicy.getAuthorization();
             if (contextName == null) {
                 contextName = "";
             }
-        
+
             if (!(StringUtils.isEmpty(authPolicy.getUserName())
                 && StringUtils.isEmpty(contextName) && loginConfig == null)) {
                 CallbackHandler callbackHandler = getUsernamePasswordHandler(
@@ -122,25 +119,27 @@ public abstract class AbstractSpnegoAuthSupplier {
                 subject = lc.getSubject();
             }
         }
-        
+
         GSSManager manager = GSSManager.getInstance();
         GSSName serverName = manager.createName(spn, serviceNameType);
-        
+
         GSSContext context = manager
                 .createContext(serverName.canonicalize(oid), oid, delegatedCred, GSSContext.DEFAULT_LIFETIME);
-        
+
         context.requestCredDeleg(isCredDelegationRequired(message));
 
         // If the delegated cred is not null then we only need the context to
         // immediately return a ticket based on this credential without attempting
-        // to log on again 
+        // to log on again
         final byte[] token = new byte[0];
         if (delegatedCred != null) {
             return context.initSecContext(token, 0, token.length);
         }
-        
+
+        decorateSubject(subject);
+
         try {
-            return (byte[])Subject.doAs(subject, new CreateServiceTicketAction(context, token));
+            return Subject.doAs(subject, new CreateServiceTicketAction(context, token));
         } catch (PrivilegedActionException e) {
             if (e.getCause() instanceof GSSException) {
                 throw (GSSException) e.getCause();
@@ -149,10 +148,14 @@ public abstract class AbstractSpnegoAuthSupplier {
             return null;
         }
     }
-    
-    protected boolean isCredDelegationRequired(Message message) { 
-        Object prop = message.getContextualProperty(PROPERTY_REQUIRE_CRED_DELEGATION);
-        return prop == null ? credDelegation : MessageUtils.isTrue(prop);
+
+    // Allow subclasses to decorate the Subject if required.
+    protected void decorateSubject(Subject subject) {
+
+    }
+
+    protected boolean isCredDelegationRequired(Message message) {
+        return MessageUtils.getContextualBoolean(message, PROPERTY_REQUIRE_CRED_DELEGATION, credDelegation);
     }
 
     protected String getCompleteServicePrincipalName(URI currentURI) {
@@ -167,7 +170,7 @@ public abstract class AbstractSpnegoAuthSupplier {
         } else {
             name = servicePrincipalName;
         }
-        if (realm != null) {            
+        if (realm != null) {
             name += "@" + realm;
         }
         if (LOG.isLoggable(Level.FINE)) {
@@ -195,8 +198,8 @@ public abstract class AbstractSpnegoAuthSupplier {
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
-    private final class CreateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
+
+    private static final class CreateServiceTicketAction implements PrivilegedExceptionAction<byte[]> {
         private final GSSContext context;
         private final byte[] token;
 
@@ -209,13 +212,12 @@ public abstract class AbstractSpnegoAuthSupplier {
             return context.initSecContext(token, 0, token.length);
         }
     }
-    
+
     public CallbackHandler getUsernamePasswordHandler(final String username, final String password) {
         if (StringUtils.isEmpty(username)) {
             return null;
-        } else {
-            return new NamePasswordCallbackHandler(username, password);
         }
+        return new NamePasswordCallbackHandler(username, password);
     }
 
     public void setCredDelegation(boolean delegation) {

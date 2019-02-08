@@ -33,20 +33,20 @@ import java.util.Set;
  * Implements a combination of WeakHashMap and IdentityHashMap.
  * Useful for caches that need to key off of a == comparison
  * instead of a .equals.
- * 
+ *
  * <b>
  * This class is not a general-purpose Map implementation! While
  * this class implements the Map interface, it intentionally violates
  * Map's general contract, which mandates the use of the equals method
  * when comparing objects. This class is designed for use only in the
  * rare cases wherein reference-equality semantics are required.
- * 
+ *
  * Note that this implementation is not synchronized.
  * </b>
  */
 public class WeakIdentityHashMap<K, V> implements Map<K, V> {
-    private final ReferenceQueue<K> queue = new ReferenceQueue<K>();
-    private Map<IdentityWeakReference, V> backingStore = new HashMap<IdentityWeakReference, V>();
+    private final ReferenceQueue<K> queue = new ReferenceQueue<>();
+    private Map<IdentityWeakReference, V> backingStore = new HashMap<>();
 
 
     public WeakIdentityHashMap() {
@@ -70,30 +70,37 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public Set<Map.Entry<K, V>> entrySet() {
         reap();
-        Set<Map.Entry<K, V>> ret = new HashSet<Map.Entry<K, V>>();
+        Set<Map.Entry<K, V>> ret = new HashSet<>();
         for (Map.Entry<IdentityWeakReference, V> ref : backingStore.entrySet()) {
             final K key = ref.getKey().get();
-            final V value = ref.getValue();
-            Map.Entry<K, V> entry = new Map.Entry<K, V>() {
-                public K getKey() {
-                    return key;
-                }
-                public V getValue() {
-                    return value;
-                }
-                public V setValue(V value) {
-                    throw new UnsupportedOperationException();
-                }
-            };
-            ret.add(entry);
+            if (key != null) {
+                final V value = ref.getValue();
+                Map.Entry<K, V> entry = new Map.Entry<K, V>() {
+                    public K getKey() {
+                        return key;
+                    }
+
+                    public V getValue() {
+                        return value;
+                    }
+
+                    public V setValue(V value) {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+                ret.add(entry);
+            }
         }
         return Collections.unmodifiableSet(ret);
     }
     public Set<K> keySet() {
         reap();
-        Set<K> ret = new HashSet<K>();
+        Set<K> ret = new HashSet<>();
         for (IdentityWeakReference ref : backingStore.keySet()) {
-            ret.add(ref.get());
+            K key = ref.get();
+            if (key != null) {
+                ret.add(key);
+            }
         }
         return Collections.unmodifiableSet(ret);
     }
@@ -150,7 +157,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     class IdentityWeakReference extends WeakReference<K> {
         int hash;
-        
+
         @SuppressWarnings("unchecked")
         IdentityWeakReference(Object obj) {
             super((K)obj, queue);

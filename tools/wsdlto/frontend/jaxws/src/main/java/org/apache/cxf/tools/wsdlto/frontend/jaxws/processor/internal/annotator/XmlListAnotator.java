@@ -35,7 +35,7 @@ public class XmlListAnotator implements Annotator {
     }
 
     public void annotate(JavaAnnotatable jn) {
-        
+
         JAnnotation jaxbAnnotation = new JAnnotation(XmlList.class);
         if (jn instanceof JavaParameter) {
             JavaParameter jp = (JavaParameter)jn;
@@ -46,7 +46,7 @@ public class XmlListAnotator implements Annotator {
         } else {
             throw new RuntimeException("XmlList can only annotate to JavaParameter or JavaMethod");
         }
-        
+
         jf.addImport(XmlList.class.getName());
 
     }

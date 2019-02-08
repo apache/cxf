@@ -20,16 +20,16 @@
 package org.apache.cxf.tools.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 /**
- * 
+ *
  */
 public class OutputStreamCreator {
-    
+
     public OutputStream createOutputStream(File file) throws IOException {
-        return new FileOutputStream(file);
+        return Files.newOutputStream(file.toPath());
     }
 }

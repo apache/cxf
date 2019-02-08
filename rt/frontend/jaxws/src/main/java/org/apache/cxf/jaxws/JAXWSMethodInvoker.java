@@ -44,11 +44,11 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
 
     javax.xml.ws.spi.Invoker invoker;
 
-    
+
     public JAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
     }
-    
+
     public JAXWSMethodInvoker(Factory factory) {
         super(factory);
     }
@@ -56,7 +56,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         super(null);
         invoker = i;
     }
-     
+
     @Override
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,
                                        Object[] paramArray) throws Exception {
@@ -65,27 +65,27 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         }
         return super.performInvocation(exchange, serviceObject, m, paramArray);
     }
-    
+
     @Override
-    protected Object invoke(Exchange exchange, 
+    protected Object invoke(Exchange exchange,
                             final Object serviceObject, Method m,
                             List<Object> params) {
-        
-        // set up the webservice request context 
+
+        // set up the webservice request context
         WrappedMessageContext ctx = new WrappedMessageContext(exchange.getInMessage(), Scope.APPLICATION);
-        
+
         Map<String, Object> handlerScopedStuff = removeHandlerProperties(ctx);
-        
+
         final MessageContext oldCtx = WebServiceContextImpl.setMessageContext(ctx);
         List<Object> res = null;
         try {
-            if ((params == null || params.isEmpty()) && m.getDeclaringClass().equals(Provider.class)) {
+            if ((params == null || params.isEmpty()) && serviceObject instanceof Provider) {
                 params = Collections.singletonList(null);
             }
             res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
-                        
-            if ((serviceObject instanceof Provider) 
-                && MessageUtils.getContextualBoolean(exchange.getInMessage(), 
+
+            if ((serviceObject instanceof Provider)
+                && MessageUtils.getContextualBoolean(exchange.getInMessage(),
                                                      "jaxws.provider.interpretNullAsOneway",
                                                      true)
                 && (res != null && !res.isEmpty() && res.get(0) == null)
@@ -110,7 +110,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             } else {
                 WebServiceContextImpl.setMessageContext(oldCtx);
             }
-            
+
             addHandlerProperties(ctx, handlerScopedStuff);
         }
         return res;
@@ -119,12 +119,12 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
     private void changeToOneway(Exchange exchange) {
         exchange.setOneWay(true);
         exchange.setOutMessage(null);
-        javax.servlet.http.HttpServletResponse httpresp = 
+        javax.servlet.http.HttpServletResponse httpresp =
             (javax.servlet.http.HttpServletResponse)exchange.getInMessage().
                 get("HTTP.RESPONSE");
         if (httpresp != null) {
             httpresp.setStatus(202);
         }
     }
-    
+
 }

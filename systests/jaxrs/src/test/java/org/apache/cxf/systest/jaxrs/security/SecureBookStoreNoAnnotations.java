@@ -30,15 +30,15 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
 public class SecureBookStoreNoAnnotations implements BookInterface {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    
+    private Map<Long, Book> books = new HashMap<>();
+
     public SecureBookStoreNoAnnotations() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     public Book getThatBook(Long id) {
         return books.get(id);
     }
@@ -49,7 +49,7 @@ public class SecureBookStoreNoAnnotations implements BookInterface {
         }
         return books.get(id);
     }
-    
+
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
     }

@@ -26,15 +26,16 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+
 import org.junit.Assert;
 
 public class MessageReplayObserver implements MessageObserver {
     String responseMessage;
-    
+
     public MessageReplayObserver(String responseMessage) {
         this.responseMessage = responseMessage;
     }
-    
+
     public void onMessage(Message message) {
         try {
 
@@ -43,14 +44,14 @@ public class MessageReplayObserver implements MessageObserver {
                 // do nothing
             }
             in.close();
-            
+
             Conduit backChannel = message.getDestination().getBackChannel(message);
 
             backChannel.prepare(message);
 
             OutputStream out = message.getContent(OutputStream.class);
             Assert.assertNotNull(out);
-            InputStream  res = getClass().getResourceAsStream(responseMessage);
+            InputStream res = getClass().getResourceAsStream(responseMessage);
             IOUtils.copy(res, out, 2045);
 
             res.close();

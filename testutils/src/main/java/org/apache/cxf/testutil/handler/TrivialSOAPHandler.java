@@ -19,6 +19,7 @@
 package org.apache.cxf.testutil.handler;
 
 import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -29,10 +30,10 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 
 public class TrivialSOAPHandler implements SOAPHandler<SOAPMessageContext> {
-    
+
     @Resource(name = "greeting")
     private String greeting;
-    
+
     public TrivialSOAPHandler() {
         System.out.println(this + " Construct");
     }
@@ -51,18 +52,18 @@ public class TrivialSOAPHandler implements SOAPHandler<SOAPMessageContext> {
         System.out.println(this + " handleMessage(): " + greeting);
         return true;
     }
-       
+
     public boolean handleFault(SOAPMessageContext smc) {
         System.out.println(this + " handleFault()");
         return true;
     }
-    
+
     public void close(MessageContext messageContext) {
         System.out.println(this + " close()");
     }
-    
+
     public Set<QName> getHeaders() {
         return null;
     }
-    
+
 }

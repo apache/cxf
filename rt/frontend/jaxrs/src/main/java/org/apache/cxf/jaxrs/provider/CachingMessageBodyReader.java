@@ -37,15 +37,14 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 @Provider
 public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<T>
     implements MessageBodyReader<T> {
-    
+
     private List<MessageBodyReader<T>> delegatingReaders;
-    
+
     public boolean isReadable(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingReaders != null) {
             return getDelegatingReader(type, gType, anns, mt) != null;
-        } else {
-            return isProviderKeyNotSet();
         }
+        return isProviderKeyNotSet();
     }
 
     private MessageBodyReader<T> getDelegatingReader(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
@@ -56,33 +55,33 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
         }
         return null;
     }
-    
+
     public T readFrom(Class<T> type, Type gType, Annotation[] anns, MediaType mt,
-                        MultivaluedMap<String, String> theheaders, InputStream is) 
+                        MultivaluedMap<String, String> theheaders, InputStream is)
         throws IOException, WebApplicationException {
         this.setObject(
             getReader(type, gType, anns, mt).readFrom(type, gType, anns, mt, theheaders, is));
         return getObject();
     }
-    
-    
+
+
     protected MessageBodyReader<T> getReader(Class<?> type, Type gType, Annotation[] anns, MediaType mt) {
         if (delegatingReaders != null) {
             return getDelegatingReader(type, gType, anns, mt);
         }
         MessageBodyReader<T> r = null;
-        
+
         mc.put(ACTIVE_JAXRS_PROVIDER_KEY, this);
         try {
             @SuppressWarnings("unchecked")
             Class<T> actualType = (Class<T>)type;
             r = mc.getProviders().getMessageBodyReader(actualType, gType, anns, mt);
         } finally {
-            mc.put(ACTIVE_JAXRS_PROVIDER_KEY, null); 
+            mc.put(ACTIVE_JAXRS_PROVIDER_KEY, null);
         }
-        
+
         if (r == null) {
-            org.apache.cxf.common.i18n.Message message = 
+            org.apache.cxf.common.i18n.Message message =
                 new org.apache.cxf.common.i18n.Message("NO_MSG_READER", BUNDLE, type);
             LOG.severe(message.toString());
             throw ExceptionUtils.toNotAcceptableException(null, null);
@@ -93,7 +92,7 @@ public class CachingMessageBodyReader<T> extends AbstractCachingMessageProvider<
     public void setDelegatingReader(MessageBodyReader<T> reader) {
         this.delegatingReaders = Collections.singletonList(reader);
     }
-    
+
     public void setDelegatingReaders(List<MessageBodyReader<T>> readers) {
         this.delegatingReaders = readers;
     }

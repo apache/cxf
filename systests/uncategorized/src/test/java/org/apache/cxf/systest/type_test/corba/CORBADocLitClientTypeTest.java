@@ -27,25 +27,28 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
-    protected static final String WSDL_PATH 
+    protected static final String WSDL_PATH
         = "/wsdl_systest/type_test_corba/type_test_corba-corba.wsdl";
-    
-    
+
+
     protected static final QName SERVICE_NAME = new QName("http://apache.org/type_test/doc",
                                                           "TypeTestCORBAService");
     protected static final QName PORT_NAME = new QName("http://apache.org/type_test/doc",
                                                        "TypeTestCORBAPort");
 
-    private static final Set<String> NOT_WORKING_TESTS = new HashSet<String>();
-    private static final Set<String> RUN_TESTS = new HashSet<String>();
+    private static final Set<String> NOT_WORKING_TESTS = new HashSet<>();
+    private static final Set<String> RUN_TESTS = new HashSet<>();
     static {
-        
-        String notWorking[] = new String[] {
+
+        String[] notWorking = new String[] {
             "AnonEnumList",
             "AnonymousType",
             "AnyURIRestriction",
@@ -60,6 +63,9 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             "ChoiceWithSubstitutionGroup",
             "ChoiceWithSubstitutionGroupAbstract",
             "ChoiceWithSubstitutionGroupNil",
+            "ComplexArray",
+            "ComplexChoice",
+            "ComplexStruct",
             "ComplexRestriction",
             "ComplexRestriction2",
             "ComplexRestriction3",
@@ -69,8 +75,13 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             "ComplexTypeWithAttributeGroup1",
             "ComplexTypeWithAttributes",
             "DateTime",
+            "DerivedAllBaseAll",
+            "DerivedAllBaseChoice",
+            "DerivedAllBaseStruct",
+            "DerivedChoiceBaseAll",
             "DerivedChoiceBaseArray",
             "DerivedChoiceBaseChoice",
+            "DerivedChoiceBaseComplex",
             "DerivedChoiceBaseStruct",
             "DerivedNoContent",
             "DerivedStructBaseChoice",
@@ -137,7 +148,11 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             "StringList",
             "StructWithAny",
             "StructWithAnyArray",
+            "StructWithAnyArrayLax",
+            "StructWithAnyArrayLaxComplex",
             "StructWithAnyAttribute",
+            "StructWithAnyStrict",
+            "StructWithAnyStrictComplex",
             "StructWithAnyXsi",
             "StructWithInvalidAny",
             "StructWithInvalidAnyArray",
@@ -162,7 +177,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         };
         NOT_WORKING_TESTS.addAll(Arrays.asList(notWorking));
 
-        String notWorkingIBM[] = new String[] {
+        String[] notWorkingIBM = new String[] {
             "AnyURIEnum",
             "NMTokenEnum",
             "DecimalEnum",
@@ -191,7 +206,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             NOT_WORKING_TESTS.addAll(Arrays.asList(notWorkingIBM));
         }
     }
-    
+
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -210,7 +225,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         //System.out.println(RUN_TESTS.size());
     }
 
-    public boolean shouldRunTest(String name) {        
+    public boolean shouldRunTest(String name) {
         if (!NOT_WORKING_TESTS.contains(name)) {
             boolean b = super.shouldRunTest(name);
             if (b) {
@@ -221,12 +236,12 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
         //return true;
         return false;
     }
-    
-    
+
+
     @Test
     public void testA() throws Exception {
     }
-    
+
     protected float[][] getTestFloatData() {
         return new float[][] {{0.0f, 1.0f}, {-1.0f, (float)java.lang.Math.PI},
                               {-100.0f, 100.0f},

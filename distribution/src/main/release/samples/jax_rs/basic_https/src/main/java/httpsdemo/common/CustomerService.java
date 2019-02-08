@@ -36,11 +36,11 @@ public interface CustomerService {
     @GET
     @Path("/customers/{id}/")
     Customer getCustomer(@PathParam("id") String id);
-    
+
     @PUT
     @Path("/customers/")
     Response updateCustomer(Customer customer);
-     
+
     @POST
     @Path("/customers/")
     Response addCustomer(Customer customer);

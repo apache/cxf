@@ -49,7 +49,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
     private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
 
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(RM10Constants.WSRMP_RMASSERTION_QNAME);
         types.add(RM11Constants.WSRMP_RMASSERTION_QNAME);
         types.add(MC11AssertionBuilder.MCSUPPORTED_QNAME);
@@ -61,9 +61,10 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         super(ASSERTION_TYPES);
         rmIn.setBus(bus);
         rmOut.setBus(bus);
+        rmCaptureIn.setBus(bus);
         rmCaptureOut.setBus(bus);
         rmDelivery.setBus(bus);
-        
+
         getInInterceptors().add(rmIn);
         getInInterceptors().add(rmInSoap);
         getInInterceptors().add(rmDelivery);

@@ -33,7 +33,7 @@ class JaxwsResponseCallback<T> implements Response<T> {
     JaxwsResponseCallback(ClientCallback cb) {
         callback = cb;
     }
-    
+
     public Map<String, Object> getContext() {
         try {
             return callback.getResponseContext();

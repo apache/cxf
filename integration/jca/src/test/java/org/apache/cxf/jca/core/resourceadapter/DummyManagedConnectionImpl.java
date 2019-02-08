@@ -75,7 +75,7 @@ public class DummyManagedConnectionImpl extends AbstractManagedConnectionImpl {
         con = o;
     }
 /*
-    public CXFManagedConnectionFactory getManagedConnectionFactory() { 
+    public CXFManagedConnectionFactory getManagedConnectionFactory() {
         return (CXFManagedConnectionFactory)theManagedConnectionFactory();
-    } */ 
+    } */
 }

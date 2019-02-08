@@ -18,34 +18,28 @@
  */
 package org.apache.cxf.cdi;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.InjectionTarget;
-import javax.enterprise.util.AnnotationLiteral;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.bus.CXFBusFactory;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
+import org.apache.cxf.common.util.ClassUnwrapper;
+import org.apache.cxf.common.util.SystemPropertyAction;
 
-public final class CdiBusBean implements Bean< ExtensionManagerBus > {
+final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     static final String CXF = "cxf";
-    
+
     private final InjectionTarget<ExtensionManagerBus> injectionTarget;
-    
+
     CdiBusBean(final InjectionTarget<ExtensionManagerBus> injectionTarget) {
         this.injectionTarget = injectionTarget;
     }
-    
+
     @Override
     public Class< ? > getBeanClass() {
         return Bus.class;
@@ -61,56 +55,29 @@ public final class CdiBusBean implements Bean< ExtensionManagerBus > {
         return CXF;
     }
 
-    @SuppressWarnings("serial")
-    @Override
-    public Set< Annotation > getQualifiers() {
-        Set<Annotation> qualifiers = new HashSet<Annotation>();
-        qualifiers.add(new AnnotationLiteral< Default >() { });
-        qualifiers.add(new AnnotationLiteral< Any >() { });
-        return qualifiers;
-    }
-
     @Override
     public Set<Type> getTypes() {
-        final Set< Type > types = new HashSet< Type >();
+        final Set< Type > types = super.getTypes();
         types.add(Bus.class);
-        types.add(Object.class);
         return types;
-    }
-    
-    @Override
-    public Class<? extends Annotation> getScope() {
-        return ApplicationScoped.class;
-    }
-
-    @Override
-    public boolean isAlternative() {
-        return false;
-    }
-
-    @Override
-    public boolean isNullable() {
-        return false;
-    }
-    
-    @Override
-    public Set< Class< ? extends Annotation > > getStereotypes() {
-        return Collections.< Class< ? extends Annotation > >emptySet();
     }
 
     @Override
     public ExtensionManagerBus create(final CreationalContext< ExtensionManagerBus > ctx) {
         final ExtensionManagerBus instance = injectionTarget.produce(ctx);
-        CXFBusFactory.possiblySetDefaultBus(instance);
+        if ("true".equals(SystemPropertyAction.getProperty("org.apache.cxf.cdi.unwrap.proxies", "true"))) {
+            instance.setProperty(ClassUnwrapper.class.getName(), new CdiClassUnwrapper());
+        }
+        BusFactory.possiblySetDefaultBus(instance);
         instance.initialize();
-        
+
         injectionTarget.inject(instance, ctx);
         injectionTarget.postConstruct(instance);
         return instance;
     }
 
     @Override
-    public void destroy(final ExtensionManagerBus instance, 
+    public void destroy(final ExtensionManagerBus instance,
             final CreationalContext< ExtensionManagerBus > ctx) {
         injectionTarget.preDestroy(instance);
         injectionTarget.dispose(instance);

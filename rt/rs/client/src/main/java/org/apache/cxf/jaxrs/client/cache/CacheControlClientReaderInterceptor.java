@@ -49,9 +49,9 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     @Context
     private UriInfo uriInfo;
     private boolean cacheResponseInputStream;
-    
+
     public CacheControlClientReaderInterceptor(final Cache<Key, Entry> cache) {
-        setCache(cache);
+        this.cache = cache;
     }
 
     public CacheControlClientReaderInterceptor() {
@@ -73,51 +73,37 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
                 byte[] bytes = bytesEntity.getEntity();
                 cachedEntity = bytesEntity.isFromStream() ? new ByteArrayInputStream(bytes) : bytes;
                 if (cacheResponseInputStream) {
-                    InputStream is = bytesEntity.isFromStream() ? (InputStream)cachedEntity 
-                        : new ByteArrayInputStream((byte[])cachedEntity); 
+                    InputStream is = bytesEntity.isFromStream() ? (InputStream)cachedEntity
+                        : new ByteArrayInputStream((byte[])cachedEntity);
                     context.setInputStream(is);
                     return context.proceed();
                 }
             }
             return cachedEntity;
         }
-        
+
         if (Boolean.parseBoolean((String)context.getProperty(CacheControlClientRequestFilter.NO_CACHE_PROPERTY))) {
             // non GET HTTP method or other restriction applies
             return context.proceed();
         }
-        final MultivaluedMap<String, String> responseHeaders = context.getHeaders(); 
+        final MultivaluedMap<String, String> responseHeaders = context.getHeaders();
         final String cacheControlHeader = responseHeaders.getFirst(HttpHeaders.CACHE_CONTROL);
         final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader.toString());
-        
+
         byte[] cachedBytes = null;
         final boolean validCacheControl = isCacheControlValid(context, cacheControl);
         if (validCacheControl && cacheResponseInputStream) {
             // if Cache-Control is set and the stream needs to be cached then do it
-            cachedBytes = IOUtils.readBytesFromStream((InputStream)context.getInputStream());
+            cachedBytes = IOUtils.readBytesFromStream(context.getInputStream());
             context.setInputStream(new ByteArrayInputStream(cachedBytes));
         }
         // Read the stream and get the actual entity
         Object responseEntity = context.proceed();
-        
+
         if (!validCacheControl) {
             return responseEntity;
         }
-        // if a max-age property is set then it overrides Expires
-        long expiry = cacheControl.getMaxAge();
-        if (expiry == -1) {
-            //TODO: Review if Expires can be supported as an alternative to Cache-Control
-            String expiresHeader = responseHeaders.getFirst(HttpHeaders.EXPIRES);
-            if (expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
-                expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
-            }
-            try {
-                expiry = (Headers.getHttpDateFormat().parse(expiresHeader).getTime() 
-                    - System.currentTimeMillis()) / 1000;
-            } catch (final ParseException e) {
-                // TODO: Revisit the possibility of supporting multiple formats 
-            }
-        }
+
         Serializable ser = null;
         if (cachedBytes != null) {
             // store the cached bytes - they will be parsed again when a client cache will return them
@@ -135,9 +121,11 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
             // the cached bytes will be returned immediately when a client cache will return them
             ser = new BytesEntity((byte[])responseEntity, false);
         }
-        if (ser != null) { 
-            final Entry entry = 
-                new Entry(ser, responseHeaders, computeCacheHeaders(responseHeaders), expiry);
+
+        if (ser != null) {
+            final Entry entry =
+                new Entry(ser, responseHeaders,
+                          computeCacheHeaders(responseHeaders), computeExpiry(cacheControl, responseHeaders));
             final URI uri = uriInfo.getRequestUri();
             final String accepts = (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_ACCEPTS);
             cache.put(new Key(uri, accepts), entry);
@@ -146,7 +134,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     }
 
     private Map<String, String> computeCacheHeaders(final MultivaluedMap<String, String> responseHeaders) {
-        final Map<String, String> cacheHeaders = new HashMap<String, String>(2);
+        final Map<String, String> cacheHeaders = new HashMap<>(2);
 
         final String etagHeader = responseHeaders.getFirst(HttpHeaders.ETAG);
         if (etagHeader != null) {
@@ -160,30 +148,49 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         return cacheHeaders;
     }
 
+    private long computeExpiry(CacheControl cacheControl, MultivaluedMap<String, String> responseHeaders) {
+        // if a max-age property is set then it overrides Expires
+        long expiry = cacheControl.getMaxAge();
+        if (expiry == -1) {
+            //TODO: Review if Expires can be supported as an alternative to Cache-Control
+            String expiresHeader = responseHeaders.getFirst(HttpHeaders.EXPIRES);
+            if (expiresHeader.length() > 1 && expiresHeader.startsWith("'") && expiresHeader.endsWith("'")) {
+                expiresHeader = expiresHeader.substring(1, expiresHeader.length() - 1);
+            }
+            try {
+                expiry = (Headers.getHttpDateFormat().parse(expiresHeader).getTime()
+                    - System.currentTimeMillis()) / 1000L;
+            } catch (final ParseException e) {
+                // TODO: Revisit the possibility of supporting multiple formats
+            }
+        }
+        return expiry;
+    }
+
     public boolean isCacheInputStream() {
         return cacheResponseInputStream;
     }
     /**
-     * Enforce the caching of the response stream. 
+     * Enforce the caching of the response stream.
      * This is not recommended if the client code expects Serializable data,
-     * example, String or custom JAXB beans marked as Serializable, 
+     * example, String or custom JAXB beans marked as Serializable,
      * which can be stored in the cache directly.
-     * Use this property only if returning a cached entity does require a 
+     * Use this property only if returning a cached entity does require a
      * repeated stream parsing.
-     * 
+     *
      * @param cacheInputStream
      */
     public void setCacheResponseInputStream(boolean cacheInputStream) {
         this.cacheResponseInputStream = cacheInputStream;
     }
-    
+
     protected boolean isCacheControlValid(final ReaderInterceptorContext context,
                                           final CacheControl responseControl) {
-        
+
         boolean valid =
             responseControl != null && !responseControl.isNoCache() && !responseControl.isNoStore();
         if (valid) {
-            String clientHeader = 
+            String clientHeader =
                 (String)context.getProperty(CacheControlClientRequestFilter.CLIENT_CACHE_CONTROL);
             CacheControl clientControl = clientHeader == null ? null : CacheControl.valueOf(clientHeader);
             if (clientControl != null && clientControl.isPrivate() != responseControl.isPrivate()) {

@@ -34,9 +34,9 @@ public final class WsdlUtilities {
 
     private WsdlUtilities() {
     }
-    
-    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option, 
-                                                        Artifact artifact, 
+
+    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option,
+                                                        Artifact artifact,
                                                         File outputDir) {
         if (!WSDL_TYPE.equals(artifact.getType())) {
             return false;
@@ -52,31 +52,23 @@ public final class WsdlUtilities {
     }
 
     public static String joinWithComma(String[] arr) {
-        if (arr == null) {
+        if (arr == null || arr.length == 0) {
             return "";
         }
-        StringBuilder str = new StringBuilder();
-
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
-            }
-            str.append(s);
-        }
-        return str.toString();
+        return String.join(",", arr);
     }
 
-    public static List<File> getWsdlFiles(File dir, String includes[], String excludes[])
+    public static List<File> getWsdlFiles(File dir, String[] includes, String[] excludes)
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }
         exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
 
         String inc = joinWithComma(includes);
-        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
+        String ex = joinWithComma(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);

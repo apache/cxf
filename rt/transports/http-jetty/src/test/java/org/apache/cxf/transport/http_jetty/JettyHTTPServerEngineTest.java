@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,25 +43,37 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
-import org.junit.Assert;
+
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JettyHTTPServerEngineTest extends Assert {
-    private static final int PORT1 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JettyHTTPServerEngineTest {
+    private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 1));
     private static final int PORT2
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 2));
-    private static final int PORT3 
+    private static final int PORT3
         = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 3));
-    
+    private static final int PORT4
+        = Integer.valueOf(TestUtil.getPortNumber(JettyHTTPServerEngineTest.class, 4));
+
 
     private Bus bus;
     private IMocksControl control;
@@ -70,27 +83,27 @@ public class JettyHTTPServerEngineTest extends Assert {
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
-        
+
         Configurer configurer = new ConfigurerImpl();
         bus.getExtension(Configurer.class);
         EasyMock.expectLastCall().andReturn(configurer).anyTimes();
-        
+
         InstrumentationManager iManager = control.createMock(InstrumentationManager.class);
         iManager.getMBeanServer();
         EasyMock.expectLastCall().andReturn(ManagementFactory.getPlatformMBeanServer()).anyTimes();
-        
+
         bus.getExtension(InstrumentationManager.class);
         EasyMock.expectLastCall().andReturn(iManager).anyTimes();
-        
+
         control.replay();
 
         factory = new JettyHTTPServerEngineFactory();
         factory.setBus(bus);
 
     }
-    
+
     /**
-     * Check that names of threads serving requests for instances of JettyHTTPServerEngine 
+     * Check that names of threads serving requests for instances of JettyHTTPServerEngine
      * can be set with user specified name.
      */
     @Test
@@ -104,9 +117,9 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.finalizeConfig();
         JettyHTTPTestHandler handler = new JettyHTTPTestHandler("string1", true);
         engine.addServant(new URL("https://localhost:" + PORT1 + "/test"), handler);
-        assertTrue("No threads whose name is started with " + threadNamePrefix1, 
+        assertTrue("No threads whose name is started with " + threadNamePrefix1,
                 checkForExistenceOfThreads(threadNamePrefix1));
-        
+
         // Default thread name prefix
         engine = factory.createJettyHTTPServerEngine(PORT3, "http");
         engine.finalizeConfig();
@@ -115,9 +128,9 @@ public class JettyHTTPServerEngineTest extends Assert {
         ThreadPool threadPool = engine.getServer().getThreadPool();
         QueuedThreadPool qtp = (QueuedThreadPool)threadPool;
         String prefixDefault = qtp.getName();
-        assertTrue("No threads whose name is started with " + prefixDefault, 
+        assertTrue("No threads whose name is started with " + prefixDefault,
                 checkForExistenceOfThreads(prefixDefault));
-        
+
         // User specific thread name prefix 2
         String threadNamePrefix2 = "AnotherPrefix";
         engine = factory.createJettyHTTPServerEngine(PORT2, "http");
@@ -127,9 +140,9 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.finalizeConfig();
         handler = new JettyHTTPTestHandler("string2", true);
         engine.addServant(new URL("https://localhost:" + PORT2 + "/test"), handler);
-        assertTrue("No threads whose name is started with " + threadNamePrefix2, 
+        assertTrue("No threads whose name is started with " + threadNamePrefix2,
                 checkForExistenceOfThreads(threadNamePrefix2));
-        
+
         JettyHTTPServerEngineFactory.destroyForPort(PORT1);
         JettyHTTPServerEngineFactory.destroyForPort(PORT2);
         JettyHTTPServerEngineFactory.destroyForPort(PORT3);
@@ -141,11 +154,11 @@ public class JettyHTTPServerEngineTest extends Assert {
         for (Thread thread : threadSet) {
             if (thread.getName().startsWith(prefixName)) {
                 return true;
-            } 
+            }
         }
         return false;
     }
-    
+
     @Test
     public void testEngineRetrieval() throws Exception {
         JettyHTTPServerEngine engine =
@@ -172,7 +185,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.setTlsServerParameters(new TLSServerParameters());
         engine.finalizeConfig();
 
-        List<JettyHTTPServerEngine> list = new ArrayList<JettyHTTPServerEngine>();
+        List<JettyHTTPServerEngine> list = new ArrayList<>();
         list.add(engine);
         factory.setEnginesList(list);
         engine = factory.createJettyHTTPServerEngine(PORT2, "https");
@@ -181,7 +194,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.addServant(new URL("https://localhost:" + PORT2 + "/test"), handler1);
         assertTrue("Protocol must be https",
                 "https".equals(engine.getProtocol()));
-        
+
         assertEquals("Get the wrong maxIdleTime.", 30000, getMaxIdle(engine.getConnector()));
 
         factory.setTLSServerParametersForPort(PORT1, new TLSServerParameters());
@@ -218,7 +231,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         engine.setMaxIdleTime(30000);
         engine.addServant(new URL(urlStr), new JettyHTTPTestHandler("string1", true));
         assertEquals("Get the wrong maxIdleTime.", 30000, getMaxIdle(engine.getConnector()));
-        
+
         String response = null;
         response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1");
@@ -229,34 +242,34 @@ public class JettyHTTPServerEngineTest extends Assert {
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test") > 0);
         }
-        
+
         try {
             engine.addServant(new URL(urlStr + "/test"), new JettyHTTPTestHandler("string2", true));
             fail("We don't support to publish the two service at the same context path");
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello/test/test") > 0);
         }
-        
+
         try {
-            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"), 
+            engine.addServant(new URL("http://localhost:" + PORT1 + "/hello"),
                               new JettyHTTPTestHandler("string2", true));
             fail("We don't support to publish the two service at the same context path");
         } catch (Exception ex) {
             assertTrue("Get a wrong exception message", ex.getMessage().indexOf("hello") > 0);
         }
-        
+
         // check if the system property change could work
         System.setProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl", "true");
         engine.addServant(new URL(urlStr + "/test"), new JettyHTTPTestHandler("string2", true));
         // clean up the System property setting
         System.clearProperty("org.apache.cxf.transports.http_jetty.DontCheckUrl");
-        
+
         engine.addServant(new URL(urlStr2), new JettyHTTPTestHandler("string2", true));
-        
+
         Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
-        
+
         engine.removeServant(new URL(urlStr));
         engine.shutdown();
         response = getResponse(urlStr2);
@@ -265,7 +278,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPServerEngineFactory.destroyForPort(PORT1);
 
     }
-    
+
     /**
      * Test that multiple JettyHTTPServerEngine instances can be used simultaneously
      * without having name collisions.
@@ -280,35 +293,35 @@ public class JettyHTTPServerEngineTest extends Assert {
             factory.createJettyHTTPServerEngine(PORT2, "http");
         JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
         JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
-        
+
         engine.addServant(new URL(urlStr), handler1);
-        
+
         Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
-        
+
         engine2.addServant(new URL(urlStr2), handler2);
-        
+
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 2 Jetty Server: " + s, 2, s.size());
-        
+
         engine.removeServant(new URL(urlStr));
         engine2.removeServant(new URL(urlStr2));
-        
-        
+
+
         engine.shutdown();
-        
+
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 2 Jetty Server: " + s, 1, s.size());
-        
+
         engine2.shutdown();
-        
+
         s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
             queryNames(new ObjectName("org.eclipse.jetty.server:type=server,*"), null));
         assertEquals("Could not find 0 Jetty Server: " + s, 0, s.size());
-        
+
         JettyHTTPServerEngineFactory.destroyForPort(PORT1);
         JettyHTTPServerEngineFactory.destroyForPort(PORT2);
     }
@@ -322,7 +335,7 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
         engine.setPort(PORT2);
 
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         handlers.add(handler1);
         engine.setHandlers(handlers);
         engine.finalizeConfig();
@@ -353,7 +366,7 @@ public class JettyHTTPServerEngineTest extends Assert {
 
         // Note: There appears to be an internal issue in Jetty that does not
         // unregister the MBean for handler1 during this setHandler operation.
-        // This scenario may create a warning message in the logs 
+        // This scenario may create a warning message in the logs
         //     (javax.management.InstanceAlreadyExistsException: org.apache.cxf.
         //         transport.http_jetty:type=jettyhttptesthandler,id=0)
         // when running subsequent tests.
@@ -384,12 +397,12 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPHandler handler1 = new JettyHTTPTestHandler("test", false);
         JettyHTTPHandler handler2 = new JettyHTTPTestHandler("test2", false);
         engine.addServant(new URL(urlStr1), handler1);
-        
+
         contextHandler = engine.getContextHandler(new URL(urlStr1));
-        
+
         engine.addServant(new URL(urlStr2), handler2);
         contextHandler = engine.getContextHandler(new URL(urlStr2));
-        
+
         String response = null;
         try {
             response = getResponse(urlStr1 + "/test");
@@ -408,6 +421,41 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPServerEngineFactory.destroyForPort(PORT3);
     }
 
+    @Test
+    public void testSetConnector() throws Exception {
+        URL url = new URL("http://localhost:" + PORT4 + "/hello/test");
+        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
+        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
+
+        JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
+        engine.setPort(PORT4);
+        Server server = new Server();
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(PORT4);
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
+        HttpConnectionFactory httpFactory = new HttpConnectionFactory(httpConfig);
+        Collection<ConnectionFactory> connectionFactories = new ArrayList<>();
+        connectionFactories.add(httpFactory);
+        connector.setConnectionFactories(connectionFactories);
+        engine.setConnector(connector);
+        List<Handler> handlers = new ArrayList<>();
+        handlers.add(handler1);
+        engine.setHandlers(handlers);
+        engine.finalizeConfig();
+
+        engine.addServant(url, handler2);
+        String response = null;
+        try {
+            response = getResponse(url.toString());
+            assertEquals("the jetty http handler1 did not take effect", response, "string1string2");
+        } catch (Exception ex) {
+            fail("Can't get the reponse from the server " + ex);
+        }
+        engine.stop();
+        JettyHTTPServerEngineFactory.destroyForPort(PORT4);
+    }
+
     private String getResponse(String target) throws Exception {
         URL url = new URL(target);
 
@@ -416,8 +464,9 @@ public class JettyHTTPServerEngineTest extends Assert {
         assertTrue(connection instanceof HttpURLConnection);
         connection.connect();
         InputStream in = connection.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        IOUtils.copy(in, buffer);
-        return buffer.toString();
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            IOUtils.copy(in, buffer);
+            return buffer.toString();
+        }
     }
 }

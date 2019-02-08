@@ -40,9 +40,13 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.policy.PolicyInInterceptor;
 import org.apache.cxf.ws.policy.PolicyOutInterceptor;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-Addressing and
@@ -54,53 +58,53 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
     private static final Logger LOG = LogUtils.getLogger(AddressingInlinePolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
-    
+
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             ep = Endpoint.publish(address, implementor);
-            LOG.info("Published greeter endpoint.");            
+            LOG.info("Published greeter endpoint.");
             testInterceptors(bus);
         }
-        
+
         public void tearDown() {
             ep.stop();
         }
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtil.getNewPortNumber("decoupled");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testUsingAddressing() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
-        
+
         bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy-old.xml");
-        
+
         BusFactory.setDefaultBus(bus);
-        
+
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
@@ -109,32 +113,32 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
         testInterceptors(bus);
-        
+
         // oneway
-        
+
         greeter.greetMeOneWay("CXF");
 
         // two-way
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
-     
+        assertEquals("CXF", greeter.greetMe("cxf"));
+
         // exception
 
         try {
             greeter.pingMe();
         } catch (PingMeFault ex) {
             fail("First invocation should have succeeded.");
-        } 
-       
+        }
+
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault ex) {
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
-        } 
+        }
         ((Closeable)greeter).close();
-        
+
     }
 
     private static void testInterceptors(Bus b) {
@@ -147,7 +151,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
             }
         }
         assertTrue(hasServerIn);
-        
+
         for (Interceptor<? extends Message> i : b.getOutInterceptors()) {
             if (i instanceof PolicyOutInterceptor) {
                 hasServerOut = true;

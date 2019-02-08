@@ -85,7 +85,7 @@ public class Base64DecoderStream extends FilterInputStream {
             } catch (Base64Exception e) {
                 throw new IOException(e);
             }
-            decodedCount = decodedChars.length; 
+            decodedCount = decodedChars.length;
             return true;
         }
         return false;
@@ -102,7 +102,7 @@ public class Base64DecoderStream extends FilterInputStream {
             return -1;
         }
         decodedCount--;
-        // we need to ensure this doesn't get sign extended 
+        // we need to ensure this doesn't get sign extended
         return decodedChars[decodedIndex++] & 0xff;
     }
 
@@ -149,7 +149,8 @@ public class Base64DecoderStream extends FilterInputStream {
                 // now check to see if this is normal, or potentially an error
                 // if we didn't get characters as a multiple of 4, we may need to complain about this.
                 if ((readCharacters % 4) != 0) {
-                    throw new IOException("Base64 encoding error, data truncated");
+                    throw new IOException("Base64 encoding error, data truncated: " + readCharacters + " "
+                                          + new String(encodedChars, 0, readCharacters));
                 }
                 // return the count.
                 return readCharacters;

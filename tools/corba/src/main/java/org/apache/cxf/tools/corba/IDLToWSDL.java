@@ -32,7 +32,6 @@ import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.common.toolspec.parser.BadUsageException;
 import org.apache.cxf.tools.common.toolspec.parser.CommandDocument;
 import org.apache.cxf.tools.common.toolspec.parser.ErrorVisitor;
-
 import org.apache.cxf.tools.corba.common.ProcessorEnvironment;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.cxf.tools.corba.processors.idl.IDLToWSDLProcessor;
@@ -51,7 +50,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
     }
 
     private Set<String> getArrayKeys() {
-        Set<String> arrayKeys = new HashSet<String>();
+        Set<String> arrayKeys = new HashSet<>();
         arrayKeys.add(ToolCorbaConstants.CFG_INCLUDEDIR);
         return arrayKeys;
     }
@@ -68,7 +67,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
                 if (isVerboseOn()) {
                     env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
                 }
-                env.put(ToolConstants.CFG_CMD_ARG, args);                
+                env.put(ToolConstants.CFG_CMD_ARG, args);
                 initialise(env);
                 validate(env);
                 idlProcessor.setEnvironment(env);
@@ -103,7 +102,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
         }
         if (env.optionSet(ToolCorbaConstants.CFG_TNS)) {
             env.put(ToolCorbaConstants.CFG_TNS, doc.getParameter(ToolCorbaConstants.CFG_TNS));
-        }        
+        }
         if (env.optionSet(ToolConstants.CFG_OUTPUTDIR)) {
             env.put(ToolConstants.CFG_OUTPUTDIR, doc.getParameter(ToolConstants.CFG_OUTPUTDIR));
         }
@@ -121,7 +120,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
         if (env.optionSet(ToolCorbaConstants.CFG_LOGICAL)) {
             env.put(ToolCorbaConstants.CFG_LOGICAL,
                     doc.getParameter(ToolCorbaConstants.CFG_LOGICAL));
-        }        
+        }
         if (env.optionSet(ToolCorbaConstants.CFG_PHYSICAL)) {
             env.put(ToolCorbaConstants.CFG_PHYSICAL,
                     doc.getParameter(ToolCorbaConstants.CFG_PHYSICAL));
@@ -138,12 +137,12 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
             env.put(ToolCorbaConstants.CFG_IMPORTSCHEMA,
                     doc.getParameter(ToolCorbaConstants.CFG_IMPORTSCHEMA));
         }
-        
+
         if (env.optionSet(ToolCorbaConstants.CFG_MODULETONS)) {
             env.put(ToolCorbaConstants.CFG_MODULETONS,
                     doc.getParameter(ToolCorbaConstants.CFG_MODULETONS));
         }
-        
+
         if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {
             env.put(ToolCorbaConstants.CFG_INCLUDEDIR,
                     doc.getParameters(ToolCorbaConstants.CFG_INCLUDEDIR));
@@ -157,14 +156,14 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
             env.put(ToolCorbaConstants.CFG_EXCLUDEMODULES,
                     doc.getParameter(ToolCorbaConstants.CFG_EXCLUDEMODULES));
         }
-        
+
     }
 
     public static void run(String[] arguments) throws Exception {
         ToolRunner.runTool(IDLToWSDL.class, IDLToWSDL.class
                            .getResourceAsStream(ToolCorbaConstants.TOOLSPECS_BASE + "idl2wsdl.xml"),
                            false,
-                           arguments);       
+                           arguments);
     }
 
     public static void main(String[] arguments) {
@@ -184,7 +183,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
             if (!dir.exists()) {
                 dir.mkdir();
             }
-        }        
+        }
     }
 
     public void checkParams(ErrorVisitor errors) throws ToolException {
@@ -197,7 +196,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
             && (doc.hasParameter(ToolCorbaConstants.CFG_IMPORTSCHEMA))) {
             errors.add(new ErrorVisitor.UserError("Options -n & -T cannot be used together"));
         }
-        
+
         if ((doc.hasParameter(ToolCorbaConstants.CFG_MODULETONS))
             && ((doc.hasParameter(ToolCorbaConstants.CFG_LOGICAL))
                 || (doc.hasParameter(ToolCorbaConstants.CFG_PHYSICAL))

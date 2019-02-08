@@ -29,66 +29,66 @@ public class Parameter {
     private boolean isEncoded;
     private String defaultValue;
     private Class<?> javaType;
-    
+
     public Parameter() {
-        
+
     }
-    
+
     public Parameter(String type, int pos, String aValue) {
-        this(ParameterType.valueOf(type), pos, aValue); 
+        this(ParameterType.valueOf(type), pos, aValue);
     }
-    
+
     public Parameter(ParameterType type, String aValue) {
-        this(type, 0, aValue); 
+        this(type, 0, aValue);
     }
-    
+
     public Parameter(ParameterType type, int ind, String aValue) {
         this.type = type;
         this.ind = ind;
-        this.aValue = aValue; 
+        this.aValue = aValue;
     }
-    
-    public Parameter(ParameterType type, int ind, String aValue, 
+
+    public Parameter(ParameterType type, int ind, String aValue,
                      boolean isEncoded, String defaultValue) {
         this.type = type;
         this.ind = ind;
-        this.aValue = aValue; 
+        this.aValue = aValue;
         this.isEncoded = isEncoded;
         this.defaultValue = defaultValue;
     }
-    
+
     public int getIndex() {
         return ind;
     }
-    
+
     public String getName() {
         return aValue;
     }
-    
+
     public void setName(String value) {
         aValue = value;
     }
-    
+
     public ParameterType getType() {
         return type;
     }
-    
+
     public void setType(String stype) {
         type = ParameterType.valueOf(stype);
     }
-    
+
     public boolean isEncoded() {
         return isEncoded;
     }
-    
-    public void setEncoded(boolean encoded) { 
+
+    public void setEncoded(boolean encoded) {
         isEncoded = encoded;
     }
-    
+
     public String getDefaultValue() {
         return defaultValue;
     }
-    
+
     public void setDefaultValue(String dValue) {
         defaultValue = dValue;
     }
@@ -98,8 +98,7 @@ public class Parameter {
     public Class<?> getJavaType() {
         if (javaType == null) {
             return type == ParameterType.REQUEST_BODY ? InputStream.class : String.class;
-        } else {
-            return javaType;
         }
+        return javaType;
     }
 }

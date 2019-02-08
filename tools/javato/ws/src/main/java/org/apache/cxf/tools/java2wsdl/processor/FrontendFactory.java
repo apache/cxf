@@ -37,15 +37,15 @@ import org.apache.cxf.tools.util.AnnotationUtil;
 public final class FrontendFactory {
     private Class<?> serviceClass;
     private List<Method> wsMethods;
-    
+
     @SuppressWarnings("unchecked")
-    private Class<? extends Annotation>[] annotations 
+    private Class<? extends Annotation>[] annotations
         = new Class[] {SOAPBinding.class,
                        WebService.class,
                        WebServiceProvider.class};
 
     private static final class FrontendFactoryHolder {
-        private static final FrontendFactory INSTANCE = 
+        private static final FrontendFactory INSTANCE =
             new FrontendFactory();
     }
 
@@ -91,7 +91,7 @@ public final class FrontendFactory {
     }
 
     private List<Method> getWSMethods() {
-        List<Method> methods = new ArrayList<Method>();
+        List<Method> methods = new ArrayList<>();
         for (Method method : serviceClass.getMethods()) {
             if (method.getDeclaringClass().equals(Object.class)
                 || !Modifier.isPublic(method.getModifiers())

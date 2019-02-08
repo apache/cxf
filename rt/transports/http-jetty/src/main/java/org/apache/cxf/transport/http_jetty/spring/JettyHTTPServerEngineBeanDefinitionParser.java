@@ -31,6 +31,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -70,10 +71,10 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         "http://cxf.apache.org/configuration/security";
 
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        
+
         String portStr = element.getAttribute("port");
         bean.addPropertyValue("port", portStr);
-        
+
         String hostStr = element.getAttribute("host");
         if (hostStr != null && !"".equals(hostStr.trim())) {
             bean.addPropertyValue("host", hostStr);
@@ -83,17 +84,17 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         if (continuationsStr != null && continuationsStr.length() > 0) {
             bean.addPropertyValue("continuationsEnabled", continuationsStr);
         }
-        
+
         String maxIdleTimeStr = element.getAttribute("maxIdleTime");
         if (maxIdleTimeStr != null && !"".equals(maxIdleTimeStr.trim())) {
             bean.addPropertyValue("maxIdleTime", maxIdleTimeStr);
         }
-        
+
         String sendServerVersionStr = element.getAttribute("sendServerVersion");
         if (sendServerVersionStr != null && sendServerVersionStr.length() > 0) {
             bean.addPropertyValue("sendServerVersion", sendServerVersionStr);
         }
-        
+
         ValueHolder busValue = ctx.getContainingBeanDefinition()
             .getConstructorArgumentValues().getArgumentValue(0, Bus.class);
         bean.addPropertyValue("bus", busValue.getValue());
@@ -125,21 +126,22 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                                                     JettyHTTPServerEngineBeanDefinitionParser.class,
                                                     "createThreadingParametersRef"
                                                     );
-                } else if ("connector".equals(name)) { 
+                } else if ("connector".equals(name)) {
                     // only deal with the one connector here
-                    List<?> list = 
+                    List<?> list =
                         ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
                     bean.addPropertyValue("connector", list.get(0));
                 } else if ("handlers".equals(name)) {
-                    List<?> handlers = 
+                    List<?> handlers =
                         ctx.getDelegate().parseListElement(elem, bean.getBeanDefinition());
                     bean.addPropertyValue("handlers", handlers);
-                } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
-                    String text = elem.getTextContent();                        
+                } else if ("sessionTimeout".equals(name) 
+                    || "sessionSupport".equals(name) || "reuseAddress".equals(name)) {
+                    String text = elem.getTextContent();
                     bean.addPropertyValue(name, text);
-                }                         
+                }
 
-                elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);          
+                elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);
             }
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
@@ -147,28 +149,28 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         bean.setLazyInit(false);
     }
-    
+
     private void mapTLSServerParameters(Element e, BeanDefinitionBuilder bean) {
-        BeanDefinitionBuilder paramsbean 
+        BeanDefinitionBuilder paramsbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.TLSServerParametersTypeInternal.class);
-        
+
         // read the attributes
         NamedNodeMap as = e.getAttributes();
         for (int i = 0; i < as.getLength(); i++) {
             Attr a = (Attr) as.item(i);
             if (a.getNamespaceURI() == null) {
                 String aname = a.getLocalName();
-                if ("jsseProvider".equals(aname) 
+                if ("jsseProvider".equals(aname)
                     || "secureSocketProtocol".equals(aname)) {
                     paramsbean.addPropertyValue(aname, a.getValue());
                 }
             }
         }
-        
+
         // read the child elements
         Node n = e.getFirstChild();
         while (n != null) {
-            if (Node.ELEMENT_NODE != n.getNodeType() 
+            if (Node.ELEMENT_NODE != n.getNodeType()
                 || !SECURITY_NS.equals(n.getNamespaceURI())) {
                 n = n.getNextSibling();
                 continue;
@@ -181,14 +183,14 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("keyManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                              KeyManagersType.class);
                 }
             } else if ("trustManagers".equals(ename)) {
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("trustManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                              TrustManagersType.class);
                 }
             } else if ("cipherSuites".equals(ename)) {
@@ -218,7 +220,7 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             n = n.getNextSibling();
         }
 
-        BeanDefinitionBuilder jaxbbean 
+        BeanDefinitionBuilder jaxbbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.class);
         jaxbbean.addConstructorArgValue(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsServerParameters", jaxbbean.getBeanDefinition());
@@ -238,11 +240,11 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         }
         return params;
     }
-    
-       
+
+
     /*
      * We do not require an id from the configuration.
-     * 
+     *
      * (non-Javadoc)
      * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
      */
@@ -255,16 +257,16 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
     protected Class<?> getBeanClass(Element arg0) {
         return SpringJettyHTTPServerEngine.class;
     }
-    
+
     @NoJSR250Annotations
     public static class SpringJettyHTTPServerEngine extends JettyHTTPServerEngine
         implements ApplicationContextAware, InitializingBean {
-        
+
         String threadingRef;
         String tlsRef;
         Bus bus;
         JettyHTTPServerEngineFactory factory;
-        
+
         public SpringJettyHTTPServerEngine(
             JettyHTTPServerEngineFactory fac,
             Bus b,
@@ -274,33 +276,33 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
             bus = b;
             factory = fac;
         }
-        
+
         public SpringJettyHTTPServerEngine() {
             super();
         }
-        
+
         public void setBus(Bus b) {
             bus = b;
             if (null != bus && null == factory) {
                 factory = bus.getExtension(JettyHTTPServerEngineFactory.class);
-            } 
+            }
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (bus == null) {
                 bus = BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx);
             }
         }
-        
+
         public void setThreadingParametersRef(String s) {
             threadingRef = s;
         }
         public void setTlsServerParametersRef(String s) {
             tlsRef = s;
         }
-        
+
         @PostConstruct
-        public void finalizeConfig() 
+        public void finalizeConfig()
             throws GeneralSecurityException,
                    IOException {
             if (tlsRef != null || threadingRef != null) {
@@ -320,37 +322,37 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         }
 
     }
-        
 
-    
-    public static TLSServerParametersConfig createTLSServerParametersConfig(String s, 
-                                                                            JAXBContext context) 
+
+
+    public static TLSServerParametersConfig createTLSServerParametersConfig(String s,
+                                                                            JAXBContext context)
         throws GeneralSecurityException, IOException {
-        
+
         TLSServerParametersType parametersType = unmarshalFactoryString(s, context,
                                                                         TLSServerParametersType.class);
-        
+
         return new TLSServerParametersConfig(parametersType);
     }
     public static String createTLSServerParametersConfigRef(String s, JAXBContext context)
-    
+
         throws GeneralSecurityException, IOException {
-        
-        TLSServerParametersIdentifiedType parameterTypeRef 
+
+        TLSServerParametersIdentifiedType parameterTypeRef
             = unmarshalFactoryString(s, context, TLSServerParametersIdentifiedType.class);
-        
-        return parameterTypeRef.getId(); 
-    } 
-    
+
+        return parameterTypeRef.getId();
+    }
+
     public static ThreadingParameters createThreadingParameters(String s, JAXBContext context) {
-        
+
         ThreadingParametersType parametersType = unmarshalFactoryString(s, context,
                                                                         ThreadingParametersType.class);
-        
+
         return toThreadingParameters(parametersType);
     }
     public static String createThreadingParametersRef(String s, JAXBContext context) {
-        ThreadingParametersIdentifiedType parametersType 
+        ThreadingParametersIdentifiedType parametersType
             = unmarshalFactoryString(s, context, ThreadingParametersIdentifiedType.class);
         return parametersType.getId();
     }

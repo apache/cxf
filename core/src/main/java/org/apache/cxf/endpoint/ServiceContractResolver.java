@@ -30,9 +30,9 @@ import javax.xml.namespace.QName;
 public interface ServiceContractResolver {
 
     /**
-     * Resolves a service's QName to a URI representing the location of a WSDL 
-     * contract. This method is called by the 
-     * <code>ServiceContractResolverRegistry</code> with which the contract 
+     * Resolves a service's QName to a URI representing the location of a WSDL
+     * contract. This method is called by the
+     * <code>ServiceContractResolverRegistry</code> with which the contract
      * resolver is registered.
      *
      * @param qname the QName being mapped to a URI

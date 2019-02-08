@@ -65,7 +65,7 @@ import org.apache.wss4j.policy.model.X509Token;
 public abstract class AbstractCommonBindingHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractCommonBindingHandler.class);
     protected final SoapMessage message;
-    
+
     public AbstractCommonBindingHandler(
         SoapMessage msg
     ) {
@@ -92,7 +92,7 @@ public abstract class AbstractCommonBindingHandler {
             throw new PolicyException(new Message(reason, LOG));
         }
     }
-    
+
     protected void unassertPolicy(Assertion assertion, Exception reason) {
         if (assertion == null) {
             return;
@@ -113,7 +113,7 @@ public abstract class AbstractCommonBindingHandler {
             throw new PolicyException(new Message(reason.getMessage(), LOG), reason);
         }
     }
-    
+
     protected void assertTokenWrapper(AbstractTokenWrapper tokenWrapper) {
         if (tokenWrapper == null) {
             return;
@@ -121,18 +121,18 @@ public abstract class AbstractCommonBindingHandler {
         assertPolicy(tokenWrapper.getName());
         assertToken(tokenWrapper.getToken());
     }
-    
+
     protected void assertToken(AbstractToken token) {
         if (token == null) {
             return;
         }
         assertPolicy(token.getName());
-        
+
         String namespace = token.getName().getNamespaceURI();
         if (token.getDerivedKeys() != null) {
             assertPolicy(new QName(namespace, token.getDerivedKeys().name()));
         }
-        
+
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token)token;
             assertX509Token(x509Token);
@@ -167,12 +167,12 @@ public abstract class AbstractCommonBindingHandler {
         } else if (token instanceof SamlToken) {
             SamlToken samlToken = (SamlToken)token;
             assertSamlToken(samlToken);
-        } 
+        }
     }
-    
+
     private void assertX509Token(X509Token token) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireEmbeddedTokenReference()) {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_EMBEDDED_TOKEN_REFERENCE));
         }
@@ -189,10 +189,10 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, token.getTokenType().name()));
         }
     }
-    
+
     private void assertUsernameToken(UsernameToken token) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.getPasswordType() != null) {
             assertPolicy(new QName(namespace, token.getPasswordType().name()));
         }
@@ -206,7 +206,7 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(SP13Constants.NONCE);
         }
     }
-    
+
     private void assertSecurityContextToken(SecurityContextToken token) {
         String namespace = token.getName().getNamespaceURI();
         if (token.isRequireExternalUriReference()) {
@@ -219,10 +219,10 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.SC13_SECURITY_CONTEXT_TOKEN));
         }
     }
-    
+
     private void assertSecureConversationToken(SecureConversationToken token) {
         assertSecurityContextToken(token);
-        
+
         String namespace = token.getName().getNamespaceURI();
         if (token.isMustNotSendAmend()) {
             assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_AMEND));
@@ -234,7 +234,7 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_RENEW));
         }
     }
-    
+
     private void assertSpnegoContextToken(SpnegoContextToken token) {
         String namespace = token.getName().getNamespaceURI();
         if (token.isMustNotSendAmend()) {
@@ -247,10 +247,10 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.MUST_NOT_SEND_RENEW));
         }
     }
-    
+
     private void assertIssuedToken(IssuedToken token) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireExternalReference()) {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_EXTERNAL_REFERENCE));
         }
@@ -258,10 +258,10 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_INTERNAL_REFERENCE));
         }
     }
-    
+
     private void assertKerberosToken(KerberosToken token) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireKeyIdentifierReference()) {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
         }
@@ -269,10 +269,10 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, token.getApReqTokenType().name()));
         }
     }
-    
+
     private void assertSamlToken(SamlToken token) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireKeyIdentifierReference()) {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
         }
@@ -280,22 +280,22 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, token.getSamlTokenType().name()));
         }
     }
-    
+
     protected void assertAlgorithmSuite(AlgorithmSuite algorithmSuite) {
         if (algorithmSuite == null) {
             return;
         }
-        
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> algorithmSuiteAis = aim.get(algorithmSuite.getName());
         for (AssertionInfo ai : algorithmSuiteAis) {
             ai.setAsserted(true);
         }
-        
+
         AlgorithmSuiteType algorithmSuiteType = algorithmSuite.getAlgorithmSuiteType();
         String namespace = algorithmSuiteType.getNamespace();
         if (namespace != null) {
-            Collection<AssertionInfo> algAis = 
+            Collection<AssertionInfo> algAis =
                 aim.get(new QName(namespace, algorithmSuiteType.getName()));
             if (algAis != null) {
                 for (AssertionInfo algAi : algAis) {
@@ -304,7 +304,7 @@ public abstract class AbstractCommonBindingHandler {
             }
         }
     }
-    
+
     protected void assertWSSProperties(String namespace) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> wss10Ais = aim.get(new QName(namespace, SPConstants.WSS10));
@@ -315,14 +315,14 @@ public abstract class AbstractCommonBindingHandler {
                 assertWSS10Properties(wss10);
             }
         }
-        
+
         Collection<AssertionInfo> wss11Ais = aim.get(new QName(namespace, SPConstants.WSS11));
         if (wss11Ais != null) {
             for (AssertionInfo ai : wss11Ais) {
                 ai.setAsserted(true);
                 Wss11 wss11 = (Wss11)ai.getAssertion();
                 assertWSS10Properties(wss11);
-                
+
                 if (wss11.isMustSupportRefThumbprint()) {
                     assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_THUMBPRINT));
                 }
@@ -335,7 +335,7 @@ public abstract class AbstractCommonBindingHandler {
             }
         }
     }
-    
+
     private void assertWSS10Properties(Wss10 wss10) {
         String namespace = wss10.getName().getNamespaceURI();
         if (wss10.isMustSupportRefEmbeddedToken()) {
@@ -351,7 +351,7 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.MUST_SUPPORT_REF_EXTERNAL_URI));
         }
     }
-    
+
     protected void assertTrustProperties(String namespace) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> trust10Ais = aim.get(new QName(namespace, SPConstants.TRUST_10));
@@ -362,14 +362,14 @@ public abstract class AbstractCommonBindingHandler {
                 assertTrust10Properties(trust10);
             }
         }
-        
+
         Collection<AssertionInfo> trust13Ais = aim.get(new QName(namespace, SPConstants.TRUST_13));
         if (trust13Ais != null) {
             for (AssertionInfo ai : trust13Ais) {
                 ai.setAsserted(true);
                 Trust13 trust13 = (Trust13)ai.getAssertion();
                 assertTrust10Properties(trust13);
-                
+
                 if (trust13.isRequireRequestSecurityTokenCollection()) {
                     assertPolicy(new QName(namespace, SPConstants.REQUIRE_REQUEST_SECURITY_TOKEN_COLLECTION));
                 }
@@ -385,7 +385,7 @@ public abstract class AbstractCommonBindingHandler {
             }
         }
     }
-    
+
     private void assertTrust10Properties(Trust10 trust10) {
         String namespace = trust10.getName().getNamespaceURI();
         if (trust10.isMustSupportClientChallenge()) {
@@ -404,20 +404,20 @@ public abstract class AbstractCommonBindingHandler {
             assertPolicy(new QName(namespace, SPConstants.REQUIRE_SERVER_ENTROPY));
         }
     }
-    
+
     protected Collection<AssertionInfo> getAllAssertionsByLocalname(String localname) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         return PolicyUtils.getAllAssertionsByLocalname(aim, localname);
     }
-    
+
     protected SoapMessage getMessage() {
         return message;
     }
-    
+
     protected boolean isRequestor() {
         return MessageUtils.isRequestor(message);
     }
-    
+
     protected boolean isTokenRequired(IncludeTokenType includeToken) {
         if (includeToken == IncludeTokenType.INCLUDE_TOKEN_NEVER) {
             return false;
@@ -434,20 +434,20 @@ public abstract class AbstractCommonBindingHandler {
             return false;
         }
     }
-    
+
     protected Wss10 getWss10() {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.WSS10);
         if (ai == null) {
             ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.WSS11);
         }
-        
+
         if (ai != null) {
             return (Wss10)ai.getAssertion();
         }
         return null;
     }
-    
+
     protected SecurityToken getSecurityToken() {
         SecurityToken st = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
         if (st == null) {
@@ -458,12 +458,12 @@ public abstract class AbstractCommonBindingHandler {
         }
         return st;
     }
-   
+
     protected void assertPolicy(QName name) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         PolicyUtils.assertPolicy(aim, name);
-    } 
-    
+    }
+
     protected void assertPolicy(Assertion assertion) {
         if (assertion == null) {
             return;
@@ -481,5 +481,5 @@ public abstract class AbstractCommonBindingHandler {
             }
         }
     }
-    
+
 }

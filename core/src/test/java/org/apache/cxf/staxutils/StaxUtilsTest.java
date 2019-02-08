@@ -29,6 +29,7 @@ import java.io.Writer;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
@@ -48,17 +49,22 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.DOMUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class StaxUtilsTest extends Assert {
+public class StaxUtilsTest {
 
     @Test
     public void testFactoryCreation() {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream("./resources/amazon.xml"));
-        assertTrue(reader != null);
+        assertNotNull(reader);
     }
 
     private InputStream getTestStream(String resource) {
@@ -86,7 +92,7 @@ public class StaxUtilsTest extends Assert {
         assertTrue(StaxUtils.toNextElement(reader));
         assertEquals("Body", reader.getLocalName());
     }
-    
+
     @Test
     public void testToNextTag() throws Exception {
         String soapMessage = "./resources/headerSoapReq.xml";
@@ -95,23 +101,24 @@ public class StaxUtilsTest extends Assert {
         reader.nextTag();
         StaxUtils.toNextTag(reader, new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
         assertEquals("Body", reader.getLocalName());
-    }   
-    
+    }
+
     @Test
     public void testCopy() throws Exception {
-        
+
         // do the stream copying
-        String soapMessage = "./resources/headerSoapReq.xml";     
+        String soapMessage = "./resources/headerSoapReq.xml";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream(soapMessage));
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
         StaxUtils.copy(reader, writer);
         writer.flush();
         baos.flush();
-           
+
         // write output to a string
-        String output = baos.toString();       
-        
+        String output = baos.toString();
+        baos.close();
+
         // re-read the input xml doc to a string
         InputStreamReader inputStreamReader = new InputStreamReader(getTestStream(soapMessage));
         StringWriter stringWriter = new StringWriter();
@@ -123,19 +130,20 @@ public class StaxUtilsTest extends Assert {
             n = inputStreamReader.read(buffer);
         }
         String input = stringWriter.toString();
+        stringWriter.close();
         // seach for the first begin of "<soap:Envelope" to escape the apache licenses header
         int beginIndex = input.indexOf("<soap:Envelope");
         input = input.substring(beginIndex);
         beginIndex = output.indexOf("<soap:Envelope");
         output = output.substring(beginIndex);
-        
+
         output = output.replaceAll("\r\n", "\n");
         input = input.replaceAll("\r\n", "\n");
-        
+
         // compare the input and output string
         assertEquals(input, output);
     }
-    
+
     @Test
     public void testCXF2468() throws Exception {
         Document doc = DOMUtils.newDocument();
@@ -152,28 +160,28 @@ public class StaxUtilsTest extends Assert {
         swriter.flush();
         assertTrue("No xsi namespace: " + sw.toString(), sw.toString().contains("XMLSchema-instance"));
     }
-    
+
     @Test
     public void testNonNamespaceAwareParser() throws Exception {
         String xml = "<blah xmlns=\"http://blah.org/\" xmlns:snarf=\"http://snarf.org\">"
             + "<foo snarf:blop=\"blop\">foo</foo></blah>";
 
-        
+
         StringReader reader = new StringReader(xml);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(false);
         dbf.setValidating(false);
         Document doc = dbf.newDocumentBuilder().parse(new InputSource(reader));
         Source source = new DOMSource(doc);
-        
+
         dbf.setNamespaceAware(true);
         reader = new StringReader(xml);
         Document docNs = dbf.newDocumentBuilder().parse(new InputSource(reader));
         Source sourceNs = new DOMSource(docNs);
-        
-        
+
+
         XMLStreamReader sreader = StaxUtils.createXMLStreamReader(source);
-        
+
         StringWriter sw = new StringWriter();
         XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
 
@@ -181,14 +189,14 @@ public class StaxUtilsTest extends Assert {
         StaxUtils.copy(sreader, swriter);
         swriter.flush();
         swriter.close();
-        
+
         String output = sw.toString();
-        assertTrue(output.contains("blah"));        
-        assertTrue(output.contains("foo"));        
-        assertTrue(output.contains("snarf"));        
-        assertTrue(output.contains("blop"));        
-       
-        
+        assertTrue(output.contains("blah"));
+        assertTrue(output.contains("foo"));
+        assertTrue(output.contains("snarf"));
+        assertTrue(output.contains("blop"));
+
+
         sreader = StaxUtils.createXMLStreamReader(sourceNs);
         sw = new StringWriter();
         swriter = StaxUtils.createXMLStreamWriter(sw);
@@ -196,36 +204,36 @@ public class StaxUtilsTest extends Assert {
         StaxUtils.copy(sreader, swriter);
         swriter.flush();
         swriter.close();
-        
-        output = sw.toString();
-        assertTrue(output.contains("blah"));        
-        assertTrue(output.contains("foo"));        
-        assertTrue(output.contains("snarf"));        
-        assertTrue(output.contains("blop"));        
 
-        
+        output = sw.toString();
+        assertTrue(output.contains("blah"));
+        assertTrue(output.contains("foo"));
+        assertTrue(output.contains("snarf"));
+        assertTrue(output.contains("blop"));
+
+
         sreader = StaxUtils.createXMLStreamReader(source);
-        
+
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         swriter = StaxUtils.createXMLStreamWriter(bout);
-        StaxUtils.copy(sreader, swriter); 
+        StaxUtils.copy(sreader, swriter);
         swriter.flush();
         swriter.close();
-        
+
         output = bout.toString();
-        assertTrue(output.contains("blah"));        
-        assertTrue(output.contains("foo"));        
-        assertTrue(output.contains("snarf"));        
-        assertTrue(output.contains("blop"));        
+        assertTrue(output.contains("blah"));
+        assertTrue(output.contains("foo"));
+        assertTrue(output.contains("snarf"));
+        assertTrue(output.contains("blop"));
     }
-    
+
     @Test
     public void testEmptyNamespace() throws Exception {
         String testString = "<ns1:a xmlns:ns1=\"http://www.apache.org/\"><s1 xmlns=\"\">"
             + "abc</s1><s2 xmlns=\"\">def</s2></ns1:a>";
-        
+
         cycleString(testString);
-        
+
         testString = "<a xmlns=\"http://www.apache.org/\"><s1 xmlns=\"\">"
             + "abc</s1><s2 xmlns=\"\">def</s2></a>";
         cycleString(testString);
@@ -233,36 +241,36 @@ public class StaxUtilsTest extends Assert {
         testString = "<a xmlns=\"http://www.apache.org/\"><s1 xmlns=\"\">"
             + "abc</s1><s2>def</s2></a>";
         cycleString(testString);
-        
+
         testString = "<ns1:a xmlns:ns1=\"http://www.apache.org/\"><s1>"
             + "abc</s1><s2 xmlns=\"\">def</s2></ns1:a>";
-        
+
         cycleString(testString);
     }
-    
+
     private void cycleString(String s) throws Exception {
         StringReader reader = new StringReader(s);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document doc = dbf.newDocumentBuilder().parse(new InputSource(reader));
         String orig = StaxUtils.toString(doc.getDocumentElement());
-        
+
         StringWriter sw = new StringWriter();
         XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
         //should not throw an exception
         StaxUtils.writeDocument(doc, swriter, false, true);
         swriter.flush();
         swriter.close();
-        
+
         String output = sw.toString();
         assertEquals(s, output);
-        
+
         W3CDOMStreamWriter domwriter = new W3CDOMStreamWriter();
         StaxUtils.writeDocument(doc, domwriter, false, true);
         output = StaxUtils.toString(domwriter.getDocument().getDocumentElement());
         assertEquals(orig, output);
     }
-    
+
     @Test
     public void testRootPI() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -277,7 +285,7 @@ public class StaxUtilsTest extends Assert {
         assertTrue(output.contains("<?pi in='the sky'?>"));
         assertTrue(output.contains("<?e excl='gads'?>"));
     }
-    
+
     @Test
     public void testRootPInoProlog() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -292,10 +300,10 @@ public class StaxUtilsTest extends Assert {
         assertFalse(output.contains("<?pi in='the sky'?>"));
         assertFalse(output.contains("<?e excl='gads'?>"));
     }
-    
+
     @Test
     public void testDefaultPrefix() throws Exception {
-        String soapMessage = "./resources/AddRequest.xml";     
+        String soapMessage = "./resources/AddRequest.xml";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream(soapMessage));
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
@@ -314,8 +322,9 @@ public class StaxUtilsTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
         StaxSource staxSource = new StaxSource(reader);
-        TransformerFactory trf = TransformerFactory.newInstance();
-        Transformer transformer = trf.newTransformer();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(staxSource, new StreamResult(baos));
         writer.flush();
@@ -332,9 +341,10 @@ public class StaxUtilsTest extends Assert {
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(stringReader);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
         StaxSource staxSource = new StaxSource(reader);
-        TransformerFactory trf = TransformerFactory.newInstance();
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Document doc = StaxUtils.read(getTestStream("./resources/copy.xsl"));
-        Transformer transformer = trf.newTransformer(new DOMSource(doc));
+        Transformer transformer = transformerFactory.newTransformer(new DOMSource(doc));
         //System.out.println("Used transformer: " + transformer.getClass().getName());
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(staxSource, new StreamResult(baos));
@@ -349,6 +359,7 @@ public class StaxUtilsTest extends Assert {
         try {
             trf = TransformerFactory
                 .newInstance("com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl", null);
+            trf.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             String xml = "<root xmlns=\"urn:org.apache.cxf:test\">Text</root>";
             StringReader stringReader = new StringReader(xml);
@@ -382,31 +393,31 @@ public class StaxUtilsTest extends Assert {
             StaxUtils.writeEvent(event, xwriter);
         }
         xwriter.flush();
-        
+
         String s = swriter.toString();
         int idx = s.indexOf("xmlns:a");
         idx = s.indexOf("xmlns:a", idx + 1);
-        assertEquals(-1, idx);        
-    }        
-    
+        assertEquals(-1, idx);
+    }
+
     @Test
     public void testCopyWithEmptyNamespace() throws Exception {
         StringBuilder in = new StringBuilder();
         in.append("<foo xmlns=\"http://example.com/\">");
         in.append("<bar xmlns=\"\"/>");
         in.append("</foo>");
-        
+
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(
              new ByteArrayInputStream(in.toString().getBytes()));
-        
+
         Writer out = new StringWriter();
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
         StaxUtils.copy(reader, writer);
         writer.close();
-        
+
         assertEquals(in.toString(), out.toString());
     }
-    
+
     @Test
     public void testQName() throws Exception {
         StringBuilder in = new StringBuilder();
@@ -418,16 +429,16 @@ public class StaxUtilsTest extends Assert {
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(
              new ByteArrayInputStream(in.toString().getBytes()));
-        
+
         QName qname = new QName("http://example.com/", "Bar");
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // first bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // second bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // third bar
         try {
             StaxUtils.readQName(reader);
@@ -436,7 +447,7 @@ public class StaxUtilsTest extends Assert {
             // ignore
         }
     }
-    
+
     @Test
     public void testCopyFromTheMiddle() throws Exception {
         String innerXml =
@@ -472,5 +483,5 @@ public class StaxUtilsTest extends Assert {
         //System.out.println(innerXml);
         //System.out.println(sw.toString());
         assertEquals(innerXml, sw.toString());
-    }    
+    }
 }

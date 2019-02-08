@@ -30,9 +30,9 @@ import org.apache.cxf.service.model.OperationInfo;
  */
 public interface MethodDispatcher {
     Method getMethod(BindingOperationInfo op);
-    
+
     BindingOperationInfo getBindingOperation(Method m, Endpoint endpoint);
-    
+
     void bind(OperationInfo o, Method... methods);
 
 }

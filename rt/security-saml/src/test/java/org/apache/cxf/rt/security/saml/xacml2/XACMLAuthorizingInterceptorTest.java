@@ -31,12 +31,14 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
 
+import static org.junit.Assert.fail;
+
 
 /**
  * Some unit tests to test the AbstractXACMLAuthorizingInterceptor.
  */
-public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
-    
+public class XACMLAuthorizingInterceptorTest {
+
     static {
         org.apache.wss4j.common.saml.OpenSAMLUtil.initSamlEngine();
     }
@@ -45,7 +47,7 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
     public void testPermit() throws Exception {
         // Mock up a Security Context
         SecurityContext sc = createSecurityContext("alice", "manager");
-        
+
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
@@ -54,17 +56,17 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         String resourceURI = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
-        
+
         PolicyDecisionPoint pdp = new DummyPDP();
         XACMLAuthorizingInterceptor authorizingInterceptor = new XACMLAuthorizingInterceptor(pdp);
         authorizingInterceptor.handleMessage(msg);
     }
-    
+
     @org.junit.Test
     public void testDeny() throws Exception {
         // Mock up a Security Context
         SecurityContext sc = createSecurityContext("alice", "boss");
-        
+
         String operation = "{http://www.example.org/contract/DoubleIt}DoubleIt";
         MessageImpl msg = new MessageImpl();
         msg.put(Message.WSDL_OPERATION, QName.valueOf(operation));
@@ -73,10 +75,10 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
         String resourceURI = "https://localhost:8080/doubleit";
         msg.put(Message.REQUEST_URI, resourceURI);
         msg.put(SecurityContext.class, sc);
-        
+
         PolicyDecisionPoint pdp = new DummyPDP();
         XACMLAuthorizingInterceptor authorizingInterceptor = new XACMLAuthorizingInterceptor(pdp);
-        
+
         try {
             authorizingInterceptor.handleMessage(msg);
             fail("Failure expected on deny");
@@ -84,7 +86,7 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
             // Failure expected
         }
     }
-    
+
     private SecurityContext createSecurityContext(final String user, final String role) {
         return new LoginSecurityContext() {
 
@@ -109,7 +111,7 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
 
             @Override
             public Set<Principal> getUserRoles() {
-                Set<Principal> principals = new HashSet<Principal>();
+                Set<Principal> principals = new HashSet<>();
                 principals.add(new Principal() {
                     public String getName() {
                         return role;
@@ -117,8 +119,8 @@ public class XACMLAuthorizingInterceptorTest extends org.junit.Assert {
                 });
                 return principals;
             }
-            
+
         };
     }
-    
+
 }

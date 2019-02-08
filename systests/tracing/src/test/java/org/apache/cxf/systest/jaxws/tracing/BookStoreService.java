@@ -27,4 +27,5 @@ import org.apache.cxf.systest.Book;
 @WebService
 public interface BookStoreService {
     Collection< Book > getBooks();
+    int removeBooks();
 }

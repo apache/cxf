@@ -22,68 +22,68 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/* dkulp - Stupid little program I use to help merge changes from 
-   trunk to the fixes branches.   It requires the command line version of 
+/* dkulp - Stupid little program I use to help merge changes from
+   trunk to the fixes branches.   It requires the command line version of
    svn to be available on the path.   If using a git checkout, it also requires
    the command line version of git on the path.
 
-   Basically, git does all the work, but this little wrapper 
+   Basically, git does all the work, but this little wrapper
    thing will display the commit logs, prompt if you want to merge/block/ignore
-   each commit, prompt for commit (so you can resolve any conflicts first), 
+   each commit, prompt for commit (so you can resolve any conflicts first),
    etc....
 
-   Yes - doing this in python itself (or perl or even bash itself or ruby or ...) 
-   would probably be better.  However, I'd then need to spend time 
+   Yes - doing this in python itself (or perl or even bash itself or ruby or ...)
+   would probably be better.  However, I'd then need to spend time
    learning python/ruby/etc... that I just don't have time to do right now.
    What is more productive: Taking 30 minutes to bang this out in Java or
    spending a couple days learning another language that would allow me to
    bang it out in 15 minutes?
 
-   Explanation of commands: 
+   Explanation of commands:
 
-   [B]lock will permanently block the particular commit from being merged.  
+   [B]lock will permanently block the particular commit from being merged.
    It won't ask again on subsequent runs of DoMerge.
 
-   [I]gnore ignores the commit for the current DoMerges run, but will ask 
+   [I]gnore ignores the commit for the current DoMerges run, but will ask
    again the next time you DoMerges.  If you're not certain for a particular
    commit use this option for someone else to determine on a later run.
 
-   [R]ecord formally records that a merge occurred, but it does *not* 
+   [R]ecord formally records that a merge occurred, but it does *not*
    actually merge the commit.  This is useful if you another tool to do
    the merging but still wish to record a merge did occur.
 
-   [F]lush will permanently save all the [B]'s and [R]'s you've earlier made, 
-   useful when you need to stop DoMerges (due to a missed commit or other 
-   problem) before it's complete.  That way subsequent runs of DoMerges 
+   [F]lush will permanently save all the [B]'s and [R]'s you've earlier made,
+   useful when you need to stop DoMerges (due to a missed commit or other
+   problem) before it's complete.  That way subsequent runs of DoMerges
    won't go through the blocked/recorded items again.  (Flushes occur
    automatically when DoMerges is finished running.)
 
-   [C]hanges will display the changes in the commit to help you decide the 
+   [C]hanges will display the changes in the commit to help you decide the
    appropriate action to take.
 
 */
 
 public class DoMerges {
     public static final String MERGEINFOFILE = ".gitmergeinfo";
-    
+
     public static boolean auto = false;
     public static Pattern jiraPattern = Pattern.compile("([A-Z]{2,10}+-\\d+)");
     public static String username;
     public static String fromBranch;
-    
-    public static Set<String> records = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-    public static Set<String> patchIds = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-    
+
+    public static Set<String> records = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    public static Set<String> patchIds = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
     static class ToFrom {
         final String from;
         final String to;
-        
+
         public ToFrom(String t, String f) {
             to = t;
             from = f;
         }
     }
-    public static List<ToFrom> pathMaps = new LinkedList<ToFrom>();
+    public static List<ToFrom> pathMaps = new LinkedList<>();
 
     static int waitFor(Process p) throws Exception  {
         return waitFor(p, true);
@@ -116,7 +116,7 @@ public class DoMerges {
         }
         return waitFor(p, exit);
     }
-    
+
 
     static boolean doCommit() throws Exception {
         while (System.in.available() > 0) {
@@ -134,17 +134,17 @@ public class DoMerges {
             runProcess(p);
             return false;
         }
-        
+
         Process p = Runtime.getRuntime().exec(new String[] {"git", "commit", "--no-edit", "-a"});
         runProcess(p);
         return true;
-    }   
+    }
 
     public static void changes(String ver) throws Exception {
         Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "show", ver}));
         runProcess(p);
     }
-    
+
     public static void flush() throws Exception {
         BufferedWriter writer = new BufferedWriter(new FileWriter(MERGEINFOFILE));
         writer.write(fromBranch);
@@ -162,7 +162,7 @@ public class DoMerges {
         }
         writer.flush();
         writer.close();
-        
+
         Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "commit", "-m",
                                                                            "Recording .gitmergeinfo Changes",
                                                                            MERGEINFOFILE}));
@@ -171,7 +171,7 @@ public class DoMerges {
     public static void doUpdate() throws Exception {
         Process p = Runtime.getRuntime().exec(new String[] {"git", "pull", "--rebase"});
         runProcess(p);
-        
+
         File file = new File(MERGEINFOFILE);
         records.clear();
         if (file.exists()) {
@@ -205,19 +205,19 @@ public class DoMerges {
     }
 
     public static List<String> getAvailableUpdates() throws Exception {
-        List<String> verList = new LinkedList<String>();
+        List<String> verList = new LinkedList<>();
         Process p;
         BufferedReader reader;
         String line;
-        
+
         p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry",
-                                                                   "HEAD", fromBranch})); 
-            
+                                                                   "HEAD", fromBranch}));
+
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
         while (line != null) {
             if (line.charAt(0) == '+') {
-                String ver = line.substring(2).trim(); 
+                String ver = line.substring(2).trim();
                 if (!records.contains("B " + ver) && !records.contains("M " + ver)) {
                     verList.add(ver);
                 }
@@ -235,8 +235,8 @@ public class DoMerges {
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
 
-        List<String[]> map = new LinkedList<String[]>();
-        List<String> list = new ArrayList<String>(10);
+        List<String[]> map = new LinkedList<>();
+        List<String> list = new ArrayList<>(10);
         while (line != null) {
             if (line.length() > 0 && line.startsWith("commit ")) {
                 if (!list.isEmpty()) {
@@ -257,7 +257,7 @@ public class DoMerges {
         }
         return map;
     }
-        
+
     public static String[] getLog(String ver, Set<String> jiras) throws Exception {
         Process p;
         BufferedReader reader;
@@ -266,7 +266,7 @@ public class DoMerges {
 
         reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         line = reader.readLine();
-        List<String> lines = new ArrayList<String>(10);
+        List<String> lines = new ArrayList<>(10);
         while (line != null) {
             if (!line.startsWith("commit ")) {
                 lines.add(line);
@@ -280,13 +280,13 @@ public class DoMerges {
         p.waitFor();
         return lines.toArray(new String[lines.size()]);
     }
-        
+
     private static void doMerge(String ver) throws Exception {
-        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", ver}));
+        Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "cherry-pick", "-x", ver}));
         if (runProcess(p, false) != 0) {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
             runProcess(p);
-                
+
             if (doCommit()) {
                 records.add("M " + ver);
             }
@@ -301,11 +301,11 @@ public class DoMerges {
     private static void doMappedMerge(String ver) throws Exception {
         Process p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "format-patch", "--stdout", "-1", "-k", ver}));
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        
+
         File outputFile = File.createTempFile("merge", ".patch");
         outputFile.deleteOnExit();
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-        
+
         String line = reader.readLine();
         while (line != null) {
             if ((line.startsWith("--- ")
@@ -314,7 +314,7 @@ public class DoMerges {
                 for (ToFrom ent : pathMaps) {
                     if (file.contains(ent.from)) {
                         String newf = file.replace(ent.from, ent.to);
-                        File fo = new File(newf);                        
+                        File fo = new File(newf);
                         if (fo.exists() && fo.isFile()) {
                             line = line.substring(0, 6) + newf;
                             break;
@@ -330,13 +330,13 @@ public class DoMerges {
         waitFor(p, false);
         writer.flush();
         writer.close();
-        
+
         p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "am", "-k", outputFile.getCanonicalPath()}));
-        
+
         if (waitFor(p, false) != 0) {
             p = Runtime.getRuntime().exec(getCommandLine(new String[] {"git", "status"}));
             runProcess(p);
-                
+
             if (doCommit()) {
                 records.add("M " + ver);
             }
@@ -346,15 +346,15 @@ public class DoMerges {
         outputFile.delete();
     }
     private static String getPatchId(String id) throws Exception {
-       
-        String commands[] = new String[] { "git", "show", id};
+
+        String[] commands = new String[] { "git", "show", id};
         Process p = Runtime.getRuntime().exec(commands);
         InputStream in = p.getInputStream();
-        
+
         commands = new String[] { "git", "patch-id"};
         Process p2 = Runtime.getRuntime().exec(commands);
         OutputStream out = p2.getOutputStream();
-        byte bytes[] = new byte[1024];
+        byte[] bytes = new byte[1024];
         int len = in.read(bytes);
         BufferedReader r2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
         while (len > 0) {
@@ -363,14 +363,14 @@ public class DoMerges {
         }
         p.waitFor();
         out.close();
-        
+
         id = r2.readLine();
         p2.waitFor();
-        
+
         id = id.substring(0, id.indexOf(" "));
         return id;
     }
-    
+
     private static String getUserName() throws Exception {
         BufferedReader reader;
         String line;
@@ -381,24 +381,24 @@ public class DoMerges {
         p.waitFor();
         return line;
     }
-    
-    public static void main(String a[]) throws Exception {
+
+    public static void main(String[] a) throws Exception {
         File file = new File(".git-commit-message.txt");
         if (file.exists()) {
             //make sure we delete this to not cause confusion
             file.delete();
         }
-        
+
         System.out.println("Updating directory");
 
         doUpdate();
-        
-        List<String> args = new LinkedList<String>(Arrays.asList(a));
-        List<String> check = new LinkedList<String>();
+
+        List<String> args = new LinkedList<>(Arrays.asList(a));
+        List<String> check = new LinkedList<>();
         while (!args.isEmpty()) {
             String get = args.remove(0);
-            
-            if ("-auto".equals(get)) { 
+
+            if ("-auto".equals(get)) {
                 auto = true;
             } else if ("-me".equals(get)) {
                 username = getUserName();
@@ -409,10 +409,10 @@ public class DoMerges {
             }
         }
 
-        
+
         List<String> verList = getAvailableUpdates();
         if (!check.isEmpty()) {
-            List<String> newList = new LinkedList<String>();
+            List<String> newList = new LinkedList<>();
             for (String s : check) {
                 if (verList.contains(s)) {
                     newList.add(s);
@@ -428,11 +428,11 @@ public class DoMerges {
         System.out.println("Merging versions (" + verList.size() + "): " + verList);
 
         List<String[]> gitLogs = null;
-        //with GIT, we can relatively quickly check the logs on the current branch 
+        //with GIT, we can relatively quickly check the logs on the current branch
         //and compare with what should be merged and check if things are already merged
         gitLogs = getGitLogs();
-        
-        Set<String> jiras = new TreeSet<String>();
+
+        Set<String> jiras = new TreeSet<>();
 
         for (int cur = 0; cur < verList.size(); cur++) {
             jiras.clear();
@@ -446,7 +446,7 @@ public class DoMerges {
             System.out.println();
             System.out.println("Merging: " + ver + " (" + (cur + 1) + "/" + verList.size() + ")");
             //System.out.println("http://svn.apache.org/viewvc?view=revision&revision=" + ver);
-            
+
             for (String s : jiras) {
                 System.out.println("https://issues.apache.org/jira/browse/" + s);
             }
@@ -459,7 +459,7 @@ public class DoMerges {
                 System.out.println(s);
                 log.append(s).append("\n");
             }
-            
+
             char c = auto ? 'M' : 0;
             if (checkPatchId(ver)) {
                 continue;
@@ -546,14 +546,14 @@ public class DoMerges {
         if (gitLogs == null) {
             return false;
         }
-        List<List<String>> matchingLogs = new LinkedList<List<String>>();
+        List<List<String>> matchingLogs = new LinkedList<>();
         for (String[] f : gitLogs) {
             List<String> ll = compareLogs(f, logLines);
             if (!ll.isEmpty()) {
                 matchingLogs.add(ll);
             }
         }
-        
+
         if (!matchingLogs.isEmpty()) {
             //everything in the source log is in a log on this branch, let's prompt to record the merge
             System.out.println("Found possible commit(s) already on branch:");
@@ -563,7 +563,7 @@ public class DoMerges {
                 }
                 System.out.println("------------------------");
             }
-            
+
             while (System.in.available() > 0) {
                 System.in.read();
             }
@@ -579,36 +579,36 @@ public class DoMerges {
             }
         }
         return false;
-    }        
+    }
     private static List<String> compareLogs(String[] f, String[] logLines) throws IOException {
-        ArrayList<String> onBranch = new ArrayList<String>(f.length);
+        ArrayList<String> onBranch = new ArrayList<>(f.length);
         for (String s : f) {
             if (s.trim().startsWith("Conflicts:")) {
                 break;
             }
-            if (s.trim().length() > 0 
+            if (s.trim().length() > 0
                 && s.charAt(0) == ' '
                 && !s.contains("git-svn-id")) {
                 onBranch.add(s.trim());
             }
         }
-        
-        List<String> ll = new ArrayList<String>();
+
+        List<String> ll = new ArrayList<>();
         for (String s : logLines) {
-            if (s.trim().length() > 0 
+            if (s.trim().length() > 0
                 && onBranch.remove(s.trim())
                 && !s.startsWith("Author: ")
                 && !s.startsWith("Date: ")
-                && !s.contains("git-svn-id")) {                
+                && !s.contains("git-svn-id")) {
                 ll.add(s);
-            } 
+            }
         }
         return ll;
     }
-        
+
 
     private static String[] getCommandLine(String[] args) {
-        List<String> argLine = new ArrayList<String>();
+        List<String> argLine = new ArrayList<>();
         if (isWindows()) {
             argLine.add("cmd.exe");
             argLine.add("/c");
@@ -632,8 +632,8 @@ public class DoMerges {
     private static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
     }
-    
-    
+
+
 }
 
 

@@ -29,7 +29,7 @@ public class BookNotFoundFault extends Exception {
     public BookNotFoundFault(String errorMessage) {
         super(errorMessage);
     }
-    
+
     public BookNotFoundFault(BookNotFoundDetails details) {
         super();
         this.details = details;

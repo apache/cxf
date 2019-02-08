@@ -25,8 +25,8 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.schemavalidation.CkRequestType;
 import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
@@ -41,21 +41,24 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SchemaValidationClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
     private final QName portName = new QName("http://cxf.apache.org/jaxws/schemavalidation", "servicePort");
 
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run()  {
             String address;
             Object implementor = new ServicePortTypeImpl();
             address = "http://localhost:" + PORT + "/schemavalidation";
             Endpoint ep = Endpoint.create(implementor);
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(map);
             ((EndpointImpl)ep).setWsdlLocation("wsdl_systest_jaxws/schemaValidation.wsdl");
@@ -67,25 +70,25 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         }
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
     }
-   
+
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-   
+
+
     @Test
     public void testSchemaValidationWithMultipleXsds() throws Exception {
         Service service = new Service();
@@ -95,7 +98,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             greeter.getInInterceptors().add(new LoggingInInterceptor());
             greeter.getOutInterceptors().add(new LoggingOutInterceptor());
             updateAddressPort(greeter, PORT);
-    
+
             RequestIdType requestId = new RequestIdType();
             requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
             CkRequestType request = new CkRequestType();
@@ -103,9 +106,9 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             greeter.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             RequestHeader header = new RequestHeader();
             header.setHeaderValue("AABBCC");
-            CkResponseType response = greeter.ckR(request, header); 
+            CkResponseType response = greeter.ckR(request, header);
             assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
-            
+
             try {
                 requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeeez");
                 request.setRequest(requestId);
@@ -118,12 +121,12 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                     assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
                 }
             }
-    
+
             try {
                 requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
                 request.setRequest(requestId);
                 header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
-                
+
                 //Check if incoming validation on server side works, turn off outgoing
                 greeter.ckR(request, header);
                 fail("should catch marshall exception as the invalid outgoing message per schema");
@@ -134,12 +137,12 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                     assertTrue(e.getMessage().contains("is not facet-valid with respect to maxLength"));
                 }
             }
-            
+
             try {
                 requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
                 request.setRequest(requestId);
                 header.setHeaderValue("AABBCCDDEEFFGGHHIIJJ");
-                
+
                 //Check if incoming validation on server side works, turn off outgoing
                 greeter.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
                 greeter.ckR(request, header);
@@ -152,7 +155,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
                 }
             }
         }
-        
+
     }
-    
+
 }

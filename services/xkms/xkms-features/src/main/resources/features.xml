@@ -20,6 +20,7 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${project.version}/xml/features</repository>
     <feature name="cxf-xkms-client" version="${project.version}">
+        <feature>aries-blueprint</feature>
         <feature>cxf-jaxws</feature>
         <feature>cxf-http</feature>
         <feature>cxf-ws-security</feature>
@@ -36,6 +37,7 @@
         <feature>cxf-http</feature>
         <feature>http</feature>
         <feature>wss4j</feature>
+        <bundle start-level="30">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/${cxf.xerces.bundle.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-common/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-x509-handlers/${project.version}</bundle>
         <bundle>mvn:${project.groupId}/cxf-services-xkms-service/${project.version}</bundle>

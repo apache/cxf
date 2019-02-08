@@ -30,17 +30,20 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the addition of WS-RM properties to application messages and the
@@ -54,7 +57,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/decoupled.xml");
             BusFactory.setDefaultBus(bus);
@@ -65,14 +68,14 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
             LoggingOutInterceptor out = new LoggingOutInterceptor();
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             implementor.useLastOnewayArg(true);
             implementor.setDelay(5000);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
@@ -83,14 +86,14 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-    }    
-    
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }
-            
+
     @Test
     public void testDecoupled() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -102,32 +105,32 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-        
+
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, 
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                            Boolean.TRUE);
         LOG.fine("Created greeter client.");
-       
+
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
         class TwowayThread extends Thread {
 
             String response;
-            
+
             @Override
             public void run() {
                 response = greeter.greetMe("twoway");
             }
-   
+
         }
-        
-        TwowayThread t = new TwowayThread();    
+
+        TwowayThread t = new TwowayThread();
         t.start();
-        
+
         // allow for partial response to twoway request to arrive
-        
+
         long wait = 3000;
         while (wait > 0) {
             long start = System.currentTimeMillis();
@@ -140,9 +143,9 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
         }
 
         greeter.greetMeOneWay("oneway");
-        
+
         t.join();
         assertEquals("Unexpected response to twoway request", "oneway", t.response);
-        
+
     }
 }

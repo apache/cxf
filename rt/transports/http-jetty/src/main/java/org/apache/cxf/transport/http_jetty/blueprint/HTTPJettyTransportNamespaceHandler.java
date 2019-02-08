@@ -26,15 +26,15 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/transports/http-jetty/configuration")
-public class HTTPJettyTransportNamespaceHandler implements NamespaceHandler {
+public class HTTPJettyTransportNamespaceHandler extends BaseNamespaceHandler {
 
     public static final String JETTY_TRANSPORT = "http://cxf.apache.org/transports/http-jetty/configuration";
 
@@ -48,9 +48,8 @@ public class HTTPJettyTransportNamespaceHandler implements NamespaceHandler {
         if (JETTY_TRANSPORT.equals(s)) {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-jetty.xsd");
-        } else {
-            return null;
         }
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")
@@ -74,8 +73,8 @@ public class HTTPJettyTransportNamespaceHandler implements NamespaceHandler {
         return null;
     }
 
-    public ComponentMetadata decorate(Node node, 
-                                      ComponentMetadata componentMetadata, 
+    public ComponentMetadata decorate(Node node,
+                                      ComponentMetadata componentMetadata,
                                       ParserContext parserContext) {
         LOG.info("Decorating node " + node + " " + componentMetadata);
         return componentMetadata;

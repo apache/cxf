@@ -25,17 +25,22 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.model.JavaMethod;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class MethodMapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class MethodMapperTest {
 
     private OperationInfo getOperation() {
         OperationInfo operation = new OperationInfo();
         operation.setName(new QName("urn:test:ns", "OperationTest"));
         return operation;
     }
-    
+
     @Test
     public void testMap() throws Exception {
         JavaMethod method = new MethodMapper().map(getOperation());
@@ -69,7 +74,7 @@ public class MethodMapperTest extends Assert {
 
         JavaMethod method = new MethodMapper().map(operation);
         assertNotNull(method);
-        
+
         assertTrue(method.isWrapperStyle());
     }
 }

@@ -32,10 +32,10 @@ public interface PartialCondition {
 
     /** Disjunct multiple expressions */
     CompleteCondition or(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn);
-    
+
     /** Conjunct multiple expressions */
     CompleteCondition and(List<CompleteCondition> conditions);
-    
+
     /** Disjunct multiple expressions */
     CompleteCondition or(List<CompleteCondition> conditions);
 }

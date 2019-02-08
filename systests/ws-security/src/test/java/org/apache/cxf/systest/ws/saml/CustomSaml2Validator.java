@@ -30,29 +30,29 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 
 /**
  * This class does some trivial validation of a received SAML Assertion. It checks that it is
- * a SAML 2 Assertion, and checks the issuer name and that it has an Attribute Statement. 
+ * a SAML 2 Assertion, and checks the issuer name and that it has an Attribute Statement.
  */
 public class CustomSaml2Validator extends SamlAssertionValidator {
-    
+
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
-        
+
         if (!"sts".equals(assertion.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         Assertion saml2Assertion = assertion.getSaml2();
         if (saml2Assertion == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         List<AttributeStatement> attributeStatements = saml2Assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         return validatedCredential;
     }
 

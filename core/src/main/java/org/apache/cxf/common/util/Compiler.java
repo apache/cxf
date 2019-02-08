@@ -48,19 +48,19 @@ public class Compiler {
     private String encoding;
     private boolean forceFork = Boolean.getBoolean(Compiler.class.getName() + "-fork");
     private File classpathTmpFile;
-    private List<String> errors = new LinkedList<String>();
-    private List<String> warnings = new LinkedList<String>();
-    
+    private List<String> errors = new LinkedList<>();
+    private List<String> warnings = new LinkedList<>();
+
     public Compiler() {
     }
-    
+
     public List<String> getErrors() {
         return errors;
     }
     public List<String> getWarnings() {
         return warnings;
     }
-    
+
     public void setMaxMemory(long l) {
         maxMemory = l;
     }
@@ -83,7 +83,7 @@ public class Compiler {
     public void setClassPath(String s) {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
-    
+
     protected void addArgs(List<String> list) {
         if (!StringUtils.isEmpty(encoding)) {
             list.add("-encoding");
@@ -100,7 +100,7 @@ public class Compiler {
             list.add("-d");
             list.add(outputDir);
         }
-        
+
         if (StringUtils.isEmpty(classPath)) {
             String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
             boolean classpathSetted = javaClasspath != null ? true : false;
@@ -109,7 +109,7 @@ public class Compiler {
                 f = new File(f, "../lib");
                 if (f.exists() && f.isDirectory()) {
                     list.add("-extdirs");
-                    list.add(f.toString());                    
+                    list.add(f.toString());
                 }
             } else {
                 list.add("-classpath");
@@ -122,26 +122,26 @@ public class Compiler {
 
     }
     public boolean compileFiles(File[] files) {
-        List<String> f = new ArrayList<String>(files.length);
+        List<String> f = new ArrayList<>(files.length);
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.length]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(List<File> files) {
-        List<String> f = new ArrayList<String>(files.size());
+        List<String> f = new ArrayList<>(files.size());
         for (File file : files) {
             f.add(file.getAbsolutePath());
         }
-        return compileFiles(f.toArray(new String[files.size()]));
+        return compileFiles(f.toArray(new String[0]));
     }
     public boolean compileFiles(String[] files) {
         String endorsed = SystemPropertyAction.getProperty("java.endorsed.dirs");
         if (!forceFork) {
             return useJava6Compiler(files);
         }
-        
-        List<String> list = new ArrayList<String>();
+
+        List<String> list = new ArrayList<>();
 
         // Start of honoring java.home for used javac
         String fsep = File.separator;
@@ -160,6 +160,11 @@ public class Compiler {
             // check if java.home is jre home
             javacstr = SystemPropertyAction.getProperty("java.home") + fsep + ".." + fsep + "bin" + fsep
                        + platformjavacname;
+        } else if (new File(SystemPropertyAction.getProperty("java.home") + fsep + "bin" + fsep
+                            + platformjavacname).exists()) {
+            //java9
+            javacstr = SystemPropertyAction.getProperty("java.home") + fsep + "bin" + fsep
+                + platformjavacname;
         }
         list.add(javacstr);
         // End of honoring java.home for used javac
@@ -179,11 +184,15 @@ public class Compiler {
         int idx = list.size();
         list.addAll(Arrays.asList(files));
 
-        return internalCompile(list.toArray(new String[list.size()]), idx);
+        return internalCompile(list.toArray(new String[0]), idx);
     }
 
     protected boolean useJava6Compiler(String[] files) {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException(
+                "No compiler detected, make sure you are running on top of a JDK instead of a JRE.");
+        }
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         Iterable<? extends JavaFileObject> fileList = fileManager.getJavaFileObjectsFromStrings(Arrays
             .asList(files));
@@ -191,11 +200,11 @@ public class Compiler {
         return internalJava6Compile(compiler, wrapJavaFileManager(fileManager), setupDiagnosticListener(),
                                     fileList);
     }
-    
+
     protected JavaFileManager wrapJavaFileManager(StandardJavaFileManager standardJavaFileManger) {
         return standardJavaFileManger;
     }
-    
+
     protected DiagnosticListener<JavaFileObject> setupDiagnosticListener() {
         return new DiagnosticListener<JavaFileObject>() {
             public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
@@ -215,15 +224,15 @@ public class Compiler {
                     break;
                 default:
                     break;
-                }   
+                }
             }
         };
     }
-    
+
     protected boolean internalJava6Compile(JavaCompiler compiler, JavaFileManager fileManager,
                                            DiagnosticListener<JavaFileObject> listener,
                                            Iterable<? extends JavaFileObject> fileList) {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         addArgs(args);
         CompilationTask task = compiler.getTask(null, fileManager, listener, args, null, fileList);
         Boolean ret = task.call();
@@ -238,7 +247,7 @@ public class Compiler {
 
     public boolean internalCompile(String[] args, int sourceFileIndex) {
         Process p = null;
-        String cmdArray[] = null;
+        String[] cmdArray = null;
         File tmpFile = null;
         try {
             if (isLongCommandLines(args) && sourceFileIndex >= 0) {
@@ -315,18 +324,18 @@ public class Compiler {
         return false;
     }
 
-    private boolean isLongCommandLines(String args[]) {
+    private boolean isLongCommandLines(String[] args) {
         StringBuilder strBuffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             strBuffer.append(args[i]);
         }
         return strBuffer.toString().length() > 4096 ? true : false;
     }
-    
+
     private boolean isLongClasspath(String classpath) {
         return classpath.length() > 2048 ? true : false;
-    }   
-    
+    }
+
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
         if (isLongClasspath(classpath)) {
             PrintWriter out = null;
@@ -340,12 +349,12 @@ public class Compiler {
             } catch (IOException e) {
                 System.err.print("[ERROR] can't write long classpath to @argfile");
             }
-        } 
+        }
     }
 
     public void setEncoding(String string) {
         encoding = string;
     }
 
-    
+
 }

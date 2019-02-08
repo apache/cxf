@@ -20,6 +20,6 @@ package org.apache.cxf.endpoint;
 
 public interface ConduitSelectorHolder {
     ConduitSelector getConduitSelector();
-    
+
     void setConduitSelector(ConduitSelector conduitSelector);
 }

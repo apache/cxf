@@ -30,24 +30,24 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFactory implements
     ServiceBuilder {
-    
+
     protected AbstractServiceFactory() {
         super();
     }
     protected AbstractServiceFactory(ReflectionServiceFactoryBean sbean) {
         super(sbean);
     }
-    
+
     @Override
     protected String detectTransportIdFromAddress(String ad) {
         ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiatorForUri(getAddress());
         if (ci != null) {
             return ci.getTransportIds().get(0);
-        }    
+        }
         return null;
     }
-    
+
     @Override
     protected WSDLEndpointFactory getWSDLEndpointFactory() {
         if (destinationFactory == null) {
@@ -65,7 +65,7 @@ public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFa
                     //ignore
                 }
             }
-        } 
+        }
         if (destinationFactory instanceof WSDLEndpointFactory) {
             return (WSDLEndpointFactory)destinationFactory;
         }

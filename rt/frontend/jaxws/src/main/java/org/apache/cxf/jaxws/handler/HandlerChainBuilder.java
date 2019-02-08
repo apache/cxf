@@ -65,10 +65,10 @@ public class HandlerChainBuilder {
         return sortHandlers(buildHandlerChain(hc, getHandlerClassLoader()));
     }
     public List<Handler> buildHandlerChainFromConfiguration(List<PortComponentHandlerType> hc) {
-        if (null == hc || hc.size() == 0) {
+        if (null == hc || hc.isEmpty()) {
             return null;
         }
-        List<Handler> handlers = new ArrayList<Handler>();
+        List<Handler> handlers = new ArrayList<>();
         for (PortComponentHandlerType pt : hc) {
             handlers.addAll(buildHandlerChain(pt, getHandlerClassLoader()));
         }
@@ -83,19 +83,19 @@ public class HandlerChainBuilder {
     public boolean isHandlerInitEnabled() {
         return handlerInitEnabled;
     }
-    
+
     /**
      * sorts the handlers into correct order. All of the logical handlers first
      * followed by the protocol handlers
-     * 
+     *
      * @param handlers
      * @return sorted list of handlers
      */
     public List<Handler> sortHandlers(List<Handler> handlers) {
 
         final int size = handlers.size();
-        List<Handler> logicalHandlers = new ArrayList<Handler>(size);
-        List<Handler> protocolHandlers = new ArrayList<Handler>(Math.min(10, size));
+        List<Handler> logicalHandlers = new ArrayList<>(size);
+        List<Handler> protocolHandlers = new ArrayList<>(Math.min(10, size));
 
         for (Handler<?> handler : handlers) {
             if (handler instanceof LogicalHandler) {
@@ -116,7 +116,7 @@ public class HandlerChainBuilder {
     }
 
     protected List<Handler> buildHandlerChain(PortComponentHandlerType ht, ClassLoader classLoader) {
-        List<Handler> handlerChain = new ArrayList<Handler>();
+        List<Handler> handlerChain = new ArrayList<>();
         try {
             final boolean fineLog = LOG.isLoggable(Level.FINE);
             if (fineLog) {
@@ -139,14 +139,14 @@ public class HandlerChainBuilder {
         }
         return handlerChain;
     }
-    
+
     /**
      * Resolve handler chain configuration file associated with the given class
-     * 
+     *
      * @param clz
      * @param filename
      * @return A URL object or null if no resource with this name is found
-     */    
+     */
     protected URL resolveHandlerChainFile(Class<?> clz, String filename) {
         URL handlerFile = clz.getResource(filename);
         if (handlerFile == null) {
@@ -157,21 +157,21 @@ public class HandlerChainBuilder {
                 handlerFile.openStream();
             } catch (Exception e) {
                 //do nothing
-            } 
+            }
         }
         return handlerFile;
-    } 
-    
+    }
+
     private void configureHandler(Handler<?> handler, PortComponentHandlerType h) {
         if (!handlerInitEnabled) {
             return;
         }
 
-        if (h.getInitParam().size() == 0) {
+        if (h.getInitParam().isEmpty()) {
             return;
         }
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
 
         for (ParamValueType param : h.getInitParam()) {
             params.put(trimString(param.getParamName() == null ? null : param.getParamName().getValue()),

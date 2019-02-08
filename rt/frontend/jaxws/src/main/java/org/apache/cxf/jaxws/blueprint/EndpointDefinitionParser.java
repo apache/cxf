@@ -21,7 +21,9 @@ package org.apache.cxf.jaxws.blueprint;
 
 import java.util.StringTokenizer;
 import java.util.UUID;
+
 import javax.xml.namespace.QName;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -33,6 +35,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
+import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
@@ -66,18 +70,18 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
         boolean isAbstract = false;
         boolean publish = true;
         NamedNodeMap atts = element.getAttributes();
-        
+
         String bus = null;
         Metadata impl = null;
-        
+
         for (int i = 0; i < atts.getLength(); i++) {
             Attr node = (Attr) atts.item(i);
             String val = node.getValue();
             String pre = node.getPrefix();
             String name = node.getLocalName();
             if ("createdFromAPI".equals(name) || "abstract".equals(name)) {
-                cxfBean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
-                isAbstract = true; 
+                cxfBean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
+                isAbstract = true;
             } else if ("publish".equals(name)) {
                 publish = Boolean.parseBoolean(val);
             } else if ("bus".equals(name)) {
@@ -108,12 +112,12 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
                 cxfBean.addProperty(name, map);
             } else if ("binding".equals(name)) {
                 setFirstChildAsProperty(elem, context, cxfBean, "bindingConfig");
-            } else if ("inInterceptors".equals(name) 
-                    || "inFaultInterceptors".equals(name) 
+            } else if ("inInterceptors".equals(name)
+                    || "inFaultInterceptors".equals(name)
                     || "outInterceptors".equals(name)
-                    || "outFaultInterceptors".equals(name) 
-                    || "features".equals(name) 
-                    || "schemaLocations".equals(name) 
+                    || "outFaultInterceptors".equals(name)
+                    || "features".equals(name)
+                    || "schemaLocations".equals(name)
                     || "handlers".equals(name)) {
                 Metadata list = parseListData(context, cxfBean, elem);
                 cxfBean.addProperty(name, list);
@@ -136,7 +140,7 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
             cxfBean.setDestroyMethod("stop");
         }
         // We don't want to delay the registration of our Server
-        cxfBean.setActivation(MutableBeanMetadata.ACTIVATION_EAGER);
+        cxfBean.setActivation(ComponentMetadata.ACTIVATION_EAGER);
         return cxfBean;
     }
 }

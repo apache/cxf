@@ -35,14 +35,14 @@ import org.apache.cxf.common.logging.LogUtils;
 
 
 
-/** 
- * Deal with the MBeanServer Connections 
+/**
+ * Deal with the MBeanServer Connections
  *
  */
-public final class MBServerConnectorFactory {    
-        
+public final class MBServerConnectorFactory {
+
     public static final String DEFAULT_SERVICE_URL = "service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(MBServerConnectorFactory.class);
 
     private static MBeanServer server;
@@ -58,20 +58,20 @@ public final class MBServerConnectorFactory {
     private static JMXConnectorServer connectorServer;
 
     private static class MBServerConnectorFactoryHolder {
-        private static final MBServerConnectorFactory INSTANCE = 
+        private static final MBServerConnectorFactory INSTANCE =
             new MBServerConnectorFactory();
     }
 
     private static class MBeanServerHolder {
-        private static final MBeanServer INSTANCE = 
-            MBeanServerFactory.createMBeanServer(); 
+        private static final MBeanServer INSTANCE =
+            MBeanServerFactory.createMBeanServer();
     }
-    
+
     private MBServerConnectorFactory() {
-        
+
     }
-    
-    private int getURLLocalHostPort(String url) {        
+
+    private int getURLLocalHostPort(String url) {
         int portStart = url.indexOf("localhost") + 10;
         int portEnd;
         int port = 0;
@@ -79,12 +79,12 @@ public final class MBServerConnectorFactory {
             portEnd = indexNotOfNumber(url, portStart);
             if (portEnd > portStart) {
                 final String portString = url.substring(portStart, portEnd);
-                port = Integer.parseInt(portString);               
+                port = Integer.parseInt(portString);
             }
         }
         return port;
     }
-    
+
     private static int indexNotOfNumber(String str, int index) {
         int i = 0;
         for (i = index; i < str.length(); i++) {
@@ -94,11 +94,11 @@ public final class MBServerConnectorFactory {
         }
         return -1;
     }
-    
+
     public static MBServerConnectorFactory getInstance() {
         return MBServerConnectorFactoryHolder.INSTANCE;
-    }  
-    
+    }
+
     public void setMBeanServer(MBeanServer ms) {
         server = ms;
     }
@@ -110,25 +110,25 @@ public final class MBServerConnectorFactory {
     public void setEnvironment(Map<String, ?> env) {
         environment = env;
     }
-    
+
     public void setThreaded(boolean fthread) {
         threaded = fthread;
     }
-    
+
     public void setDaemon(boolean fdaemon) {
         daemon = fdaemon;
     }
 
 
     public void createConnector() throws IOException {
-        
+
         if (server == null) {
             server = MBeanServerHolder.INSTANCE;
         }
-        
+
         // Create the JMX service URL.
-        JMXServiceURL url = new JMXServiceURL(serviceUrl);       
-        
+        JMXServiceURL url = new JMXServiceURL(serviceUrl);
+
         // if the URL is localhost, start up an Registry
         if (serviceUrl.indexOf("localhost") > -1
             && url.getProtocol().compareToIgnoreCase("rmi") == 0) {
@@ -140,17 +140,17 @@ public final class MBServerConnectorFactory {
                     // the registry may had been created
                     LocateRegistry.getRegistry(port);
                 }
-               
+
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "CREATE_REGISTRY_FAULT_MSG", new Object[]{ex});
             }
         }
-        
+
         // Create the connector server now.
-        connectorServer = 
+        connectorServer =
             JMXConnectorServerFactory.newJMXConnectorServer(url, environment, server);
 
-       
+
         if (threaded) {
              // Start the connector server asynchronously (in a separate thread).
             Thread connectorThread = new Thread() {
@@ -159,10 +159,10 @@ public final class MBServerConnectorFactory {
                         connectorServer.start();
                     } catch (IOException ex) {
                         LOG.log(Level.SEVERE, "START_CONNECTOR_FAILURE_MSG", new Object[]{ex});
-                    } 
+                    }
                 }
             };
-            
+
             connectorThread.setName("JMX Connector Thread [" + serviceUrl + "]");
             connectorThread.setDaemon(daemon);
             connectorThread.start();
@@ -173,14 +173,14 @@ public final class MBServerConnectorFactory {
 
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("JMX connector server started: " + connectorServer);
-        }    
+        }
     }
 
-    public void destroy() throws IOException {        
-        connectorServer.stop();        
+    public void destroy() throws IOException {
+        connectorServer.stop();
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("JMX connector server stopped: " + connectorServer);
-        } 
+        }
     }
 
 }

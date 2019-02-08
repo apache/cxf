@@ -65,15 +65,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
 public class Customer extends AbstractCustomer implements CustomerInfo {
-    
+
     public interface CustomerContext {
         String get();
     }
-    
+
     public interface CustomerBeanInterface {
-        
+
     }
-    
+
     @XmlRootElement(name = "CustomerBean")
     public static class CustomerBean implements CustomerBeanInterface {
         private String a;
@@ -85,7 +85,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         //CHECKSTYLE:OFF
         public List<CustomerBean> e;
         //CHECKSTYLE:ON
-        
+
         public void setA(String aString) {
             this.a = aString;
         }
@@ -122,9 +122,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         public void setCb(boolean cb) {
             this.cb = cb;
         }
-        
+
     }
-    
+
     @Context private ContextResolver<JAXBContext> cr;
     private UriInfo uriInfo;
     @Context private CustomerContext customerContext;
@@ -136,7 +136,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @Context private Application application1;
     private Application application2;
     private int applicationInjections;
-    
+
     @Context private HttpServletRequest servletRequest;
     @Context private HttpServletResponse servletResponse;
     @Context private ServletContext servletContext;
@@ -144,196 +144,201 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @Context private HttpServletResponse servletResponse2;
     @Context private ServletContext servletContext2;
     private ServletContext servletContext3;
-    
+
     @Context private UriInfo uriInfo2;
     private String queryParam;
-    
+
     @DefaultValue("bQuery")
     @QueryParam("b")
     private String b;
     private String name;
-    
+
     private boolean postConstuctCalled;
     private boolean preDestroyCalled;
-    
+
     public Customer() {
-        
+
     }
-    
+
     public Customer(@Context UriInfo info) {
         uriInfo = info;
     }
-    
+
     public Customer(@Context UriInfo info,
                     @QueryParam("a") String queryParam) {
         uriInfo = info;
         this.queryParam = queryParam;
     }
-    
+
     @PostConstruct
     public void postConstruct() {
         postConstuctCalled = true;
     }
-    
+
     public boolean isPostConstuctCalled() {
         return postConstuctCalled;
     }
-    
+
     @PreDestroy
     public void preDestroy() {
         preDestroyCalled = true;
     }
-    
+
     public boolean isPreDestroyCalled() {
         return preDestroyCalled;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
-    
+
     public String getB() {
         return b;
     }
-    
+
     public void testQueryBean(@QueryParam("") CustomerBean cb) {
-        
+
     }
-    
+
     public void testLocaleParam(@QueryParam("p1") Locale l) {
-        
+
     }
-    
+
     public void testGenericObjectParam(@QueryParam("p1") Query<String> query) {
-        
+
     }
-    
-    public void testXmlAdapter(@QueryParam("a") 
-                               @XmlJavaTypeAdapter(CustomerBeanAdapter.class) 
+
+    public void testGenericObjectParamDefaultValue(@QueryParam("p1") String query1,
+                                                   @QueryParam("p2") @DefaultValue("thequery") String query2) {
+
+    }
+
+    public void testXmlAdapter(@QueryParam("a")
+                               @XmlJavaTypeAdapter(CustomerBeanAdapter.class)
                                CustomerBean cb) {
-        
+
     }
-    
-    public void testXmlAdapter2(@QueryParam("a") 
-                               @XmlJavaTypeAdapter(CustomerBeanAdapter2.class) 
+
+    public void testXmlAdapter2(@QueryParam("a")
+                               @XmlJavaTypeAdapter(CustomerBeanAdapter2.class)
                                CustomerBean cb) {
-        
+
     }
-    
-    public void testXmlAdapter3(@QueryParam("") 
-                                @XmlJavaTypeAdapter(CustomerBeanAdapter3.class) 
+
+    public void testXmlAdapter3(@QueryParam("")
+                                @XmlJavaTypeAdapter(CustomerBeanAdapter3.class)
                                 CustomerBeanInterface cb) {
-         
+
     }
-    
+
     public void testPathBean(@PathParam("") CustomerBean cb) {
-        
+
     }
     public void testFormBean(@FormParam("") CustomerBean cb) {
-        
+
     }
     public void testMatrixBean(@MatrixParam("") CustomerBean cb) {
-        
+
     }
-    
+
     public Application getApplication1() {
         return application1;
     }
-    
+
     public Application getApplication2() {
         if (applicationInjections > 1) {
             throw new RuntimeException();
         }
         return application2;
     }
-    
+
     @Context
     public void setApplication(Application app) {
         applicationInjections++;
         application2 = app;
     }
-    
+
     public UriInfo getUriInfo() {
         return uriInfo;
     }
     public UriInfo getUriInfo2() {
         return uriInfo2;
     }
-    
+
     @Context
     public void setTestUriInfo(UriInfo ui) {
         uriInfo = ui;
     }
-    
+
     public void setUriInfoContext(UriInfo ui) {
     }
-    
+
     @Context
     public void setServletContext(ServletContext sc) {
         servletContext3 = sc;
     }
-    
+
     public ServletContext getThreadLocalServletContext() {
         return servletContext3;
     }
-    
+
     @QueryParam("a_value")
     public void setA(String a) {
         queryParam = a;
     }
-    
+
     public String getQueryParam() {
         return queryParam;
     }
-    
+
     public HttpHeaders getHeaders() {
         return headers;
     }
-    
+
     public ResourceInfo getResourceInfo() {
         return resourceInfo;
     }
-    
+
     public Request getRequest() {
         return request;
     }
-    
+
     public Providers getBodyWorkers() {
         return bodyWorkers;
     }
-    
+
     public SecurityContext getSecurityContext() {
         return sContext;
     }
-    
+
     public HttpServletRequest getServletRequest() {
         return servletRequest2;
     }
-    
+
     public HttpServletResponse getServletResponse() {
         return servletResponse2;
     }
-    
+
     public ServletContext getServletContext() {
         return servletContext2;
     }
-    
+
     public HttpServletRequest getServletRequestResource() {
         return servletRequest;
     }
-    
+
     public HttpServletResponse getServletResponseResource() {
         return servletResponse;
     }
-    
+
     public ServletContext getServletContextResource() {
         return servletContext;
     }
-    
+
     public ContextResolver<JAXBContext> getContextResolver() {
         return cr;
     }
@@ -344,63 +349,81 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void test() {
         // complete
     }
-    
-    @Produces("text/xml")   
+
+    @Produces("text/xml")
     public void getItAsXML() {
         // complete
     }
-    @Produces("text/plain")   
+    @Produces("text/plain")
     public void getItPlain() {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testQuery(@QueryParam("query") String queryString, 
+
+    @Produces("text/xml")
+    public void testQuery(@QueryParam("query") String queryString,
                           @QueryParam("query") int queryInt,
                           @QueryParam("query2") String query2,
                           @QueryParam("query3") String query3) {
         // complete
     }
-    
-    @Produces("text/xml")   
+
+    @Produces("text/xml")
     public void testQueryIntegerArray(@QueryParam("query") Integer[] query) {
         // complete
     }
-    
-    @Produces("text/xml")   
+
+    @Produces("text/xml")
     public void testQueryIntArray(@QueryParam("query") int[] query) {
         // complete
     }
-    
-    @Produces("text/xml")   
+
+    @Produces("text/xml")
+    //CHECKSTYLE:OFF
     public void testQueryAsList(
         @DefaultValue("default") @QueryParam("query") List<String> queryString,
         @QueryParam("query2") List<String> queryString2,
         @QueryParam("query3") List<Integer> queryString3,
         @QueryParam("query3") Integer[] queryString3Array,
         @QueryParam("query4") List<String> queryString4,
-        @QueryParam("query5") List<String> queryString5) {
+        @QueryParam("query5") List<String> queryString5,
+        @QueryParam("query3") List<MyType<Integer>> queryString6,
+        @QueryParam("query3") List<Long> queryString7,
+        @QueryParam("query3") List<Double> queryString8) {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testPathSegment(@PathParam("ps") PathSegment ps, 
+    //CHECKSTYLE:ON
+    public static class MyType<T> {
+        private T t;
+        public MyType(T t) {
+            this.t = t;
+        }
+        public T get() {
+            return t;
+        }
+
+    }
+    @Produces("text/xml")
+    public void testPathSegment(@PathParam("ps") PathSegment ps,
                                 @PathParam("ps") String path) {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testMultipleQuery(@QueryParam("query")  String queryString, 
+
+    @Produces("text/xml")
+    //CHECKSTYLE:OFF: checkstyle:parameternumber
+    public void testMultipleQuery(@QueryParam("query")  String queryString,
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
                                   @QueryParam("query4") boolean queryBoolean4,
                                   @QueryParam("query5") char queryChar5,
-                                  @QueryParam("query6") String queryString6) {
+                                  @QueryParam("query6") String queryString6,
+                                  @QueryParam("query7") Boolean queryString7,
+                                  @QueryParam("query8") String queryString8) {
         // complete
     }
-    
-    @Produces("text/xml")   
-    public void testMatrixParam(@MatrixParam("p1") String mp1, 
+    //CHECKSTYLE:ON: checkstyle:parameternumber
+
+    @Produces("text/xml")
+    public void testMatrixParam(@MatrixParam("p1") String mp1,
                                 @MatrixParam("p2") String mp2,
                                 @MatrixParam("p3") String mp3,
                                 @MatrixParam("p4") String mp4,
@@ -408,61 +431,61 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                 @MatrixParam("p5") String mp5) {
         // complete
     }
-    
-    public void testCustomerParam(@QueryParam("p1") Customer c, 
+
+    public void testCustomerParam(@QueryParam("p1") Customer c,
                                   @QueryParam("p2") Customer[] c2,
                                   @QueryParam("p3") Customer2 c3) {
         // complete
     }
-    
+
     public void testCustomerParam2(@QueryParam("p1") String[] p) {
         // complete
     }
-    
+
     public void testFromStringParam(@QueryParam("p1") UUID uuid,
                                     @QueryParam("p2") CustomerGender gender,
                                     @QueryParam("p3") CustomerGender gender2) {
         // complete
     }
-    
+
     public void testFromValueParam(@QueryParam("p1") Timezone tzone) {
         // complete
     }
-    
+
 //  CHECKSTYLE:OFF
     public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) {
         // complete
     }
-//  CHECKSTYLE:ON    
+//  CHECKSTYLE:ON
     public void testWrongType2(@QueryParam("p1") CustomerGender g) {
         // complete
     }
-    
-    public void testFormParam(@FormParam("p1") String fp1, 
+
+    public void testFormParam(@FormParam("p1") String fp1,
                               @FormParam("p2") List<String> fp2) {
         // complete
     }
-    
+
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void testMultivaluedMapAndFormParam(MultivaluedMap<String, String> params,
-                                               @FormParam("p1") String fp1, 
+                                               @FormParam("p1") String fp1,
                                                @FormParam("p2") List<String> fp2) {
         // complete
     }
-    
+
     public void testCookieParam(@CookieParam("c1") String c1,
                                 @CookieParam("c1") Set<Cookie> c11,
                                 @CookieParam("c2") @DefaultValue("c2Value") String c2,
                                 @CookieParam("c2") @DefaultValue("c2Value") Set<String> c22) {
         // complete
     }
-    
+
     public void testMultipleCookieParam(@CookieParam("c1") String c1,
                                         @CookieParam("c2") String c2,
                                         @CookieParam("c3") Cookie c3) {
         // complete
     }
-    
+
     public void testParams(@Context UriInfo info,
                            @Context HttpHeaders hs,
                            @Context Request r,
@@ -472,20 +495,20 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                            @HeaderParam("Foo") List<String> l) {
         // complete
     }
-    
+
     public void testServletParams(@Context HttpServletRequest req,
                                   @Context HttpServletResponse res,
                                   @Context ServletContext context,
                                   @Context ServletConfig config) {
         // complete
     }
-    
+
     @Path("{id1}/{id2}")
     public void testConversion(@PathParam("id1") PathSegmentImpl id1,
                                @PathParam("id2") SimpleFactory f) {
         // complete
     }
-    
+
     public void testContextResolvers(@Context ContextResolver<JAXBContext> resolver) {
         // complete
     }
@@ -504,27 +527,26 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public String marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
+
     public static final class ABean {
         private String value;
         private ABean(String value) {
             this.value = value;
         }
-        
+
         public String getValue() {
             return value;
         }
-        
+
         public static ABean fromString(String value) {
             return new ABean(value);
         }
     }
-    
+
     public static class CustomerBeanAdapter2 extends XmlAdapter<ABean, CustomerBean> {
 
         @Override
@@ -536,12 +558,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
         @Override
         public ABean marshal(CustomerBean v) throws Exception {
-            // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
+
     public class CustomerBeanAdapter3 extends XmlAdapter<CustomerBean, CustomerBeanInterface> {
         public CustomerBean marshal(CustomerBeanInterface v) throws Exception {
             return null;
@@ -551,17 +572,17 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
             return v;
         }
     }
-    
+
     public static class Query<T> implements Serializable {
-        
+
         private static final long serialVersionUID = -1600323678121423761L;
         private T entity;
         public Query(T entity) {
             this.entity = entity;
         }
-        
+
         public T getEntity() {
             return entity;
         }
     }
-};
+}

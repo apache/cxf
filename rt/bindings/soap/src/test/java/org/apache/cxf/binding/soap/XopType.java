@@ -28,9 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for XopType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="XopType">
  *   &lt;complexContent>
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "XopType", propOrder = {"name", "attachinfo" })
@@ -58,11 +58,11 @@ public class XopType {
 
     /**
      * Gets the value of the name property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getName() {
         return name;
@@ -70,11 +70,11 @@ public class XopType {
 
     /**
      * Sets the value of the name property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setName(String value) {
         this.name = value;
@@ -82,11 +82,11 @@ public class XopType {
 
     /**
      * Gets the value of the attachinfo property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link DataHandler }
-     *     
+     *
      */
     public DataHandler getAttachinfo() {
         return attachinfo;
@@ -94,11 +94,11 @@ public class XopType {
 
     /**
      * Sets the value of the attachinfo property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link DataHandler }
-     *     
+     *
      */
     public void setAttachinfo(DataHandler value) {
         this.attachinfo = value;

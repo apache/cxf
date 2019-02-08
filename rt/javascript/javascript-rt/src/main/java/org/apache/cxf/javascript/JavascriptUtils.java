@@ -71,8 +71,8 @@ public class JavascriptUtils {
     private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();
     private static final XmlSchemaChoice EMPTY_CHOICE = new XmlSchemaChoice();
     private static final XmlSchemaAll EMPTY_ALL = new XmlSchemaAll();
-    
-    
+
+
     private static final Logger LOG = LogUtils.getL7dLogger(JavascriptUtils.class);
 
     private static final String NL = "\n";
@@ -87,14 +87,14 @@ public class JavascriptUtils {
 
     public JavascriptUtils(StringBuilder code) {
         this.code = code;
-        defaultValueForSimpleType = new HashMap<String, String>();
+        defaultValueForSimpleType = new HashMap<>();
         defaultValueForSimpleType.put("int", "0");
         defaultValueForSimpleType.put("unsignedInt", "0");
         defaultValueForSimpleType.put("long", "0");
         defaultValueForSimpleType.put("unsignedLong", "0");
         defaultValueForSimpleType.put("float", "0.0");
         defaultValueForSimpleType.put("double", "0.0");
-        nonStringSimpleTypes = new HashSet<String>();
+        nonStringSimpleTypes = new HashSet<>();
         nonStringSimpleTypes.add("int");
         nonStringSimpleTypes.add("long");
         nonStringSimpleTypes.add("unsignedInt");
@@ -102,16 +102,16 @@ public class JavascriptUtils {
         nonStringSimpleTypes.add("float");
         nonStringSimpleTypes.add("double");
 
-        intTypes = new HashSet<String>();
+        intTypes = new HashSet<>();
         intTypes.add("int");
         intTypes.add("long");
         intTypes.add("unsignedInt");
         intTypes.add("unsignedLong");
-        floatTypes = new HashSet<String>();
+        floatTypes = new HashSet<>();
         floatTypes.add("float");
         floatTypes.add("double");
 
-        prefixStack = new Stack<String>();
+        prefixStack = new Stack<>();
         prefixStack.push("    ");
     }
 
@@ -119,9 +119,8 @@ public class JavascriptUtils {
         String val = defaultValueForSimpleType.get(type.getName());
         if (val == null) { // ints and such return the appropriate 0.
             return "''";
-        } else {
-            return val;
         }
+        return val;
     }
 
     public boolean isStringSimpleType(QName typeName) {
@@ -151,7 +150,7 @@ public class JavascriptUtils {
 
     /**
      * emit javascript to append a value to the accumulator.
-     * 
+     *
      * @param value
      */
     public void appendString(String value) {
@@ -248,7 +247,7 @@ public class JavascriptUtils {
     public static String javaScriptNameToken(String token) {
         return token;
     }
-    
+
     /**
      * We really don't want to take the attitude that 'all base64Binary elements are candidates for MTOM'.
      * So we look for clues.
@@ -259,7 +258,7 @@ public class JavascriptUtils {
         if (schemaObject == null) {
             return false;
         }
-        
+
         Map<Object, Object> metaInfoMap = schemaObject.getMetaInfoMap();
         if (metaInfoMap != null) {
             Map<?, ?> attribMap = (Map<?, ?>)metaInfoMap.get(Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES);
@@ -268,7 +267,7 @@ public class JavascriptUtils {
                 return true;
             }
         }
-        
+
         if (schemaObject instanceof XmlSchemaElement) {
             XmlSchemaElement element = (XmlSchemaElement) schemaObject;
             if (element.getSchemaType() == null) {
@@ -281,12 +280,12 @@ public class JavascriptUtils {
             if (new QName("http://www.w3.org/2005/05/xmlmime", "base64Binary").equals(typeName)) {
                 return true;
             }
-            
+
         }
-        
+
         return false;
     }
-    
+
     /**
      * We don't want to generate Javascript overhead for complex types with simple content models,
      * at least until or unless we decide to cope with attributes in a general way.
@@ -294,8 +293,8 @@ public class JavascriptUtils {
      * @return
      */
     public static boolean notVeryComplexType(XmlSchemaType type) {
-        return type instanceof XmlSchemaSimpleType 
-               || (type instanceof XmlSchemaComplexType 
+        return type instanceof XmlSchemaSimpleType
+               || (type instanceof XmlSchemaComplexType
                    && ((XmlSchemaComplexType)type).getContentModel() instanceof XmlSchemaSimpleContent);
     }
 
@@ -315,11 +314,11 @@ public class JavascriptUtils {
         // what if 'base64binary' was extended in some crazy way? At runtime, either it has
         // an xop:Include or it doesn't.
         if (type instanceof XmlSchemaComplexType) {
-            XmlSchemaComplexType complexType = (XmlSchemaComplexType)type; 
+            XmlSchemaComplexType complexType = (XmlSchemaComplexType)type;
             if (complexType.getContentModel() instanceof XmlSchemaSimpleContent) {
                 XmlSchemaSimpleContent content = (XmlSchemaSimpleContent)complexType.getContentModel();
                 if (content.getContent() instanceof XmlSchemaSimpleContentExtension) {
-                    XmlSchemaSimpleContentExtension extension = 
+                    XmlSchemaSimpleContentExtension extension =
                         (XmlSchemaSimpleContentExtension)content.getContent();
                     if (Constants.XSD_BASE64.equals(extension.getBaseTypeName())) {
                         return true;
@@ -332,7 +331,7 @@ public class JavascriptUtils {
 
     /**
      * Given an element, generate the serialization code.
-     * 
+     *
      * @param elementInfo description of the element we are serializing
      * @param referencePrefix prefix to the Javascript variable. Nothing for
      *                args, this._ for members.
@@ -359,8 +358,8 @@ public class JavascriptUtils {
         // first question: optional?
         if (optional) {
             startIf(jsVar + " != null");
-        } 
-        
+        }
+
         // nillable and optional would be very strange together.
         // and nillable in the array case applies to the elements.
         if (nillable && !array) {
@@ -368,7 +367,7 @@ public class JavascriptUtils {
             appendString("<" + elementInfo.getXmlName() + " " + XmlSchemaUtils.XSI_NIL + "/>");
             appendElse();
         }
-        
+
         if (array) {
             // protected against null in arrays.
             startIf(jsVar + " != null");
@@ -379,24 +378,24 @@ public class JavascriptUtils {
             // Recode and fiddle appropriately.
             startIf(jsVar + " == null");
             if (nillable) {
-                appendString("<" + elementInfo.getXmlName() 
+                appendString("<" + elementInfo.getXmlName()
                              + " " + XmlSchemaUtils.XSI_NIL + "/>");
             } else {
-                appendString("<" + elementInfo.getXmlName() + "/>");                    
+                appendString("<" + elementInfo.getXmlName() + "/>");
             }
             appendElse();
         }
-        
+
         if (elementInfo.isAnyType()) {
             serializeAnyTypeElement(elementInfo, jsVar);
-            // mtom can be turned on for the special complex type that is really a basic type with 
+            // mtom can be turned on for the special complex type that is really a basic type with
             // a content-type attribute.
         } else if (!mtom && type instanceof XmlSchemaComplexType) {
             // it has a value
             // pass the extra null in the slot for the 'extra namespaces' needed
             // by 'any'.
-            appendExpression(jsVar 
-                             + ".serialize(cxfjsutils, '" 
+            appendExpression(jsVar
+                             + ".serialize(cxfjsutils, '"
                              + elementInfo.getXmlName() + "', null)");
         } else { // simple type
             appendString("<" + elementInfo.getXmlName() + ">");
@@ -407,18 +406,18 @@ public class JavascriptUtils {
             }
             appendString("</" + elementInfo.getXmlName() + ">");
         }
-        
+
         if (array) {
             endBlock(); // for the extra level of nil checking, which might be
                         // wrong.
             endBlock(); // for the for loop.
             endBlock(); // the null protection.
         }
-        
+
         if (nillable && !array) {
             endBlock();
         }
-        
+
         if (optional) {
             endBlock();
         }
@@ -446,8 +445,8 @@ public class JavascriptUtils {
                    + "+ anyHolder.localName + '\\\'';");
         endBlock();
         startIf("anySerializer");
-        appendExpression(jsVar 
-                         + ".serialize(cxfjsutils, '" 
+        appendExpression(jsVar
+                         + ".serialize(cxfjsutils, '"
                          + elementInfo.getXmlName() + "', typeAttr)");
         appendElse(); // simple type or raw
         appendExpression("'<" + elementInfo.getXmlName() + " ' + typeAttr + " + "'>'");
@@ -459,7 +458,7 @@ public class JavascriptUtils {
         appendString("</" + elementInfo.getXmlName() + ">");
         endBlock();
         appendElse(); // nil (from null holder)
-        appendString("<" + elementInfo.getXmlName() 
+        appendString("<" + elementInfo.getXmlName()
                      + " " + XmlSchemaUtils.XSI_NIL + "/>");
         endBlock();
     }
@@ -467,7 +466,7 @@ public class JavascriptUtils {
     /**
      * Generate code to serialize an xs:any. There is too much duplicate code
      * with the element serializer; fix that some day.
-     * 
+     *
      * @param elementInfo
      * @param schemaCollection
      */
@@ -528,8 +527,8 @@ public class JavascriptUtils {
         appendExpression("anyEndTag");
         endBlock();
         if (array) {
-            endBlock(); 
-            endBlock(); 
+            endBlock();
+            endBlock();
         }
 
         if (optional) {
@@ -560,7 +559,7 @@ public class JavascriptUtils {
 
         return (XmlSchemaAnnotated) object;
     }
-    
+
     /**
      * If the object is an element or an any, return the particle. If it's not a particle, or it's a group,
      * throw. We're not ready for groups yet.
@@ -659,11 +658,11 @@ public class JavascriptUtils {
 
         return all;
     }
-    
-    
+
+
     public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type,
                                                            SchemaCollection collection) {
-        List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
+        List<XmlSchemaObject> results = new ArrayList<>();
         QName baseTypeName = XmlSchemaUtils.getBaseType(type);
         if (baseTypeName != null) {
             XmlSchemaComplexType baseType = (XmlSchemaComplexType)collection.getTypeByQName(baseTypeName);
@@ -680,14 +679,13 @@ public class JavascriptUtils {
                 }
             }
             return results;
-        } else {
-            // no base type, the simple case.
-            XmlSchemaSequence sequence = getSequence(type);
-            for (XmlSchemaSequenceMember item : sequence.getItems()) {
-                results.add((XmlSchemaObject)item);
-            }
-            return results;
         }
+        // no base type, the simple case.
+        XmlSchemaSequence sequence = getSequence(type);
+        for (XmlSchemaSequenceMember item : sequence.getItems()) {
+            results.add((XmlSchemaObject)item);
+        }
+        return results;
     }
 
     public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
@@ -716,7 +714,7 @@ public class JavascriptUtils {
         }
         return sequence;
     }
-    
+
     static void unsupportedConstruct(String messageKey,
                                              String what,
                                              QName subjectName,
@@ -727,18 +725,17 @@ public class JavascriptUtils {
         throw new UnsupportedConstruct(message);
     }
 
-    
+
     static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
         Message message = new Message(messageKey, LOG, subject.getQName(),
                                       cleanedUpSchemaSource(subject));
         throw new UnsupportedConstruct(message);
     }
-    
+
     static String cleanedUpSchemaSource(XmlSchemaObject subject) {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
-        } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
-    }    
+        return subject.getSourceURI() + ":" + subject.getLineNumber();
+    }
 }

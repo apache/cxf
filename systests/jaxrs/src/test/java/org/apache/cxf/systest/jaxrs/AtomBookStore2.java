@@ -31,16 +31,16 @@ import org.apache.abdera.model.Feed;
 
 @Path("/")
 public class AtomBookStore2 extends AtomBookStore {
-    
+
     @GET
     @Path("/")
     @Produces({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
-        
+
         return super.getBooksAsFeed(uParam);
-        
+
     }
-    
+
     @Context
     public void setUriInfo(UriInfo ui) {
         super.uField = ui;

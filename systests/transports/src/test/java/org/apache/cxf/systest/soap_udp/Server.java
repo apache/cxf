@@ -28,9 +28,9 @@ import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
-    
+
     Endpoint ep;
-    protected void run() {        
+    protected void run() {
         Object implementor = new GreeterImpl();
         String address = "soap.udp://:" + PORT;
         ep = Endpoint.publish(address, implementor);
@@ -40,10 +40,10 @@ public class Server extends AbstractBusTestServerBase {
         if (ep != null) {
             ep.stop();
         }
-        
+
     }
-    
-    
+
+
     public static void main(String[] args) {
         try {
             Server s = new Server();
@@ -53,14 +53,14 @@ public class Server extends AbstractBusTestServerBase {
             System.exit(-1);
         }
     }
-    
+
 
     @WebService(serviceName = "SOAPService",
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
                 wsdlLocation = "testutils/hello_world.wsdl")
-    @GZIP(threshold = 50)            
+    @GZIP(threshold = 50)
     public class GreeterImpl extends BaseGreeterImpl {
 
 

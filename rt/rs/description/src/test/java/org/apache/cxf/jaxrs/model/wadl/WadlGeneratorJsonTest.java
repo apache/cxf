@@ -47,53 +47,55 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WadlGeneratorJsonTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class WadlGeneratorJsonTest {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
         control.makeThreadSafe(true);
     }
-    
+
     @Test
     public void testWadlInJsonFormat() throws Exception {
-        ClassResourceInfo cri = 
+        ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(BookChapters.class, BookChapters.class, true, true);
         final Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         headers.put("Accept", Collections.singletonList("application/json"));
         m.put(Message.PROTOCOL_HEADERS, headers);
-        
+
         WadlGenerator wg = new WadlGenerator() {
-            public void filter(ContainerRequestContext context) {
+            @Override public void filter(ContainerRequestContext context) {
                 super.doFilter(context, m);
             }
         };
         wg.setUseJaxbContextForQnames(false);
         wg.setIgnoreMessageWriters(false);
         wg.setExternalLinks(Collections.singletonList("json.schema"));
-        
+
         Response r = handleRequest(wg, m);
         assertEquals("application/json",
                 r.getMetadata().getFirst("Content-Type").toString());
-        
+
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
+
         new JSONProvider<Document>().writeTo(
-                (Document)r.getEntity(), Document.class, Document.class, 
-                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+                (Document)r.getEntity(), Document.class, Document.class,
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                   new MetadataMap<String, Object>(), os);
         String s = os.toString();
-        String expected1 = 
+        String expected1 =
             "{\"application\":{\"grammars\":{\"include\":{\"@href\":\"http://localhost:8080/baz"
             + "/json.schema\"}},\"resources\":{\"@base\":\"http://localhost:8080/baz\","
             + "\"resource\":{\"@path\":\"/bookstore/{id}\"";

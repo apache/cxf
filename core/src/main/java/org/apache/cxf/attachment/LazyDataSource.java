@@ -31,7 +31,7 @@ import javax.activation.DataSource;
 import org.apache.cxf.message.Attachment;
 
 /**
- * A DataSource which will search through a Collection of attachments so as to 
+ * A DataSource which will search through a Collection of attachments so as to
  * lazily load the attachment from the collection. This allows streaming attachments
  * with databinding toolkits like JAXB.
  */
@@ -39,7 +39,7 @@ public class LazyDataSource implements DataSource {
     private DataSource dataSource;
     private Collection<Attachment> attachments;
     private String id;
-    
+
     public LazyDataSource(String id, Collection<Attachment> attachments) {
         super();
         this.id = id;
@@ -57,7 +57,7 @@ public class LazyDataSource implements DataSource {
         }
         if (dataSource == null) {
             //couldn't find it, build up error message
-            List<String> ids = new ArrayList<String>(10);
+            List<String> ids = new ArrayList<>(10);
             for (Attachment a : attachments) {
                 ids.add(a.getId());
                 if (a.getId().equals(id)) {
@@ -65,10 +65,9 @@ public class LazyDataSource implements DataSource {
                     if (dataSource != null) {
                         ids = null;
                         break;
-                    } else {
-                        throw new IllegalStateException("Could not get DataSource for "
-                                                        + "attachment of id " + id);
                     }
+                    throw new IllegalStateException("Could not get DataSource for "
+                                                    + "attachment of id " + id);
                 }
             }
             if (ids != null) {
@@ -77,34 +76,34 @@ public class LazyDataSource implements DataSource {
             }
         }
     }
-    
+
     public String getContentType() {
         load();
-        
+
         return dataSource.getContentType();
     }
 
     public InputStream getInputStream() throws IOException {
         load();
-        
+
         return dataSource.getInputStream();
     }
 
     public String getName() {
         load();
-        
+
         return dataSource.getName();
     }
 
     public OutputStream getOutputStream() throws IOException {
         load();
-        
+
         return dataSource.getOutputStream();
     }
 
     public DataSource getDataSource() {
         load();
-        
+
         return dataSource;
     }
 

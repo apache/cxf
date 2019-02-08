@@ -29,5 +29,5 @@ public interface AuthenticationStatementProvider {
      * Get an AuthenticationStatementBean using the given parameters.
      */
     AuthenticationStatementBean getStatement(TokenProviderParameters providerParameters);
-        
+
 }

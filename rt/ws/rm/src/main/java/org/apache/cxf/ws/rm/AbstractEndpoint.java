@@ -26,38 +26,38 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public class AbstractEndpoint {
-    
+
     /* the number of currently processing sequences */
     protected AtomicInteger processingSequenceCount;
     /* the number of completed sequences since last started */
     protected AtomicInteger completedSequenceCount;
-    
+
     private final RMEndpoint reliableEndpoint;
-    
+
     protected AbstractEndpoint(RMEndpoint rme) {
         reliableEndpoint = rme;
         processingSequenceCount = new AtomicInteger();
         completedSequenceCount = new AtomicInteger();
     }
-    
+
     public String getName() {
         return RMUtils.getEndpointIdentifier(getEndpoint(), getBus());
     }
-    
-    /** 
+
+    /**
      * @return Returns the reliableEndpoint.
      */
     public RMEndpoint getReliableEndpoint() {
         return reliableEndpoint;
     }
-    
+
     /**
      * @return Returns the endpoint.
      */
     public Endpoint getEndpoint() {
         return reliableEndpoint.getApplicationEndpoint();
     }
-    
+
     /**
      * @return Returns the manager.
      */
@@ -67,7 +67,7 @@ public class AbstractEndpoint {
 
     /**
      * Generates and returns a new sequence identifier.
-     * 
+     *
      * @return the sequence identifier.
      */
     public Identifier generateSequenceIdentifier() {
@@ -81,7 +81,7 @@ public class AbstractEndpoint {
     int getCompletedSequenceCount() {
         return completedSequenceCount.get();
     }
-    
+
     private Bus getBus() {
         return reliableEndpoint.getManager().getBus();
     }

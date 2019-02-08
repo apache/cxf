@@ -36,19 +36,19 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
 
     private static final String DEFAULT_ENV_PREFIX = "env";
-    private static final QName DEFAULT_ENV_QNAME = 
+    private static final QName DEFAULT_ENV_QNAME =
         new QName("http://org.apache.cxf/rs/env", "Envelope", DEFAULT_ENV_PREFIX);
     private QName envelopeQName = DEFAULT_ENV_QNAME;
     private boolean signLater;
-    
+
     public SamlEnvelopedOutInterceptor() {
         // SAML assertions may contain enveloped XML signatures so
         // makes sense to avoid having them signed in the detached mode
         super.addAfter(XmlSigOutInterceptor.class.getName());
-        
+
         super.addBefore(XmlEncOutInterceptor.class.getName());
     }
-    
+
     public SamlEnvelopedOutInterceptor(boolean signLater) {
         if (signLater) {
             super.addBefore(XmlSigOutInterceptor.class.getName());
@@ -56,39 +56,39 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             super.addAfter(XmlSigOutInterceptor.class.getName());
         }
         this.signLater = signLater;
-        
+
         super.addBefore(XmlEncOutInterceptor.class.getName());
     }
 
-    
-    protected Document processDocument(Message message, Document doc) 
+
+    protected Document processDocument(Message message, Document doc)
         throws Exception {
         return createEnvelopedSamlToken(message, doc);
     }
-    
+
     // enveloping & detached sigs will be supported too
-    private Document createEnvelopedSamlToken(Message message, Document payloadDoc) 
+    private Document createEnvelopedSamlToken(Message message, Document payloadDoc)
         throws Exception {
-        
+
         Element docEl = payloadDoc.getDocumentElement();
         SamlAssertionWrapper assertion = SAMLUtils.createAssertion(message);
-        
+
         QName rootName = DOMUtils.getElementQName(payloadDoc.getDocumentElement());
         if (rootName.equals(envelopeQName)) {
             docEl.appendChild(assertion.toDOM(payloadDoc));
             return payloadDoc;
         }
-        
+
         Document newDoc = DOMUtils.createDocument();
-        
-        Element root = 
-            newDoc.createElementNS(envelopeQName.getNamespaceURI(), 
+
+        Element root =
+            newDoc.createElementNS(envelopeQName.getNamespaceURI(),
                     envelopeQName.getPrefix() + ":" + envelopeQName.getLocalPart());
         newDoc.appendChild(root);
-        
+
         Element assertionEl = assertion.toDOM(newDoc);
         root.appendChild(assertionEl);
-        
+
         payloadDoc.removeChild(docEl);
         newDoc.adoptNode(docEl);
         root.appendChild(docEl);
@@ -102,21 +102,20 @@ public class SamlEnvelopedOutInterceptor extends AbstractXmlSecOutInterceptor {
             CachedOutputStream bos = new CachedOutputStream();
             StaxUtils.writeTo(newDoc, bos);
             return StaxUtils.read(bos.getInputStream());
-        } else {
-            return newDoc;
         }
+        return newDoc;
     }
 
 
     public void setEnvelopeName(String expandedName) {
         setEnvelopeQName(DOMUtils.convertStringToQName(expandedName, DEFAULT_ENV_PREFIX));
     }
-    
+
     public void setEnvelopeQName(QName name) {
         if (name.getPrefix().length() == 0) {
             name = new QName(name.getNamespaceURI(), name.getLocalPart(), DEFAULT_ENV_PREFIX);
         }
         this.envelopeQName = name;
     }
-    
+
 }

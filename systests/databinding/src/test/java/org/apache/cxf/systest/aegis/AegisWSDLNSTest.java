@@ -30,39 +30,39 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
- * 
+ *
  */
 @ContextConfiguration(locations = { "classpath:aegisWSDLNSBeans.xml" })
 public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
     static final String PORT = TestUtil.getPortNumber(AegisWSDLNSTest.class);
 
     private AegisJaxWsWsdlNs client;
-    
+
     public AegisWSDLNSTest() {
     }
-    
+
     private void setupForTest(boolean specifyWsdl) throws Exception {
-        
+
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(AegisJaxWsWsdlNs.class);
         if (specifyWsdl) {
-            factory.setServiceName(new QName("http://v1_1_2.rtf2pdf.doc.ws.daisy.marbes.cz", 
-                                             "AegisJaxWsWsdlNsImplService")); 
+            factory.setServiceName(new QName("http://v1_1_2.rtf2pdf.doc.ws.daisy.marbes.cz",
+                                             "AegisJaxWsWsdlNsImplService"));
             factory.setWsdlLocation("http://localhost:" + PORT + "/aegisJaxWsWSDLNS?wsdl");
         }
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        factory.setAddress("http://localhost:" + PORT + "/aegisJaxWsWSDLNS"); 
+        factory.setAddress("http://localhost:" + PORT + "/aegisJaxWsWSDLNS");
         client = (AegisJaxWsWsdlNs)factory.create();
     }
-    
+
     @Test
     public void testWithInterface() throws Exception {
         setupForTest(false);
@@ -70,15 +70,15 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
         vo.setStr("ffang");
         client.updateVO(vo);
     }
-    
+
     @Test
     public void testWithWsdl() throws Exception {
         setupForTest(true);
         AegisJaxWsWsdlNs.VO vo = new AegisJaxWsWsdlNs.VO();
         vo.setStr("ffang");
-        client.updateVO(vo);        
+        client.updateVO(vo);
     }
-    
+
     @Test
     public void testGeneratedWsdlNs() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/aegisJaxWsWSDLNS?wsdl");
@@ -86,7 +86,7 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
         TestUtilities util = new TestUtilities(this.getClass());
         util.addDefaultNamespaces();
         util.assertValid(
-                         "//wsdl:definitions[@targetNamespace" 
+                         "//wsdl:definitions[@targetNamespace"
                          + "='http://v1_1_2.rtf2pdf.doc.ws.daisy.marbes.cz']",
                          dom);
         //should be a targetNamespace for "http://wo.rtf2pdf.doc.ws.daisy.marbes.cz"
@@ -95,12 +95,12 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
                          + "='http://wo.rtf2pdf.doc.ws.daisy.marbes.cz']",
                          dom);
     }
-    
+
     @Test
     public void testUsingCorrectMethod() throws Exception {
         setupForTest(false);
-        Integer result = client.updateInteger(new Integer(20));
+        Integer result = client.updateInteger(Integer.valueOf(20));
         Assert.assertEquals(result.intValue(), 20);
     }
-   
+
 }

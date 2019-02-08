@@ -23,7 +23,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public final class TestUtils {
-    
+
     private TestUtils() {
         // complete
     }
@@ -47,5 +47,5 @@ public final class TestUtils {
         }
         return unrestrictedPoliciesInstalled;
     }
-    
+
 }

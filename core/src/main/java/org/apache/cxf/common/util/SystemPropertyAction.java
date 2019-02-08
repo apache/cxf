@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * 
+ *
  */
 public final class SystemPropertyAction implements PrivilegedAction<String> {
     private static final Logger LOG = LogUtils.getL7dLogger(SystemPropertyAction.class);
@@ -41,7 +41,7 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
         property = name;
         def = d;
     }
-    
+
     /* (non-Javadoc)
      * @see java.security.PrivilegedAction#run()
      */
@@ -51,11 +51,11 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
         }
         return System.getProperty(property);
     }
-    
+
     public static String getProperty(String name) {
         return AccessController.doPrivileged(new SystemPropertyAction(name));
     }
-    
+
     public static String getProperty(String name, String def) {
         try {
             return AccessController.doPrivileged(new SystemPropertyAction(name, def));
@@ -66,7 +66,7 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
     }
 
     /**
-     * Get the system property via the AccessController, but if a SecurityException is 
+     * Get the system property via the AccessController, but if a SecurityException is
      * raised, just return null;
      * @param name
      */
@@ -76,6 +76,25 @@ public final class SystemPropertyAction implements PrivilegedAction<String> {
         } catch (SecurityException ex) {
             LOG.log(Level.FINE, "SecurityException raised getting property " + name, ex);
             return null;
+        }
+    }
+    
+    /**
+     * Get the integer system property via the AccessController, but if a SecurityException is
+     * raised, just return the default;
+     * @param name - system property name
+     * @param def - the default value if the system property does not exist or cannot be acquired
+     */
+    public static int getInteger(String name, int def) {
+        try {
+            return AccessController.doPrivileged(new PrivilegedAction<Integer>() {
+                @Override
+                public Integer run() {
+                    return Integer.getInteger(name, def);
+                } });
+        } catch (SecurityException ex) {
+            LOG.log(Level.FINE, "SecurityException raised getting property " + name, ex);
+            return def;
         }
     }
 }

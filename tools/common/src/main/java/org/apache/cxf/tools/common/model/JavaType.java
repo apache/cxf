@@ -24,12 +24,13 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 
 public class JavaType {
-    
+
     public enum Style { IN, OUT, INOUT }
-    private static Map<String, String> typeMapping = new HashMap<String, String>();
+    private static Map<String, String> typeMapping = new HashMap<>();
 
     static {
         typeMapping.put("boolean", "false");
@@ -41,7 +42,7 @@ public class JavaType {
         typeMapping.put("double", "0.0");
         typeMapping.put("char", "0");
         typeMapping.put("java.lang.String", "\"\"");
-        
+
         typeMapping.put("javax.xml.namespace.QName", "new javax.xml.namespace.QName(\"\", \"\")");
         typeMapping.put("java.net.URI", "new java.net.URI(\"\")");
 
@@ -72,7 +73,7 @@ public class JavaType {
         this.type = t;
         this.targetNamespace = tns;
         this.className = t;
-    }    
+    }
 
     public void setDefaultValueWriter(DefaultValueWriter w) {
         dvw = w;
@@ -80,7 +81,7 @@ public class JavaType {
     public DefaultValueWriter getDefaultValueWriter() {
         return dvw;
     }
-    
+
     public void setQName(QName qn) {
         this.qname = qn;
     }
@@ -122,8 +123,8 @@ public class JavaType {
             writer.write(";");
         }
     }
-    
-    
+
+
     protected String getDefaultTypeValue() {
         if (this.className.trim().endsWith("[]")) {
             return "new " + this.className.substring(0, this.className.length() - 2) + "[0]";
@@ -146,16 +147,15 @@ public class JavaType {
         Constructor<?>[] cons = clz.getConstructors();
         if (cons.length == 0) {
             return false;
-        } else {
-            for (int i = 0; i < cons.length; i++) {
-                if (cons[i].getParameterTypes().length == 0) {
-                    return true;
-                }
+        }
+        for (int i = 0; i < cons.length; i++) {
+            if (cons[i].getParameterTypes().length == 0) {
+                return true;
             }
         }
         return false;
     }
-    
+
     public void setTargetNamespace(String tns) {
         this.targetNamespace = tns;
     }
@@ -167,7 +167,7 @@ public class JavaType {
     public String getRawName() {
         return this.name;
     }
-    
+
     public String getName() {
         return this.name;
     }
@@ -183,7 +183,7 @@ public class JavaType {
     public void setType(String t) {
         type = t;
     }
-    
+
     //
     // getter and setter for in, out inout style
     //

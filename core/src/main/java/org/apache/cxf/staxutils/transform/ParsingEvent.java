@@ -22,19 +22,19 @@ package org.apache.cxf.staxutils.transform;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *
  */
 class ParsingEvent {
     private int event;
     private QName name;
     private String value;
-        
+
     ParsingEvent(int event, QName name, String value) {
         this.event = event;
         this.name = name;
         this.value = value;
     }
-        
+
     public String toString() {
         return new StringBuilder().append("Event(").
             append(event).append(", ").append(name).append(", ").append(value).append(")").

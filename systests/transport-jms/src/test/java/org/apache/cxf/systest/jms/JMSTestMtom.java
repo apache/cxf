@@ -37,6 +37,7 @@ import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.jms_mtom.JMSOutMTOMService;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -47,7 +48,7 @@ import org.junit.Test;
 public class JMSTestMtom {
     private static EmbeddedJMSBrokerLauncher broker;
     private static Bus bus;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         broker = new EmbeddedJMSBrokerLauncher();
@@ -57,15 +58,15 @@ public class JMSTestMtom {
         Object mtom = new JMSMTOMImpl();
         EndpointImpl ep = (EndpointImpl)Endpoint
             .publish("jms:jndi:dynamicQueues/test.cxf.jmstransport.queue&amp;receiveTimeout=10000", mtom);
-        Binding binding = ep.getBinding();        
-        ((SOAPBinding)binding).setMTOMEnabled(true); 
+        Binding binding = ep.getBinding();
+        ((SOAPBinding)binding).setMTOMEnabled(true);
     }
-    
+
     @AfterClass
     public static void stopServers() throws Exception {
         broker.stop();
     }
-    
+
     @Test
     public void testMTOM() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
@@ -78,19 +79,19 @@ public class JMSTestMtom {
         Binding binding = ((BindingProvider)mtom).getBinding();
         ((SOAPBinding)binding).setMTOMEnabled(true);
 
-        Holder<String> name = new Holder<String>("Sam");
+        Holder<String> name = new Holder<>("Sam");
         URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
-        Holder<DataHandler> handler1 = new Holder<DataHandler>();
+        Holder<DataHandler> handler1 = new Holder<>();
         handler1.value = new DataHandler(fileURL);
         int size = handler1.value.getInputStream().available();
         mtom.testDataHandler(name, handler1);
-        
-        byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
+
+        byte[] bytes = IOUtils.readBytesFromStream(handler1.value.getInputStream());
         Assert.assertEquals("The response file is not same with the sent file.", size, bytes.length);
         ((Closeable)mtom).close();
     }
-    
-    
+
+
     @Test
     public void testOutMTOM() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
@@ -104,12 +105,12 @@ public class JMSTestMtom {
         DataHandler handler1 = new DataHandler(fileURL);
         int size = handler1.getInputStream().available();
         DataHandler ret = mtom.testOutMtom();
-        
-        byte bytes[] = IOUtils.readBytesFromStream(ret.getInputStream());
+
+        byte[] bytes = IOUtils.readBytesFromStream(ret.getInputStream());
         Assert.assertEquals("The response file is not same with the original file.", size, bytes.length);
         ((Closeable)mtom).close();
     }
-    
+
     public static URL getWSDLURL(String s) throws Exception {
         URL u = JMSTestMtom.class.getResource(s);
         if (u == null) {

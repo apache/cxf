@@ -44,12 +44,12 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class TypeClassInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(TypeClassInitializer.class);
-    
+
     S2JJAXBModel model;
     boolean allowWrapperOperations;
     boolean isFault;
-    
-    public TypeClassInitializer(ServiceInfo serviceInfo, 
+
+    public TypeClassInitializer(ServiceInfo serviceInfo,
                                 S2JJAXBModel model,
                                 boolean allowWr) {
         super(serviceInfo);
@@ -63,7 +63,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
         if (!isFault && !allowWrapperOperations && op.isUnwrappedCapable() && !op.isUnwrapped()) {
             return;
         }
-        
+
         QName name;
         if (part.isElement()) {
             name = part.getElementQName();
@@ -71,27 +71,27 @@ public class TypeClassInitializer extends ServiceModelVisitor {
             name = part.getTypeQName();
         }
         Mapping mapping = model.get(name);
-        
+
         //String clsName = null;
         JType jType = null;
         if (mapping != null) {
-            jType = mapping.getType().getTypeClass();              
+            jType = mapping.getType().getTypeClass();
         }
-        
+
         if (jType == null) {
-            TypeAndAnnotation typeAndAnnotation = model.getJavaType(part.getTypeQName());           
-            if (typeAndAnnotation != null) {                
+            TypeAndAnnotation typeAndAnnotation = model.getJavaType(part.getTypeQName());
+            if (typeAndAnnotation != null) {
                 jType = typeAndAnnotation.getTypeClass();
             }
         }
-        if (jType == null 
+        if (jType == null
             && part.isElement()
             && part.getXmlSchema() instanceof XmlSchemaElement
             && ((XmlSchemaElement)part.getXmlSchema()).getSchemaTypeName() == null) {
             //anonymous inner thing.....
             UnwrappedOperationInfo oInfo = (UnwrappedOperationInfo)op;
             op = oInfo.getWrappedOperation();
-            
+
             if (part.getMessageInfo() == oInfo.getInput()) {
                 mapping = model.get(op.getInput().getFirstMessagePart().getElementQName());
             } else {
@@ -111,15 +111,15 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                     //ignore, JType is a type that doesn't have a classes method
                 }
             }
-            
+
         }
-        
+
         if (jType == null) {
             throw new ServiceConstructionException(new Message("NO_JAXB_CLASSMapping", LOG, name));
         }
-            
+
         Class<?> cls;
-        
+
         try {
             int arrayCount = 0;
             JType rootType = jType;
@@ -134,7 +134,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 arrayCount = 1;
             }
             cls = getClassByName(rootType);
-            // bmargulies cannot find a way to ask the JVM to do this without creating 
+            // bmargulies cannot find a way to ask the JVM to do this without creating
             // an array object on the way.
             if (arrayCount > 0) {
                 int[] dimensions = new int[arrayCount];
@@ -148,7 +148,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
         } catch (ClassNotFoundException e) {
             throw new ServiceConstructionException(e);
         }
-        
+
         part.setTypeClass(cls);
         if (isFault) {
             //need to create an Exception class for this
@@ -167,7 +167,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
 
     private Class<?> getClassByName(JType jType) throws ClassNotFoundException {
         Class<?> cls;
-        
+
         if (!jType.isPrimitive()) {
             cls = ClassLoaderUtils.loadClass(jType.binaryName(), getClass());
         } else {
@@ -182,8 +182,8 @@ public class TypeClassInitializer extends ServiceModelVisitor {
         isFault = false;
     }
 
-    
-    private class ExceptionCreator extends ASMHelper {
+
+    private static class ExceptionCreator extends ASMHelper {
         public Class<?> createExceptionClass(Class<?> bean) {
             String newClassName = bean.getName() + "_Exception";
             newClassName = newClassName.replaceAll("\\$", ".");
@@ -198,15 +198,15 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                          null,
                          "java/lang/Exception",
                          null);
-                
+
                 FieldVisitor fv;
                 MethodVisitor mv;
-                
+
                 String beanClassCode = getClassCode(bean);
                 fv = cw.visitField(0, "faultInfo", beanClassCode, null, null);
                 fv.visitEnd();
-                                
-                
+
+
                 mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
                                     "(Ljava/lang/String;" + beanClassCode + ")V", null, null);
                 mv.visitCode();
@@ -225,7 +225,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 mv.visitMaxs(2, 3);
                 mv.visitEnd();
 
-                mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getFaultInfo", 
+                mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getFaultInfo",
                                     "()" + beanClassCode, null, null);
                 mv.visitCode();
                 mv.visitLabel(createLabel());
@@ -237,7 +237,7 @@ public class TypeClassInitializer extends ServiceModelVisitor {
                 mv.visitEnd();
 
                 cw.visitEnd();
-                
+
                 return super.loadClass(bean.getName() + "_Exception", bean, cw.toByteArray());
             }
             return cls;

@@ -39,10 +39,10 @@ import org.apache.cxf.wsdl.WSDLManager;
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(EmbeddedJMSBrokerLauncher.class);
 
-    String brokerUrl1;            
+    String brokerUrl1;
     BrokerService broker;
     String brokerName;
-    
+
     public EmbeddedJMSBrokerLauncher() {
         this(null);
     }
@@ -55,7 +55,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     public void setBrokerName(String s) {
         brokerName = s;
     }
-    
+
     public String getBrokerURL() {
         return brokerUrl1;
     }
@@ -69,24 +69,24 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 break;
             default:
                 b.append(c);
-            }               
+            }
         }
         return b.toString();
     }
-    
-    public void updateWsdl(Bus b, URL wsdlLocation) { 
+
+    public void updateWsdl(Bus b, URL wsdlLocation) {
         updateWsdl(b, wsdlLocation.toString());
     }
-    
-    public void updateWsdl(Bus b, String wsdlLocation) { 
+
+    public void updateWsdl(Bus b, String wsdlLocation) {
         updateWsdlExtensors(b, wsdlLocation, brokerUrl1, getEncodedBrokerURL());
     }
-    
-    public static void updateWsdlExtensors(Bus bus, 
+
+    public static void updateWsdlExtensors(Bus bus,
                                            String wsdlLocation) {
         updateWsdlExtensors(bus, wsdlLocation, "tcp://localhost:" + PORT, null);
     }
-    public static void updateWsdlExtensors(Bus bus, 
+    public static void updateWsdlExtensors(Bus bus,
                                            String wsdlLocation,
                                            String url,
                                            String encodedUrl) {
@@ -104,7 +104,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 Service service = (Service)o;
                 Map<?, ?> ports = service.getPorts();
                 adjustExtensibilityElements(service.getExtensibilityElements(), url, encodedUrl);
-                
+
                 for (Object p : ports.values()) {
                     Port port = (Port)p;
                     adjustExtensibilityElements(port.getExtensibilityElements(), url, encodedUrl);
@@ -115,7 +115,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     private static void adjustExtensibilityElements(List<?> l,
                                                     String url,
                                                     String encodedUrl) {
@@ -135,7 +135,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                     e.getClass().getMethod("setValue", String.class).invoke(e, url);
                 } catch (Exception ex) {
                     //ignore
-                }                
+                }
             } else {
                 try {
                     Field f = e.getClass().getDeclaredField("jmsNamingProperty");
@@ -157,7 +157,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                     //ignore
                 }
             }
-        }        
+        }
     }
     public void stop() throws Exception {
         tearDown();
@@ -167,10 +167,10 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             broker.stop();
         }
     }
-    
+
     //START SNIPPET: broker
     public final void run() {
-        try {             
+        try {
             broker = new BrokerService();
             broker.setPersistent(false);
             broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
@@ -180,7 +180,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 broker.setBrokerName(brokerName);
             }
             broker.addConnector(brokerUrl1);
-            broker.start();  
+            broker.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

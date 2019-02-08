@@ -22,6 +22,7 @@ package org.apache.cxf.ws.eventing.shared.utils;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.xpath.XPath;
@@ -33,6 +34,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.eventing.FilterType;
 
 public final class FilteringUtil {
@@ -41,7 +43,15 @@ public final class FilteringUtil {
     public static final String NAMESPACE_XPATH20 = "http://www.w3.org/2011/03/ws-evt/Dialects/XPath20";
 
     private static final Logger LOG = LogUtils.getLogger(FilteringUtil.class);
-    private static XPathFactory xPathFactory =  XPathFactory.newInstance();
+    private static XPathFactory xPathFactory = XPathFactory.newInstance();
+
+    static {
+        try {
+            xPathFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+        } catch (javax.xml.xpath.XPathFactoryConfigurationException ex) {
+            // ignore
+        }
+    }
 
     private FilteringUtil() {
 
@@ -59,6 +69,7 @@ public final class FilteringUtil {
         try {
             XPath xPath = xPathFactory.newXPath();
             XPathExpression xPathExpression = xPath.compile(xPathString);
+            elm = (Element)DOMUtils.getDomElement(elm);
             return (Boolean)xPathExpression.evaluate(elm, XPathConstants.BOOLEAN);
         } catch (XPathExpressionException ex) {
             LOG.severe(ex.toString());
@@ -78,10 +89,10 @@ public final class FilteringUtil {
             return false;
         }
     }
-    
+
     public static boolean runFilterOnMessage(SOAPMessage msg, FilterType filter) {
         try {
-            Iterator<?> i  = msg.getSOAPBody().getChildElements();
+            Iterator<?> i = msg.getSOAPBody().getChildElements();
             final String xPath = (String)filter.getContent().get(0);
             while (i.hasNext()) {
                 Element elm = (Element)i.next();

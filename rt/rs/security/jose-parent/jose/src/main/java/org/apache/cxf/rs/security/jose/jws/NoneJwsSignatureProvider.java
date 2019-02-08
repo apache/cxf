@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jws;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureProvider implements JwsSignatureProvider {
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
 
     @Override
     public SignatureAlgorithm getAlgorithm() {
@@ -34,9 +35,7 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
 
     @Override
     public byte[] sign(JwsHeaders headers, byte[] content) {
-        JwsSignature sig = createJwsSignature(headers);
-        sig.update(content, 0, content.length);
-        return sig.sign();
+        return EMPTY_BYTE_ARRAY;
     }
     private static class NoneJwsSignature implements JwsSignature {
 
@@ -47,9 +46,9 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
 
         @Override
         public byte[] sign() {
-            return new byte[]{};
+            return EMPTY_BYTE_ARRAY;
         }
-        
+
     }
 }
 

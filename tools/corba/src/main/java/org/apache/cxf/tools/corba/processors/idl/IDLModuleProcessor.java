@@ -34,7 +34,7 @@ public class IDLModuleProcessor extends IDLProcessor {
         mapper = new ModuleToNSMapper();
         mapper.setDefaultMapping(false);
     }
-    
+
     public ModuleToNSMapper getMapper() {
         return mapper;
     }

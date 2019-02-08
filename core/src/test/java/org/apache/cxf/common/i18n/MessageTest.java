@@ -27,22 +27,26 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.junit.Assert;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class MessageTest extends Assert {
+
+public class MessageTest {
     private static final Logger LOG = LogUtils.getL7dLogger(MessageTest.class);
-    
+
     @Test
     public void testMessageWithLoggerBundle() throws Exception {
         Message msg = new Message("SUB1_EXC", LOG, new Object[] {1});
         assertSame("unexpected resource bundle",
                    LOG.getResourceBundle(),
                    msg.bundle);
-        assertEquals("unexpected message string", 
-                     "subbed in 1 only", 
-                     msg.toString()); 
+        assertEquals("unexpected message string",
+                     "subbed in 1 only",
+                     msg.toString());
     }
 
     @Test
@@ -50,11 +54,11 @@ public class MessageTest extends Assert {
         ResourceBundle bundle = BundleUtils.getBundle(getClass());
         Message msg = new Message("SUB2_EXC", bundle, new Object[] {3, 4});
         assertSame("unexpected resource bundle", bundle, msg.bundle);
-        assertEquals("unexpected message string", 
+        assertEquals("unexpected message string",
                      "subbed in 4 & 3",
-                     msg.toString()); 
+                     msg.toString());
     }
-    
+
     @Test
     public void testExceptionIO() throws java.lang.Exception {
         ResourceBundle bundle = BundleUtils.getBundle(getClass());
@@ -64,13 +68,13 @@ public class MessageTest extends Assert {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bout);
         out.writeObject(ex);
-        
+
         ByteArrayInputStream bin = new ByteArrayInputStream(bout.toByteArray());
         ObjectInputStream in = new ObjectInputStream(bin);
         Object o = in.readObject();
         assertTrue(o instanceof UncheckedException);
         UncheckedException ex2 = (UncheckedException)o;
         assertEquals("subbed in 4 & 3", ex2.getMessage());
-        
+
     }
 }

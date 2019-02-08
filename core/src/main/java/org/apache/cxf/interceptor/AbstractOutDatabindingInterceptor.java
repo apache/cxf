@@ -52,14 +52,14 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
 
     public static final String DISABLE_OUTPUTSTREAM_OPTIMIZATION = "disable.outputstream.optimization";
     public static final String OUT_BUFFERING = "org.apache.cxf.output.buffering";
-    
+
     public AbstractOutDatabindingInterceptor(String phase) {
         super(phase);
     }
     public AbstractOutDatabindingInterceptor(String id, String phase) {
         super(id, phase);
     }
-    
+
     protected boolean shouldBuffer(Message message) {
         Object en = message.getContextualProperty(OUT_BUFFERING);
         boolean allowBuffer = true;
@@ -71,19 +71,19 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         // need to cache the events in case validation fails or buffering is enabled
         return buffer || (allowBuffer && shouldValidate(message) && !isRequestor(message));
     }
-    
-    protected void writeParts(Message message, Exchange exchange, 
-                              BindingOperationInfo operation, MessageContentsList objs, 
+
+    protected void writeParts(Message message, Exchange exchange,
+                              BindingOperationInfo operation, MessageContentsList objs,
                               List<MessagePartInfo> parts) {
         OutputStream out = message.getContent(OutputStream.class);
         XMLStreamWriter origXmlWriter = message.getContent(XMLStreamWriter.class);
         Service service = exchange.getService();
         XMLStreamWriter xmlWriter = origXmlWriter;
         CachingXmlEventWriter cache = null;
-        
+
         // configure endpoint and operation level schema validation
         setOperationSchemaValidation(message);
-        
+
         // need to cache the events in case validation fails or buffering is enabled
         if (shouldBuffer(message)) {
             if (!(xmlWriter instanceof CachingXmlEventWriter)) {
@@ -97,10 +97,10 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
             }
             out = null;
         }
-        
-        if (out != null 
+
+        if (out != null
             && writeToOutputStream(message, operation.getBinding(), service)
-            && !MessageUtils.isTrue(message.getContextualProperty(DISABLE_OUTPUTSTREAM_OPTIMIZATION))) {
+            && !MessageUtils.getContextualBoolean(message, DISABLE_OUTPUTSTREAM_OPTIMIZATION, false)) {
             if (xmlWriter != null) {
                 try {
                     xmlWriter.writeCharacters("");
@@ -109,18 +109,18 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
                     throw new Fault(e);
                 }
             }
-            
+
             DataWriter<OutputStream> osWriter = getDataWriter(message, service, OutputStream.class);
 
             for (MessagePartInfo part : parts) {
                 if (objs.hasValue(part)) {
                     Object o = objs.get(part);
-                    osWriter.write(o, part, out);                  
+                    osWriter.write(o, part, out);
                 }
             }
         } else {
             DataWriter<XMLStreamWriter> dataWriter = getDataWriter(message, service, XMLStreamWriter.class);
-            
+
             for (MessagePartInfo part : parts) {
                 if (objs.hasValue(part)) {
                     NamespaceContext c = null;
@@ -155,48 +155,47 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
             }
         }
     }
-    
+
     protected void setOperationSchemaValidation(Message message) {
         SchemaValidationType validationType = ServiceUtils.getSchemaValidationType(message);
         message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
-    
+
     protected boolean shouldValidate(Message m) {
         return ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, m);
     }
-    
+
     protected boolean writeToOutputStream(Message m, BindingInfo info, Service s) {
         /**
          * Yes, all this code is EXTREMELY ugly. But it gives about a 60-70% performance
-         * boost with the JAXB RI, so its worth it. 
+         * boost with the JAXB RI, so its worth it.
          */
-        
+
         if (s == null) {
             return false;
         }
-        
+
         String enc = (String)m.get(Message.ENCODING);
-        return info.getClass().getName().equals("org.apache.cxf.binding.soap.model.SoapBindingInfo") 
-            && s.getDataBinding().getClass().getName().equals("org.apache.cxf.jaxb.JAXBDataBinding")
+        return "org.apache.cxf.binding.soap.model.SoapBindingInfo".equals(info.getClass().getName())
+            && "org.apache.cxf.jaxb.JAXBDataBinding".equals(s.getDataBinding().getClass().getName())
             && !MessageUtils.isDOMPresent(m)
             && (enc == null || StandardCharsets.UTF_8.name().equals(enc));
     }
-    
+
     protected <T> DataWriter<T> getDataWriter(Message message, Service service, Class<T> output) {
         DataWriter<T> writer = service.getDataBinding().createWriter(output);
-        
+
         Collection<Attachment> atts = message.getAttachments();
-        if (MessageUtils.isTrue(message.getContextualProperty(
-              org.apache.cxf.message.Message.MTOM_ENABLED))
+        if (MessageUtils.getContextualBoolean(message, Message.MTOM_ENABLED, false)
               && atts == null) {
-            atts = new ArrayList<Attachment>();
+            atts = new ArrayList<>();
             message.setAttachments(atts);
         }
-        
+
         writer.setAttachments(atts);
         writer.setProperty(DataWriter.ENDPOINT, message.getExchange().getEndpoint());
         writer.setProperty(Message.class.getName(), message);
-        
+
         setDataWriterValidation(service, message, writer);
         return writer;
     }

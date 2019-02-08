@@ -23,15 +23,17 @@ import java.util.*;
 
 import javax.xml.namespace.QName;
 
-import junit.framework.TestCase;
-
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
 
-public class CorbaPrimitiveMapTest extends TestCase {
+import org.junit.Assert;
+import org.junit.Test;
 
+public class CorbaPrimitiveMapTest {
+
+    @Test
     public void testMap() {
 
-        Map<QName, CorbaType> map = new HashMap<QName, CorbaType>();
+        Map<QName, CorbaType> map = new HashMap<>();
         QName corbaName = new QName("http://cxf.apache.org/bindings/corba", "string", "corba");
         QName typeName = new QName("http://www.w3.org/2001/XMLSchema", "string");
 
@@ -42,10 +44,10 @@ public class CorbaPrimitiveMapTest extends TestCase {
 
         map.put(typeName, corbaTypeImpl);
         Object value = map.get(typeName);
-        assertEquals(corbaTypeImpl.getName(), corbaName.getLocalPart());
-        assertEquals(corbaTypeImpl.getQName(), corbaName);
-        assertEquals(corbaTypeImpl.getType(), typeName);
-        assertEquals(corbaTypeImpl, value);
+        Assert.assertEquals(corbaTypeImpl.getName(), corbaName.getLocalPart());
+        Assert.assertEquals(corbaTypeImpl.getQName(), corbaName);
+        Assert.assertEquals(corbaTypeImpl.getType(), typeName);
+        Assert.assertEquals(corbaTypeImpl, value);
     }
 
 }

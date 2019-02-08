@@ -36,24 +36,24 @@ import org.apache.neethi.PolicyReference;
 import org.apache.neethi.PolicyRegistry;
 
 /**
- * 
+ *
  */
 public abstract class AbstractPolicyProvider implements PolicyProvider {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractPolicyProvider.class);
-    
+
     protected PolicyBuilder builder;
-    protected PolicyRegistry registry; 
+    protected PolicyRegistry registry;
     protected Bus bus;
-    
+
     protected AbstractPolicyProvider() {
         this(null);
     }
-    
+
     protected AbstractPolicyProvider(Bus b) {
         setBus(b);
     }
-    
+
     public final void setBus(Bus b) {
         bus = b;
         if (null != bus) {
@@ -65,16 +65,16 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
             }
         }
     }
-    
+
     public final void setBuilder(PolicyBuilder b) {
         builder = b;
     }
-    
+
     public final void setRegistry(PolicyRegistry r) {
         registry = r;
-    }  
-    
-    
+    }
+
+
     protected Policy resolveExternal(PolicyReference ref,  String baseURI) {
         Policy resolved = registry.lookup(ref.getURI());
         if (null != resolved) {
@@ -83,11 +83,11 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
         ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
         return resolver.resolveReference(ref.getURI());
     }
-    
+
     protected boolean isExternal(PolicyReference ref) {
         return !ref.getURI().startsWith("#");
     }
-    
+
     protected void checkResolved(PolicyReference ref, Policy p) {
         if (null == p) {
             throw new PolicyException(new Message("UNRESOLVED_POLICY_REFERENCE_EXC", BUNDLE, ref.getURI()));

@@ -27,7 +27,7 @@ import org.apache.cxf.message.Exchange;
 
 /**
  * Factory the maintains a pool of instances that are used.
- * 
+ *
  * Can optionally create more instances than the size of the queue
  */
 public class PooledFactory implements Factory {
@@ -58,34 +58,34 @@ public class PooledFactory implements Factory {
      * Pool of instances constructed from the given factory
      * @param factory
      * @param max the absolute maximum number to create and pool
-     * @param createMore If the pool is empty, but max objects have already 
-     * been constructed, should more be constructed on a per-request basis (and 
-     * then discarded when done) or should requests block until instances are 
-     * released back into the pool. 
+     * @param createMore If the pool is empty, but max objects have already
+     * been constructed, should more be constructed on a per-request basis (and
+     * then discarded when done) or should requests block until instances are
+     * released back into the pool.
      */
     public PooledFactory(final Factory factory, int max, boolean createMore) {
         this.factory = factory;
         if (max < 1) {
             max = 16;
         }
-        pool = new ArrayBlockingQueue<Object>(max, true);
+        pool = new ArrayBlockingQueue<>(max, true);
         this.max = max;
         this.count = 0;
         this.createMore = createMore;
     }
-    
+
     /**
-     * Pool constructed from the give Collection of objects. 
+     * Pool constructed from the give Collection of objects.
      * @param objs The collection of objects to pre-populate the pool
      */
     public PooledFactory(Collection<Object> objs) {
-        pool = new ArrayBlockingQueue<Object>(objs.size(), true);
+        pool = new ArrayBlockingQueue<>(objs.size(), true);
         pool.addAll(objs);
     }
 
     /** {@inheritDoc}*/
     public Object create(Exchange ex) throws Throwable {
-        if (factory == null 
+        if (factory == null
             || ((count >= max) && !createMore)) {
             return pool.take();
         }
@@ -97,13 +97,13 @@ public class PooledFactory implements Factory {
     }
     protected synchronized Object createObject(Exchange e) throws Throwable {
         //recheck the count/max stuff now that we're in a sync block
-        if (factory == null 
+        if (factory == null
             || ((count >= max) && !createMore)) {
             return pool.take();
         }
-        
+
         count++;
-        return factory.create(e);        
+        return factory.create(e);
     }
 
     /** {@inheritDoc}*/

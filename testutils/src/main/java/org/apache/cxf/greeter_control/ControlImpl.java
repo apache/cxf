@@ -39,12 +39,12 @@ import org.apache.cxf.greeter_control.types.StopGreeterResponse;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 
-@WebService(serviceName = "ControlService", 
-            portName = "ControlPort", 
-            endpointInterface = "org.apache.cxf.greeter_control.Control", 
+@WebService(serviceName = "ControlService",
+            portName = "ControlPort",
+            endpointInterface = "org.apache.cxf.greeter_control.Control",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 public class ControlImpl implements Control {
-    
+
     private static final Logger LOG = LogUtils.getLogger(ControlImpl.class);
     protected Object implementor;
     protected String address;
@@ -54,7 +54,7 @@ public class ControlImpl implements Control {
     public void setImplementor(Object i) {
         implementor = i;
     }
- 
+
     public Object getImplementor() {
         return implementor;
     }
@@ -66,7 +66,7 @@ public class ControlImpl implements Control {
     public String getAddress() {
         return address;
     }
-    
+
     public boolean startGreeter(String cfgResource) {
         LOG.fine("Starting greeter with cfgResource: " + cfgResource);
         greeterBus = null;
@@ -76,7 +76,7 @@ public class ControlImpl implements Control {
             if (cfgResource != null && cfgResource.length() > 0) {
                 System.setProperty(Configurer.USER_CFG_FILE_PROPERTY_NAME, cfgResource);
             }
-    
+
             String a = address == null ? "http://localhost:9020/SoapContext/GreeterPort" : address;
             Object i = implementor == null ? new GreeterImpl() : implementor;
             endpoint = Endpoint.publish(a, i);
@@ -91,13 +91,13 @@ public class ControlImpl implements Control {
         if (implementor instanceof AbstractGreeterImpl) {
             ((AbstractGreeterImpl)implementor).resetLastOnewayArg();
         }
-        
-        return null != greeterBus; 
+
+        return null != greeterBus;
     }
 
-    public boolean stopGreeter(String requestType) {  
+    public boolean stopGreeter(String requestType) {
         LOG.fine("Stopping greeter");
-        
+
         if (null != endpoint) {
             LOG.info("Stopping Greeter endpoint");
             endpoint.stop();
@@ -126,19 +126,19 @@ public class ControlImpl implements Control {
             LOG.fine("Removed FaultThrowingInterceptor");
             return;
         }
-        
+
         fi = new FaultThrowingInterceptor(fl.getPhase());
         if (null != fl.getBefore() && !"".equals(fl.getBefore())) {
-            fi.addBefore(fl.getBefore()); 
+            fi.addBefore(fl.getBefore());
         }
         if (null != fl.getAfter() && !"".equals(fl.getAfter())) {
-            fi.addAfter(fl.getAfter()); 
+            fi.addAfter(fl.getAfter());
         }
 
         interceptors.add(fi);
         LOG.fine("Added FaultThrowingInterceptor to phase " + fl.getPhase());
     }
-    
+
     public Future<?> startGreeterAsync(String requestType, AsyncHandler<StartGreeterResponse> asyncHandler) {
         // never called
         return null;
@@ -167,27 +167,23 @@ public class ControlImpl implements Control {
     }
 
     public Response<?> setFaultLocationAsync(FaultLocation in) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> setFaultLocationAsync(FaultLocation in, AsyncHandler<?> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<?> setRobustInOnlyModeAsync(boolean in) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> setRobustInOnlyModeAsync(boolean in, AsyncHandler<?> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setRobustInOnlyMode(boolean in) {
-        endpoint.getProperties().put(Message.ROBUST_ONEWAY, in);        
+        endpoint.getProperties().put(Message.ROBUST_ONEWAY, in);
     }
 
 }

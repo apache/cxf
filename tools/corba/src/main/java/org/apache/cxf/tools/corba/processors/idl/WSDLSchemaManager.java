@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
@@ -60,7 +61,7 @@ public class WSDLSchemaManager {
 
     boolean ignoreImports;
 
-    class DeferredSchemaAttachment {
+    static class DeferredSchemaAttachment {
         Definition defn;
         XmlSchema schema;
         boolean isGenerated;
@@ -69,13 +70,13 @@ public class WSDLSchemaManager {
     List<DeferredSchemaAttachment> deferredAttachments;
 
     public WSDLSchemaManager() {
-        defns = new HashMap<String, Definition>();
-        schemas = new HashMap<String, XmlSchema>();
-        importedDefns = new HashMap<File, Definition>();
-        importedSchemas = new HashMap<File, XmlSchema>();
-        defnSchemas = new HashMap<String, XmlSchema>();
+        defns = new HashMap<>();
+        schemas = new HashMap<>();
+        importedDefns = new HashMap<>();
+        importedSchemas = new HashMap<>();
+        defnSchemas = new HashMap<>();
 
-        deferredAttachments = new ArrayList<DeferredSchemaAttachment>();
+        deferredAttachments = new ArrayList<>();
     }
 
     public Definition createWSDLDefinition(String tns) throws WSDLException, JAXBException {
@@ -138,7 +139,7 @@ public class WSDLSchemaManager {
     }
 
     public void addWSDLDefinitionImport(Definition rootDefn, Definition defn, String prefix, File file) {
-        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null && !file.getName().equals(".wsdl")) {
+        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null && !".wsdl".equals(file.getName())) {
             // Only import if not already done to prevent multiple imports of the same file
             // in the WSDL. Also watch out for empty fileNames, which by this point in the
             // code would show up as ".wsdl".
@@ -319,22 +320,18 @@ public class WSDLSchemaManager {
     }
 
     public File getImportedWSDLDefinitionFile(String ns) {
-        for (Iterator<File> it = importedDefns.keySet().iterator(); it.hasNext();) {
-            File file = it.next();
-            Definition defn = importedDefns.get(file);
-            if (defn.getTargetNamespace().equals(ns)) {
-                return file;
+        for (Entry<File, Definition> entry : importedDefns.entrySet()) {
+            if (entry.getValue().getTargetNamespace().equals(ns)) {
+                return entry.getKey();
             }
         }
         return null;
     }
 
     public File getImportedXmlSchemaFile(String ns) {
-        for (Iterator<File> it = importedSchemas.keySet().iterator(); it.hasNext();) {
-            File file = it.next();
-            XmlSchema schema = importedSchemas.get(file);
-            if (schema.getTargetNamespace().equals(ns)) {
-                return file;
+        for (Entry<File, XmlSchema> entry : importedSchemas.entrySet()) {
+            if (entry.getValue().getTargetNamespace().equals(ns)) {
+                return entry.getKey();
             }
         }
         return null;

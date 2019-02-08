@@ -22,8 +22,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertSame;
 
 
 public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
@@ -37,34 +40,33 @@ public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
 
 
     @Before
-    public void setUp() { 
-        super.setUp(); 
+    public void setUp() {
+        super.setUp();
         data = new CXFInvocationHandlerDataImpl();
         testObject = new ProxyInvocationHandler(data);
         testObject.getData().setManagedConnection(mci);
-    } 
+    }
 
 
-    public CXFInvocationHandler getHandler() { 
+    public CXFInvocationHandler getHandler() {
         return testObject;
     }
 
-   
+
     @Test
     public void testInvokeSetsBusCurrent() throws Throwable {
         Bus oldBus = BusFactory.getDefaultBus();
-        
+
         testObject.invoke(target, testMethod, new Object[] {});
 
-        Bus  newBus = BusFactory.getDefaultBus();
-       
+        Bus newBus = BusFactory.getDefaultBus();
+
         assertSame("Current Bus has been set and is as expected, val=" + newBus, newBus, mockBus);
-         // set back the JVM current local variable        
+         // set back the JVM current local variable
         BusFactory.setDefaultBus(oldBus);
     }
 
 }
-
 
 
 

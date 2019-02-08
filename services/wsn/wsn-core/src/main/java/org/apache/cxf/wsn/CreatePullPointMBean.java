@@ -21,10 +21,10 @@ package org.apache.cxf.wsn;
 import java.util.List;
 
 public interface CreatePullPointMBean extends EndpointMBean {
-    
-    
+
+
     List<String> getPullEndpoints();
-    
+
     EndpointMBean getPullEndpoint(String name);
 
 

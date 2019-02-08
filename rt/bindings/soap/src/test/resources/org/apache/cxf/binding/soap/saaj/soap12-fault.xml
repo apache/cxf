@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <s:Body>
+        <Fault xmlns="http://www.w3.org/2003/05/soap-envelope"><Code><Value>Receiver</Value></Code><Reason><Text xml:lang="en">Error Message.</Text></Reason></Fault>
+    </s:Body>
+</s:Envelope>

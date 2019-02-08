@@ -79,6 +79,6 @@ public @interface FastInfoset {
      * Fast Infoset data.
      */
     int serializerMaxCharacterContentChunkSize() default -1;
-    
+
 }
 

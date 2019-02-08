@@ -23,25 +23,25 @@ import javax.xml.namespace.QName;
 
 public class FaultInfo extends AbstractMessageContainer {
     private QName faultName;
-    
+
     public FaultInfo(QName fname, QName mname, OperationInfo info) {
         super(info, mname);
         faultName = fname;
     }
-    
+
     public QName getFaultName() {
         return faultName;
     }
     public void setFaultName(QName fname) {
         faultName = fname;
     }
-    
-    
-    
+
+
+
     public int hashCode() {
         return faultName == null ? -1 : faultName.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -51,9 +51,9 @@ public class FaultInfo extends AbstractMessageContainer {
             return false;
         }
         FaultInfo oi = (FaultInfo)o;
-        return equals(faultName, oi.faultName) 
+        return equals(faultName, oi.faultName)
             && super.equals(o);
     }
-    
+
 
 }

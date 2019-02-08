@@ -33,12 +33,12 @@ public final class Scope implements Comparable<Object> {
     private List<String> scope;
     private Scope parent;
     private String prefix;
-    
+
     public Scope() {
-        scope = new ArrayList<String>();
+        scope = new ArrayList<>();
         parent = this;
     }
-    
+
     public Scope(String scopes, String separator) {
         java.util.StringTokenizer tokens = new java.util.StringTokenizer(scopes, separator);
         Scope rootScope = new Scope();
@@ -52,15 +52,15 @@ public final class Scope implements Comparable<Object> {
             scope.add(token);
         }
     }
-    
+
     public Scope(Scope containingScope) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         parent = containingScope.getParent();
         this.setPrefix(parent.getPrefix());
     }
-    
+
     public Scope(Scope containingScope, String str) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         scope.add(str);
         parent = containingScope;
         this.setPrefix(parent.getPrefix());
@@ -68,35 +68,34 @@ public final class Scope implements Comparable<Object> {
 
     // This is used for interface inheritance
     public Scope(Scope containingScope, Scope prefixScope, String str) {
-        scope = new ArrayList<String>(containingScope.scope);
+        scope = new ArrayList<>(containingScope.scope);
         scope.addAll(prefixScope.scope);
         scope.add(str);
         parent = containingScope;
         this.setPrefix(parent.getPrefix());
     }
-    
+
     public Scope(Scope containingScope, AST node) {
-        scope = new ArrayList<String>(containingScope.scope);
-        if (node != null) { 
+        scope = new ArrayList<>(containingScope.scope);
+        if (node != null) {
             scope.add(node.toString());
         }
         parent = containingScope;
         this.setPrefix(parent.getPrefix());
     }
-    
+
     public String tail() {
         int size = scope.size();
         if (size > 0) {
             return scope.get(size - 1);
-        } else {
-            return "";
         }
+        return "";
     }
-    
+
     public Scope getParent() {
         return parent;
     }
-    
+
     public String toString(String separator) {
         StringBuilder result = new StringBuilder();
         Iterator<String> it = scope.iterator();
@@ -108,7 +107,7 @@ public final class Scope implements Comparable<Object> {
         }
         return result.toString();
     }
-    
+
     public String toString() {
         return toString(SEPARATOR);
     }
@@ -123,13 +122,12 @@ public final class Scope implements Comparable<Object> {
         result.append(CorbaConstants.IDL_VERSION);
         return result.toString();
     }
-    
+
     public boolean equals(Object otherScope) {
         if (otherScope instanceof Scope) {
-            return toString().equals(((Scope)otherScope).toString());   
-        } else {
-            return false;
+            return toString().equals(((Scope)otherScope).toString());
         }
+        return false;
     }
 
     public int hashCode() {
@@ -142,10 +140,9 @@ public final class Scope implements Comparable<Object> {
         }
         if (otherScope instanceof Scope) {
             return toString().compareTo(otherScope.toString());
-        } else {
-            throw new ClassCastException("Scope class expected but found "
-                                         + otherScope.getClass().getName());
         }
+        throw new ClassCastException("Scope class expected but found "
+                                     + otherScope.getClass().getName());
     }
 
     public void setPrefix(String prefix) {

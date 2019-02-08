@@ -18,6 +18,7 @@
     <resources base="http://localhost:8080/baz">
         <resource path="/">
             <resource path="setTest3">
+                <param name="id" style="template"/>
                 <method name="PUT">
                     <request>
                         <representation mediaType="application/xml" element="ns1:test"/>

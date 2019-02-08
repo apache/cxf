@@ -31,33 +31,33 @@ import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
 
 /**
- * This class validates a SAML 2 Assertion and checks that it has a Subject with a value 
+ * This class validates a SAML 2 Assertion and checks that it has a Subject with a value
  * containing "alice" or bob
  */
 public class OnBehalfOfValidator extends SamlAssertionValidator {
-    
+
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
-        
+
         Assertion saml2Assertion = assertion.getSaml2();
         if (saml2Assertion == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         List<AttributeStatement> attributeStatements = saml2Assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         Subject subject = saml2Assertion.getSubject();
         NameID nameID = subject.getNameID();
         String subjectName = nameID.getValue();
         if ("alice".equals(subjectName) || "bob".equals(subjectName)) {
             return validatedCredential;
         }
-        
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
     }
 

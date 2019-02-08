@@ -52,10 +52,10 @@ public class NettyServletInputStream extends ServletInputStream {
     public int read(byte[] buf, int offset, int len) throws IOException {
         return this.in.read(buf, offset, len);
     }
-    
+
     public void close() throws IOException {
         // we need to release the ByteBufInputStream
         byteBuf.release();
     }
-    
+
 }

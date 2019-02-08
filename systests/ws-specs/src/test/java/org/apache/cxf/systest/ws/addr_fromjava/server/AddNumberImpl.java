@@ -42,21 +42,21 @@ public class AddNumberImpl {
     }
 
     @Action(input = "http://cxf.apache.org/input3", output = "http://cxf.apache.org/output3",
-            fault = {@FaultAction(className = AddNumbersException.class, 
+            fault = {@FaultAction(className = AddNumbersException.class,
                                   value = "http://cxf.apache.org/fault3") })
-    @WebMethod(action = "http://cxf.apache.org/input3")                                  
+    @WebMethod(action = "http://cxf.apache.org/input3")
     public int addNumbers3(int number1, int number2) throws AddNumbersException {
         return execute(number1, number2);
     }
 
     @Action(input = "http://cxf.apache.org/input4", output = "http://cxf.apache.org/output4",
-            fault = {@FaultAction(className = AddNumbersException.class, 
+            fault = {@FaultAction(className = AddNumbersException.class,
                                   value = "http://cxf.apache.org/fault4") })
-    @WebMethod(action = "http://cxf.apache.org/input4")                                  
+    @WebMethod(action = "http://cxf.apache.org/input4")
     public int addNumbers4(int number1, int number2) throws AddNumbersException {
         return number1 + number2;
     }
-    
+
     int execute(int number1, int number2) throws AddNumbersException {
         if (number1 < 0 || number2 < 0) {
             throw new AddNumbersException("Negative numbers can't be added!",

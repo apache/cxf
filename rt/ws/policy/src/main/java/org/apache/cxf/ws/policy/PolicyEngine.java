@@ -29,76 +29,77 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyRegistry;
 
 /**
- * 
+ *
  */
 public interface PolicyEngine {
-    
+
     // configuration
 
     boolean isEnabled();
-    
+
     void setEnabled(boolean e);
-    
+
     AlternativeSelector getAlternativeSelector();
-    
+
     void setAlternativeSelector(AlternativeSelector selector);
-   
+
     boolean isIgnoreUnknownAssertions();
-    
+
     void setIgnoreUnknownAssertions(boolean ignoreUnknownAssertions);
-    
+
     //
-    
+
     boolean supportsAlternative(Collection<? extends PolicyComponent> alterative,
                                 Assertor assertor,
                                 Message m);
-    
+
     // available throughout the outbound path
-    
+
     EffectivePolicy getEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, Conduit c, Message m);
-    
+
     void setEffectiveClientRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
-    
-    EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, 
+
+    EffectivePolicy getEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi,
                                                      Destination d, List<List<Assertion>> incoming, Message m);
-    
+
     void setEffectiveServerResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
-    
+
     EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingOperationInfo boi,
                                                   BindingFaultInfo bfi, Destination d, Message m);
-    
-    void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep); 
-    
+
+    void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep);
+
     // available throughout the inbound path
-        
+
     EndpointPolicy getClientEndpointPolicy(EndpointInfo ei, Conduit conduit, Message msg);
     EndpointPolicy getServerEndpointPolicy(EndpointInfo ei, Destination destination, Message msg);
-    
+
     void setServerEndpointPolicy(EndpointInfo ei, EndpointPolicy ep);
     void setClientEndpointPolicy(EndpointInfo ei, EndpointPolicy ep);
-    
+
     // only available after message type has been determined
-    
+
     EffectivePolicy getEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, Message m);
-    
+
     void setEffectiveServerRequestPolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
-    
+
     EffectivePolicy getEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, Message m);
-    
+
     void setEffectiveClientResponsePolicy(EndpointInfo ei, BindingOperationInfo boi, EffectivePolicy ep);
-    
-    EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei, 
+
+    EffectivePolicy getEffectiveClientFaultPolicy(EndpointInfo ei,
                                                   BindingOperationInfo boi,
                                                   BindingFaultInfo bfi, Message m);
-    
+
     void setEffectiveClientFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep);
-    
-    
-    
+
+    void addPolicy(Policy p);
+
     PolicyRegistry getRegistry();
-    
+
 }

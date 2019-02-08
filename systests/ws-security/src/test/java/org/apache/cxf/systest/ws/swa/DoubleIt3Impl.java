@@ -28,26 +28,26 @@ import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
 import org.example.schema.doubleit.DoubleItResponse;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItSwaPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleIt3Impl implements DoubleItSwaPortType {
-    
+
     @Override
     public DoubleItResponse doubleIt3(DoubleIt3 parameters, byte[] attachment) throws DoubleItFault {
         int numberToDouble = parameters.getNumberToDouble();
         if (numberToDouble == 0) {
             throw new DoubleItFault("0 can't be doubled!");
         }
-        
+
         if (!Arrays.equals(attachment, "12345".getBytes())) {
             throw new DoubleItFault("Unexpected attachment value!");
         }
-        
+
         DoubleItResponse response = new DoubleItResponse();
         response.setDoubledNumber(numberToDouble * 2);
         return response;
     }
-    
+
 }

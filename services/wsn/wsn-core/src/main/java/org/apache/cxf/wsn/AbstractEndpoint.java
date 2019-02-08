@@ -35,6 +35,8 @@ public abstract class AbstractEndpoint implements EndpointMBean {
     protected EndpointManager manager;
 
     protected Endpoint endpoint;
+    
+    protected W3CEndpointReference endpointEpr;
 
     public AbstractEndpoint(String name) {
         this.name = name;
@@ -43,7 +45,7 @@ public abstract class AbstractEndpoint implements EndpointMBean {
     public ObjectName getMBeanName() {
         return null;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -57,21 +59,26 @@ public abstract class AbstractEndpoint implements EndpointMBean {
     }
 
     public final URL getWSDLLocation() {
-        return CreatePullPoint.class.getClassLoader().getResource("org/apache/cxf/wsn/wsdl/wsn.wsdl"); 
+        return CreatePullPoint.class.getClassLoader().getResource("org/apache/cxf/wsn/wsdl/wsn.wsdl");
     }
-    public void register() throws EndpointRegistrationException {
+    public synchronized void register() throws EndpointRegistrationException {
         endpoint = manager.register(getAddress(), this, getWSDLLocation());
+        endpointEpr = null;
     }
 
-    public void unregister() throws EndpointRegistrationException {
+    public synchronized void unregister() throws EndpointRegistrationException {
         if (endpoint != null) {
             manager.unregister(endpoint, this);
+            endpointEpr = null;
         }
     }
 
-    public W3CEndpointReference getEpr() {
+    public synchronized W3CEndpointReference getEpr() {
         if (endpoint != null) {
-            return manager.getEpr(endpoint);
+            if (endpointEpr == null) {
+                endpointEpr = manager.getEpr(endpoint);
+            }
+            return endpointEpr;
         }
         return null;
     }

@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
@@ -48,15 +49,19 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class STSClientTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+public class STSClientTest {
 
     @Test
     public void testConfigureViaEPR() throws Exception {
 
-        final Set<Class<?>> addressingClasses = new HashSet<Class<?>>();
+        final Set<Class<?>> addressingClasses = new HashSet<>();
         addressingClasses.add(org.apache.cxf.ws.addressing.wsdl.ObjectFactory.class);
         addressingClasses.add(org.apache.cxf.ws.addressing.ObjectFactory.class);
 
@@ -78,21 +83,21 @@ public class STSClientTest extends Assert {
         assertEquals(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "UT_Port"),
                      client.getEndpointQName());
     }
-    
+
     // A unit test to make sure that we can parse a WCF wsdl properly. See CXF-5817.
     @Test
     public void testWCFWsdl() throws Exception {
         Bus bus = BusFactory.getThreadDefaultBus();
-        
+
         // Load WSDL
         InputStream inStream = getClass().getResourceAsStream("wcf.wsdl");
         Document doc = StaxUtils.read(inStream);
-        
-        
-        NodeList metadataSections = 
+
+
+        NodeList metadataSections =
             doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/ws/2004/09/mex", "MetadataSection");
         Element wsdlDefinition = null;
-        List<Element> schemas = new ArrayList<Element>();
+        List<Element> schemas = new ArrayList<>();
         for (int i = 0; i < metadataSections.getLength(); i++) {
             Node node = metadataSections.item(i);
             if (node instanceof Element) {
@@ -105,28 +110,28 @@ public class STSClientTest extends Assert {
                 }
             }
         }
-        
+
         assertNotNull(wsdlDefinition);
-        assertTrue(!schemas.isEmpty());
-        
+        assertFalse(schemas.isEmpty());
+
         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
         Definition definition = wsdlManager.getDefinition(wsdlDefinition);
-        
+
         for (Element schemaElement : schemas) {
-            QName schemaName = 
+            QName schemaName =
                 new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
             ExtensibilityElement
                 exElement = wsdlManager.getExtensionRegistry().createExtension(Types.class, schemaName);
             ((Schema)exElement).setElement(schemaElement);
             definition.getTypes().addExtensibilityElement(exElement);
         }
-        
+
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, definition);
         SourceDataBinding dataBinding = new SourceDataBinding();
         factory.setDataBinding(dataBinding);
         Service service = factory.create();
         service.setDataBinding(dataBinding);
-        
+
     }
-    
+
 }

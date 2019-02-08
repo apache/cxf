@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
     </parent>
     <modules>
         <module>container-integration</module>
@@ -36,6 +36,7 @@
         <module>transports</module>
         <module>transports-ssl3</module>
         <module>transport-jms</module>
+        <module>transport-undertow</module>
         <module>jaxws</module>
         <module>databinding</module>
         <module>jaxrs</module>
@@ -44,11 +45,14 @@
         <module>ws-security</module>
         <module>ws-security-examples</module>
         <module>kerberos</module>
+        <module>ldap</module>
         <module>rs-security</module>
         <module>wsdl_maven</module>
         <module>cdi</module>
         <module>rs-http-sci</module>
         <module>tracing</module>
-	<module>jibx</module>
+        <module>ws-transfer</module>
+        <module>rs-sse</module>
+        <module>microprofile</module>
     </modules>
 </project>

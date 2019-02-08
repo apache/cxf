@@ -36,7 +36,6 @@ import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.test.TestUtilities;
-import org.junit.Assert;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
@@ -44,6 +43,8 @@ import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+
+import org.junit.Assert;
 
 /**
  * Test utilities class with some Javascript capability included.
@@ -185,7 +186,7 @@ public class JavascriptTestUtilities extends TestUtilities {
         rhinoContextFactory = new ContextFactory();
         if (System.getProperty("cxf.jsdebug") != null && !rhinoDebuggerUp) {
             try {
-                Class<?> debuggerMain = 
+                Class<?> debuggerMain =
                             ClassLoaderUtils.loadClass("org.mozilla.javascript.tools.debugger.Main",
                                                                    getClass());
                 if (debuggerMain != null) {
@@ -210,11 +211,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
             // so that the stock test for IE can gracefully fail.
             rhinoContext.evaluateString(rhinoScope, "var window = new Object();", "<internal>", 0, null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         } finally {
             Context.exit();
@@ -280,7 +277,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     /**
      * Evaluate a javascript expression, returning the raw Rhino object.
-     * 
+     *
      * @param jsExpression the javascript expression.
      * @return return value.
      */
@@ -294,7 +291,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     /**
      * Call a method on a Javascript object.
-     * 
+     *
      * @param that the object.
      * @param methodName method name.
      * @param args arguments.
@@ -307,7 +304,7 @@ public class JavascriptTestUtilities extends TestUtilities {
     /**
      * Call a method on a Javascript object and convert result to specified class. Convert to the requested
      * class.
-     * 
+     *
      * @param <T> type
      * @param clazz class object.
      * @param that Javascript object.
@@ -321,7 +318,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     /**
      * Call a method on a Javascript object inside context brackets.
-     * 
+     *
      * @param <T> return type.
      * @param clazz class for the return type.
      * @param that object
@@ -341,7 +338,7 @@ public class JavascriptTestUtilities extends TestUtilities {
 
     /**
      * Evaluate a Javascript expression, converting the return value to a convenient Java type.
-     * 
+     *
      * @param <T> The desired type
      * @param jsExpression the javascript expression.
      * @param clazz the Class object for the desired type.
@@ -354,7 +351,7 @@ public class JavascriptTestUtilities extends TestUtilities {
     /**
      * Call a JavaScript function within the Context. Optionally, require it to throw an exception equal to a
      * supplied object. If the exception is called for, this function will either return null or Assert.
-     * 
+     *
      * @param expectingException Exception desired, or null.
      * @param functionName Function to call.
      * @param args args for the function. Be sure to Javascript-ify them as appropriate.
@@ -372,7 +369,7 @@ public class JavascriptTestUtilities extends TestUtilities {
     /**
      * Call a Javascript function, identified by name, on a set of arguments. Optionally, expect it to throw
      * an exception.
-     * 
+     *
      * @param expectingException
      * @param functionName
      * @param args

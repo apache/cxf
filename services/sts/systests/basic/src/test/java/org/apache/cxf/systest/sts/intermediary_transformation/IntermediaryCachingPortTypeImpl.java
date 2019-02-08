@@ -35,25 +35,26 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.trust.delegation.ReceivedTokenCallbackHandler;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
-public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTestBase 
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
+public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTestBase
     implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @Resource
     private WebServiceContext wsc;
-    
+
     private int i;
-    
+
     private DoubleItPortType transportPort;
-    
+
     public int doubleIt(int numberToDouble) {
         if (transportPort == null) {
             // Re-use the same proxy
@@ -87,21 +88,21 @@ public class IntermediaryCachingPortTypeImpl extends AbstractBusClientServerTest
             }
         }
         Principal pr = wsc.getUserPrincipal();
-        
+
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
         // Assert.assertTrue("Principal must be alice", pr.getName().contains("alice"));
-        
-        // Disable the STSClient after the first invocation
-        if (i > 0) {
+
+        // Disable the STSClient after the second invocation
+        if (i > 1) {
             BindingProvider p = (BindingProvider)transportPort;
             STSClient stsClient = new STSClient(null);
             stsClient.setOnBehalfOf(new ReceivedTokenCallbackHandler());
             p.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         }
-        
+
         i++;
         return transportPort.doubleIt(numberToDouble);
     }
-    
+
 }

@@ -25,7 +25,7 @@ import org.apache.cxf.common.i18n.UncheckedException;
 public class ExtensionException extends UncheckedException {
 
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructs a <code>ExtensionException</code> with the provided detail message.
      */

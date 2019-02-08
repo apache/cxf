@@ -25,7 +25,7 @@ public final class ToolCorbaConstants  {
     public static final String CFG_CORBA = "corba";
     public static final String CFG_IDL = "idl";
     public static final String CFG_WSDLOUTPUTFILE = "wsdloutputfile";
-    public static final String CFG_IDLOUTPUTFILE = "idloutputfile";   
+    public static final String CFG_IDLOUTPUTFILE = "idloutputfile";
 
     public static final String CFG_IDLFILE = "idl";
     public static final String CFG_TNS = "tns";
@@ -48,10 +48,10 @@ public final class ToolCorbaConstants  {
     public static final String CFG_INCLUDEDIR = "includedir";
     public static final String CFG_EXCLUDEMODULES = "excludemodules";
     public static final String CFG_POLYMORPHIC_FACTORIES = "polymorphicfactories";
-                               
+
 
     public static final String MODULE_SEPARATOR = "::";
-    
+
     private ToolCorbaConstants() {
         //utility class
     }

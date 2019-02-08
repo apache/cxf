@@ -23,10 +23,16 @@ import java.util.Map;
 
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint.DeliveryModeType;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class JMSEndpointTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JMSEndpointTest {
 
     private static final String TEST_VALUE = "testValue";
 
@@ -91,7 +97,7 @@ public class JMSEndpointTest extends Assert {
                      "ConnectionFactory");
         assertEquals(endpoint.getJndiURL(), "tcp://localhost:61616");
     }
-    
+
     @Test
     public void testReplyToNameParameters() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?replyToName=FOO.Tar");
@@ -105,13 +111,13 @@ public class JMSEndpointTest extends Assert {
         } catch (IllegalArgumentException ex) {
             // expect the exception
         }
-        
+
         endpoint = new JMSEndpoint("jms:queue:Foo.Bar?topicReplyToName=FOO.Zar");
         assertEquals("Foo.Bar", endpoint.getDestinationName());
         assertNull(endpoint.getReplyToName());
         assertEquals("FOO.Zar", endpoint.getTopicReplyToName());
     }
-    
+
     @Test
     public void testJNDIWithAdditionalParameters() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
@@ -122,7 +128,7 @@ public class JMSEndpointTest extends Assert {
             + "&durableSubscriptionName=dur");
         assertEquals(JMSEndpoint.JNDI, endpoint.getJmsVariant());
         assertEquals(endpoint.getParameters().size(), 0);
-        assertEquals("org.apache.activemq.jndi.ActiveMQInitialContextFactory", 
+        assertEquals("org.apache.activemq.jndi.ActiveMQInitialContextFactory",
                      endpoint.getJndiInitialContextFactory());
         assertEquals("ConnectionFactory", endpoint.getJndiConnectionFactoryName());
         assertEquals("tcp://localhost:61616", endpoint.getJndiURL());
@@ -146,7 +152,7 @@ public class JMSEndpointTest extends Assert {
 
     @Test
     public void testRequestUri() throws Exception {
-        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar" 
+        JMSEndpoint endpoint = new JMSEndpoint("jms:jndi:Foo.Bar"
             + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&targetService=greetMe"
             + "&replyToName=replyQueue"
@@ -167,21 +173,21 @@ public class JMSEndpointTest extends Assert {
         assertFalse(requestUri.contains("replyToName"));
         assertFalse(requestUri.contains("priority=3"));
     }
-    
+
     @Test
     public void testRequestUriWithMessageType() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?messageType=text");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("text", endpoint.getMessageType().value());
-        
+
         endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("byte", endpoint.getMessageType().value());
-        
+
         endpoint = new JMSEndpoint("jms:queue:Foo.Bar?messageType=binary");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals("binary", endpoint.getMessageType().value());
-        
+
     }
 
     @Test
@@ -189,13 +195,13 @@ public class JMSEndpointTest extends Assert {
         JMSEndpoint endpoint = new JMSEndpoint("jms://");
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
     }
-    
+
     @Test
     public void testTransactionManager() {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=test");
         assertEquals("test", endpoint.getJndiTransactionManagerName());
     }
-    
+
     @Test
     public void testJaxWsProps() throws Exception {
         EndpointInfo ei = new EndpointInfo();

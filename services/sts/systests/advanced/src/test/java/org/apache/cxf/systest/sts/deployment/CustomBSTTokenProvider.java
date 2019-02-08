@@ -34,23 +34,23 @@ import org.apache.wss4j.dom.WSConstants;
  */
 public class CustomBSTTokenProvider implements TokenProvider {
 
-    private static final String TOKEN_TYPE = 
+    private static final String TOKEN_TYPE =
         "http://custom.apache.org/token";
-    private static final String BASE64_NS = 
+    private static final String BASE64_NS =
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-    
+
     public boolean canHandleToken(String tokenType) {
         return TOKEN_TYPE.equals(tokenType);
     }
-    
+
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
-            Document doc = DOMUtils.createDocument();
-            
+            Document doc = DOMUtils.getEmptyDocument();
+
             // Mock up a BinarySecurityToken
             String id = "BST-1234";
             BinarySecurity bst = new BinarySecurity(doc);
@@ -60,11 +60,11 @@ public class CustomBSTTokenProvider implements TokenProvider {
             bst.setValueType(TOKEN_TYPE);
             bst.setEncodingType(BASE64_NS);
             bst.setToken("12345678".getBytes());
-            
+
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(bst.getElement());
             response.setTokenId(id);
-            
+
             return response;
         } catch (Exception e) {
             e.printStackTrace();

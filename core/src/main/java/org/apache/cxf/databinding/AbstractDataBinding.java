@@ -50,7 +50,7 @@ import org.apache.ws.commons.schema.XmlSchema;
  * Supply default implementations, as appropriate, for DataBinding.
  */
 public abstract class AbstractDataBinding implements DataBinding {
-    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<String, String>();
+    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<>();
     {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
@@ -95,8 +95,8 @@ public abstract class AbstractDataBinding implements DataBinding {
                                        String systemId) {
         return addSchemaDocument(serviceInfo, col, d, systemId, null);
     }
-    public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, 
-                                       SchemaCollection col, 
+    public XmlSchema addSchemaDocument(ServiceInfo serviceInfo,
+                                       SchemaCollection col,
                                        Document d,
                                        String systemId,
                                        Collection<String> ids) {
@@ -153,7 +153,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         while (n != null) {
             if (n instanceof Element) {
                 Element e = (Element)n;
-                if (e.getLocalName().equals("import")) {
+                if ("import".equals(e.getLocalName())) {
                     patchRequired = true;
                     break;
                 }
@@ -169,7 +169,7 @@ public abstract class AbstractDataBinding implements DataBinding {
             while (n != null) {
                 if (n instanceof Element) {
                     Element e = (Element)n;
-                    if (e.getLocalName().equals("import")) {
+                    if ("import".equals(e.getLocalName())) {
                         e = (Element)n;
                         String loc = e.getAttribute("schemaLocation");
                         if (ids == null || ids.contains(loc)) {
@@ -233,9 +233,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     private Document copy(Document doc) {
         try {
             return StaxUtils.copy(doc);
-        } catch (XMLStreamException e) {
-            // ignore
-        } catch (ParserConfigurationException e) {
+        } catch (XMLStreamException | ParserConfigurationException e) {
             // ignore
         }
         return doc;
@@ -286,7 +284,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     protected static void checkNamespaceMap(Map<String, String> namespaceMap) {
         // make some checks. This is a map from namespace to prefix, but we want unique prefixes.
         if (namespaceMap != null) {
-            Set<String> prefixesSoFar = new HashSet<String>();
+            Set<String> prefixesSoFar = new HashSet<>();
             for (Map.Entry<String, String> mapping : namespaceMap.entrySet()) {
                 if (prefixesSoFar.contains(mapping.getValue())) {
                     throw new IllegalArgumentException("Duplicate prefix " + mapping.getValue());

@@ -31,20 +31,20 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 
 @Provider
 public class AbstractCachingMessageProvider<T> extends AbstractConfigurableProvider {
-    
+
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractCachingMessageProvider.class);
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractCachingMessageProvider.class);
     protected static final String ACTIVE_JAXRS_PROVIDER_KEY = "active.jaxrs.provider";
-    
+
     protected MessageContext mc;
     private T object;
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
     }
-    
-    
+
+
     protected boolean isProviderKeyNotSet() {
         return mc.get(ACTIVE_JAXRS_PROVIDER_KEY) == null;
     }
@@ -56,7 +56,7 @@ public class AbstractCachingMessageProvider<T> extends AbstractConfigurableProvi
     public void setObject(T object) {
         this.object = object;
     }
-    
-    
-        
+
+
+
 }

@@ -26,11 +26,11 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
-    
+
 public class AtomBookServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(AtomBookServer.class);
     private org.eclipse.jetty.server.Server server;
-    
+
     protected void run() {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
@@ -51,13 +51,13 @@ public class AtomBookServer extends AbstractBusTestServerBase {
         server.setHandler(handlers);
         try {
             server.start();
-                       
+
         } catch (Exception e) {
             e.printStackTrace();
-        }     
-        
+        }
+
     }
-    
+
     public void tearDown() throws Exception {
         super.tearDown();
         if (server != null) {
@@ -65,7 +65,7 @@ public class AtomBookServer extends AbstractBusTestServerBase {
             server.destroy();
             server = null;
         }
-    }   
+    }
 
     public static void main(String[] args) {
         try {

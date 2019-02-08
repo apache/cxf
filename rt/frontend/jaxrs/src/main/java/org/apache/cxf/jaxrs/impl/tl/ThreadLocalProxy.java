@@ -21,6 +21,6 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 public interface ThreadLocalProxy<T> {
     void set(T value);
-    T get(); 
+    T get();
     void remove();
 }

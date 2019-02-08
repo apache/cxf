@@ -44,12 +44,12 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 
 /**
- * 
+ *
  */
 public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
     final MEXEndpoint ep;
     Endpoint mexEndpoint;
-    
+
     public MEXInInterceptor(Server serv) {
         super(Phase.PRE_PROTOCOL);
         ep = new MEXEndpoint(serv);
@@ -72,7 +72,7 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
             ex.put(Endpoint.class, endpoint);
             ex.put(Service.class, endpoint.getService());
             ex.put(org.apache.cxf.binding.Binding.class, endpoint.getBinding());
-            ex.put(BindingOperationInfo.class, 
+            ex.put(BindingOperationInfo.class,
                    endpoint.getBinding().getBindingInfo()
                        .getOperation(new QName("http://mex.ws.cxf.apache.org/", "Get2004")));
             ex.remove(BindingOperationInfo.class);
@@ -93,16 +93,16 @@ public class MEXInInterceptor extends AbstractPhaseInterceptor<Message> {
             Endpoint ep = super.createEndpoint();
             new WSAddressingFeature().initialize(ep, getBus());
             return ep;
-        }        
+        }
     }
     private synchronized Endpoint createEndpoint(Message message) {
         if (mexEndpoint == null) {
-            MEXJaxWsServerFactoryBean factory 
+            MEXJaxWsServerFactoryBean factory
                 = new MEXJaxWsServerFactoryBean(message.getExchange().getBus());
             try {
                 Endpoint endpoint = factory.createEndpoint();
                 endpoint.getService().setInvoker(new JAXWSMethodInvoker(ep));
-                
+
                 mexEndpoint = endpoint;
             } catch (Exception ex) {
                 throw new Fault(ex);

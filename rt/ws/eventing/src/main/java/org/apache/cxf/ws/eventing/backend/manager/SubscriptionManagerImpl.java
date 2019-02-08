@@ -76,7 +76,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         this.url = url;
     }
 
-    public  SubscriptionManagerImpl(String url, String namespace, String elementName) {
+    public SubscriptionManagerImpl(String url, String namespace, String elementName) {
         database = new SubscriptionDatabaseImpl();
         this.url = url;
         this.subscriptionIdNamespace = namespace;
@@ -206,14 +206,12 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         // check if there is any usable EPR in the Delivery part
         try {
             @SuppressWarnings("unchecked")
-            JAXBElement<EndpointReferenceType> notifyTo 
+            JAXBElement<EndpointReferenceType> notifyTo
                 = (JAXBElement<EndpointReferenceType>)request.getContent().get(0);
             if (!EPRInspectionTool.containsUsableEPR(notifyTo.getValue())) {
                 throw new NoDeliveryMechanismEstablished();
             }
-        } catch (NullPointerException npe) {
-            throw new NoDeliveryMechanismEstablished();
-        } catch (IndexOutOfBoundsException ioobe) {
+        } catch (NullPointerException | IndexOutOfBoundsException npe) {
             throw new NoDeliveryMechanismEstablished();
         }
         ticket.setDelivery(request);
@@ -225,8 +223,8 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         subscriptionManagerReference.setAddress(getSubscriptionManagerAddress());
         // generate a ID for this subscription
         UUID uuid = UUID.randomUUID();
-        JAXBElement<String> idqn 
-            = new JAXBElement<String>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
+        JAXBElement<String> idqn
+            = new JAXBElement<>(new QName(subscriptionIdNamespace, subscriptionIdElementName),
                     String.class,
                     uuid.toString());
         subscriptionManagerReference.setReferenceParameters(new ReferenceParametersType());

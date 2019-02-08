@@ -24,6 +24,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -50,31 +54,31 @@ public class OASISCatalogManager {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(OASISCatalogManager.class);
-    private static final String DEBUG_LEVEL 
+    private static final String DEBUG_LEVEL
         = SystemPropertyAction.getPropertyOrNull(CATALOG_DEBUG_KEY);
-    
+
 
     private EntityResolver resolver;
     private Object catalog;
-    private Set<String> loadedCatalogs = new CopyOnWriteArraySet<String>();
+    private Set<String> loadedCatalogs = new CopyOnWriteArraySet<>();
     private Bus bus;
 
     public OASISCatalogManager() {
         resolver = getResolver();
         catalog = getCatalog(resolver);
     }
-    
+
     public OASISCatalogManager(Bus b) {
         bus = b;
         resolver = getResolver();
         catalog = getCatalog(resolver);
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
-    
+
     public boolean hasCatalogs() {
         return !loadedCatalogs.isEmpty();
     }
-    
+
     private static Object getCatalog(EntityResolver resolver) {
         try {
             return ((CatalogResolver)resolver).getCatalog();
@@ -91,7 +95,7 @@ public class OASISCatalogManager {
             }
             catalogManager.setUseStaticCatalog(false);
             catalogManager.setIgnoreMissingProperties(true);
-            CatalogResolver catalogResolver = new CatalogResolver(catalogManager) {
+            return new CatalogResolver(catalogManager) {
                 public String getResolvedEntity(String publicId, String systemId) {
                     String s = super.getResolvedEntity(publicId, systemId);
                     if (s != null && s.startsWith("classpath:")) {
@@ -108,10 +112,9 @@ public class OASISCatalogManager {
                     return s;
                 }
             };
-            return catalogResolver;
         } catch (Throwable t) {
             //ignore
-        }        
+        }
         return null;
     }
 
@@ -133,7 +136,7 @@ public class OASISCatalogManager {
     }
     public final void loadContextCatalogs(String name) {
         try {
-            loadCatalogs(Thread.currentThread().getContextClassLoader(), name);
+            loadCatalogs(getContextClassLoader(), name);
         } catch (IOException e) {
             LOG.log(Level.WARNING, "Error loading " + name + " catalog files", e);
         }
@@ -146,12 +149,27 @@ public class OASISCatalogManager {
 
         Enumeration<URL> catalogs = classLoader.getResources(name);
         while (catalogs.hasMoreElements()) {
-            URL catalogURL = catalogs.nextElement();
+            final URL catalogURL = catalogs.nextElement();
             if (catalog == null) {
                 LOG.log(Level.WARNING, "Catalog found at {0} but no org.apache.xml.resolver.CatalogManager was found."
                         + "  Check the classpatch for an xmlresolver jar.", catalogURL.toString());
             } else if (!loadedCatalogs.contains(catalogURL.toString())) {
-                ((Catalog)catalog).parseCatalog(catalogURL);
+                final SecurityManager sm = System.getSecurityManager();
+                if (sm == null) {
+                    ((Catalog)catalog).parseCatalog(catalogURL);
+                } else {
+                    try {
+                        AccessController.doPrivileged(new PrivilegedExceptionAction<Void>() {
+                            @Override
+                            public Void run() throws Exception {
+                                ((Catalog)catalog).parseCatalog(catalogURL);
+                                return null;
+                            }
+                        });
+                    } catch (PrivilegedActionException e) {
+                        throw (IOException) e.getException();
+                    }
+                }
                 loadedCatalogs.add(catalogURL.toString());
             }
         }
@@ -180,7 +198,7 @@ public class OASISCatalogManager {
             }
         }
     }
-    
+
     private static OASISCatalogManager getContextCatalog() {
         try {
             OASISCatalogManager oasisCatalog = new OASISCatalogManager();
@@ -201,9 +219,9 @@ public class OASISCatalogManager {
             if (catalog != null) {
                 bus.setExtension(catalog, OASISCatalogManager.class);
             }
-        } 
+        }
         return catalog;
-        
+
     }
 
     public String resolveSystem(String sys) throws MalformedURLException, IOException {
@@ -225,9 +243,22 @@ public class OASISCatalogManager {
         }
         return ((Catalog)catalog).resolvePublic(uri, parent);
     }
-    
+
     public EntityResolver getEntityResolver() {
         return resolver;
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
     }
 
 }

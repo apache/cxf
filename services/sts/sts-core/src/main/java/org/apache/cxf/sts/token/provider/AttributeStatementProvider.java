@@ -29,5 +29,5 @@ public interface AttributeStatementProvider {
      * Get an AttributeStatementBean using the given parameters.
      */
     AttributeStatementBean getStatement(TokenProviderParameters providerParameters);
-        
+
 }

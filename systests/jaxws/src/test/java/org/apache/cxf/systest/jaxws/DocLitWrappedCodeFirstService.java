@@ -29,7 +29,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -52,12 +51,12 @@ import org.apache.cxf.systest.jaxws.types.Bar;
 @WSDLDocumentationCollection(
     {
         @WSDLDocumentation("DocLitWrappedCodeFirstService interface"),
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService top level doc", 
-                           placement = WSDLDocumentation.Placement.TOP),   
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc", 
-                           placement = WSDLDocumentation.Placement.BINDING),   
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc", 
-                           placement = WSDLDocumentation.Placement.SERVICE_PORT)   
+        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService top level doc",
+                           placement = WSDLDocumentation.Placement.TOP),
+        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc",
+                           placement = WSDLDocumentation.Placement.BINDING),
+        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc",
+                           placement = WSDLDocumentation.Placement.SERVICE_PORT)
     }
 )
 @GZIP
@@ -67,7 +66,7 @@ public interface DocLitWrappedCodeFirstService {
     @Oneway
     @WebMethod
     void doOneWay();
-    
+
     @WebMethod
     String[] arrayOutput();
 
@@ -77,38 +76,38 @@ public interface DocLitWrappedCodeFirstService {
 
     @WebMethod
     Vector<String> listOutput();
-    
-    @WebMethod 
+
+    @WebMethod
     String echoStringNotReallyAsync(String s);
-    
+
     @WebMethod
     int[] echoIntArray(int[] ar, Exchange ex);
-    
+
     @WebMethod
     @WebResult(partName = "parameters")
     String listInput(List<String> inputs);
 
     @WebMethod
     String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y);
-    
+
     @WebMethod
     @WSDLDocumentationCollection(
         {
             @WSDLDocumentation("multiInOut doc"),
-            @WSDLDocumentation(value = "multiInOut Input doc", 
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_INPUT),   
-            @WSDLDocumentation(value = "multiInOut Output doc", 
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_OUTPUT),   
-            @WSDLDocumentation(value = "multiInOut InputMessage doc", 
-                               placement = WSDLDocumentation.Placement.INPUT_MESSAGE),   
-            @WSDLDocumentation(value = "multiInOut OutputMessage doc", 
-                               placement = WSDLDocumentation.Placement.OUTPUT_MESSAGE),   
+            @WSDLDocumentation(value = "multiInOut Input doc",
+                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_INPUT),
+            @WSDLDocumentation(value = "multiInOut Output doc",
+                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_OUTPUT),
+            @WSDLDocumentation(value = "multiInOut InputMessage doc",
+                               placement = WSDLDocumentation.Placement.INPUT_MESSAGE),
+            @WSDLDocumentation(value = "multiInOut OutputMessage doc",
+                               placement = WSDLDocumentation.Placement.OUTPUT_MESSAGE),
             @WSDLDocumentation(value = "multiInOut binding doc",
                                placement = WSDLDocumentation.Placement.BINDING_OPERATION),
-            @WSDLDocumentation(value = "multiInOut binding Input doc", 
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),   
-            @WSDLDocumentation(value = "multiInOut binding Output doc", 
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)   
+            @WSDLDocumentation(value = "multiInOut binding Input doc",
+                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),
+            @WSDLDocumentation(value = "multiInOut binding Output doc",
+                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)
         }
     )
     String multiInOut(@WebParam(mode = WebParam.Mode.OUT)
@@ -125,12 +124,12 @@ public interface DocLitWrappedCodeFirstService {
                       Holder<String> f,
                       @WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> g);
-    
-    void singleInOut(@WebParam(mode = WebParam.Mode.OUT, 
+
+    void singleInOut(@WebParam(mode = WebParam.Mode.OUT,
                                name = "created", targetNamespace = "")
                                Holder<Boolean> created);
-    
-    
+
+
     @WebMethod
     List<Foo> listObjectOutput();
 
@@ -138,53 +137,53 @@ public interface DocLitWrappedCodeFirstService {
     boolean listObjectIn(@WebParam(mode = WebParam.Mode.INOUT)
                          Holder<List<Foo[]>> foos);
 
-    
+
     @WebMethod
     List<Foo[]> listObjectArrayOutput();
-    
-    String outOnly(@WebParam(mode = WebParam.Mode.OUT) Holder<String> out1, 
+
+    String outOnly(@WebParam(mode = WebParam.Mode.OUT) Holder<String> out1,
                    @WebParam(mode = WebParam.Mode.OUT) Holder<String> out2);
-    
+
     @WebMethod
     @WSDLDocumentationCollection({
         @WSDLDocumentation(value = "fault message doc",
                            placement = WSDLDocumentation.Placement.FAULT_MESSAGE,
-                           faultClass = CustomException.class),   
+                           faultClass = CustomException.class),
         @WSDLDocumentation(value = "fault binding doc",
                            placement = WSDLDocumentation.Placement.BINDING_OPERATION_FAULT,
-                           faultClass = CustomException.class),   
+                           faultClass = CustomException.class),
         @WSDLDocumentation(value = "fault porttype doc",
                            placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_FAULT,
-                           faultClass = CustomException.class)   
+                           faultClass = CustomException.class)
         }
     )
-    int throwException(int i) 
+    int throwException(int i)
         throws ServiceTestFault,
         CustomException,
         ComplexException;
-    
+
     @RequestWrapper(localName = "echoIntX")
     @ResponseWrapper(localName = "echoIntXResponse")
     int echoIntDifferentWrapperName(int i);
-    
+
     @WebMethod
     @WebResult(targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
                name = "result")
     @RequestWrapper(className = "org.apache.cxf.systest.jaxws.Echo")
     @ResponseWrapper(className = "org.apache.cxf.systest.jaxws.EchoResponse")
-    String echo(@WebParam(targetNamespace = 
-            "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService2", 
+    String echo(@WebParam(targetNamespace =
+            "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService2",
                           name = "String_1")
                         String msg);
 
     Bar createBar(String val);
-    
+
     class Foo  {
         String name;
-        
+
         public Foo() {
         }
-        
+
         public void setName(String n) {
             if ("NoName".equals(n)) {
                 throw new IllegalArgumentException(n + " is not a valid name");
@@ -198,33 +197,33 @@ public interface DocLitWrappedCodeFirstService {
             return name;
         }
     }
-    
+
     @WebResult(name = "return")
     String doBug2692(@WebParam(name = "name", header = true) String name);
 
-    
+
     Set<Foo> getFooSet();
-    
+
     Foo modifyFoo(Foo foo);
-    
+
     @RequestWrapper(className = "org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService$DoFooListRequest")
     @WebMethod(operationName = "doFooList")
     String doFooList(@WebParam(name = "dbRef") List<Foo> fooList);
-    
-    
+
+
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "doFooList", propOrder = { "dbReves" })
     class DoFooListRequest {
         @XmlElement(name = "dbRef", required = true)
-        protected List<Foo> dbReves = new ArrayList<Foo>();
+        protected List<Foo> dbReves = new ArrayList<>();
 
         public List<Foo> getDbReves() {
             return dbReves;
         }
     }
-    
+
     CXF2411Result<CXF2411SubClass> doCXF2411();
-    
+
     class CXF2411Result<T extends CXF2411Base> {
         private T[] content;
         public T[] getContent() {

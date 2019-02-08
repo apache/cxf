@@ -19,24 +19,31 @@
 
 package org.apache.cxf.binding.soap.saaj;
 
+import java.lang.reflect.Method;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
- * 
+ *
  */
 public final class SAAJUtils {
-    
+
     private SAAJUtils() {
         //not constructed
     }
-    
+
     public static SOAPHeader getHeader(SOAPMessage m) throws SOAPException {
         try {
             return m.getSOAPHeader();
@@ -49,21 +56,64 @@ public final class SAAJUtils {
             return m.getSOAPBody();
         } catch (UnsupportedOperationException ex) {
             return m.getSOAPPart().getEnvelope().getBody();
+        } catch (IllegalArgumentException ex) {
+            //java9
+            return null;
         }
     }
     public static void setFaultCode(SOAPFault f, QName code) throws SOAPException {
-        try {
-            f.setFaultCode(code);
-        } catch (Throwable t) {
-            int count = 1;
-            String pfx = "fc1";
-            while (!StringUtils.isEmpty(f.getNamespaceURI(pfx))) {
-                count++;
-                pfx = "fc" + count;
+        if (f.getNamespaceURI().equals(Soap12.SOAP_NAMESPACE)) {
+            try {
+                f.setFaultCode(code);
+            } catch (SOAPException ex) {
+                f.setFaultCode(SOAPConstants.SOAP_SENDER_FAULT);
+                f.appendFaultSubcode(code);
             }
-            f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
-            f.setFaultCode(pfx + ":" + code.getLocalPart());
+        } else {
+            try {
+                f.setFaultCode(code);
+            } catch (Throwable t) {
+                int count = 1;
+                String pfx = "fc1";
+                while (!StringUtils.isEmpty(f.getNamespaceURI(pfx))) {
+                    count++;
+                    pfx = "fc" + count;
+                }
+                if (code.getNamespaceURI() != null && !"".equals(code.getNamespaceURI())) {
+                    f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
+                } else {
+                    f.addNamespaceDeclaration(pfx, f.getNamespaceURI());
+                }
+                f.setFaultCode(pfx + ":" + code.getLocalPart());
+            }
         }
-        
+    }
+
+    public static Element adjustPrefix(Element e, String prefix) {
+        if (prefix == null) {
+            prefix = "";
+        }
+        try {
+            String s = e.getPrefix();
+            if (!prefix.equals(s)) {
+                e.setPrefix(prefix);
+                if (e instanceof SOAPElement) {
+                    ((SOAPElement)e).removeNamespaceDeclaration(s);
+                } else if (e.getClass().getName().equals(
+                       "com.sun.org.apache.xerces.internal.dom.ElementNSImpl")) {
+                    //since java9 159 SOAPPart1_1Impl.getDocumentElement not return SOAPElement
+                    try {
+                        Method method = e.getClass().getMethod("removeAttribute", String.class);
+                        method.invoke(e, "xmlns:" + s);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+            }
+        } catch (Throwable t) {
+            //likely old old version of SAAJ, we'll just try our best
+        }
+        return e;
     }
 }

@@ -30,13 +30,13 @@ public class OwnerInfo {
     private Date dateOfBirth;
 
     public OwnerInfo() {
-        
+
     }
-    
+
     public OwnerInfo(Name name) {
         this.name = name;
     }
-    
+
     @Embedded
     public Name getName() {
         return name;

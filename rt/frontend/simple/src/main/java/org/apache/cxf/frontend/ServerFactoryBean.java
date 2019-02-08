@@ -90,7 +90,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public String getBeanName() {
         return this.getClass().getName();
     }
-    
+
     @Override
     protected String detectTransportIdFromAddress(String ad) {
         DestinationFactory df = getDestinationFactory();
@@ -103,7 +103,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
         }
         return null;
     }
-    
+
     @Override
     protected WSDLEndpointFactory getWSDLEndpointFactory() {
         if (destinationFactory == null) {
@@ -121,13 +121,13 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     //ignore
                 }
             }
-        } 
+        }
         if (destinationFactory instanceof WSDLEndpointFactory) {
             return (WSDLEndpointFactory)destinationFactory;
         }
         return null;
     }
-    
+
     /**
      * For subclasses that hold onto the created Server, this will return the singleton server.
      * Default returns null as the default factories do not hold onto the server and will
@@ -149,7 +149,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                         orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                     }
                 }
-    
+
                 if (getServiceFactory().getProperties() == null) {
                     getServiceFactory().setProperties(getProperties());
                 } else if (getProperties() != null) {
@@ -164,23 +164,23 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                     invoker = createInvoker();
                     getServiceFactory().setInvoker(invoker);
                 }
-    
+
                 Endpoint ep = createEndpoint();
 
                 getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_SERVER_CREATE, server, serviceBean,
-                                              serviceBean == null 
-                                              ? getServiceClass() == null 
-                                                  ? getServiceFactory().getServiceClass() 
+                                              serviceBean == null
+                                              ? getServiceClass() == null
+                                                  ? getServiceFactory().getServiceClass()
                                                   : getServiceClass()
                                               : getServiceClass() == null
-                                                  ? ClassHelper.getRealClass(getBus(), getServiceBean()) 
+                                                  ? ClassHelper.getRealClass(getBus(), getServiceBean())
                                                   : getServiceClass());
 
                 server = new ServerImpl(getBus(),
                                         ep,
                                         getDestinationFactory(),
                                         getBindingFactory());
-    
+
                 if (ep.getService().getInvoker() == null) {
                     if (invoker == null) {
                         ep.getService().setInvoker(createInvoker());
@@ -188,15 +188,11 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                         ep.getService().setInvoker(invoker);
                     }
                 }
-    
-            } catch (EndpointException e) {
-                throw new ServiceConstructionException(e);
-            } catch (BusException e) {
-                throw new ServiceConstructionException(e);
-            } catch (IOException e) {
+
+            } catch (EndpointException | BusException | IOException e) {
                 throw new ServiceConstructionException(e);
             }
-            
+
             if (serviceBean != null) {
                 Class<?> cls = ClassHelper.getRealClass(getServiceBean());
                 if (getServiceClass() == null || cls.equals(getServiceClass())) {
@@ -207,18 +203,18 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             } else if (getServiceClass() != null) {
                 initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
             }
-    
+
             applyFeatures(server);
-   
+
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
-                                          serviceBean == null 
-                                          ? getServiceClass() == null 
-                                              ? getServiceFactory().getServiceClass() 
+                                          serviceBean == null
+                                          ? getServiceClass() == null
+                                              ? getServiceFactory().getServiceClass()
                                               : getServiceClass()
                                           : getServiceClass() == null
-                                              ? ClassHelper.getRealClass(getServiceBean()) 
+                                              ? ClassHelper.getRealClass(getServiceBean())
                                               : getServiceClass());
-            
+
             if (start) {
                 try {
                     server.start();
@@ -234,9 +230,9 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             if (orig != null) {
                 orig.reset();
             }
-        }            
+        }
     }
-    
+
     @Override
     protected void initializeServiceFactory() {
         super.initializeServiceFactory();
@@ -286,9 +282,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public Class<?> getServiceBeanClass() {
         if (serviceBean != null) {
             return ClassHelper.getRealClass(getBus(), serviceBean);
-        } else {
-            return getServiceFactory().getServiceClass();
         }
+        return getServiceFactory().getServiceClass();
     }
 
     /**

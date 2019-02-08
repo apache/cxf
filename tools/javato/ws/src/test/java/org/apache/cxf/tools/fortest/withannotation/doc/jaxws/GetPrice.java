@@ -27,9 +27,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * <p>Java class for getPrice element declaration.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;element name="getPrice">
  *   &lt;complexType>
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  *   &lt;/complexType>
  * &lt;/element>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "getPrice")
@@ -55,11 +55,11 @@ public class GetPrice {
 
     /**
      * Gets the value of the responseType property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getResponseType() {
         return responseType;
@@ -67,11 +67,11 @@ public class GetPrice {
 
     /**
      * Sets the value of the responseType property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setResponseType(String value) {
         this.responseType = value;

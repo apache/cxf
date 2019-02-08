@@ -35,12 +35,15 @@ import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchParseException;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class FiqlParserTest extends Assert {
-    private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class FiqlParserTest {
+    private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
 
     @Test(expected = SearchParseException.class)
     public void testCompareWrongComparator() throws SearchParseException {
@@ -131,12 +134,12 @@ public class FiqlParserTest extends Assert {
     public void testParseName() throws SearchParseException {
         doTestParseName("name==king");
     }
-    
+
     @Test
     public void testParseTheName() throws SearchParseException {
         doTestParseName2("thename==king2");
     }
-    
+
     @Test
     public void testParseTheName2() throws SearchParseException {
         doTestParseName2("theName==king2");
@@ -149,7 +152,7 @@ public class FiqlParserTest extends Assert {
         assertFalse(filter.isMet(new Condition("diamond", 10, new Date(), "theking2")));
         assertFalse(filter.isMet(new Condition("diamond", 0, null, "theking2")));
     }
-    
+
     private void doTestParseName(String exp) throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse(exp);
         assertTrue(filter.isMet(new Condition("king", 10, new Date())));
@@ -157,7 +160,7 @@ public class FiqlParserTest extends Assert {
         assertFalse(filter.isMet(new Condition("diamond", 10, new Date())));
         assertFalse(filter.isMet(new Condition("diamond", 0, null)));
     }
-    
+
     @Test
     public void testParseLevel() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("level=gt=10");
@@ -179,11 +182,11 @@ public class FiqlParserTest extends Assert {
 
     @Test
     public void testParseDateWithCustomFormat() throws SearchParseException, ParseException {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
-        parser = new FiqlParser<Condition>(Condition.class, props);
-        
+        parser = new FiqlParser<>(Condition.class, props);
+
         SearchCondition<Condition> filter = parser.parse("time=le=2010-03-11T18:00:00");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         assertTrue(filter.isMet(new Condition("whatever", 15, df.parse("2010-03-11T18:00:00"))));
@@ -191,7 +194,7 @@ public class FiqlParserTest extends Assert {
         assertFalse(filter.isMet(new Condition("blah", null, df.parse("2010-03-12T00:00:00"))));
         assertFalse(filter.isMet(new Condition(null, 123, df.parse("2010-03-12T00:00:00"))));
     }
-    
+
     @Test
     public void testParseDateDuration() throws Exception {
         SearchCondition<Condition> filter = parser.parse("time=gt=-PT1M");
@@ -211,9 +214,9 @@ public class FiqlParserTest extends Assert {
         assertEquals(2, conditions.size());
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition()) 
-            && ConditionType.GREATER_THAN.equals(st2.getCondition())) 
-            || (ConditionType.EQUALS.equals(st2.getCondition()) 
+        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
+            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
+            || (ConditionType.EQUALS.equals(st2.getCondition())
                 && ConditionType.GREATER_THAN.equals(st1.getCondition())));
 
         assertTrue(filter.isMet(new Condition("amichalec", 12, new Date())));
@@ -240,9 +243,9 @@ public class FiqlParserTest extends Assert {
 
         PrimitiveStatement st1 = conditions.get(0).getStatement();
         PrimitiveStatement st2 = conditions.get(1).getStatement();
-        assertTrue((ConditionType.EQUALS.equals(st1.getCondition()) 
-            && ConditionType.GREATER_THAN.equals(st2.getCondition())) 
-            || (ConditionType.EQUALS.equals(st2.getCondition()) 
+        assertTrue((ConditionType.EQUALS.equals(st1.getCondition())
+            && ConditionType.GREATER_THAN.equals(st2.getCondition()))
+            || (ConditionType.EQUALS.equals(st2.getCondition())
                 && ConditionType.GREATER_THAN.equals(st1.getCondition())));
 
         assertTrue(filter.isMet(new Condition("ami", 0, new Date())));
@@ -302,10 +305,10 @@ public class FiqlParserTest extends Assert {
         assertTrue(filter.isMet(new Condition("foobar", 20, null)));
         assertFalse(filter.isMet(new Condition("fooxxxbar", 0, null)));
     }
-    
+
     @Test
     public void testMultipleLists() throws SearchParseException {
-        FiqlParser<Job> jobParser = new FiqlParser<Job>(Job.class, 
+        FiqlParser<Job> jobParser = new FiqlParser<>(Job.class,
                                                         Collections.<String, String>emptyMap(),
                                                         Collections.singletonMap("itemName", "tasks.items.itemName"));
         SearchCondition<Job> jobCondition = jobParser.parse("itemName==myitem");
@@ -328,13 +331,13 @@ public class FiqlParserTest extends Assert {
             this.level = level;
             this.time = time;
         }
-        
+
         public Condition(String name, Integer level, Date time, String name2) {
             this.name = name;
             this.level = level;
             this.time = time;
             this.name2 = name2;
-            
+
         }
 
         public String getName() {
@@ -364,14 +367,14 @@ public class FiqlParserTest extends Assert {
         public void setTheName(String thename) {
             name2 = thename;
         }
-        
+
         public String getTheName() {
             return name2;
         }
 
     }
 
-    
+
     public static class Job {
         private List<Task> tasks;
         public List<Task> getTasks() {
@@ -379,7 +382,7 @@ public class FiqlParserTest extends Assert {
         }
         public void setTasks(List<Task> tasks) {
             this.tasks = tasks;
-            
+
         }
     }
     public static class Task {

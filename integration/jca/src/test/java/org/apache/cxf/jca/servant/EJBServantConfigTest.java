@@ -21,12 +21,14 @@ package org.apache.cxf.jca.servant;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class EJBServantConfigTest extends Assert {
-    
+
+public class EJBServantConfigTest {
+
     @Test
     public void testNoWsdl() throws Exception {
         String value = "{http://apache.org/hello_world_soap_http}Greeter";
@@ -35,7 +37,7 @@ public class EJBServantConfigTest extends Assert {
         assertEquals(result, config.getServiceName());
         assertNull(config.getWsdlURL());
     }
-    
+
     @Test
     public void testNoWsdlNoLocalPart() throws Exception {
         String value = "{http://apache.org/hello_world_soap_http}";
@@ -44,7 +46,7 @@ public class EJBServantConfigTest extends Assert {
         assertEquals(result, config.getServiceName());
         assertNull(config.getWsdlURL());
     }
-    
+
     @Test
     public void testNoWsdlNoNamespace() throws Exception {
         String value = "Greeter";
@@ -53,7 +55,7 @@ public class EJBServantConfigTest extends Assert {
         assertEquals(result, config.getServiceName());
         assertNull(config.getWsdlURL());
     }
-    
+
     @Test
     public void testAllNull() throws Exception {
         String value = "";
@@ -61,7 +63,7 @@ public class EJBServantConfigTest extends Assert {
         assertNull(config.getServiceName());
         assertNull(config.getWsdlURL());
     }
-    
+
     @Test
     public void testWithNullWsdl() throws Exception {
         String value = "@";
@@ -69,15 +71,15 @@ public class EJBServantConfigTest extends Assert {
         assertNull(config.getServiceName());
         assertNull(config.getWsdlURL());
     }
-    
+
     @Test
     public void testWithNullServiceName() throws Exception {
         String value = "@wsdl/hello_world.wsdl";
         EJBServantConfig config = new EJBServantConfig(null, value);
         assertNull(config.getServiceName());
-        assertEquals("wsdl/hello_world.wsdl", config.getWsdlURL()); 
+        assertEquals("wsdl/hello_world.wsdl", config.getWsdlURL());
     }
-    
+
     @Test
     public void testFullValue() throws Exception {
         String value = "{http://apache.org/hello_world_soap_http}SOAPService@file:/wsdl/hello_world.wsdl";
@@ -86,7 +88,7 @@ public class EJBServantConfigTest extends Assert {
         assertEquals("file:/wsdl/hello_world.wsdl", config.getWsdlURL());
         assertEquals(result, config.getServiceName());
     }
-    
+
     @Test
     public void testGetServiceClassName() throws Exception {
         String value = "{http://apache.org/hello_world_soap_http}Greeter@file:";

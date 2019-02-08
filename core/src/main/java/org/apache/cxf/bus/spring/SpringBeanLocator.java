@@ -48,17 +48,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * 
+ *
  */
 public class SpringBeanLocator implements ConfiguredBeanLocator {
     private static final Logger LOG = LogUtils.getL7dLogger(SpringBeanLocator.class);
-    
+
     ApplicationContext context;
     ConfiguredBeanLocator orig;
-    Set<String> passThroughs = new HashSet<String>();
+    Set<String> passThroughs = new HashSet<>();
     Object bundleContext;
     boolean osgi = true;
-    
+
     public SpringBeanLocator(ApplicationContext ctx) {
         this(ctx, null);
     }
@@ -67,14 +67,14 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         if (bus != null) {
             orig = bus.getExtension(ConfiguredBeanLocator.class);
             if (orig instanceof ExtensionManagerImpl) {
-                List<String> names = new ArrayList<String>();
+                List<String> names = new ArrayList<>();
                 for (String s : ctx.getBeanDefinitionNames()) {
                     names.add(s);
                     for (String s2 : ctx.getAliases(s)) {
                         names.add(s2);
                     }
                 }
-                
+
                 ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
             }
         }
@@ -87,7 +87,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             osgi = false;
         }
     }
-    
+
     private Object findBundleContext(ApplicationContext applicationContext, Bus b) {
         Object answer = null;
         ApplicationContext aContext = applicationContext;
@@ -98,7 +98,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         }
         return answer;
     }
-    
+
     private Object getBundleContext(ApplicationContext applicationContext, Bus b) {
         try {
             //use a little reflection to allow this to work without the spring-dm jars
@@ -116,7 +116,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         }
         return null;
     }
-    
+
     public <T> T getBeanOfType(String name, Class<T> type) {
         T t = null;
         try {
@@ -129,24 +129,24 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         }
         return t;
     }
-    
+
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+        Set<String> s = new LinkedHashSet<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                          false,
                                                                                          false)));
         s.removeAll(passThroughs);
         s.addAll(orig.getBeanNamesOfType(type));
-        return new ArrayList<String>(s);
+        return new ArrayList<>(s);
     }
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        Set<String> s = new LinkedHashSet<String>(Arrays.asList(context.getBeanNamesForType(type,
+        Set<String> s = new LinkedHashSet<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                             false,
                                                                                             false)));
         s.removeAll(passThroughs);
-        List<T> lst = new LinkedList<T>();
+        List<T> lst = new LinkedList<>();
         for (String n : s) {
             lst.add(type.cast(context.getBean(n, type)));
         }
@@ -184,7 +184,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
     private Class<?> findContextClass(Class<?> cls) {
         for (Class<?> c : cls.getInterfaces()) {
-            if (c.getName().equals("org.osgi.framework.BundleContext")) {
+            if ("org.osgi.framework.BundleContext".equals(c.getName())) {
                 return c;
             }
         }
@@ -198,14 +198,14 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
         if (c2 != null) {
             return c2;
         }
-        
+
         return cls;
     }
-    
+
 
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
-        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type,
+        List<String> list = new ArrayList<>(Arrays.asList(context.getBeanNamesForType(type,
                                                                                             false,
                                                                                             false)));
         list.removeAll(passThroughs);
@@ -234,13 +234,13 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
             }
             Collection<?> ids = null;
             PropertyValue pv = def.getPropertyValues().getPropertyValue(propertyName);
-            
+
             if (pv != null) {
                 Object value = pv.getValue();
                 if (!(value instanceof Collection)) {
                     throw new RuntimeException("The property " + propertyName + " must be a collection!");
                 }
-    
+
                 if (value instanceof Mergeable) {
                     if (!((Mergeable)value).isMergeEnabled()) {
                         ids = (Collection<?>)value;
@@ -248,8 +248,8 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                 } else {
                     ids = (Collection<?>)value;
                 }
-            } 
-            
+            }
+
             if (ids != null) {
                 for (Iterator<?> itr = ids.iterator(); itr.hasNext();) {
                     Object o = itr.next();
@@ -269,17 +269,17 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
 
     public <T> List<T> getOSGiServices(Class<T> type) {
-        List<T> lst = new ArrayList<T>();
+        List<T> lst = new ArrayList<>();
         if (!osgi) {
             return lst;
         }
-        
+
         Class<?> contextClass = findContextClass(bundleContext.getClass());
         try {
             Method m = contextClass.getMethod("getServiceReference", String.class);
             Class<?> servRefClass = m.getReturnType();
             m = contextClass.getMethod("getServiceReferences", String.class, String.class);
-            
+
             Object o = ReflectionUtil.setAccessible(m).invoke(bundleContext, type.getName(), null);
             if (o != null) {
                 m = contextClass.getMethod("getService", servRefClass);

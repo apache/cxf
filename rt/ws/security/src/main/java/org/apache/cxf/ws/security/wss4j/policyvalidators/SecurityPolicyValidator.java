@@ -27,13 +27,13 @@ import org.apache.cxf.ws.policy.AssertionInfo;
  * Validate a WS-SecurityPolicy
  */
 public interface SecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     boolean canValidatePolicy(AssertionInfo assertionInfo);
-    
+
     /**
      * Validate policies.
      */

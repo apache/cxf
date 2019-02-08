@@ -26,7 +26,7 @@ public class Something {
     private String multiple;
     // the .aegis.xml file sets the following to minOccurs=1.
     private String singular;
-    
+
     /**
      *  @return Returns the multiple.
      */

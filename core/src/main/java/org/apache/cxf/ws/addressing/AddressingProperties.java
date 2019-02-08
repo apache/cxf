@@ -25,7 +25,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 /**
- * Abstraction of Message Addressing Properties. 
+ * Abstraction of Message Addressing Properties.
  */
 public class AddressingProperties  {
     private EndpointReferenceType to;
@@ -39,6 +39,7 @@ public class AddressingProperties  {
     private String namespaceURI;
     private QName duplicate;
     private List<QName> mustUnderstand;
+    private boolean isRequired;
 
     /**
      * Constructor, defaults to 2005/08 namespace.
@@ -49,7 +50,7 @@ public class AddressingProperties  {
 
     /**
      * Constructor.
-     * 
+     *
      * @param uri the namespace URI
      */
     public AddressingProperties(String uri) {
@@ -70,7 +71,7 @@ public class AddressingProperties  {
         }
         return toURIType;
     }
-    
+
     /**
      * Mutator for the <b>To</b> property.
      * @param t new value for To property
@@ -150,7 +151,7 @@ public class AddressingProperties  {
         faultTo = ref;
     }
 
-    
+
     /**
      * Accessor for the <b>RelatesTo</b> property.
      * @return current value of RelatesTo property
@@ -166,7 +167,7 @@ public class AddressingProperties  {
     public void setRelatesTo(RelatesToType rel) {
         relatesTo = rel;
     }
-    
+
     /**
      * Accessor for the <b>Action</b> property.
      * @return current value of Action property
@@ -182,16 +183,16 @@ public class AddressingProperties  {
     public void setAction(AttributedURIType iri) {
         action = iri;
     }
-    
+
     /**
      * @return WS-Addressing namespace URI
      */
     public String getNamespaceURI() {
         return namespaceURI;
     }
-    
+
     /**
-     * Used to specify a different WS-Addressing namespace URI, 
+     * Used to specify a different WS-Addressing namespace URI,
      * so as to cause MAPs to be exposed (i.e. encoded in externalized
      * message with a different WS-Addressing version).
      */
@@ -209,9 +210,15 @@ public class AddressingProperties  {
 
     public List<QName> getMustUnderstand() {
         if (mustUnderstand == null) {
-            mustUnderstand = new ArrayList<QName>();
+            mustUnderstand = new ArrayList<>();
         }
         return mustUnderstand;
+    }
+    public boolean isRequired() {
+        return isRequired;
+    }
+    public void setRequired(boolean b) {
+        isRequired = b;
     }
 
     public String toString() {
@@ -236,7 +243,7 @@ public class AddressingProperties  {
                 buf.append(", ");
             }
             buf.append("To: ");
-            buf.append(to.getAddress().getValue()); 
+            buf.append(to.getAddress().getValue());
         }
         if (null != replyTo) {
             AttributedURIType address = replyTo.getAddress();
@@ -245,7 +252,7 @@ public class AddressingProperties  {
                     buf.append(", ");
                 }
                 buf.append("ReplyTo: ");
-                buf.append(address.getValue()); 
+                buf.append(address.getValue());
             }
         }
         if (null != faultTo) {
@@ -255,7 +262,7 @@ public class AddressingProperties  {
                     buf.append(", ");
                 }
                 buf.append("FaultTo: ");
-                buf.append(address.getValue()); 
+                buf.append(address.getValue());
             }
         }
         if (null != relatesTo) {
@@ -267,9 +274,9 @@ public class AddressingProperties  {
         }
         buf.append("]");
         return buf.toString();
-        
-    } 
-    
+
+    }
+
     public AddressingProperties createCompatibleResponseProperties() {
         return new AddressingProperties(getNamespaceURI());
     }

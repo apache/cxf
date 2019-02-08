@@ -46,22 +46,22 @@ import org.springframework.core.io.support.EncodedResource;
  * The time it takes to parse them, especially if validating, builds up.
  * The XML files shipped in a release in the JARs are valid and invariant.
  * To speed things up, this class implements two levels of optimization.
- * When a CXF distribution is fully-packaged, each of the Spring XML 
+ * When a CXF distribution is fully-packaged, each of the Spring XML
  * bus extension .xml files is accompanied by a FastInfoset '.fixml' file.
  * These read much more rapidly. When one of those is present, this classs
- * reads it instead of reading the XML text file. 
- * 
+ * reads it instead of reading the XML text file.
+ *
  * Absent a .fixml file, this class uses WoodStox instead of Xerces (or
  * whatever the JDK is providing).
- * 
+ *
  * The Woodstox optimization also applies to user cxf.xml or cxf-servlet.xml files
  * if the user has disabled XML validation of Spring files with
  * the org.apache.cxf.spring.validation.mode system property.
- * 
- * Note that the fastInfoset optimization is only applied for the 
+ *
+ * Note that the fastInfoset optimization is only applied for the
  * methods here that start from a Resource. If this is called with an InputSource,
  * that optimization is not applied, since we can't reliably know the
- * location of the XML. 
+ * location of the XML.
  */
 public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefinitionReader {
 
@@ -74,7 +74,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
 
     }
 
-    // the following flag allows performance comparisons with and 
+    // the following flag allows performance comparisons with and
     // without fast infoset processing.
     private boolean noFastinfoset;
     // Spring has no 'getter' for this, so we need our own copy.
@@ -88,12 +88,12 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         super(beanFactory);
         tunedDocumentLoader = new TunedDocumentLoader();
         this.setDocumentLoader(tunedDocumentLoader);
-        noFastinfoset = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.nofastinfoset") != null 
+        noFastinfoset = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.nofastinfoset") != null
             || !TunedDocumentLoader.hasFastInfoSet();
     }
 
     @Override
-    protected int doLoadBeanDefinitions(InputSource inputSource, 
+    protected int doLoadBeanDefinitions(InputSource inputSource,
                                         Resource resource) throws BeanDefinitionStoreException {
         // sadly, the Spring class we are extending has the critical function
         // getValidationModeForResource
@@ -107,7 +107,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         } catch (IOException e) {
             // this space intentionally left blank.
         }
-        
+
         int savedValidation = visibleValidationMode;
         if (suppressValidation) {
             setValidationMode(VALIDATION_NONE);
@@ -140,7 +140,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
                 public Integer run() throws Exception {
                     return internalLoadBeanDefinitions(encodedResource);
                 }
-                
+
             });
         } catch (PrivilegedActionException e) {
             if (e.getException() instanceof RuntimeException) {
@@ -149,15 +149,15 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
             throw (BeanDefinitionStoreException)e.getException();
         }
     }
-    
+
     private int internalLoadBeanDefinitions(EncodedResource encodedResource) {
         return super.loadBeanDefinitions(encodedResource);
     }
-    
+
     private int fastInfosetLoadBeanDefinitions(EncodedResource encodedResource)
-        throws IOException, StaleFastinfosetException, 
+        throws IOException, StaleFastinfosetException,
         ParserConfigurationException, XMLStreamException {
-        
+
         URL resUrl = encodedResource.getResource().getURL();
         // There are XML files scampering around that don't end in .xml.
         // We don't apply the optimization to them.
@@ -170,7 +170,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         if ("jar".equals(protocol)) {
             fixmlPath = fixmlPath.replaceFirst("^.*!", "");
         }
-        
+
         URL fixmlUrl = new URL(resUrl, fixmlPath);
 
         // if we are in unpacked files, we take some extra time
@@ -184,8 +184,8 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
                 throw new StaleFastinfosetException();
             }
         }
-        
-        Resource newResource = new UrlResource(fixmlUrl); 
+
+        Resource newResource = new UrlResource(fixmlUrl);
         Document doc = TunedDocumentLoader.loadFastinfosetDocument(fixmlUrl);
         if (doc == null) {
             //something caused FastinfoSet to not be able to read the doc

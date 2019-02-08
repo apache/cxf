@@ -31,6 +31,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class JettyHTTPHandler extends AbstractHandler {
+    private static final String METHOD_TRACE = "TRACE";
+
     protected JettyHTTPDestination jettyHTTPDestination;
     protected ServletContext servletContext;
     private String urlName;
@@ -45,6 +47,9 @@ public class JettyHTTPHandler extends AbstractHandler {
         this.bus = bus;
     }
 
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
     public void setServletContext(ServletContext sc) {
         servletContext = sc;
         if (jettyHTTPDestination != null) {
@@ -61,16 +66,21 @@ public class JettyHTTPHandler extends AbstractHandler {
 
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
-        if (contextMatchExact) {
-            if (target.equals(urlName)) {
-                jettyHTTPDestination.doService(servletContext, request, response);
-            }
+        if (request.getMethod().equals(METHOD_TRACE)) {
+            baseRequest.setHandled(true);
+            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         } else {
-            if (target.equals(urlName) || HttpUrlUtil.checkContextPath(urlName, target)) {
-                jettyHTTPDestination.doService(servletContext, request, response);
+            if (contextMatchExact) {
+                if (target.equals(urlName)) {
+                    jettyHTTPDestination.doService(servletContext, request, response);
+                }
+            } else {
+                if (target.equals(urlName) || HttpUrlUtil.checkContextPath(urlName, target)) {
+                    jettyHTTPDestination.doService(servletContext, request, response);
+                }
             }
         }
-        
+
     }
 
     public Bus getBus() {

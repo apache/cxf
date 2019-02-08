@@ -19,20 +19,20 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 public class LogoutResponse {
-    
+
     private String principalName;
     private String mainApplicationAddress;
-    
+
     public LogoutResponse(String principalName, String mainApplicationAddress) {
         this.principalName = principalName;
         this.mainApplicationAddress = mainApplicationAddress;
     }
-    
+
     public String getPrincipalName() {
         return principalName;
     }
     public String getMainApplicationAddress() {
         return mainApplicationAddress;
     }
-    
+
 }

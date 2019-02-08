@@ -44,7 +44,7 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length == 0) {
             System.out.println("please specify wsdl");
@@ -58,15 +58,15 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         HeaderService hs = new HeaderService(wsdlURL, SERVICE_NAME);
         HeaderTester proxy = hs.getSoapPort();
 
         invokeInHeader(proxy);
-        invokeOutHeader(proxy);  
-        invokeInOutHeader(proxy);  
+        invokeOutHeader(proxy);
+        invokeInOutHeader(proxy);
     }
-     
+
     private static void invokeInHeader(HeaderTester proxy) {
         // invoke inHeader operation
         System.out.println("Invoking inHeader operation");
@@ -80,13 +80,13 @@ public final class Client {
         System.out.println("\t\tResult: " + response.getResponseType());
     }
 
-    private static void invokeOutHeader(HeaderTester proxy) {    
+    private static void invokeOutHeader(HeaderTester proxy) {
         // invoke outHeaderoperation
         System.out.println("Invoking outHeader operation");
         OutHeader me = new OutHeader();
         me.setRequestType("CXF user");
-        Holder<OutHeaderResponse> theResponse = new Holder<OutHeaderResponse>();
-        Holder<SOAPHeaderData> headerInfo = new Holder<SOAPHeaderData>();
+        Holder<OutHeaderResponse> theResponse = new Holder<>();
+        Holder<SOAPHeaderData> headerInfo = new Holder<>();
         proxy.outHeader(me, theResponse, headerInfo);
         System.out.println("\toutHeader invocation returned: ");
         System.out.println("\t\tOut parameter: " + theResponse.value.getResponseType());
@@ -99,7 +99,7 @@ public final class Client {
         System.out.println("Invoking inoutHeader operation");
         InoutHeader me = new InoutHeader();
         me.setRequestType("CXF user");
-        Holder<SOAPHeaderData> headerInfo = new Holder<SOAPHeaderData>();
+        Holder<SOAPHeaderData> headerInfo = new Holder<>();
         SOAPHeaderData shd = new SOAPHeaderData();
         shd.setOriginator("CXF client");
         shd.setMessage("Invoking inoutHeader operation");

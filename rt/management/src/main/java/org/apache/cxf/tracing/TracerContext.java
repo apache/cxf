@@ -23,40 +23,50 @@ import java.util.concurrent.Callable;
 public interface TracerContext {
     /**
      * Picks up an currently detached span from another thread. This method is intended
-     * to be used in the context of JAX-RS asynchronous invocations, where request and 
+     * to be used in the context of JAX-RS asynchronous invocations, where request and
      * response are effectively executed by different threads.
      * @param traceable traceable implementation to be executed
-     * @return the result of the execution 
-     * @throws Exception any exception being thrown by the traceable implementation 
+     * @return the result of the execution
+     * @throws Exception any exception being thrown by the traceable implementation
      */
-    <T> T continueSpan(final Traceable<T> traceable) throws Exception;
-    
+    <T> T continueSpan(Traceable<T> traceable) throws Exception;
+
     /**
      * Starts a new span in the current thread.
      * @param description span description
      * @return span instance object
      */
-    <T> T startSpan(final String description);
-    
+    <T> T startSpan(String description);
+
     /**
      * Wraps the traceable into a new span, preserving the current span as a parent.
      * @param description span description
      * @param traceable  traceable implementation to be wrapped
      * @return callable to be executed (in current thread or any other thread pool)
      */
-    <T> Callable<T> wrap(final String description, final Traceable<T> traceable);
-    
-    
+    <T> Callable<T> wrap(String description, Traceable<T> traceable);
+
+
     /**
      * Adds a key/value pair to the currently active span.
      * @param key key to add
      * @param value value to add
      */
     void annotate(String key, String value);
-    
+
     /**
      * Adds a timeline to the currently active span.
      * @param message timeline message
      */
     void timeline(String message);
+    
+    /**
+     * Returns an object of the specified type to allow access to the specific API 
+     * of the tracing provider.
+     * @param clazz - the class of the object to be returned.
+     * @return an instance of the specified class 
+     */
+    default <T> T unwrap(Class<T> clazz) {
+        throw new UnsupportedOperationException("This operation is not supported");
+    }
 }

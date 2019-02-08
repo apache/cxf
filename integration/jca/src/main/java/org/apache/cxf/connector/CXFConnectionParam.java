@@ -32,11 +32,11 @@ public class CXFConnectionParam {
     private QName serviceName;
     private QName portName;
     private String address;
-    
+
     public CXFConnectionParam() {
     }
 
-    public CXFConnectionParam(Class<?> aIface, URL aWsdlLocation, 
+    public CXFConnectionParam(Class<?> aIface, URL aWsdlLocation,
                                        QName aServiceName, QName aPortName) {
         this.iface = aIface;
         this.wsdlLocation = aWsdlLocation;
@@ -68,18 +68,18 @@ public class CXFConnectionParam {
     public boolean equals(java.lang.Object other) {
         boolean result = false;
         if (other instanceof CXFConnectionRequestInfo) {
-            CXFConnectionRequestInfo cri = (CXFConnectionRequestInfo)other; 
-            result = areEquals(iface, cri.getInterface()) 
+            CXFConnectionRequestInfo cri = (CXFConnectionRequestInfo)other;
+            result = areEquals(iface, cri.getInterface())
                      && areEquals(wsdlLocation, cri.getWsdlLocation())
-                     && areEquals(serviceName, cri.getServiceName()) 
+                     && areEquals(serviceName, cri.getServiceName())
                      && areEquals(portName, cri.getPortName())
                      && areEquals(address, cri.getAddress());
         }
         return result;
     }
-    
-    
-  
+
+
+
     public void setAddress(String address) {
         this.address = address;
     }
@@ -95,18 +95,17 @@ public class CXFConnectionParam {
     public void setWsdlLocation(URL wsdlLocation) {
         this.wsdlLocation = wsdlLocation;
     }
-    
+
     public void setInterface(Class<?> aInterface) {
         this.iface = aInterface;
     }
 
-    public int hashCode() {        
+    public int hashCode() {
         if (getServiceName() != null) {
             return getInterface().hashCode() ^ getServiceName().hashCode();
-        } else {
-            return getInterface().hashCode() ^ (getAddress() != null ? getAddress().hashCode() : 1);
         }
-    }  
+        return getInterface().hashCode() ^ (getAddress() != null ? getAddress().hashCode() : 1);
+    }
 
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
@@ -121,9 +120,8 @@ public class CXFConnectionParam {
 
     private boolean areEquals(Object obj1, Object obj2) {
         if (obj1 == null) {
-            return null == obj2; 
-        } else {
-            return obj1.equals(obj2);
-        }            
+            return null == obj2;
+        }
+        return obj1.equals(obj2);
     }
 }

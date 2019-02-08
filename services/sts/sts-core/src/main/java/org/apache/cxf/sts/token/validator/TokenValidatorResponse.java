@@ -34,7 +34,7 @@ public class TokenValidatorResponse {
     private String realm;
     private ReceivedToken token;
     private Set<Principal> roles;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -42,27 +42,27 @@ public class TokenValidatorResponse {
     public void setToken(ReceivedToken token) {
         this.token = token;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setTokenRealm(String tokenRealm) {
         this.realm = tokenRealm;
     }
-    
+
     public String getTokenRealm() {
         return realm;
     }
@@ -74,5 +74,5 @@ public class TokenValidatorResponse {
     public void setRoles(Set<Principal> roles) {
         this.roles = roles;
     }
-    
+
 }

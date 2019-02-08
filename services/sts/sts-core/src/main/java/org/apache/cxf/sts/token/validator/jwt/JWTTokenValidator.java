@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.Node;
 
 import org.w3c.dom.Element;
 
@@ -53,13 +52,13 @@ import org.apache.wss4j.common.crypto.Merlin;
  * Validate a SAML Assertion. It is valid if it was issued and signed by this STS.
  */
 public class JWTTokenValidator implements TokenValidator {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(JWTTokenValidator.class);
     private int clockOffset;
     private int ttl;
     private JWTRoleParser roleParser;
     private JWTRealmCodec realmCodec;
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument.
@@ -67,7 +66,7 @@ public class JWTTokenValidator implements TokenValidator {
     public boolean canHandleToken(ReceivedToken validateTarget) {
         return canHandleToken(validateTarget, null);
     }
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument. The realm is ignored in this Validator.
@@ -76,7 +75,7 @@ public class JWTTokenValidator implements TokenValidator {
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
             Element tokenEl = (Element)token;
-            if (tokenEl.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+            if (tokenEl.getFirstChild().getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
                 try {
                     JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(tokenEl.getTextContent());
                     if (jwtConsumer.getJwtToken() != null) {
@@ -89,63 +88,63 @@ public class JWTTokenValidator implements TokenValidator {
         }
         return false;
     }
-    
+
     /**
      * Validate a Token using the given TokenValidatorParameters.
      */
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating JWT Token");
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
-        
+
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         String token = ((Element)validateTarget.getToken()).getTextContent();
         if (token == null || "".equals(token)) {
             return response;
         }
-        
+
         if (token.split("\\.").length != 3) {
             LOG.log(Level.WARNING, "JWT Token appears not to be signed. Validation has failed");
             return response;
         }
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        
+
         // Verify the signature
         Properties verificationProperties = new Properties();
-        
+
         Crypto signatureCrypto = stsProperties.getSignatureCrypto();
         String alias = stsProperties.getSignatureUsername();
-        
+
         if (alias != null) {
             verificationProperties.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, alias);
         }
-        
+
         if (!(signatureCrypto instanceof Merlin)) {
             throw new STSException("Can't get the keystore", STSException.REQUEST_FAILED);
         }
         KeyStore keystore = ((Merlin)signatureCrypto).getKeyStore();
         verificationProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
-        
-        JwsSignatureVerifier signatureVerifier = 
+
+        JwsSignatureVerifier signatureVerifier =
             JwsUtils.loadSignatureVerifier(verificationProperties, jwt.getJwsHeaders());
-        
+
         if (!jwtConsumer.verifySignatureWith(signatureVerifier)) {
             return response;
         }
-        
+
         try {
             validateToken(jwt);
         } catch (RuntimeException ex) {
             LOG.log(Level.WARNING, "JWT token validation failed", ex);
             return response;
         }
-        
-        
+
+
         // Get the realm of the JWT Token
         if (realmCodec != null) {
             String tokenRealm = realmCodec.getRealmFromToken(jwt);
@@ -155,10 +154,10 @@ public class JWTTokenValidator implements TokenValidator {
         if (isVerifiedWithAPublicKey(jwt)) {
             Principal principal = new SimplePrincipal(jwt.getClaims().getSubject());
             response.setPrincipal(principal);
-            
+
             // Parse roles from the validated token
             if (roleParser != null) {
-                Set<Principal> roles = 
+                Set<Principal> roles =
                     roleParser.parseRolesFromToken(principal, null, jwt);
                 response.setRoles(roles);
             }
@@ -169,13 +168,13 @@ public class JWTTokenValidator implements TokenValidator {
 
         return response;
     }
-    
+
     private boolean isVerifiedWithAPublicKey(JwtToken jwt) {
         String alg = (String)jwt.getJwsHeader(JoseConstants.HEADER_ALGORITHM);
         SignatureAlgorithm sigAlg = SignatureAlgorithm.getAlgorithm(alg);
         return SignatureAlgorithm.isPublicKeyAlgorithm(sigAlg);
     }
-    
+
     protected void validateToken(JwtToken jwt) {
         JwtUtils.validateTokenClaims(jwt.getClaims(), ttl, clockOffset, false);
     }
@@ -187,7 +186,7 @@ public class JWTTokenValidator implements TokenValidator {
     public void setClockOffset(int clockOffset) {
         this.clockOffset = clockOffset;
     }
-    
+
     public int getTtl() {
         return ttl;
     }
@@ -195,7 +194,7 @@ public class JWTTokenValidator implements TokenValidator {
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
-    
+
     public JWTRoleParser getRoleParser() {
         return roleParser;
     }

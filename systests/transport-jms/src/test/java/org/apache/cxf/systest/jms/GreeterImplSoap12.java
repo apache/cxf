@@ -21,11 +21,11 @@ package org.apache.cxf.systest.jms;
 import javax.jws.WebService;
 import javax.xml.ws.soap.Addressing;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 
 
-@WebService(serviceName = "SOAPService8", 
-            portName = "SoapPort8", 
+@WebService(serviceName = "SOAPService8",
+            portName = "SoapPort8",
             endpointInterface = "org.apache.hello_world_doc_lit.Greeter",
             targetNamespace = "http://apache.org/hello_world_doc_lit",
             wsdlLocation = "testutils/hello_world_doc_lit.wsdl")

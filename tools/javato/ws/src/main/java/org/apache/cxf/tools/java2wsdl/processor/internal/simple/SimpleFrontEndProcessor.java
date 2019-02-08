@@ -38,12 +38,12 @@ import org.apache.cxf.tools.wsdlto.core.AbstractGenerator;
 
 public class SimpleFrontEndProcessor implements Processor {
     private ToolContext context;
-    private List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
+    private List<AbstractGenerator> generators = new ArrayList<>();
     @SuppressWarnings("unchecked")
-    public void process() throws ToolException {       
+    public void process() throws ToolException {
         List<ServiceInfo> services = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         ServiceInfo serviceInfo = services.get(0);
-        
+
         JavaInterface jinf = JavaFirstUtil.serviceInfo2JavaInf(serviceInfo);
         JavaModel jm = new JavaModel();
         jm.addInterface("inf", jinf);
@@ -54,14 +54,14 @@ public class SimpleFrontEndProcessor implements Processor {
         generators.add(new SimpleServerGenerator());
         generators.add(new SimpleClientGenerator());
         generators.add(new AntGenerator());
-        
+
         for (AbstractGenerator generator : generators) {
             generator.generate(context);
         }
 
     }
-    
+
     public void setEnvironment(ToolContext env) {
         this.context = env;
-    } 
+    }
 }

@@ -52,11 +52,11 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     private static final String WSDL_PLUGIN_RESOURCE = "META-INF/wsdl.plugin.xml";
 
     protected Definition wsdlDefinition;
-    private List<Definition> importedDefinitions = new ArrayList<Definition>();
+    private List<Definition> importedDefinitions = new ArrayList<>();
 
 
     private final Map<String, WSDLExtensibilityPlugin> wsdlPlugins
-        = new HashMap<String, WSDLExtensibilityPlugin>();
+        = new HashMap<>();
     private Bus bus;
 
     public WSDLDefinitionBuilder(Bus b) {
@@ -101,7 +101,7 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
     }
 
     public static Collection<Import> getImports(final Definition wsdlDef) {
-        Collection<Import> importList = new ArrayList<Import>();
+        Collection<Import> importList = new ArrayList<>();
         Map<?, ?> imports = wsdlDef.getImports();
         for (Map.Entry<?, ?> entry : imports.entrySet()) {
             List<Import> lst = CastUtils.cast((List<?>)entry.getValue());

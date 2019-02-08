@@ -39,38 +39,38 @@ import org.apache.cxf.helpers.CastUtils;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world_rpc_lit.wsdl"
-@WebServiceProvider(portName = "SoapPortProviderRPCLit1", 
+@WebServiceProvider(portName = "SoapPortProviderRPCLit1",
                     serviceName = "SOAPServiceProviderRPCLit",
                     targetNamespace = "http://apache.org/hello_world_rpclit",
                     wsdlLocation = "wsdl/hello_world_rpc_lit.wsdl")
-@ServiceMode(value = Service.Mode.MESSAGE)      
+@ServiceMode(value = Service.Mode.MESSAGE)
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public class HWSoapMessageProvider implements Provider<SOAPMessage> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
-    
-    
+
+
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
-    
+
     public HWSoapMessageProvider() {
-       
+
         try {
-            MessageFactory factory = MessageFactory.newInstance();            
+            MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is);
+            sayHiResponse = factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            greetMeResponse =  factory.createMessage(null, is);
+            greetMeResponse = factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     public SOAPMessage invoke(SOAPMessage request) {
-        SOAPMessage response = null;        
+        SOAPMessage response = null;
         try {
             SOAPBody body = SAAJUtils.getBody(request);
             Node n = body.getFirstChild();
@@ -81,11 +81,11 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
             if (n.getLocalName().equals(sayHi.getLocalPart())) {
                 response = sayHiResponse;
                 if (request.countAttachments() > 0) {
-                    MessageFactory factory = MessageFactory.newInstance();            
+                    MessageFactory factory = MessageFactory.newInstance();
                     InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-                    response =  factory.createMessage(null, is);
+                    response = factory.createMessage(null, is);
                     is.close();
-                    Iterator<AttachmentPart> it = CastUtils.cast(request.getAttachments(), 
+                    Iterator<AttachmentPart> it = CastUtils.cast(request.getAttachments(),
                                                                  AttachmentPart.class);
                     while (it.hasNext()) {
                         response.addAttachmentPart(it.next());

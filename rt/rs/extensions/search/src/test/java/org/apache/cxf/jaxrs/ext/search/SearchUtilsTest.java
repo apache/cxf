@@ -18,36 +18,37 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SearchUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class SearchUtilsTest {
 
     @Test
     public void testSqlWildcardString() {
         assertEquals("abc", SearchUtils.toSqlWildcardString("abc", false));
     }
-    
+
     @Test
     public void testSqlWildcardStringAlways() {
         assertEquals("%abc%", SearchUtils.toSqlWildcardString("abc", true));
     }
-    
+
     @Test
     public void testSqlWildcardString2() {
         assertEquals("%abc", SearchUtils.toSqlWildcardString("*abc", false));
     }
-    
+
     @Test
     public void testSqlWildcardString3() {
         assertEquals("abc%", SearchUtils.toSqlWildcardString("abc*", false));
     }
-    
+
     @Test
     public void testSqlWildcardString4() {
         assertEquals("%abc%", SearchUtils.toSqlWildcardString("*abc*", false));
     }
-    
+
     @Test
     public void testSqlWildcardString5() {
         assertEquals("%", SearchUtils.toSqlWildcardString("*", false));

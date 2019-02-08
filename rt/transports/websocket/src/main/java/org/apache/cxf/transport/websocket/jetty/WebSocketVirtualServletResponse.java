@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +39,7 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
- * 
+ *
  */
 public class WebSocketVirtualServletResponse implements HttpServletResponse {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletResponse.class);
@@ -48,7 +49,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     public WebSocketVirtualServletResponse(WebSocketServletHolder websocket) {
         this.webSocketHolder = websocket;
-        this.responseHeaders = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        this.responseHeaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         this.outputStream = createOutputStream();
     }
 
@@ -116,7 +117,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void setCharacterEncoding(String charset) {
-        // TODO 
+        // TODO
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "setCharacterEncoding({0})", charset);
         }
@@ -321,6 +322,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
         // the things to consider :
         // - provide a size limit if we are use this buffering
         // - add a chunking mode in the cxf websocket's binding.
+        //CHECKSTYLE:OFF
         return new ServletOutputStream() {
             private InternalByteArrayOutputStream buffer = new InternalByteArrayOutputStream();
 
@@ -344,7 +346,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                 } else {
                     // unbuffered write to the socket
                     String respid = responseHeaders.get(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY);
-                    byte[] headers = respid != null 
+                    byte[] headers = respid != null
                         ? WebSocketUtils.buildHeaderLine(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, respid) : null;
                     data = WebSocketUtils.buildResponse(headers, data, offset, length);
                     webSocketHolder.write(data, 0, data.length);
@@ -358,12 +360,29 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                 }
                 super.close();
             }
+
+            @Override
+            public boolean isReady() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void setWriteListener(WriteListener arg0) {
+                throw new UnsupportedOperationException();
+            }
         };
+        //CHECKSTYLE:ON
     }
 
     private static class InternalByteArrayOutputStream extends ByteArrayOutputStream {
         public byte[] getBytes() {
             return buf;
         }
+    }
+
+    @Override
+    public void setContentLengthLong(long arg0) {
+        throw new UnsupportedOperationException();
+
     }
 }

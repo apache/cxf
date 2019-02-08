@@ -26,10 +26,13 @@ public class JwkException extends JoseException {
     public JwkException() {
 
     }
-    public JwkException(String error) {
-        super(error);
+    public JwkException(String message) {
+        super(message);
     }
     public JwkException(Throwable cause) {
         super(cause);
+    }
+    public JwkException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

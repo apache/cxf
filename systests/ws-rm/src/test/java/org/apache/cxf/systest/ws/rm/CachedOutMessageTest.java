@@ -27,10 +27,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -41,8 +41,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
- * Tests the WS-RM processing with the cached out message (using temporary files). 
+ * Tests the WS-RM processing with the cached out message (using temporary files).
  */
 public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -50,12 +52,12 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
 
     private static final Logger LOG = LogUtils.getLogger(RetransmissionQueueTest.class);
     private Bus bus;
-    
 
-    
+
+
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/message-loss.xml");
             BusFactory.setDefaultBus(bus);
@@ -66,16 +68,16 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
             LoggingOutInterceptor out = new LoggingOutInterceptor();
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             ep = Endpoint.create(implementor);
             ep.publish(address);
 
             LOG.info("Published greeter endpoint.");
         }
-        
+
         public void tearDown() {
             ep.stop();
             ep = null;
@@ -85,7 +87,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         CachedOutputStream.setDefaultThreshold(16);
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }
 
@@ -108,17 +110,17 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
         MessageLossSimulator mls = new MessageLossSimulator();
         bus.getOutInterceptors().add(mls);
         RMManager manager = bus.getExtension(RMManager.class);
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
-        
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(2000));
+
         bus.getOutFaultInterceptors().add(out);
-        
+
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
-       
+
         ConnectionHelper.setKeepAliveConnection(greeter, true);
-        
+
         greeter.greetMeOneWay("one");
         greeter.greetMeOneWay("two");
         greeter.greetMeOneWay("three");
@@ -133,7 +135,7 @@ public class CachedOutMessageTest extends AbstractBusClientServerTestBase {
             }
             wait -= System.currentTimeMillis() - start;
         }
-        
+
         boolean empty = manager.getRetransmissionQueue().isEmpty();
         assertTrue("Some messages are not acknowledged", empty);
     }

@@ -37,13 +37,13 @@ public final class OptionLoader {
     private static final String WADL_TYPE = "wadl";
     private static final String WADL_OPTIONS = "-options$";
     private static final String WADL_BINDINGS = "-binding-?\\d*.xml$";
-    
+
     private OptionLoader() {
     }
-    
-    public static List<WadlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
+
+    public static List<WadlOption> loadWsdlOptionsFromDependencies(MavenProject project,
                                                                    Option defaultOptions, File outputDir) {
-        List<WadlOption> options = new ArrayList<WadlOption>();
+        List<WadlOption> options = new ArrayList<>();
         Set<Artifact> dependencies = project.getDependencyArtifacts();
         for (Artifact artifact : dependencies) {
             WadlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
@@ -76,7 +76,7 @@ public final class OptionLoader {
      * Scan files in a directory and generate one wadlOption per file found. Extra args for code generation
      * can be defined in a file that is named like the wadl file and ends in -options. Binding files can be
      * defined in files named like the wadl file and end in -binding-*.xml
-     * 
+     *
      * @param wadlBasedir
      * @param includes file name patterns to include
      * @param excludes file name patterns to exclude
@@ -84,15 +84,15 @@ public final class OptionLoader {
      * @return list of one WadlOption object for each wadl found
      * @throws MojoExecutionException
      */
-    public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir, 
-                                                           String includes[],
-                                                            String excludes[], 
+    public static List<WadlOption> loadWadlOptionsFromFile(File wadlBasedir,
+                                                           String[] includes,
+                                                            String[] excludes,
                                                             Option defaultOptions,
                                                             File defaultOutputDir)
         throws MojoExecutionException {
 
         if (wadlBasedir == null) {
-            return new ArrayList<WadlOption>();
+            return new ArrayList<>();
         }
 
         if (!wadlBasedir.exists()) {
@@ -100,7 +100,7 @@ public final class OptionLoader {
         }
 
         List<File> wadlFiles = getWadlFiles(wadlBasedir, includes, excludes);
-        List<WadlOption> wadlOptions = new ArrayList<WadlOption>();
+        List<WadlOption> wadlOptions = new ArrayList<>();
         for (File wadl : wadlFiles) {
             WadlOption wadlOption = generateWadlOptionFromFile(wadl, defaultOptions, defaultOutputDir);
             if (wadlOption != null) {
@@ -111,31 +111,23 @@ public final class OptionLoader {
     }
 
     private static String joinWithComma(String[] arr) {
-        if (arr == null) {
+        if (arr == null || arr.length == 0) {
             return "";
         }
-        StringBuilder str = new StringBuilder();
-
-        for (String s : arr) {
-            if (str.length() > 0) {
-                str.append(',');
-            }
-            str.append(s);
-        }
-        return str.toString();
+        return String.join(",", arr);
     }
 
-    private static List<File> getWadlFiles(File dir, String includes[], String excludes[])
+    private static List<File> getWadlFiles(File dir, String[] includes, String[] excludes)
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }
         exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
 
         String inc = joinWithComma(includes);
-        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
+        String ex = joinWithComma(exList.toArray(new String[0]));
 
         try {
             List<?> newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
@@ -146,7 +138,7 @@ public final class OptionLoader {
     }
 
 
-    protected static WadlOption generateWadlOptionFromFile(final File wadl, 
+    protected static WadlOption generateWadlOptionFromFile(final File wadl,
                                                            final Option defaultOptions,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
@@ -168,15 +160,15 @@ public final class OptionLoader {
         if (defaultOptions != null) {
             wadlOption.merge(defaultOptions);
         }
-        
-        
+
+
         final String wadlName = wadlFileName.substring(0, idx);
 
         final String[] options = readOptionsFromFile(wadl.getParentFile(), wadlName);
         if (options.length > 0) {
             wadlOption.getExtraargs().addAll(Arrays.asList(options));
         }
-        
+
         List<File> bindingFiles = FileUtils.getFiles(wadl.getParentFile(), wadlName + WADL_BINDINGS);
         if (bindingFiles != null) {
             for (File binding : bindingFiles) {
@@ -184,17 +176,17 @@ public final class OptionLoader {
             }
         }
         wadlOption.setWadl(wadl.toURI().toString());
-        
+
         if (wadlOption.getOutputDir() == null) {
             wadlOption.setOutputDir(defaultOutputDir);
         }
 
         return wadlOption;
     }
-    
+
     private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
         String[] noOptions = new String[] {};
-        List<File> files = FileUtils.getFiles(dir, wsdlName + WADL_OPTIONS); 
+        List<File> files = FileUtils.getFiles(dir, wsdlName + WADL_OPTIONS);
         if (files.size() <= 0) {
             return noOptions;
         }

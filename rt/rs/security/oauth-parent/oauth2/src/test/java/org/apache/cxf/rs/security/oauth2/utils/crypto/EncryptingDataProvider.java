@@ -43,15 +43,15 @@ public class EncryptingDataProvider implements OAuthDataProvider {
 
     SecretKey key;
     private Map<String, String> clients;
-    private Set<String> tokens = new HashSet<String>();
-    private Map<String, String> refreshTokens = new HashMap<String, String>();
-    
+    private Set<String> tokens = new HashSet<>();
+    private Map<String, String> refreshTokens = new HashMap<>();
+
     public EncryptingDataProvider() throws Exception {
         key = CryptoUtils.getSecretKey("AES");
         String encryptedClient = ModelEncryptionSupport.encryptClient(new Client("1", "2", true), key);
         clients = Collections.singletonMap("1", encryptedClient);
     }
-    
+
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return ModelEncryptionSupport.decryptClient(clients.get(clientId), key);
@@ -60,12 +60,12 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     @Override
     public ServerAccessToken createAccessToken(AccessTokenRegistration accessTokenReg)
         throws OAuthServiceException {
-        
+
         ServerAccessToken token = createAccessTokenInternal(accessTokenReg);
         encryptAccessToken(token);
         return token;
     }
-    
+
     @Override
     public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
         return ModelEncryptionSupport.decryptAccessToken(this, accessTokenKey, key);
@@ -78,18 +78,13 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         String encrypted = refreshTokens.remove(refreshToken);
         ServerAccessToken token = ModelEncryptionSupport.decryptAccessToken(this, encrypted, key);
         tokens.remove(token.getTokenKey());
-        
+
         // create a new refresh token
         createRefreshToken(token);
-        // possibly update other token properties 
+        // possibly update other token properties
         encryptAccessToken(token);
-        
-        return token;
-    }
 
-    @Override
-    public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-        tokens.remove(accessToken.getTokenKey());
+        return token;
     }
 
     @Override
@@ -106,45 +101,55 @@ public class EncryptingDataProvider implements OAuthDataProvider {
         // assuming that no specific scopes is documented/supported
         return Collections.emptyList();
     }
-    
+
     @Override
     public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
                                                    UserSubject subject, String grantType)
         throws OAuthServiceException {
-        // This is an optimization useful in cases where a client requests an authorization code: 
-        // if a user has already provided a given client with a pre-authorized token then challenging 
-        // a user with yet another form asking for the authorization is redundant  
+        // This is an optimization useful in cases where a client requests an authorization code:
+        // if a user has already provided a given client with a pre-authorized token then challenging
+        // a user with yet another form asking for the authorization is redundant
         return null;
     }
-    
+
     BearerAccessToken createAccessTokenInternal(AccessTokenRegistration accessTokenReg) {
         BearerAccessToken token = new BearerAccessToken(accessTokenReg.getClient(), 3600L);
         token.setSubject(accessTokenReg.getSubject());
-        
+
         createRefreshToken(token);
-        
+
         token.setGrantType(accessTokenReg.getGrantType());
-        token.setAudience(accessTokenReg.getAudience());
+        token.setAudiences(accessTokenReg.getAudiences());
         token.setParameters(Collections.singletonMap("param", "value"));
         token.setScopes(Collections.singletonList(
             new OAuthPermission("read", "read permission")));
         return token;
     }
-    
+
     private void encryptAccessToken(ServerAccessToken token) {
         String encryptedToken = ModelEncryptionSupport.encryptAccessToken(token, key);
         tokens.add(encryptedToken);
         refreshTokens.put(token.getRefreshToken(), encryptedToken);
         token.setTokenKey(encryptedToken);
     }
-    
+
     private void createRefreshToken(ServerAccessToken token) {
         RefreshToken refreshToken = new RefreshToken(token.getClient(),
                                                      "refresh",
                                                      1200L,
                                                      OAuthUtils.getIssuedAt());
-        
+
         String encryptedRefreshToken = ModelEncryptionSupport.encryptRefreshToken(refreshToken, key);
         token.setRefreshToken(encryptedRefreshToken);
+    }
+
+    @Override
+    public List<ServerAccessToken> getAccessTokens(Client client, UserSubject sub) throws OAuthServiceException {
+        return null;
+    }
+
+    @Override
+    public List<RefreshToken> getRefreshTokens(Client client, UserSubject sub) throws OAuthServiceException {
+        return null;
     }
 }

@@ -39,17 +39,10 @@ public class JwsCompactConsumer {
     private String jwsPayload;
     private String decodedJwsPayload;
     private JwsHeaders jwsHeaders;
-    private boolean detached;
     public JwsCompactConsumer(String encodedJws) {
-        this(encodedJws, null, null);
+        this(encodedJws, null);
     }
     public JwsCompactConsumer(String encodedJws, String detachedPayload) {
-        this(encodedJws, detachedPayload, null);
-    }
-    protected JwsCompactConsumer(String encodedJws, String detachedPayload, JsonMapObjectReaderWriter r) {
-        if (r != null) {
-            this.reader = r;
-        }
         String[] parts = JoseUtils.getCompactParts(encodedJws);
         if (parts.length != 3) {
             if (parts.length == 2 && encodedJws.endsWith(".")) {
@@ -67,7 +60,6 @@ public class JwsCompactConsumer {
                 LOG.warning("Compact JWS includes a payload expected to be detached");
                 throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
-            detached = true;
             jwsPayload = detachedPayload;
         }
         encodedSequence = parts[0] + "." + jwsPayload;
@@ -84,6 +76,7 @@ public class JwsCompactConsumer {
     }
     public String getDecodedJwsPayload() {
         if (decodedJwsPayload == null) {
+            getJwsHeaders();
             if (JwsUtils.isPayloadUnencoded(jwsHeaders)) {
                 decodedJwsPayload = jwsPayload;
             } else {
@@ -106,10 +99,6 @@ public class JwsCompactConsumer {
                 throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
             }
             jwsHeaders = new JwsHeaders(joseHeaders.asMap());
-            if (JwsUtils.isPayloadUnencoded(jwsHeaders) && !detached) {
-                LOG.warning("Only detached payload can be unencoded");
-                throw new JwsException(JwsException.Error.INVALID_COMPACT_JWS);
-            }
         }
         return jwsHeaders;
     }
@@ -145,5 +134,5 @@ public class JwsCompactConsumer {
     protected JsonMapObjectReaderWriter getReader() {
         return reader;
     }
-    
+
 }

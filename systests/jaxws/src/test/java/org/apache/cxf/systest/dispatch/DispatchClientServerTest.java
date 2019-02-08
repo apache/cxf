@@ -81,17 +81,21 @@ import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_soap_http", "SOAPDispatchService");
-    private static final QName PORT_NAME 
+    private static final QName PORT_NAME
         = new QName("http://apache.org/hello_world_soap_http", "SoapDispatchPort");
 
-    private static String greeterPort = TestUtil.getPortNumber(DispatchClientServerTest.class); 
-    
-    
+    private static String greeterPort = TestUtil.getPortNumber(DispatchClientServerTest.class);
+
+
     @WebService(serviceName = "SOAPService",
         portName = "SoapPort",
         endpointInterface = "org.apache.hello_world_soap_http.Greeter",
@@ -99,11 +103,11 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         wsdlLocation = "testutils/hello_world.wsdl")
     @Addressing
     public static class GreeterImpl extends BaseGreeterImpl {
-    }    
-    
-    public static class Server extends AbstractBusTestServerBase {        
+    }
+
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        
+
         protected void run() {
             setBus(BusFactory.getDefaultBus());
             Object implementor = new GreeterImpl();
@@ -111,12 +115,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                 + TestUtil.getPortNumber(DispatchClientServerTest.class)
                 + "/SOAPDispatchService/SoapDispatchPort";
             ep = Endpoint.create(SOAPBinding.SOAP11HTTP_BINDING, implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
-            Map<String, String> nsMap = new HashMap<String, String>();
+            Map<String, Object> properties = new HashMap<>();
+            Map<String, String> nsMap = new HashMap<>();
             nsMap.put("gmns", "http://apache.org/hello_world_soap_http/types");
             properties.put("soap.env.ns.map", nsMap);
             properties.put("disable.outputstream.optimization", "true");
-            
+
             ep.setProperties(properties);
             ep.publish(address);
             BusFactory.setDefaultBus(null);
@@ -145,7 +149,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     private void waitForFuture(Future<?> fd) throws Exception {
         int count = 0;
         while (!fd.isDone()) {
@@ -167,26 +171,26 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         QName otherServiceName = new QName("http://apache.org/hello_world_soap_http",
                 "SOAPProviderService");
         QName otherPortName = new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
-        
-        
+
+
         SOAPService service = new SOAPService(wsdl, otherServiceName);
         assertNotNull(service);
 
         Dispatch<SOAPMessage> disp = service
             .createDispatch(otherPortName, SOAPMessage.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + TestUtil.getPortNumber("fake-port")
                                      + "/SOAPDispatchService/SoapDispatchPort");
-        
+
         DispatchImpl<?> dispImpl = (DispatchImpl<?>)disp;
         HTTPConduit cond = (HTTPConduit)dispImpl.getClient().getConduit();
         cond.getClient().setConnectionTimeout(500);
-        
+
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
         assertNotNull(soapReqMsg);
-        
+
         try {
             disp.invoke(soapReqMsg);
             fail("Should have faulted");
@@ -199,7 +203,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                        || ex.getCause() instanceof java.net.SocketTimeoutException);
         }
         dispImpl.close();
-        
+
     }
     @Test
     public void test404() throws Exception {
@@ -212,22 +216,22 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         QName otherServiceName = new QName("http://apache.org/hello_world_soap_http",
                 "SOAPProviderService");
         QName otherPortName = new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
-        
-        
+
+
         SOAPService service = new SOAPService(wsdl, otherServiceName);
         assertNotNull(service);
 
         Dispatch<SOAPMessage> disp = service
             .createDispatch(otherPortName, SOAPMessage.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SomePlaceWithNoServiceRunning/SoapDispatchPort");
-        
+
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
         assertNotNull(soapReqMsg);
-        
+
         try {
             disp.invoke(soapReqMsg);
             fail("Should have faulted");
@@ -238,17 +242,17 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getCause().getClass().getName(),
                        ex.getCause() instanceof java.io.IOException);
         }
-        
+
     }
-    
+
     @Test
     public void testSOAPMessageInvokeToOneWay() throws Exception {
         SOAPService service = new SOAPService(null, SERVICE_NAME);
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING,
-                        "http://localhost:" + greeterPort 
+                        "http://localhost:" + greeterPort
                         + "/SOAPDispatchService/SoapDispatchPort");
         assertNotNull(service);
-        
+
         Dispatch<SOAPMessage> disp = service
             .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
 
@@ -262,7 +266,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         //Version 1:
         //we'll just call invoke
         disp.invoke(soapReqMsg1);
-        
+
         //Version 2:
         //We want to handle things asynchronously
         AsyncHandler<SOAPMessage> callback = new AsyncHandler<SOAPMessage>() {
@@ -289,19 +293,19 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Dispatch<SOAPMessage> disp = service
             .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
-        
+
         // Test request-response
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
         assertNotNull(soapReqMsg);
         SOAPMessage soapResMsg = disp.invoke(soapReqMsg);
-        
+
         assertNotNull(soapResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected,
                      DOMUtils.getContent(SAAJUtils.getBody(soapResMsg)
                                              .getFirstChild().getFirstChild()).trim());
 
@@ -320,8 +324,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SOAPMessage soapResMsg2 = (SOAPMessage)response.get();
         assertNotNull(soapResMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2, 
-                     DOMUtils.getContent(SAAJUtils.getBody(soapResMsg2).getFirstChild().getFirstChild()));  
+        assertEquals("Response should be : Hello TestSOAPInputMessage2", expected2,
+                     DOMUtils.getContent(SAAJUtils.getBody(soapResMsg2).getFirstChild().getFirstChild()));
 
         // Test async callback
         InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
@@ -331,13 +335,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Future<?> f = disp.invokeAsync(soapReqMsg3, tsmh);
         assertNotNull(f);
         waitForFuture(f);
-        
+
         String expected3 = "Hello TestSOAPInputMessage3";
-        assertEquals("Response should be : Hello TestSOAPInputMessage3", 
+        assertEquals("Response should be : Hello TestSOAPInputMessage3",
                      expected3, tsmh.getReplyBuffer().trim());
 
     }
-    
+
     @Test
     public void testCreateDispatchWithEPR() throws Exception {
 
@@ -348,8 +352,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
-        builder.address("http://localhost:" 
-                        + greeterPort 
+        builder.address("http://localhost:"
+                        + greeterPort
                         + "/SOAPDispatchService/SoapDispatchPort");
         builder.serviceName(SERVICE_NAME);
         builder.endpointName(PORT_NAME);
@@ -360,13 +364,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
         assertNotNull(soapReqMsg);
         SOAPMessage soapResMsg = disp.invoke(soapReqMsg);
-        
+
         assertNotNull(soapResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected,
                      DOMUtils.getAllContent(SAAJUtils.getBody(soapResMsg)).trim());
     }
-    
+
     @Test
     public void testDOMSourceMESSAGE() throws Exception {
         /*URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -376,8 +380,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);*/
         Service service = Service.create(SERVICE_NAME);
         assertNotNull(service);
-        service.addPort(PORT_NAME, "http://schemas.xmlsoap.org/soap/", 
-                        "http://localhost:" 
+        service.addPort(PORT_NAME, "http://schemas.xmlsoap.org/soap/",
+                        "http://localhost:"
                         + greeterPort
                         + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -393,12 +397,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(domResMsg);
         String expected = "Hello TestSOAPInputMessage";
 
-        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, 
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected,
                      DOMUtils.getAllContent(domResMsg.getNode().getFirstChild()).trim());
-        
+
         Element el = (Element)domResMsg.getNode().getFirstChild();
         assertEquals("gmns", el.lookupPrefix("http://apache.org/hello_world_soap_http/types"));
-        assertEquals("http://apache.org/hello_world_soap_http/types", 
+        assertEquals("http://apache.org/hello_world_soap_http/types",
                      el.lookupNamespaceURI("gmns"));
 
         // Test invoke oneway
@@ -432,13 +436,13 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(fd);
         waitForFuture(fd);
         String expected3 = "Hello TestSOAPInputMessage3";
-        assertEquals("Response should be : Hello TestSOAPInputMessage3", expected3, 
+        assertEquals("Response should be : Hello TestSOAPInputMessage3", expected3,
                      tdsh.getReplyBuffer().trim());
     }
-    
+
     @Test
     public void testDOMSourcePAYLOAD() throws Exception {
-        
+
         /*URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
@@ -446,7 +450,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);*/
         Service service = Service.create(SERVICE_NAME);
         assertNotNull(service);
-        service.addPort(PORT_NAME, "http://schemas.xmlsoap.org/soap/", 
+        service.addPort(PORT_NAME, "http://schemas.xmlsoap.org/soap/",
                         "http://localhost:"
                         + greeterPort + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -459,10 +463,10 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         // invoke
         DOMSource domResMsg = disp.invoke(domReqMsg);
-        
+
         assertNotNull(domResMsg);
         String expected = "Hello TestSOAPInputMessage";
-        
+
         Node node = domResMsg.getNode();
         assertNotNull(node);
         if (node instanceof Document) {
@@ -488,7 +492,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         DOMSource domRespMsg2 = response.get();
         assertNotNull(domRespMsg2);
         String expected2 = "Hello TestSOAPInputMessage2";
-        
+
         node = domRespMsg2.getNode();
         assertNotNull(node);
         if (node instanceof Document) {
@@ -509,7 +513,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(fd);
         waitForFuture(fd);
         String expected3 = "Hello TestSOAPInputMessage3";
-        assertEquals("Response should be : Hello TestSOAPInputMessage3", 
+        assertEquals("Response should be : Hello TestSOAPInputMessage3",
                      expected3, tdsh.getReplyBuffer().trim());
     }
 
@@ -520,7 +524,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
         assertNotNull(service);
-        
+
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
         Dispatch<Object> disp = service.createDispatch(PORT_NAME, jc, Service.Mode.PAYLOAD);
         doJAXBPayload(disp);
@@ -534,8 +538,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
-        builder.address("http://localhost:" 
-                        + greeterPort 
+        builder.address("http://localhost:"
+                        + greeterPort
                         + "/SOAPDispatchService/SoapDispatchPort");
         builder.serviceName(SERVICE_NAME);
         builder.endpointName(PORT_NAME);
@@ -546,7 +550,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
     }
     private void doJAXBPayload(Dispatch<Object> disp) throws Exception {
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -577,11 +581,11 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         String responseValue3 = ((GreetMeResponse)tjbh.getResponse()).getResponseType();
         assertTrue("Expected string, " + expected, expected.equals(responseValue3));
-        
-        org.apache.hello_world_soap_http.types.TestDocLitFault fr = 
-            new  org.apache.hello_world_soap_http.types.TestDocLitFault();
+
+        org.apache.hello_world_soap_http.types.TestDocLitFault fr =
+            new org.apache.hello_world_soap_http.types.TestDocLitFault();
         fr.setFaultType(BadRecordLitFault.class.getSimpleName());
-            
+
         tjbh = new TestJAXBHandler();
         fd = disp.invokeAsync(fr, tjbh);
         waitForFuture(fd);
@@ -591,10 +595,10 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             //expected
         }
-        
+
         GreetMeLater later = new GreetMeLater();
         later.setRequestType(1000);
-        
+
         HTTPClientPolicy pol = new HTTPClientPolicy();
         pol.setReceiveTimeout(100);
         disp.getRequestContext().put(HTTPClientPolicy.class.getName(), pol);
@@ -623,21 +627,21 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
     public void testJAXBObjectPAYLOADWithFeature() throws Exception {
         createBus("org/apache/cxf/systest/dispatch/client-config.xml");
         BusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
         String bindingId = "http://schemas.xmlsoap.org/wsdl/soap/";
         String endpointUrl = "http://localhost:" + greeterPort + "/SOAPDispatchService/SoapDispatchPort";
-        
+
         Service service = Service.create(wsdl, SERVICE_NAME);
         service.addPort(PORT_NAME, bindingId, endpointUrl);
         assertNotNull(service);
-        
+
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
         Dispatch<Object> disp = service.createDispatch(PORT_NAME, jc, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -649,19 +653,19 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(response);
         String responseValue = ((GreetMeResponse)response).getResponseType();
         assertTrue("Expected string, " + expected, expected.equals(responseValue));
-        
+
         assertEquals("Feature should be applied", 1, TestDispatchFeature.getCount());
-        assertEquals("Feature based interceptors should be added", 
+        assertEquals("Feature based interceptors should be added",
                      1, TestDispatchFeature.getCount());
-        
-        assertEquals("Feature based In interceptors has be added to in chain.", 
+
+        assertEquals("Feature based In interceptors has be added to in chain.",
                      1, TestDispatchFeature.getInInterceptorCount());
 
-        assertEquals("Feature based interceptors has to be added to out chain.", 
+        assertEquals("Feature based interceptors has to be added to out chain.",
                      1, TestDispatchFeature.getOutInterceptorCount());
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testSAXSourceMESSAGE() throws Exception {
 
@@ -678,7 +682,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         Dispatch<SAXSource> disp = service.createDispatch(PORT_NAME, SAXSource.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
         SAXSource saxSourceResp = disp.invoke(saxSourceReq);
@@ -720,7 +724,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(saxSourceResp3);
         assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp3).contains(expected3));
     }
-    
+
     @Test
     public void testSAXSourceMESSAGEWithSchemaValidation() throws Exception {
 
@@ -729,7 +733,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
         assertNotNull(service);
-        
+
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         InputSource inputSource = new InputSource(is);
         SAXSource saxSourceReq = new SAXSource(inputSource);
@@ -737,7 +741,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         Dispatch<SAXSource> disp = service.createDispatch(PORT_NAME, SAXSource.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
         disp.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
@@ -745,12 +749,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(saxSourceResp);
         String expected = "Hello TestSOAPInputMessage";
         assertTrue("Expected: " + expected, StaxUtils.toString(saxSourceResp).contains(expected));
-        
+
         is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReqWithExceedMaxLength.xml");
         inputSource = new InputSource(is);
         saxSourceReq = new SAXSource(inputSource);
         assertNotNull(saxSourceReq);
-        
+
         try {
             disp.invoke(saxSourceReq);
             fail("Should have thrown an exception");
@@ -771,7 +775,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         Dispatch<SAXSource> disp = service.createDispatch(PORT_NAME, SAXSource.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -842,7 +846,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Dispatch<StreamSource> disp = service.createDispatch(PORT_NAME, StreamSource.class,
                                                              Service.Mode.MESSAGE);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -893,7 +897,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Dispatch<StreamSource> disp = service.createDispatch(PORT_NAME, StreamSource.class,
                                                              Service.Mode.PAYLOAD);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
 
@@ -929,14 +933,14 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Future<?> fd = disp.invokeAsync(streamSourceReq3, tssh);
         assertNotNull(fd);
         waitForFuture(fd);
-        
+
         String expected3 = "Hello TestSOAPInputMessage3";
         StreamSource streamSourceResp3 = tssh.getStreamSource();
         assertNotNull(streamSourceResp3);
         assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp3).contains(expected3));
     }
-    
-    
+
+
     @Test
     public void testStreamSourcePAYLOADWithSchemaValidation() throws Exception {
 
@@ -948,7 +952,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         Dispatch<StreamSource> disp = service.createDispatch(PORT_NAME, StreamSource.class,
                                                              Service.Mode.PAYLOAD);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
         disp.getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
@@ -962,7 +966,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             // expected
             assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
         }
-        
+
         is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
         streamSourceReq = new StreamSource(is);
         assertNotNull(streamSourceReq);
@@ -971,7 +975,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         String expected = "Hello TestSOAPInputMessage";
         assertTrue("Expected: " + expected, StaxUtils.toString(streamSourceResp).contains(expected));
     }
-    
+
     @Test
     public void testStAXSourcePAYLOAD() throws Exception {
 
@@ -983,12 +987,12 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         Dispatch<StAXSource> disp = service.createDispatch(PORT_NAME, StAXSource.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                     "http://localhost:" 
+                                     "http://localhost:"
                                      + greeterPort
                                      + "/SOAPDispatchService/SoapDispatchPort");
         QName opQName = new QName("http://apache.org/hello_world_soap_http", "greetMe");
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, opQName);
-        
+
         // Test request-response
         InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralSOAPBodyReq.xml");
         StAXSource staxSourceReq = new StAXSource(StaxUtils.createXMLStreamReader(is));

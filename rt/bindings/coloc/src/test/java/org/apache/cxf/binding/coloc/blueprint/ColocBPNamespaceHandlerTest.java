@@ -19,17 +19,18 @@
 
 package org.apache.cxf.binding.coloc.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
- * 
+ *
  */
-public class ColocBPNamespaceHandlerTest extends Assert {
+public class ColocBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         ColocBPNamespaceHandler handler = new ColocBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/binding/coloc"));
     }
 

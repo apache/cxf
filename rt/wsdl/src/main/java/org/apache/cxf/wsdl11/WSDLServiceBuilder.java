@@ -108,7 +108,7 @@ public class WSDLServiceBuilder {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceBuilder.class);
     private Bus bus;
-    private Map<String, Element> schemaList = new HashMap<String, Element>();
+    private Map<String, Element> schemaList = new HashMap<>();
     private boolean recordOriginal = true;
     private boolean allowRefs;
     private boolean ignoreUnknownBindings;
@@ -153,7 +153,7 @@ public class WSDLServiceBuilder {
             info.setExtensionAttributes(attrs);
         }
     }
-    
+
     private void copyDocumentation(AbstractPropertiesHolder info, WSDLElement el) {
         if (el.getDocumentationElement() != null) {
             String doc = DOMUtils.getRawContent(el.getDocumentationElement());
@@ -171,7 +171,7 @@ public class WSDLServiceBuilder {
         copyExtensors(description, d.getExtensibilityElements());
         copyExtensionAttributes(description, d);
 
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
         for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
             .hasNext();) {
             QName qn = ite.next();
@@ -210,8 +210,8 @@ public class WSDLServiceBuilder {
     }
 
     public List<ServiceInfo> buildMockServices(Definition d) {
-        List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
-        List<Definition> defList = new ArrayList<Definition>();
+        List<ServiceInfo> serviceList = new ArrayList<>();
+        List<Definition> defList = new ArrayList<>();
         defList.add(d);
         parseImports(d, defList);
         for (Definition def : defList) {
@@ -231,7 +231,7 @@ public class WSDLServiceBuilder {
                 }
             }
 
-            if (def.getPortTypes().size() == 0) {
+            if (def.getPortTypes().isEmpty()) {
 
                 DescriptionInfo description = new DescriptionInfo();
                 if (recordOriginal) {
@@ -284,7 +284,7 @@ public class WSDLServiceBuilder {
                                             Service serv,
                                             QName endpointName,
                                             DescriptionInfo d) {
-        Map<QName, ServiceInfo> services = new LinkedHashMap<QName, ServiceInfo>();
+        Map<QName, ServiceInfo> services = new LinkedHashMap<>();
 
         DescriptionInfo description = d;
         if (null == description) {
@@ -297,7 +297,7 @@ public class WSDLServiceBuilder {
             copyExtensors(description, def.getExtensibilityElements());
             copyExtensionAttributes(description, def);
 
-            Set<Definition> done = new HashSet<Definition>();
+            Set<Definition> done = new HashSet<>();
             done.add(def);
             Collection<List<Import>> values = CastUtils.cast(def.getImports().values());
             for (List<Import> imports : values) {
@@ -362,7 +362,7 @@ public class WSDLServiceBuilder {
             buildEndpoint(service, bi, port);
         }
 
-        return new ArrayList<ServiceInfo>(services.values());
+        return new ArrayList<>(services.values());
     }
 
 
@@ -391,7 +391,7 @@ public class WSDLServiceBuilder {
 
 
     private void parseImports(Definition def, List<Definition> defList) {
-        List<Import> importList = new ArrayList<Import>();
+        List<Import> importList = new ArrayList<>();
 
         Collection<List<Import>> ilist = cast(def.getImports().values());
         for (List<Import> list : ilist) {
@@ -412,7 +412,7 @@ public class WSDLServiceBuilder {
         DestinationFactory factory = null;
         EndpointInfo ei = null;
 
-        if (null != elements && elements.size() > 0) {
+        if (null != elements && !elements.isEmpty()) {
             for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                 ns = el.getElementType().getNamespaceURI();
                 try {
@@ -431,7 +431,7 @@ public class WSDLServiceBuilder {
 
         if (factory == null) { // get the transport id from bindingInfo
             elements = port.getBinding().getExtensibilityElements();
-            if (null != elements && elements.size() > 0) {
+            if (null != elements && !elements.isEmpty()) {
                 for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                     if (el instanceof SOAPBinding) {
                         ns = ((SOAPBinding)el).getTransportURI();
@@ -462,7 +462,7 @@ public class WSDLServiceBuilder {
         }
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
-            ei = wFactory.createEndpointInfo(bus, service, bi, 
+            ei = wFactory.createEndpointInfo(bus, service, bi,
                                              port.getExtensibilityElements());
         }
 
@@ -665,7 +665,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_1", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -691,7 +691,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_2", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -712,7 +712,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_3", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -742,7 +742,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_4", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -768,7 +768,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_5", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -808,12 +808,12 @@ public class WSDLServiceBuilder {
                                                 allowRefs)) {
                         return false;
                     }
-                                 
+
                     if (extension.getParticle() instanceof XmlSchemaSequence) {
                         XmlSchemaSequence seq = (XmlSchemaSequence)extension.getParticle();
                         return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
-                    }  
-                    
+                    }
+
                 }
                 return true;
             }
@@ -821,7 +821,7 @@ public class WSDLServiceBuilder {
         return false;
     }
 
-        
+
     private static boolean buildMessageParts(XmlSchemaSequence seq, String namespaceURI, MessageInfo wrapper,
                                              boolean allowRefs) {
         List<XmlSchemaSequenceMember> items = seq.getItems();
@@ -861,8 +861,8 @@ public class WSDLServiceBuilder {
         }
         return ret;
     }
-        
-        
+
+
     private void buildMessage(AbstractMessageContainer minfo, Message msg) {
         SchemaCollection schemas = minfo.getOperation().getInterface().getService()
             .getXmlSchemaCollection();

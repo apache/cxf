@@ -43,33 +43,33 @@ public class SamlOAuthValidator {
     private boolean subjectConfirmationDataRequired;
     public SamlOAuthValidator() {
     }
-    
-    
+
+
     public void setSubjectConfirmationDataRequired(boolean required) {
         subjectConfirmationDataRequired = required;
     }
-    
+
     public void setAccessTokenServiceAddress(String address) {
         accessTokenServiceAddress = address;
     }
-    
+
     public void setIssuer(String value) {
         issuer = value;
     }
-    
+
     public void setClientAddress(String value) {
         issuer = value;
     }
-    
+
     public void validate(Message message, SamlAssertionWrapper wrapper) {
         validateSAMLVersion(wrapper);
-        
+
         Conditions cs = wrapper.getSaml2().getConditions();
         validateAudience(message, cs);
-        
+
         if (issuer != null) {
             String actualIssuer = getIssuer(wrapper);
-            String expectedIssuer = OAuthConstants.CLIENT_ID.equals(issuer) 
+            String expectedIssuer = OAuthConstants.CLIENT_ID.equals(issuer)
                 ? wrapper.getSaml2().getSubject().getNameID().getValue() : issuer;
             if (actualIssuer == null || !actualIssuer.equals(expectedIssuer)) {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -79,21 +79,21 @@ public class SamlOAuthValidator {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
     private void validateSAMLVersion(SamlAssertionWrapper assertionW) {
         if (assertionW.getSaml2() == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
     private String getIssuer(SamlAssertionWrapper assertionW) {
         Issuer samlIssuer = assertionW.getSaml2().getIssuer();
         return samlIssuer == null ? null : samlIssuer.getValue();
     }
-    
+
     private void validateAudience(Message message, Conditions cs) {
         String absoluteAddress = getAbsoluteTargetAddress(message);
-        
+
         List<AudienceRestriction> restrictions = cs.getAudienceRestrictions();
         for (AudienceRestriction ar : restrictions) {
             List<Audience> audiences = ar.getAudiences();
@@ -105,9 +105,9 @@ public class SamlOAuthValidator {
         }
         throw ExceptionUtils.toNotAuthorizedException(null, null);
     }
-    
+
     private String getAbsoluteTargetAddress(Message m) {
-        if (accessTokenServiceAddress == null) {    
+        if (accessTokenServiceAddress == null) {
             return new UriInfoImpl(m).getAbsolutePath().toString();
         }
         if (!accessTokenServiceAddress.startsWith("http")) {
@@ -116,12 +116,11 @@ public class SamlOAuthValidator {
                              .path(accessTokenServiceAddress)
                              .build()
                              .toString();
-        } else {
-            return accessTokenServiceAddress;
         }
+        return accessTokenServiceAddress;
     }
-    
-    private boolean validateAuthenticationSubject(Message m, 
+
+    private boolean validateAuthenticationSubject(Message m,
                                                   Conditions cs,
                                                   org.opensaml.saml.saml2.core.Subject subject) {
         // We need to find a Bearer Subject Confirmation method
@@ -134,10 +133,10 @@ public class SamlOAuthValidator {
                 }
             }
         }
-          
+
         return bearerSubjectConfFound;
     }
-      
+
       /**
        * Validate a (Bearer) Subject Confirmation
        */
@@ -151,28 +150,28 @@ public class SamlOAuthValidator {
             }
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-          
+
         // Recipient must match assertion consumer URL
         String recipient = subjectConfData.getRecipient();
         if (recipient == null || !recipient.equals(getAbsoluteTargetAddress(m))) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-          
+
         // We must have a NotOnOrAfter timestamp
         if (subjectConfData.getNotOnOrAfter() == null
             || subjectConfData.getNotOnOrAfter().isBeforeNow()) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-          
+
         //TODO: replay cache, same as with SAML SSO case
-          
+
         // Check address
         if (subjectConfData.getAddress() != null
             && (clientAddress == null || !subjectConfData.getAddress().equals(clientAddress))) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-          
-          
+
+
     }
-    
+
 }

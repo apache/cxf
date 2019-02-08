@@ -28,17 +28,21 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.SOAPServiceTest1;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JSClientServerTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String JS_PORT = Server.JS_PORT;
     public static final String JSX_PORT = Server.JSX_PORT;
-    
+
     private static final String NS = "http://apache.org/hello_world_soap_http";
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));

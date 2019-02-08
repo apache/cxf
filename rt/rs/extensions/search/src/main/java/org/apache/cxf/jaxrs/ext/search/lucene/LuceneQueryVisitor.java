@@ -51,30 +51,30 @@ import static org.apache.cxf.jaxrs.ext.search.ParamConverterUtils.getValue;
 /**
  * LuceneQueryVisitor implements SearchConditionVisitor and returns corresponding Lucene query. The
  * implementations is thread-safe, however if visitor is called multiple times, each call to visit()
- * method should be preceded by reset() method call (to properly reset the visitor's internal 
- * state). 
+ * method should be preceded by reset() method call (to properly reset the visitor's internal
+ * state).
  */
 public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Query> {
 
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
-    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState< Stack< List< Query > > >();
+    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState<>();
     private QueryBuilder queryBuilder;
-    
+
     public LuceneQueryVisitor() {
-        this(Collections.<String, String>emptyMap());        
-    }
-    
-    public LuceneQueryVisitor(Analyzer analyzer) {
-        this(Collections.<String, String>emptyMap(), null, analyzer);        
+        this(Collections.<String, String>emptyMap());
     }
 
-    
+    public LuceneQueryVisitor(Analyzer analyzer) {
+        this(Collections.<String, String>emptyMap(), null, analyzer);
+    }
+
+
     public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName) {
         this(Collections.singletonMap(contentsFieldAlias, contentsFieldName));
     }
-         
+
     public LuceneQueryVisitor(String contentsFieldName) {
         this(Collections.<String, String>emptyMap(), contentsFieldName);
     }
@@ -82,42 +82,42 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     public LuceneQueryVisitor(String contentsFieldName, Analyzer analyzer) {
         this(Collections.<String, String>emptyMap(), contentsFieldName, analyzer);
     }
-    
+
     public LuceneQueryVisitor(Map<String, String> fieldsMap) {
         this(fieldsMap, null);
     }
-    
+
     public LuceneQueryVisitor(Map<String, String> fieldsMap, String contentsFieldName) {
         this(fieldsMap, contentsFieldName, null);
     }
-    
+
     public LuceneQueryVisitor(String contentsFieldAlias, String contentsFieldName, Analyzer analyzer) {
         this(Collections.singletonMap(contentsFieldAlias, contentsFieldName), null, analyzer);
     }
-    
+
     public LuceneQueryVisitor(Map<String, String> fieldsMap, String contentsFieldName, Analyzer analyzer) {
         super(fieldsMap);
         this.contentsFieldName = contentsFieldName;
-        
+
         if (analyzer != null) {
             queryBuilder = new QueryBuilder(analyzer);
-        }                
-        
+        }
+
     }
-    
+
     public void setContentsFieldMap(Map<String, String> map) {
         this.contentsFieldMap = map;
     }
-    
+
     /**
-     * Resets visitor's internal state. If the instance of the visitor is intended to be used many times, 
+     * Resets visitor's internal state. If the instance of the visitor is intended to be used many times,
      * each call to visit() method should be preceded by reset() method call.
      */
     public void reset() {
         state.set(new Stack<List<Query>>());
-        state.get().push(new ArrayList<Query>());        
+        state.get().push(new ArrayList<>());
     }
-    
+
     public void visit(SearchCondition<T> sc) {
         if (state.get() == null) {
             reset();
@@ -125,37 +125,37 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                state.get().peek().add(buildSimpleQuery(sc.getConditionType(), 
-                                         statement.getProperty(), 
+                state.get().peek().add(buildSimpleQuery(sc.getConditionType(),
+                                         statement.getProperty(),
                                          statement.getValue()));
             }
         } else {
-            state.get().push(new ArrayList<Query>());
+            state.get().push(new ArrayList<>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }
             boolean orCondition = sc.getConditionType() == ConditionType.OR;
             List<Query> queries = state.get().pop();
             state.get().peek().add(createCompositeQuery(queries, orCondition));
-        }    
+        }
     }
-    
+
     public Query getQuery() {
         List<Query> queries = state.get().peek();
         return queries.isEmpty() ? null : queries.get(0);
     }
-    
+
     public void setCaseInsensitiveMatch(boolean caseInsensitiveMatch) {
         this.caseInsensitiveMatch = caseInsensitiveMatch;
-    }   
-    
+    }
+
     private Query buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
         validatePropertyValue(name, value);
-        
+
         Class<?> clazz = getPrimitiveFieldClass(name, value.getClass());
-        
-        
+
+
         Query query = null;
         switch (ct) {
         case EQUALS:
@@ -179,12 +179,12 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         case LESS_OR_EQUALS:
             query = createRangeQuery(clazz, name, value, ct);
             break;
-        default: 
+        default:
             break;
         }
         return query;
     }
-    
+
     private Query createEqualsQuery(Class<?> cls, String name, Object value) {
         Query query = null;
         if (cls == String.class) {
@@ -192,15 +192,15 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             if (caseInsensitiveMatch) {
                 strValue = strValue.toLowerCase();
             }
-            boolean isWildCard = strValue.contains("*") || super.isWildcardStringMatch(); 
-            
+            boolean isWildCard = strValue.contains("*") || super.isWildcardStringMatch();
+
             String theContentsFieldName = getContentsFieldName(name);
             if (theContentsFieldName == null) {
                 if (!isWildCard) {
                     query = newTermQuery(name, strValue);
                 } else {
                     query = new WildcardQuery(new Term(name, strValue));
-                } 
+                }
             } else if (!isWildCard) {
                 query = newPhraseQuery(theContentsFieldName, strValue);
             } else {
@@ -211,26 +211,26 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         }
         return query;
     }
-    
+
     private String getContentsFieldName(String name) {
         String fieldName = null;
         if (contentsFieldMap != null) {
-            fieldName = contentsFieldMap.get(name); 
+            fieldName = contentsFieldMap.get(name);
         }
         if (fieldName == null) {
             fieldName = contentsFieldName;
         }
         return fieldName;
     }
-    
+
     private Query createRangeQuery(Class<?> cls, String name, Object value, ConditionType type) {
-        
+
         boolean minInclusive = type == ConditionType.GREATER_OR_EQUALS || type == ConditionType.EQUALS;
         boolean maxInclusive = type == ConditionType.LESS_OR_EQUALS || type == ConditionType.EQUALS;
-        
+
         if (String.class.isAssignableFrom(cls) || Number.class.isAssignableFrom(cls)) {
             Query query = null;
-            
+
             if (Double.class.isAssignableFrom(cls)) {
                 query = createDoubleRangeQuery(name, value, type, minInclusive, maxInclusive);
             } else if (Float.class.isAssignableFrom(cls)) {
@@ -240,88 +240,87 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             } else {
                 query = createIntRangeQuery(name, value, type, minInclusive, maxInclusive);
             }
-        
+
             return query;
         } else if (Date.class.isAssignableFrom(cls)) {
-            final Date date = getValue(Date.class, getFieldTypeConverter(), value.toString());           
+            final Date date = getValue(Date.class, getFieldTypeConverter(), value.toString());
             final String luceneDateValue = getString(Date.class, getFieldTypeConverter(), date);
-                
+
             if (type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS) {
                 return TermRangeQuery.newStringRange(name, null, luceneDateValue, minInclusive, maxInclusive);
-            } else {
-                return TermRangeQuery.newStringRange(name, luceneDateValue, 
-                    DateTools.dateToString(new Date(), Resolution.MILLISECOND), minInclusive, maxInclusive);
             }
+            return TermRangeQuery.newStringRange(name, luceneDateValue,
+                DateTools.dateToString(new Date(), Resolution.MILLISECOND), minInclusive, maxInclusive);
         } else {
             return null;
         }
     }
 
     private Query createIntRangeQuery(final String name, final Object value,
-            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
-        final Integer intValue = Integer.valueOf(value.toString());        
-        
-        return NumericRangeQuery.newIntRange(name, getMin(type, intValue), 
-            getMax(type, intValue),  minInclusive, maxInclusive);        
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
+        final Integer intValue = Integer.valueOf(value.toString());
+
+        return NumericRangeQuery.newIntRange(name, getMin(type, intValue),
+            getMax(type, intValue),  minInclusive, maxInclusive);
     }
-    
+
     private Query createLongRangeQuery(final String name, final Object value,
-            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
-        final Long longValue = Long.valueOf(value.toString());        
-        
-        return NumericRangeQuery.newLongRange(name, getMin(type, longValue), 
-            getMax(type, longValue),  minInclusive, maxInclusive);        
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
+        final Long longValue = Long.valueOf(value.toString());
+
+        return NumericRangeQuery.newLongRange(name, getMin(type, longValue),
+            getMax(type, longValue),  minInclusive, maxInclusive);
     }
-    
+
     private Query createDoubleRangeQuery(final String name, final Object value,
-            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
-        final Double doubleValue = Double.valueOf(value.toString());        
-        
-        return NumericRangeQuery.newDoubleRange(name, getMin(type, doubleValue), 
-            getMax(type, doubleValue),  minInclusive, maxInclusive);        
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
+        final Double doubleValue = Double.valueOf(value.toString());
+
+        return NumericRangeQuery.newDoubleRange(name, getMin(type, doubleValue),
+            getMax(type, doubleValue),  minInclusive, maxInclusive);
     }
-    
+
     private Query createFloatRangeQuery(final String name, final Object value,
-            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {        
-        final Float floatValue = Float.valueOf(value.toString());        
-        
-        return NumericRangeQuery.newFloatRange(name, getMin(type, floatValue), 
-            getMax(type, floatValue),  minInclusive, maxInclusive);        
+            final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
+        final Float floatValue = Float.valueOf(value.toString());
+
+        return NumericRangeQuery.newFloatRange(name, getMin(type, floatValue),
+            getMax(type, floatValue),  minInclusive, maxInclusive);
     }
 
     private< N > N getMax(final ConditionType type, final N value) {
-        return type == ConditionType.GREATER_THAN || type == ConditionType.GREATER_OR_EQUALS 
+        return type == ConditionType.GREATER_THAN || type == ConditionType.GREATER_OR_EQUALS
             ? null : value;
     }
 
     private< N > N getMin(final ConditionType type, final N value) {
         return type == ConditionType.LESS_THAN || type == ConditionType.LESS_OR_EQUALS ? null : value;
     }
-    
+
     private Query createCompositeQuery(List<Query> queries, boolean orCondition) {
-        
-        BooleanClause.Occur clause = orCondition 
+
+        BooleanClause.Occur clause = orCondition
             ? BooleanClause.Occur.SHOULD : BooleanClause.Occur.MUST;
-        
+
         BooleanQuery booleanQuery = new BooleanQuery();
-        
+
         for (Query query : queries) {
             booleanQuery.add(query, clause);
         }
-        
+
         return booleanQuery;
     }
 
     private Query newTermQuery(final String field, final String query) {
-        return (queryBuilder != null) ? queryBuilder.createBooleanQuery(field, query) 
+        return (queryBuilder != null) ? queryBuilder.createBooleanQuery(field, query)
             : new TermQuery(new Term(field, query));
     }
-    
+
     private Query newPhraseQuery(final String field, final String query) {
         if (queryBuilder != null) {
             return queryBuilder.createPhraseQuery(field, query);
         }
-        
+
         final PhraseQuery phraseQuery = new PhraseQuery();
         phraseQuery.add(new Term(field, query));
         return phraseQuery;

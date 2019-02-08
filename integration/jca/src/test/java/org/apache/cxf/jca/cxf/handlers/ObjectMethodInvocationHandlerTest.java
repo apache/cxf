@@ -23,116 +23,120 @@ import java.lang.reflect.Proxy;
 
 import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 
 public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandlerTest {
 
-    ObjectMethodInvocationHandler handler; 
+    ObjectMethodInvocationHandler handler;
     CXFInvocationHandlerData data;
 
-    TestTarget testTarget = new TestTarget(); 
+    TestTarget testTarget = new TestTarget();
     DummyHandler dummyHandler = new DummyHandler();
-    
+
     public ObjectMethodInvocationHandlerTest() {
         super();
     }
 
     @Before
-    public void setUp() { 
-        super.setUp(); 
-        target.lastMethod = null; 
-        dummyHandler.invokeCalled = false;         
+    public void setUp() {
+        super.setUp();
+        target.lastMethod = null;
+        dummyHandler.invokeCalled = false;
         data = new CXFInvocationHandlerDataImpl();
         data.setTarget(target);
         handler = new ObjectMethodInvocationHandler(data);
-        handler.setNext(dummyHandler); 
-    } 
-
-    @Test
-    public void testToString() throws Throwable  { 
-
-        Method toString = Object.class.getMethod("toString", new Class[0]);
-        
-        Object result = handler.invoke(testTarget, toString, null); 
-        assertTrue("object method must not be passed to next handler in chain", 
-                   !dummyHandler.invokeCalled); 
-        assertTrue("object must be a String", result instanceof String);
-        assertTrue("checking toString method ", ((String)result).startsWith("ConnectionHandle"));
-    } 
-
-    @Test
-    public void testHashCode() throws Throwable { 
-
-        Method hashCode = Object.class.getMethod("hashCode", new Class[0]); 
-        doObjectMethodTest(hashCode); 
-    } 
-
-    @Test
-    public void testEqualsDoesNotCallNext() throws Throwable { 
-
-        Method equals = Object.class.getMethod("equals", new Class[] {Object.class}); 
-        handler.invoke(testTarget, equals, new Object[] {this}); 
-        assertTrue("object method must not be passed to next handler in chain", 
-                   !dummyHandler.invokeCalled); 
-    } 
-    
-    @Test
-    public void testNonObjecMethod() throws Throwable { 
-
-        DummyHandler dummyHandler1 = new DummyHandler(); 
-        handler.setNext(dummyHandler1); 
-
-        final Method method = TestTarget.class.getMethod("testMethod", new Class[0]); 
-        
-        handler.invoke(testTarget, method, new Object[0]); 
-
-        assertTrue("non object method must be passed to next handler in chain", dummyHandler1.invokeCalled); 
+        handler.setNext(dummyHandler);
     }
 
     @Test
-    public void testEqualsThroughProxies() { 
+    public void testToString() throws Throwable  {
+
+        Method toString = Object.class.getMethod("toString", new Class[0]);
+
+        Object result = handler.invoke(testTarget, toString, null);
+        assertTrue("object method must not be passed to next handler in chain",
+                   !dummyHandler.invokeCalled);
+        assertTrue("object must be a String", result instanceof String);
+        assertTrue("checking toString method ", ((String)result).startsWith("ConnectionHandle"));
+    }
+
+    @Test
+    public void testHashCode() throws Throwable {
+
+        Method hashCode = Object.class.getMethod("hashCode", new Class[0]);
+        doObjectMethodTest(hashCode);
+    }
+
+    @Test
+    public void testEqualsDoesNotCallNext() throws Throwable {
+
+        Method equals = Object.class.getMethod("equals", new Class[] {Object.class});
+        handler.invoke(testTarget, equals, new Object[] {this});
+        assertTrue("object method must not be passed to next handler in chain",
+                   !dummyHandler.invokeCalled);
+    }
+
+    @Test
+    public void testNonObjecMethod() throws Throwable {
+
+        DummyHandler dummyHandler1 = new DummyHandler();
+        handler.setNext(dummyHandler1);
+
+        final Method method = TestTarget.class.getMethod("testMethod", new Class[0]);
+
+        handler.invoke(testTarget, method, new Object[0]);
+
+        assertTrue("non object method must be passed to next handler in chain", dummyHandler1.invokeCalled);
+    }
+
+    @Test
+    public void testEqualsThroughProxies() {
 
         Class<?>[] interfaces = {TestInterface.class};
         CXFInvocationHandlerData data1 = new CXFInvocationHandlerDataImpl();
         CXFInvocationHandlerData data2 = new CXFInvocationHandlerDataImpl();
         data1.setTarget(new TestTarget());
         data2.setTarget(new TestTarget());
-        ObjectMethodInvocationHandler handler1 = new ObjectMethodInvocationHandler(data1); 
-        handler1.setNext(mockHandler); 
-        ObjectMethodInvocationHandler handler2 = new ObjectMethodInvocationHandler(data2); 
-        handler2.setNext(mockHandler); 
+        ObjectMethodInvocationHandler handler1 = new ObjectMethodInvocationHandler(data1);
+        handler1.setNext(mockHandler);
+        ObjectMethodInvocationHandler handler2 = new ObjectMethodInvocationHandler(data2);
+        handler2.setNext(mockHandler);
 
-        TestInterface proxy1 = 
+        TestInterface proxy1 =
             (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces, handler1);
-        TestInterface proxy2 = 
+        TestInterface proxy2 =
             (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces, handler2);
 
-        assertEquals(proxy1, proxy1); 
-        assertTrue(!proxy1.equals(proxy2)); 
-    } 
+        assertEquals(proxy1, proxy1);
+        assertFalse(proxy1.equals(proxy2));
+    }
 
 
-    protected void doObjectMethodTest(Method method) throws Throwable { 
-        doObjectMethodTest(method, null); 
-    } 
+    protected void doObjectMethodTest(Method method) throws Throwable {
+        doObjectMethodTest(method, null);
+    }
 
-    protected void doObjectMethodTest(Method method, Object[] args) throws Throwable { 
+    protected void doObjectMethodTest(Method method, Object[] args) throws Throwable {
 
-        handler.invoke(testTarget, method, args); 
+        handler.invoke(testTarget, method, args);
 
         assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled); 
+                   !dummyHandler.invokeCalled);
         assertEquals(method + " must be invoked directly on target object",
-                     method.getName(), target.lastMethod.getName()); 
-    }    
+                     method.getName(), target.lastMethod.getName());
+    }
 
-    public CXFInvocationHandler getHandler() { 
+    public CXFInvocationHandler getHandler() {
         return handler;
-    } 
+    }
 
-      
+
 }
-

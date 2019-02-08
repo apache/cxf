@@ -38,7 +38,7 @@ public class CorbaMessage extends AbstractWrappedMessage {
     private CorbaStreamable except;
     private SystemException systemExcept;
     private CorbaTypeMap corbaTypeMap;
-    
+
     private NVList list;
 
     public CorbaMessage(Message m) {
@@ -46,26 +46,26 @@ public class CorbaMessage extends AbstractWrappedMessage {
         if (m instanceof CorbaMessage) {
             CorbaMessage msg = (CorbaMessage)m;
             CorbaStreamable[] data = msg.getStreamableArguments();
-            setStreamableArguments(data);            
+            setStreamableArguments(data);
             returnParam = msg.getStreamableReturn();
             except = msg.getStreamableException();
             systemExcept = msg.getSystemException();
             list = msg.getList();
             corbaTypeMap = msg.getCorbaTypeMap();
         } else {
-            this.arguments = new ArrayList<CorbaStreamable>();    
-        }        
+            this.arguments = new ArrayList<>();
+        }
     }
 
-    
+
     public void setList(NVList lst) {
         this.list = lst;
     }
-    
+
     public NVList getList() {
         return this.list;
     }
-    
+
     public CorbaStreamable getStreamableException() {
         return this.except;
     }
@@ -73,23 +73,23 @@ public class CorbaMessage extends AbstractWrappedMessage {
     public CorbaStreamable getStreamableReturn() {
         return this.returnParam;
     }
-    
+
     public SystemException getSystemException() {
         return this.systemExcept;
     }
-    
+
     public void setSystemException(SystemException sysEx) {
         systemExcept = sysEx;
     }
 
     public final void addStreamableArgument(CorbaStreamable arg) {
         if (this.arguments == null) {
-            this.arguments = new ArrayList<CorbaStreamable>(1);
+            this.arguments = new ArrayList<>(1);
         }
 
         this.arguments.add(arg);
     }
-    
+
     public CorbaStreamable[] getStreamableArguments() {
         return this.arguments.toArray(new CorbaStreamable[this.arguments.size()]);
     }
@@ -97,12 +97,12 @@ public class CorbaMessage extends AbstractWrappedMessage {
 
     public final void setStreamableArguments(CorbaStreamable[] data) {
         if (this.arguments == null) {
-            this.arguments = new ArrayList<CorbaStreamable>(data.length);
+            this.arguments = new ArrayList<>(data.length);
         }
 
-        for (CorbaStreamable streamable : data) {         
+        for (CorbaStreamable streamable : data) {
             addStreamableArgument(streamable);
-        }       
+        }
     }
 
     public void setStreamableArgumentValue(CorbaObjectHandler data, int idx) {
@@ -124,16 +124,14 @@ public class CorbaMessage extends AbstractWrappedMessage {
     }
 
     public void setStreamableReturnValue(CorbaObjectHandler data) {
-        // TODO: Handle case of the return parameter has not yet been initialized.
         returnParam.setObject(data);
     }
-    
+
     public void setStreamableException(CorbaStreamable ex) {
         except = ex;
     }
-    
+
     public void setStreamableExceptionValue(CorbaObjectHandler exData) {
-        // TODO: Handle case of the return parameter has not yet been initialized.
         except.setObject(exData);
     }
 

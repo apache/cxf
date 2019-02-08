@@ -35,7 +35,7 @@ public class BookStoreNoSubResource {
 
     public BookStoreNoSubResource() {
     }
-    
+
     @GET
     public String getBookStoreInfo() {
         return "This is a great store";
@@ -47,20 +47,20 @@ public class BookStoreNoSubResource {
     public Book getBooks() {
         return null;
     }
-    
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) {
         return null;
-    }    
-    
+    }
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/json")
     public Book getBookJSON(@PathParam("bookId") String id) {
         return null;
-    } 
+    }
 
     @POST
     @Path("/books")

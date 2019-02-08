@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.KerberosToken;
@@ -36,27 +38,35 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 
 /**
- * Validate an EncryptedSupportingToken policy. 
+ * Validate an EncryptedSupportingToken policy.
  */
 public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && SP12Constants.ENCRYPTED_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName());
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+        // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
+        if (isTLSInUse(parameters.getMessage())) {
+            AssertionInfo transportAi =
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(),
+                                                         SPConstants.TRANSPORT_BINDING);
+            super.setEnforceEncryptedTokens(transportAi == null);
+        }
+
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
@@ -67,7 +77,7 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
                 if (!isTokenRequired(token, parameters.getMessage())) {
                     continue;
                 }
-                
+
                 boolean processingFailed = false;
                 if (token instanceof UsernameToken) {
                     if (!processUsernameTokens(parameters, false)) {
@@ -91,13 +101,18 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(parameters)) {
+                    if (!processSAMLTokens(parameters, false)) {
                         processingFailed = true;
                     }
-                } else if (!(token instanceof IssuedToken)) {
+                } else if (token instanceof IssuedToken) {
+                    IssuedToken issuedToken = (IssuedToken)token;
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters, false)) {
+                        processingFailed = true;
+                    }
+                } else {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the encrypted supporting token requirement"
@@ -107,15 +122,15 @@ public class EncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicy
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return false;
     }
-    
+
     protected boolean isEncrypted() {
         return true;
     }
-    
+
     protected boolean isEndorsing() {
         return false;
     }

@@ -34,77 +34,77 @@ import javax.ws.rs.core.UriBuilder;
  *  - last response
  */
 public interface ClientState {
-    
+
     /**
      * Sets the current builder
      * @param currentBuilder the builder
      */
     void setCurrentBuilder(UriBuilder currentBuilder);
-    
+
     /**
      * Gets the current builder
      * @return
      */
     UriBuilder getCurrentBuilder();
-    
+
     /**
      * Sets the base URI
      * @param baseURI baseURI
      */
     void setBaseURI(URI baseURI);
-    
+
     /**
      * Gets the base URI
      * @return baseURI
      */
     URI getBaseURI();
-    
+
     /**
      * Sets Response
      * @param response response
      */
     void setResponse(Response response);
-    
+
     /**
      * Gets Response
      * @return response
      */
     Response getResponse();
-    
+
     /**
      * Sets the request headers
      * @param requestHeaders request headers
      */
     void setRequestHeaders(MultivaluedMap<String, String> requestHeaders);
-    
+
     /**
      * Gets the request headers
      * @return request headers, may be immutable
      */
     MultivaluedMap<String, String> getRequestHeaders();
-    
+
     /**
      * Sets the map containing template name and value pairs
      * @param templates
      */
     void setTemplates(MultivaluedMap<String, String> map);
-    
+
     /**
      * Gets the templates map
      * @return templates
      */
     MultivaluedMap<String, String> getTemplates();
-    
-    
+
+
     /**
      * Resets the current state to the baseURI
      *
      */
     void reset();
-    
+
     /**
-     * The factory method for creating a new state. 
-     * Example, proxy and WebClient.fromClient will use this method when creating 
+     * The factory method for creating a new state.
+     * Example, proxy and WebClient.fromClient will use this method when creating
      * subresource proxies and new web clients respectively to ensure thet stay
      * thread-local if needed
      * @param baseURI baseURI
@@ -112,7 +112,7 @@ public interface ClientState {
      * @param templates initial templates map, can be null
      * @return client state
      */
-    ClientState newState(URI baseURI, 
+    ClientState newState(URI baseURI,
                          MultivaluedMap<String, String> headers,
                          MultivaluedMap<String, String> templates);
 }

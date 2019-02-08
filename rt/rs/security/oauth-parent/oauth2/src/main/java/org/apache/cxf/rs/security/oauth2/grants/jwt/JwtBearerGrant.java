@@ -26,19 +26,19 @@ public class JwtBearerGrant extends AbstractJwtBearerGrant {
     public JwtBearerGrant(String assertion) {
         this(assertion, true);
     }
-    
+
     public JwtBearerGrant(String assertion, boolean encoded) {
         this(assertion, encoded, null);
     }
-    
+
     public JwtBearerGrant(String assertion, String scope) {
         this(assertion, true, scope);
     }
-    
+
     public JwtBearerGrant(String assertion, boolean encoded, String scope) {
         super(Constants.JWT_BEARER_GRANT, assertion, encoded, scope);
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = initMap();
         map.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, encodeAssertion());

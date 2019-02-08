@@ -36,4 +36,4 @@ public interface Hello {
     @WebResult
     @WebMethod
     SayHiResponse sayHi(SayHi s);
-} 
+}

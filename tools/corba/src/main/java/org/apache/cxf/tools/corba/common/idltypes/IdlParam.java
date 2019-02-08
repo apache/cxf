@@ -35,9 +35,9 @@ public final class IdlParam extends IdlDefnImplBase {
     private IdlParam(IdlOperation parent, String name, IdlType typeType, String modeValue) {
         super(parent, name);
         this.type = typeType;
-        this.mode = new String(modeValue);        
+        this.mode = modeValue;
     }
-    
+
     public static IdlParam create(IdlOperation parent, String name, IdlType type, String mode) {
         name = CorbaUtils.mangleName(name);
 
@@ -53,13 +53,13 @@ public final class IdlParam extends IdlDefnImplBase {
             LOG.log(Level.WARNING, "Ignoring Param " + localName() + " with Empty Type");
         }
     }
-    
+
     public boolean isEmptyDef() {
         return type.isEmptyDef();
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         return type.getCircularScope(startScope, doneDefn);
     }
-    
+
 }

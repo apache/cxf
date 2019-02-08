@@ -29,6 +29,6 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Features {
     String[] features() default { };
-    
+
     Class<? extends Feature>[] classes() default { };
 }

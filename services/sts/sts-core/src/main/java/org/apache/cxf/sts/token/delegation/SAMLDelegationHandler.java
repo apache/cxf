@@ -24,14 +24,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.request.ReceivedToken.STATE;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
 
 /**
@@ -41,36 +42,36 @@ import org.opensaml.saml.saml1.core.AudienceRestrictionCondition;
  * "checkAudienceRestriction" property is set to "true".
  */
 public class SAMLDelegationHandler implements TokenDelegationHandler {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(SAMLDelegationHandler.class);
-    
+
     private boolean checkAudienceRestriction;
-    
+
     public boolean canHandleToken(ReceivedToken delegateTarget) {
         Object token = delegateTarget.getToken();
         if (token instanceof Element) {
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((WSConstants.SAML_NS.equals(namespace) || WSConstants.SAML2_NS.equals(namespace))
+            if ((WSS4JConstants.SAML_NS.equals(namespace) || WSS4JConstants.SAML2_NS.equals(namespace))
                 && "Assertion".equals(localname)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public TokenDelegationResponse isDelegationAllowed(TokenDelegationParameters tokenParameters) {
         TokenDelegationResponse response = new TokenDelegationResponse();
         ReceivedToken delegateTarget = tokenParameters.getToken();
         response.setToken(delegateTarget);
-        
+
         if (delegateTarget.getState() != STATE.VALID || !delegateTarget.isDOMElement()) {
             LOG.fine("Delegation token is not valid");
             return response;
         }
-        
+
         if (isDelegationAllowed(delegateTarget, tokenParameters.getAppliesToAddress())) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Delegation is allowed for principal " + tokenParameters.getPrincipal());
@@ -79,10 +80,10 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
         } else if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Delegation is not allowed for principal " + tokenParameters.getPrincipal());
         }
-        
+
         return response;
     }
-    
+
     /**
      * Is Delegation allowed for a particular token
      */
@@ -116,28 +117,28 @@ public class SAMLDelegationHandler implements TokenDelegationHandler {
 
         return true;
     }
-    
+
     protected List<String> getAudienceRestrictions(SamlAssertionWrapper assertion) {
         List<String> addresses = new ArrayList<>();
         if (assertion.getSaml1() != null) {
-            for (AudienceRestrictionCondition restriction 
+            for (AudienceRestrictionCondition restriction
                 : assertion.getSaml1().getConditions().getAudienceRestrictionConditions()) {
                 for (org.opensaml.saml.saml1.core.Audience audience : restriction.getAudiences()) {
                     addresses.add(audience.getUri());
                 }
             }
         } else if (assertion.getSaml2() != null) {
-            for (org.opensaml.saml.saml2.core.AudienceRestriction restriction 
+            for (org.opensaml.saml.saml2.core.AudienceRestriction restriction
                 : assertion.getSaml2().getConditions().getAudienceRestrictions()) {
                 for (org.opensaml.saml.saml2.core.Audience audience : restriction.getAudiences()) {
                     addresses.add(audience.getAudienceURI());
                 }
             }
         }
-        
+
         return addresses;
     }
-    
+
     public boolean isCheckAudienceRestriction() {
         return checkAudienceRestriction;
     }

@@ -46,11 +46,11 @@ public class JaxwsSEIGenerator extends AbstractJaxwsGenerator {
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
         JavaModel javaModel = env.get(JavaModel.class);
-        
+
         if (passthrough()) {
             return;
         }
-        
+
         Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
         for (JavaInterface intf : interfaces.values()) {

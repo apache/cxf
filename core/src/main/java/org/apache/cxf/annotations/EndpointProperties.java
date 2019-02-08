@@ -34,12 +34,12 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 @Inherited
 public @interface EndpointProperties {
-    
+
     /**
      * The properties
      * @return the list of properties to set
      */
     EndpointProperty[] value();
-    
+
 }
 

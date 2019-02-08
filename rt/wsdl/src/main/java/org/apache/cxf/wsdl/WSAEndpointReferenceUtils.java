@@ -29,10 +29,10 @@ import org.apache.cxf.ws.addressing.MetadataType;
 public final class WSAEndpointReferenceUtils {
 
     public static final String ANONYMOUS_ADDRESS = "http://www.w3.org/2005/08/addressing/anonymous";
-    static final org.apache.cxf.ws.addressing.ObjectFactory WSA_OBJECT_FACTORY = 
+    static final org.apache.cxf.ws.addressing.ObjectFactory WSA_OBJECT_FACTORY =
         new org.apache.cxf.ws.addressing.ObjectFactory();
 
-    
+
     private WSAEndpointReferenceUtils() {
         // Utility class - never constructed
     }
@@ -42,7 +42,7 @@ public final class WSAEndpointReferenceUtils {
         reference.setMetadata(WSA_OBJECT_FACTORY.createMetadataType());
         return reference;
     }
-    
+
     public static MetadataType getSetMetadata(EndpointReferenceType ref) {
         MetadataType mt = ref.getMetadata();
         if (null == mt) {
@@ -51,8 +51,8 @@ public final class WSAEndpointReferenceUtils {
         }
         return mt;
     }
-    
-    
+
+
     /**
      * Set the address of the provided endpoint reference.
      * @param ref - the endpoint reference
@@ -63,7 +63,7 @@ public final class WSAEndpointReferenceUtils {
         a.setValue(address);
         ref.setAddress(a);
     }
-    
+
     /**
      * Get the address from the provided endpoint reference.
      * @param ref - the endpoint reference
@@ -71,14 +71,14 @@ public final class WSAEndpointReferenceUtils {
      */
     public static String getAddress(EndpointReferenceType ref) {
         AttributedURIType a = ref.getAddress();
-        
+
         if (null != a) {
             return a.getValue();
         }
         // should wsdl be parsed for an address now?
         return null;
     }
-    
+
     /**
      * Create a duplicate endpoint reference sharing all atributes
      * @param ref the reference to duplicate
@@ -92,7 +92,7 @@ public final class WSAEndpointReferenceUtils {
         reference.setAddress(ref.getAddress());
         return reference;
     }
-    
+
     /**
      * Create an endpoint reference for the provided address.
      * @param address - address URI
@@ -104,25 +104,25 @@ public final class WSAEndpointReferenceUtils {
         setAddress(reference, address);
         return reference;
     }
-    
+
     public static EndpointReferenceType getEndpointReference(AttributedURIType address) {
 
         EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
         reference.setAddress(address);
         return reference;
-    }    
-    
+    }
+
     /**
      * Create an anonymous endpoint reference.
      * @return EndpointReferenceType - the endpoint reference
      */
     public static EndpointReferenceType getAnonymousEndpointReference() {
-        
+
         EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
         setAddress(reference, ANONYMOUS_ADDRESS);
         return reference;
     }
-    
+
 }
 
 

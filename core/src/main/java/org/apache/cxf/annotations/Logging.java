@@ -31,32 +31,33 @@ import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 /**
  * Enables message Logging
  */
+@Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 @Inherited
 public @interface Logging {
     /**
-     * The size limit at which messages are truncated in the log 
+     * The size limit at which messages are truncated in the log
      */
     int limit() default AbstractLoggingInterceptor.DEFAULT_LIMIT;
- 
+
     /**
      * the locations where the messages are logged.   The default is
-     * <logger> which means to log to the java.util.logging.Logger, 
-     * but <stdout>, <stderr>, and a "file:/.." URI are acceptable. 
+     * <logger> which means to log to the java.util.logging.Logger,
+     * but <stdout>, <stderr>, and a "file:/.." URI are acceptable.
      */
     String inLocation() default "<logger>";
     String outLocation() default "<logger>";
-    
-    
+
+
     /**
      * For XML content, turn on pretty printing in the logs
      */
     boolean pretty() default false;
-    
+
     /**
-     * Ignore binary payloads by default 
+     * Ignore binary payloads by default
      */
     boolean showBinary() default false;
 }

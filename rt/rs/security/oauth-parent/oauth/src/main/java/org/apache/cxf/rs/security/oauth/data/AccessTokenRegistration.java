@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oauth.data;
 
 /**
  * Captures the information associated with the access token registration request.
- * @see AccessToken  
+ * @see AccessToken
  */
 public class AccessTokenRegistration {
     private RequestToken requestToken;
@@ -33,5 +33,5 @@ public class AccessTokenRegistration {
     public RequestToken getRequestToken() {
         return requestToken;
     }
-    
+
 }

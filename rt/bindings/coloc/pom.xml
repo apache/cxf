@@ -27,13 +27,15 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.binding.coloc</cxf.module.name>
         <cxf.osgi.import>
             org.springframework*;resolution:=optional;version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}"
         </cxf.osgi.import>
         <cxf.bundle.activator>org.apache.cxf.binding.coloc.blueprint.Activator</cxf.bundle.activator>
         <!-- keep in sync with services exported in activator -->

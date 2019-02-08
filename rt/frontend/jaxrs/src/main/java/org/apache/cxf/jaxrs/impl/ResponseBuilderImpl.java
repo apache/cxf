@@ -43,11 +43,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
-    
+
     private int status = 200;
+    private String reasonPhrase;
     private boolean statusSet;
     private Object entity;
-    private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
+    private MultivaluedMap<String, Object> metadata = new MetadataMap<>();
     private Annotation[] annotations;
 
     public ResponseBuilderImpl() {
@@ -56,30 +57,43 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     private ResponseBuilderImpl(ResponseBuilderImpl copy) {
         status = copy.status;
         statusSet = copy.statusSet;
+        reasonPhrase = copy.reasonPhrase;
         metadata.putAll(copy.metadata);
         entity = copy.entity;
     }
-       
+
     public Response build() {
         if (entity == null && !statusSet) {
             status = 204;
         }
-        ResponseImpl r = new ResponseImpl(status);
-        MetadataMap<String, Object> m = 
-            new MetadataMap<String, Object>(metadata, false, true);
+        ResponseImpl r = new ResponseImpl(status, null, reasonPhrase);
+        MetadataMap<String, Object> m =
+            new MetadataMap<>(metadata, false, true);
         r.addMetadata(m);
         r.setEntity(entity, annotations);
         reset();
         return r;
     }
 
-    public ResponseBuilder status(int s) {
-        if (s < 100 || s > 599) {
-            throw new IllegalArgumentException("Illegal status value : " + s);
-        }
-        status = s;
+    public ResponseBuilder status(int statusCode) {
+        validateStatusCode(statusCode);
+        status = statusCode;
         statusSet = true;
         return this;
+    }
+
+    public ResponseBuilder status(int statusCode, String reason) {
+        validateStatusCode(statusCode);
+        status = statusCode;
+        statusSet = true;
+        reasonPhrase = reason;
+        return this;
+    }
+
+    private void validateStatusCode(int statusCode) {
+        if (statusCode < 100 || statusCode > 599) {
+            throw new IllegalArgumentException("Illegal status value : " + statusCode);
+        }
     }
 
     public ResponseBuilder entity(Object e) {
@@ -99,7 +113,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     public ResponseBuilder language(Locale locale) {
         return setHeader(HttpHeaders.CONTENT_LANGUAGE, locale);
     }
-    
+
     public ResponseBuilder language(String language) {
         return setHeader(HttpHeaders.CONTENT_LANGUAGE, language);
     }
@@ -108,7 +122,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         if (!loc.isAbsolute()) {
             Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
             if (currentMessage != null) {
-                
+
                 UriInfo ui = new UriInfoImpl(currentMessage.getExchange().getInMessage(), null);
                 loc = ui.getBaseUriBuilder()
                         .path(loc.getRawPath())
@@ -152,12 +166,12 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     public ResponseBuilder cookie(NewCookie... cookies) {
         return addHeader(HttpHeaders.SET_COOKIE, (Object[])cookies);
     }
-    
+
     public ResponseBuilder header(String name, Object value) {
         return addHeader(name, value);
     }
 
-    
+
     @Override
     public ResponseBuilder variant(Variant variant) {
         type(variant == null ? null : variant.getMediaType());
@@ -196,7 +210,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         handleVaryValue(acceptVary, acceptLangVary, acceptEncVary);
         return this;
     }
-    
+
     private void handleVaryValue(String ...values) {
         List<Object> varyValues = metadata.get(HttpHeaders.VARY);
         for (String v : values) {
@@ -210,7 +224,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
             }
         }
     }
-    
+
 //  CHECKSTYLE:OFF
     @Override
     public ResponseBuilder clone() {
@@ -218,14 +232,15 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     }
 //  CHECKSTYLE:ON
 
-    
+
     private void reset() {
         metadata.clear();
         entity = null;
         annotations = null;
         status = 200;
+        reasonPhrase = null;
     }
-    
+
     private ResponseBuilder setHeader(String name, Object value) {
         if (value == null) {
             metadata.remove(name);
@@ -234,25 +249,25 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         }
         return this;
     }
-    
+
     private ResponseBuilder addHeader(String name, Object... values) {
         if (values != null && values.length >= 1 && values[0] != null) {
             boolean isAllowHeader = HttpHeaders.ALLOW.equals(name);
             for (Object value : values) {
-                Object thevalue = isAllowHeader ? value.toString().toUpperCase() : value; 
+                Object thevalue = isAllowHeader ? value.toString().toUpperCase() : value;
                 if (!valueExists(name, thevalue)) {
                     metadata.add(name, thevalue);
                 }
             }
         } else {
             metadata.remove(name);
-        }    
+        }
         return this;
     }
-    
+
     private boolean valueExists(String key, Object value) {
         List<Object> values = metadata.get(key);
-        return values == null ? false : values.contains(value);
+        return values != null && values.contains(value);
     }
 
     @Override
@@ -264,9 +279,8 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     public ResponseBuilder allow(Set<String> methods) {
         if (methods == null) {
             return allow();
-        } else {
-            return allow(methods.toArray(new String[methods.size()]));
         }
+        return allow(methods.toArray(new String[0]));
     }
 
     @Override

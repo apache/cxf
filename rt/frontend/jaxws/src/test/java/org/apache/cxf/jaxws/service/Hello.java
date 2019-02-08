@@ -29,31 +29,31 @@ import javax.jws.WebService;
 public class Hello {
 
     private boolean postConstructCalled;
-    
+
     @PostConstruct
     @WebMethod(exclude = true)
     public void init() {
         postConstructCalled = true;
     }
-    
+
     @WebMethod(exclude = true)
     public boolean isPostConstructCalled() {
         return postConstructCalled;
     }
-    
+
     @WebMethod
     public String sayHi(String text) {
         return text;
     }
-    
+
     @WebMethod(action = "myaction")
     public List<String> getGreetings() {
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("Hello");
         strings.add("Bonjour");
         return strings;
     }
-    
+
     @WebMethod
     public String[] getStringArray(String[] strs) {
         String[] strings = new String[2];
@@ -63,12 +63,12 @@ public class Hello {
     }
     @WebMethod
     public List<String> getStringList(List<String> list) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.add("Hello" + list.get(0));
         ret.add("Bonjour" + list.get(1));
         return ret;
     }
-    
+
     @WebMethod
     public String addNumbers(int arg0, int arg1) throws AddNumbersSubException, AddNumbersException {
         if (arg0 + arg1 < 0) {

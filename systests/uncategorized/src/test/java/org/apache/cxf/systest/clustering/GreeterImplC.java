@@ -31,11 +31,11 @@ import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 public class GreeterImplC extends AbstractGreeterImpl {
 
     private String address;
-    
+
     GreeterImplC() {
-        address = FailoverTest.REPLICA_C;    
+        address = FailoverTest.REPLICA_C;
     }
-    
+
     public String greetMe(String s) {
         return super.greetMe(s)
                + " from: " + address;

@@ -25,11 +25,11 @@ import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.types.FaultDetail;
 
 
-@WebService(serviceName = "SOAPService2", 
-            portName = "SoapPort2", 
+@WebService(serviceName = "SOAPService2",
+            portName = "SoapPort2",
             endpointInterface = "org.apache.hello_world_doc_lit.Greeter",
             targetNamespace = "http://apache.org/hello_world_doc_lit")
-            
+
 public class GreeterImplDoc implements Greeter {
 
     public String sayHi() {
@@ -43,7 +43,7 @@ public class GreeterImplDoc implements Greeter {
     }
 
     public void greetMeOneWay(String requestType) {
-        System.out.println("*********  greetMeOneWay: " + requestType);        
+        System.out.println("*********  greetMeOneWay: " + requestType);
     }
 
     public void pingMe() throws PingMeFault {
@@ -51,7 +51,7 @@ public class GreeterImplDoc implements Greeter {
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
         throw new PingMeFault("PingMeFault raised by server", faultDetail);
-        
+
     }
 
 }

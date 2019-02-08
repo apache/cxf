@@ -47,25 +47,28 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
-import org.apache.cxf.ws.addressing.soap.VersionTransformer;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.NoSuchCodeLitFault;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public abstract class MAPTestBase extends AbstractClientServerTestBase implements VerificationCache {
     protected static final String DECOUPLE_PORT = allocatePort(MAPTestBase.class, 1);
-    
+
     protected static Bus staticBus;
 
     static final String INBOUND_KEY = "inbound";
@@ -78,16 +81,16 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     private static MAPVerifier mapVerifier;
     private static HeaderVerifier headerVerifier;
 
-    private static final QName SERVICE_NAME = 
+    private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
-    
+
     private static Map<Object, Map<String, String>> messageIDs =
-        new HashMap<Object, Map<String, String>>();
+        new HashMap<>();
     protected Greeter greeter;
     private String verified;
-    
 
-    
+
+
     @AfterClass
     public static void shutdownBus() throws Exception {
         staticBus.shutdown(true);
@@ -96,9 +99,9 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         mapVerifier = null;
         headerVerifier = null;
     }
-    
+
     public abstract String getPort();
-    
+
     private void addInterceptors(List<Interceptor<? extends Message>> chain,
                                  Interceptor<? extends Message>[] interceptors) {
         for (int i = 0; i < interceptors.length; i++) {
@@ -111,20 +114,20 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             chain.remove(interceptors[i]);
         }
     }
-    
+
     public abstract String getConfigFileName();
     public abstract String getAddress();
-    
+
     @Before
     public void setUp() throws Exception {
         //super.setUp();
-        
+
         if (staticBus == null) {
             SpringBusFactory bf = new SpringBusFactory();
             staticBus = bf.createBus(getConfigFileName());
             BusFactory.setDefaultBus(staticBus);
         }
-                
+
         messageIDs.clear();
         mapVerifier = new MAPVerifier();
         headerVerifier = new HeaderVerifier();
@@ -133,13 +136,13 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         addInterceptors(staticBus.getOutInterceptors(), interceptors);
         addInterceptors(staticBus.getOutFaultInterceptors(), interceptors);
         addInterceptors(staticBus.getInFaultInterceptors(), interceptors);
-        
-        EndpointReferenceType target = 
+
+        EndpointReferenceType target =
             EndpointReferenceUtils.getEndpointReference(getAddress());
-        ReferenceParametersType params = 
+        ReferenceParametersType params =
             ContextUtils.WSA_OBJECT_FACTORY.createReferenceParametersType();
         JAXBElement<String> param =
-             new JAXBElement<String>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
+             new JAXBElement<>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
         params.getAny().add(param);
         target.setReferenceParameters(params);
         greeter = createGreeter(target);
@@ -150,13 +153,13 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         return getClass().getResource("/wsdl/hello_world.wsdl");
     }
     public Greeter createGreeter(EndpointReferenceType target) throws Exception {
-        ServiceImpl serviceImpl = 
+        ServiceImpl serviceImpl =
             ServiceDelegateAccessor.get(new SOAPService(getWSDLURL(), SERVICE_NAME));
         Greeter g = serviceImpl.getPort(target, Greeter.class);
         updateAddressPort(g, getPort());
         return g;
     }
-    
+
     @After
     public void tearDown() throws Exception {
         Interceptor<?>[] interceptors = {mapVerifier, headerVerifier };
@@ -175,18 +178,18 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         verified = null;
         messageIDs.clear();
     }
-        
+
     //--Tests
     @Test
     public void testImplicitMAPs() throws Exception {
         try {
             String greeting = greeter.greetMe("implicit1");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello implicit1",
                          greeting);
             checkVerification();
             greeting = greeter.greetMe("implicit2");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello implicit2",
                          greeting);
             checkVerification();
@@ -199,15 +202,15 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     public void testExplicitMAPs() throws Exception {
         try {
             String msgId = "urn:uuid:12345-" + Math.random();
-            Map<String, Object> requestContext = 
+            Map<String, Object> requestContext =
                 ((BindingProvider)greeter).getRequestContext();
             AddressingProperties maps = new AddressingProperties();
-            AttributedURIType id = 
+            AttributedURIType id =
                 ContextUtils.getAttributedURI(msgId);
             maps.setMessageID(id);
             requestContext.put(CLIENT_ADDRESSING_PROPERTIES, maps);
             String greeting = greeter.greetMe("explicit1");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello explicit1",
                          greeting);
             checkVerification();
@@ -228,14 +231,14 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             maps.setMessageID(null);
             //maps.setRelatesTo(ContextUtils.getRelatesTo(id.getValue()));
             greeting = greeter.greetMe("explicit3");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello explicit3",
                          greeting);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
     }
-    
+
     @Test
     public void testOneway() throws Exception {
         try {
@@ -245,8 +248,8 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             throw (Exception)ex.getCause();
         }
     }
-    
-    
+
+
     @Test
     public void testApplicationFault() throws Exception {
         try {
@@ -258,7 +261,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             throw (Exception)ex.getCause();
         }
         String greeting = greeter.greetMe("intra-fault");
-        assertEquals("unexpected response received from service", 
+        assertEquals("unexpected response received from service",
                      "Hello intra-fault",
                      greeting);
         try {
@@ -270,22 +273,22 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             throw (Exception)ex.getCause();
         }
     }
-    
+
 
     @Test
     public void testVersioning() throws Exception {
         try {
-            // expect two MAPs instances versioned with 200408, i.e. for both 
+            // expect two MAPs instances versioned with 200408, i.e. for both
             // the partial and full responses
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
-            mapVerifier.expectedExposedAs.add(VersionTransformer.Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.expectedExposedAs.add(Names200408.WSA_NAMESPACE_NAME);
+            mapVerifier.expectedExposedAs.add(Names200408.WSA_NAMESPACE_NAME);
             String greeting = greeter.greetMe("versioning1");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello versioning1",
                          greeting);
             checkVerification();
             greeting = greeter.greetMe("versioning2");
-            assertEquals("unexpected response received from service", 
+            assertEquals("unexpected response received from service",
                          "Hello versioning2",
                          greeting);
             checkVerification();
@@ -313,14 +316,14 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
      * @param checkPoint the check point
      * @return null if all expected MAPs present, otherwise an error string.
      */
-    protected static String verifyMAPs(AddressingProperties maps, 
+    protected static String verifyMAPs(AddressingProperties maps,
                                        Object checkPoint) {
         if (maps == null) {
             return "expected MAPs";
         }
-        //String rt = maps.getReplyTo() != null ? maps.getReplyTo().getAddress().getValue() : "null"; 
+        //String rt = maps.getReplyTo() != null ? maps.getReplyTo().getAddress().getValue() : "null";
         //System.out.println("verifying MAPs: " + maps
-        //                   + " id: " + maps.getMessageID().getValue() 
+        //                   + " id: " + maps.getMessageID().getValue()
         //                   + " to: " + maps.getTo().getValue()
         //                   + " reply to: " + rt);
         // MessageID
@@ -333,14 +336,14 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         }
         // ensure MessageID is unique for this check point
         Map<String, String> checkPointMessageIDs = messageIDs.get(checkPoint);
-        if (checkPointMessageIDs != null) { 
+        if (checkPointMessageIDs != null) {
             if (checkPointMessageIDs.containsKey(id)) {
                 //return "MessageID MAP duplicate: " + id;
                 return null;
             }
         } else {
-            checkPointMessageIDs = new HashMap<String, String>();
-            messageIDs.put(checkPoint, checkPointMessageIDs);    
+            checkPointMessageIDs = new HashMap<>();
+            messageIDs.put(checkPoint, checkPointMessageIDs);
         }
         checkPointMessageIDs.put(id, id);
         // To
@@ -365,19 +368,19 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         //System.out.println("verifying headers: " + wsaHeaders);
         String ret = null;
         if (!wsaHeaders.contains(Names.WSA_MESSAGEID_NAME)) {
-            ret = "expected MessageID header"; 
+            ret = "expected MessageID header";
         }
         if (!wsaHeaders.contains(Names.WSA_TO_NAME)) {
             ret = "expected To header";
         }
-       
-        if (replyToRequired 
+
+        if (replyToRequired
             && !(wsaHeaders.contains(Names.WSA_REPLYTO_NAME)
                 || wsaHeaders.contains(Names.WSA_RELATESTO_NAME))) {
             ret = "expected ReplyTo or RelatesTo header";
         }
         /*
-        if (partial) { 
+        if (partial) {
             if (!wsaHeaders.contains(Names.WSA_FROM_NAME)) {
                 ret = "expected From header";
             }
@@ -385,7 +388,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             // REVISIT Action missing from full response
             //if (!wsaHeaders.contains(Names.WSA_ACTION_NAME)) {
             //    ret = "expected Action header";
-            //}            
+            //}
         }
         */
         if (requestLeg && !(wsaHeaders.contains(CUSTOMER_NAME.getLocalPart()))) {

@@ -37,35 +37,40 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ApplicationContextTest extends Assert {
-    
-    private static final String S1 = 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
+public class ApplicationContextTest {
+
+    private static final String S1 =
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();
-    
+
     @Before
     public void setUp() {
         BusFactory.setDefaultBus(null);
     }
-    
+
     @After
     public void clearBus() {
         BusFactory.setDefaultBus(null);
     }
-    
- 
+
+
     @Test
     public void testInvalid() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http_jetty/spring/invalid-beans.xml").toString();
-    
+
         try {
             new TestApplicationContext(new String[] {S1, s4}).close();
             fail("Expected XmlBeanDefinitionStoreException not thrown.");
@@ -73,110 +78,109 @@ public class ApplicationContextTest extends Assert {
             assertTrue(ex.getCause() instanceof SAXParseException);
         }
     }
-    
+
     @Test
     public void testContext() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http_jetty/spring/beans.xml").toString();
-        
+
         TestApplicationContext ctx = new TestApplicationContext(
             new String[] {S1, s4});
-        
+
         //ctx.refresh();
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
     @Test
     public void testContextWithProperties() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http_jetty/spring/beans-props.xml").toString();
-        
+
         TestApplicationContext ctx = new TestApplicationContext(
             new String[] {S1, s4});
         checkContext(ctx);
         ctx.close();
-        ctx.destroy();
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);
-        
+
         EndpointInfo info = getEndpointInfo("bla", "Foo", "http://localhost:9000");
-        
+
         Bus bus = (Bus) ctx.getBean(Bus.DEFAULT_BUS_ID);
         bus.setExtension(cfg, Configurer.class);
-        
+
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         DestinationFactory factory = dfm.getDestinationFactory("http://cxf.apache.org/transports/http");
         Destination d = factory.getDestination(info, bus);
         assertTrue(d instanceof JettyHTTPDestination);
-        JettyHTTPDestination jd = (JettyHTTPDestination) d;        
-        assertEquals("foobar", jd.getServer().getContentEncoding());   
-        
+        JettyHTTPDestination jd = (JettyHTTPDestination) d;
+        assertEquals("foobar", jd.getServer().getContentEncoding());
+
         JettyHTTPServerEngine engine = (JettyHTTPServerEngine)jd.getEngine();
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
         assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
-        
+
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
         HTTPConduit conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(97, conduit.getClient().getConnectionTimeout());
-        
+
         info.setName(new QName("urn:test:ns", "Bar"));
         conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(79, conduit.getClient().getConnectionTimeout());
 
-        JettyHTTPDestination jd2 = 
+        JettyHTTPDestination jd2 =
             (JettyHTTPDestination)factory.getDestination(
                 getEndpointInfo("foo", "bar", "http://localhost:9001"), bus);
-        
+
         engine = (JettyHTTPServerEngine)jd2.getEngine();
         assertEquals(40000, engine.getMaxIdleTime());
         assertFalse(engine.getSendServerVersion());
         assertEquals(99, engine.getThreadingParameters().getMinThreads());
         assertEquals(777, engine.getThreadingParameters().getMaxThreads());
         assertEquals("AnotherPrefix", engine.getThreadingParameters().getThreadNamePrefix());
-        
+
+        assertEquals("session timeout should be 600 secs", 600, engine.getSessionTimeout());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
         assertNotNull("The handlers should not be null", engine.getHandlers());
         assertEquals(1, engine.getHandlers().size());
-        
-        JettyHTTPDestination jd3 = 
+
+        JettyHTTPDestination jd3 =
             (JettyHTTPDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo", "https://localhost:9002"), bus);
-        
+
         engine = (JettyHTTPServerEngine)jd3.getEngine();
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
         assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
-        
-        JettyHTTPDestination jd4 = 
+
+        JettyHTTPDestination jd4 =
             (JettyHTTPDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
-        
+
         engine = (JettyHTTPServerEngine)jd4.getEngine();
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
 
-        JettyHTTPDestination jd5 = 
+        JettyHTTPDestination jd5 =
             (JettyHTTPDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo", "http://localhost:9100"), bus);
-        
+
         engine = (JettyHTTPServerEngine)jd5.getEngine();
         String r = "expected fallback thread parameters configured for port 0";
         assertNotNull(r, engine.getThreadingParameters());
         assertEquals(r, 21, engine.getThreadingParameters().getMinThreads());
         assertEquals(r, 389, engine.getThreadingParameters().getMaxThreads());
     }
-    
-    private EndpointInfo getEndpointInfo(String serviceNS, 
-                                         String endpointLocal, 
+
+    private EndpointInfo getEndpointInfo(String serviceNS,
+                                         String endpointLocal,
                                          String address) {
         ServiceInfo serviceInfo2 = new ServiceInfo();
-        serviceInfo2.setName(new QName(serviceNS, "Service"));        
+        serviceInfo2.setName(new QName(serviceNS, "Service"));
         EndpointInfo info2 = new EndpointInfo(serviceInfo2, "");
         info2.setName(new QName("urn:test:ns", endpointLocal));
         info2.setAddress(address);

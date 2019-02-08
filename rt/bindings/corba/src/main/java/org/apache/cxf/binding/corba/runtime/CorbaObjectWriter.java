@@ -126,9 +126,10 @@ public class CorbaObjectWriter {
             break;
         case TCKind._tk_objref:
             this.writeObjectReference((CorbaObjectReferenceHandler)obj);
-            break;            
+            break;
         default:
-        // TODO: Provide Implementation. Do we throw an exception.
+            throw new CorbaBindingException("CorbaObjectWriter: unhandled TypeCode.Kind: "
+                                            + obj.getTypeCode().kind().value());
         }
     }
 
@@ -265,14 +266,14 @@ public class CorbaObjectWriter {
         Enum enumType = (Enum)enumHandler.getType();
         String enumLabel = enumHandler.getValue();
         List<Enumerator> enumerators = enumType.getEnumerator();
-        
+
         for (int i = 0; i < enumerators.size(); ++i) {
             if (enumerators.get(i).getValue().equals(enumLabel)) {
                 stream.write_long(i);
                 return;
             }
         }
-        
+
         throw new CorbaBindingException("CorbaObjectWriter: unable to find enumeration label");
     }
 
@@ -309,9 +310,9 @@ public class CorbaObjectWriter {
     }
 
     public void writeUnion(CorbaObjectHandler obj) throws CorbaBindingException {
-        Union unionType = (Union) obj.getType();        
+        Union unionType = (Union) obj.getType();
         List<Unionbranch> branches = unionType.getUnionbranch();
-        if (branches.size() > 0) {             
+        if (!branches.isEmpty()) {
             CorbaObjectHandler discriminator = ((CorbaUnionHandler)obj).getDiscriminator();
             this.write(discriminator);
             CorbaObjectHandler unionValue = ((CorbaUnionHandler)obj).getValue();
@@ -344,8 +345,8 @@ public class CorbaObjectWriter {
             }
         }
     }
-    
+
     public void writeObjectReference(CorbaObjectReferenceHandler objHandler) throws CorbaBindingException {
         stream.write_Object(objHandler.getReference());
-    }   
+    }
 }

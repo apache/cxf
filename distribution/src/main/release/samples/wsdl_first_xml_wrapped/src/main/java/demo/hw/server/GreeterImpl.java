@@ -23,7 +23,7 @@ import org.apache.hello_world_xml_http.wrapped.Greeter;
 import org.apache.hello_world_xml_http.wrapped.PingMeFault;
 import org.apache.hello_world_xml_http.wrapped.types.FaultDetail;
 
-@javax.jws.WebService(serviceName = "XMLService", 
+@javax.jws.WebService(serviceName = "XMLService",
                       portName = "XMLPort",
                       endpointInterface = "org.apache.hello_world_xml_http.wrapped.Greeter",
                       targetNamespace = "http://apache.org/hello_world_xml_http/wrapped")

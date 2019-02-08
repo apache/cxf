@@ -37,13 +37,17 @@ import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JaxWsClientThreadTest extends AbstractCXFTest {
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
-    
+
     @Test
     public void testRequestContextThreadSafety() throws Throwable {
 
@@ -54,12 +58,12 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
 
         ((BindingProvider)handler).getRequestContext().put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT,
                                                            Boolean.TRUE);
-        
+
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
-        
+
         String address = (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
 
-        final Throwable errorHolder[] = new Throwable[1];
+        final Throwable[] errorHolder = new Throwable[1];
 
         Runnable r = new Runnable() {
             public void run() {
@@ -85,11 +89,11 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                             assertTrue("protocol contains thread id from context", mue.getMessage()
                                 .indexOf(protocol) != 0);
                         }
-                        
+
                         requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
                         assertTrue("property is null", requestContext
                                      .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
-                        
+
                     }
                 } catch (Throwable t) {
                     // capture assert failures
@@ -97,7 +101,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                 }
             }
         };
-        
+
         final int numThreads = 5;
         Thread[] threads = new Thread[numThreads];
         for (int i = 0; i < numThreads; i++) {
@@ -118,7 +122,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
 
         // get the latest values
-        
+
         ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
         assertTrue("address is different", !address.equals(requestContext
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
@@ -126,9 +130,9 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         assertTrue("property is null from last thread execution", requestContext
                    .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
     }
-    
-    
-    
+
+
+
     @Test
     public void testRequestContextThreadSafetyDispatch() throws Throwable {
 
@@ -139,12 +143,12 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
 
         disp.getRequestContext().put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT,
                                      Boolean.TRUE);
-        
+
         Map<String, Object> requestContext = disp.getRequestContext();
-        
+
         String address = (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
 
-        final Throwable errorHolder[] = new Throwable[1];
+        final Throwable[] errorHolder = new Throwable[1];
 
         Runnable r = new Runnable() {
             public void run() {
@@ -172,11 +176,11 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                             assertTrue("protocol contains thread id from context", mue.getMessage()
                                 .indexOf(protocol) != 0);
                         }
-                        
+
                         requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
                         assertTrue("property is null", requestContext
                                      .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
-                        
+
                     }
                 } catch (Throwable t) {
                     // capture assert failures
@@ -184,7 +188,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                 }
             }
         };
-        
+
         final int numThreads = 5;
         Thread[] threads = new Thread[numThreads];
         for (int i = 0; i < numThreads; i++) {
@@ -205,7 +209,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
 
         // get the latest values
-        
+
         ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
         assertTrue("address is different", !address.equals(requestContext
             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
@@ -215,4 +219,3 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
     }
 
 }
-

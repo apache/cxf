@@ -26,7 +26,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * 
+ *
  */
 public interface DomainExpression {
     boolean appliesTo(BindingFaultInfo bfi);

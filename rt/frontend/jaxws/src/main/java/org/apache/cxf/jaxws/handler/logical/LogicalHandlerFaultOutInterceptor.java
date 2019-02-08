@@ -44,18 +44,18 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 
-public class LogicalHandlerFaultOutInterceptor 
+public class LogicalHandlerFaultOutInterceptor
     extends AbstractJAXWSHandlerInterceptor<Message> {
-    
+
     public static final String ORIGINAL_WRITER = "original_writer";
 
     LogicalHandlerFaultOutEndingInterceptor ending;
-    
+
     public LogicalHandlerFaultOutInterceptor(Binding binding) {
         super(binding, Phase.PRE_MARSHAL);
         ending = new LogicalHandlerFaultOutEndingInterceptor(binding);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         if (binding.getHandlerChain().isEmpty()) {
             return;
@@ -64,7 +64,7 @@ public class LogicalHandlerFaultOutInterceptor
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
         }
-        
+
         XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
         Document doc = DOMUtils.newDocument();
         message.setContent(Node.class, doc);
@@ -78,28 +78,28 @@ public class LogicalHandlerFaultOutInterceptor
         // Replace stax writer with DomStreamWriter
         message.setContent(XMLStreamWriter.class, writer);
         message.put(ORIGINAL_WRITER, origWriter);
-            
+
         message.getInterceptorChain().add(ending);
     }
-    
-    
-    private class LogicalHandlerFaultOutEndingInterceptor 
+
+
+    private static class LogicalHandlerFaultOutEndingInterceptor
         extends AbstractJAXWSHandlerInterceptor<Message> {
-    
+
         LogicalHandlerFaultOutEndingInterceptor(Binding binding) {
             super(binding, Phase.POST_MARSHAL);
         }
-    
-        public void handleMessage(Message message) throws Fault {            
+
+        public void handleMessage(Message message) throws Fault {
             W3CDOMStreamWriter domWriter = (W3CDOMStreamWriter)message.getContent(XMLStreamWriter.class);
             XMLStreamWriter origWriter = (XMLStreamWriter)message
-                .get(LogicalHandlerFaultOutInterceptor.ORIGINAL_WRITER);      
-            
+                .get(LogicalHandlerFaultOutInterceptor.ORIGINAL_WRITER);
+
             HandlerChainInvoker invoker = getInvoker(message);
             LogicalMessageContextImpl lctx = new LogicalMessageContextImpl(message);
             invoker.setLogicalMessageContext(lctx);
             boolean requestor = isRequestor(message);
-            
+
             XMLStreamReader reader = (XMLStreamReader)message.get("LogicalHandlerInterceptor.INREADER");
             SOAPMessage origMessage = null;
             if (reader != null) {
@@ -110,21 +110,21 @@ public class LogicalHandlerFaultOutInterceptor
                 Source source = new DOMSource(domWriter.getDocument());
                 message.setContent(Source.class, source);
                 message.setContent(Node.class, domWriter.getDocument());
-                message.setContent(XMLStreamReader.class, 
+                message.setContent(XMLStreamReader.class,
                                    StaxUtils.createXMLStreamReader(domWriter.getDocument()));
             }
-            
+
             try {
                 if (!invoker.invokeLogicalHandlersHandleFault(requestor, lctx)) {
                     // handleAbort(message, context);
                 }
             } catch (RuntimeException exception) {
                 Exchange exchange = message.getExchange();
-                
+
                 Exception ex = new Fault(exception);
 
-                FaultMode mode = message.get(FaultMode.class);                
-                
+                FaultMode mode = message.get(FaultMode.class);
+
                 Message faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {
                     faultMessage = new MessageImpl();
@@ -137,22 +137,22 @@ public class LogicalHandlerFaultOutInterceptor
                 }
                 exchange.setOutMessage(null);
                 exchange.setOutFaultMessage(faultMessage);
-            
+
                 InterceptorChain ic = message.getInterceptorChain();
                 ic.reset();
-                
+
                 onCompletion(message);
-                
+
                 faultMessage.setInterceptorChain(ic);
                 ic.doIntercept(faultMessage);
-                
+
                 return;
-            }          
-            
+            }
+
             if (origMessage != null) {
                 message.setContent(SOAPMessage.class, origMessage);
             }
-            
+
             try {
                 reader = message.getContent(XMLStreamReader.class);
                 message.removeContent(XMLStreamReader.class);
@@ -165,7 +165,7 @@ public class LogicalHandlerFaultOutInterceptor
             } catch (XMLStreamException e) {
                 throw new Fault(e);
             }
-        }        
+        }
     }
-    
+
 }

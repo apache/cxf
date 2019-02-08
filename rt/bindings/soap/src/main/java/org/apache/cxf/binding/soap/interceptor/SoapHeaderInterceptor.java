@@ -65,7 +65,7 @@ import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SoapHeaderInterceptor.class);
-    
+
     public SoapHeaderInterceptor() {
         super(Phase.UNMARSHAL);
         addAfter(BareInInterceptor.class.getName());
@@ -92,19 +92,19 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         if (bop.isUnwrapped()) {
             bop = bop.getWrappedOperation();
         }
-        
+
         boolean client = isRequestor(message);
         BindingMessageInfo bmi = client ? bop.getOutput() : bop.getInput();
         if (bmi == null) {
             // one way operation.
             return;
         }
-        
+
         List<SoapHeaderInfo> headers = bmi.getExtensors(SoapHeaderInfo.class);
-        if (headers == null || headers.size() == 0) {
+        if (headers == null || headers.isEmpty()) {
             return;
         }
-        
+
         boolean supportsNode = this.supportsDataReader(message, Node.class);
         Service service = ServiceModelUtil.getService(message.getExchange());
         for (SoapHeaderInfo header : headers) {
@@ -124,18 +124,18 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
             if (mpi.getTypeClass() != null) {
 
                 Header param = findHeader(message, mpi);
-                
+
                 Object object = null;
                 if (param != null) {
                     message.getHeaders().remove(param);
-                    
+
                     if (param.getDataBinding() == null) {
                         Node source = (Node)param.getObject();
                         if (source instanceof Element) {
                             //need to remove these attributes as they
                             //would cause validation failures
                             Element el = (Element)source;
-                            
+
                             el.removeAttributeNS(soapVersion.getNamespace(),
                                               soapVersion.getAttrNameMustUnderstand());
                             el.removeAttributeNS(soapVersion.getNamespace(),
@@ -149,18 +149,18 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                                 reader.nextTag(); //advance into the first tag
                             } catch (XMLStreamException e) {
                                 //ignore
-                            } 
+                            }
                             object = getDataReader(message, XMLStreamReader.class).read(mpi, reader);
                         }
                     } else {
                         object = param.getObject();
                     }
-                    
+
                 }
                 parameters.put(mpi, object);
             }
         }
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
         }
     }
@@ -196,10 +196,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                     };
                     v.setErrorHandler(errorHandler);
                     v.validate(ds);
-                } catch (SAXException e) {
-                    throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
-                        .getCanonicalName(), e.getMessage());
-                } catch (IOException e) {
+                } catch (SAXException | IOException e) {
                     throw new Fault("COULD_NOT_VALIDATE_SOAP_HEADER_CAUSED_BY", LOG, e, e.getClass()
                         .getCanonicalName(), e.getMessage());
                 }

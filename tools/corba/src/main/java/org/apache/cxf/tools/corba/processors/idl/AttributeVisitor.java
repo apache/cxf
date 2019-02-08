@@ -57,15 +57,15 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class AttributeVisitor extends VisitorBase {
 
-    private static Map<String, String> duplicateTypeTrackerMap = new HashMap<String, String>();
-//    private static Map<String, String> duplicateMessageTrackerMap = new HashMap<String, String>();
+    private static Map<String, String> duplicateTypeTrackerMap = new HashMap<>();
+//    private static Map<String, String> duplicateMessageTrackerMap = new HashMap<>();
 
-    private static final String GETTER_PREFIX     = "_get_";
-    private static final String SETTER_PREFIX     = "_set_";
-    private static final String RESULT_POSTFIX    = "Result";
-    private static final String RESPONSE_POSTFIX  = "Response";
-    private static final String PART_NAME         = "parameters";
-    private static final String PARAM_NAME        = "_arg";
+    private static final String GETTER_PREFIX = "_get_";
+    private static final String SETTER_PREFIX = "_set_";
+    private static final String RESULT_POSTFIX = "Result";
+    private static final String RESPONSE_POSTFIX = "Response";
+    private static final String PART_NAME = "parameters";
+    private static final String PARAM_NAME = "_arg";
     private static final String RETURN_PARAM_NAME = "return";
 
     private ExtensionRegistry   extReg;

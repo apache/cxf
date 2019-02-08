@@ -34,14 +34,19 @@ if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 
 set CXF_JAR=%CXF_HOME%\lib\cxf-manifest.jar
 
-"%JAVA_HOME%\bin\java" -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.management.utils.ManagementConsole %*
+if "%JAVA_MAX_MEM%" == "" (
+   set JAVA_MAX_MEM=512M
+)
+
+
+"%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.management.utils.ManagementConsole %*
 
 rem @endlocal
 
 goto end
 
 :no_java_home
-echo ERROR: Set JAVA_HOME to the path where the J2SE 6.0 (JDK6.0) is installed
+echo ERROR: Set JAVA_HOME to the path where the Java Development Kit (JDK) is installed
 goto end 
 
 :no_cxf_jar

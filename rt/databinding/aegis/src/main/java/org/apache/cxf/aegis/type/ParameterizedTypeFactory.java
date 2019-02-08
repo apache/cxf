@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 public final class ParameterizedTypeFactory {
     private ParameterizedTypeFactory() {
     }
-    
+
     public static ParameterizedType createParameterizedType(Class<?> rawType, Type[] parameters) {
         return new SimpleParameterizedType(rawType, parameters);
     }

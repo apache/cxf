@@ -20,48 +20,49 @@
 package org.apache.cxf.systest.jaxb.validators;
 
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 /**
- * 
+ *
  */
 @ContextConfiguration(locations = { "classpath:jaxbCustomValidators.xml" })
 public class CustomValidatorJAXBTest extends AbstractJUnit4SpringContextTests {
     static final String PORT = TestUtil.getPortNumber(CustomValidatorJAXBTest.class);
-   
+
     @Test
     public void cleanTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
-        
+
         PassedObject hi = client.sayHi(new PassedObject("John", "Doe"));
         Assert.assertTrue("Expected: 'Hello John Doe' Actual: " + hi.getName(),
                 "Hello John Doe".equals(hi.getName()));
-        
+
     }
-    
+
     @Test
     public void sendNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
-        
+
         PassedObject hi = client.sayHi(new PassedObject());
         Assert.assertTrue("Expected: 'Hello null null' Actual: '" + hi.getName() + "'",
                 "Hello null null".equals(hi.getName()));
-        
+
     }
-    
+
     @Test
     public void returnNullTest() {
-        HelloWorld client = (HelloWorld)applicationContext
+        HelloWorld client = applicationContext
                 .getBean("testClient", HelloWorld.class);
-        
+
         PassedObject hi = client.returnNull(new PassedObject("John", "Doe"));
         Assert.assertTrue("Expected: 'Hello null' Actual: '" + hi.getName() + "'",
                 "Hello null".equals(hi.getName()));
-        
+
     }
 }

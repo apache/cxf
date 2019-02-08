@@ -45,17 +45,17 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 
 public abstract class AbstractGreeterImpl implements Greeter {
     VerificationCache verificationCache;
-    
+
     /**
      * Injectable context.
      */
     @Resource
     private WebServiceContext context;
     private boolean quiet;
-    
+
     public AbstractGreeterImpl() {
     }
-    
+
     public AbstractGreeterImpl(boolean q) {
         quiet = q;
     }
@@ -86,7 +86,7 @@ public abstract class AbstractGreeterImpl implements Greeter {
         return "Hello, finally";
     }
 
-    public void greetMeOneWay(String requestType) {   
+    public void greetMeOneWay(String requestType) {
         if (!quiet) {
             System.out.println("\n\n*** GreetMeOneWay called with: " + requestType + "***\n\n");
         }
@@ -97,7 +97,7 @@ public abstract class AbstractGreeterImpl implements Greeter {
         verifyMAPs();
         return "Bonjour";
     }
-    
+
     public void testDocLitFault(String faultType) throws BadRecordLitFault, NoSuchCodeLitFault {
         verifyMAPs();
         if (faultType.equals(BadRecordLitFault.class.getSimpleName())) {
@@ -125,63 +125,63 @@ public abstract class AbstractGreeterImpl implements Greeter {
             String property = ADDRESSING_PROPERTIES_INBOUND;
             AddressingProperties maps = (AddressingProperties)
                 context.getMessageContext().get(property);
-            verificationCache.put(MAPTest.verifyMAPs(maps, this));
+            verificationCache.put(MAPTestBase.verifyMAPs(maps, this));
         }
     }
 
     public String greetMeSometime(String me) {
         return "How are you " + me;
     }
-    
-    public Future<?>  greetMeSometimeAsync(String requestType, 
-                                           AsyncHandler<GreetMeSometimeResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?>  greetMeSometimeAsync(String requestType,
+                                           AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
+        return null;
         /*not called */
     }
-    
-    public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) { 
-        return null; 
+
+    public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) {
+        return null;
         /*not called */
     }
-    
-    public Response<TestDocLitFaultResponse> testDocLitFaultAsync(String faultType) {  
-        return null; 
+
+    public Response<TestDocLitFaultResponse> testDocLitFaultAsync(String faultType) {
+        return null;
         /*not called */
     }
-    
-    
+
+
     public Response<BareDocumentResponse> testDocLitBareAsync(String bare) {
         return null;
         /* not called */
     }
-    
-    public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
+        return null;
         /*not called */
     }
-    
-    public Response<GreetMeResponse> greetMeAsync(String requestType) { 
-        return null; 
+
+    public Response<GreetMeResponse> greetMeAsync(String requestType) {
+        return null;
         /*not called */
     }
-    
-    public Future<?> greetMeLaterAsync(long requestType, AsyncHandler<GreetMeLaterResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> greetMeLaterAsync(long requestType, AsyncHandler<GreetMeLaterResponse> asyncHandler) {
+        return null;
         /*not called */
     }
-    
-    public Response<GreetMeLaterResponse> greetMeLaterAsync(long requestType) { 
-        return null; 
+
+    public Response<GreetMeLaterResponse> greetMeLaterAsync(long requestType) {
+        return null;
         /*not called */
     }
-    
-    public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) {
+        return null;
         /*not called */
     }
-    
-    public Response<SayHiResponse> sayHiAsync() { 
-        return null; 
+
+    public Response<SayHiResponse> sayHiAsync() {
+        return null;
         /*not called */
     }
 
@@ -193,8 +193,8 @@ public abstract class AbstractGreeterImpl implements Greeter {
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;

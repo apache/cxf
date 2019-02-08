@@ -19,8 +19,8 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -50,31 +50,32 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
+import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.neethi.All;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.spnego.SpnegoTokenContext;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SPConstants;
-import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
+
     SpnegoContextTokenInInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(WSS4JStaxInInterceptor.class.getName());
         addBefore(HttpsTokenInInterceptor.class.getName());
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
+            Collection<AssertionInfo> ais =
                 PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
             if (ais.isEmpty()) {
                 return;
@@ -83,7 +84,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 //client side should be checked on the way out
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
-                }      
+                }
                 return;
             }
             String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
@@ -97,7 +98,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 s = inProps.getAction().getValue();
             }
 
-            if (s != null 
+            if (s != null
                 && s.contains("/RST/Issue")
                 && (s.startsWith(STSUtils.WST_NS_05_02)
                     || s.startsWith(STSUtils.WST_NS_05_12))) {
@@ -109,7 +110,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 Assertion ass = NegotiationUtils.getAddressingPolicy(aim, false);
                 all.addPolicyComponent(ass);
                 ea.addPolicyComponent(all);
-                
+
                 //setup endpoint and forward to it.
                 unmapSecurityProps(message);
                 String ns = STSUtils.WST_NS_05_12;
@@ -122,7 +123,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
     }
-    
+
     private void unmapSecurityProps(Message message) {
         Exchange ex = message.getExchange();
         for (String s : SecurityConstants.ALL_PROPERTIES) {
@@ -137,24 +138,24 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
         void doIssue(
             Element requestEl,
-            Exchange exchange, 
+            Exchange exchange,
             Element binaryExchange,
             W3CDOMStreamWriter writer,
-            String prefix, 
+            String prefix,
             String namespace
         ) throws Exception {
-            
-            SpnegoTokenContext spnegoToken = 
+
+            SpnegoTokenContext spnegoToken =
                 handleBinaryExchange(binaryExchange, exchange.getInMessage(), namespace);
-            
+
             writer.writeStartElement(prefix, "RequestSecurityTokenResponseCollection", namespace);
             writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
-            
+
             String context = requestEl.getAttributeNS(null, "Context");
             if (context != null && !"".equals(context)) {
                 writer.writeAttribute("Context", context);
             }
-            
+
             // Find TokenType and KeySize
             int keySize = 256;
             String tokenType = null;
@@ -168,22 +169,22 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         tokenType = el.getTextContent();
                     }
                 }
-                
+
                 el = DOMUtils.getNextElement(el);
             }
-            
+
             // Check received KeySize
             if (keySize < 128 || keySize > 512) {
                 keySize = 256;
             }
-            
+
             // TokenType
             writer.writeStartElement(prefix, "TokenType", namespace);
             writer.writeCharacters(tokenType);
             writer.writeEndElement();
-            
+
             writer.writeStartElement(prefix, "RequestedSecurityToken", namespace);
-            
+
             // SecurityContextToken
             SecurityContextToken sct =
                 new SecurityContextToken(
@@ -191,51 +192,51 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 );
             WSSConfig wssConfig = WSSConfig.getNewInstance();
             sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
-            
+
             // Lifetime
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + 300000L);
-            
+            Instant created = Instant.now();
+            Instant expires =
+                created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage()) / 1000L);
+
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
-            
+
             SecurityContext sc = exchange.getInMessage().get(SecurityContext.class);
             if (sc != null) {
                 token.setSecurityContext(sc);
             }
-            
+
             writer.getCurrentNode().appendChild(sct.getElement());
-            writer.writeEndElement();        
-            
+            writer.writeEndElement();
+
             // References
             writer.writeStartElement(prefix, "RequestedAttachedReference", namespace);
             token.setAttachedReference(
                 writeSecurityTokenReference(writer, "#" + sct.getID(), tokenType)
             );
             writer.writeEndElement();
-            
+
             writer.writeStartElement(prefix, "RequestedUnattachedReference", namespace);
             token.setUnattachedReference(
                 writeSecurityTokenReference(writer, sct.getIdentifier(), tokenType)
             );
             writer.writeEndElement();
-            
+
             writeLifetime(writer, created, expires, prefix, namespace);
-            
+
             // KeySize
             writer.writeStartElement(prefix, "KeySize", namespace);
             writer.writeCharacters("" + keySize);
             writer.writeEndElement();
-            
+
             byte[] secret = WSSecurityUtil.generateNonce(keySize / 8);
             byte[] key = spnegoToken.wrapKey(secret);
-            
+
             writeProofToken(writer, prefix, namespace, key);
 
             writer.writeEndElement();
-            
+
             /*
             // Second RequestSecurityTokenResponse containing the Authenticator
             // TODO
@@ -246,11 +247,11 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             writeAuthenticator(writer, prefix, namespace, secret);
             writer.writeEndElement();
             */
-            
+
             writer.writeEndElement();
-            
+
             spnegoToken.clear();
-            
+
             token.setSecret(secret);
             ((TokenStore)exchange.getEndpoint().getEndpointInfo()
                     .getProperty(TokenStore.class.getName())).add(token);
@@ -277,7 +278,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                 throw new Exception("No BinaryExchange element received");
             }
             String encoding = binaryExchange.getAttributeNS(null, "EncodingType");
-            if (!WSConstants.BASE64_ENCODING.equals(encoding)) {
+            if (!WSS4JConstants.BASE64_ENCODING.equals(encoding)) {
                 throw new Exception("Unknown encoding type: " + encoding);
             }
 
@@ -287,13 +288,13 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
 
             String content = DOMUtils.getContent(binaryExchange);
-            byte[] decodedContent = Base64.decode(content);
-            
-            String jaasContext = 
+            byte[] decodedContent = XMLUtils.decode(content);
+
+            String jaasContext =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
-            String kerberosSpn = 
+            String kerberosSpn =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
-            CallbackHandler callbackHandler = 
+            CallbackHandler callbackHandler =
                 SecurityUtils.getCallbackHandler(
                     SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message)
                 );
@@ -304,66 +305,66 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             );
             return spnegoToken;
         }
-        
+
         private void writeProofToken(
             W3CDOMStreamWriter writer,
-            String prefix, 
+            String prefix,
             String namespace,
             byte[] key
         ) throws Exception {
             // RequestedProofToken
             writer.writeStartElement(prefix, "RequestedProofToken", namespace);
-            
+
             // EncryptedKey
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptedKey", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "EncryptionMethod", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptedKey", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "EncryptionMethod", WSS4JConstants.ENC_NS);
             writer.writeAttribute("Algorithm", namespace + "/spnego#GSS_Wrap");
             writer.writeEndElement();
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherData", WSConstants.ENC_NS);
-            writer.writeStartElement(WSConstants.ENC_PREFIX, "CipherValue", WSConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherData", WSS4JConstants.ENC_NS);
+            writer.writeStartElement(WSS4JConstants.ENC_PREFIX, "CipherValue", WSS4JConstants.ENC_NS);
 
-            writer.writeCharacters(Base64.encode(key));
-            
+            writer.writeCharacters(XMLUtils.encodeToString(key));
+
             writer.writeEndElement();
             writer.writeEndElement();
             writer.writeEndElement();
-            
+
             writer.writeEndElement();
         }
-        
+
         /*
         private void writeAuthenticator(
             W3CDOMStreamWriter writer,
-            String prefix, 
+            String prefix,
             String namespace,
             byte[] secret
         ) throws Exception {
             // Authenticator
             writer.writeStartElement(prefix, "Authenticator", namespace);
-            
+
             // CombinedHash
             writer.writeStartElement(prefix, "CombinedHash", namespace);
-            
+
             P_SHA1 psha1 = new P_SHA1();
             byte[] seed = "AUTH-HASH".getBytes();
             byte[] digest = psha1.createKey(secret, seed, 0, 32);
             writer.writeCharacters(Base64.encode(digest));
-            
+
             writer.writeEndElement();
-            
+
             writer.writeEndElement();
         }
         */
 
     }
-    
-    
-    static final class SpnegoContextTokenFinderInterceptor 
+
+
+    static final class SpnegoContextTokenFinderInterceptor
         extends AbstractPhaseInterceptor<SoapMessage> {
-        
-        static final SpnegoContextTokenFinderInterceptor INSTANCE 
+
+        static final SpnegoContextTokenFinderInterceptor INSTANCE
             = new SpnegoContextTokenFinderInterceptor();
-        
+
         private SpnegoContextTokenFinderInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
@@ -371,11 +372,11 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
         public void handleMessage(SoapMessage message) throws Fault {
             boolean foundSCT = NegotiationUtils.parseSCTResult(message);
-            
+
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = 
+                Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
                 if (ais.isEmpty()) {
                     return;
@@ -390,7 +391,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
         }
     }
-    
 
-    
+
+
 }

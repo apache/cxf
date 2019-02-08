@@ -42,7 +42,7 @@ public final class AnnotationUtil {
     private AnnotationUtil() {
 
     }
-    
+
     public static <T extends Annotation> T getPrivClassAnnotation(final Class<?> clazz,
                                                                   final Class<T> anoClass) {
         return AccessController.doPrivileged(new PrivilegedAction<T>() {
@@ -125,9 +125,8 @@ public final class AnnotationUtil {
         Annotation ann = method.getAnnotation(WebResult.class);
         if (ann == null) {
             return null;
-        } else {
-            return (WebResult)ann;
         }
+        return (WebResult)ann;
     }
 
 }

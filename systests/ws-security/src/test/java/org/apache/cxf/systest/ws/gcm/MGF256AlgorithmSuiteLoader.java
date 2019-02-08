@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
@@ -33,7 +34,7 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
@@ -43,19 +44,19 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * MGF SHA-1 256 specified.
  */
 public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
-    
+
     public MGF256AlgorithmSuiteLoader(Bus bus) {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
-    
+
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
             String ns = "http://cxf.apache.org/custom/security-policy";
-            final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+            final Map<QName, Assertion> assertions = new HashMap<>();
             QName qName = new QName(ns, "Basic256GCMMGFSHA256");
             assertions.put(qName, new PrimitiveAssertion(qName));
-            
+
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
                     if (XMLPrimitiveAssertionBuilder.isOptional(element)
@@ -64,29 +65,44 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     }
                     QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                     return assertions.get(q);
-                }            
+                }
             });
         }
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
-    
+
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
-        
+
         static {
-            algorithmSuiteTypes.put(
-                "Basic256GCMMGFSHA256", 
+            ALGORITHM_SUITE_TYPES.put(
+                "Basic256GCMMGFSHA256",
                 new AlgorithmSuiteType(
                     "Basic256GCMMGFSHA256",
                     SPConstants.SHA1,
                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
                     SPConstants.KW_AES256,
-                    WSConstants.KEYTRANSPORT_RSAOEP_XENC11,
+                    WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11,
                     SPConstants.P_SHA1_L256,
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
                 )
             );
-            algorithmSuiteTypes.get("Basic256GCMMGFSHA256").setMGFAlgo(WSConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.put(
+                 "Basic256GCMMGFSHA256Digest",
+                 new AlgorithmSuiteType(
+                     "Basic256GCMMGFSHA256Digest",
+                     SPConstants.SHA256,
+                     "http://www.w3.org/2009/xmlenc11#aes256-gcm",
+                     SPConstants.KW_AES256,
+                     WSS4JConstants.KEYTRANSPORT_RSAOAEP_XENC11,
+                     SPConstants.P_SHA1_L256,
+                     SPConstants.P_SHA1_L192,
+                     256, 192, 256, 256, 1024, 4096
+                 )
+            );
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256").setMGFAlgo(WSS4JConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setMGFAlgo(WSS4JConstants.MGF_SHA256);
+            ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest").setEncryptionDigest(SPConstants.SHA256);
         }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
@@ -107,7 +123,10 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             }
 
             if ("Basic256GCMMGFSHA256".equals(assertionName)) {
-                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic256GCMMGFSHA256"));
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256"));
+                getAlgorithmSuiteType().setNamespace(assertionNamespace);
+            } else if ("Basic256GCMMGFSHA256Digest".equals(assertionName)) {
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCMMGFSHA256Digest"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }

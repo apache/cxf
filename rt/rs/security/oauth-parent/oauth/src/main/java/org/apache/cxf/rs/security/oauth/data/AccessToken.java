@@ -24,7 +24,7 @@ package org.apache.cxf.rs.security.oauth.data;
 public class AccessToken extends Token {
     public AccessToken(Client client, String tokenString,
                        String tokenSecret) {
-        this(client, tokenString, tokenSecret, -1L, 
+        this(client, tokenString, tokenSecret, -1L,
              System.currentTimeMillis() / 1000);
     }
 

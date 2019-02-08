@@ -58,8 +58,8 @@ public class TestMustUnderstandHandler<T extends SOAPMessageContext> extends Tes
                         header = envelope.addHeader();
                     }
 
-                    
-                    SOAPHeaderElement headerElement 
+
+                    SOAPHeaderElement headerElement
                         = header.addHeaderElement(envelope.createName("MU", "ns1", qname.getNamespaceURI()));
 
                     // QName soapMustUnderstand = new QName("http://schemas.xmlsoap.org/soap/envelope/",
@@ -76,18 +76,18 @@ public class TestMustUnderstandHandler<T extends SOAPMessageContext> extends Tes
         }
         return continueProcessing;
     }
-    
+
     public String getHandlerId() {
         return "TestMustUnderstandHandler";
     }
-    
+
     public Set<QName> getHeaders() {
         return null;
     }
-    
+
     public void close(MessageContext messagecontext) {
     }
-   
+
     public boolean handleFault(T messagecontext) {
         return true;
     }

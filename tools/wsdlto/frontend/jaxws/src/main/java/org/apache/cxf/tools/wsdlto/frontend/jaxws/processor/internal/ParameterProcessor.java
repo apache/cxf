@@ -124,7 +124,7 @@ public class ParameterProcessor extends AbstractProcessor {
             && parameter.getStyle() != JavaType.Style.INOUT) {
             parameter.setName(name + (++count));
         }
-        
+
         parameter.setMethod(method);
         parameter.annotate(new WebParamAnnotator(isOutOfBandHeader(mpart)));
         method.addParameter(parameter);
@@ -148,7 +148,7 @@ public class ParameterProcessor extends AbstractProcessor {
         if (namespace != null && type != null && !"void".equals(type)) {
             returnType.setClassName(ProcessorUtil.getFullClzName(part, context, false));
         }
-        
+
         if (part != null && part.getXmlSchema() instanceof XmlSchemaSimpleType) {
             processXmlSchemaSimpleType((XmlSchemaSimpleType)part.getXmlSchema(), method, part);
         } else if (part != null && part.getXmlSchema() instanceof XmlSchemaElement) {
@@ -157,10 +157,10 @@ public class ParameterProcessor extends AbstractProcessor {
                 processXmlSchemaSimpleType((XmlSchemaSimpleType)element.getSchemaType(), method, part);
             }
         }
-        
+
         method.setReturn(returnType);
     }
-    
+
     private static void processXmlSchemaSimpleType(XmlSchemaSimpleType xmlSchema, JavaMethod method,
                                                    MessagePartInfo part) {
         if (xmlSchema.getContent() instanceof XmlSchemaSimpleTypeList
@@ -239,17 +239,17 @@ public class ParameterProcessor extends AbstractProcessor {
         MessagePartInfo part = inputMessage.getFirstMessagePart();
 
         List<QName> wrappedElements = ProcessorUtil.getWrappedElementQNames(context, part.getElementQName());
-        if ((wrappedElements == null || wrappedElements.size() == 0) 
+        if ((wrappedElements == null || wrappedElements.isEmpty())
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
         for (QName item : wrappedElements) {
             JavaParameter jp = getParameterFromQName(part.getElementQName(),
                                   item, JavaType.Style.IN, part);
-            
+
             checkPartName(inputMessage, item, jp);
-            
-            if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) { 
+
+            if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) {
                 jp.setTargetNamespace("");
             }
 
@@ -269,12 +269,12 @@ public class ParameterProcessor extends AbstractProcessor {
 
     private void processOutput(JavaMethod method, MessageInfo inputMessage, MessageInfo outputMessage)
         throws ToolException {
-                        
+
         Map<QName, MessagePartInfo> inputPartsMap = inputMessage.getMessagePartsMap();
         List<MessagePartInfo> outputParts =
-            outputMessage == null ? new ArrayList<MessagePartInfo>() : outputMessage.getMessageParts();
+            outputMessage == null ? new ArrayList<>() : outputMessage.getMessageParts();
         // figure out output parts that are not present in input parts
-        List<MessagePartInfo> outParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> outParts = new ArrayList<>();
         int numHeader = 0;
         if (isRequestResponse(method)) {
             for (MessagePartInfo outpart : outputParts) {
@@ -285,7 +285,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                     oob = true;
                 }
-                
+
                 MessagePartInfo inpart = inputPartsMap.get(outpart.getName());
                 if (inpart == null) {
                     outParts.add(outpart);
@@ -303,7 +303,7 @@ public class ParameterProcessor extends AbstractProcessor {
                             String holderClass = p.getClassName();
                             if (JAXBUtils.holderClass(holderClass) != null) {
                                 holderClass = JAXBUtils.holderClass(holderClass).getName();
-                            }  
+                            }
                             p.setClassName(holderClass);
                             p.getAnnotations().clear();
                             p.setStyle(JavaType.Style.INOUT);
@@ -399,7 +399,7 @@ public class ParameterProcessor extends AbstractProcessor {
             outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, outputPart.getElementQName());
         }
 
-        if (inputWrapElement == null || outputWrapElement.size() == 0) {
+        if (inputWrapElement == null || outputWrapElement.isEmpty()) {
             addVoidReturn(method);
             return;
         }
@@ -419,13 +419,13 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                     JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                              JavaType.Style.INOUT, outputPart);
-                    
+
                     if (!qualified && !isRefElement(outputPart, outElement)) {
                         jp.setTargetNamespace("");
                     }
-                    if (!jpIn.getClassName().equals(jp.getClassName())) {
+                    if (jpIn != null && !jpIn.getClassName().equals(jp.getClassName())) {
                         jp.setStyle(JavaType.Style.OUT);
-                    } 
+                    }
                     addParameter(outputPart, method, jp);
                     sameWrapperChild = true;
 
@@ -462,7 +462,7 @@ public class ParameterProcessor extends AbstractProcessor {
             if (inputWrapElement != null) {
                 for (QName inElement : inputWrapElement) {
                     if (isSameWrapperChild(inElement, outElement)) {
-                        
+
                         JavaParameter jpIn = null;
                         for (JavaParameter j : method.getParameters()) {
                             if (inElement.equals(j.getQName())) {
@@ -471,11 +471,11 @@ public class ParameterProcessor extends AbstractProcessor {
                         }
                         JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                                  JavaType.Style.INOUT, outputPart);
-                        
+
                         if (!qualified && !isRefElement(outputPart, outElement)) {
                             jp.setTargetNamespace("");
                         }
-                        if (!jpIn.getClassName().equals(jp.getClassName())) {
+                        if (jpIn != null && !jpIn.getClassName().equals(jp.getClassName())) {
                             jp.setStyle(JavaType.Style.OUT);
                             checkPartName(outputMessage, outElement, jp);
                         }
@@ -487,13 +487,13 @@ public class ParameterProcessor extends AbstractProcessor {
                 }
             }
             if (!sameWrapperChild) {
-                JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                           JavaType.Style.OUT, outputPart);
                 if (!qualified && !isRefElement(outputPart, outElement)) {
                     jp.setTargetNamespace("");
                 }
                 checkPartName(outputMessage, outElement, jp);
-    
+
                 addParameter(outputPart, method, jp);
             }
         }
@@ -510,7 +510,7 @@ public class ParameterProcessor extends AbstractProcessor {
                     jp.setName(jwsp.getName());
                 }
             }
-        }        
+        }
     }
     private void addVoidReturn(JavaMethod method) {
         JavaReturn returnType = new JavaReturn("return", "void", null);
@@ -601,10 +601,10 @@ public class ParameterProcessor extends AbstractProcessor {
 
             if (inputMessage != null) {
                 List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-                MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
+                MessagePartInfo inputPart = !inputParts.isEmpty() ? inputParts.iterator().next() : null;
                 List<QName> inputWrapElement = null;
                 if (inputPart != null && inputPart.isElement()) {
-                    inputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                    inputWrapElement = ProcessorUtil.getWrappedElementQNames(context,
                                                                              inputPart.getElementQName());
                 }
                 if (inputWrapElement != null) {
@@ -615,15 +615,15 @@ public class ParameterProcessor extends AbstractProcessor {
                             wrapped = false;
                             break;
                         }
-                    }                
+                    }
                 }
             }
             if (outputMessage != null) {
                 List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
-                MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
+                MessagePartInfo outputPart = !outputParts.isEmpty() ? outputParts.iterator().next() : null;
                 List<QName> outputWrapElement = null;
                 if (outputPart != null && outputPart.isElement()) {
-                    outputWrapElement = ProcessorUtil.getWrappedElementQNames(context, 
+                    outputWrapElement = ProcessorUtil.getWrappedElementQNames(context,
                                                                               outputPart.getElementQName());
                 }
                 if (outputWrapElement != null) {
@@ -642,7 +642,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 method.setWrapperStyle(false);
             }
         }
-        
+
         if (inputMessage != null) {
             if (method.isWrapperStyle()) {
                 processWrappedInput(method, inputMessage);
@@ -670,18 +670,18 @@ public class ParameterProcessor extends AbstractProcessor {
 
         final Map<QName, MessagePartInfo> outputPartsMap;
         final Collection<MessagePartInfo> outputParts;
-        
+
         if (outputMessage != null) {
             outputPartsMap = outputMessage.getMessagePartsMap();
             outputParts = outputPartsMap.values();
         } else {
-            outputPartsMap = new LinkedHashMap<QName, MessagePartInfo>();
-            outputParts = new ArrayList<MessagePartInfo>();
+            outputPartsMap = new LinkedHashMap<>();
+            outputParts = new ArrayList<>();
         }
 
 
-        List<MessagePartInfo> inputUnlistedParts = new ArrayList<MessagePartInfo>();
-        List<MessagePartInfo> outputUnlistedParts = new ArrayList<MessagePartInfo>();
+        List<MessagePartInfo> inputUnlistedParts = new ArrayList<>();
+        List<MessagePartInfo> outputUnlistedParts = new ArrayList<>();
 
         for (MessagePartInfo part : inputParts) {
             if (!parameterList.contains(part.getName().getLocalPart())) {
@@ -701,7 +701,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
             if (outputUnlistedParts.size() == 1) {
                 processReturn(method, outputUnlistedParts.get(0));
-                outputPartsMap.remove(outputUnlistedParts.get(0));
+                outputPartsMap.remove((Object)outputUnlistedParts.get(0));
                 outputUnlistedParts.clear();
             } else {
                 processReturn(method, null);
@@ -724,7 +724,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 style = JavaType.Style.OUT;
             } else if (outputPartsMap.get(inputMessage.getMessagePartQName(partName)) != null
                 && isSamePart(part, outputPartsMap.get(inputMessage.getMessagePartQName(partName)))) {
-                
+
                 style = JavaType.Style.INOUT;
             }
             if (part != null) {
@@ -766,7 +766,7 @@ public class ParameterProcessor extends AbstractProcessor {
         if (outputMessage != null) {
             outputParts = outputMessage.getMessageParts();
         } else {
-            outputParts = new ArrayList<MessagePartInfo>();
+            outputParts = new ArrayList<>();
         }
 
         while (params.hasNext()) {
@@ -788,7 +788,7 @@ public class ParameterProcessor extends AbstractProcessor {
             }
             if (inPart == null && outPart == null) {
                 return false;
-            } else if (inPart != null 
+            } else if (inPart != null
                 && outPart != null) {
                 if (inPart.isElement() != outPart.isElement()) {
                     return false;
@@ -798,10 +798,10 @@ public class ParameterProcessor extends AbstractProcessor {
                     return false;
                 } else if (!inPart.isElement()
                     && !inPart.getTypeQName().equals(outPart.getTypeQName())) {
-                    return false;                    
+                    return false;
                 }
             }
-            
+
         }
         return true;
     }

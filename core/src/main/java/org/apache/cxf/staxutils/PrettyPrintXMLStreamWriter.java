@@ -34,7 +34,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
 
     int curIndent;
     int indentAmount = DEFAULT_INDENT_LEVEL;
-    Stack<CurrentElement> elems = new Stack<CurrentElement>();
+    Stack<CurrentElement> elems = new Stack<>();
 
     public PrettyPrintXMLStreamWriter(XMLStreamWriter writer,
                                       int indentAmount) {
@@ -62,7 +62,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     public void indent() {
         curIndent += indentAmount;
     }
-    
+
     public void unindent() {
         curIndent -= indentAmount;
     }
@@ -206,16 +206,16 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
         throws XMLStreamException {
         baseWriter.writeStartDocument(encoding, version);
     }
-     
+
     public void writeStartElement(java.lang.String localName) throws XMLStreamException {
         writeStartElement(null, localName, null);
     }
-     
+
     public void writeStartElement(java.lang.String namespaceURI, java.lang.String localName)
         throws XMLStreamException {
         writeStartElement(null, localName, namespaceURI);
     }
-     
+
     public void writeStartElement(java.lang.String prefix,
                            java.lang.String localName,
                            java.lang.String namespaceURI) throws XMLStreamException {
@@ -232,7 +232,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
         if (prefix == null && namespaceURI == null) {
             baseWriter.writeStartElement(localName);
         } else if (prefix == null) {
-            baseWriter.writeStartElement(namespaceURI, localName);            
+            baseWriter.writeStartElement(namespaceURI, localName);
         } else {
             baseWriter.writeStartElement(prefix, localName, namespaceURI);
         }
@@ -240,7 +240,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
 
 
-    class CurrentElement {
+    static class CurrentElement {
         private QName name;
         private boolean hasChildElements;
 
@@ -260,5 +260,5 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
             hasChildElements = childElements;
         }
     }
-     
+
 }

@@ -20,13 +20,13 @@
 package org.apache.cxf.extension;
 
 /**
- * 
+ *
  */
 public interface Registry<K, T> {
-    
+
     /**
-     * Registers an object of type T with this registry. 
-     *  
+     * Registers an object of type T with this registry.
+     *
      * @param k the key under which rto register the object
      * @param t the object to register
      */
@@ -34,8 +34,8 @@ public interface Registry<K, T> {
 
     /**
      * Unregisters the object stored under the given key from this registry.
-     *  
-     * @param k the key 
+     *
+     * @param k the key
      */
     void unregister(K k);
 

@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -50,10 +51,10 @@ public class ClaimsManager {
 
     private List<ClaimsParser> claimParsers;
     private List<ClaimsHandler> claimHandlers;
-    private List<URI> supportedClaimTypes = new ArrayList<>();
+    private List<String> supportedClaimTypes = new ArrayList<>();
     private boolean stopProcessingOnException = true;
     private IdentityMapper identityMapper;
-    
+
 
     public IdentityMapper getIdentityMapper() {
         return identityMapper;
@@ -71,14 +72,14 @@ public class ClaimsManager {
         this.stopProcessingOnException = stopProcessingOnException;
     }
 
-    public List<URI> getSupportedClaimTypes() {
+    public List<String> getSupportedClaimTypes() {
         return supportedClaimTypes;
     }
 
     public List<ClaimsParser> getClaimParsers() {
         return claimParsers;
     }
-    
+
     public List<ClaimsHandler> getClaimHandlers() {
         return claimHandlers;
     }
@@ -86,7 +87,7 @@ public class ClaimsManager {
     public void setClaimParsers(List<ClaimsParser> claimParsers) {
         this.claimParsers = claimParsers;
     }
-    
+
     public void setClaimHandlers(List<ClaimsHandler> claimHandlers) {
         this.claimHandlers = claimHandlers;
         if (claimHandlers == null) {
@@ -110,108 +111,89 @@ public class ClaimsManager {
         } else if (secondaryClaims != null && primaryClaims == null) {
             return retrieveClaimValues(secondaryClaims, parameters);
         }
-        
+
         // Here we have two sets of claims
         if (primaryClaims.getDialect() != null
             && primaryClaims.getDialect().equals(secondaryClaims.getDialect())) {
             // Matching dialects - so we must merge them
             ClaimCollection mergedClaims = mergeClaims(primaryClaims, secondaryClaims);
             return retrieveClaimValues(mergedClaims, parameters);
-        } else {
-            // If the dialects don't match then just return all Claims
-            ProcessedClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
-            ProcessedClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
-            ProcessedClaimCollection returnedClaims = new ProcessedClaimCollection();
-            if (claims != null) {
-                returnedClaims.addAll(claims);
-            }
-            if (claims2 != null) {
-                returnedClaims.addAll(claims2);
-            }
-            return returnedClaims;
         }
+        // If the dialects don't match then just return all Claims
+        ProcessedClaimCollection claims = retrieveClaimValues(primaryClaims, parameters);
+        ProcessedClaimCollection claims2 = retrieveClaimValues(secondaryClaims, parameters);
+        ProcessedClaimCollection returnedClaims = new ProcessedClaimCollection();
+        if (claims != null) {
+            returnedClaims.addAll(claims);
+        }
+        if (claims2 != null) {
+            returnedClaims.addAll(claims2);
+        }
+        return returnedClaims;
     }
-    
+
     public ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters) {
+        if (claims == null || claims.isEmpty()) {
+            return null;
+        }
+
         Relationship relationship = null;
         if (parameters.getAdditionalProperties() != null) {
             relationship = (Relationship)parameters.getAdditionalProperties().get(
                     Relationship.class.getName());
         }
-        
-        if (claims == null || claims.size() == 0) {
-            return null;
-        }
+
         if (relationship == null || relationship.getType().equals(Relationship.FED_TYPE_IDENTITY)) {
             // Federate identity. Identity already mapped.
             // Call all configured claims handlers to retrieve the required claims
-            if (claimHandlers == null || claimHandlers.size() == 0) {
-                return null;
+            ProcessedClaimCollection returnCollection = handleClaims(claims, parameters);
+            validateClaimValues(claims, returnCollection);
+            return returnCollection;
+
+        }
+        // Federate claims
+        ClaimsMapper claimsMapper = relationship.getClaimsMapper();
+        if (claimsMapper == null) {
+            LOG.log(Level.SEVERE, "ClaimsMapper required to federate claims but not configured.");
+            throw new STSException("ClaimsMapper required to federate claims but not configured",
+                                   STSException.BAD_REQUEST);
+        }
+
+        // Get the claims of the received token (only SAML supported)
+        // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
+        SamlAssertionWrapper assertion =
+            (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
+        List<ProcessedClaim> claimList = null;
+        if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
+            claimList = this.parseClaimsInAssertion(assertion.getSaml2());
+        } else {
+            claimList = this.parseClaimsInAssertion(assertion.getSaml1());
+        }
+        ProcessedClaimCollection sourceClaims = new ProcessedClaimCollection();
+        sourceClaims.addAll(claimList);
+
+        ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
+                sourceClaims, relationship.getTargetRealm(), parameters);
+        validateClaimValues(claims, targetClaims);
+        return targetClaims;
+    }
+
+    private ProcessedClaimCollection handleClaims(ClaimCollection claims, ClaimsParameters parameters) {
+        ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
+        if (claimHandlers == null) {
+            return returnCollection;
+        }
+
+        Principal originalPrincipal = parameters.getPrincipal();
+        for (ClaimsHandler handler : claimHandlers) {
+
+            ClaimCollection supportedClaims =
+                filterHandlerClaims(claims, handler.getSupportedClaimTypes());
+            if (supportedClaims.isEmpty()) {
+                continue;
             }
-            Principal originalPrincipal = parameters.getPrincipal();
-            ProcessedClaimCollection returnCollection = new ProcessedClaimCollection();
-            for (ClaimsHandler handler : claimHandlers) {
-                
-                ClaimCollection supportedClaims = 
-                    filterHandlerClaims(claims, handler.getSupportedClaimTypes());
-                if (supportedClaims.isEmpty()) {
-                    continue;
-                }
-                
-                if (handler instanceof RealmSupport) {
-                    RealmSupport handlerRealmSupport = (RealmSupport)handler;
-                    // Check whether the handler supports the current realm
-                    if (handlerRealmSupport.getSupportedRealms() != null
-                            && handlerRealmSupport.getSupportedRealms().size() > 0
-                            && handlerRealmSupport.getSupportedRealms().indexOf(parameters.getRealm()) == -1) {
-                        if (LOG.isLoggable(Level.FINER)) {
-                            LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't support"
-                                    + " realm '" + parameters.getRealm()  + "'");
-                        }
-                        continue;
-                    }
-                    
-                    // If handler realm is configured and different from current realm
-                    // do an identity mapping
-                    if (handlerRealmSupport.getHandlerRealm() != null
-                            && !handlerRealmSupport.getHandlerRealm().equalsIgnoreCase(parameters.getRealm())) {
-                        Principal targetPrincipal = null;
-                        try {
-                            if (LOG.isLoggable(Level.FINE)) {
-                                LOG.fine("Mapping user '" + parameters.getPrincipal().getName()
-                                        + "' [" + parameters.getRealm() + "] to realm '"
-                                        + handlerRealmSupport.getHandlerRealm() + "'");
-                            }
-                            targetPrincipal = doMapping(parameters.getRealm(), parameters.getPrincipal(),
-                                    handlerRealmSupport.getHandlerRealm());
-                        } catch (Exception ex) {
-                            LOG.log(Level.WARNING, "Failed to map user '" + parameters.getPrincipal().getName()
-                                    + "' [" + parameters.getRealm() + "] to realm '"
-                                    + handlerRealmSupport.getHandlerRealm() + "'", ex);
-                            throw new STSException("Failed to map user for claims handler",
-                                    STSException.REQUEST_FAILED);
-                        }
-                        
-                        if (targetPrincipal == null || targetPrincipal.getName() == null) {
-                            LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
-                                    + "' [" + parameters.getRealm() + "] to realm '"
-                                    + handlerRealmSupport.getHandlerRealm() + "'");
-                            continue;
-                        }
-                        if (LOG.isLoggable(Level.INFO)) {
-                            LOG.info("Principal '" + targetPrincipal.getName()
-                                    + "' passed to handler '" + handler.getClass().getName() + "'");
-                        }
-                        parameters.setPrincipal(targetPrincipal);
-                    } else {
-                        if (LOG.isLoggable(Level.FINER)) {
-                            LOG.finer("Handler '" + handler.getClass().getName() + "' doesn't require"
-                                    + " identity mapping '" + parameters.getRealm()  + "'");
-                        }
-                        
-                    }
-                }
-                
+
+            if (isCurrentRealmSupported(handler, parameters)) {
                 ProcessedClaimCollection claimCollection = null;
                 try {
                     claimCollection = handler.retrieveClaimValues(supportedClaims, parameters);
@@ -226,47 +208,79 @@ public class ClaimsManager {
                     // if no mapping required or wrong source principal used for next identity mapping
                     parameters.setPrincipal(originalPrincipal);
                 }
-                
-                if (claimCollection != null && claimCollection.size() != 0) {
+
+                if (claimCollection != null && !claimCollection.isEmpty()) {
                     returnCollection.addAll(claimCollection);
                 }
             }
-            validateClaimValues(claims, returnCollection);
-            return returnCollection;
-            
-        } else {
-            // Federate claims
-            ClaimsMapper claimsMapper = relationship.getClaimsMapper();
-            if (claimsMapper == null) {
-                LOG.log(Level.SEVERE, "ClaimsMapper required to federate claims but not configured.");
-                throw new STSException("ClaimsMapper required to federate claims but not configured",
-                                       STSException.BAD_REQUEST);
-            }
-            
-            // Get the claims of the received token (only SAML supported)
-            // Consider refactoring to use a CallbackHandler and keep ClaimsManager token independent
-            SamlAssertionWrapper assertion = 
-                (SamlAssertionWrapper)parameters.getAdditionalProperties().get(SamlAssertionWrapper.class.getName());
-            List<ProcessedClaim> claimList = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                claimList = this.parseClaimsInAssertion(assertion.getSaml2());
-            } else {
-                claimList = this.parseClaimsInAssertion(assertion.getSaml1());
-            }
-            ProcessedClaimCollection sourceClaims = new ProcessedClaimCollection();
-            sourceClaims.addAll(claimList);
-            
-            ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
-                    sourceClaims, relationship.getTargetRealm(), parameters);
-            validateClaimValues(claims, targetClaims);
-            return targetClaims;
         }
 
+        return returnCollection;
+    }
+
+    private boolean isCurrentRealmSupported(ClaimsHandler handler, ClaimsParameters parameters) {
+        if (!(handler instanceof RealmSupport)) {
+            return true;
+        }
+
+        RealmSupport handlerRealmSupport = (RealmSupport)handler;
+
+        // Check whether the handler supports the current realm
+        if (handlerRealmSupport.getSupportedRealms() != null
+                && handlerRealmSupport.getSupportedRealms().size() > 0
+                && handlerRealmSupport.getSupportedRealms().indexOf(parameters.getRealm()) == -1) {
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.finer("Handler '" + handlerRealmSupport.getClass().getName() + "' doesn't support"
+                        + " realm '" + parameters.getRealm()  + "'");
+            }
+            return false;
+        }
+
+        // If handler realm is configured and different from current realm
+        // do an identity mapping
+        if (handlerRealmSupport.getHandlerRealm() != null
+                && !handlerRealmSupport.getHandlerRealm().equalsIgnoreCase(parameters.getRealm())) {
+            Principal targetPrincipal = null;
+            try {
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.fine("Mapping user '" + parameters.getPrincipal().getName()
+                            + "' [" + parameters.getRealm() + "] to realm '"
+                            + handlerRealmSupport.getHandlerRealm() + "'");
+                }
+                targetPrincipal = doMapping(parameters.getRealm(), parameters.getPrincipal(),
+                        handlerRealmSupport.getHandlerRealm());
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "Failed to map user '" + parameters.getPrincipal().getName()
+                        + "' [" + parameters.getRealm() + "] to realm '"
+                        + handlerRealmSupport.getHandlerRealm() + "'", ex);
+                throw new STSException("Failed to map user for claims handler",
+                        STSException.REQUEST_FAILED);
+            }
+
+            if (targetPrincipal == null || targetPrincipal.getName() == null) {
+                LOG.log(Level.WARNING, "Null. Failed to map user '" + parameters.getPrincipal().getName()
+                        + "' [" + parameters.getRealm() + "] to realm '"
+                        + handlerRealmSupport.getHandlerRealm() + "'");
+                return false;
+            }
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.info("Principal '" + targetPrincipal.getName()
+                        + "' passed to handler '" + handlerRealmSupport.getClass().getName() + "'");
+            }
+            parameters.setPrincipal(targetPrincipal);
+        } else {
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.finer("Handler '" + handlerRealmSupport.getClass().getName() + "' doesn't require"
+                        + " identity mapping '" + parameters.getRealm()  + "'");
+            }
+        }
+
+        return true;
     }
 
     private ClaimCollection filterHandlerClaims(ClaimCollection claims,
-                                                         List<URI> handlerClaimTypes) {
-        ClaimCollection supportedClaims = new ClaimCollection(); 
+                                                         List<String> handlerClaimTypes) {
+        ClaimCollection supportedClaims = new ClaimCollection();
         supportedClaims.setDialect(claims.getDialect());
         for (Claim claim : claims) {
             if (handlerClaimTypes.contains(claim.getClaimType())) {
@@ -275,10 +289,10 @@ public class ClaimsManager {
         }
         return supportedClaims;
     }
-    
+
     private boolean validateClaimValues(ClaimCollection requestedClaims, ProcessedClaimCollection claims) {
         for (Claim claim : requestedClaims) {
-            URI claimType = claim.getClaimType();
+            String claimType = claim.getClaimType();
             boolean found = false;
             if (!claim.isOptional()) {
                 for (ProcessedClaim c : claims) {
@@ -299,12 +313,12 @@ public class ClaimsManager {
 
 
     protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml.saml1.core.Assertion assertion) {
-        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("No attribute statements found");
-            }            
+            }
             return Collections.emptyList();
         }
         ProcessedClaimCollection collection = new ProcessedClaimCollection();
@@ -343,7 +357,7 @@ public class ClaimsManager {
     }
 
     protected List<ProcessedClaim> parseClaimsInAssertion(org.opensaml.saml.saml2.core.Assertion assertion) {
-        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -352,7 +366,7 @@ public class ClaimsManager {
             return Collections.emptyList();
         }
 
-        List<ProcessedClaim> collection = new ArrayList<ProcessedClaim>();
+        List<ProcessedClaim> collection = new ArrayList<>();
 
         for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -382,8 +396,8 @@ public class ClaimsManager {
     }
 
     /**
-     * This method merges the primary claims with the secondary claims (of the same dialect). 
-     * This facilitates handling claims from a service via wst:SecondaryParameters/wst:Claims 
+     * This method merges the primary claims with the secondary claims (of the same dialect).
+     * This facilitates handling claims from a service via wst:SecondaryParameters/wst:Claims
      * with any client-specific claims sent in wst:RequestSecurityToken/wst:Claims
      */
     private ClaimCollection mergeClaims(
@@ -391,11 +405,11 @@ public class ClaimsManager {
     ) {
         ClaimCollection parsedClaims = new ClaimCollection();
         parsedClaims.addAll(secondaryClaims);
-        
+
         // Merge claims
         ClaimCollection mergedClaims = new ClaimCollection();
         mergedClaims.setDialect(primaryClaims.getDialect());
-        
+
         for (Claim claim : primaryClaims) {
             Claim matchingClaim = null;
             // Search for a matching claim via the ClaimType URI
@@ -405,7 +419,7 @@ public class ClaimsManager {
                     break;
                 }
             }
-            
+
             if (matchingClaim == null) {
                 mergedClaims.add(claim);
             } else {
@@ -421,23 +435,23 @@ public class ClaimsManager {
                     mergedClaim.setValues(matchingClaim.getValues());
                 }
                 mergedClaims.add(mergedClaim);
-                
+
                 // Remove from parsed Claims
                 parsedClaims.remove(matchingClaim);
             }
         }
-        
+
         // Now add in any claims from the parsed claims that weren't merged
         mergedClaims.addAll(parsedClaims);
-        
+
         return mergedClaims;
     }
-    
-    
+
+
     protected Principal doMapping(String sourceRealm, Principal sourcePrincipal, String targetRealm) {
         return this.identityMapper.mapPrincipal(
                 sourceRealm, sourcePrincipal, targetRealm);
-        
+
     }
 
 }

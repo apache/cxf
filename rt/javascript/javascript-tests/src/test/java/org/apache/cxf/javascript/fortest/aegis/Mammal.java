@@ -20,11 +20,11 @@
 package org.apache.cxf.javascript.fortest.aegis;
 
 /**
- * 
+ *
  */
 public class Mammal {
     private String name;
-    
+
     public Mammal() {
         name = "shrew";
     }

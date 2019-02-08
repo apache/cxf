@@ -25,7 +25,7 @@ import javax.xml.ws.WebFault;
 public class CustomerNotFoundFault extends Exception {
     private static final long serialVersionUID = -2104569359859457879L;
     private CustomerNotFoundDetails details;
-    
+
     public CustomerNotFoundFault(CustomerNotFoundDetails details) {
         super();
         this.details = details;

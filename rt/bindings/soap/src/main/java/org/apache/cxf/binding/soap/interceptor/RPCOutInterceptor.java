@@ -53,7 +53,7 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             NSStack nsStack = new NSStack();
             nsStack.push();
 
-            BindingOperationInfo operation = (BindingOperationInfo) message.getExchange().getBindingOperationInfo();
+            BindingOperationInfo operation = message.getExchange().getBindingOperationInfo();
 
             assert operation.getName() != null;
 
@@ -112,8 +112,8 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
 
             // Finishing the writing.
             xmlWriter.writeEndElement();
-            
-            
+
+
             if (cache != null) {
                 try {
                     for (XMLEvent event : cache.getEvents()) {
@@ -132,10 +132,10 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
 
-    protected String addOperationNode(NSStack nsStack, Message message, 
-                                      XMLStreamWriter xmlWriter, 
+    protected String addOperationNode(NSStack nsStack, Message message,
+                                      XMLStreamWriter xmlWriter,
                                       boolean output,
-                                      BindingOperationInfo boi) 
+                                      BindingOperationInfo boi)
         throws XMLStreamException {
         String ns = boi.getName().getNamespaceURI();
         SoapBody body = null;

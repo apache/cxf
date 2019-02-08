@@ -21,135 +21,137 @@ package demo.jaxrs.client;
 
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-
 import org.apache.cxf.common.util.Base64Utility;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 public final class Client {
 
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         System.out.println("\n");
         Client c = new Client();
-                
-        // 1. get customer info  
-        // 
+
+        // 1. get customer info
+        //
         c.getCustomerInfo("fred", "fred", 123);
         c.getCustomerInfo("fred", "fredspassword", 123);
         c.getCustomerInfo("bob", "bobspassword", 123);
 
-        // 2. add customer info  
-        // 
+        // 2. add customer info
+        //
         c.addCustomerInfo("fred", "fredspassword");
         c.addCustomerInfo("bob", "bobspassword");
-         
-        // 3. update customer info  
-        // 
+
+        // 3. update customer info
+        //
         c.updateCustomerInfo("fred", "fredspassword");
         c.updateCustomerInfo("bob", "bobspassword");
 
-        // 4. delete customer info  
-        // 
+        // 4. delete customer info
+        //
         c.deleteCustomerInfo("bob", "bobspassword", 123);
         c.deleteCustomerInfo("fred", "fredspassword", 123);
-        
+
 
     }
 
     public void getCustomerInfo(String name, String password, int id) throws Exception {
-               
-        System.out.println("HTTP GET to query customer info, user : " 
+
+        System.out.println("HTTP GET to query customer info, user : "
             + name + ", password : " + password);
-        GetMethod get = 
-            new GetMethod("http://localhost:9002/customerservice/customers/" + id);
+        HttpGet get =
+            new HttpGet("http://localhost:9002/customerservice/customers/" + id);
         setMethodHeaders(get, name, password);
         handleHttpMethod(get);
-    } 
+    }
 
     public void addCustomerInfo(String name, String password) throws Exception {
-               
-        System.out.println("HTTP POST to add customer info, user : " 
+
+        System.out.println("HTTP POST to add customer info, user : "
             + name + ", password : " + password);
-        PostMethod post = new PostMethod("http://localhost:9002/customerservice/customers");
+        HttpPost post = new HttpPost("http://localhost:9002/customerservice/customers");
         setMethodHeaders(post, name, password);
-        RequestEntity entity = new InputStreamRequestEntity(
+        HttpEntity entity = new InputStreamEntity(
             this.getClass().getClassLoader().getResourceAsStream("add_customer.xml"));
-        post.setRequestEntity(entity);
-        
+        post.setEntity(entity);
+
         handleHttpMethod(post);
-    } 
+    }
 
     public void updateCustomerInfo(String name, String password) throws Exception {
-               
-        System.out.println("HTTP PUT to update customer info, user : " 
+
+        System.out.println("HTTP PUT to update customer info, user : "
             + name + ", password : " + password);
-        PutMethod put = new PutMethod("http://localhost:9002/customerservice/customers/123");
+        HttpPut put = new HttpPut("http://localhost:9002/customerservice/customers/123");
         setMethodHeaders(put, name, password);
-        RequestEntity entity = new InputStreamRequestEntity(
+        HttpEntity entity = new InputStreamEntity(
             this.getClass().getClassLoader().getResourceAsStream("update_customer.xml"));
-        put.setRequestEntity(entity);
-        
+        put.setEntity(entity);
+
         handleHttpMethod(put);
-    } 
+    }
 
     public void deleteCustomerInfo(String name, String password, int id) throws Exception {
-               
-        System.out.println("HTTP DELETE to update customer info, user : " 
+
+        System.out.println("HTTP DELETE to update customer info, user : "
             + name + ", password : " + password);
         System.out.println("Confirming a customer with id " + id + " exists first");
         getCustomerInfo(name, password, id);
         System.out.println("Deleting now...");
-        DeleteMethod del = 
-            new DeleteMethod("http://localhost:9002/customerservice/customers/" + id);
+        HttpDelete del =
+            new HttpDelete("http://localhost:9002/customerservice/customers/" + id);
         setMethodHeaders(del, name, password);
         handleHttpMethod(del);
         System.out.println("Confirming a customer with id " + id + " does not exist anymore");
         getCustomerInfo(name, password, id);
-    }  
+    }
 
-    private static void handleHttpMethod(HttpMethod httpMethod) throws Exception {
-        HttpClient client = new HttpClient();
+    private static void handleHttpMethod(HttpRequestBase httpMethod) throws Exception {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
         try {
-            int statusCode = client.executeMethod(httpMethod);
-            System.out.println("Response status : " + statusCode); 
+            CloseableHttpResponse response = httpClient.execute(httpMethod);
+            System.out.println("Response status : " + response.getStatusLine().getStatusCode());
 
-            Response.Status status =  Response.Status.fromStatusCode(statusCode);
+            Response.Status status =
+                Response.Status.fromStatusCode(response.getStatusLine().getStatusCode());
 
             if (status == Response.Status.OK) {
-                System.out.println(httpMethod.getResponseBodyAsString());    
+                System.out.println(EntityUtils.toString(response.getEntity()));
             } else if (status == Response.Status.FORBIDDEN) {
                 System.out.println("Authorization failure");
             } else if (status == Response.Status.UNAUTHORIZED) {
                 System.out.println("Authentication failure");
             }
-            System.out.println(); 
+            System.out.println();
 
         } finally {
             // release any connection resources used by the method
             httpMethod.releaseConnection();
-        }  
+        }
     }
 
-    private static void setMethodHeaders(HttpMethod httpMethod, String name, String password) {
-        if (httpMethod instanceof PostMethod || httpMethod instanceof PutMethod) {
-            httpMethod.setRequestHeader("Content-Type", "application/xml");
-        }         
-        httpMethod.setDoAuthentication(false);
-        httpMethod.setRequestHeader("Accept", "application/xml");
-        httpMethod.setRequestHeader("Authorization", 
+    private static void setMethodHeaders(HttpRequestBase httpMethod, String name, String password) {
+        if (httpMethod instanceof HttpPost || httpMethod instanceof HttpPut) {
+            httpMethod.addHeader("Content-Type", "application/xml");
+        }
+        httpMethod.addHeader("Accept", "application/xml");
+        httpMethod.addHeader("Authorization",
                              "Basic " + base64Encode(name + ":" + password));
-          
+
     }
 
     private static String base64Encode(String value) {

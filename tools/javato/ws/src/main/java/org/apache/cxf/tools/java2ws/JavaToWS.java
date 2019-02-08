@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
+import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.toolspec.ToolRunner;
 
 public class JavaToWS {
@@ -34,11 +35,12 @@ public class JavaToWS {
         args = new String[0];
     }
 
-    public JavaToWS(String pargs[]) {
+    public JavaToWS(String[] pargs) {
         args = pargs;
     }
 
     public static void main(String[] args) {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         CommandInterfaceUtils.commandCommonMain();
         JavaToWS j2w = new JavaToWS(args);
         try {
@@ -75,23 +77,34 @@ public class JavaToWS {
 
     public void run() throws Exception {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
-                           .getResourceAsStream("java2ws.xml"), false, args);      
+                           .getResourceAsStream("java2ws.xml"), false, args);
     }
-    
+
     public void run(OutputStream os) throws Exception {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
-                           .getResourceAsStream("java2ws.xml"), false, args, os);      
+                           .getResourceAsStream("java2ws.xml"), false, args, os);
     }
-    
+
+    /**
+     * Pass user app's (compiler) information in the context.
+     * @param context
+     * @param os
+     * @throws Exception
+     */
+    public void run(ToolContext context, OutputStream os) throws Exception {
+        ToolRunner.runTool(JavaToWSContainer.class,
+            JavaToWSContainer.class.getResourceAsStream("java2ws.xml"),
+            false, args, isExitOnFinish(), context, os);
+    }
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
-    
+
+
 
 }

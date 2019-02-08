@@ -26,30 +26,35 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class AssertionBuilderRegistryImplTest extends Assert {
+public class AssertionBuilderRegistryImplTest {
 
     private IMocksControl control;
-    
-    @Before 
+
+    @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();       
+        control = EasyMock.createNiceControl();
     }
-    
+
     @After
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testBuildUnknownAssertion() {
         Bus bus = control.createMock(Bus.class);
@@ -71,11 +76,11 @@ public class AssertionBuilderRegistryImplTest extends Assert {
             EasyMock.expect(elems[i].getNamespaceURI()).andReturn(qnames[i].getNamespaceURI()).anyTimes();
             EasyMock.expect(elems[i].getLocalName()).andReturn(qnames[i].getLocalPart()).anyTimes();
         }
-        
+
         control.replay();
         reg.setBus(bus);
-        
-        assertTrue(!reg.isIgnoreUnknownAssertions());
+
+        assertFalse(reg.isIgnoreUnknownAssertions());
         try {
             reg.build(elems[0]);
             fail("Expected PolicyException not thrown.");
@@ -86,7 +91,7 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         assertTrue(reg.isIgnoreUnknownAssertions());
         for (int i = 0; i < 10; i++) {
             Assertion assertion = reg.build(elems[i]);
-            assertTrue("Not a PrimitiveAsertion: " + assertion.getClass().getName(), 
+            assertTrue("Not a PrimitiveAsertion: " + assertion.getClass().getName(),
                        assertion instanceof PrimitiveAssertion);
         }
         for (int i = 9; i >= 0; i--) {

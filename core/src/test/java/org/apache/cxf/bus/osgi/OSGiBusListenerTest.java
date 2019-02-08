@@ -30,31 +30,34 @@ import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.feature.Feature;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+
+
 /**
- * 
+ *
  */
-public class OSGiBusListenerTest extends Assert {
+public class OSGiBusListenerTest {
     private static final String[] SERVICE_BUNDLE_NAMES = new String[]{"me.temp.foo.test", "me.temp.bar.sample"};
     private static final String EXCLUDES = "me\\.temp\\.bar\\..*";
     private static final String RESTRICTED = "me\\.my\\.app\\..*";
     private static final String BUNDLE_NAME = "me.my.app";
-    
+
     private IMocksControl control;
     private Bus bus;
     private BundleContext bundleContext;
     private Bundle bundle;
-    
-    
+
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -65,19 +68,19 @@ public class OSGiBusListenerTest extends Assert {
         blcManager.registerLifeCycleListener(EasyMock.isA(OSGIBusListener.class));
         EasyMock.expectLastCall();
         bundleContext = control.createMock(BundleContext.class);
-        
+
         BundleContext app = control.createMock(BundleContext.class);
         EasyMock.expect(bus.getExtension(BundleContext.class)).andReturn(app).anyTimes();
         bundle = control.createMock(Bundle.class);
         EasyMock.expect(app.getBundle()).andReturn(bundle).anyTimes();
         EasyMock.expect(bundle.getSymbolicName()).andReturn(BUNDLE_NAME).anyTimes();
     }
-    
+
     @Test
     public void testRegistratioWithNoServices() throws Exception {
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
-        
+
         control.verify();
     }
 
@@ -85,14 +88,14 @@ public class OSGiBusListenerTest extends Assert {
     public void testRegistratioWithServices() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null);
-        Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null, lst);
-        
+        Collection<Feature> lst = new ArrayList<>();
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
+
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
-        
+
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{null, null}, null), lst.size());
-        
+
         control.verify();
     }
 
@@ -100,34 +103,34 @@ public class OSGiBusListenerTest extends Assert {
     public void testRegistratioWithServicesExcludes() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES);
-        Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES, lst);
+        Collection<Feature> lst = new ArrayList<>();
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{null, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
-        
+
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{null, null}, EXCLUDES), lst.size());
-        
+
         control.verify();
     }
-    
+
     @Test
     public void testRegistratioWithServicesExcludesAndRestricted() throws Exception {
         setUpClientLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
         setUpServerLifeCycleListeners(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES);
-        Collection<Feature> lst = new ArrayList<Feature>();
-        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES, lst);
+        Collection<Feature> lst = new ArrayList<>();
+        setFeatures(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, lst);
         EasyMock.expect(bus.getProperty("bus.extension.bundles.excludes")).andReturn(EXCLUDES);
         control.replay();
         new OSGIBusListener(bus, new Object[]{bundleContext});
-        
+
         assertEquals(countServices(SERVICE_BUNDLE_NAMES, new String[]{RESTRICTED, null}, EXCLUDES), lst.size());
-        
+
         control.verify();
     }
 
     private void setUpClientLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
-        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(ClientLifeCycleListener.class.getName(), null))
             .andReturn(svcrefs);
         ClientLifeCycleManager lcmanager = control.createMock(ClientLifeCycleManager.class);
@@ -143,7 +146,7 @@ public class OSGiBusListenerTest extends Assert {
     }
 
     private void setUpServerLifeCycleListeners(String[] names, String[] restricted, String excludes) throws Exception {
-        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(ServerLifeCycleListener.class.getName(), null))
             .andReturn(svcrefs);
         ServerLifeCycleManager lcmanager = control.createMock(ServerLifeCycleManager.class);
@@ -158,9 +161,9 @@ public class OSGiBusListenerTest extends Assert {
         }
     }
 
-    private void setFeatures(String[] names, String[] restricted, String excludes, 
+    private void setFeatures(String[] names, String[] restricted,
                              Collection<Feature> lst) throws Exception {
-        ServiceReference[] svcrefs = createTestServiceReferences(names, restricted);
+        ServiceReference<Object>[] svcrefs = createTestServiceReferences(names, restricted);
         EasyMock.expect(bundleContext.getServiceReferences(Feature.class.getName(), null))
             .andReturn(svcrefs);
         for (int i = 0; i < names.length; i++) {
@@ -168,29 +171,30 @@ public class OSGiBusListenerTest extends Assert {
             EasyMock.expect(bundleContext.getService(svcrefs[i])).andReturn(f).anyTimes();
         }
         EasyMock.expect(bus.getFeatures()).andReturn(lst).anyTimes();
-        
+
     }
 
     // Creates test service references with the specified symbolic names and the restricted extension properties.
-    private ServiceReference[] createTestServiceReferences(String[] names, String[] restricted) {
-        ServiceReference[] refs = new ServiceReference[names.length];
+    private ServiceReference<Object>[] createTestServiceReferences(String[] names, String[] restricted) {
+        @SuppressWarnings("unchecked")
+        ServiceReference<Object>[] refs = new ServiceReference[names.length];
         for (int i = 0; i < names.length; i++) {
-            refs[i] = createTestServiceReference(names[i], restricted[i]); 
+            refs[i] = createTestServiceReference(names[i], restricted[i]);
         }
         return refs;
     }
 
-    
+
     // Creates a test service reference with the specified symbolic name and the restricted extension property.
-    private ServiceReference createTestServiceReference(String name, String rst) {
-        ServiceReference ref = control.createMock(ServiceReference.class);
+    private ServiceReference<Object> createTestServiceReference(String name, String rst) {
+        ServiceReference<Object> ref = control.createMock(ServiceReference.class);
         Bundle b = control.createMock(Bundle.class);
         EasyMock.expect(b.getSymbolicName()).andReturn(name).anyTimes();
         EasyMock.expect(ref.getBundle()).andReturn(b).anyTimes();
         EasyMock.expect(ref.getProperty("org.apache.cxf.bus.restricted.extension")).andReturn(rst).anyTimes();
         return ref;
     }
-    
+
     private static boolean isExcluded(String aname, String sname, String rst, String exc) {
         if (!StringUtils.isEmpty(rst) && !aname.matches(rst)) {
             return true;

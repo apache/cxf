@@ -42,9 +42,9 @@ public class GreeterSoapMessageProvider implements Provider<SOAPMessage> {
         try {
             System.out.println("Incoming Client Request as a SOAPMessage");
             MessageFactory factory = MessageFactory.newInstance();
-            InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp1.xml");
-            response =  factory.createMessage(null, is);
-            is.close();
+            try (InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp1.xml")) {
+                response = factory.createMessage(null, is);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -19,8 +19,11 @@
 package org.apache.cxf.rs.security.oauth2.utils.crypto;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeRegistration;
 import org.apache.cxf.rs.security.oauth2.grants.code.ServerAuthorizationCodeGrant;
@@ -29,16 +32,16 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 public class CodeGrantEncryptingDataProvider extends EncryptingDataProvider
     implements AuthorizationCodeDataProvider {
 
-    private Set<String> grants = new HashSet<String>();
-    
+    private Set<String> grants = new HashSet<>();
+
     public CodeGrantEncryptingDataProvider() throws Exception {
         super();
     }
-    
+
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
-        ServerAuthorizationCodeGrant grant = 
+        ServerAuthorizationCodeGrant grant =
             new ServerAuthorizationCodeGrant(reg.getClient(), 123);
         grant.setAudience(reg.getAudience());
         String encrypted = ModelEncryptionSupport.encryptCodeGrant(grant, key);
@@ -51,5 +54,10 @@ public class CodeGrantEncryptingDataProvider extends EncryptingDataProvider
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
         grants.remove(code);
         return ModelEncryptionSupport.decryptCodeGrant(this, code, key);
+    }
+
+    @Override
+    public List<ServerAuthorizationCodeGrant> getCodeGrants(Client c, UserSubject sub) throws OAuthServiceException {
+        return null;
     }
 }

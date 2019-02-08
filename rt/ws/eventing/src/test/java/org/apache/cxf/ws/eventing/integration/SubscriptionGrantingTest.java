@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.eventing.integration;
 
 import java.io.IOException;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 
@@ -32,6 +33,7 @@ import org.apache.cxf.ws.eventing.base.SimpleEventingIntegrationTest;
 import org.apache.cxf.ws.eventing.shared.faults.CannotProcessFilter;
 import org.apache.cxf.ws.eventing.shared.faults.NoDeliveryMechanismEstablished;
 import org.apache.cxf.ws.eventing.shared.utils.DurationAndDateUtil;
+
 import org.junit.Assert;
 import org.junit.Test;
 

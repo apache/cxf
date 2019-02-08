@@ -30,7 +30,6 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
@@ -38,29 +37,29 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 /**
- * An in-memory EHCache implementation of the XKMSClientCache interface. 
+ * An in-memory EHCache implementation of the XKMSClientCache interface.
  */
 public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleListener {
-    
+
     public static final String CACHE_KEY = "cxf.xkms.client.cache";
     private static final String DEFAULT_CONFIG_URL = "cxf-xkms-client-ehcache.xml";
-    
+
     private Ehcache cache;
     private CacheManager cacheManager;
     private Bus bus;
-    
+
     public EHCacheXKMSClientCache() {
         this(DEFAULT_CONFIG_URL, null);
     }
-    
+
     public EHCacheXKMSClientCache(Bus cxfBus) {
         this(DEFAULT_CONFIG_URL, cxfBus);
     }
-    
+
     public EHCacheXKMSClientCache(String configFileURL) {
         this(configFileURL, null);
     }
-    
+
     public EHCacheXKMSClientCache(String configFileURL, Bus cxfBus) {
         createCache(configFileURL, cxfBus);
         this.bus = cxfBus;
@@ -68,14 +67,14 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
             bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
     }
-    
+
     private void createCache(String configFile, Bus cxfBus) {
         if (cxfBus == null) {
             cxfBus = BusFactory.getThreadDefaultBus(true);
         }
         URL configFileURL = null;
         try {
-            configFileURL = 
+            configFileURL =
                 ClassLoaderUtils.getResource(configFile, EHCacheXKMSClientCache.class);
         } catch (Exception ex) {
             // ignore
@@ -84,7 +83,7 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
             cacheManager = EHCacheUtil.createCacheManager();
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-            
+
             if (cxfBus != null) {
                 conf.setName(cxfBus.getId());
                 DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
@@ -94,23 +93,23 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
                     conf.getDiskStoreConfiguration().setPath(path);
                 }
             }
-            
+
             cacheManager = EHCacheUtil.createCacheManager(conf);
         }
-        
+
         CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
-        
+
         Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
-    
+
     /**
      * Store an XKMSCacheToken in the Cache using the given key
      */
     public void put(String key, XKMSCacheToken cacheToken) {
         cache.put(new Element(key, cacheToken, false));
     }
-    
+
     /**
      * Get an XKMSCacheToken from the cache matching the given key. Returns null if there
      * is no such XKMSCacheToken in the cache, or if the certificate has expired in the cache
@@ -122,7 +121,7 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
         }
         return null;
     }
-    
+
     public void close() {
         if (cacheManager != null) {
             if (cache != null) {
@@ -131,13 +130,13 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
             cacheManager.shutdown();
             cacheManager = null;
             cache = null;
-            
+
             if (bus != null) {
                 bus.getExtension(BusLifeCycleManager.class).unregisterLifeCycleListener(this);
             }
         }
     }
-    
+
     public void initComplete() {
     }
 
@@ -148,5 +147,5 @@ public class EHCacheXKMSClientCache implements XKMSClientCache, BusLifeCycleList
     public void postShutdown() {
         close();
     }
-    
+
 }

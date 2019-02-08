@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JwsJwtCompactProducer extends JwsCompactProducer {
-    
+
     public JwsJwtCompactProducer(JwtToken token) {
         this(token, null);
     }
@@ -35,10 +35,10 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
     public JwsJwtCompactProducer(JwsHeaders headers, JwtClaims claims) {
         this(new JwtToken(headers, claims), null);
     }
-    protected JwsJwtCompactProducer(JwtToken token, JwtTokenReaderWriter w) {
-        super(new JwsHeaders(token.getJwsHeaders()), w, 
+    protected JwsJwtCompactProducer(JwtToken token, JsonMapObjectReaderWriter w) {
+        super(new JwsHeaders(token.getJwsHeaders()), w,
               JwtUtils.claimsToJson(token.getClaims(), w));
     }
-    
-    
+
+
 }

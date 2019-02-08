@@ -40,58 +40,58 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Assert;
 
 /**
- * 
+ *
  */
 public final class TransformTestUtils {
     private static final Logger LOG = LogUtils.getLogger(TransformTestUtils.class);
 
     private TransformTestUtils() {
     }
-    
-    // test utilities methods 
-    
-    static void transformInStreamAndCompare(String inname, String outname, 
+
+    // test utilities methods
+
+    static void transformInStreamAndCompare(String inname, String outname,
                                            Map<String, String> transformElements,
                                            Map<String, String> appendElements,
                                            List<String> dropElements,
                                            Map<String, String> transformAttributes,
-                                           Map<String, String> appendAttributes) 
+                                           Map<String, String> appendAttributes)
         throws XMLStreamException {
-        
+
         XMLStreamReader reader = createInTransformedStreamReader(inname,
                                                                  transformElements,
                                                                  appendElements,
                                                                  dropElements,
                                                                  transformAttributes);
-        XMLStreamReader teacher = 
+        XMLStreamReader teacher =
             StaxUtils.createXMLStreamReader(
                       TransformTestUtils.class.getResourceAsStream(outname));
-        
+
         verifyReaders(teacher, reader, false, true);
     }
 
-    static void transformOutStreamAndCompare(String inname, String outname, 
+    static void transformOutStreamAndCompare(String inname, String outname,
                                            Map<String, String> transformElements,
                                            Map<String, String> appendElements,
                                            List<String> dropElements,
                                            Map<String, String> transformAttributes,
-                                           Map<String, String> appendAttributes) 
+                                           Map<String, String> appendAttributes)
         throws XMLStreamException {
-        
-        XMLStreamReader reader = createOutTransformedStreamReader(inname, 
-                                                                  transformElements, appendElements, 
-                                                                  dropElements, transformAttributes, 
+
+        XMLStreamReader reader = createOutTransformedStreamReader(inname,
+                                                                  transformElements, appendElements,
+                                                                  dropElements, transformAttributes,
                                                                   false, null);
-        XMLStreamReader teacher = 
+        XMLStreamReader teacher =
             StaxUtils.createXMLStreamReader(
                       TransformTestUtils.class.getResourceAsStream(outname));
- 
+
         verifyReaders(teacher, reader, false, true);
     }
 
     static XMLStreamReader createInTransformedStreamReader(
         String file,
-        Map<String, String> emap, 
+        Map<String, String> emap,
         Map<String, String> eappend,
         List<String> dropEls,
         Map<String, String> amap) throws XMLStreamException {
@@ -100,10 +100,10 @@ public final class TransformTestUtils {
             TransformTestUtils.class.getResourceAsStream(file)),
             emap, eappend, dropEls, amap, false);
     }
-    
+
     static XMLStreamReader createOutTransformedStreamReader(
         String file,
-        Map<String, String> emap, 
+        Map<String, String> emap,
         Map<String, String> append,
         List<String> dropEls,
         Map<String, String> amap,
@@ -111,8 +111,8 @@ public final class TransformTestUtils {
         String defaultNamespace) throws XMLStreamException {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        XMLStreamWriter writer = 
-            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()), 
+        XMLStreamWriter writer =
+            new OutTransformWriter(StaxUtils.createXMLStreamWriter(os, StandardCharsets.UTF_8.name()),
                                    emap, append, dropEls, amap, attributesToElements, defaultNamespace);
         StaxUtils.copy(new StreamSource(TransformTestUtils.class.getResourceAsStream(file)), writer);
         writer.flush();
@@ -121,20 +121,20 @@ public final class TransformTestUtils {
     }
 
     /**
-     * Verifies the two stream events are equivalent and throws an assertion 
+     * Verifies the two stream events are equivalent and throws an assertion
      * exception at the first mismatch.
      * @param teacher
      * @param reader
      * @param eec
      * @throws XMLStreamException
      */
-    static void verifyReaders(XMLStreamReader teacher, XMLStreamReader reader, 
+    static void verifyReaders(XMLStreamReader teacher, XMLStreamReader reader,
                                boolean eec, boolean pfx) throws XMLStreamException {
         // compare the elements and attributes while ignoring comments, line breaks, etc
         for (;;) {
             int revent = getNextEvent(reader);
             int tevent = getNextEvent(teacher);
-            
+
             if (revent == -1 && tevent == -1) {
                 break;
             }
@@ -171,7 +171,7 @@ public final class TransformTestUtils {
     private static void verifyAttributes(XMLStreamReader teacher, XMLStreamReader reader) {
         int acount = teacher.getAttributeCount();
         Assert.assertEquals(acount, reader.getAttributeCount());
-        Map<QName, String> attributesMap = new HashMap<QName, String>();
+        Map<QName, String> attributesMap = new HashMap<>();
         // temporarily store all the attributes
         for (int i = 0; i < acount; i++) {
             attributesMap.put(reader.getAttributeName(i), reader.getAttributeValue(i));
@@ -179,7 +179,7 @@ public final class TransformTestUtils {
         // compares each attribute
         for (int i = 0; i < acount; i++) {
             String avalue = attributesMap.remove(teacher.getAttributeName(i));
-            Assert.assertEquals("attribute " + teacher.getAttributeName(i) + " has wrong value.", 
+            Assert.assertEquals("attribute " + teacher.getAttributeName(i) + " has wrong value.",
                                 teacher.getAttributeValue(i), avalue);
         }
         // attributes must be exhausted
@@ -190,14 +190,14 @@ public final class TransformTestUtils {
         int dcount = teacher.getNamespaceCount();
         for (int i = 0; i < dcount; i++) {
             String p = teacher.getNamespacePrefix(i);
-            Assert.assertEquals("nsdecl prefix " + p + " is incorrectly bound.", 
+            Assert.assertEquals("nsdecl prefix " + p + " is incorrectly bound.",
                                 teacher.getNamespaceURI(i), reader.getNamespaceURI(p));
         }
     }
 
     /**
      * Returns the next relevant reader event.
-     *  
+     *
      * @param reader
      * @return
      * @throws XMLStreamException
@@ -212,7 +212,7 @@ public final class TransformTestUtils {
                 return e;
             } else if (e == XMLStreamConstants.CHARACTERS) {
                 String text = reader.getText();
-                if (text.trim().length() == 0) {
+                if (text.trim().isEmpty()) {
                     continue;
                 }
                 return e;

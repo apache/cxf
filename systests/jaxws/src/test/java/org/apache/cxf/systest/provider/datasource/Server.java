@@ -24,14 +24,14 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 
 public class Server extends AbstractBusTestServerBase {
-    
-    protected void run() { 
+
+    protected void run() {
         String port = TestUtil.getPortNumber(Server.class);
         TestProvider servant = new TestProvider();
         servant.publish("http://localhost:" + port + "/test/foo");
     }
-    
-    public static void main(String[] args) throws Exception { 
+
+    public static void main(String[] args) throws Exception {
         try {
             Server s = new Server();
             s.start();

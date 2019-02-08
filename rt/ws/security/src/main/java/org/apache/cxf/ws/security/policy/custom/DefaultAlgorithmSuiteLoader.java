@@ -41,19 +41,19 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * This class retrieves the default AlgorithmSuites plus the CXF specific GCM AlgorithmSuites.
  */
 public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
-    
+
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
             String ns = "http://cxf.apache.org/custom/security-policy";
-            final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+            final Map<QName, Assertion> assertions = new HashMap<>();
             QName qName = new QName(ns, "Basic128GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
             qName = new QName(ns, "Basic192GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
             qName = new QName(ns, "Basic256GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
-            
+
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
                     if (XMLPrimitiveAssertionBuilder.isOptional(element)
@@ -62,17 +62,17 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     }
                     QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                     return assertions.get(q);
-                }            
+                }
             });
         }
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
-    
+
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
-        
+
         static {
-            algorithmSuiteTypes.put(
-                "Basic128GCM", 
+            ALGORITHM_SUITE_TYPES.put(
+                "Basic128GCM",
                 new AlgorithmSuiteType(
                     "Basic128GCM",
                     SPConstants.SHA1,
@@ -84,9 +84,9 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     128, 128, 128, 256, 1024, 4096
                 )
             );
-            
-            algorithmSuiteTypes.put(
-                "Basic192GCM", 
+
+            ALGORITHM_SUITE_TYPES.put(
+                "Basic192GCM",
                 new AlgorithmSuiteType(
                     "Basic192GCM",
                     SPConstants.SHA1,
@@ -98,9 +98,9 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     192, 192, 192, 256, 1024, 4096
                 )
             );
-            
-            algorithmSuiteTypes.put(
-                "Basic256GCM", 
+
+            ALGORITHM_SUITE_TYPES.put(
+                "Basic256GCM",
                 new AlgorithmSuiteType(
                     "Basic256GCM",
                     SPConstants.SHA1,
@@ -111,7 +111,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
                 )
-            );        
+            );
         }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
@@ -132,13 +132,13 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             }
 
             if ("Basic128GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic128GCM"));
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic128GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic192GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic192GCM"));
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic192GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             } else if ("Basic256GCM".equals(assertionName)) {
-                setAlgorithmSuiteType(algorithmSuiteTypes.get("Basic256GCM"));
+                setAlgorithmSuiteType(ALGORITHM_SUITE_TYPES.get("Basic256GCM"));
                 getAlgorithmSuiteType().setNamespace(assertionNamespace);
             }
         }

@@ -19,7 +19,7 @@
 
 package demo.jaxrs.search.server;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchContextProvider;
 import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 import org.apache.cxf.jaxrs.provider.MultipartProvider;
@@ -39,13 +39,13 @@ public class Server {
         final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
         // Register and map the dispatcher servlet
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-        final ServletContextHandler context = new ServletContextHandler();      
+        final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addServlet(staticHolder, "/static/*");
-        context.addServlet(servletHolder, "/*");  
+        context.addServlet(servletHolder, "/*");
         context.setResourceBase(getClass().getResource("/browser").toURI().toString());
-        
-        servletHolder.setInitParameter("redirects-list", 
+
+        servletHolder.setInitParameter("redirects-list",
             "/ /index.html /js/fileinput.min.js /css/fileinput.min.css");
         servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
         servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
@@ -54,7 +54,7 @@ public class Server {
             new String[] {
                 "search.query.parameter.name=$filter",
                 SearchUtils.DATE_FORMAT_PROPERTY + "=yyyy/MM/dd"
-            }, " ")            
+            }, " ")
         );
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] {
@@ -62,15 +62,15 @@ public class Server {
                 SearchContextProvider.class.getName(),
                 JsrJsonpProvider.class.getName(),
                 CrossOriginResourceSharingFilter.class.getName()
-            }, ",") 
-        );                
-                
+            }, ",")
+        );
+
         server.setHandler(context);
         server.start();
         server.join();
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new Server();
         System.out.println("Server ready...");
 

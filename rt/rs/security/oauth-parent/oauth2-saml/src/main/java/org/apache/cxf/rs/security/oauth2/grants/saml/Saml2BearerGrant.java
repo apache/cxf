@@ -28,19 +28,19 @@ public class Saml2BearerGrant extends AbstractSaml2BearerGrant {
     public Saml2BearerGrant(String assertion) {
         this(assertion, false);
     }
-    
+
     public Saml2BearerGrant(String assertion, boolean encoded) {
-        this(assertion, false, null);
+        this(assertion, encoded, null);
     }
-    
+
     public Saml2BearerGrant(String assertion, String scope) {
         this(assertion, false, scope);
     }
-    
+
     public Saml2BearerGrant(String assertion, boolean encoded, String scope) {
         super(Constants.SAML2_BEARER_GRANT, assertion, encoded, scope);
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = initMap();
         map.putSingle(Constants.CLIENT_GRANT_ASSERTION_PARAM, encodeAssertion());

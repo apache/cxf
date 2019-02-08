@@ -26,7 +26,7 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
 public class SamlUserSubject extends UserSubject {
     private static final long serialVersionUID = -1135272749329239037L;
     private ClaimCollection claims;
-    public SamlUserSubject(String user, 
+    public SamlUserSubject(String user,
                            List<String> roles,
                            ClaimCollection claims) {
         super(user, roles);

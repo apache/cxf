@@ -30,35 +30,34 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.corba.CorbaDestination;
 import org.apache.cxf.binding.corba.TestUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.transport.MessageObserver; 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.cxf.transport.MessageObserver;
 import org.omg.CORBA.Context;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ServerRequest;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CorbaDSIServantTest extends Assert {
+public class CorbaDSIServantTest {
     protected static ORB orb;
     protected static Bus bus;
-        
+
     public CorbaDSIServantTest() {
         super();
     }
-    
+
     @Before
-    public void setUp() throws Exception {        
+    public void setUp() throws Exception {
         bus = BusFactory.getDefaultBus();
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
-               
+
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (orb != null) {
@@ -67,15 +66,15 @@ public class CorbaDSIServantTest extends Assert {
             } catch (Exception ex) {
                 // Do nothing.  Throw an Exception?
             }
-        } 
+        }
     }
- 
+
     /*public void testCorbaDSIServant() throws Exception {
-    
-        CorbaDestination destination = testUtils.getSimpleTypesTestDestination();        
+
+        CorbaDestination destination = testUtils.getSimpleTypesTestDestination();
         Service service = new ServiceImpl();
-        Endpoint endpoint = new EndpointImpl(bus, service, destination.getEndPointInfo());       
-        MessageObserver observer = new ChainInitiationObserver(endpoint, bus);       
+        Endpoint endpoint = new EndpointImpl(bus, service, destination.getEndPointInfo());
+        MessageObserver observer = new ChainInitiationObserver(endpoint, bus);
         destination.setMessageObserver(observer);
         POA rootPOA = null;
         CorbaDSIServant dsiServant = new CorbaDSIServant();
@@ -83,26 +82,26 @@ public class CorbaDSIServantTest extends Assert {
                         rootPOA,
                         destination,
                         observer);
-        
+
         assertNotNull("DSIServant should not be null", dsiServant != null);
         assertNotNull("POA should not be null", dsiServant._default_POA() != null);
         assertNotNull("Destination should not be null", dsiServant.getDestination() != null);
         assertNotNull("ORB should not be null", dsiServant.getOrb() != null);
         assertNotNull("MessageObserver should not be null", dsiServant.getObserver() != null);
-        
+
         byte[] objectId = new byte[10];
         String[] interfaces = dsiServant._all_interfaces(rootPOA, objectId);
         assertNotNull("Interfaces should not be null", interfaces != null);
         assertEquals("Interface ID should be equal", interfaces[0], "IDL:Simple:1.0");
-        
+
     }*/
-        
+
     @Test
     public void testInvoke() throws Exception {
-        
+
         CorbaDestination dest = new TestUtils().getComplexTypesTestDestination();
 
-        
+
         CorbaDSIServant dsiServant = new CorbaDSIServant();
         dsiServant.init(orb, null, dest, null);
         ServerRequest request = new ServerRequest() {
@@ -112,31 +111,30 @@ public class CorbaDSIServantTest extends Assert {
             public Context ctx() {
                 return null;
             }
-            
+
         };
-        
-        MessageObserver incomingObserver = new TestObserver();               
+
+        MessageObserver incomingObserver = new TestObserver();
         dsiServant.setObserver(incomingObserver);
-        
-        Map<String, QName> map = new HashMap<String, QName>(2);
+
+        Map<String, QName> map = new HashMap<>(2);
 
         map.put("greetMe", new QName("greetMe"));
         dsiServant.setOperationMapping(map);
-        
+
         dsiServant.invoke(request);
     }
-        
+
     class TestObserver implements MessageObserver {
-              
+
         TestObserver() {
             super();
-        }            
-        
-        public void onMessage(Message msg) {            
-            //System.out.println("Test OnMessage in TestObserver");            
+        }
+
+        public void onMessage(Message msg) {
+            //System.out.println("Test OnMessage in TestObserver");
         }
     }
 }
-    
-    
-    
+
+

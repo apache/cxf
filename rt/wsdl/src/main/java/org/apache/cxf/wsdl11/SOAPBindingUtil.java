@@ -56,7 +56,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public final class SOAPBindingUtil {
-    private static Map<String, String> bindingMap = new HashMap<String, String>();
+    private static Map<String, String> bindingMap = new HashMap<>();
 
     static {
         bindingMap.put("RPC", "SOAPBinding.Style.RPC");
@@ -84,7 +84,7 @@ public final class SOAPBindingUtil {
             proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                               new Class[] {cls}, ih);
         } catch (Throwable ex) {
-            // Using cls classloader as a fallback to make it work within OSGi  
+            // Using cls classloader as a fallback to make it work within OSGi
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             if (contextLoader != cls.getClassLoader()) {
                 proxy = Proxy.newProxyInstance(cls.getClassLoader(),
@@ -201,7 +201,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SOAPHeader> getSoapHeaders(List<ExtensibilityElement> exts) {
-        List<SOAPHeader> headers = new ArrayList<SOAPHeader>();
+        List<SOAPHeader> headers = new ArrayList<>();
         if (exts != null) {
             for (ExtensibilityElement ext : exts) {
                 if (isSOAPHeader(ext)) {
@@ -277,7 +277,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SOAPFault> getBindingOperationSoapFaults(BindingOperation bop) {
-        List<SOAPFault> faults = new ArrayList<SOAPFault>();
+        List<SOAPFault> faults = new ArrayList<>();
         for (Object obj : bop.getBindingFaults().values()) {
             if (!(obj instanceof BindingFault)) {
                 continue;
@@ -304,7 +304,7 @@ public final class SOAPBindingUtil {
         String bindingStyle = "";
         String previousOpStyle = "";
         String style = "";
-        
+
         for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 SOAPBinding soapBinding = getSoapBinding(obj);

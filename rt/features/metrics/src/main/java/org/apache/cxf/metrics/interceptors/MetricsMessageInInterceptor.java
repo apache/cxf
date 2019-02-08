@@ -28,7 +28,7 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInInterceptor(MetricsProvider p[]) {
+    public MetricsMessageInInterceptor(MetricsProvider[] p) {
         super(Phase.RECEIVE, p);
         addBefore(AttachmentInInterceptor.class.getName());
     }

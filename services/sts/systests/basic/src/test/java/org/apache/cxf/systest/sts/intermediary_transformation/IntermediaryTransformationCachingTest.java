@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -33,28 +34,33 @@ import org.apache.cxf.systest.sts.deployment.STSServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a STS instance, and
- * receives a (HOK) SAML 1.1 Assertion. This is then sent via (1-way) TLS to an Intermediary 
- * service provider. The intermediary service provider validates the token, and then the 
- * Intermediary client uses delegation to dispatch the received token (via OnBehalfOf) to another 
- * STS instance. After this point, the STSClient is disabled, meaning that the Intermediary client must rely
- * on its cache to get tokens. The retrieved token is sent to the service provider via (2-way) TLS.
+ * receives a (HOK) SAML 1.1 Assertion. This is then sent via (1-way) TLS to an Intermediary
+ * service provider. The intermediary service provider validates the token, and then the
+ * Intermediary client uses delegation to dispatch the received token (via OnBehalfOf) to another
+ * STS instance. The retrieved token is sent to the service provider via (2-way) TLS. The STSClient is disabled
+ * after two invocations, meaning that the Intermediary client must rely on its cache to get tokens.
  */
 public class IntermediaryTransformationCachingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     static final String PORT2 = allocatePort(Server.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
-    private static final String PORT = allocatePort(Intermediary.class);
-    
+
+    private static final String PORT = allocatePort(IntermediaryCaching.class);
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -69,14 +75,11 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
             // set this to false to fork
             launchServer(Server.class, true)
         );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(STSServer.class, true)
-        );
+        STSServer stsServer = new STSServer();
+        stsServer.setContext("cxf-transport.xml");
+        assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -90,44 +93,60 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         URL busFile = IntermediaryTransformationCachingTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         URL wsdl = IntermediaryTransformationCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType alicePort =
             service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
-        
-        TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
+        updateAddressPort(alicePort, PORT);
 
-        ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
-        
+        TokenTestUtils.updateSTSPort((BindingProvider)alicePort, STSPORT);
+
+        ((BindingProvider)alicePort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
+
         // Make initial successful invocation (for "alice")
-        doubleIt(transportPort, 25);
-        
-        // Make another invocation - this should work as the intermediary caches the token
-        // even though its STSClient is disabled after the first invocation
-        doubleIt(transportPort, 30);
-        
-        transportPort = service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(transportPort, PORT);
-        TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
+        doubleIt(alicePort, 25);
 
-        ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
-        
-        // Make invocation for "bob"...this should fail as the intermediary's STS client is disabled
+        // Make another successful invocation for "bob"
+        DoubleItPortType bobPort = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(bobPort, PORT);
+        TokenTestUtils.updateSTSPort((BindingProvider)bobPort, STSPORT);
+
+        ((BindingProvider)bobPort).getRequestContext().put(SecurityConstants.USERNAME, "bob");
+        doubleIt(bobPort, 30);
+
+        // Make another invocation for "bob" - this should work as the intermediary caches the token
+        // even though its STSClient is disabled after the second invocation
+        doubleIt(bobPort, 35);
+
+        // Make another invocation for "alice" - this should work as the intermediary caches the token
+        // even though its STSClient is disabled after the first invocation
+        doubleIt(alicePort, 40);
+
+        // Now make an invocation for "myservicekey"
+        DoubleItPortType servicePort = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(servicePort, PORT);
+        TokenTestUtils.updateSTSPort((BindingProvider)servicePort, STSPORT);
+
+        ((BindingProvider)servicePort).getRequestContext().put(SecurityConstants.USERNAME, "myservicekey");
+
+        // Make invocation for "myservicekey"...this should fail as the intermediary's STS client is disabled
         try {
-            doubleIt(transportPort, 35);
+            doubleIt(servicePort, 45);
+            fail("Expected failure on a cache retrieval failure");
         } catch (SOAPFaultException ex) {
             // expected
         }
-        
-        ((java.io.Closeable)transportPort).close();
+
+        ((java.io.Closeable)alicePort).close();
+        ((java.io.Closeable)bobPort).close();
+        ((java.io.Closeable)servicePort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

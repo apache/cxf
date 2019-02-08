@@ -36,6 +36,6 @@ public class MethodNameSoapActionServiceConfiguration extends AbstractServiceCon
         if (StringUtils.isEmpty(action)) {
             action = method.getName();
         }
-        return action; 
+        return action;
     }
 }

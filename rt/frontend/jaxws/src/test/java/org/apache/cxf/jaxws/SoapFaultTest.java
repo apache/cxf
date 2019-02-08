@@ -35,8 +35,11 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 import org.apache.hello_world_soap_http.GreeterImpl;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class SoapFaultTest extends AbstractJaxWsTest {
 
@@ -62,17 +65,17 @@ public class SoapFaultTest extends AbstractJaxWsTest {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setBus(bus);
         svrFactory.setServiceFactory(bean);
-        
+
         svrFactory.create();
     }
 
-    
+
     @Test
     public void testInterceptorThrowingSoapFault() throws Exception {
         service.getInInterceptors().add(new FaultThrowingInterceptor());
 
         Node response = invoke("http://localhost:9000/SoapContext/SoapPort",
-                               LocalTransportFactory.TRANSPORT_ID, 
+                               LocalTransportFactory.TRANSPORT_ID,
                                "GreeterMessage.xml");
 
         assertNotNull(response);

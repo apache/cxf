@@ -38,22 +38,22 @@ import org.opensaml.xacml.ctx.SubjectType;
  */
 public final class RequestComponentBuilder {
     private static volatile XACMLObjectBuilder<AttributeValueType> attributeValueTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<AttributeType> attributeTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<SubjectType> subjectTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<ResourceType> resourceTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<ActionType> actionTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<EnvironmentType> environmentTypeBuilder;
-    
+
     private static volatile XACMLObjectBuilder<RequestType> requestTypeBuilder;
-    
-    private static volatile XMLObjectBuilderFactory builderFactory = 
+
+    private static volatile XMLObjectBuilderFactory builderFactory =
         XMLObjectProviderRegistrySupport.getBuilderFactory();
-    
+
     private RequestComponentBuilder() {
         // complete
     }
@@ -68,10 +68,10 @@ public final class RequestComponentBuilder {
         }
         AttributeValueType attributeValue = attributeValueTypeBuilder.buildObject();
         attributeValue.setValue(value);
-        
+
         return attributeValue;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static AttributeType createAttributeType(
         String attributeId,
@@ -88,10 +88,10 @@ public final class RequestComponentBuilder {
         attributeType.setDataType(dataType);
         attributeType.setIssuer(issuer);
         attributeType.getAttributeValues().addAll(attributeValues);
-        
+
         return attributeType;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static SubjectType createSubjectType(
         List<AttributeType> attributes,
@@ -106,10 +106,10 @@ public final class RequestComponentBuilder {
             subject.getAttributes().addAll(attributes);
         }
         subject.setSubjectCategory(subjectCategory);
-        
+
         return subject;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static ResourceType createResourceType(
         List<AttributeType> attributes,
@@ -124,10 +124,10 @@ public final class RequestComponentBuilder {
             resource.getAttributes().addAll(attributes);
         }
         resource.setResourceContent(resourceContent);
-        
+
         return resource;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static ActionType createActionType(
         List<AttributeType> attributes
@@ -140,10 +140,10 @@ public final class RequestComponentBuilder {
         if (attributes != null) {
             action.getAttributes().addAll(attributes);
         }
-        
+
         return action;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static EnvironmentType createEnvironmentType(
         List<AttributeType> attributes
@@ -156,10 +156,10 @@ public final class RequestComponentBuilder {
         if (attributes != null) {
             enviroment.getAttributes().addAll(attributes);
         }
-        
+
         return enviroment;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static RequestType createRequestType(
         List<SubjectType> subjects,
@@ -176,8 +176,8 @@ public final class RequestComponentBuilder {
         request.getResources().addAll(resources);
         request.setAction(action);
         request.setEnvironment(environment);
-        
+
         return request;
     }
-    
+
 }

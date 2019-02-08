@@ -22,5 +22,5 @@ package org.apache.cxf.tools.wsdlto.javascript;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 
 public class JavaScriptProfile extends FrontEndProfile {
-    
+
 }

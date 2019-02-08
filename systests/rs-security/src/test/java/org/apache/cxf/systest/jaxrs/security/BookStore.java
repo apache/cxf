@@ -31,17 +31,17 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/bookstore")
 public class BookStore {
-    
+
     public BookStore() {
     }
-    
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) {
         return new Book();
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
@@ -49,7 +49,7 @@ public class BookStore {
     public Book addBook(Book book) {
         return book;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")

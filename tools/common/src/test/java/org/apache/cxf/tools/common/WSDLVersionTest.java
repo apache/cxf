@@ -21,10 +21,11 @@ package org.apache.cxf.tools.common;
 
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class WSDLVersionTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class WSDLVersionTest {
 
     @Test
     public void testWSDLVersion() {

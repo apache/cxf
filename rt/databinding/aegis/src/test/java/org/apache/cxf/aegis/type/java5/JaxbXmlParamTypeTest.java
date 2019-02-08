@@ -38,7 +38,7 @@ public class JaxbXmlParamTypeTest extends AbstractAegisTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        tm = new DefaultTypeMapping(null, 
+        tm = new DefaultTypeMapping(null,
                                     DefaultTypeMapping.createDefaultTypeMapping(false, false));
         creator = new Java5TypeCreator();
         creator.setNextCreator(new DefaultTypeCreator());
@@ -51,7 +51,7 @@ public class JaxbXmlParamTypeTest extends AbstractAegisTest {
     public void testMapServiceWSDL() throws Exception {
         createService(CustomTypeService.class, new CustomTypeService(), null);
 
-        // Document wsdl = 
+        // Document wsdl =
         getWSDLDocument("CustomTypeService");
         // todo overriding type qname only seems to work with a Aegis annotation with type class defined
         // if type is not defined, aegis ignores specified qname

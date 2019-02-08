@@ -39,27 +39,34 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class CXF4818Test extends AbstractBusClientServerTestBase {
 
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber(Server.class)
             + "/AddressProvider/AddressProvider";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new CXF4818Provider();
-            Endpoint.publish(ADDRESS, implementor);                                 
+            Endpoint.publish(ADDRESS, implementor);
         }
 
         public static void main(String[] args) {
@@ -79,20 +86,20 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCXF4818() throws Exception {
         InputStream body = getClass().getResourceAsStream("cxf4818data.txt");
-        HttpClient client = new HttpClient();
-        PostMethod post = new PostMethod(ADDRESS);
-        post.setRequestEntity(new InputStreamRequestEntity(body, "text/xml"));
-        client.executeMethod(post); 
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(ADDRESS);
+        post.setEntity(new InputStreamEntity(body, ContentType.TEXT_XML));
+        CloseableHttpResponse response = client.execute(post);
 
-        Document doc = StaxUtils.read(post.getResponseBodyAsStream());
+        Document doc = StaxUtils.read(response.getEntity().getContent());
         //System.out.println(StaxUtils.toString(doc));
         Element root = doc.getDocumentElement();
         Node child = root.getFirstChild();
-        
+
         boolean foundBody = false;
         boolean foundHeader = false;
         while (child != null) {
@@ -109,10 +116,10 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
         assertTrue("Did not find the soap:Header element", foundHeader);
     }
 
-    
-    
+
+
     @WebServiceProvider(serviceName = "GenericService",
-        targetNamespace = "http://cxf.apache.org/basictest", 
+        targetNamespace = "http://cxf.apache.org/basictest",
         portName = "GenericServicePosrt")
     @ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
     @Addressing
@@ -129,7 +136,7 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
                     + "<ns2:FooResponse xmlns:ns2=\"http://cxf.apache.org/soapheader/inband\">"
                     + "<ns2:Return>Foo Response Body</ns2:Return>"
                     + "</ns2:FooResponse>"
-                    + "</SOAP-ENV:Body>" 
+                    + "</SOAP-ENV:Body>"
                     + "</SOAP-ENV:Envelope>\n";
 
 
@@ -150,5 +157,5 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
 
         }
 
-    }    
+    }
 }

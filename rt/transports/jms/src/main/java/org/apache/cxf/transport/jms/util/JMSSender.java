@@ -28,7 +28,7 @@ public class JMSSender {
     private int deliveryMode;
     private int priority;
     private long timeToLive;
-    
+
     public void setExplicitQosEnabled(boolean explicitQosEnabled) {
         this.explicitQosEnabled = explicitQosEnabled;
     }
@@ -58,6 +58,6 @@ public class JMSSender {
         } finally {
             ResourceCloser.close(producer);
         }
-        
+
     }
 }

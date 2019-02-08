@@ -25,7 +25,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 /**
- * 
+ *
  */
 public class TrustException extends UncheckedException {
 
@@ -57,7 +57,7 @@ public class TrustException extends UncheckedException {
     public TrustException(Throwable cause) {
         super(cause);
     }
-    
+
     public TrustException(String msg, Logger log) {
         super(new Message(msg, log));
     }

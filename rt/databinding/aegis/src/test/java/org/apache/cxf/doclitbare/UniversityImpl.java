@@ -23,16 +23,16 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 /**
- * 
+ *
  */
 
 @WebService(name = "University", targetNamespace = "http://cxf.apache.org/dlb/")
-@SOAPBinding(use = SOAPBinding.Use.LITERAL, 
-             style = SOAPBinding.Style.DOCUMENT, 
+@SOAPBinding(use = SOAPBinding.Use.LITERAL,
+             style = SOAPBinding.Style.DOCUMENT,
              parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public class UniversityImpl implements University {
 
     public Teacher getTeacher(Course course) {
-        return new Teacher(52, "Mr. Tom", "Computer Science" + course.getName()); 
+        return new Teacher(52, "Mr. Tom", "Computer Science" + course.getName());
     }
 }

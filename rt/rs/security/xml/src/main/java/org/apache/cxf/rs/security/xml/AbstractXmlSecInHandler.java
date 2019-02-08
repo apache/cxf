@@ -30,10 +30,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
@@ -48,33 +50,35 @@ public abstract class AbstractXmlSecInHandler {
      * A key used to reference the public key that was used to verify the signed request
      */
     public static final String SIGNING_PUBLIC_KEY = "xml.security.signing.public.key";
-    
+
     protected static final String SIG_NS = "http://www.w3.org/2000/09/xmldsig#";
     protected static final String SIG_PREFIX = "ds";
     protected static final String ENC_NS = "http://www.w3.org/2001/04/xmlenc#";
     protected static final String ENC_PREFIX = "xenc";
-    protected static final String WSU_NS = 
+    protected static final String WSU_NS =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractXmlSecInHandler.class);
-    
+
     static {
         WSProviderConfig.init();
     }
-    
+
     private boolean allowEmptyBody;
-    
+
     public void setAllowEmptyBody(boolean allow) {
         this.allowEmptyBody = allow;
     }
-    
+
     protected Document getDocument(Message message) {
-        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
+        if (isServerGet(message)) {
             return null;
         }
-        
+        Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+        if (responseCode != null && responseCode != 200) {
+            return null;
+        }
         Document doc = null;
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
@@ -95,9 +99,18 @@ public abstract class AbstractXmlSecInHandler {
         return doc;
     }
     
+    protected boolean isServerGet(Message message) {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        return "GET".equals(method) && !MessageUtils.isRequestor(message);
+    }
+
     protected void throwFault(String error, Exception ex) {
-        LOG.warning(error);
-        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
+        StringBuilder log = new StringBuilder(error);
+        if (ex != null) {
+            log = log.append(" - ").append(ex.getMessage());
+        }
+        LOG.warning(log.toString());
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).type("text/plain").build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 
@@ -105,8 +118,8 @@ public abstract class AbstractXmlSecInHandler {
         NodeList list = parent.getElementsByTagNameNS(ns, name);
         if (list != null && list.getLength() >= index + 1) {
             return (Element)list.item(index);
-        } 
+        }
         return null;
     }
-    
+
 }

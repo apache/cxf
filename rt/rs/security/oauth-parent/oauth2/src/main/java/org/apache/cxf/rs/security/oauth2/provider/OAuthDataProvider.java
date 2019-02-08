@@ -26,16 +26,17 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 /**
- * OAuth provider responsible for persisting the information about 
+ * OAuth provider responsible for persisting the information about
  * OAuth consumers, request and access tokens.
  */
 public interface OAuthDataProvider {
 
 
     /**
-     * Returns the previously registered third-party {@link Client} 
+     * Returns the previously registered third-party {@link Client}
      * @param clientId the client id
      * @return Client
      * @throws OAuthServiceException
@@ -43,67 +44,80 @@ public interface OAuthDataProvider {
     Client getClient(String clientId) throws OAuthServiceException;
 
     /**
-     * Create access token 
-     * @param accessToken the token registration info 
+     * Create access token
+     * @param accessToken the token registration info
      * @return AccessToken
      * @throws OAuthServiceException
      */
     ServerAccessToken createAccessToken(AccessTokenRegistration accessToken) throws OAuthServiceException;
-    
+
     /**
-     * Get access token 
-     * @param accessToken the token key 
+     * Get access token
+     * @param accessToken the token key
      * @return AccessToken
      * @throws OAuthServiceException
      */
     ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException;
-    
+
     /**
-     * Get preauthorized access token 
+     * Get preauthorized access token
      * @param client Client
      * @param requestedScopes the scopes requested by the client
-     * @param subject End User subject 
+     * @param subject End User subject
      * @return AccessToken access token
      * @throws OAuthServiceException
      */
     ServerAccessToken getPreauthorizedToken(Client client,
                                             List<String> requestedScopes,
-                                            UserSubject subject, 
-                                            String grantType) 
+                                            UserSubject subject,
+                                            String grantType)
         throws OAuthServiceException;
-    
+
     /**
-     * Refresh access token 
+     * Refresh access token
      * @param client the client
-     * @param refreshToken refresh token key 
-     * @param requestedScopes the scopes requested by the client  
+     * @param refreshToken refresh token key
+     * @param requestedScopes the scopes requested by the client
      * @return AccessToken
      * @throws OAuthServiceException
      */
-    ServerAccessToken refreshAccessToken(Client client, 
-                                         String refreshToken, 
-                                         List<String> requestedScopes) 
+    ServerAccessToken refreshAccessToken(Client client,
+                                         String refreshToken,
+                                         List<String> requestedScopes)
         throws OAuthServiceException;
 
     /**
-     * Removes the access token
-     * The runtime will call this method if it finds that a token has expired
-     * @param accessToken the token
+     * Return all access tokens associated with a given client
+     * @param client the client
+     * @param subject the user subject, can be null
+     * @return list of access tokens
      * @throws OAuthServiceException
      */
-    void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException;
-    
+    List<ServerAccessToken> getAccessTokens(Client client, UserSubject subject) throws OAuthServiceException;
+
+    /**
+     * Return all refresh tokens associated with a given client
+     * @param client the client
+     * @param subject the user subject, can be null
+     * @return list of refresh tokens
+     * @throws OAuthServiceException
+     */
+    List<RefreshToken> getRefreshTokens(Client client, UserSubject subject) throws OAuthServiceException;
+
     /**
      * Revokes a refresh or access token
      * @param token token identifier
-     * @param tokenTypeHint 
+     * @param tokenTypeHint can be access_token or refresh_token or null
      * @throws OAuthServiceException
      */
-    void revokeToken(Client client, String token, String tokenTypeHint) throws OAuthServiceException;
+    void revokeToken(Client client, String tokenId, String tokenTypeHint) throws OAuthServiceException;
 
     /**
-     * Converts the requested scope to the list of permissions  
-     * @param requestedScopes
+     * Converts the requested scopes to the list of permissions.
+     * The scopes are extracted from OAuth2 'scope' property which
+     * if set may contain one or more space separated scope values
+     *
+     * @param requestedScopes the scopes
      * @return list of permissions
      */
     List<OAuthPermission> convertScopeToPermissions(Client client,

@@ -58,13 +58,13 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public final class WrapperClassGenerator extends ASMHelper {
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassGenerator.class);
-    private Set<Class<?>> wrapperBeans = new LinkedHashSet<Class<?>>();
+    private Set<Class<?>> wrapperBeans = new LinkedHashSet<>();
     private InterfaceInfo interfaceInfo;
     private boolean qualified;
     private JaxWsServiceFactoryBean factory;
-    
+
     public WrapperClassGenerator(JaxWsServiceFactoryBean fact, InterfaceInfo inf, boolean q) {
         factory = fact;
         interfaceInfo = inf;
@@ -81,7 +81,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         if (a != null) {
             return a;
         }
-        
+
         Annotation[][] paramAnno = (Annotation[][])mpi
             .getProperty(ReflectionServiceFactoryBean.METHOD_PARAM_ANNOTATIONS);
         int index = mpi.getIndex();
@@ -92,11 +92,11 @@ public final class WrapperClassGenerator extends ASMHelper {
     }
 
     private List<Annotation> getJaxbAnnos(MessagePartInfo mpi) {
-        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<Annotation>();
+        List<Annotation> list = new java.util.concurrent.CopyOnWriteArrayList<>();
         Annotation[] anns = getMethodParameterAnnotations(mpi);
         if (anns != null) {
             for (Annotation anno : anns) {
-                if (anno.annotationType() == XmlList.class 
+                if (anno.annotationType() == XmlList.class
                     || anno.annotationType() == XmlAttachmentRef.class
                     || anno.annotationType() == XmlJavaTypeAdapter.class
                     || anno.annotationType() == XmlMimeType.class
@@ -120,9 +120,9 @@ public final class WrapperClassGenerator extends ASMHelper {
                 if (inf.getTypeClass() == null) {
                     MessageInfo messageInfo = opInfo.getUnwrappedOperation().getInput();
                     createWrapperClass(inf,
-                                       messageInfo, 
+                                       messageInfo,
                                        opInfo,
-                                       method, 
+                                       method,
                                        true);
                 }
                 MessageInfo messageInfo = opInfo.getUnwrappedOperation().getOutput();
@@ -132,7 +132,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                         createWrapperClass(inf,
                                            messageInfo,
                                            opInfo,
-                                           method, 
+                                           method,
                                            false);
                     }
                 }
@@ -144,21 +144,21 @@ public final class WrapperClassGenerator extends ASMHelper {
     private void createWrapperClass(MessagePartInfo wrapperPart,
                                         MessageInfo messageInfo,
                                         OperationInfo op,
-                                        Method method, 
+                                        Method method,
                                         boolean isRequest) {
 
 
         ClassWriter cw = createClassWriter();
         if (cw == null) {
-            LOG.warning(op.getName() + "requires a wrapper bean but problems with"
-                + " ASM has prevented creating one.  Operation may not work correctly.");
+            LOG.warning(op.getName() + " requires a wrapper bean but problems with"
+                + " ASM has prevented creating one. Operation may not work correctly.");
             return;
         }
         QName wrapperElement = messageInfo.getName();
         boolean anonymous = factory.getAnonymousWrapperTypes();
 
         String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
-        String className =  pkg + "." 
+        String className = pkg + "."
             + StringUtils.capitalize(op.getName().getLocalPart());
         if (!isRequest) {
             className = className + "Response";
@@ -169,7 +169,7 @@ public final class WrapperClassGenerator extends ASMHelper {
             generatePackageInfo(pname, wrapperElement.getNamespaceURI(),
                                 method.getDeclaringClass());
         }
-        
+
         def = findClass(className, method.getDeclaringClass());
         String origClassName = className;
         int count = 0;
@@ -202,7 +202,7 @@ public final class WrapperClassGenerator extends ASMHelper {
             av0.visit("name", wrapperElement.getLocalPart());
             av0.visit("namespace", wrapperElement.getNamespaceURI());
         } else {
-            av0.visit("name", "");            
+            av0.visit("name", "");
         }
         av0.visitEnd();
 
@@ -236,7 +236,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         String classFileName = periodToSlashes(className);
         cw.visit(Opcodes.V1_5, Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE, classFileName, null,
                  "java/lang/Object", null);
-        
+
         boolean q = qualified;
         SchemaInfo si = interfaceInfo.getService().getSchema(ns);
         if (si != null) {
@@ -248,7 +248,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                       getClassCode(XmlNsForm.class),
                       q ? "QUALIFIED" : "UNQUALIFIED");
         av0.visitEnd();
-        
+
         if (clz.getPackage() != null && clz.getPackage().getAnnotations() != null) {
             for (Annotation ann : clz.getPackage().getAnnotations()) {
                 if (ann instanceof XmlJavaTypeAdapters) {
@@ -263,15 +263,15 @@ public final class WrapperClassGenerator extends ASMHelper {
             }
         }
         cw.visitEnd();
-        
+
         loadClass(className, clz, cw.toByteArray());
     }
 
     private void generateXmlJavaTypeAdapters(AnnotationVisitor av, XmlJavaTypeAdapters adapters) {
         AnnotationVisitor av1 = av.visitArray("value");
-        
+
         for (XmlJavaTypeAdapter adapter : adapters.value()) {
-            AnnotationVisitor av2 
+            AnnotationVisitor av2
                 = av1.visitAnnotation(null, "Ljavax/xml/bind/annotation/adapters/XmlJavaTypeAdapter;");
             generateXmlJavaTypeAdapter(av2, adapter);
             av2.visitEnd();
@@ -286,7 +286,7 @@ public final class WrapperClassGenerator extends ASMHelper {
             av.visit("type", getType(getClassCode(adapter.type())));
         }
     }
-    
+
     private void generateMessagePart(ClassWriter cw, MessagePartInfo mpi,
                                      Method method, String className) {
         if (Boolean.TRUE.equals(mpi.getProperty(ReflectionServiceFactoryBean.HEADER))) {
@@ -309,13 +309,12 @@ public final class WrapperClassGenerator extends ASMHelper {
         }
         String classCode = getClassCode(clz);
         String fieldDescriptor = null;
-        
+
         if (genericType instanceof ParameterizedType) {
             if (Collection.class.isAssignableFrom(clz) || clz.isArray()) {
                 ParameterizedType ptype = (ParameterizedType)genericType;
 
                 java.lang.reflect.Type[] types = ptype.getActualTypeArguments();
-                // TODO: more complex Parameterized type
                 if (types.length > 0) {
                     if (types[0] instanceof Class) {
                         fieldDescriptor = getClassCode(genericType);
@@ -334,13 +333,13 @@ public final class WrapperClassGenerator extends ASMHelper {
             }
         }
         String fieldName = JavaUtils.isJavaKeyword(name) ? JavaUtils.makeNonJavaKeyword(name) : name;
-        
+
         FieldVisitor fv = cw.visitField(Opcodes.ACC_PRIVATE,
-                                        fieldName, 
+                                        fieldName,
                                         classCode,
                                         fieldDescriptor,
                                         null);
-        
+
 
 
         List<Annotation> jaxbAnnos = getJaxbAnnos(mpi);
@@ -348,7 +347,7 @@ public final class WrapperClassGenerator extends ASMHelper {
             AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
             av0.visit("name", name);
             if (Boolean.TRUE.equals(factory.isWrapperPartQualified(mpi))) {
-                av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
+                av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());
             }
             if (factory.isWrapperPartNillable(mpi)) {
                 av0.visit("nillable", Boolean.TRUE);
@@ -356,12 +355,12 @@ public final class WrapperClassGenerator extends ASMHelper {
             if (factory.getWrapperPartMinOccurs(mpi) == 1) {
                 av0.visit("required", Boolean.TRUE);
             }
-            av0.visitEnd();            
+            av0.visitEnd();
         }
         fv.visitEnd();
 
         String methodName = JAXBUtils.nameToIdentifier(name, JAXBUtils.IdentifierType.GETTER);
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, methodName, "()" + classCode, 
+        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, methodName, "()" + classCode,
                                           fieldDescriptor == null ? null : "()" + fieldDescriptor,
                                           null);
         mv.visitCode();
@@ -371,7 +370,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         mv.visitInsn(getType(classCode).getOpcode(Opcodes.IRETURN));
         mv.visitMaxs(0, 0);
         mv.visitEnd();
-        
+
         methodName = JAXBUtils.nameToIdentifier(name, JAXBUtils.IdentifierType.SETTER);
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, methodName, "(" + classCode + ")V",
                             fieldDescriptor == null ? null : "(" + fieldDescriptor + ")V", null);
@@ -379,13 +378,13 @@ public final class WrapperClassGenerator extends ASMHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         ASMType setType = getType(classCode);
         mv.visitVarInsn(setType.getOpcode(Opcodes.ILOAD), 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, className, fieldName, classCode);       
+        mv.visitFieldInsn(Opcodes.PUTFIELD, className, fieldName, classCode);
         mv.visitInsn(Opcodes.RETURN);
         mv.visitMaxs(0, 0);
         mv.visitEnd();
 
     }
-     
+
     private boolean addJAXBAnnotations(FieldVisitor fv,
                                        List<Annotation> jaxbAnnos,
                                        String name) {
@@ -407,7 +406,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlList;", true);
                 av0.visitEnd();
             } else if (ann instanceof XmlElement) {
-                addedEl = true;   
+                addedEl = true;
                 XmlElement el = (XmlElement)ann;
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
                 if ("##default".equals(el.name())) {
@@ -420,9 +419,9 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0.visit("namespace", el.namespace());
                 av0.visit("defaultValue", el.defaultValue());
                 if (el.type() != XmlElement.DEFAULT.class) {
-                    av0.visit("type", el.type());                    
+                    av0.visit("type", el.type());
                 }
-                av0.visitEnd(); 
+                av0.visitEnd();
             } else if (ann instanceof XmlElementWrapper) {
                 XmlElementWrapper el = (XmlElementWrapper)ann;
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElementWrapper;", true);
@@ -430,11 +429,11 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0.visit("nillable", el.nillable());
                 av0.visit("required", el.required());
                 av0.visit("namespace", el.namespace());
-                av0.visitEnd(); 
+                av0.visitEnd();
             }
         }
         return addedEl;
     }
-    
-    
+
+
 }

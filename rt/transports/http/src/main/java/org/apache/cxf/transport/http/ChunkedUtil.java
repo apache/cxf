@@ -28,13 +28,13 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 final class ChunkedUtil {
     private ChunkedUtil() {
     }
-    
+
     /**
      * Get an input stream containing the partial response if one is present.
-     * 
+     *
      * @param connection the connection in question
      * @param responseCode the response code
-     * @return an input stream if a partial response is pending on the connection 
+     * @return an input stream if a partial response is pending on the connection
      */
     public static InputStream getPartialResponse(
         HttpURLConnection connection,
@@ -45,15 +45,15 @@ final class ChunkedUtil {
             || responseCode == HttpURLConnection.HTTP_OK) {
             if (connection.getContentLength() > 0) {
                 in = connection.getInputStream();
-            } else if (hasChunkedResponse(connection) 
+            } else if (hasChunkedResponse(connection)
                        || hasEofTerminatedResponse(connection)) {
                 // ensure chunked or EOF-terminated response is non-empty
-                in = getNonEmptyContent(connection);        
+                in = getNonEmptyContent(connection);
             }
         }
         return in;
     }
-    
+
     /**
      * @param connection the given HttpURLConnection
      * @return true iff the connection has a chunked response pending
@@ -62,7 +62,7 @@ final class ChunkedUtil {
         return HttpHeaderHelper.CHUNKED.equalsIgnoreCase(
                    connection.getHeaderField(HttpHeaderHelper.TRANSFER_ENCODING));
     }
-    
+
     /**
      * @param connection the given HttpURLConnection
      * @return true iff the connection has a chunked response pending
@@ -83,7 +83,7 @@ final class ChunkedUtil {
     ) {
         InputStream in = null;
         try {
-            PushbackInputStream pin = 
+            PushbackInputStream pin =
                 new PushbackInputStream(connection.getInputStream());
             int c = pin.read();
             if (c != -1) {
@@ -92,7 +92,7 @@ final class ChunkedUtil {
             }
         } catch (IOException ioe) {
             // ignore
-        }    
+        }
         return in;
     }
 }

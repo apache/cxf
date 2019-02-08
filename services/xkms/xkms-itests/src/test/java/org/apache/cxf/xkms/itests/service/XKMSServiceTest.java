@@ -25,7 +25,6 @@ import java.util.UUID;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.handlers.XKMSConstants;
 import org.apache.cxf.xkms.itests.BasicIntegrationTest;
-import org.apache.cxf.xkms.model.extensions.ResultDetails;
 import org.apache.cxf.xkms.model.xkms.LocateRequestType;
 import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.MessageAbstractType;
@@ -38,6 +37,7 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,9 +45,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 
 @RunWith(PaxExam.class)
 public class XKMSServiceTest extends BasicIntegrationTest {
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
-    
+
     @Test
     public void testLocatePKIX() throws URISyntaxException, Exception {
         LocateRequestType request = XKMS_OF.createLocateRequestType();
@@ -102,8 +102,6 @@ public class XKMSServiceTest extends BasicIntegrationTest {
                             result.getResultMajor());
         Assert.assertEquals(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE.value(),
                             result.getResultMinor());
-        ResultDetails message = (ResultDetails)result.getMessageExtension().get(0);
-        Assert.assertEquals("org.apache.cxf.xkms.model.xkms.PrototypeKeyBindingType must be set", message.getDetails());
     }
 
     @Test
@@ -120,5 +118,5 @@ public class XKMSServiceTest extends BasicIntegrationTest {
         Assert.assertEquals(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE.value(),
                             result.getResultMinor());
     }
-    
+
 }

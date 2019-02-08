@@ -36,44 +36,45 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.ietf.jgss.GSSCredential;
+
 import org.junit.Assert;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @Resource
     WebServiceContext wsc;
 
     public int doubleIt(int numberToDouble) {
         Principal pr = wsc.getUserPrincipal();
-        
+
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
-        
+
         URL wsdl = IntermediaryPortTypeImpl.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         try {
             updateAddressPort(transportPort, KerberosDelegationTokenTest.PORT);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         // Retrieve delegated credential + set it on the outbound message
         MessageContext messageContext = wsc.getMessageContext();
-        GSSCredential delegatedCredential = 
+        GSSCredential delegatedCredential =
             (GSSCredential)messageContext.get(SecurityConstants.DELEGATED_CREDENTIAL);
         Map<String, Object> context = ((BindingProvider)transportPort).getRequestContext();
         context.put(SecurityConstants.DELEGATED_CREDENTIAL, delegatedCredential);
-        
+
         STSClient stsClient = (STSClient)context.get(SecurityConstants.STS_CLIENT);
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
@@ -83,8 +84,8 @@ public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase im
                 );
             }
         }
-        
+
         return transportPort.doubleIt(numberToDouble);
     }
-    
+
 }

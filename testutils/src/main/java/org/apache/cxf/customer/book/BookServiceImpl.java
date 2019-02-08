@@ -28,7 +28,7 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")
 public class BookServiceImpl implements BookService {
     long currentId = 1;
-    Map<Long, Book> books = new HashMap<Long, Book>();
+    Map<Long, Book> books = new HashMap<>();
 
     public BookServiceImpl() {
         Book book = createBook();
@@ -47,11 +47,11 @@ public class BookServiceImpl implements BookService {
 
     public Book getBook(GetBook getBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("getBook -> " + me.getKey() + " : " 
+            System.out.println("getBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getBook.getId());
-        Book b = books.get(((Long)getBook.getId()).longValue());
+        Book b = books.get(getBook.getId());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -63,11 +63,11 @@ public class BookServiceImpl implements BookService {
 
     public Book getAnotherBook(GetAnotherBook getAnotherBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("getBook -> " + me.getKey() + " : " 
+            System.out.println("getBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getAnotherBook.getId());
-        Book b = books.get(((Long)getAnotherBook.getId()).longValue());
+        Book b = books.get(getAnotherBook.getId());
 
         if (b == null) {
             BookNotFoundDetails details = new BookNotFoundDetails();
@@ -90,7 +90,7 @@ public class BookServiceImpl implements BookService {
         b.setId(id);
         books.put(id, b);
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("addBook -> " + me.getKey() + " : " 
+            System.out.println("addBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
 

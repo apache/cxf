@@ -26,19 +26,21 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public abstract class AbstractJoseProducer {
+    private boolean jwsRequired = true;
+    private boolean jweRequired;
     private JwsSignatureProvider sigProvider;
     private JweEncryptionProvider encryptionProvider;
-    
+
     protected JwsSignatureProvider getInitializedSignatureProvider(JwsHeaders jwsHeaders) {
         if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        
+            return sigProvider;
+        }
+
         return JwsUtils.loadSignatureProvider(jwsHeaders, false);
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(JweHeaders jweHeaders) {
         if (encryptionProvider != null) {
-            return encryptionProvider;    
+            return encryptionProvider;
         }
         return JweUtils.loadEncryptionProvider(jweHeaders, false);
     }
@@ -49,5 +51,27 @@ public abstract class AbstractJoseProducer {
 
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         this.sigProvider = signatureProvider;
+    }
+    
+    public boolean isJwsRequired() {
+        return jwsRequired;
+    }
+
+    public void setJwsRequired(boolean jwsRequired) {
+        this.jwsRequired = jwsRequired;
+    }
+
+    public boolean isJweRequired() {
+        return jweRequired;
+    }
+
+    public void setJweRequired(boolean jweRequired) {
+        this.jweRequired = jweRequired;
+    }
+
+    protected void checkProcessRequirements() {
+        if (!isJwsRequired() && !isJweRequired()) {
+            throw new JoseException("Unable to process the data");
+        }
     }
 }

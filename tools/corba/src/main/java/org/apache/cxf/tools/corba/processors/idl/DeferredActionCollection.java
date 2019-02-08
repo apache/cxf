@@ -27,23 +27,23 @@ import java.util.Map;
 
 /**
  * Class that holds a fully qualified name as the key that represents
- * a type that was forward declared. 
+ * a type that was forward declared.
  * Associated with each fully qualified name is a list of actions.
- * Each action represents a task that is deferred until 
- * the type is really declared. 
+ * Each action represents a task that is deferred until
+ * the type is really declared.
  */
 
-public final class DeferredActionCollection {    
-    Map<String, List<DeferredAction>> deferredActions = new HashMap<String, List<DeferredAction>>();
+public final class DeferredActionCollection {
+    Map<String, List<DeferredAction>> deferredActions = new HashMap<>();
     public void add(Scope scope, DeferredAction action) {
         List<DeferredAction> list = deferredActions.get(scope.toString());
         if (list == null) {
-            list = new ArrayList<DeferredAction>();
+            list = new ArrayList<>();
             deferredActions.put(scope.toString(), list);
         }
         list.add(action);
     }
-    
+
     public void remove(Scope scope, DeferredAction action) {
         List<DeferredAction> list = deferredActions.get(scope.toString());
         if (list != null) {
@@ -54,12 +54,12 @@ public final class DeferredActionCollection {
     public void removeScope(Scope scope) {
         deferredActions.remove(scope.toString());
     }
-                   
+
     public int getSize() {
         return deferredActions.size();
     }
-    
-    public List<DeferredAction> getActions(Scope scope) {   
+
+    public List<DeferredAction> getActions(Scope scope) {
         return deferredActions.get(scope.toString());
     }
 }

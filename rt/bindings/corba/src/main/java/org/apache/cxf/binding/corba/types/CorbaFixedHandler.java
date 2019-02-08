@@ -24,7 +24,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.Anonfixed;
 import org.apache.cxf.binding.corba.wsdl.Fixed;
-
 import org.omg.CORBA.TypeCode;
 
 public final class CorbaFixedHandler extends CorbaObjectHandler {
@@ -32,10 +31,10 @@ public final class CorbaFixedHandler extends CorbaObjectHandler {
     private final long digits;
     private final long scale;
     private BigDecimal value;
-    
+
     public CorbaFixedHandler(QName fixedName, QName fixedIdlType, TypeCode fixedTC, Object fixedType) {
         super(fixedName, fixedIdlType, fixedTC, fixedType);
-        
+
         if (fixedType instanceof Fixed) {
             digits = ((Fixed)fixedType).getDigits();
             scale = ((Fixed)fixedType).getScale();
@@ -48,32 +47,32 @@ public final class CorbaFixedHandler extends CorbaObjectHandler {
             scale = 0;
         }
     }
-    
+
     public long getDigits() {
         return digits;
     }
-    
+
     public long getScale() {
         return scale;
     }
-    
+
     public BigDecimal getValue() {
         return value;
     }
-    
+
     public String getValueData() {
         return value.toString();
     }
-    
+
     public void setValue(BigDecimal val) {
         value = val;
     }
-    
+
     public void setValueFromData(String data) {
         value = new BigDecimal(data);
     }
 
     public void clear() {
         value = null;
-    }  
+    }
 }

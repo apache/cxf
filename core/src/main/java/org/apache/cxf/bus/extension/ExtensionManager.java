@@ -21,9 +21,9 @@ package org.apache.cxf.bus.extension;
 
 public interface ExtensionManager {
     void activateAll();
-    
+
     <T> void activateAllByType(Class<T> type);
-    
+
     <T> T getExtension(String ns, Class<T> type);
-    
+
 }

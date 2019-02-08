@@ -24,8 +24,9 @@ public class JweEncryptionInput {
     private byte[] iv;
     private byte[] aad;
     private byte[] content;
+    private boolean contentEncryptionRequired = true;
     public JweEncryptionInput() {
-        
+
     }
     public JweEncryptionInput(JweHeaders jweHeaders) {
         this(jweHeaders, null);
@@ -38,7 +39,7 @@ public class JweEncryptionInput {
                               byte[] content,
                               byte[] aad) {
         this(jweHeaders, content, aad, null, null);
-        
+
     }
     public JweEncryptionInput(JweHeaders jweHeaders,
                               byte[] content,
@@ -86,5 +87,11 @@ public class JweEncryptionInput {
     }
     public void setContent(byte[] content) {
         this.content = content;
+    }
+    public boolean isContentEncryptionRequired() {
+        return contentEncryptionRequired;
+    }
+    public void setContentEncryptionRequired(boolean required) {
+        this.contentEncryptionRequired = required;
     }
 }

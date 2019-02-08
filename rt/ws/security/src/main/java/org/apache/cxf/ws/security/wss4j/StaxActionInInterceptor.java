@@ -41,12 +41,12 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
  * then no checking is done on the received security events.
  */
 public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(StaxActionInInterceptor.class);
-                                                            
+
     private final List<XMLSecurityConstants.Action> inActions;
-    
+
     public StaxActionInInterceptor(List<XMLSecurityConstants.Action> inActions) {
         super(Phase.PRE_PROTOCOL);
         this.inActions = inActions;
@@ -55,74 +55,74 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
 
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
-        
-        if (inActions == null || inActions.size() == 0) {
+
+        if (inActions == null || inActions.isEmpty()) {
             return;
         }
-        
+
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingSecurityEventList = 
+        final List<SecurityEvent> incomingSecurityEventList =
             (List<SecurityEvent>)soapMessage.get(SecurityEvent.class.getName() + ".in");
 
         if (incomingSecurityEventList == null) {
             LOG.warning("Security processing failed (actions mismatch)");
-            WSSecurityException ex = 
+            WSSecurityException ex =
                 new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR);
             throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), ex);
         }
-        
+
         // First check for a SOAP Fault with no security header if we are the client
         if (MessageUtils.isRequestor(soapMessage)
-            && isEventInResults(WSSecurityEventConstants.NoSecurity, incomingSecurityEventList)) {
-            OperationSecurityEvent securityEvent = 
+            && isEventInResults(WSSecurityEventConstants.NO_SECURITY, incomingSecurityEventList)) {
+            OperationSecurityEvent securityEvent =
                 (OperationSecurityEvent)findEvent(
-                    WSSecurityEventConstants.Operation, incomingSecurityEventList
+                    WSSecurityEventConstants.OPERATION, incomingSecurityEventList
                 );
-            if (securityEvent != null 
+            if (securityEvent != null
                 && soapMessage.getVersion().getFault().equals(securityEvent.getOperation())) {
                 LOG.warning("Request does not contain Security header, but it's a fault.");
                 return;
             }
         }
-        
+
         for (XMLSecurityConstants.Action action : inActions) {
             Event requiredEvent = null;
             if (WSSConstants.TIMESTAMP.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.Timestamp;
+                requiredEvent = WSSecurityEventConstants.TIMESTAMP;
             } else if (WSSConstants.USERNAMETOKEN.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.UsernameToken;
-            } else if (WSSConstants.SIGNATURE.equals(action)) {
+                requiredEvent = WSSecurityEventConstants.USERNAME_TOKEN;
+            } else if (XMLSecurityConstants.SIGNATURE.equals(action)) {
                 requiredEvent = WSSecurityEventConstants.SignatureValue;
             } else if (WSSConstants.SAML_TOKEN_SIGNED.equals(action)
                 || WSSConstants.SAML_TOKEN_UNSIGNED.equals(action)) {
-                requiredEvent = WSSecurityEventConstants.SamlToken;
+                requiredEvent = WSSecurityEventConstants.SAML_TOKEN;
             }
-            
-            if (requiredEvent != null 
+
+            if (requiredEvent != null
                 && !isEventInResults(requiredEvent, incomingSecurityEventList)) {
                 LOG.warning("Security processing failed (actions mismatch)");
-                WSSecurityException ex = 
+                WSSecurityException ex =
                     new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR);
                 throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), ex);
             }
-            
-            if (WSSConstants.ENCRYPT.equals(action)) {
-                boolean foundEncryptionPart = 
-                    isEventInResults(WSSecurityEventConstants.EncryptedPart, incomingSecurityEventList);
+
+            if (XMLSecurityConstants.ENCRYPT.equals(action)) {
+                boolean foundEncryptionPart =
+                    isEventInResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList);
                 if (!foundEncryptionPart) {
                     foundEncryptionPart =
                         isEventInResults(WSSecurityEventConstants.EncryptedElement, incomingSecurityEventList);
                 }
                 if (!foundEncryptionPart) {
                     LOG.warning("Security processing failed (actions mismatch)");
-                    WSSecurityException ex = 
+                    WSSecurityException ex =
                         new WSSecurityException(WSSecurityException.ErrorCode.SECURITY_ERROR);
                     throw WSS4JUtils.createSoapFault(soapMessage, soapMessage.getVersion(), ex);
                 }
-            } 
+            }
         }
     }
-    
+
     private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
         for (SecurityEvent incomingEvent : incomingSecurityEventList) {
             if (event == incomingEvent.getSecurityEventType()) {
@@ -131,7 +131,7 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
         }
         return false;
     }
-    
+
     private SecurityEvent findEvent(Event event, List<SecurityEvent> incomingSecurityEventList) {
         for (SecurityEvent incomingEvent : incomingSecurityEventList) {
             if (event == incomingEvent.getSecurityEventType()) {
@@ -140,5 +140,5 @@ public class StaxActionInInterceptor extends AbstractPhaseInterceptor<SoapMessag
         }
         return null;
     }
-    
+
 }

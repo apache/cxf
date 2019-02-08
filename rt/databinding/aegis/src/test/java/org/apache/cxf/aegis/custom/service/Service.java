@@ -28,7 +28,7 @@ public interface Service {
 
     Collection<NoDefaultConstructorBean> getByName(NoDefaultConstructorBeanKey key);
 
-    Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> 
+    Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>
     getByNames(Collection<NoDefaultConstructorBeanKey> keys);
 
     Map<String, NoDefaultConstructorBean> getByIds(Collection<String> beanIds);

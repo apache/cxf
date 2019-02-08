@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 /**
  * Collection of categorized {@link Description} annotations.
- * 
+ *
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

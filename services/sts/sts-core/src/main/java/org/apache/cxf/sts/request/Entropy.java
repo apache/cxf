@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.sts.request;
 
+import java.util.Arrays;
+
 /**
  * This class contains values that have been extracted from an Entropy structure.
  */
@@ -28,17 +30,25 @@ public class Entropy {
     public BinarySecret getBinarySecret() {
         return binarySecret;
     }
-    
+
     public void setBinarySecret(BinarySecret binarySecret) {
         this.binarySecret = binarySecret;
     }
-    
+
     public void setDecryptedKey(byte[] decryptedKey) {
         this.decryptedKey = decryptedKey;
     }
-    
+
     public byte[] getDecryptedKey() {
         return decryptedKey;
     }
-    
+
+    public void clean() {
+        if (decryptedKey != null) {
+            Arrays.fill(decryptedKey, (byte) 0);
+        }
+        if (binarySecret != null) {
+            binarySecret.clean();
+        }
+    }
 }

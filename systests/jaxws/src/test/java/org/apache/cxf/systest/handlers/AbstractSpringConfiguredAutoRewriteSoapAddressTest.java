@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.handlers;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.LinkedList;
@@ -39,12 +40,14 @@ public abstract class AbstractSpringConfiguredAutoRewriteSoapAddressTest extends
     private Document retrieveWsdlDocument(String hostname, String port) throws Exception {
         URL wsdlUrlLocalhost = new URL("http://" + hostname + ":" + port + "/SpringEndpoint?wsdl");
         URLConnection urlConnection = wsdlUrlLocalhost.openConnection();
-        return StaxUtils.read(urlConnection.getInputStream());
+        try (InputStream input = urlConnection.getInputStream()) {
+            return StaxUtils.read(input);
+        }
     }
 
     protected List<String> findAllServiceUrlsFromWsdl(String hostname, String port) throws Exception {
         Document wsdlDocument = retrieveWsdlDocument(hostname, port);
-        List<String> serviceUrls = new LinkedList<String>();
+        List<String> serviceUrls = new LinkedList<>();
         List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(wsdlDocument.getDocumentElement(),
                                                           "http://schemas.xmlsoap.org/wsdl/",
                                                           "service");

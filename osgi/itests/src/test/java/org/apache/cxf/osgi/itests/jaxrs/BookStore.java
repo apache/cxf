@@ -21,9 +21,15 @@ package org.apache.cxf.osgi.itests.jaxrs;
 
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationProviderResolver;
+import javax.validation.spi.ValidationProvider;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -40,17 +46,21 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.validation.BeanValidationProvider;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+
 @Path("/bookstore")
 @Produces("application/xml")
 public class BookStore {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
-    @Context 
+    @Context
     private UriInfo ui;
 
-    @Context 
+    @Context
     private ResourceInfo rcInfo;
-    
+
     @Context
     private ResourceContext resourceContext;
 
@@ -60,7 +70,7 @@ public class BookStore {
     public BookStore() {
         init();
     }
-    
+
     @GET
     @Path("/books/{id}")
     public Response getBookRoot(@PathParam("id") Long id) {
@@ -75,16 +85,45 @@ public class BookStore {
     @PUT
     @Path("/books/{id}")
     public Response updateBook(@PathParam("id") Long id, Book book) {
-        assertInjections();        
+        assertInjections();
         Book b = books.get(id);
         if (b == null) {
             return Response.status(Status.NOT_FOUND).build();
-        } else {
-            b.setName(book.getName());
-            return Response.ok().build();
         }
+        b.setName(book.getName());
+        return Response.ok().build();
     }
-    
+
+    @POST
+    @Path("/books-validate")
+    public Response createBookValidate(Book book) {
+        assertInjections();
+
+        BeanValidationProvider prov = new BeanValidationProvider(
+                new ValidationProviderResolver() {
+                    @Override
+                    public List<ValidationProvider<?>> getValidationProviders() {
+                        ValidationProvider<HibernateValidatorConfiguration> prov = new HibernateValidator();
+                        List<ValidationProvider<?>> provs = new ArrayList<>();
+                        provs.add(prov);
+                        return provs;
+                    }
+                }, HibernateValidator.class);
+        try {
+            prov.validateBean(book);
+        } catch (ConstraintViolationException cve) {
+            StringBuilder violationMessages = new StringBuilder();
+            for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
+                violationMessages.append(constraintViolation.getPropertyPath())
+                        .append(": ").append(constraintViolation.getMessage()).append("\n");
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type("text/plain").entity(violationMessages.toString()).build();
+        }
+        return createBook(book);
+    }
+
+
     @POST
     @Path("/books")
     public Response createBook(Book book) {
@@ -92,12 +131,11 @@ public class BookStore {
         Book b = books.get(book.getId());
         if (b != null) {
             return Response.status(Status.CONFLICT).build();
-        } else {
-            books.put(book.getId(), book);
-            URI createdURI = UriBuilder.fromUri(ui.getAbsolutePath())
-                .path(Long.toString(book.getId())).build();
-            return Response.created(createdURI).build();
         }
+        books.put(book.getId(), book);
+        URI createdURI = UriBuilder.fromUri(ui.getAbsolutePath())
+            .path(Long.toString(book.getId())).build();
+        return Response.created(createdURI).build();
     }
 
     @DELETE
@@ -107,20 +145,19 @@ public class BookStore {
         Book b = books.remove(id);
         if (b == null) {
             return Response.status(Status.NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
 
     private void init() {
         books.clear();
-        
+
         Book book = new Book();
         book.setId(123);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     private void assertInjections() {
         if (ui.getAbsolutePath() == null) {
             throw new IllegalArgumentException("UriInfo absolute path is null");

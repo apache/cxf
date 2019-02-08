@@ -27,21 +27,28 @@ import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 
 /**
- * 
+ *
  */
 public class OSGiTestSupport {
 
     @Inject
     protected BundleContext bundleContext;
-    
+
     protected void assertBundleStarted(String name) {
         Bundle bundle = findBundleByName(name);
-        Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
-        Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
+        Assert.assertNotNull("Bundle " + name + " should be deployed", bundle);
+        if (bundle.getState() != Bundle.ACTIVE) {
+            try {
+                bundle.start();
+            } catch (BundleException e) {
+                throw new RuntimeException("Bundle " + name + " should be started but we get this error", e);
+            }
+        }
     }
-    
+
     protected Bundle findBundleByName(String symbolicName) {
         for (Bundle bundle : bundleContext.getBundles()) {
             if (bundle.getSymbolicName().equals(symbolicName)) {

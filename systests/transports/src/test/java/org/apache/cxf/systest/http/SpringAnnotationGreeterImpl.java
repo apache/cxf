@@ -33,66 +33,58 @@ import org.apache.cxf.service.invoker.spring.SpringBeanFactory;
 
 @WebService(serviceName = "GreeterService",
             portName = "GreeterPort",
-            endpointInterface = "org.apache.cxf.greeter_control.Greeter", 
+            endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 @FactoryType(factoryClass = SpringBeanFactory.class, args = { "SpringBean" })
 public class SpringAnnotationGreeterImpl implements Greeter {
     String name;
-    
-    
+
+
     // greetMe will use session to return last called name
     public String greetMe(String me) {
         name = me;
         return "Hello " + me;
     }
-    
+
 
     public String sayHi() {
         return "Bonjour " + name;
     }
-    
+
     public void pingMe() {
     }
 
 
     public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<GreetMeResponse> greetMeAsync(String requestType) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public void greetMeOneWay(String requestType) {
-        // TODO Auto-generated method stub
-        
     }
 
 
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<PingMeResponse> pingMeAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public Response<SayHiResponse> sayHiAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 

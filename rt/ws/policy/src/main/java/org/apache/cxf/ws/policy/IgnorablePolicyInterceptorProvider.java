@@ -38,10 +38,10 @@ import org.apache.cxf.phase.Phase;
 public class IgnorablePolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
     private static final long serialVersionUID = 8411915832046532494L;
 
-    private static final Logger LOG = LogUtils.getL7dLogger(IgnorablePolicyInterceptorProvider.class); 
+    private static final Logger LOG = LogUtils.getL7dLogger(IgnorablePolicyInterceptorProvider.class);
 
     private IgnorableAssertionsInterceptor interceptor = new IgnorableAssertionsInterceptor();
-    
+
     /**
      * @param type
      */
@@ -54,21 +54,21 @@ public class IgnorablePolicyInterceptorProvider extends AbstractPolicyIntercepto
      */
     public IgnorablePolicyInterceptorProvider(Collection<QName> at) {
         super(at);
-        
+
         getInInterceptors().add(interceptor);
         getOutInterceptors().add(interceptor);
         getInFaultInterceptors().add(interceptor);
         getOutFaultInterceptors().add(interceptor);
     }
-    
-    private class IgnorableAssertionsInterceptor 
+
+    private class IgnorableAssertionsInterceptor
         extends AbstractPhaseInterceptor<Message> {
 
         IgnorableAssertionsInterceptor() {
-            // somewhat irrelevant 
+            // somewhat irrelevant
             super(Phase.POST_LOGICAL);
         }
-        
+
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             for (QName an : getAssertionTypes()) {

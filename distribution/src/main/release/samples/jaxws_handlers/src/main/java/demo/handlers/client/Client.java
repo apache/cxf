@@ -58,7 +58,7 @@ public final class Client {
 
         //Add client side handlers programmatically
         SmallNumberHandler sh = new SmallNumberHandler();
-        List<Handler> newHandlerChain = new ArrayList<Handler>();
+        List<Handler> newHandlerChain = new ArrayList<>();
         newHandlerChain.add(sh);
         ((BindingProvider)port).getBinding().setHandlerChain(newHandlerChain);
 

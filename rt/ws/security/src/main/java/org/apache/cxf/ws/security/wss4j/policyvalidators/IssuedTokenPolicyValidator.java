@@ -35,6 +35,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.token.BinarySecurity;
@@ -51,28 +52,28 @@ import org.opensaml.saml.common.SAMLVersion;
  * or Kerberos token against an IssuedToken policy.
  */
 public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
-    
+
     private ClaimsPolicyValidator claimsValidator = new DefaultClaimsPolicyValidator();
 
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.ISSUED_TOKEN.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.ISSUED_TOKEN.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
-    public void validatePolicies(PolicyValidatorParameters parameters, 
+    public void validatePolicies(PolicyValidatorParameters parameters,
                                     Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> samlResults = parameters.getSamlResults();
         if (samlResults != null) {
             for (WSSecurityEngineResult samlResult : samlResults) {
-                SamlAssertionWrapper samlAssertion = 
+                SamlAssertionWrapper samlAssertion =
                     (SamlAssertionWrapper)samlResult.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 if (validateSAMLToken(parameters, samlAssertion, ais)) {
                     // Store token on the security context
@@ -82,13 +83,13 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 }
             }
         }
-        
-        List<WSSecurityEngineResult> bstResults = 
+
+        List<WSSecurityEngineResult> bstResults =
             parameters.getResults().getActionResults().get(WSConstants.BST);
-            
+
         if (bstResults != null) {
             for (WSSecurityEngineResult bstResult : bstResults) {
-                BinarySecurity binarySecurity = 
+                BinarySecurity binarySecurity =
                     (BinarySecurity)bstResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 if (Boolean.TRUE.equals(bstResult.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))
                     && validateBinarySecurityToken(parameters, binarySecurity, ais)) {
@@ -100,8 +101,8 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
         }
     }
-    
-    private boolean validateSAMLToken(PolicyValidatorParameters parameters, 
+
+    private boolean validateSAMLToken(PolicyValidatorParameters parameters,
                                       SamlAssertionWrapper samlAssertion,
                                       Collection<AssertionInfo> ais) {
         boolean asserted = true;
@@ -113,7 +114,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             if (!isTokenRequired(issuedToken, parameters.getMessage())) {
                 continue;
             }
-            
+
             if (samlAssertion == null) {
                 asserted = false;
                 ai.setNotAsserted(
@@ -128,7 +129,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 ai.setNotAsserted("Error in validating the IssuedToken policy");
                 continue;
             }
-            
+
             Element claims = issuedToken.getClaims();
             if (claims != null) {
                 String dialect = claims.getAttributeNS(null, "Dialect");
@@ -150,14 +151,14 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 ai.setNotAsserted("Assertion fails holder-of-key requirements");
                 continue;
             }
-            
+
         }
-        
+
         return asserted;
     }
-    
-    private boolean validateBinarySecurityToken(PolicyValidatorParameters parameters, 
-                                                BinarySecurity binarySecurity, 
+
+    private boolean validateBinarySecurityToken(PolicyValidatorParameters parameters,
+                                                BinarySecurity binarySecurity,
                                                 Collection<AssertionInfo> ais) {
         boolean asserted = true;
         for (AssertionInfo ai : ais) {
@@ -184,13 +185,13 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 continue;
             }
         }
-        
+
         return asserted;
     }
-    
+
     private void assertToken(IssuedToken token, AssertionInfoMap aim) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireExternalReference()) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_EXTERNAL_REFERENCE));
         }
@@ -198,7 +199,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_INTERNAL_REFERENCE));
         }
     }
-    
+
     /**
      * Check the issued token template against the received assertion
      */
@@ -207,10 +208,10 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         while (child != null) {
             if ("TokenType".equals(child.getLocalName())) {
                 String content = child.getTextContent();
-                if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(content) 
+                if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(content)
                     && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
                     return false;
-                } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(content) 
+                } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(content)
                     && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
                     return false;
                 }
@@ -239,7 +240,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         return true;
     }
-    
+
     /**
      * Check the issued token template against the received BinarySecurityToken
      */
@@ -257,7 +258,7 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
         }
         return true;
     }
-    
+
     private SecurityToken createSecurityToken(
         SamlAssertionWrapper assertionWrapper
     ) {
@@ -270,11 +271,14 @@ public class IssuedTokenPolicyValidator extends AbstractSamlPolicyValidator {
             if (certs != null && certs.length > 0) {
                 token.setX509Certificate(certs[0], null);
             }
+            if (subjectKeyInfo.getPublicKey() != null) {
+                token.setKey(subjectKeyInfo.getPublicKey());
+            }
         }
         if (assertionWrapper.getSaml1() != null) {
-            token.setTokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+            token.setTokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
         } else if (assertionWrapper.getSaml2() != null) {
-            token.setTokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            token.setTokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
         }
         token.setToken(assertionWrapper.getElement());
 

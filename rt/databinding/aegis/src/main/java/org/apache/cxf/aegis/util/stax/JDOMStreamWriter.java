@@ -35,7 +35,7 @@ import org.jdom.EntityRef;
 import org.jdom.Namespace;
 
 public class JDOMStreamWriter implements XMLStreamWriter {
-    private Stack<Element> stack = new Stack<Element>();
+    private Stack<Element> stack = new Stack<>();
 
     private Document document;
 
@@ -43,7 +43,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
 
     private NamespaceContext context;
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<>();
 
     public JDOMStreamWriter() {
     }
@@ -56,7 +56,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void flush() throws XMLStreamException {
-    }    
+    }
 
     public void writeStartElement(String local) throws XMLStreamException {
         newChild(new Element(local));
@@ -84,7 +84,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
+        if (prefix == null || prefix.isEmpty()) {
             writeStartElement(namespace, local);
         } else {
             newChild(new Element(local, prefix, namespace));
@@ -178,7 +178,6 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
-        // TODO Auto-generated method stub
         currentNode.addContent(new String(text, start, len));
     }
 

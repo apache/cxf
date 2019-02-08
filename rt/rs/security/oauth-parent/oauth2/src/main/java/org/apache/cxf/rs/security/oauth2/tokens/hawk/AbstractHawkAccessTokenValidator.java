@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -48,37 +48,37 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-        String authScheme, String authSchemeData, MultivaluedMap<String, String> extraProps) 
+        String authScheme, String authSchemeData, MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
-         
+
         Map<String, String> schemeParams = getSchemeParameters(authSchemeData);
-        AccessTokenValidation atv = 
+        AccessTokenValidation atv =
             getAccessTokenValidation(mc, authScheme, authSchemeData, extraProps, schemeParams);
         if (isRemoteSignatureValidation()) {
             return atv;
         }
-        
+
         String macKey = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_KEY);
         String macAlgo = atv.getExtraProps().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
-        
-        
+
+
         HttpRequestProperties httpProps = null;
         if (extraProps != null && extraProps.containsKey(HTTP_VERB) && extraProps.containsKey(HTTP_URI)) {
             httpProps = new HttpRequestProperties(URI.create(extraProps.getFirst(HTTP_URI)),
                                                   extraProps.getFirst(HTTP_VERB));
         } else {
-            httpProps = new HttpRequestProperties(mc.getUriInfo().getRequestUri(), 
+            httpProps = new HttpRequestProperties(mc.getUriInfo().getRequestUri(),
                                                   mc.getHttpServletRequest().getMethod());
         }
         HawkAuthorizationScheme macAuthInfo = new HawkAuthorizationScheme(httpProps, schemeParams);
         String normalizedString = macAuthInfo.getNormalizedRequestString();
         try {
             HmacAlgorithm hmacAlgo = HmacAlgorithm.toHmacAlgorithm(macAlgo);
-            byte[] serverMacData = HmacUtils.computeHmac(macKey, hmacAlgo.getJavaName(), normalizedString); 
-                                                         
+            byte[] serverMacData = HmacUtils.computeHmac(macKey, hmacAlgo.getJavaName(), normalizedString);
+
             String clientMacString = schemeParams.get(OAuthConstants.HAWK_TOKEN_SIGNATURE);
             byte[] clientMacData = Base64Utility.decode(clientMacString);
-            boolean validMac = Arrays.equals(serverMacData, clientMacData);
+            boolean validMac = MessageDigest.isEqual(serverMacData, clientMacData);
             if (!validMac) {
                 AuthorizationUtils.throwAuthorizationFailure(Collections
                     .singleton(OAuthConstants.HAWK_AUTHORIZATION_SCHEME));
@@ -89,29 +89,29 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
         validateTimestampNonce(macKey, macAuthInfo.getTimestamp(), macAuthInfo.getNonce());
         return atv;
     }
-    
+
     protected abstract AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                                      String authScheme, 
-                                                                      String authSchemeData, 
+                                                                      String authScheme,
+                                                                      String authSchemeData,
                                                                       MultivaluedMap<String, String> extraProps,
                                                                       Map<String, String> schemeParams);
-    
+
     protected static Map<String, String> getSchemeParameters(String authData) {
         String[] attributePairs = authData.split(",");
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         for (String pair : attributePairs) {
             String[] pairValues = pair.trim().split("=", 2);
             attributeMap.put(pairValues[0].trim(), pairValues[1].trim().replaceAll("\"", ""));
         }
         return attributeMap;
     }
-    
+
     protected void validateTimestampNonce(String tokenKey, String ts, String nonce) {
         if (nonceVerifier != null) {
             nonceVerifier.verifyNonce(tokenKey, nonce, ts);
         }
     }
-    
+
     public void setNonceVerifier(NonceVerifier nonceVerifier) {
         this.nonceVerifier = nonceVerifier;
     }

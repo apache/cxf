@@ -33,7 +33,7 @@ public final class ServiceUtils {
     /**
      * Generates a suitable service name from a given class. The returned name
      * is the simple name of the class, i.e. without the package name.
-     * 
+     *
      * @param clazz the class.
      * @return the name.
      */

@@ -44,36 +44,35 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
- * 
+ *
  */
 public class SoapFaultFactory implements BindingFaultFactory {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(SoapFaultFactory.class); 
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(SoapFaultFactory.class);
+
     private SoapVersion version;
-    
+
     public SoapFaultFactory(Binding binding) {
         version = ((SoapBinding)binding).getSoapVersion();
     }
-    
+
     public Fault createFault(SequenceFault sf, Message msg) {
         Fault f = null;
         if (version == Soap11.getInstance()) {
             f = createSoap11Fault(sf);
-            // so we can encode the SequenceFault as header   
+            // so we can encode the SequenceFault as header
             f.initCause(sf);
         } else {
             f = createSoap12Fault(sf, msg);
         }
         return f;
     }
-    
+
     Fault createSoap11Fault(SequenceFault sf) {
-        SoapFault fault = new SoapFault(sf.getReason(),
+        return new SoapFault(sf.getReason(),
             sf.isSender() ? version.getSender() : version.getReceiver());
-        return fault;
     }
-    
+
     Fault createSoap12Fault(SequenceFault sf, Message msg) {
         SoapFault fault = (SoapFault)createSoap11Fault(sf);
         fault.setSubCode(sf.getFaultCode());
@@ -89,12 +88,12 @@ public class SoapFaultFactory implements BindingFaultFactory {
                 maps.getNamespaceURI()).getCodec();
             setDetail(fault, detail, codec);
         } catch (Exception ex) {
-            LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex); 
+            LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex);
             ex.printStackTrace();
         }
         return fault;
     }
-    
+
     void setDetail(SoapFault fault, Object detail, EncoderDecoder codec) throws Exception {
         String name = fault.getSubCode().getLocalPart();
         Element element = null;
@@ -102,15 +101,15 @@ public class SoapFaultFactory implements BindingFaultFactory {
             element = codec.encodeSequenceAcknowledgement((SequenceAcknowledgement)detail);
         } else if (!RMConstants.CREATE_SEQUENCE_REFUSED_FAULT_CODE.equals(name)
             && !RMConstants.WSRM_REQUIRED_FAULT_CODE.equals(name)) {
-            element = codec.encodeIdentifier((Identifier)detail);  
+            element = codec.encodeIdentifier((Identifier)detail);
         }
         fault.setDetail(element);
     }
-    
+
     public String toString(Fault f) {
         SoapFault sf = (SoapFault)f;
         org.apache.cxf.common.i18n.Message msg
-            = new org.apache.cxf.common.i18n.Message("SEQ_FAULT_MSG", LOG, 
+            = new org.apache.cxf.common.i18n.Message("SEQ_FAULT_MSG", LOG,
                 new Object[] {sf.getReason(), sf.getFaultCode(), sf.getSubCode()});
         return msg.toString();
     }

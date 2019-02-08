@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.mtom_feature;
 
 import java.awt.Image;
+
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.MTOM;
 
@@ -28,7 +29,7 @@ public class HelloImpl implements Hello {
     public void detail(Holder<byte[]> photo, Holder<Image> image) {
         // echo through Holder
     }
-      
+
     public void echoData(Holder<byte[]> data) {
         // echo through Holder
     }

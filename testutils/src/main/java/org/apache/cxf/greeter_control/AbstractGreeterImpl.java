@@ -32,7 +32,7 @@ import org.apache.cxf.greeter_control.types.PingMeResponse;
 import org.apache.cxf.greeter_control.types.SayHiResponse;
 
 /**
- * 
+ *
  */
 
 public class AbstractGreeterImpl implements Greeter {
@@ -43,7 +43,7 @@ public class AbstractGreeterImpl implements Greeter {
     private boolean throwAlways;
     private boolean useLastOnewayArg;
     private int pingMeCount;
-     
+
     public long getDelay() {
         return delay;
     }
@@ -69,7 +69,7 @@ public class AbstractGreeterImpl implements Greeter {
     }
 
     public String greetMe(String arg0) {
-        LOG.fine("Executing operation greetMe with parameter: " + arg0);        
+        LOG.fine("Executing operation greetMe with parameter: " + arg0);
         if (delay > 0) {
             try {
                 Thread.sleep(delay);
@@ -86,12 +86,10 @@ public class AbstractGreeterImpl implements Greeter {
     }
 
     public Future<?> greetMeAsync(String arg0, AsyncHandler<GreetMeResponse> arg1) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<GreetMeResponse> greetMeAsync(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -110,33 +108,27 @@ public class AbstractGreeterImpl implements Greeter {
             fd.setMajor((short)2);
             fd.setMinor((short)1);
             throw new PingMeFault("Pings succeed only every other time.", fd);
-        } else {
-            LOG.fine("Executing operation pingMe");        
         }
+        LOG.fine("Executing operation pingMe");
     }
 
     public Response<PingMeResponse> pingMeAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public String sayHi() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<SayHiResponse> sayHiAsync() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 

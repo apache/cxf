@@ -28,23 +28,23 @@ public class Cookie {
     public static final String DISCARD_ATTRIBUTE = "discard";
     public static final String MAX_AGE_ATTRIBUTE = "max-age";
     public static final String PATH_ATTRIBUTE = "path";
-    
+
     /**
      * The name of this cookie
      */
     private String name;
-    
+
     /**
      * The value of this cookie
      */
     private String value;
-    
+
     /**
      * The path on the server where this cookie is valid.
      * Used to distinguish between identical cookies from different contexts.
      */
     private String path;
-    
+
     /**
      * The maximum age of the cookie
      */
@@ -118,7 +118,7 @@ public class Cookie {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public int hashCode() {
@@ -127,7 +127,7 @@ public class Cookie {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public boolean equals(Object o) {
@@ -135,10 +135,9 @@ public class Cookie {
             return false;
         }
         Cookie c = (Cookie)o;
-        boolean result = this.name.equals(c.name)
+        return this.name.equals(c.name)
                 && ((this.path == null && c.path == null)
                         || (this.path != null && this.path.equals(c.path)));
-        return result;
     }
 
     /**

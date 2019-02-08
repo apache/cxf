@@ -29,4 +29,4 @@ public class AbstractRestController<T extends RestResource> {
         // build some response
         return null;
     }
-} 
+}

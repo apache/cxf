@@ -25,19 +25,19 @@ public class SimpleBean {
     private String bleh;
 
     private String howdy;
-    
+
     private int[] numbers;
-    
+
     private Character character;
     private char primitiveCharacter;
     private byte littleByte;
     private Byte bigByte;
     private Number numberValue;
-    
+
     public Number getNumber() {
         return numberValue;
     }
-    
+
     public void setNumber(Number value) {
         numberValue = value;
     }
@@ -49,13 +49,13 @@ public class SimpleBean {
     public void setNumbers(int[] numbers) {
         this.numbers = numbers;
     }
-    
+
     // this property has no XML mapping,
     // useful for testing defaults.
     public int[] getDefaultSchemaNumbers() {
         return numbers;
     }
-    
+
     public void setDefaultSchemaNumbers(int[] n) {
         this.numbers = n;
     }

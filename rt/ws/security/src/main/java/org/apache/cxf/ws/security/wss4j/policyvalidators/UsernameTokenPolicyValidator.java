@@ -42,27 +42,27 @@ import org.apache.wss4j.policy.model.UsernameToken.UsernameTokenType;
  * Validate a UsernameToken policy.
  */
 public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.USERNAME_TOKEN.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies. W
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
-            org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy = 
+            org.apache.wss4j.policy.model.UsernameToken usernameTokenPolicy =
                 (org.apache.wss4j.policy.model.UsernameToken)ai.getAssertion();
             ai.setAsserted(true);
             assertToken(usernameTokenPolicy, parameters.getAssertionInfoMap());
-            
+
             if (!isTokenRequired(usernameTokenPolicy, parameters.getMessage())) {
                 continue;
             }
@@ -79,28 +79,28 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
             }
         }
     }
-    
+
     private void assertToken(org.apache.wss4j.policy.model.UsernameToken token, AssertionInfoMap aim) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isCreated()) {
             PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);
         }
         if (token.isNonce()) {
             PolicyUtils.assertPolicy(aim, SP13Constants.NONCE);
         }
-        
+
         PasswordType passwordType = token.getPasswordType();
         if (passwordType != null) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, passwordType.name()));
         }
-        
+
         UsernameTokenType usernameTokenType = token.getUsernameTokenType();
         if (usernameTokenType != null) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, usernameTokenType.name()));
         }
     }
-    
+
     /**
      * All UsernameTokens must conform to the policy
      */
@@ -110,7 +110,7 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
         List<WSSecurityEngineResult> utResults
     ) {
         for (WSSecurityEngineResult result : utResults) {
-            UsernameToken usernameToken = 
+            UsernameToken usernameToken =
                 (UsernameToken)result.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
             PasswordType passwordType = usernameTokenPolicy.getPasswordType();
             boolean isHashPassword = passwordType == PasswordType.HashPassword;
@@ -119,7 +119,7 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
                 ai.setNotAsserted("Password hashing policy not enforced");
                 return false;
             }
-            
+
             if (isNoPassword && (usernameToken.getPassword() != null)) {
                 ai.setNotAsserted("Username Token NoPassword policy not enforced");
                 return false;
@@ -128,14 +128,14 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
                 ai.setNotAsserted("Username Token No Password supplied");
                 return false;
             }
-            
+
             if (usernameTokenPolicy.isCreated()
                 && (usernameToken.getCreated() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Created policy not enforced");
                 return false;
             }
-            
-            if (usernameTokenPolicy.isNonce() 
+
+            if (usernameTokenPolicy.isNonce()
                 && (usernameToken.getNonce() == null || usernameToken.isHashed())) {
                 ai.setNotAsserted("Username Token Nonce policy not enforced");
                 return false;
@@ -143,7 +143,7 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
         }
         return true;
     }
-    
+
     /**
      * Return true if this UsernameToken policy is a (non-endorsing)SupportingToken. If this is
      * true then the corresponding UsernameToken must have a password element.
@@ -164,5 +164,5 @@ public class UsernameTokenPolicyValidator extends AbstractSecurityPolicyValidato
         }
         return false;
     }
-    
+
 }

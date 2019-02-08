@@ -40,18 +40,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class BookType {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
-    
+    private Map<Long, Chapter> chapters = new HashMap<>();
+
     public BookType() {
         init();
         //System.out.println("----chapters: " + chapters.size());
     }
-    
+
     public BookType(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -59,57 +59,57 @@ public class BookType {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
     @PUT
     public void cloneState(BookType book) {
         id = book.getId();
         name = book.getName();
     }
-    
+
     @GET
     public BookType retrieveState() {
         return this;
     }
-    
+
     @GET
-    @Path("chapters/{chapterid}/")    
+    @Path("chapters/{chapterid}/")
     @Produces("application/xml;charset=ISO-8859-1")
     public Chapter getChapter(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
-    }
-    
-    @GET
-    @Path("chapters/acceptencoding/{chapterid}/")    
-    @Produces("application/xml")
-    public Chapter getChapterAcceptEncoding(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
 
     @GET
-    @Path("chapters/badencoding/{chapterid}/")    
+    @Path("chapters/acceptencoding/{chapterid}/")
+    @Produces("application/xml")
+    public Chapter getChapterAcceptEncoding(@PathParam("chapterid")int chapterid) {
+        return chapters.get(Long.valueOf(chapterid));
+    }
+
+    @GET
+    @Path("chapters/badencoding/{chapterid}/")
     @Produces("application/xml;charset=UTF-48")
     public Chapter getChapterBadEncoding(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
-    
-    @Path("chapters/sub/{chapterid}/")    
+
+    @Path("chapters/sub/{chapterid}/")
     public Chapter getSubChapter(@PathParam("chapterid")int chapterid) {
-        return chapters.get(new Long(chapterid));
+        return chapters.get(Long.valueOf(chapterid));
     }
-    
-    @Path("chaptersobject/sub/{chapterid}/")    
+
+    @Path("chaptersobject/sub/{chapterid}/")
     public Object getSubChapterObject(@PathParam("chapterid")int chapterid) {
         return getSubChapter(chapterid);
     }
-    
-    
+
+
     final void init() {
         Chapter c1 = new Chapter();
         c1.setId(1);

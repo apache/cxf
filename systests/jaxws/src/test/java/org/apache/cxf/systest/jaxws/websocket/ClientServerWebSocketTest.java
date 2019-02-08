@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.websocket;
 
+import java.io.Closeable;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.Map;
@@ -48,22 +49,29 @@ import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
     static final Logger LOG = LogUtils.getLogger(ClientServerWebSocketTest.class);
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
-                                                "SOAPService");    
+                                                "SOAPService");
     private final QName portName = new QName("http://apache.org/hello_world_soap_http",
                                              "SoapPort");
-    
+
     @BeforeClass
-    public static void startServers() throws Exception {                    
+    public static void startServers() throws Exception {
         // set up configuration to enable schema validation
+        //System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testBasicConnection() throws Exception {
 
@@ -85,40 +93,40 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
         }
         BindingProvider bp = (BindingProvider)greeter;
         Map<String, Object> responseContext = bp.getResponseContext();
-        Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);        
+        Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);
         assertEquals(200, responseCode.intValue());
     }
-    
+
     @Test
     public void testBasicConnection2() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
-        
+
         //getPort only passing in SEI
         Greeter greeter = service.getPort(Greeter.class);
         updateGreeterAddress(greeter, PORT);
-        
+
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {       
+        try {
             for (int idx = 0; idx < 5; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
                 String exResponse = response1 + idx;
                 assertEquals(exResponse, greeting);
-                
+
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
 
                 greeter.greetMeOneWay("Milestone-" + idx);
-            }            
+            }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    } 
+    }
 
     @Test
     public void testTimeoutConfigutation() throws Exception {
@@ -140,46 +148,46 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             }
             assertTrue("Timeout cause is expected", cause instanceof java.net.SocketTimeoutException);
         }
-    }    
+    }
 
     @Test
     public void testBasicConnectionAndOneway() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
-        
+
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateGreeterAddress(greeter, PORT);
-        
+
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {       
+        try {
             for (int idx = 0; idx < 1; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
                 String exResponse = response1 + idx;
                 assertEquals(exResponse, greeting);
-                
+
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
 
                 greeter.greetMeOneWay("Milestone-" + idx);
-                
-                
-                
-            }            
+
+
+
+            }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    } 
-    
+    }
+
     @Test
     public void testFaults() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
         ExecutorService ex = Executors.newFixedThreadPool(1);
         service.setExecutor(ex);
@@ -198,32 +206,31 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             } catch (NoSuchCodeLitFault nslf) {
                 assertNotNull(nslf.getFaultInfo());
                 assertNotNull(nslf.getFaultInfo().getCode());
-            } 
-            
+            }
+
             try {
                 greeter.testDocLitFault(badRecordFault);
                 fail("Should have thrown BadRecordLitFault exception");
-            } catch (BadRecordLitFault brlf) {                
+            } catch (BadRecordLitFault brlf) {
                 BindingProvider bp = (BindingProvider)greeter;
                 Map<String, Object> responseContext = bp.getResponseContext();
                 String contentType = (String) responseContext.get(Message.CONTENT_TYPE);
                 assertEquals("text/xml; charset=utf-8", contentType.toLowerCase());
                 Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);
-                assertEquals(500, responseCode.intValue());                
+                assertEquals(500, responseCode.intValue());
                 assertNotNull(brlf.getFaultInfo());
                 assertEquals("BadRecordLitFault", brlf.getFaultInfo());
             }
-                        
+
         }
 
     }
 
     @Test
-    @org.junit.Ignore //TODO need to pass the principal of the original upgrade request to its subsequent service calls
     public void testBasicAuth() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateGreeterAddress(greeter, PORT);
@@ -237,7 +244,10 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello BJ", s);
             bp.getRequestContext().remove(BindingProvider.USERNAME_PROPERTY);
             bp.getRequestContext().remove(BindingProvider.PASSWORD_PROPERTY);
-            
+            ((Closeable)greeter).close();
+
+            greeter = service.getPort(portName, Greeter.class);
+            updateGreeterAddress(greeter, PORT);
             //try setting on the conduit directly
             Client client = ClientProxy.getClient(greeter);
             HTTPConduit httpConduit = (HTTPConduit)client.getConduit();
@@ -245,8 +255,9 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
             policy.setUserName("BJ2");
             policy.setPassword("pswd");
             httpConduit.setAuthorization(policy);
-            
+
             s = greeter.greetMe("secure");
+            ((Closeable)greeter).close();
             assertEquals("Hello BJ2", s);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -257,7 +268,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     public void testAsyncPollingCall() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateGreeterAddress(greeter, PORT);
@@ -297,16 +308,16 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     public void testAsyncSynchronousPolling() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull(service);
-        
+
         final String expectedString = new String("Hello, finally!");
-          
+
         class Poller extends Thread {
             Response<GreetMeLaterResponse> response;
             int tid;
-            
+
             Poller(Response<GreetMeLaterResponse> r, int t) {
                 response = r;
                 tid = t;
@@ -332,14 +343,14 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
                 assertEquals(expectedString, s);
             }
         }
-        
+
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateGreeterAddress(greeter, PORT);
         long before = System.currentTimeMillis();
 
-        
+
         long delay = 3000;
-        
+
         Response<GreetMeLaterResponse> response = greeter.greetMeLaterAsync(delay);
         long after = System.currentTimeMillis();
 
@@ -348,7 +359,7 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
         // first time round, responses should not be available yet
         assertFalse("Response already available.", response.isDone());
 
-        
+
         Poller[] pollers = new Poller[4];
         for (int i = 0; i < pollers.length; i++) {
             pollers[i] = new Poller(response, i);
@@ -356,30 +367,28 @@ public class ClientServerWebSocketTest extends AbstractBusClientServerTestBase {
         for (Poller p : pollers) {
             p.start();
         }
-        
+
         for (Poller p : pollers) {
             p.join();
         }
-        
-           
+
+
     }
 
     static class MyHandler implements AsyncHandler<GreetMeLaterResponse> {
         static int invocationCount;
         private String replyBuffer;
-        
+
         public void handleResponse(Response<GreetMeLaterResponse> response) {
             invocationCount++;
             try {
                 GreetMeLaterResponse reply = response.get();
                 replyBuffer = reply.getResponseType();
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 ex.printStackTrace();
             }
         }
-        
+
         String getReplyBuffer() {
             return replyBuffer;
         }

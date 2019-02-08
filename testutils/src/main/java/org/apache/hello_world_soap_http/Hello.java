@@ -26,6 +26,6 @@ import javax.jws.soap.SOAPBinding;
 @WebService(name = "Hello", targetNamespace = "http://apache.org/hello_world_soap_http")
 @SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC, use = javax.jws.soap.SOAPBinding.Use.LITERAL)
 public interface Hello {
-    @WebMethod(operationName = "sayHi")    
+    @WebMethod(operationName = "sayHi")
     String sayHi();
 }

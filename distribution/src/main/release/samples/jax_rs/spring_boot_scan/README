@@ -1,0 +1,22 @@
+== Spring Boot Scan Demo == 
+
+This sample project demonstrates how to autodiscover and use CXF JAX-RS services and clients
+with Spring Boot. 
+
+Check eureka-registry/README on how to run Eureka Registry.
+
+Check application/README on how to run a server application.
+
+Note: 
+You can have both the registry and the server application started by running "docker-compose up" in this directory.
+
+By default it is expected that EUREKA_SERVER_URI environment variable is exported and set to 
+"http://{docker.host}" where you can find the value of {docker.host} by running 'ifconfig' and checking 
+the IP address of the docker bridge 'docker0'.
+
+Alternatively you can edit docker-compose.yml and enable the 'host' network mode.
+ 
+
+Check client/README on how to run a command line client.
+
+

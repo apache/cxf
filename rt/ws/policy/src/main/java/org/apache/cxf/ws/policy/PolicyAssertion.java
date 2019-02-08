@@ -22,12 +22,12 @@ package org.apache.cxf.ws.policy;
 import org.apache.neethi.Assertion;
 
 /**
- * Interface to mark Assertions that can participate in CXF's 
+ * Interface to mark Assertions that can participate in CXF's
  * assertion mechanism to make sure the policies have been
- * applied. 
+ * applied.
  */
 public interface PolicyAssertion extends Assertion {
-    
+
     boolean isAsserted(AssertionInfoMap aim);
-    
+
 }

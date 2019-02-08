@@ -99,7 +99,7 @@ public class ElementDataWriter implements DataWriter<Element> {
 
     public void setProperty(String prop, Object value) {
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
 
         properties.put(prop, value);

@@ -29,8 +29,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.systest.mtom_feature.Hello;
 import org.apache.cxf.systest.mtom_feature.HelloService;
 import org.apache.cxf.systest.mtom_feature.ImageHelper;
@@ -39,6 +40,10 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
@@ -80,8 +85,8 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
-        Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
-        Holder<Image> image = new Holder<Image>(getImage("/java.jpg"));
+        Holder<byte[]> photo = new Holder<>("CXF".getBytes());
+        Holder<Image> image = new Holder<>(getImage("/java.jpg"));
 
         Hello port = getPort();
 
@@ -98,12 +103,12 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
-    
+
     @Test
     @org.junit.Ignore
     public void testEcho() throws Exception {
         byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
-        Holder<byte[]> image = new Holder<byte[]>(bytes);
+        Holder<byte[]> image = new Holder<>(bytes);
 
         Hello port = getPort();
         SOAPBinding binding = (SOAPBinding) ((BindingProvider)port).getBinding();
@@ -129,8 +134,8 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //ignore
         }
-        
+
         return hello;
-        
+
     }
 }

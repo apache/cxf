@@ -29,31 +29,31 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaExceptionHandler extends CorbaObjectHandler {
 
-    List<CorbaObjectHandler> members = new ArrayList<CorbaObjectHandler>();
+    List<CorbaObjectHandler> members = new ArrayList<>();
     String id;
-    
+
     public CorbaExceptionHandler(QName exName, QName exIdlType, TypeCode exTC, Object exType) {
         name = exName;
         idlType = exIdlType;
         typeCode = exTC;
         type = (NamedType)exType;
     }
-    
+
     public void addMember(CorbaObjectHandler member) {
         members.add(member);
     }
-    
+
     public List<CorbaObjectHandler> getMembers() {
         return members;
     }
-    
+
     public CorbaObjectHandler getMember(int index) {
         return members.get(index);
     }
-    
+
     public CorbaObjectHandler getMemberByName(String name) {
         CorbaObjectHandler member = null;
-        
+
         for (Iterator<CorbaObjectHandler> iterator = members.iterator(); iterator.hasNext();) {
             CorbaObjectHandler current = iterator.next();
             if (current.getName().getLocalPart().equals(name)) {
@@ -61,14 +61,14 @@ public class CorbaExceptionHandler extends CorbaObjectHandler {
                 break;
             }
         }
-        
+
         return member;
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public void setId(String eid) {
         id = eid;
     }
@@ -77,7 +77,5 @@ public class CorbaExceptionHandler extends CorbaObjectHandler {
         for (int i = 0; i < members.size(); i++) {
             members.get(i).clear();
         }
-    }  
-    
-    // TODO: Can we add the features that exist in the main package here?
+    }
 }

@@ -35,23 +35,23 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInterceptor<Message> {
-    public static final JAXBAttachmentSchemaValidationHack INSTANCE 
+    public static final JAXBAttachmentSchemaValidationHack INSTANCE
         = new JAXBAttachmentSchemaValidationHack();
-    private static final String SAVED_DATASOURCES 
+    private static final String SAVED_DATASOURCES
         = JAXBAttachmentSchemaValidationHack.class.getName() + ".SAVED_DATASOURCES";
 
     private JAXBAttachmentSchemaValidationHack() {
         super(Phase.POST_PROTOCOL);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         // This assumes that this interceptor is only use in IN / IN Fault chains.
-        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message) 
+        if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message)
             && message.getAttachments() != null) {
-            Collection<AttachmentDataSource> dss = new ArrayList<AttachmentDataSource>();
+            Collection<AttachmentDataSource> dss = new ArrayList<>();
             for (Attachment at : message.getAttachments()) {
                 if (at.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                     AttachmentDataSource ds = (AttachmentDataSource)at.getDataHandler().getDataSource();
@@ -69,10 +69,10 @@ public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInter
             }
         }
     }
-    
+
     static class EndingInterceptor extends AbstractPhaseInterceptor<Message> {
         static final EndingInterceptor INSTANCE = new EndingInterceptor();
-        
+
         EndingInterceptor() {
             super(Phase.PRE_LOGICAL);
         }

@@ -40,7 +40,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WrappedOutInterceptor.class);
 
     private final WrappedOutEndingInterceptor ending;
-    
+
     public WrappedOutInterceptor() {
         this(Phase.MARSHAL);
     }
@@ -89,8 +89,8 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
             message.getInterceptorChain().add(ending);
         }
     }
-    
-    public class WrappedOutEndingInterceptor extends AbstractOutDatabindingInterceptor {
+
+    public static class WrappedOutEndingInterceptor extends AbstractOutDatabindingInterceptor {
         public WrappedOutEndingInterceptor(String phase) {
             super(phase);
         }
@@ -106,5 +106,5 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
         }
 
-    }  
+    }
 }

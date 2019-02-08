@@ -25,19 +25,19 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class IncomingMessageCounterInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     private static int messageCount;
-    
+
     public IncomingMessageCounterInterceptor() {
         super(Phase.RECEIVE);
         getBefore().add(AttachmentInInterceptor.class.getName());
     }
 
-    
+
     public void handleMessage(Message message) throws Fault {
         messageCount++;
     }
-    
+
     public static int getMessageCount() {
         return messageCount;
     }

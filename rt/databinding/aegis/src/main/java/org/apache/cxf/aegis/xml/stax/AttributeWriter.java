@@ -47,7 +47,7 @@ public class AttributeWriter extends AbstractMessageWriter {
                 if (XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI.equals(namespace)) {
                     prefix = NamespaceHelper.getUniquePrefix(writer, namespace, "xsi", true);
                 } else {
-                    prefix = NamespaceHelper.getUniquePrefix(writer, namespace, null, true);   
+                    prefix = NamespaceHelper.getUniquePrefix(writer, namespace, null, true);
                 }
             } else {
                 prefix = "";

@@ -33,36 +33,36 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 public class Source extends AbstractEndpoint {
-    
+
     private static final String REQUESTOR_SEQUENCE_ID = "";
-    
+
     private Map<String, SourceSequence> map;
-    private Map<String, SourceSequence> current;     
+    private Map<String, SourceSequence> current;
     private Lock sequenceCreationLock;
     private Condition sequenceCreationCondition;
     private boolean sequenceCreationNotified;
 
     Source(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new ConcurrentHashMap<String, SourceSequence>();
-        current = new HashMap<String, SourceSequence>();
-             
+        map = new ConcurrentHashMap<>();
+        current = new HashMap<>();
+
         sequenceCreationLock = new ReentrantLock();
         sequenceCreationCondition = sequenceCreationLock.newCondition();
-    }  
-    
-    public SourceSequence getSequence(Identifier id) {        
+    }
+
+    public SourceSequence getSequence(Identifier id) {
         return map.get(id.getValue());
     }
-    
-    public Collection<SourceSequence> getAllSequences() {                 
+
+    public Collection<SourceSequence> getAllSequences() {
         return CastUtils.cast(map.values());
-    } 
-    
-    public void addSequence(SourceSequence seq) { 
-        addSequence(seq, true);        
     }
-    
+
+    public void addSequence(SourceSequence seq) {
+        addSequence(seq, true);
+    }
+
     public void addSequence(SourceSequence seq, boolean persist) {
         seq.setSource(this);
         map.put(seq.getIdentifier().getValue(), seq);
@@ -74,7 +74,7 @@ public class Source extends AbstractEndpoint {
         }
         processingSequenceCount.incrementAndGet();
     }
-    
+
     public void removeSequence(SourceSequence seq) {
         SourceSequence o;
         o = map.remove(seq.getIdentifier().getValue());
@@ -87,32 +87,32 @@ public class Source extends AbstractEndpoint {
             completedSequenceCount.incrementAndGet();
         }
     }
-    
+
     /**
      * Returns a collection of all sequences for which have not yet been
      * completely acknowledged.
-     * 
+     *
      * @return the collection of unacknowledged sequences.
      */
     public Collection<SourceSequence> getAllUnacknowledgedSequences() {
-        Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> seqs = new ArrayList<>();
         for (SourceSequence seq : map.values()) {
             if (!seq.allAcknowledged()) {
                 seqs.add(seq);
             }
         }
-        return seqs;        
+        return seqs;
     }
 
     /**
      * Returns the current sequence used by a client side source.
-     * 
+     *
      * @return the current sequence.
      */
     SourceSequence getCurrent() {
         return getCurrent(null);
     }
-    
+
     /**
      * Sets the current sequence used by a client side source.
      * @param s the current sequence.
@@ -120,14 +120,14 @@ public class Source extends AbstractEndpoint {
     public void setCurrent(SourceSequence s) {
         setCurrent(null, s);
     }
-    
+
     /**
      * Returns the current sequence used by a server side source for responses to a message
      * sent as part of the inbound sequence with the specified identifier.
-     * 
+     *
      * @return the current sequence.
      */
-    SourceSequence getCurrent(Identifier i) {        
+    SourceSequence getCurrent(Identifier i) {
         sequenceCreationLock.lock();
         try {
             return getAssociatedSequence(i);
@@ -138,18 +138,18 @@ public class Source extends AbstractEndpoint {
 
     /**
      * Returns the sequence associated with the given identifier.
-     * 
+     *
      * @param i the corresponding sequence identifier
      * @return the associated sequence
      * @pre the sequenceCreationLock is already held
      */
-    SourceSequence getAssociatedSequence(Identifier i) {        
+    SourceSequence getAssociatedSequence(Identifier i) {
         return current.get(i == null ? REQUESTOR_SEQUENCE_ID : i.getValue());
     }
-    
+
     /**
      * Await the availability of a sequence corresponding to the given identifier.
-     * 
+     *
      * @param i the sequence identifier
      * @return
      */
@@ -172,13 +172,13 @@ public class Source extends AbstractEndpoint {
             sequenceCreationLock.unlock();
         }
     }
-    
+
     /**
      * Sets the current sequence used by a server side source for responses to a message
      * sent as part of the inbound sequence with the specified identifier.
      * @param s the current sequence.
      */
-    void setCurrent(Identifier i, SourceSequence s) {        
+    void setCurrent(Identifier i, SourceSequence s) {
         sequenceCreationLock.lock();
         try {
             current.put(i == null ? REQUESTOR_SEQUENCE_ID : i.getValue(), s);

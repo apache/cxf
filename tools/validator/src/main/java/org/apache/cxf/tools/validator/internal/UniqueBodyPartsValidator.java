@@ -49,14 +49,14 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
     public boolean isValid() {
         Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
         for (Binding binding : bindings) {
-            uniqueBodyPartsMap = new HashMap<QName, String>();
+            uniqueBodyPartsMap = new HashMap<>();
             List<BindingOperation> ops = CastUtils.cast(binding.getBindingOperations());
             for (BindingOperation op : ops) {
                 Operation operation = op.getOperation();
                 if (operation != null && operation.getInput() != null) {
                     Message inMessage = operation.getInput().getMessage();
                     BindingInput bin = op.getBindingInput();
-                    Set<String> headers = new HashSet<String>();
+                    Set<String> headers = new HashSet<>();
                     if (bin != null) {
                         List<ExtensibilityElement> lst = CastUtils.cast(bin.getExtensibilityElements());
                         for (ExtensibilityElement ext : lst) {
@@ -70,10 +70,10 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
                             headers.add(header.getPart());
                         }
                     }
-                    
+
                     //find the headers as they don't contribute to the body
-                    
-                    if (inMessage != null && !isUniqueBodyPart(operation.getName(), 
+
+                    if (inMessage != null && !isUniqueBodyPart(operation.getName(),
                                                                inMessage,
                                                                headers,
                                                                binding.getQName())) {
@@ -98,7 +98,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
             String opName = getOperationNameWithSamePart(operationName, part);
             if (opName != null) {
                 addErrorMessage("Non unique body parts, operation " + "[ " + opName + " ] "
-                                + "and  operation [ " + operationName + " ] in binding "
+                                + "and operation [ " + operationName + " ] in binding "
                                 + bindingName.toString()
                                 + " have the same body block: "
                                 + part.getElementName());
@@ -116,9 +116,8 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
         if (opName == null) {
             uniqueBodyPartsMap.put(partQN, operationName);
             return null;
-        } else {
-            return opName;
         }
+        return opName;
     }
 
 }

@@ -33,7 +33,7 @@ public class TExtensibilityElementImpl
 
     @XmlTransient()
     QName elementType;
-    
+
     private Boolean required;
 
     /**
@@ -44,7 +44,7 @@ public class TExtensibilityElementImpl
     public QName getElementType() {
         return elementType;
     }
-    
+
     /**
      * Sets the type of this extensibility element.
      * @param type QName the type of this element.

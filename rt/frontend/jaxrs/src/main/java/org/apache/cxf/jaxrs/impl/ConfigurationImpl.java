@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -36,25 +37,25 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public class ConfigurationImpl implements Configuration {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurationImpl.class);
-    private Map<String, Object> props = new HashMap<String, Object>();
+    private Map<String, Object> props = new HashMap<>();
     private RuntimeType runtimeType;
-    private Map<Object, Map<Class<?>, Integer>> providers = 
-        new LinkedHashMap<Object, Map<Class<?>, Integer>>(); 
-    private Map<Feature, Boolean> features = new LinkedHashMap<Feature, Boolean>();
-    
+    private Map<Object, Map<Class<?>, Integer>> providers =
+        new LinkedHashMap<>();
+    private Map<Feature, Boolean> features = new LinkedHashMap<>();
+
     public ConfigurationImpl(RuntimeType rt) {
         this.runtimeType = rt;
     }
-    
-    public ConfigurationImpl(Configuration parent, Class<?>[] defaultContracts) {
+
+    public ConfigurationImpl(Configuration parent) {
         if (parent != null) {
             this.props.putAll(parent.getProperties());
             this.runtimeType = parent.getRuntimeType();
-            
-            Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
+
+            Set<Class<?>> providerClasses = new HashSet<>(parent.getClasses());
             for (Object o : parent.getInstances()) {
                 if (!(o instanceof Feature)) {
-                    registerParentProvider(o, parent, defaultContracts);
+                    registerParentProvider(o, parent);
                 } else {
                     Feature f = (Feature)o;
                     features.put(f, parent.isEnabled(f));
@@ -62,24 +63,25 @@ public class ConfigurationImpl implements Configuration {
                 providerClasses.remove(o.getClass());
             }
             for (Class<?> cls : providerClasses) {
-                registerParentProvider(createProvider(cls), parent, defaultContracts);
+                registerParentProvider(createProvider(cls), parent);
             }
-            
+
         }
     }
-    
-    private void registerParentProvider(Object o, Configuration parent, Class<?>[] defaultContracts) {
+
+    private void registerParentProvider(Object o, Configuration parent) {
         Map<Class<?>, Integer> contracts = parent.getContracts(o.getClass());
         if (contracts != null) {
             providers.put(o, contracts);
         } else {
-            register(o, AnnotationUtils.getBindingPriority(o.getClass()), defaultContracts);
+            register(o, AnnotationUtils.getBindingPriority(o.getClass()), 
+                        ConfigurableImpl.getImplementedContracts(o, new Class<?>[]{}));
         }
     }
-    
+
     @Override
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         for (Object o : getInstances()) {
             classes.add(o.getClass());
         }
@@ -90,7 +92,11 @@ public class ConfigurationImpl implements Configuration {
     public Map<Class<?>, Integer> getContracts(Class<?> cls) {
         for (Object o : getInstances()) {
             if (cls.isAssignableFrom(o.getClass())) {
-                return Collections.unmodifiableMap(providers.get(o));
+                if (o instanceof Feature) {
+                    return Collections.emptyMap();
+                } else {
+                    return providers.get(o);
+                }
             }
         }
         return Collections.emptyMap();
@@ -98,7 +104,7 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public Set<Object> getInstances() {
-        Set<Object> allInstances = new HashSet<Object>();
+        Set<Object> allInstances = new HashSet<>();
         allInstances.addAll(providers.keySet());
         allInstances.addAll(features.keySet());
         return Collections.unmodifiableSet(allInstances);
@@ -126,13 +132,15 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public boolean isEnabled(Feature f) {
-        return features.containsKey(f);
+        return features.containsKey(f) && features.get(f);
     }
 
     @Override
     public boolean isEnabled(Class<? extends Feature> f) {
-        for (Feature feature : features.keySet()) {
-            if (feature.getClass().isAssignableFrom(f)) {
+        for (Entry<Feature, Boolean> entry : features.entrySet()) {
+            Feature feature = entry.getKey();
+            Boolean enabled = entry.getValue();
+            if (f.isAssignableFrom(feature.getClass()) && enabled.booleanValue()) {
                 return true;
             }
         }
@@ -141,7 +149,12 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public boolean isRegistered(Object obj) {
-        return isRegistered(obj.getClass());
+        for (Object o : getInstances()) {
+            if (o.equals(obj)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -161,51 +174,70 @@ public class ConfigurationImpl implements Configuration {
             props.put(name, value);
         }
     }
-    
+
     public void setFeature(Feature f, boolean enabled) {
         features.put(f, enabled);
     }
-    
-    
+
+
     private void register(Object provider, int bindingPriority, Class<?>... contracts) {
         register(provider, initContractsMap(bindingPriority, contracts));
     }
-    
+
     public boolean register(Object provider, Map<Class<?>, Integer> contracts) {
         if (provider.getClass() == Class.class) {
+            if (isRegistered((Class<?>)provider)) {
+                LOG.warning("Provider class " + ((Class<?>)provider).getName() + " has already been registered");
+                return false;
+            }
             provider = createProvider((Class<?>)provider);
         }
         if (isRegistered(provider)) {
             LOG.warning("Provider " + provider.getClass().getName() + " has already been registered");
             return false;
         }
-        
+
+        if (!contractsValid(provider, contracts)) {
+            return false;
+        }
+
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
-            metadata = new HashMap<Class<?>, Integer>();
+            metadata = new HashMap<>();
             providers.put(provider, metadata);
         }
-        for (Class<?> contract : contracts.keySet()) {
-            if (contract.isAssignableFrom(provider.getClass())) {
-                metadata.put(contract, contracts.get(contract));
+        for (Entry<Class<?>, Integer> entry : contracts.entrySet()) {
+            if (entry.getKey().isAssignableFrom(provider.getClass())) {
+                metadata.put(entry.getKey(), entry.getValue());
             }
         }
         return true;
     }
-    
+
+    private boolean contractsValid(Object provider, Map<Class<?>, Integer> contracts) {
+        final Class<?> providerClass = provider.getClass();
+        for (Class<?> contractInterface : contracts.keySet()) {
+            if (!contractInterface.isAssignableFrom(providerClass)) {
+                LOG.warning("Provider " + providerClass.getName() + " does not implement specified contract: "
+                    + contractInterface.getName());
+                return false;
+            }
+        }
+        return true;
+    }
     public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
-        Map<Class<?>, Integer> metadata = new HashMap<Class<?>, Integer>();
+        Map<Class<?>, Integer> metadata = new HashMap<>();
         for (Class<?> contract : contracts) {
             metadata.put(contract, bindingPriority);
         }
         return metadata;
     }
-    
+
     public static Object createProvider(Class<?> cls) {
         try {
             return cls.newInstance();
         } catch (Throwable ex) {
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         }
     }
 }

@@ -54,7 +54,7 @@ public class MessageContextSecondHandler implements SOAPHandler<SOAPMessageConte
     public Set<QName> getHeaders() {
         return null;
     }
-    
+
     public Map<String, List<String>> getHeaderMap() {
         return headerMap;
     }

@@ -37,7 +37,7 @@ public class NotAnnotatedGreeterImplRPCLit implements GreeterRPCLit {
         return in;
     }
 
-    public String greetUs(String you, String me) {        
+    public String greetUs(String you, String me) {
         return "Hello " + you + " and " + me;
     }
 }

@@ -28,11 +28,11 @@ public class StaxServer11 extends AbstractServer {
     public StaxServer11() throws Exception {
         super("http://localhost:" + PORT, true);
     }
-    
+
     public StaxServer11(String baseUrl) throws Exception {
         super(baseUrl, true);
     }
-    
+
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(
             "org/apache/cxf/systest/ws/wssec11/server.xml");
@@ -40,5 +40,5 @@ public class StaxServer11 extends AbstractServer {
         setBus(busLocal);
         super.run();
     }
-    
+
 }

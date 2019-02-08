@@ -19,6 +19,7 @@
 package org.apache.cxf.wsn.services;
 
 import java.net.URI;
+
 import javax.jms.ConnectionFactory;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
@@ -42,7 +43,7 @@ public class JaxwsCreatePullPoint extends JmsCreatePullPoint
         this(name, connectionFactory, null);
     }
 
-    public JaxwsCreatePullPoint(String name, 
+    public JaxwsCreatePullPoint(String name,
                                 ConnectionFactory connectionFactory,
                                 EndpointManager epManager) {
         super(name, connectionFactory);

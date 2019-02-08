@@ -32,17 +32,21 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the DefaultCryptoCoverageChecker, which extends the CryptoCoverageChecker to provide
- * an easier way to check to see if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if 
+ * an easier way to check to see if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if
  * the Timestamp was signed, and if the WS-Addressing ReplyTo and FaultTo headers were signed,
  * and if a UsernameToken was encrypted.
  */
 public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
-    
+
     @Test
     public void testSignedWithIncompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -51,7 +55,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 false);
-        
+
         // This is mostly testing that things work with no prefixes.
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
@@ -59,7 +63,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//*", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 false);
-        
+
         // This fails as the SOAP Body is not signed
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
@@ -67,7 +71,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
                 null,
                 false);
     }
-    
+
     @Test
     public void testSignedWithCompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -75,7 +79,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
                 null,
                 null,
                 true);
-        
+
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial.xml",
                 this.getPrefixes(),
@@ -83,29 +87,29 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
                         "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 true);
     }
-    
+
     private Map<String, String> getPrefixes() {
-        final Map<String, String> prefixes = new HashMap<String, String>();
+        final Map<String, String> prefixes = new HashMap<>();
         prefixes.put("ser", "http://www.sdj.pl");
-        
+
         return prefixes;
     }
-    
+
     private void runInterceptorAndValidate(
             String document,
-            Map<String, String> prefixes, 
+            Map<String, String> prefixes,
             List<XPathExpression> xpaths,
             boolean pass) throws Exception {
-        
+
         final Document doc = this.readDocument(document);
         final SoapMessage msg = this.getSoapMessageForDom(doc);
         final CryptoCoverageChecker checker = new DefaultCryptoCoverageChecker();
         checker.addPrefixes(prefixes);
         checker.addXPaths(xpaths);
         final PhaseInterceptor<SoapMessage> wss4jInInterceptor = this.getWss4jInInterceptor();
-        
+
         wss4jInInterceptor.handleMessage(msg);
-        
+
         try {
             checker.handleMessage(msg);
             if (!pass) {
@@ -115,24 +119,24 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
             if (pass) {
                 fail("Failed interceptor erroneously.");
             }
-            
+
             assertTrue(e.getMessage().contains("element found matching XPath"));
         }
     }
-    
+
     private PhaseInterceptor<SoapMessage> getWss4jInInterceptor() {
         final WSS4JInInterceptor inHandler = new WSS4JInInterceptor(true);
-        final String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        
-        inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
+        final String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
+
+        inHandler.setProperty(ConfigurationConstants.ACTION, action);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
+        inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS,
                 TestPwdCallback.class.getName());
-        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-        
+        inHandler.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
+
         return inHandler;
     }
 }

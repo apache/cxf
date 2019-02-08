@@ -45,19 +45,18 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Path("/bookstore")
 public class BookCxfContinuationStore {
 
-    private Map<String, String> books = new HashMap<String, String>();
-    private Map<String, Continuation> suspended = 
-        new HashMap<String, Continuation>();
+    private Map<String, String> books = new HashMap<>();
+    private Map<String, Continuation> suspended = new HashMap<>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
-    
+
     @Context
     private MessageContext context;
-    
+
     public BookCxfContinuationStore() {
         init();
     }
-    
+
     @GET
     @Path("/books/{id}")
     public String getBookDescription(@PathParam("id") String id) {
@@ -66,14 +65,14 @@ public class BookCxfContinuationStore {
             throw new WebApplicationException(500);
         }
         return handleContinuationRequest(id);
-        
+
     }
-    
+
     @Path("/books/subresources/")
     public BookCxfContinuationStore getBookStore() {
         return this;
     }
-    
+
     @GET
     @Path("{id}")
     public String handleContinuationRequest(@PathParam("id") String id) {
@@ -96,27 +95,27 @@ public class BookCxfContinuationStore {
         // unreachable
         return null;
     }
-    
+
     private void resumeRequest(final String name) {
-        
+
         Continuation suspendedCont = null;
         synchronized (suspended) {
             suspendedCont = suspended.get(name);
         }
-        
+
         if (suspendedCont != null) {
             synchronized (suspendedCont) {
                 suspendedCont.resume();
             }
         }
     }
-    
+
     private void suspendInvocation(final String name, Continuation cont) {
-        
+
         //System.out.println("Suspending invocation for " + name);
-        
+
         try {
-            cont.suspend(500000);    
+            cont.suspend(500000);
         } finally {
             synchronized (suspended) {
                 suspended.put(name, cont);
@@ -127,18 +126,18 @@ public class BookCxfContinuationStore {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
                         // ignore
-                    }       
+                    }
                     resumeRequest(name);
                 }
             });
         }
     }
-    
+
     private Continuation getContinuation(String name) {
-        
-        ContinuationProvider provider = 
+
+        ContinuationProvider provider =
             (ContinuationProvider)context.get(ContinuationProvider.class.getName());
-        
+
         if (provider == null) {
             Message m = PhaseInterceptorChain.getCurrentMessage();
             UriInfo uriInfo = new UriInfoImpl(m);
@@ -147,30 +146,31 @@ public class BookCxfContinuationStore {
                 // return directly to that object - and sub-resources do not have contexts supported
                 // by default - so we just need to depend on PhaseInterceptorChain
                 provider = (ContinuationProvider)m.get(ContinuationProvider.class.getName());
-            } 
+            }
         }
         if (provider == null) {
             throw new WebApplicationException(500);
         }
-        
+
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);
             if (suspendedCont != null) {
                 return suspendedCont;
             }
         }
-        
+
         return provider.getContinuation();
     }
-    
+
     private void init() {
         books.put("1", "CXF in Action1");
         books.put("2", "CXF in Action2");
         books.put("3", "CXF in Action3");
         books.put("4", "CXF in Action4");
         books.put("5", "CXF in Action5");
+        books.put("A B C", "CXF in Action A B C");
     }
-     
+
 }
 
 

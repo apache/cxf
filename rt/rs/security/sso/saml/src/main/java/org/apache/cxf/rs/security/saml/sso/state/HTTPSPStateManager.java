@@ -32,15 +32,15 @@ import javax.ws.rs.Produces;
 @Path("state")
 public class HTTPSPStateManager implements SPStateManager {
     private SPStateManager manager = new MemorySPStateManager();
-    
+
     public void setStateProvider(SPStateManager stateManager) {
         this.manager = stateManager;
     }
-    
+
     @POST
     @Path("/request/{relayState}")
     @Consumes("application/xml")
-    public void setRequestState(@Encoded @PathParam("relayState") String relayState, 
+    public void setRequestState(@Encoded @PathParam("relayState") String relayState,
                                 RequestState state) {
         manager.setRequestState(relayState, state);
     }
@@ -55,7 +55,7 @@ public class HTTPSPStateManager implements SPStateManager {
     @POST
     @Path("/response/{contextKey}")
     @Consumes("application/xml")
-    public void setResponseState(@Encoded @PathParam("contextKey") String contextKey, 
+    public void setResponseState(@Encoded @PathParam("contextKey") String contextKey,
                                  ResponseState state) {
         manager.setResponseState(contextKey, state);
 
@@ -65,7 +65,7 @@ public class HTTPSPStateManager implements SPStateManager {
     @Path("/response/{contextKey}")
     @Produces("application/xml")
     public ResponseState getResponseState(@Encoded @PathParam("contextKey") String contextKey) {
-        return manager.getResponseState(contextKey);        
+        return manager.getResponseState(contextKey);
     }
 
     @DELETE
@@ -78,7 +78,5 @@ public class HTTPSPStateManager implements SPStateManager {
     @POST
     @Path("close")
     public void close() throws IOException {
-        // TODO Auto-generated method stub
-
     }
 }

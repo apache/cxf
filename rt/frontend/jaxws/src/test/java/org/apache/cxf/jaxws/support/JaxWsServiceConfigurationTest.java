@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxws.support;
 
 import java.lang.reflect.Method;
-
 import java.util.Iterator;
 
 import javax.jws.WebMethod;
@@ -40,13 +39,18 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl11.CatalogWSDLLocator;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JaxWsServiceConfigurationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class JaxWsServiceConfigurationTest {
 
 
     @Before
@@ -63,18 +67,18 @@ public class JaxWsServiceConfigurationTest extends Assert {
         bean.setServiceClass(Hello.class);
         JaxWsServiceConfiguration jwsc = (JaxWsServiceConfiguration) bean.getServiceConfigurations().get(0);
         jwsc.setServiceFactory(bean);
-        
+
         OperationInfo op = si.getInterface().getOperation(opName);
-        op.setInput("input", new MessageInfo(op, MessageInfo.Type.INPUT, 
+        op.setInput("input", new MessageInfo(op, MessageInfo.Type.INPUT,
                                              new QName("http://cxf.com/", "input")));
-        op.setOutput("output", new MessageInfo(op, MessageInfo.Type.OUTPUT, 
+        op.setOutput("output", new MessageInfo(op, MessageInfo.Type.OUTPUT,
                                                new QName("http://cxf.com/", "output")));
-        
+
         QName partName = jwsc.getInPartName(op, sayHelloMethod, 0);
         assertEquals("get wrong in partName for first param", new QName("http://cxf.com/", "arg0"), partName);
-        
+
         op.getInput().addMessagePart(new QName("arg0"));
-        
+
         partName = jwsc.getInPartName(op, sayHelloMethod, 1);
         assertEquals("get wrong in partName for first param", new QName("http://cxf.com/", "arg1"), partName);
     }
@@ -97,7 +101,7 @@ public class JaxWsServiceConfigurationTest extends Assert {
         bean.setServiceClass(HelloRPC.class);
         JaxWsServiceConfiguration jwsc = (JaxWsServiceConfiguration) bean.getServiceConfigurations().get(0);
         jwsc.setServiceFactory(bean);
-        
+
         assertEquals("rpc", jwsc.getStyle());
         assertFalse(jwsc.isWrapped());
     }
@@ -108,7 +112,7 @@ public class JaxWsServiceConfigurationTest extends Assert {
         bean.setServiceClass(HelloWrapped.class);
         JaxWsServiceConfiguration jwsc = (JaxWsServiceConfiguration) bean.getServiceConfigurations().get(0);
         jwsc.setServiceFactory(bean);
-        
+
         assertEquals("document", jwsc.getStyle());
         assertTrue(jwsc.isWrapped());
     }
@@ -119,7 +123,7 @@ public class JaxWsServiceConfigurationTest extends Assert {
         bean.setServiceClass(HelloBare.class);
         JaxWsServiceConfiguration jwsc = (JaxWsServiceConfiguration) bean.getServiceConfigurations().get(0);
         jwsc.setServiceFactory(bean);
-        
+
         assertEquals("document", jwsc.getStyle());
         assertFalse(jwsc.isWrapped());
     }
@@ -133,13 +137,13 @@ public class JaxWsServiceConfigurationTest extends Assert {
         JaxWsServiceFactoryBean bean = new JaxWsServiceFactoryBean();
         bean.setServiceClass(Hello.class);
         jwsc.setServiceFactory(bean);
-        
+
         // clear the output
         OperationInfo op = si.getInterface().getOperation(opName);
-        op.setOutput("output", new MessageInfo(op, 
+        op.setOutput("output", new MessageInfo(op,
                                                MessageInfo.Type.OUTPUT,
                                                new QName("http://cxf.com/", "output")));
-        
+
         QName partName = jwsc.getOutPartName(op, sayHiMethod, -1);
         assertEquals("get wrong return partName", new QName("http://cxf.com/", "return"), partName);
     }
@@ -175,7 +179,7 @@ public class JaxWsServiceConfigurationTest extends Assert {
     }
 
     @WebService(name = "Hello", targetNamespace = "http://cxf.com/")
-    @SOAPBinding(parameterStyle = javax.jws.soap.SOAPBinding.ParameterStyle.BARE, 
+    @SOAPBinding(parameterStyle = javax.jws.soap.SOAPBinding.ParameterStyle.BARE,
                  style = javax.jws.soap.SOAPBinding.Style.RPC, use = javax.jws.soap.SOAPBinding.Use.LITERAL)
     public interface Hello {
         @WebMethod(operationName = "sayHi", exclude = false)

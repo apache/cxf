@@ -38,7 +38,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthorizingInInterceptor.class);
     private static final String ALL_ROLES = "*";
     private boolean allowAnonymousUsers = true;
-    
+
     public AbstractAuthorizingInInterceptor() {
         this(true);
     }
@@ -55,18 +55,18 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         } else if (!isMethodProtected(method) && isAllowAnonymousUsers()) {
             return;
         }
-        
-        
+
+
         throw new AccessDeniedException("Unauthorized");
     }
-    
+
     protected Method getTargetMethod(Message m) {
         BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
         if (bop != null) {
-            MethodDispatcher md = (MethodDispatcher) 
+            MethodDispatcher md = (MethodDispatcher)
                 m.getExchange().getService().get(MethodDispatcher.class.getName());
             return md.getMethod(bop);
-        } 
+        }
         Method method = (Method)m.get("org.apache.cxf.resource.method");
         if (method != null) {
             return method;
@@ -77,12 +77,12 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     protected boolean authorize(SecurityContext sc, Method method) {
         List<String> expectedRoles = getExpectedRoles(method);
         if (expectedRoles.isEmpty()) {
-            
+
             List<String> denyRoles = getDenyRoles(method);
-            
+
             return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
         }
-        
+
         if (isUserInRole(sc, expectedRoles, false)) {
             return true;
         }
@@ -94,13 +94,13 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     protected boolean isMethodProtected(Method method) {
         return !getExpectedRoles(method).isEmpty() || !getDenyRoles(method).isEmpty();
     }
-    
+
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
-        
+
         if (roles.size() == 1 && ALL_ROLES.equals(roles.get(0))) {
             return !deny;
         }
-        
+
         for (String role : roles) {
             if (sc.isUserInRole(role)) {
                 return !deny;
@@ -108,17 +108,17 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         }
         return deny;
     }
-    
+
     /**
-     * Returns a list of expected roles for a given method. 
+     * Returns a list of expected roles for a given method.
      * @param method Method
      * @return list, empty if no roles are available
      */
     protected abstract List<String> getExpectedRoles(Method method);
-    
-       
+
+
     /**
-     * Returns a list of roles to be denied for a given method. 
+     * Returns a list of roles to be denied for a given method.
      * @param method Method
      * @return list, empty if no roles are available
      */
@@ -133,5 +133,5 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
     public void setAllowAnonymousUsers(boolean allowAnonymousUsers) {
         this.allowAnonymousUsers = allowAnonymousUsers;
     }
-    
+
 }

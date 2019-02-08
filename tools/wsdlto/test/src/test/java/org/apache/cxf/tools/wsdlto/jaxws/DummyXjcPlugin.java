@@ -37,7 +37,7 @@ public class DummyXjcPlugin extends Plugin {
 
     static final String XDUMMY_XJC_PLUGIN = "Xdummy-xjc-plugin";
     static final String DUMMY_ARG = "-" + XDUMMY_XJC_PLUGIN + ":" + "arg";
-    
+
     @Override
     public String getOptionName() {
         return XDUMMY_XJC_PLUGIN;
@@ -50,17 +50,17 @@ public class DummyXjcPlugin extends Plugin {
 
     @Override
     public boolean run(Outline arg0, Options arg1, ErrorHandler arg2) {
-        
+
         for (ClassOutline classOutline : arg0.getClasses()) {
             JDefinedClass implClass = classOutline.implClass;
             JCodeModel codeModel = implClass.owner();
-            JMethod dummyMethod = 
+            JMethod dummyMethod =
                 implClass.method(JMod.PUBLIC, codeModel.ref(String.class), "dummy");
             dummyMethod.body()._return(JExpr.lit("dummy"));
         }
         return true;
     }
-    
+
     @Override
     public int parseArgument(Options opt, String[] args, int i)
         throws BadCommandLineException {
@@ -68,7 +68,7 @@ public class DummyXjcPlugin extends Plugin {
         if (args[i].equals(DUMMY_ARG)) {
             ret = 1;
         }
-        
+
         return ret;
     }
 }

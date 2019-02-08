@@ -28,7 +28,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 
 public class SoapAddress extends XmlAddress {
     public Map<String, String> getNamespaces(final ToolContext context) {
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         if (context.optionSet(ToolConstants.CFG_SOAP12)) {
             ns.put(ToolConstants.CFG_SOAP12, WSDLConstants.NS_SOAP12);
         } else {
@@ -38,7 +38,7 @@ public class SoapAddress extends XmlAddress {
     }
 
     public Map<String, Object> buildAddressArguments(final ToolContext context) {
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
 
         args.putAll(super.buildAddressArguments(context));
 

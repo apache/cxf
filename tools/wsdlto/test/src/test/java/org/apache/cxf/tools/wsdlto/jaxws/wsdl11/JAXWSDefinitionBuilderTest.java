@@ -36,11 +36,14 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
 import org.apache.cxf.wsdl.JAXBExtensibilityElement;
 import org.apache.cxf.wsdl.http.AddressType;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXWSDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSDefinitionBuilderTest {
     private ToolContext env;
 
     @Before
@@ -94,7 +97,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         if (obj instanceof JAXBExtensibilityElement) {
             obj = ((JAXBExtensibilityElement)obj).getValue();
         }
-        assertTrue(obj.getClass().getName() + " is not an XMLBindingMessageFormat", 
+        assertTrue(obj.getClass().getName() + " is not an XMLBindingMessageFormat",
                    obj instanceof XMLBindingMessageFormat);
     }
 

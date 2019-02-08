@@ -26,11 +26,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 @XmlRootElement(name = "customType", namespace = "http://example/")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "customType", namespace = "http://example/", 
+@XmlType(name = "customType", namespace = "http://example/",
     propOrder = { "arg0", "arg1" })
 public class CustomType {
     @XmlElement(name = "arg0", namespace = "")
@@ -40,14 +40,14 @@ public class CustomType {
 
     public CustomType() {
     }
-    
+
     public CustomType(int a, int b) {
         arg0 = a;
         arg1 = b;
     }
-    
+
     /**
-     * 
+     *
      * @return
      *     returns int
      */
@@ -56,7 +56,7 @@ public class CustomType {
     }
 
     /**
-     * 
+     *
      * @param arg0
      *     the value for the arg0 property
      */
@@ -65,7 +65,7 @@ public class CustomType {
     }
 
     /**
-     * 
+     *
      * @return
      *     returns int
      */
@@ -74,7 +74,7 @@ public class CustomType {
     }
 
     /**
-     * 
+     *
      * @param arg1
      *     the value for the arg1 property
      */

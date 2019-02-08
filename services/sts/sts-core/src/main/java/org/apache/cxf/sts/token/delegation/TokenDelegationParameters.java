@@ -20,9 +20,8 @@
 package org.apache.cxf.sts.token.delegation;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Set;
-
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -31,15 +30,15 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
 /**
- * This class encapsulates the parameters that will be passed to a TokenDelegationHandler instance to. 
- * It consists of both parameters that have been extracted from the request, as well as 
+ * This class encapsulates the parameters that will be passed to a TokenDelegationHandler instance to.
+ * It consists of both parameters that have been extracted from the request, as well as
  * configuration specific to the Operation itself (STSPropertiesMBean etc.)
  */
 public class TokenDelegationParameters {
 
     private STSPropertiesMBean stsProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private TokenStore tokenStore;
@@ -47,7 +46,7 @@ public class TokenDelegationParameters {
     private String appliesToAddress;
     private Principal tokenPrincipal;
     private Set<Principal> tokenRoles;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -63,7 +62,7 @@ public class TokenDelegationParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -79,7 +78,7 @@ public class TokenDelegationParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
@@ -87,19 +86,11 @@ public class TokenDelegationParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
 
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
@@ -127,5 +118,13 @@ public class TokenDelegationParameters {
     public void setTokenRoles(Set<Principal> tokenRoles) {
         this.tokenRoles = tokenRoles;
     }
-    
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
+    }
+
 }

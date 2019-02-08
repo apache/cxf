@@ -21,32 +21,33 @@ package org.apache.cxf.service.model;
 
 import javax.xml.namespace.QName;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MessageInfoTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class MessageInfoTest {
+
     private MessageInfo messageInfo;
-    
+
     @Before
     public void setUp() throws Exception {
         messageInfo = new MessageInfo(null, MessageInfo.Type.INPUT,
                                       new QName("http://apache.org/hello_world_soap_http", "testMessage"));
     }
-    
+
     @Test
     public void testName() throws Exception {
         assertEquals(messageInfo.getName().getLocalPart(), "testMessage");
         assertEquals(messageInfo.getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http");
     }
-    
+
     @Test
     public void testMessagePartInfo() throws Exception {
         QName qname = new QName(
                                 "http://apache.org/hello_world_soap_http", "testMessagePart");
-        
+
         messageInfo.addMessagePart(qname);
         assertEquals(messageInfo.getMessageParts().size(), 1);
         MessagePartInfo messagePartInfo = messageInfo.getMessagePart(qname);

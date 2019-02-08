@@ -30,7 +30,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class SecurityOutFaultInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     public SecurityOutFaultInterceptor() {
         super(Phase.PRE_STREAM);
 
@@ -42,10 +42,10 @@ public class SecurityOutFaultInterceptor extends AbstractPhaseInterceptor<Messag
         if (!(ex instanceof SecurityException)) {
             throw new RuntimeException("Security Exception is expected");
         }
-        
+
         HttpServletResponse response = (HttpServletResponse)message.getExchange().getInMessage()
             .get(AbstractHTTPDestination.HTTP_RESPONSE);
-        int status = ex instanceof AccessDeniedException ? 403 : 401; 
+        int status = ex instanceof AccessDeniedException ? 403 : 401;
         response.setStatus(status);
         try {
             response.getOutputStream().write(ex.getMessage().getBytes());
@@ -53,7 +53,7 @@ public class SecurityOutFaultInterceptor extends AbstractPhaseInterceptor<Messag
         } catch (IOException iex) {
             // ignore
         }
-        
+
         message.getInterceptorChain().abort();
     }
 

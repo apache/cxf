@@ -22,9 +22,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import org.apache.cxf.jaxrs.json.basic.JsonObject;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 
-public class JweJsonEncryptionEntry {
+public class JweJsonEncryptionEntry implements JsonObject {
     private JweHeaders unprotectedHeader;
     private String encodedEncryptedKey;
     public JweJsonEncryptionEntry(String encodedEncryptedKey) {
@@ -45,8 +46,8 @@ public class JweJsonEncryptionEntry {
     }
     public String toJson() {
         JsonMapObjectReaderWriter jsonWriter = new JsonMapObjectReaderWriter();
-        Map<String, Object> recipientsEntry = new LinkedHashMap<String, Object>();
-        if (unprotectedHeader != null) {
+        Map<String, Object> recipientsEntry = new LinkedHashMap<>();
+        if (unprotectedHeader != null && !unprotectedHeader.asMap().isEmpty()) {
             recipientsEntry.put("header", this.unprotectedHeader);
         }
         if (encodedEncryptedKey != null) {

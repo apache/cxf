@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.soap.wsdl11;
 
 import java.util.Map;
+
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 
@@ -41,7 +42,7 @@ public final class SoapAddressPlugin extends AbstractWSDLPlugin {
         SoapAddress soapAddress = null;
 
         soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSOAP12);
-        
+
         soapAddress.setLocationURI(address);
 
         return soapAddress;

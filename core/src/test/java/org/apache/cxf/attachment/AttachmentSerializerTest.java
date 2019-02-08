@@ -38,45 +38,48 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class AttachmentSerializerTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class AttachmentSerializerTest {
+
     @Test
     public void testMessageWriteXopOn1() throws Exception {
         doTestMessageWrite(true, "text/xml");
     }
-    
+
     @Test
     public void testMessageWriteXopOn2() throws Exception {
         doTestMessageWrite(true, "application/soap+xml; action=\"urn:foo\"");
     }
-    
+
     @Test
     public void testMessageWriteXopOff1() throws Exception {
         doTestMessageWrite(false, "text/xml");
     }
-    
+
     @Test
     public void testMessageWriteXopOff2() throws Exception {
         doTestMessageWrite(false, "application/soap+xml; action=\"urn:foo\"");
     }
-    
+
     private void doTestMessageWrite(boolean xop, String soapContentType) throws Exception {
         MessageImpl msg = new MessageImpl();
-        
-        Collection<Attachment> atts = new ArrayList<Attachment>();
+
+        Collection<Attachment> atts = new ArrayList<>();
         AttachmentImpl a = new AttachmentImpl("test.xml");
-        
+
         InputStream is = getClass().getResourceAsStream("my.wav");
         ByteArrayDataSource ds = new ByteArrayDataSource(is, "application/octet-stream");
         a.setDataHandler(new DataHandler(ds));
-        
+
         atts.add(a);
-        
+
         msg.setAttachments(atts);
-        
+
         // Set the SOAP content type
         msg.put(Message.CONTENT_TYPE, soapContentType);
         String soapCtType = null;
@@ -94,13 +97,13 @@ public class AttachmentSerializerTest extends Assert {
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         msg.setContent(OutputStream.class, out);
-        
+
         AttachmentSerializer serializer = new AttachmentSerializer(msg);
         if (!xop) {
             // default is "on"
             serializer.setXop(xop);
         }
-        
+
         serializer.writeProlog();
 
         // we expect the following rules at the package header level
@@ -109,7 +112,7 @@ public class AttachmentSerializerTest extends Assert {
         //   value must contain the content type associated with the root content's xml serialization,
         //   including its parameters as appropriate.
         // - the action property should not appear directly in the package header level
-        // - the type property must contain the media type type/subtype of the root content part. 
+        // - the type property must contain the media type type/subtype of the root content part.
         //   namely application/xop+xml for mtom but otherwise text/xml or application/soap+xml
         //   depending on the soap version 1.1 or 1.2, respectively.
         String ct = (String) msg.get(Message.CONTENT_TYPE);
@@ -123,120 +126,120 @@ public class AttachmentSerializerTest extends Assert {
             assertTrue(ct.indexOf("type=\"" + soapCtType + "\"") > -1);
         }
         out.write("<soap:Body/>".getBytes());
-        
+
         serializer.writeAttachments();
-        
+
         out.flush();
-        
+
         DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
         MimeMultipart mpart = new MimeMultipart(source);
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage inMsg = new MimeMessage(session);
         inMsg.setContent(mpart);
         inMsg.addHeaderLine("Content-Type: " + ct);
-        
+
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
-        
+
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
         // we expect the following rules at the root content level
-        // - the envelope header must have type application/xop+xml for mtom but otherwise the content's 
+        // - the envelope header must have type application/xop+xml for mtom but otherwise the content's
         //   serialization type.
         // - the type property must be present for mtom and it must contain the content's serialization type
-        //   including its parameters if appropriate. 
+        //   including its parameters if appropriate.
         // - the action must appear if it was present in the original message (i.e., for soap 1.2)
         if (xop) {
             assertEquals("application/xop+xml; charset=UTF-8; type=\"" + soapCtType + soapCtParamsEscaped + "\"",
                 part.getHeader("Content-Type")[0]);
         } else {
-            assertEquals(soapCtType + "; charset=UTF-8" + soapCtParams,  
+            assertEquals(soapCtType + "; charset=UTF-8" + soapCtParams,
                          part.getHeader("Content-Type")[0]);
         }
-        
+
         assertEquals("binary", part.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<root.message@cxf.apache.org>", part.getHeader("Content-ID")[0]);
-        
+
         InputStream in = part.getDataHandler().getInputStream();
         ByteArrayOutputStream bodyOut = new ByteArrayOutputStream();
         IOUtils.copy(in, bodyOut);
         out.close();
         in.close();
-        
+
         assertEquals("<soap:Body/>", bodyOut.toString());
-        
+
         MimeBodyPart part2 = (MimeBodyPart) multipart.getBodyPart(1);
         assertEquals("application/octet-stream", part2.getHeader("Content-Type")[0]);
         assertEquals("binary", part2.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
 
     }
-    
+
     @Test
     public void testMessageMTOM() throws Exception {
         MessageImpl msg = new MessageImpl();
-        
-        Collection<Attachment> atts = new ArrayList<Attachment>();
+
+        Collection<Attachment> atts = new ArrayList<>();
         AttachmentImpl a = new AttachmentImpl("test.xml");
-        
+
         InputStream is = getClass().getResourceAsStream("my.wav");
         ByteArrayDataSource ds = new ByteArrayDataSource(is, "application/octet-stream");
         a.setDataHandler(new DataHandler(ds));
-        
+
         atts.add(a);
-        
+
         msg.setAttachments(atts);
-        
+
         // Set the SOAP content type
         msg.put(Message.CONTENT_TYPE, "application/soap+xml");
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         msg.setContent(OutputStream.class, out);
-        
+
         AttachmentSerializer serializer = new AttachmentSerializer(msg);
-        
+
         serializer.writeProlog();
 
         String ct = (String) msg.get(Message.CONTENT_TYPE);
         assertTrue(ct.indexOf("multipart/related;") == 0);
         assertTrue(ct.indexOf("start=\"<root.message@cxf.apache.org>\"") > -1);
         assertTrue(ct.indexOf("start-info=\"application/soap+xml\"") > -1);
-        
+
         out.write("<soap:Body/>".getBytes());
-        
+
         serializer.writeAttachments();
-        
+
         out.flush();
         DataSource source = new ByteArrayDataSource(new ByteArrayInputStream(out.toByteArray()), ct);
         MimeMultipart mpart = new MimeMultipart(source);
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage inMsg = new MimeMessage(session);
         inMsg.setContent(mpart);
-        
+
         inMsg.addHeaderLine("Content-Type: " + ct);
-        
+
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
-        
+
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
-        assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\"", 
+        assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\"",
                      part.getHeader("Content-Type")[0]);
         assertEquals("binary", part.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<root.message@cxf.apache.org>", part.getHeader("Content-ID")[0]);
-        
+
         InputStream in = part.getDataHandler().getInputStream();
         ByteArrayOutputStream bodyOut = new ByteArrayOutputStream();
         IOUtils.copy(in, bodyOut);
         out.close();
         in.close();
-        
+
         assertEquals("<soap:Body/>", bodyOut.toString());
-        
+
         MimeBodyPart part2 = (MimeBodyPart) multipart.getBodyPart(1);
         assertEquals("application/octet-stream", part2.getHeader("Content-Type")[0]);
         assertEquals("binary", part2.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
-        
+
     }
 
     private static String escapeQuotes(String s) {
-        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
+        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;
     }
 }

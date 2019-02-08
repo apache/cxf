@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -27,6 +30,7 @@ import org.apache.cxf.rs.security.jose.common.JoseType;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class JwsHeaders extends JoseHeaders {
+    private static final long serialVersionUID = 3422779299093961672L;
     public JwsHeaders() {
     }
     public JwsHeaders(JoseType type) {
@@ -35,9 +39,12 @@ public class JwsHeaders extends JoseHeaders {
     public JwsHeaders(JwsHeaders headers) {
         super(headers.asMap());
     }
-    
+
     public JwsHeaders(Map<String, Object> values) {
         super(values);
+    }
+    public JwsHeaders(String kid) {
+        this(Collections.singletonMap(JoseConstants.HEADER_KEY_ID, (Object)kid));
     }
     public JwsHeaders(SignatureAlgorithm sigAlgo) {
         init(sigAlgo);
@@ -52,17 +59,28 @@ public class JwsHeaders extends JoseHeaders {
     private void init(SignatureAlgorithm sigAlgo) {
         setSignatureAlgorithm(sigAlgo);
     }
-    
-    public void setSignatureAlgorithm(SignatureAlgorithm algo) {
+
+    public final void setSignatureAlgorithm(SignatureAlgorithm algo) {
         super.setAlgorithm(algo.getJwaName());
     }
-    
+
     public SignatureAlgorithm getSignatureAlgorithm() {
         String algo = super.getAlgorithm();
         return algo == null ? null : SignatureAlgorithm.getAlgorithm(algo);
     }
     public void setPayloadEncodingStatus(Boolean status) {
         super.setProperty(JoseConstants.JWS_HEADER_B64_STATUS_HEADER, status);
+        if (!status) {
+            List<String> critical = this.getCritical();
+            if (critical == null) {
+                critical = new LinkedList<>();
+                setCritical(critical);
+            } else if (critical.contains(JoseConstants.JWS_HEADER_B64_STATUS_HEADER)) {
+                return;
+            }
+            critical.add(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);
+
+        }
     }
     public Boolean getPayloadEncodingStatus() {
         return super.getBooleanProperty(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);

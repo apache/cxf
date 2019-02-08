@@ -23,15 +23,17 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Enum;
 import org.apache.cxf.binding.corba.wsdl.Enumerator;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaEnumHandlerTest extends Assert {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaEnumHandlerTest {
 
     private ORB orb;
 
@@ -41,7 +43,7 @@ public class CorbaEnumHandlerTest extends Assert {
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (orb != null) {
@@ -52,13 +54,13 @@ public class CorbaEnumHandlerTest extends Assert {
             }
         }
     }
-    
+
     @Test
     public void testCorbaEnumHandler() {
         Enum enumType = new Enum();
         enumType.setName("EnumType");
         enumType.setRepositoryID("IDL:EnumType:1.0");
-        
+
         Enumerator enumerator0 = new Enumerator();
         enumerator0.setValue("ENUM0");
         Enumerator enumerator1 = new Enumerator();
@@ -68,22 +70,22 @@ public class CorbaEnumHandlerTest extends Assert {
         enumType.getEnumerator().add(enumerator0);
         enumType.getEnumerator().add(enumerator1);
         enumType.getEnumerator().add(enumerator2);
-        
+
         QName enumName = new QName("EnumType");
-        QName enumIdlType = 
+        QName enumIdlType =
             new QName(CorbaConstants.NU_WSDL_CORBA, "EnumType", CorbaConstants.NP_WSDL_CORBA);
-        String members[] = new String[3];
+        String[] members = new String[3];
         members[0] = enumerator0.getValue();
         members[1] = enumerator1.getValue();
         members[2] = enumerator2.getValue();
         TypeCode enumTC = orb.create_enum_tc(enumType.getRepositoryID(), enumType.getName(), members);
-        
+
         CorbaEnumHandler obj = new CorbaEnumHandler(enumName, enumIdlType, enumTC, enumType);
         assertNotNull(obj);
-        
+
         obj.setValue(members[1]);
         assertTrue(obj.getValue().equals(enumerator1.getValue()));
-        
+
         assertTrue(obj.getIndex() == 1);
     }
 }

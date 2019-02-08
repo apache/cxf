@@ -27,10 +27,11 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.clustering</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.clustering.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,

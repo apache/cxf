@@ -26,7 +26,7 @@ import org.apache.cxf.phase.Phase;
 
 @Deprecated
 public class JAXRSOutExceptionMapperInterceptor extends AbstractOutDatabindingInterceptor {
-    
+
     public JAXRSOutExceptionMapperInterceptor() {
         super(Phase.SETUP);
     }

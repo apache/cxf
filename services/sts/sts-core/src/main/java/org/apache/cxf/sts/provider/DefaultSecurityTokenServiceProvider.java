@@ -21,9 +21,11 @@ package org.apache.cxf.sts.provider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.event.STSEventListener;
@@ -50,7 +52,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
  * tokens.
  */
 public class DefaultSecurityTokenServiceProvider extends SecurityTokenServiceProvider {
-    
+
+    private static final Logger LOG = LogUtils.getL7dLogger(DefaultSecurityTokenServiceProvider.class);
+
     private STSPropertiesMBean stsProperties;
     private boolean encryptIssuedToken;
     private List<ServiceMBean> services;
@@ -62,11 +66,11 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     public DefaultSecurityTokenServiceProvider() throws Exception {
         super();
     }
-    
+
     public void setReturnReferences(boolean returnReferences) {
         this.returnReferences = returnReferences;
     }
-    
+
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
@@ -74,23 +78,23 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public void setEncryptIssuedToken(boolean encryptIssuedToken) {
         this.encryptIssuedToken = encryptIssuedToken;
     }
-    
+
     public void setServices(List<ServiceMBean> services) {
         this.services = services;
     }
-    
+
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
     }
-    
+
     public void setEventListener(STSEventListener listener) {
         this.eventListener = listener;
     }
-    
+
     @Override
     public Source invoke(Source request) {
         if (getIssueOperation() == null) {
@@ -104,41 +108,46 @@ public class DefaultSecurityTokenServiceProvider extends SecurityTokenServicePro
         }
         return super.invoke(request);
     }
-    
+
     private TokenIssueOperation createTokenIssueOperation() {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         populateAbstractOperation(issueOperation);
-        
+
         return issueOperation;
     }
 
     private TokenValidateOperation createTokenValidateOperation() {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         populateAbstractOperation(validateOperation);
-        
+
         return validateOperation;
     }
-    
+
     private TokenRenewOperation createTokenRenewOperation() {
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         populateAbstractOperation(renewOperation);
-        
+
         List<TokenRenewer> tokenRenewers = new ArrayList<>();
         tokenRenewers.add(new SAMLTokenRenewer());
         renewOperation.setTokenRenewers(tokenRenewers);
-        
+
         return renewOperation;
     }
-    
+
     private void populateAbstractOperation(AbstractOperation abstractOperation) {
+        if (stsProperties == null) {
+            LOG.warning("No 'stsProperties' configured on the DefaultSecurityTokenServiceProvider");
+            return;
+        }
+
         List<TokenProvider> tokenProviders = new ArrayList<>();
         tokenProviders.add(new SAMLTokenProvider());
-        
+
         List<TokenValidator> tokenValidators = new ArrayList<>();
         tokenValidators.add(new SAMLTokenValidator());
         tokenValidators.add(new UsernameTokenValidator());
         tokenValidators.add(new X509TokenValidator());
-        
+
         abstractOperation.setTokenProviders(tokenProviders);
         abstractOperation.setTokenValidators(tokenValidators);
         abstractOperation.setStsProperties(stsProperties);

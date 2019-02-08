@@ -21,19 +21,19 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.List;
 
 /**
- * Composite 'or' search condition   
+ * Composite 'or' search condition
  */
 public class OrSearchCondition<T> extends AbstractComplexCondition<T> {
 
     public OrSearchCondition() {
         super(ConditionType.OR);
     }
-    
+
     public OrSearchCondition(List<SearchCondition<T>> conditions) {
-        super(conditions, ConditionType.OR);    
+        super(conditions, ConditionType.OR);
     }
-    
-    
+
+
     public boolean isMet(T pojo) {
         for (SearchCondition<T> sc : conditions) {
             if (sc.isMet(pojo)) {

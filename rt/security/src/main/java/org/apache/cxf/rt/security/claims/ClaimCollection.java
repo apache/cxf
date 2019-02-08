@@ -28,17 +28,17 @@ import javax.xml.stream.XMLStreamWriter;
  * This holds a collection of Claim Objects.
  */
 public class ClaimCollection extends java.util.ArrayList<Claim> {
-    
+
     private static final long serialVersionUID = -4543840943290756510L;
-    
-    private URI dialect = 
+
+    private URI dialect =
         URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity");
     private String dialectPrefix = "ic";
-    
+
     public URI getDialect() {
         return dialect;
     }
-    
+
     public void setDialect(URI dialect) {
         this.dialect = dialect;
     }
@@ -47,11 +47,11 @@ public class ClaimCollection extends java.util.ArrayList<Claim> {
         writer.writeStartElement(prefix, "Claims", namespace);
         writer.writeNamespace(dialectPrefix, dialect.toString());
         writer.writeAttribute(null, "Dialect", dialect.toString());
-        
+
         for (Claim claim : this) {
             claim.serialize(writer, dialectPrefix, dialect.toString());
         }
-        
+
         writer.writeEndElement();
     }
 

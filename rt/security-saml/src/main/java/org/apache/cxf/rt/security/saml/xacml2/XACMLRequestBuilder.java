@@ -30,10 +30,10 @@ import org.opensaml.xacml.ctx.RequestType;
  * This interface defines a way to create an XACML 2.0 Request using OpenSAML
  */
 public interface XACMLRequestBuilder {
-    
+
     /**
      * Create an XACML Request given a Principal, list of roles and Message.
-     * 
+     *
      * @param principal The principal to insert into the Subject of the Request
      * @param roles The list of roles associated with the principal
      * @param message The Message from which to retrieve the resource
@@ -41,5 +41,5 @@ public interface XACMLRequestBuilder {
      * @throws Exception
      */
     RequestType createRequest(Principal principal, List<String> roles, Message message) throws Exception;
-    
+
 }

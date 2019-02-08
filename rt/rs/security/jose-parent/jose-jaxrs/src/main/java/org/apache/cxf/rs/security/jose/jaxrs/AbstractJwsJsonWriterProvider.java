@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -36,33 +37,34 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsException;
+import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsJsonWriterProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonWriterProvider.class);
-    
+
     private List<JwsSignatureProvider> sigProviders;
-    
+
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         setSignatureProviders(Collections.singletonList(signatureProvider));
     }
     public void setSignatureProviders(List<JwsSignatureProvider> signatureProviders) {
         this.sigProviders = signatureProviders;
     }
-    
-    protected List<JwsSignatureProvider> getInitializedSigProviders() {
-        if (sigProviders != null) {
-            return sigProviders;    
-        } 
+
+    protected List<String> getPropertyLocations() {
         Message m = JAXRSUtils.getCurrentMessage();
-        Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_LIST_PROPS, 
-                                               JoseConstants.RSSEC_SIGNATURE_LIST_PROPS);
+        Object propLocsProp =
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_PROPS,
+                                               JoseConstants.RSSEC_SIGNATURE_PROPS);
         if (propLocsProp == null) {
-            LOG.warning("JWS JSON init properties resource is not identified");
-            throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
+            if (sigProviders == null) {
+                LOG.warning("JWS JSON init properties resource is not identified");
+                throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
+            }
+            return Collections.emptyList();
         }
         List<String> propLocs = null;
         if (propLocsProp instanceof String) {
@@ -71,16 +73,26 @@ public class AbstractJwsJsonWriterProvider {
         } else {
             propLocs = CastUtils.cast((List<?>)propLocsProp);
         }
-        List<JwsSignatureProvider> theSigProviders = new LinkedList<JwsSignatureProvider>();
-        for (String propLoc : propLocs) {
-            theSigProviders.addAll(JwsUtils.loadSignatureProviders(propLoc, m));
+        return propLocs;
+    }
+    
+    protected List<JwsSignatureProvider> getInitializedSigProviders(
+        List<String> propLocs, List<JwsHeaders> protectedHeaders) {
+        if (sigProviders != null) {
+            return sigProviders;
+        }
+        Message m = JAXRSUtils.getCurrentMessage();
+        List<JwsSignatureProvider> theSigProviders = new LinkedList<>();
+        for (int i = 0; i < propLocs.size(); i++) {
+            Properties props = JwsUtils.loadJwsProperties(m, propLocs.get(i));
+            theSigProviders.add(JwsUtils.loadSignatureProvider(props, protectedHeaders.get(i)));
         }
         return theSigProviders;
     }
-    protected void writeJws(JwsJsonProducer p, OutputStream os) 
+    protected void writeJws(JwsJsonProducer p, OutputStream os)
         throws IOException {
         byte[] bytes = StringUtils.toBytesUTF8(p.getJwsJsonSignedDocument());
         IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
-    
+
 }

@@ -35,7 +35,7 @@ public class SoapBindingInfo extends BindingInfo {
     private String style;
 
     private String transportURI;
-    
+
     public SoapBindingInfo(ServiceInfo serv, String n) {
         this(serv, n, null);
         resolveSoapVersion(n);
@@ -77,9 +77,8 @@ public class SoapBindingInfo extends BindingInfo {
         SoapOperationInfo opInfo = getOperation(operation.getName()).getExtensor(SoapOperationInfo.class);
         if (opInfo != null) {
             return opInfo.getStyle();
-        } else {
-            return style;
         }
+        return style;
     }
 
     public OperationInfo getOperationByAction(String action) {
@@ -96,7 +95,7 @@ public class SoapBindingInfo extends BindingInfo {
 
     /**
      * Get the soap action for an operation. Will never return null.
-     * 
+     *
      * @param operation
      * @return
      */

@@ -43,7 +43,7 @@ public final class JarLoader {
     // this keys to this map are full distinguished names of the fromat
     // someOuterArchive!/someInnerArchive!/....
     // the values of the archives map are maps of entry names to bytes
-    static Map<String, Object> archives = new HashMap<String, Object>();
+    static Map<String, Object> archives = new HashMap<>();
     static final int CHUNK_SIZE = 4096;
     static final int MAX_CHUNK_SIZE = CHUNK_SIZE * 16;
 
@@ -54,7 +54,7 @@ public final class JarLoader {
         return getBytesFromInputStream(is, -1);
     }
 
-    public static synchronized Map<?, ?> getJarContents(String path) 
+    public static synchronized Map<?, ?> getJarContents(String path)
         throws MalformedURLException, IOException {
         if (!archives.containsKey(path)) {
             loadArchive(path);
@@ -76,9 +76,9 @@ public final class JarLoader {
                     // This byte array has now been exploded into a Map so the raw bytes are
                     // no longer needed, replace the entry with the exploded Map
                     //
-                    Map<String, Object> parentMap = 
+                    Map<String, Object> parentMap =
                         CastUtils.cast((Map<?, ?>)archives.get(buildPartialName(nameComponents, i)));
-                    Map<?, ?> archiveMap = 
+                    Map<?, ?> archiveMap =
                         (Map<?, ?>)archives.get(buildPartialName(nameComponents, i + 1));
 
                     parentMap.put(nameComponents.get(i), archiveMap);
@@ -88,7 +88,7 @@ public final class JarLoader {
     }
 
     private static List<String> tokenizePathComponents(String path) {
-        List<String> tokens = new LinkedList<String>();
+        List<String> tokens = new LinkedList<>();
         String tmpPath = new String(path);
 
         while (tmpPath.length() > 0) {
@@ -124,22 +124,21 @@ public final class JarLoader {
 
         if (name.indexOf("!/") != -1) {
             return name.substring(0, name.indexOf("!/"));
-        } else {
-            return name;
         }
+        return name;
     }
 
     private static void readArchive(String name) throws MalformedURLException, IOException {
         List<String> nameComponents = tokenizePathComponents(name);
         Map<String, Object> map = null;
 
-        if (nameComponents.size() == 1) {            
+        if (nameComponents.size() == 1) {
             map = readZipStream((new URL(getRootArchiveName(name))).openStream());
         } else {
-            Map<?, ?> parentMap 
+            Map<?, ?> parentMap
                 = (Map<?, ?>)archives.get(buildPartialName(nameComponents, nameComponents.size() - 1));
-            byte bytes[] = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
-            
+            byte[] bytes = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
+
             if (null == bytes) {
                 // unexpected, classpath entry in error, referenced jar is not in the archive
                 throw new IOException(
@@ -156,13 +155,13 @@ public final class JarLoader {
 
     private static Map<String, Object> readZipStream(InputStream is) throws IOException {
         ZipInputStream zis = new ZipInputStream(is);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
             if (ze.isDirectory()) {
-                map.put(ze.getName(), ze.getName());               
-            } else {                
-                byte bytes[] = getBytesFromInputStream(zis, ze.getSize());
+                map.put(ze.getName(), ze.getName());
+            } else {
+                byte[] bytes = getBytesFromInputStream(zis, ze.getSize());
                 map.put(ze.getName(), bytes);
             }
         }
@@ -171,15 +170,15 @@ public final class JarLoader {
     }
 
     private static byte[] getBytesFromInputStream(InputStream is, long size) throws IOException {
-               
-        byte chunk[] = new byte[((size > CHUNK_SIZE) && (size < MAX_CHUNK_SIZE)) ? (int)size : CHUNK_SIZE];
-        
+
+        byte[] chunk = new byte[((size > CHUNK_SIZE) && (size < MAX_CHUNK_SIZE)) ? (int)size : CHUNK_SIZE];
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         for (int i = is.read(chunk, 0, chunk.length); i != -1; i = is.read(chunk, 0, chunk.length)) {
-            baos.write(chunk, 0, i);           
+            baos.write(chunk, 0, i);
         }
-         
+
         return baos.toByteArray();
     }
 }

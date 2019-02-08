@@ -27,13 +27,13 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class CertificateRepoProxyFactory {
-    private ServiceTracker tracker;
+public class CertificateRepoProxyFactory<T> {
+    private ServiceTracker<?, ?> tracker;
     private CertificateRepo proxy;
 
-    public CertificateRepoProxyFactory(Class<?> serviceInterface, String filterSt, BundleContext context) {
+    public CertificateRepoProxyFactory(Class<T> serviceInterface, String filterSt, BundleContext context) {
         Filter filter = createFilter(filterSt, context);
-        this.tracker = new ServiceTracker(context, filter, null);
+        this.tracker = new ServiceTracker<>(context, filter, null);
         this.tracker.open();
         Class<?>[] interfaces = new Class<?>[]{serviceInterface};
         InvocationHandler handler = new NamedServiceProxy(tracker, filterSt);
@@ -47,11 +47,11 @@ public class CertificateRepoProxyFactory {
             throw new IllegalArgumentException("Invalid filter " + filterSt, e);
         }
     }
-    
+
     public CertificateRepo create() {
         return proxy;
     }
-    
+
     public void close() {
         this.tracker.close();
     }

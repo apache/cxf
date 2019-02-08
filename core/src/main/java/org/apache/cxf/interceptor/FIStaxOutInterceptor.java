@@ -33,9 +33,9 @@ import javax.xml.stream.XMLStreamWriter;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -67,7 +67,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this();
         force = f;
     }
-    
+
     @Override
     public void handleFault(Message message) {
         super.handleFault(message);
@@ -76,14 +76,14 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.setContent(OutputStream.class, os);
         }
     }
-    
+
     public void handleMessage(Message message) {
         OutputStream out = message.getContent(OutputStream.class);
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         if (out == null || writer != null) {
             return;
-        } 
-        
+        }
+
         boolean req = isRequestor(message);
         Object o = message.getContextualProperty(FI_ENABLED);
         if (!req) {
@@ -95,11 +95,11 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
         } else {
-            Map<String, List<String>> headers 
+            Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             List<String> accepts = headers.get("Accept");
             if (accepts == null) {
-                accepts = new ArrayList<String>();
+                accepts = new ArrayList<>();
                 headers.put("Accept", accepts);
             }
             String a = "application/fastinfoset";
@@ -110,12 +110,12 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 accepts.add(a);
             }
         }
-            
-        if (force 
-            || MessageUtils.isTrue(o)) {
-            StAXDocumentSerializer serializer = getOutput(message, out);
+
+        if (force
+            || PropertyUtils.isTrue(o)) {
+            StAXDocumentSerializer serializer = getOutput(out);
             message.setContent(XMLStreamWriter.class, serializer);
-            
+
             message.removeContent(OutputStream.class);
             message.put(OUTPUT_STREAM_HOLDER, out);
             message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
@@ -128,7 +128,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             } else {
                 message.put(Message.CONTENT_TYPE, "application/fastinfoset");
             }
-            
+
             try {
                 serializer.writeStartDocument();
             } catch (XMLStreamException e) {
@@ -137,8 +137,8 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.getInterceptorChain().add(ENDING);
         }
     }
-    
-    private StAXDocumentSerializer getOutput(Message m, OutputStream out) {
+
+    private StAXDocumentSerializer getOutput(OutputStream out) {
         /*
         StAXDocumentSerializer serializer = (StAXDocumentSerializer)m.getExchange().getEndpoint()
             .remove(StAXDocumentSerializer.class.getName());

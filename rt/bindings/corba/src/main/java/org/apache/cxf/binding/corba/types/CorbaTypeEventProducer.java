@@ -21,29 +21,28 @@ package org.apache.cxf.binding.corba.types;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
 public interface CorbaTypeEventProducer {
-    
+
     boolean hasNext();
-    
-    /* 
+
+    /*
      * return the current event
-     */ 
+     */
     int next();
-    
+
     /*
      * qname of current content
      */
     QName getName();
-    
+
     /*
      * local name of current content
      */
-    String getLocalName();    
-    
+    String getLocalName();
+
     /*
      * text of current content
      */
@@ -57,6 +56,6 @@ public interface CorbaTypeEventProducer {
     /*
      * return any namespace for the current type
      */
-    List<Namespace> getNamespaces();    
+    List<Namespace> getNamespaces();
 
 }

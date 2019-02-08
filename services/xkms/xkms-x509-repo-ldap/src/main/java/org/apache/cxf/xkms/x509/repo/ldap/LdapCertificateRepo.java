@@ -57,10 +57,10 @@ public class LdapCertificateRepo implements CertificateRepo {
     private final String filterIssuerSerialTemplate;
 
     /**
-     * 
+     *
      * @param ldapSearch
-     * @param rootDN rootDN of the LDAP tree 
-     * @param trustedAuthorityFilter 
+     * @param rootDN rootDN of the LDAP tree
+     * @param trustedAuthorityFilter
      * @param intermediateFilter
      * @param attrName
      */
@@ -88,7 +88,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     public List<X509Certificate> getCaCerts() {
         return getCertificatesFromLdap(rootDN, ldapConfig.getIntermediateFilter(), ldapConfig.getAttrCrtBinary());
     }
-    
+
     @Override
     public List<X509CRL> getCRLs() {
         return getCRLsFromLdap(rootDN, ldapConfig.getCrlFilter(), ldapConfig.getAttrCrlBinary());
@@ -110,13 +110,11 @@ public class LdapCertificateRepo implements CertificateRepo {
                 }
             }
             return certificates;
-        } catch (CertificateException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (NamingException e) {
+        } catch (CertificateException | NamingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     private List<X509CRL> getCRLsFromLdap(String tmpRootDN, String tmpFilter, String tmpAttrName) {
         try {
             List<X509CRL> crls = new ArrayList<>();
@@ -133,11 +131,7 @@ public class LdapCertificateRepo implements CertificateRepo {
                 }
             }
             return crls;
-        } catch (CertificateException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (NamingException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } catch (CRLException e) {
+        } catch (CertificateException | NamingException | CRLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -161,7 +155,7 @@ public class LdapCertificateRepo implements CertificateRepo {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     private void addConstantAttributes(String names, String values, Attributes attribs) {
         String[] arrNames = names.split(",");
         String[] arrValues = values.split(",");
@@ -194,7 +188,7 @@ public class LdapCertificateRepo implements CertificateRepo {
         }
         return cert;
     }
-    
+
     @Override
     public X509Certificate findByServiceName(String serviceName) {
         X509Certificate cert = null;
@@ -227,7 +221,7 @@ public class LdapCertificateRepo implements CertificateRepo {
         return cert;
     }
 
-    
+
     private String getDnForIdentifier(String id) {
         String escapedIdentifier = id.replaceAll("\\/", Matcher.quoteReplacement("\\/"));
         return String.format(ldapConfig.getServiceCertRDNTemplate(), escapedIdentifier) + "," + rootDN;
@@ -237,7 +231,7 @@ public class LdapCertificateRepo implements CertificateRepo {
         Attribute attr = ldapSearch.getAttribute(dn, ldapConfig.getAttrCrtBinary());
         return getCert(attr);
     }
-    
+
     private X509Certificate getCertificateForUIDAttr(String uid) throws NamingException {
         String filter = String.format(filterUIDTemplate, uid);
         Attribute attr = ldapSearch.findAttribute(rootDN, filter, ldapConfig.getAttrCrtBinary());
@@ -257,7 +251,7 @@ public class LdapCertificateRepo implements CertificateRepo {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     private X509Certificate getCert(Attribute attr) {
         if (attr == null) {
             return null;
@@ -282,7 +276,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     public void saveCertificate(X509Certificate cert, UseKeyWithType key) {
         Applications application = Applications.fromUri(key.getApplication());
         String dn = null;
-        Map<String, String> attrs = new HashMap<String, String>();
+        Map<String, String> attrs = new HashMap<>();
         if (application == Applications.PKIX) {
             dn = key.getIdentifier() + "," + rootDN;
         } else if (application == Applications.SERVICE_NAME) {

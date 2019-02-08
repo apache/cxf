@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -50,27 +51,27 @@ import org.springframework.beans.factory.xml.DefaultDocumentLoader;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 
 /**
- * A Spring DocumentLoader that uses WoodStox when we are not validating to speed up the process. 
+ * A Spring DocumentLoader that uses WoodStox when we are not validating to speed up the process.
  */
 class TunedDocumentLoader extends DefaultDocumentLoader {
-    private static final Logger LOG = LogUtils.getL7dLogger(TunedDocumentLoader.class); 
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(TunedDocumentLoader.class);
+
     private static boolean hasFastInfoSet;
-    
+
     static {
-        try { 
+        try {
             ClassLoaderUtils
-                .loadClass("com.sun.xml.fastinfoset.stax.StAXDocumentParser", 
-                           TunedDocumentLoader.class); 
+                .loadClass("com.sun.xml.fastinfoset.stax.StAXDocumentParser",
+                           TunedDocumentLoader.class);
             hasFastInfoSet = true;
-        } catch (Throwable e) { 
+        } catch (Throwable e) {
             LOG.fine("FastInfoset not found on classpath. Disabling context load optimizations.");
             hasFastInfoSet = false;
-        } 
+        }
     }
     private SAXParserFactory saxParserFactory;
     private SAXParserFactory nsasaxParserFactory;
-    
+
     TunedDocumentLoader() {
         try {
             Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
@@ -84,15 +85,19 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         }
 
         try {
-            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true); 
-            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", 
+            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
+            nsasaxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes",
                                            true);
+            saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            nsasaxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            nsasaxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (Throwable e) {
             //ignore
         }
-        
+
     }
-    
+
     public static boolean hasFastInfoSet() {
         return hasFastInfoSet;
     }
@@ -102,7 +107,7 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
                                  ErrorHandler errorHandler, int validationMode, boolean namespaceAware)
         throws Exception {
         if (validationMode == XmlBeanDefinitionReader.VALIDATION_NONE) {
-            SAXParserFactory parserFactory = 
+            SAXParserFactory parserFactory =
                 namespaceAware ? nsasaxParserFactory : saxParserFactory;
             SAXParser parser = parserFactory.newSAXParser();
             XMLReader reader = parser.getXMLReader();
@@ -112,10 +117,9 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             StaxUtils.copy(saxSource, writer);
             return writer.getDocument();
-        } else {
-            return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
-                                      namespaceAware);
         }
+        return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
+                                  namespaceAware);
     }
 
     @Override
@@ -128,11 +132,11 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             // we can get all kinds of exceptions from this
             // due to old copies of Xerces and whatnot.
         }
-        
+
         return factory;
     }
-    
-    static Document loadFastinfosetDocument(URL url) 
+
+    static Document loadFastinfosetDocument(URL url)
         throws IOException, ParserConfigurationException, XMLStreamException {
         InputStream is = url.openStream();
         InputStream in = new BufferedInputStream(is);

@@ -17,7 +17,15 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util" xsi:schemaLocation="         http://www.springframework.org/schema/util          http://www.springframework.org/schema/util/spring-util.xsd         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -28,10 +36,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-saml}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
@@ -40,7 +48,7 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.saml.SecureBookStore"/>
     <bean id="serviceBeanClaims" class="org.apache.cxf.systest.jaxrs.security.saml.SecureClaimBookStore"/>
     <bean id="samlEnvHandler" class="org.apache.cxf.rs.security.saml.SamlEnvelopedInHandler"/>
-    <bean id="claimsHandler" class="org.apache.cxf.rs.security.saml.authorization.ClaimsAuthorizingFilter">
+    <bean id="claimsHandler" class="org.apache.cxf.jaxrs.security.ClaimsAuthorizingFilter">
         <property name="securedObject" ref="serviceBeanClaims"/>
     </bean>
     <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SecureAnnotationsInterceptor">
@@ -59,6 +67,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
         <!-- If default role qualifier and format are not supported: 
        
@@ -96,6 +105,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/saml-claims">
@@ -108,6 +118,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
 </beans>

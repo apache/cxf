@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:test="http://apache.org/hello_world_soap_http"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+    
+    <!-- Realms -->
+    <bean id="realmA" class="org.apache.cxf.sts.token.realm.RealmProperties">
+        <property name="issuer" value="a-issuer"/>
+        <property name="name" value="a-issuer"/>
+    </bean>
+    
+    <bean id="realmB" class="org.apache.cxf.sts.token.realm.RealmProperties">
+        <property name="issuer" value="b-issuer"/>
+        <property name="name" value="b-issuer"/>
+    </bean>
+    
+    <util:map id="realms">
+        <entry key="#{realmA.getName()}" value-ref="realmA"/>
+        <entry key="#{realmB.getName()}" value-ref="realmB"/>
+    </util:map>
+    
+    <!-- Relationships between realms -->
+    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper">
+    </bean>
+    
+    <bean id="identityCache" class="org.apache.cxf.sts.cache.MemoryIdentityCache">
+        <constructor-arg ref="identityMapper"></constructor-arg>
+    </bean>
+    
+    <util:list id="relationships">
+        <bean class="org.apache.cxf.sts.token.realm.Relationship">
+            <property name="sourceRealm" value="#{realmA.getName()}"/>
+            <property name="targetRealm" value="#{realmB.getName()}"/>
+            <property name="identityMapper" ref="identityCache"/>
+            <property name="type" value="FederatedIdentity"/>
+        </bean>
+    </util:list>
+    
+</beans>

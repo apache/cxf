@@ -26,7 +26,7 @@ import java.util.List;
 public class AddNumbersImpl implements AddNumbers {
 
     public List<Integer> addNumbers(List<String> arg) {
-        List<Integer> res = new ArrayList<Integer>();
+        List<Integer> res = new ArrayList<>();
         res.add(100);
         res.add(200);
         return res;

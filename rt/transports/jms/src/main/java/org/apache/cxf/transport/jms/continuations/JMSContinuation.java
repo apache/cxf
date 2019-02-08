@@ -64,7 +64,7 @@ public class JMSContinuation implements Continuation {
         }
         loader = bus.getExtension(ClassLoader.class);
     }
-    
+
     public Object getObject() {
         return userObject;
     }
@@ -97,7 +97,7 @@ public class JMSContinuation implements Continuation {
         cancelTimerTask();
         doResume();
     }
-    
+
     protected void doResume() {
         suspendendContinuations.decrementAndGet();
         ClassLoaderHolder origLoader = null;
@@ -112,7 +112,7 @@ public class JMSContinuation implements Continuation {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
             }
-            if (origLoader != null) { 
+            if (origLoader != null) {
                 origLoader.reset();
             }
         }
@@ -123,7 +123,7 @@ public class JMSContinuation implements Continuation {
     }
 
     public synchronized boolean suspend(long timeout) {
-        
+
         if (isPending) {
             return false;
         }
@@ -134,7 +134,7 @@ public class JMSContinuation implements Continuation {
         isNew = false;
         isResumed = false;
         isPending = true;
-        
+
         if (timeout > 0) {
             createTimerTask(timeout);
         }
@@ -144,7 +144,7 @@ public class JMSContinuation implements Continuation {
     protected void createTimerTask(long timeout) {
         workQueue.schedule(new Runnable() {
             public void run() {
-                synchronized (JMSContinuation.this) { 
+                synchronized (JMSContinuation.this) {
                     if (isPending && !isCanceled) {
                         doResume();
                     }
@@ -152,10 +152,19 @@ public class JMSContinuation implements Continuation {
             }
         }, timeout);
     }
-    
+
     protected synchronized void cancelTimerTask() {
         isCanceled = true;
     }
 
+    @Override
+    public boolean isReadyForWrite() {
+        return true;
+    }
+
+    @Override
+    public boolean isTimeout() {
+        return false;
+    }
 
 }

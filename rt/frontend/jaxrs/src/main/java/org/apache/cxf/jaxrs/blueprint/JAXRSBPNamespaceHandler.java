@@ -29,9 +29,9 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.staxutils.transform.OutTransformWriter;
@@ -40,14 +40,20 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/blueprint/jaxrs")
-public class JAXRSBPNamespaceHandler implements NamespaceHandler {
+public class JAXRSBPNamespaceHandler extends BaseNamespaceHandler {
     private BlueprintContainer blueprintContainer;
-    
+
     public JAXRSBPNamespaceHandler() {
     }
-    
+
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs.xsd");
+        if ("http://cxf.apache.org/blueprint/jaxrs".equals(namespace)
+                || "http://cxf.apache.org/schemas/jaxrs.xsd".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs.xsd");
+        } else if ("http://cxf.apache.org/schemas/jaxrs-common.xsd".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs-common.xsd");
+        }
+        return super.findCoreSchemaLocation(namespace);
     }
 
 
@@ -69,13 +75,13 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
     private Element transformElement(Element element) {
-        final Map<String, String> transformMap = 
-            Collections.singletonMap("{" + element.getNamespaceURI() + "}*", 
+        final Map<String, String> transformMap =
+            Collections.singletonMap("{" + element.getNamespaceURI() + "}*",
                                      "{http://cxf.apache.org/blueprint/jaxrs-client}*");
-        
-        
+
+
         W3CDOMStreamWriter domWriter = new W3CDOMStreamWriter();
         OutTransformWriter transformWriter = new OutTransformWriter(domWriter, transformMap);
         try {
@@ -92,5 +98,5 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
+
 }

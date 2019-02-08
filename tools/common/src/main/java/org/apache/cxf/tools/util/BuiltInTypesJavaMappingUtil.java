@@ -29,16 +29,16 @@ public final class BuiltInTypesJavaMappingUtil {
     private static final String NS_XMLNS = "http://www.w3.org/2000/xmlns/";
     private static final String NS_XSD = "http://www.w3.org/2001/XMLSchema";
     private static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
-    
-    private static Set<String> nameSpaces = new HashSet<String>();
+
+    private static Set<String> nameSpaces = new HashSet<>();
     static {
         nameSpaces.add(XML_SCHEMA_NS.toLowerCase());
         nameSpaces.add(NS_XMLNS.toLowerCase());
         nameSpaces.add(NS_XSD.toLowerCase());
         nameSpaces.add(NS_XSI.toLowerCase());
     }
-    
-    private static Map<String, String> jTypeMapping = new HashMap<String, String>();
+
+    private static Map<String, String> jTypeMapping = new HashMap<>();
     static {
         jTypeMapping.put("string", "java.lang.String");
         jTypeMapping.put("integer", "java.math.BigInteger");
@@ -58,14 +58,14 @@ public final class BuiltInTypesJavaMappingUtil {
         jTypeMapping.put("gday", "javax.xml.datatype.XMLGregorianCalendar");
         jTypeMapping.put("gmonth", "javax.xml.datatype.XMLGregorianCalendar");
         jTypeMapping.put("gyear", "javax.xml.datatype.XMLGregorianCalendar");
-        jTypeMapping.put("gmonthday", "javax.xml.datatype.XMLGregorianCalendar");       
+        jTypeMapping.put("gmonthday", "javax.xml.datatype.XMLGregorianCalendar");
         jTypeMapping.put("base64binary", "byte[]");
         jTypeMapping.put("hexbinary", "byte[]");
         jTypeMapping.put("unsignedint", "long");
         jTypeMapping.put("unsignedshort", "int");
         jTypeMapping.put("unsignedbyte", "short");
         jTypeMapping.put("anytype", "Object");
-        
+
     }
     private BuiltInTypesJavaMappingUtil() {
     }

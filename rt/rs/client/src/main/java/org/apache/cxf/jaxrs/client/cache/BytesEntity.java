@@ -21,12 +21,12 @@ package org.apache.cxf.jaxrs.client.cache;
 import java.io.Serializable;
 
 public class BytesEntity implements Serializable {
-    
+
     private static final long serialVersionUID = -6010007172900653981L;
-    private byte[] entity; 
+    private byte[] entity;
     private boolean fromStream;
     public BytesEntity() {
-        
+
     }
     public BytesEntity(byte[] entity, boolean fromStream) {
         this.entity = entity;

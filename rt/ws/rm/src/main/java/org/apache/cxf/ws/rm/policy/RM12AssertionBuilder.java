@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.rm.RM11Constants;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.AssertionBuilderFactory;
 import org.apache.neethi.Policy;
@@ -46,7 +47,7 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
     public static final String ATLEASTONCE_NAME = "AtLeastOnce";
     public static final String ATMOSTONCE_NAME = "AtMostOnce";
     public static final String INORDER_NAME = "InOrder";
-    
+
     public static final QName SEQSTR_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCESTR_NAME);
     public static final QName SEQTRANSSEC_QNAME =
         new QName(RM11Constants.WSRMP_NAMESPACE_URI, SEQUENCETRANSEC_NAME);
@@ -56,7 +57,7 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
     public static final QName ATLEASTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATLEASTONCE_NAME);
     public static final QName ATMOSTONCE_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, ATMOSTONCE_NAME);
     public static final QName INORDER_QNAME = new QName(RM11Constants.WSRMP_NAMESPACE_URI, INORDER_NAME);
-    
+
     public static final QName[] KNOWN_ELEMENTS = {
         RM11Constants.WSRMP_RMASSERTION_QNAME,
         SEQSTR_QNAME,
@@ -67,14 +68,14 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
         ATMOSTONCE_QNAME,
         INORDER_QNAME
     };
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#getKnownElements()
      */
     public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#build(org.w3c.dom.Element,
      *  org.apache.neethi.AssertionBuilderFactory)
@@ -84,42 +85,42 @@ public class RM12AssertionBuilder implements AssertionBuilder<Element> {
         if (RM11Constants.WSRMP_NAMESPACE_URI.equals(elem.getNamespaceURI())) {
             boolean optional = XMLPrimitiveAssertionBuilder.isOptional(elem);
             String lname = elem.getLocalName();
-            if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
-                
+            if (RMConstants.RMASSERTION_NAME.equals(lname)) {
+
                 // top-level RMAssertion, with nested policy
                 XMLPrimitiveAssertionBuilder nesting = new XMLPrimitiveAssertionBuilder() {
                     public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
                         return new PrimitiveAssertion(RM11Constants.WSRMP_RMASSERTION_QNAME, isOptional(element),
-                            isIgnorable(element), mp);        
+                            isIgnorable(element), mp);
                     }
                     public Assertion newPolicyContainingAssertion(Element element, Map<QName, String> mp,
                         Policy policy) {
                         return new PolicyContainingPrimitiveAssertion(RM11Constants.WSRMP_RMASSERTION_QNAME,
                             isOptional(element), isIgnorable(element), mp, policy);
                     }
-                }; 
+                };
                 assertion = nesting.build(elem, factory);
-                
+
             } else if (SEQUENCESTR_NAME.equals(lname)) {
                 assertion = new PrimitiveAssertion(SEQSTR_QNAME,  optional);
             } else if (SEQUENCETRANSEC_NAME.equals(lname)) {
                 assertion = new PrimitiveAssertion(SEQTRANSSEC_QNAME,  optional);
             } else if (DELIVERYASSURANCE_NAME.equals(lname)) {
-                
+
                 // DeliveryAssurance, with nested policy
                 XMLPrimitiveAssertionBuilder nesting = new XMLPrimitiveAssertionBuilder() {
                     public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
                         return new PrimitiveAssertion(DELIVERYASSURANCE_QNAME, isOptional(element),
-                            isIgnorable(element), mp);        
+                            isIgnorable(element), mp);
                     }
                     public Assertion newPolicyContainingAssertion(Element element, Map<QName, String> mp,
                         Policy policy) {
                         return new PolicyContainingPrimitiveAssertion(DELIVERYASSURANCE_QNAME,
                             isOptional(element), isIgnorable(element), mp, policy);
                     }
-                }; 
+                };
                 assertion = nesting.build(elem, factory);
-                
+
             } else if (EXACTLYONCE_NAME.equals(lname)) {
                 assertion = new PrimitiveAssertion(EXACTLYONCE_QNAME,  optional);
             } else if (ATLEASTONCE_NAME.equals(lname)) {

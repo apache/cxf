@@ -22,21 +22,23 @@ package org.apache.cxf.helpers;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
 
 import org.apache.cxf.io.Transferable;
 
 /**
  * Subclass of ByteArrayOutputStream that allows creation of a
  * ByteArrayInputStream directly without creating a copy of the byte[].
- * 
+ *
  * Also, on "toByteArray()" it truncates it's buffer to the current size
- * and returns the new buffer directly.  Multiple calls to toByteArray() 
+ * and returns the new buffer directly.  Multiple calls to toByteArray()
  * will return the exact same byte[] unless a write is called in between.
- * 
+ *
  * Note: once the InputStream is created, the output stream should
  * no longer be used.  In particular, make sure not to call reset()
  * and then write as that may overwrite the data that the InputStream
@@ -49,7 +51,7 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
     public LoadingByteArrayOutputStream(int i) {
         super(i);
     }
-    
+
     private static class LoadedByteArrayInputStream extends ByteArrayInputStream implements Transferable {
         LoadedByteArrayInputStream(byte[] buf, int length) {
             super(buf, 0, length);
@@ -60,33 +62,33 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
 
         @Override
         public void transferTo(File file) throws IOException {
-            FileOutputStream fout = new FileOutputStream(file);
-            FileChannel channel = fout.getChannel();
-            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count); 
+            OutputStream out = Files.newOutputStream(file.toPath());
+            WritableByteChannel channel = Channels.newChannel(out);
+            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count);
             while (bb.hasRemaining()) {
                 channel.write(bb);
             }
             channel.close();
-            fout.close();
+            out.close();
         }
-        
+
     }
-    
+
     public ByteArrayInputStream createInputStream() {
         return new LoadedByteArrayInputStream(buf, count);
     }
-    
+
     public void setSize(int i) {
         count = i;
     }
-    
+
     public byte[] toByteArray() {
         if (count != buf.length) {
             buf = super.toByteArray();
         }
         return buf;
     }
-    
+
     public byte[] getRawBytes() {
         return buf;
     }

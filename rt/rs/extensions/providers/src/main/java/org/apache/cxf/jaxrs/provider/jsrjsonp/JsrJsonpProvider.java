@@ -48,27 +48,27 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 public class JsrJsonpProvider implements MessageBodyReader<JsonStructure>, MessageBodyWriter<JsonStructure> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return JsonStructure.class.isAssignableFrom(type) 
-                || JsonObject.class.isAssignableFrom(type) 
+        return JsonStructure.class.isAssignableFrom(type)
+                || JsonObject.class.isAssignableFrom(type)
                 || JsonArray.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(JsonStructure t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(JsonStructure t, Class<?> type, Type genericType, Annotation[] annotations,
         MediaType mediaType) {
-        
+
         return -1;
     }
 
     @Override
-    public void writeTo(JsonStructure t, Class<?> type, Type genericType, Annotation[] annotations, 
-        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
+    public void writeTo(JsonStructure t, Class<?> type, Type genericType, Annotation[] annotations,
+        MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
         throws IOException, WebApplicationException {
-        
+
         if (entityStream == null) {
             throw new IOException("Initialized OutputStream should be provided");
         }
-        
+
         JsonWriter writer = null;
         try {
             writer = Json.createWriter(entityStream);
@@ -82,16 +82,16 @@ public class JsrJsonpProvider implements MessageBodyReader<JsonStructure>, Messa
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return JsonStructure.class.isAssignableFrom(type) 
-                || JsonObject.class.isAssignableFrom(type) 
+        return JsonStructure.class.isAssignableFrom(type)
+                || JsonObject.class.isAssignableFrom(type)
                 || JsonArray.class.isAssignableFrom(type);
     }
 
     @Override
-    public JsonStructure readFrom(Class<JsonStructure> type, Type genericType, Annotation[] annotations, 
+    public JsonStructure readFrom(Class<JsonStructure> type, Type genericType, Annotation[] annotations,
         MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws IOException, WebApplicationException {
-        
+
         if (entityStream == null) {
             throw new IOException("Initialized InputStream should be provided");
         }

@@ -18,11 +18,12 @@
   under the License.
 -->
 <!-- START SNIPPET: beans -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xmlns:util="http://www.springframework.org/schema/util" 
     xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
     xmlns:cxf="http://cxf.apache.org/core" 
-    xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
     
@@ -140,7 +141,6 @@
     <cxf:bus name="cxf2" id="cxf2">
        <cxf:properties>
            <entry key="skip.default.json.provider.registration" value="true"/>
-           <entry key="cache.http.request.parameters" value="true"/>
        </cxf:properties>
     </cxf:bus>
     <jaxrs:server id="bookJsonp2" address="/jsonp2" bus="cxf2">
@@ -233,6 +233,14 @@
         <jaxrs:properties>
             <entry key="depthInnerElementCountThreshold" value="2"/>
         </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server id="thedocs" address="/thedocs">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.DocumentResourceImpl"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </jaxrs:providers>
     </jaxrs:server>
     <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
         <property name="unmarshallAsJaxbElement" value="true"/>

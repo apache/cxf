@@ -37,44 +37,44 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 public class WSDLToProcessor implements Processor {
-    
-    protected static final Logger LOG = 
+
+    protected static final Logger LOG =
         LogUtils.getL7dLogger(WSDLToProcessor.class);
-    protected Definition wsdlDefinition; 
+    protected Definition wsdlDefinition;
     protected ServiceSchemaInfo schemas;
-    
+
     protected ToolContext toolContext;
-    
+
     private ProcessorEnvironment env;
-    
-    
+
+
     public WSDLToProcessor() {
     }
 
     public void setEnvironment(ToolContext toolCtx) {
         toolContext = toolCtx;
-    } 
+    }
 
     public void parseWSDL(String wsdlUrl) {
-        try {           
+        try {
             Bus bus = BusFactory.getThreadDefaultBus();
             WSDLManager mgr = bus.getExtension(WSDLManager.class);
             wsdlDefinition = mgr.getDefinition(wsdlUrl);
             WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);
             builder.buildMockServices(wsdlDefinition);
             schemas = mgr.getSchemasForDefinition(wsdlDefinition);
-            
+
             //remove this as we're going to be modifying it
             mgr.removeDefinition(wsdlDefinition);
-            
+
         } catch (WSDLException we) {
-            org.apache.cxf.common.i18n.Message msg = 
+            org.apache.cxf.common.i18n.Message msg =
                     new org.apache.cxf.common.i18n.Message(
                     "FAIL_TO_CREATE_WSDL_DEFINITION", LOG);
             throw new ToolException(msg, we);
-        } 
+        }
     }
-            
+
 
     public void process() throws ToolException {
         if (env == null) {
@@ -82,7 +82,7 @@ public class WSDLToProcessor implements Processor {
             env.put("wsdlurl", wsdlDefinition.getDocumentBaseURI());
         }
     }
-    
+
     public Definition getWSDLDefinition() {
         return this.wsdlDefinition;
     }
@@ -96,7 +96,7 @@ public class WSDLToProcessor implements Processor {
     public SchemaCollection getXmlSchemaTypes() {
         return schemas.getSchemaCollection();
     }
-        
+
     public void setEnvironment(ProcessorEnvironment environement) {
         this.env = environement;
     }

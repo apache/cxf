@@ -32,35 +32,35 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.ReflectionUtil;
 
 /**
- * 
+ *
  */
 public abstract class CXFService extends Service {
     ServiceImpl impl;
-    
+
     protected CXFService(URL wsdlURL, QName serviceName) {
         super(wsdlURL, serviceName);
         impl = findDelegate();
         impl.initialize(null, wsdlURL);
-    } 
+    }
     protected CXFService(Bus b, URL wsdlURL, QName serviceName) {
         super(wsdlURL, serviceName);
         impl = findDelegate();
         impl.initialize(b, wsdlURL);
-    } 
+    }
     protected CXFService(URL wsdlURL, QName serviceName, WebServiceFeature ... f) {
         super(wsdlURL, serviceName);
         impl = findDelegate();
         impl.initialize(null, wsdlURL, f);
-    } 
+    }
     protected CXFService(Bus b, URL wsdlURL, QName serviceName, WebServiceFeature ... f) {
         super(wsdlURL, serviceName);
         impl = findDelegate();
         impl.initialize(b, wsdlURL, f);
-    } 
-    
+    }
+
     private ServiceImpl findDelegate() {
         for (Field f : ReflectionUtil.getDeclaredFields(Service.class)) {
-            if (ServiceDelegate.class.equals(f.getType())) { 
+            if (ServiceDelegate.class.equals(f.getType())) {
                 ServiceDelegate del = ReflectionUtil.accessDeclaredField(f, this, ServiceDelegate.class);
                 if (del instanceof ServiceImpl) {
                     return (ServiceImpl)del;

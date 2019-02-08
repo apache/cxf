@@ -23,10 +23,11 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import static org.junit.Assert.assertNotNull;
 
 public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 
@@ -35,10 +36,10 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 
     @Override
     protected Bus createBus() throws BusException {
-        
+
         ctx = new ClassPathXmlApplicationContext(new String[] {
             "classpath:org/apache/cxf/jaxws/schemaFirst.xml"});
-        
+
         return (Bus) ctx.getBean("cxf");
     }
 
@@ -51,10 +52,10 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
         Document d = getWSDLDocument(serverFB.getServer());
 
         //XMLUtils.printDOM(d);
-        
+
         // XmlSchema still isn't preserving all the extra info...
         assertValid("//xsd:complexType[@name='foo']/xsd:sequence", d);
-        
+
         EndpointImpl ep = (EndpointImpl) ctx.getBean("helloEndpoint");
 
         d = getWSDLDocument(ep.getServer());

@@ -46,12 +46,13 @@ public class ByteDataTest extends AbstractAegisTest {
 
     }
 
+    @Test
     public void testBeanServiceWSDL() throws Exception {
         Document doc = getWSDLDocument("DataService");
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
         addNamespace("xsd", WSDLConstants.NS_SCHEMA_XSD);
-   
+
         assertValid("//xsd:element[@name='data'][@type='xsd:base64Binary']", doc);
     }
 }

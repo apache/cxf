@@ -47,10 +47,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);    
 
-    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();        
+    private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);
+
+    private static Map<Object, XMLInputFactory> factories = new HashMap<>();
 
     public StaxInInterceptor() {
         super(Phase.POST_STREAM);
@@ -73,8 +73,8 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         String contentType = (String)message.get(Message.CONTENT_TYPE);
-        
-        if (contentType != null 
+
+        if (contentType != null
             && contentType.contains("text/html")
             && MessageUtils.isRequestor(message)) {
             StringBuilder htmlMessage = new StringBuilder(1024);
@@ -82,7 +82,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (reader == null) {
                     reader = new InputStreamReader(is, (String)message.get(Message.ENCODING));
                 }
-                char s[] = new char[1024];
+                char[] s = new char[1024];
                 int i = reader.read(s);
                 while (htmlMessage.length() < 64536 && i > 0) {
                     htmlMessage.append(s, 0, i);
@@ -93,7 +93,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                         LOG, "(none)"));
             }
             throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_HTML_RESPONSETYPE",
-                    LOG, (htmlMessage == null || htmlMessage.length() == 0) ? "(none)" : htmlMessage));
+                    LOG, (htmlMessage.length() == 0) ? "(none)" : htmlMessage));
         }
         if (contentType == null) {
             //if contentType is null, this is likely a an empty post/put/delete/similar, lets see if it's
@@ -104,8 +104,12 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     .getHeader(m, HttpHeaderHelper.CONTENT_LENGTH);
                 List<String> contentTE = HttpHeaderHelper
                     .getHeader(m, HttpHeaderHelper.CONTENT_TRANSFER_ENCODING);
+                List<String> transferEncoding = HttpHeaderHelper
+                    .getHeader(m, HttpHeaderHelper.TRANSFER_ENCODING);
                 if ((StringUtils.isEmpty(contentLen) || "0".equals(contentLen.get(0)))
-                    && StringUtils.isEmpty(contentTE)) {
+                    && StringUtils.isEmpty(contentTE)
+                    && (StringUtils.isEmpty(transferEncoding)
+                    || !"chunked".equalsIgnoreCase(transferEncoding.get(0)))) {
                     return;
                 }
             }
@@ -129,7 +133,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     } else {
                         xreader = factory.createXMLStreamReader(is, encoding);
                     }
-                }                
+                }
             }
             xreader = StaxUtils.configureReader(xreader, message);
         } catch (XMLStreamException e) {
@@ -141,7 +145,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
     }
 
-    
+
     public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
         Object o = m.getContextualProperty(XMLInputFactory.class.getName());
         if (o instanceof XMLInputFactory) {
@@ -160,21 +164,19 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     }
                 } else {
                     throw new Fault(
-                                    new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY", 
+                                    new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY",
                                                                            LOG, o));
                 }
 
                 try {
                     xif = (XMLInputFactory)(cls.newInstance());
                     factories.put(o, xif);
-                } catch (InstantiationException e) {
-                    throw new Fault(e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     throw new Fault(e);
                 }
             }
             return xif;
-        } 
+        }
         return null;
     }
 }

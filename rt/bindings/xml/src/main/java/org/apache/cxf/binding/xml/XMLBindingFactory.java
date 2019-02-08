@@ -20,6 +20,7 @@ package org.apache.cxf.binding.xml;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.xml.namespace.QName;
 
@@ -46,51 +47,51 @@ import org.apache.cxf.wsdl.interceptors.WrappedOutInterceptor;
 
 @NoJSR250Annotations(unlessNull = { "bus" })
 public class XMLBindingFactory extends AbstractBindingFactory {
-    public static final Collection<String> DEFAULT_NAMESPACES 
-        = Arrays.asList(
+    public static final Collection<String> DEFAULT_NAMESPACES
+        = Collections.unmodifiableList(Arrays.asList(
             "http://cxf.apache.org/bindings/xformat",
             "http://www.w3.org/2004/08/wsdl/http",
-            "http://schemas.xmlsoap.org/wsdl/http/");
-    
+            "http://schemas.xmlsoap.org/wsdl/http/"));
+
     public XMLBindingFactory() {
     }
     public XMLBindingFactory(Bus b) {
         super(b, DEFAULT_NAMESPACES);
     }
-    
+
     public Binding createBinding(BindingInfo binding) {
         XMLBinding xb = new XMLBinding(binding);
-        
-        xb.getInInterceptors().add(new AttachmentInInterceptor());    
+
+        xb.getInInterceptors().add(new AttachmentInInterceptor());
         xb.getInInterceptors().add(new StaxInInterceptor());
         xb.getInInterceptors().add(new DocLiteralInInterceptor());
         xb.getInInterceptors().add(new XMLMessageInInterceptor());
-        
+
         xb.getOutInterceptors().add(new AttachmentOutInterceptor());
         xb.getOutInterceptors().add(new StaxOutInterceptor());
         xb.getOutInterceptors().add(new WrappedOutInterceptor());
-        xb.getOutInterceptors().add(new XMLMessageOutInterceptor());            
+        xb.getOutInterceptors().add(new XMLMessageOutInterceptor());
 
         xb.getInFaultInterceptors().add(new XMLFaultInInterceptor());
         xb.getOutFaultInterceptors().add(new StaxOutInterceptor());
         xb.getOutFaultInterceptors().add(new XMLFaultOutInterceptor());
-        
+
         return xb;
-    } 
-    
+    }
+
     public BindingInfo createBindingInfo(ServiceInfo service, String namespace, Object config) {
-        BindingInfo info = new BindingInfo(service, "http://cxf.apache.org/bindings/xformat");        
-        info.setName(new QName(service.getName().getNamespaceURI(), 
+        BindingInfo info = new BindingInfo(service, "http://cxf.apache.org/bindings/xformat");
+        info.setName(new QName(service.getName().getNamespaceURI(),
                                service.getName().getLocalPart() + "XMLBinding"));
 
         for (OperationInfo op : service.getInterface().getOperations()) {
             adjustConcreteNames(op.getInput());
             adjustConcreteNames(op.getOutput());
-            BindingOperationInfo bop = 
+            BindingOperationInfo bop =
                 info.buildOperation(op.getName(), op.getInputName(), op.getOutputName());
             info.addOperation(bop);
         }
-        
+
         return info;
     }
 

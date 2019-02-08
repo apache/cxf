@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.policy.attachment.external;
 
 import java.util.Collection;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -34,19 +35,19 @@ public class PolicyAttachment {
     private Collection<DomainExpression> domainExpressions;
     private Policy policy;
     private Element element;
-    
+
     public Collection<DomainExpression> getDomainExpressions() {
         return domainExpressions;
     }
-    
+
     public void setDomainExpressions(Collection<DomainExpression> des) {
         domainExpressions = des;
     }
-    
+
     public Policy getPolicy() {
         return policy;
     }
-    
+
     public void setPolicy(Policy p) {
         policy = p;
     }
@@ -67,7 +68,7 @@ public class PolicyAttachment {
         }
         return false;
     }
-    
+
     public boolean appliesTo(EndpointInfo ei) {
         for (DomainExpression de : domainExpressions) {
             if (de.appliesTo(ei)) {
@@ -76,7 +77,7 @@ public class PolicyAttachment {
         }
         return false;
     }
-    
+
     public boolean appliesTo(BindingOperationInfo boi) {
         for (DomainExpression de : domainExpressions) {
             if (de.appliesTo(boi)) {

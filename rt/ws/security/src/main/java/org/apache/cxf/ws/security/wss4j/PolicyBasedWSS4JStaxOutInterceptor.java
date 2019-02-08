@@ -40,24 +40,24 @@ import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 
 /**
- * 
+ *
  */
 public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor {
 
     public void handleMessage(SoapMessage msg) throws Fault {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        boolean enableStax = 
-            MessageUtils.isTrue(msg.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        boolean enableStax =
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (aim != null && enableStax) {
             super.handleMessage(msg);
         }
     }
-    
+
     @Override
     protected WSSSecurityProperties createSecurityProperties() {
         return new WSSSecurityProperties();
     }
-    
+
     private void checkAsymmetricBinding(
         SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
@@ -69,7 +69,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         if (e == null) {
             e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
-        
+
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
@@ -77,18 +77,18 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         } else {
             signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
-        
+
         if (signCrypto != null) {
             securityProperties.setSignatureCrypto(signCrypto);
         }
-        
+
         if (encrCrypto != null) {
             securityProperties.setEncryptionCrypto(encrCrypto);
         } else if (signCrypto != null) {
             securityProperties.setEncryptionCrypto(signCrypto);
         }
     }
-    
+
     private void checkTransportBinding(
         SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
@@ -100,7 +100,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         if (e == null) {
             e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
-        
+
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
@@ -108,18 +108,18 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         } else {
             signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
-        
+
         if (signCrypto != null) {
             securityProperties.setSignatureCrypto(signCrypto);
         }
-        
+
         if (encrCrypto != null) {
             securityProperties.setEncryptionCrypto(encrCrypto);
         } else if (signCrypto != null) {
             securityProperties.setEncryptionCrypto(signCrypto);
         }
     }
-    
+
     private void checkSymmetricBinding(
         SoapMessage message, WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
@@ -131,7 +131,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         if (e == null) {
             e = SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_PROPERTIES, message);
         }
-        
+
         Crypto encrCrypto = getEncryptionCrypto(e, message, securityProperties);
         Crypto signCrypto = null;
         if (e != null && e.equals(s)) {
@@ -139,7 +139,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
         } else {
             signCrypto = getSignatureCrypto(s, message, securityProperties);
         }
-        
+
         if (isRequestor(message)) {
             Crypto crypto = encrCrypto;
             if (crypto == null) {
@@ -148,7 +148,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
             if (crypto != null) {
                 securityProperties.setEncryptionCrypto(crypto);
             }
-            
+
             crypto = signCrypto;
             if (crypto == null) {
                 crypto = encrCrypto;
@@ -164,7 +164,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
             if (crypto != null) {
                 securityProperties.setEncryptionCrypto(crypto);
             }
-            
+
             crypto = encrCrypto;
             if (crypto == null) {
                 crypto = signCrypto;
@@ -174,34 +174,34 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
             }
         }
     }
-    
+
     @Override
     protected void configureProperties(
         SoapMessage msg, OutboundSecurityContext outboundSecurityContext,
         WSSSecurityProperties securityProperties
     ) throws WSSecurityException {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
-        
+
         AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (asymAis != null) {
             checkAsymmetricBinding(msg, securityProperties);
             asymAis.setAsserted(true);
         }
-        
+
         AssertionInfo symAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SYMMETRIC_BINDING);
         if (symAis != null) {
             checkSymmetricBinding(msg, securityProperties);
             symAis.setAsserted(true);
         }
-        
+
         AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (transAis != null) {
             checkTransportBinding(msg, securityProperties);
             transAis.setAsserted(true);
         }
-        
+
         super.configureProperties(msg, outboundSecurityContext, securityProperties);
-        
+
         if (transAis != null) {
             TransportBinding binding = (TransportBinding)transAis.getAssertion();
             new StaxTransportBindingHandler(
@@ -219,7 +219,7 @@ public class PolicyBasedWSS4JStaxOutInterceptor extends WSS4JStaxOutInterceptor 
             new StaxTransportBindingHandler(
                 securityProperties, msg, null, outboundSecurityContext).handleBinding();
         }
-        
+
     }
-    
+
 }

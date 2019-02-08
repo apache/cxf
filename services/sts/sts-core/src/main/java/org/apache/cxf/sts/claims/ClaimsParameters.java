@@ -24,8 +24,6 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.ws.WebServiceContext;
-
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.request.TokenRequirements;
@@ -43,14 +41,14 @@ public class ClaimsParameters {
     private EncryptionProperties encryptionProperties;
     private Principal principal;
     private Set<Principal> roles;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private String appliesToAddress;
     private Map<String, Object> additionalProperties;
     private TokenStore tokenStore;
     private String realm;
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -58,7 +56,7 @@ public class ClaimsParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-        
+
     public String getAppliesToAddress() {
         return appliesToAddress;
     }
@@ -74,7 +72,7 @@ public class ClaimsParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -90,7 +88,7 @@ public class ClaimsParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
@@ -98,23 +96,15 @@ public class ClaimsParameters {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
 
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public Set<Principal> getRoles() {
         return roles;
     }
@@ -122,22 +112,30 @@ public class ClaimsParameters {
     public void setRoles(Set<Principal> roles) {
         this.roles = roles;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
-    
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
+    }
+
 }
 

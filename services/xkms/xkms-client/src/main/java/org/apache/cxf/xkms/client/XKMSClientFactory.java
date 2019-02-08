@@ -30,18 +30,18 @@ public final class XKMSClientFactory {
     private XKMSClientFactory() {
         // Util class
     }
-    
+
     public static XKMSPortType create(String endpointAddress, Bus bus) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setBus(bus);
         factory.setServiceClass(XKMSPortType.class);
         factory.setAddress(endpointAddress);
-        
+
         Map<String, Object> properties = new HashMap<>();
-        properties.put("jaxb.additionalContextClasses", 
+        properties.put("jaxb.additionalContextClasses",
                        new Class[] {ResultDetails.class});
         factory.setProperties(properties);
-        
+
         return (XKMSPortType)factory.create();
     }
 }

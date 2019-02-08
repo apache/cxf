@@ -34,14 +34,14 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
     private static final String REL = "rel";
     private static final String TYPE = "type";
     private static final String TITLE = "title";
-    
+
     private static final Set<String> KNOWN_PARAMETERS;
     static {
-        KNOWN_PARAMETERS = new HashSet<String>(Arrays.asList(REL, TYPE, TITLE));
+        KNOWN_PARAMETERS = new HashSet<>(Arrays.asList(REL, TYPE, TITLE));
     }
-    
+
     public Link fromString(String value) {
-        
+
         if (value == null) {
             throw new IllegalArgumentException("Link value can not be null");
         }
@@ -53,8 +53,8 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         Link.Builder builder = new LinkBuilderImpl();
         builder.uri(value.substring(1, closeIndex).trim());
         if (closeIndex < value.length() - 1) {
-            
-            String[] tokens = StringUtils.split(value.substring(closeIndex + 1), ";");
+
+            String[] tokens = value.substring(closeIndex + 1).split(";");
             for (String token : tokens) {
                 String theToken = token.trim();
                 if (theToken.isEmpty()) {
@@ -68,7 +68,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
                     paramValue = i == theToken.length() - 1 ? "" : theToken.substring(i + 1).trim();
                 }
                 if (REL.equals(paramName)) {
-                    String[] rels = StringUtils.split(removeQuotesIfNeeded(paramValue), ",");
+                    String[] rels = removeQuotesIfNeeded(paramValue).split(",");
                     for (String rel : rels) {
                         builder.rel(rel.trim());
                     }
@@ -82,24 +82,23 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
             }
         }
         return builder.build();
-        
+
     }
 
     private String removeQuotesIfNeeded(String value) {
         if (value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
             return value.substring(1, value.length() - 1);
-        }  else {
-            return value;
         }
+        return value;
     }
-    
+
     public String toString(Link link) {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append('<');
         sb.append(link.getUri());
         sb.append('>');
-        
+
         String rels = link.getRel();
         if (!rels.isEmpty()) {
             sb.append(";").append(REL).append('=');
@@ -118,9 +117,9 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
             sb.append(";").append(entry.getKey()).append('=');
             writeListParamValues(sb, entry.getValue());
         }
-        
+
         return sb.toString();
-        
+
     }
 
     private void writeListParamValues(StringBuilder sb, String value) {

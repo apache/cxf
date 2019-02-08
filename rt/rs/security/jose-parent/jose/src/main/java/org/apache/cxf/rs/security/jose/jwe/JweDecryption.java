@@ -20,9 +20,9 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 
 public class JweDecryption extends AbstractJweDecryption {
-    
+
     public JweDecryption(KeyDecryptionProvider keyDecryptionAlgo,
-                         ContentDecryptionProvider cipherProps) {    
+                         ContentDecryptionProvider cipherProps) {
         super(keyDecryptionAlgo, cipherProps);
     }
 }

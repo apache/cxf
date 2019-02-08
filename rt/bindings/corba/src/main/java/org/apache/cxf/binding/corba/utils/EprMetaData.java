@@ -23,48 +23,48 @@ import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 public class EprMetaData {
-    
+
     private Definition candidateWsdlDef;
     private Binding binding;
     private QName serviceQName;
     private String portName;
-    
+
     public Binding getBinding() {
         return binding;
     }
-    
+
     public void setBinding(Binding b) {
         binding = b;
     }
-    
+
     public Definition getCandidateWsdlDef() {
         return candidateWsdlDef;
     }
-    
+
     public void setCandidateWsdlDef(Definition def) {
         candidateWsdlDef = def;
     }
-    
+
     public String getPortName() {
         return portName;
     }
-    
+
     public void setPortName(String name) {
         portName = name;
     }
-    
+
     public QName getServiceQName() {
         return serviceQName;
     }
-    
+
     public void setServiceQName(QName name) {
         serviceQName = name;
     }
-    
+
     public boolean isValid() {
         return binding != null && candidateWsdlDef != null;
     }
-    
+
     public String toString() {
         String ret = null;
         if (isValid()) {

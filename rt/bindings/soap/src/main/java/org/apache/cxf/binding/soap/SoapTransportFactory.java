@@ -57,31 +57,31 @@ import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 @NoJSR250Annotations
 public class SoapTransportFactory extends AbstractTransportFactory implements DestinationFactory,
     WSDLEndpointFactory, ConduitInitiator {
-    
-    public static final String CANNOT_GET_CONDUIT_ERROR 
+
+    public static final String CANNOT_GET_CONDUIT_ERROR
         = "Could not find conduit initiator for address: %s and transport: %s";
     public static final String SOAP_11_HTTP_BINDING = "http://schemas.xmlsoap.org/soap/http";
     public static final String SOAP_12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
-    
+
     public static final String TRANSPORT_ID = "http://schemas.xmlsoap.org/soap/";
-    
-    public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
+
+    public static final List<String> DEFAULT_NAMESPACES = Collections.unmodifiableList(Arrays.asList(
             "http://schemas.xmlsoap.org/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap/",
             "http://schemas.xmlsoap.org/wsdl/soap12/",
             "http://schemas.xmlsoap.org/soap/http",
             "http://schemas.xmlsoap.org/wsdl/soap/http",
             "http://www.w3.org/2010/soapjms/",
-            "http://www.w3.org/2003/05/soap/bindings/HTTP/");
-    public static final Set<String> DEFAULT_PREFIXES 
-        = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/"));
+    public static final Set<String> DEFAULT_PREFIXES
+        = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "soap.udp"
         )));
-    
+
     public SoapTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
-    
+
     public Set<String> getUriPrefixes() {
         return DEFAULT_PREFIXES;
     }
@@ -119,8 +119,8 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         DestinationFactory destinationFactory;
         try {
             DestinationFactoryManager mgr = bus.getExtension(DestinationFactoryManager.class);
-            if (StringUtils.isEmpty(address) 
-                || address.startsWith("http") 
+            if (StringUtils.isEmpty(address)
+                || address.startsWith("http")
                 || address.startsWith("jms")
                 || address.startsWith("soap.udp")
                 || address.startsWith("/")) {
@@ -128,6 +128,10 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             } else {
                 destinationFactory = mgr.getDestinationFactoryForUri(address);
             }
+            if (destinationFactory == null) {
+                throw new IOException("Could not find destination factory for transport " + transId);
+            }
+
             return destinationFactory.getDestination(ei, bus);
         } catch (BusException e) {
             IOException ex = new IOException("Could not find destination factory for transport " + transId);
@@ -145,7 +149,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
     private void createSoapExtensors(Bus bus, EndpointInfo ei, SoapBindingInfo bi, boolean isSoap12) {
         try {
-            
+
             String address = ei.getAddress();
             if (address == null) {
                 address = "http://localhost:9090";
@@ -154,9 +158,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             ExtensionRegistry registry = bus.getExtension(WSDLManager.class).getExtensionRegistry();
             SoapAddress soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSoap12);
             soapAddress.setLocationURI(address);
-            
+
             ei.addExtensor(soapAddress);
-            
+
         } catch (WSDLException e) {
             e.printStackTrace();
         }
@@ -164,7 +168,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
 
     public EndpointInfo createEndpointInfo(Bus bus,
                                            ServiceInfo serviceInfo,
-                                           BindingInfo b, 
+                                           BindingInfo b,
                                            List<?> ees) {
         String transportURI = "http://schemas.xmlsoap.org/wsdl/soap/";
         if (b instanceof SoapBindingInfo) {
@@ -172,14 +176,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             transportURI = sbi.getTransportURI();
         }
         EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
-        
+
         if (ees != null) {
             for (Iterator<?> itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
-    
+
                 if (SOAPBindingUtil.isSOAPAddress(extensor)) {
                     final SoapAddress sa = SOAPBindingUtil.getSoapAddress(extensor);
-    
+
                     info.addExtensor(sa);
                     info.setAddress(sa.getLocationURI());
                     if (isJMSSpecAddress(sa.getLocationURI())) {
@@ -190,7 +194,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 }
             }
         }
-        
+
         return info;
     }
 
@@ -208,7 +212,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         ConduitInitiator conduitInit;
         try {
             ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
-            if (StringUtils.isEmpty(address) 
+            if (StringUtils.isEmpty(address)
                 || address.startsWith("http")
                 || address.startsWith("jms")
                 || address.startsWith("soap.udp")) {
@@ -228,9 +232,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public Conduit getConduit(EndpointInfo ei, Bus b) throws IOException {
         return getConduit(ei, ei.getTarget(), b);
     }
-    
+
     public void setActivationNamespaces(Collection<String> ans) {
-        super.setTransportIds(new ArrayList<String>(ans));
+        super.setTransportIds(new ArrayList<>(ans));
     }
 
     private static class SoapEndpointInfo extends EndpointInfo {

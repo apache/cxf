@@ -18,15 +18,19 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
-import org.junit.Assert;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
+
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for JwtUtils
  */
-public class JwtUtilsTest extends Assert {
+public class JwtUtilsTest {
 
     @org.junit.Test
     public void testExpiredToken() throws Exception {
@@ -34,12 +38,11 @@ public class JwtUtilsTest extends Assert {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the expiry date to be yesterday
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1L);
+        claims.setExpiryTime(dateTime.toEpochSecond());
+
         try {
             JwtUtils.validateJwtExpiry(claims, 0, true);
             fail("Failure expected on an expired token");
@@ -47,19 +50,18 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testFutureToken() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).plusDays(1L);
+        claims.setIssuedAt(dateTime.toEpochSecond());
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 300, 0, true);
             fail("Failure expected on a token issued in the future");
@@ -67,72 +69,69 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testNearFutureToken() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30L);
+        claims.setIssuedAt(dateTime.toEpochSecond());
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 0, 0, true);
             fail("Failure expected on a token issued in the future");
         } catch (JwtException ex) {
             // expected
         }
-        
+
         // Now set the clock offset
         JwtUtils.validateJwtIssuedAt(claims, 0, 60, true);
     }
-    
+
     @org.junit.Test
     public void testNotBefore() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
-        
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(dateTime.toEpochSecond());
+        claims.setNotBefore(dateTime.plusSeconds(30L).toEpochSecond());
+
         try {
             JwtUtils.validateJwtNotBefore(claims, 0, true);
             fail("Failure expected on not before");
         } catch (JwtException ex) {
             // expected
         }
-        
+
         // Now set the clock offset
         JwtUtils.validateJwtNotBefore(claims, 60, true);
     }
-    
+
     @org.junit.Test
     public void testIssuedAtTTL() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be now
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(dateTime.toEpochSecond());
+
         // Now test the TTL
         JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);
-        
+
         // Now create the token 70 seconds ago
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, -70);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+        claims.setIssuedAt(dateTime.minusSeconds(70L).toEpochSecond());
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);
             fail("Failure expected on an expired token");
@@ -140,5 +139,39 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
-}
 
+    @org.junit.Test
+    public void testExpectedAudience() throws Exception {
+        // Create the JWT Token
+        JwtClaims claims = new JwtClaims();
+        claims.setSubject("alice");
+        claims.setIssuer("DoubleItSTSIssuer");
+
+        // No aud claim should validate OK
+        Message message = new MessageImpl();
+        JwtUtils.validateJwtAudienceRestriction(claims, message);
+
+        // It should fail when we have an unknown aud claim
+        claims.setAudience("Receiver");
+        try {
+            JwtUtils.validateJwtAudienceRestriction(claims, message);
+            fail("Failure expected on an invalid audience");
+        } catch (JwtException ex) {
+            // expected
+        }
+
+        // Here the aud claim matches what is expected
+        message.put(JwtConstants.EXPECTED_CLAIM_AUDIENCE, "Receiver");
+        JwtUtils.validateJwtAudienceRestriction(claims, message);
+
+        // It should fail when the expected aud claim is not present
+        claims.removeProperty(JwtConstants.CLAIM_AUDIENCE);
+        try {
+            JwtUtils.validateJwtAudienceRestriction(claims, message);
+            fail("Failure expected on an invalid audience");
+        } catch (JwtException ex) {
+            // expected
+        }
+    }
+
+}

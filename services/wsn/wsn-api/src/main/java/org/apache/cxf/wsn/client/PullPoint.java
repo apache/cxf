@@ -20,6 +20,7 @@ package org.apache.cxf.wsn.client;
 
 import java.math.BigInteger;
 import java.util.List;
+
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.cxf.wsn.util.WSNHelper;
@@ -53,7 +54,7 @@ public class PullPoint implements Referencable {
         return this.epr;
     }
 
-    public List<NotificationMessageHolderType> getMessages(long max) 
+    public List<NotificationMessageHolderType> getMessages(long max)
         throws UnableToGetMessagesFault, ResourceUnknownFault {
         GetMessages getMessages = new GetMessages();
         getMessages.setMaximumNumber(BigInteger.valueOf(max));

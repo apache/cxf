@@ -30,40 +30,42 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class XMLStreamDataReaderTest extends Assert {
+public class XMLStreamDataReaderTest {
     private static final byte[] DUMMY_DATA = "<ns:dummy xmlns:ns='http://www.apache.org/cxf'/>".getBytes();
-    
+
     @Test
     public void testCloseOriginalInputStream() throws Exception {
         XMLStreamDataReader reader = new XMLStreamDataReader();
         Message msg = new MessageImpl();
-        
+
         TestInputStream in1 = new TestInputStream(DUMMY_DATA);
-        
+
         msg.setContent(InputStream.class, in1);
-        
+
         reader.setProperty(Message.class.getName(), msg);
-        
-        Object obj = reader.read(new QName("http://www.apache.org/cxf", "dummy"), 
+
+        Object obj = reader.read(new QName("http://www.apache.org/cxf", "dummy"),
                                  StaxUtils.createXMLStreamReader(in1), XMLStreamReader.class);
 
         assertTrue(obj instanceof XMLStreamReader);
-        
+
         assertFalse(in1.isClosed());
         ((XMLStreamReader)obj).close();
-        
+
         assertTrue(in1.isClosed());
     }
-    
+
     private static class TestInputStream extends ByteArrayInputStream {
         private boolean closed;
-        
+
         TestInputStream(byte[] buf) {
             super(buf);
         }
@@ -73,7 +75,7 @@ public class XMLStreamDataReaderTest extends Assert {
             closed = true;
             super.close();
         }
-        
+
         public boolean isClosed() {
             return closed;
         }

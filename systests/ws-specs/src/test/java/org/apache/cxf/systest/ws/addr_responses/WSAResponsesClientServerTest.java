@@ -25,9 +25,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class WSAResponsesClientServerTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
@@ -59,7 +63,7 @@ public class WSAResponsesClientServerTest extends AbstractWSATestBase {
             } else {
                 throw e;
             }
-            
+
         }
     }
 

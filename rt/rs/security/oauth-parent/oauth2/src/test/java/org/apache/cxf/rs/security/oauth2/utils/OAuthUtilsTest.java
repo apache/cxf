@@ -20,11 +20,13 @@ package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class OAuthUtilsTest extends Assert {
-    
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class OAuthUtilsTest {
+
     @Test
     public void testValidateScopesStrict() {
         List<String> requestScopes = OAuthUtils.parseScope("a c b");
@@ -37,14 +39,14 @@ public class OAuthUtilsTest extends Assert {
         List<String> registeredScopes = OAuthUtils.parseScope("a b d");
         assertFalse(OAuthUtils.validateScopes(requestScopes, registeredScopes, false));
     }
-    
+
     @Test
     public void testValidateScopesPartial() {
         List<String> requestScopes = OAuthUtils.parseScope("a b c-1");
         List<String> registeredScopes = OAuthUtils.parseScope("a b c");
         assertTrue(OAuthUtils.validateScopes(requestScopes, registeredScopes, true));
     }
-    
+
     @Test
     public void testValidateScopesPartialFail() {
         List<String> requestScopes = OAuthUtils.parseScope("a b c");

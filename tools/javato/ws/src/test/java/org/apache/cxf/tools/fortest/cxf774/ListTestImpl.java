@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.tools.fortest.cxf774;
 import java.util.List;
+
 import javax.jws.WebService;
-@WebService(serviceName = "SOAPService", 
-            portName = "SoapPort", 
+
+@WebService(serviceName = "SOAPService",
+            portName = "SoapPort",
             endpointInterface = "org.apache.cxf.tools.fortest.cxf774.ListTest",
             targetNamespace = "http://cxf.apache/")
 public class ListTestImpl implements ListTest {

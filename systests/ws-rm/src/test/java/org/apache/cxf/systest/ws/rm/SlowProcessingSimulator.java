@@ -33,19 +33,19 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class SlowProcessingSimulator extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getLogger(SlowProcessingSimulator.class);
-    
+
     private long delay = 10000L;
     private String action;
-    
+
     public SlowProcessingSimulator() {
         this(Phase.USER_PROTOCOL);
     }
-    
+
     public SlowProcessingSimulator(String p) {
         super(p);
     }
 
-    
+
     public long getDelay() {
         return delay;
     }
@@ -69,7 +69,7 @@ public class SlowProcessingSimulator extends AbstractPhaseInterceptor<Message> {
             LOG.log(Level.INFO, "action=" + a);
             if (null == action || action.equals(a)) {
                 LOG.log(Level.INFO, "sleeping " + delay + " msec ...");
-                Thread.sleep(delay);    
+                Thread.sleep(delay);
             }
         } catch (InterruptedException e) {
             LOG.log(Level.INFO, "interrupted");
@@ -81,7 +81,7 @@ public class SlowProcessingSimulator extends AbstractPhaseInterceptor<Message> {
         final AddressingProperties ap = ContextUtils.retrieveMAPs(message, false, false);
         if (ap != null && ap.getAction() != null) {
             return ap.getAction().getValue();
-        } 
+        }
         return (String)message.get(SoapBindingConstants.SOAP_ACTION);
     }
 

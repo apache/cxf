@@ -27,13 +27,13 @@ import org.apache.abdera.model.Entry;
 
 public class AtomBook {
     private Book book;
-    
+
     public AtomBook(Book book) {
         this.book = book;
     }
-    
-    
-    
+
+
+
     @GET
     @Produces("application/atom+xml")
     public Entry getAsEntry() {
@@ -44,7 +44,7 @@ public class AtomBook {
         }
         return null;
     }
-    
-    
-    
+
+
+
 }

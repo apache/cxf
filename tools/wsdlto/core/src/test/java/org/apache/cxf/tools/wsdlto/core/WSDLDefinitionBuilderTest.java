@@ -32,43 +32,45 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class WSDLDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class WSDLDefinitionBuilderTest {
     @BeforeClass
     public static void ensureNewBus() {
         BusFactory.setDefaultBus(null);
     }
-    
-    
+
+
     @Test
     public void testBuildSimpleWSDL() throws Exception {
         String qname = "http://apache.org/hello_world_soap_http";
         String wsdlUrl = getClass().getResource("hello_world.wsdl").toString();
-        
+
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
-        
+
         Map<?, ?> services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         Service service = (Service)services.get(new QName(qname, "SOAPService"));
         assertNotNull(service);
-        
+
         Map<?, ?> ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");
-        assertNotNull(port);        
+        assertNotNull(port);
     }
-    
+
     @Test
     public void testBuildImportedWSDL() throws Exception {
         String wsdlUrl = getClass().getResource("hello_world_services.wsdl").toString();
-        
+
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
         Definition def = builder.build(wsdlUrl);
 
@@ -76,17 +78,17 @@ public class WSDLDefinitionBuilderTest extends Assert {
         Map<?, ?> services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
-        
+
         String serviceQName = "http://apache.org/hello_world/services";
         Service service = (Service)services.get(new QName(serviceQName, "SOAPService"));
         assertNotNull(service);
-        
+
         Map<?, ?> ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");
         assertNotNull(port);
-        
+
         Binding binding = port.getBinding();
         assertNotNull(binding);
         QName bindingQName = new QName("http://apache.org/hello_world/bindings", "SOAPBinding");
@@ -99,12 +101,12 @@ public class WSDLDefinitionBuilderTest extends Assert {
         assertNotNull(op1);
         QName messageQName = new QName("http://apache.org/hello_world/messages", "sayHiRequest");
         assertEquals(messageQName, op1.getInput().getMessage().getQName());
-        
+
         Part part = op1.getInput().getMessage().getPart("in");
         assertNotNull(part);
         assertEquals(new QName("http://apache.org/hello_world/types", "sayHi"), part.getElementName());
-    }    
-    
+    }
+
     @Test
     public void testBuildImportedWSDLSpacesInPath() throws Exception {
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
@@ -112,7 +114,7 @@ public class WSDLDefinitionBuilderTest extends Assert {
 
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
-        
+
         Map<?, ?> services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
@@ -120,12 +122,12 @@ public class WSDLDefinitionBuilderTest extends Assert {
         String serviceQName = "urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1";
         Service service = (Service)services.get(new QName(serviceQName, "S1importsS2S3TestService"));
         assertNotNull(service);
-        
+
         Map<?, ?> ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("S1importsS2S3TestPort");
         assertNotNull(port);
     }
-    
+
 }

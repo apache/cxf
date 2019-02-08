@@ -30,30 +30,30 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class MinimalAlternativeSelector extends BaseAlternativeSelector {
-    
+
     public Collection<Assertion> selectAlternative(
         Policy policy, PolicyEngine engine,
         Assertor assertor,
         List<List<Assertion>> request,
         Message msg) {
-        
+
         Collection<Assertion> choice = null;
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
-            
+
             if (engine.supportsAlternative(alternative, assertor, msg)
                 && isCompatibleWithRequest(alternative, request)) {
-                
+
                 if (null == choice) {
                     choice = alternative;
                 } else if (request != null) {
                     //we have a request policy, we likely want the one longest alternative that
-                    //matches as any of "optional" incoming policies so that asssertions that were 
-                    //asserted on the incoming will also be assertable on the outgoing. 
+                    //matches as any of "optional" incoming policies so that asssertions that were
+                    //asserted on the incoming will also be assertable on the outgoing.
                     //Example: ws:addressing policy asserted on incoming should also be
                     // used to add headers for the response
                     if (alternative.size() > choice.size()) {
@@ -69,7 +69,7 @@ public class MinimalAlternativeSelector extends BaseAlternativeSelector {
             alternatives = policy.getAlternatives();
             while (alternatives.hasNext()) {
                 List<Assertion> alternative = alternatives.next();
-                
+
                 if (engine.supportsAlternative(alternative, assertor, msg)
                     && (null == choice || alternative.size() < choice.size())) {
                     choice = alternative;

@@ -140,7 +140,7 @@ public class ClaimUtils {
      * Mapping all values from the given claim according to the provided map. Input claims will not be
      * modified. Result claim will be a clone of the provided claims just with different (mapped) claim
      * values.
-     * 
+     *
      * @param processedClaim Claim providing values to be mapped
      * @param map Map of old:new mapping values
      * @param keepUnmapped if set to false only values contained in the map will be returned. If set to true,
@@ -152,9 +152,9 @@ public class ClaimUtils {
         if (processedClaim != null) {
             resultClaim = processedClaim.clone();
             List<Object> values = resultClaim.getValues();
-            List<Object> mappedValues = new ArrayList<Object>();
+            List<Object> mappedValues = new ArrayList<>();
 
-            if (values == null || mapping == null || mapping.size() == 0) {
+            if (values == null || mapping == null || mapping.isEmpty()) {
                 resultClaim.setValues(mappedValues);
                 return resultClaim;
             }
@@ -176,7 +176,7 @@ public class ClaimUtils {
      * Filtering all values from the given claim according to the provided regex filter. Input claims will not
      * be modified. Result claim will be a clone of the provided claims just possible fewer (filtered) claim
      * values.
-     * 
+     *
      * @param processedClaim Claim containing arbitrary values
      * @param filter Regex filter to be used to match with claim values
      * @return Returns a claim containing only values from the processedClaim which matched the provided
@@ -207,7 +207,7 @@ public class ClaimUtils {
     /**
      * Merges the first value (only) from different claim types in a collection to a new claim type separated
      * by the provided delimiter.
-     * 
+     *
      * @param processedClaims Collection of claims containing claims with claim types of listed
      *            <code>claimType</code> array
      * @param targetClaimType claim type URI of merged result claim
@@ -225,7 +225,7 @@ public class ClaimUtils {
             ProcessedClaim c = get(processedClaims, sc);
             if (c != null) {
                 List<Object> values = c.getValues();
-                if (values != null && values.size() > 0) {
+                if (values != null && !values.isEmpty()) {
                     if (mergedProcessedClaim == null) {
                         // First match TODO refactor for better method override
                         mergedProcessedClaim = c.clone();
@@ -262,7 +262,7 @@ public class ClaimUtils {
      * issuer is set, the issuer in the provided claims will be set as original issuer. If an original issuer
      * was already set before, the original issuer will not be updated. All claims will be updated to have the
      * provided issuer name be set as the claim issuer.
-     * 
+     *
      * @param processedClaims Collection of claims to be updated
      * @param issuerName Issuer to be set for all claims within the collection
      * @return Returns a new claim collection with clones of updated claims
@@ -359,7 +359,7 @@ public class ClaimUtils {
      * For example multi user roles could all be stored in a single value element separated by comma:
      * USER,MANAGER,ADMIN The result of this function will provide a claim with three distinct values: USER
      * and MANAGER and ADMIN.
-     * 
+     *
      * @param processedClaim claim containing multi-values in a single value entry
      * @param delimiter Delimiter to split multi-values into single values
      * @return Returns a clone of the provided claim containing only single values per value entry
@@ -390,7 +390,7 @@ public class ClaimUtils {
      * single value element. For example a user has three roles: USER and MANAGER and ADMIN. If ',' is used as
      * a delimiter, then this method would provide the following claim with only a single value looking like
      * this: USER,MANAGER,ADMIN
-     * 
+     *
      * @param processedClaim claim containing multi-values
      * @param delimiter Delimiter to concatenate multi-values into a single value
      * @return Returns a clone of the provided claim containing only one single value
@@ -417,10 +417,10 @@ public class ClaimUtils {
         }
         return resultClaim;
     }
-    
+
     /**
      * This function removes duplicated values.
-     * 
+     *
      * @param processedClaim claim containing multi-values of which some might be duplicated
      * @return Returns a clone of the provided claim containing only distinct values
      */
@@ -437,10 +437,10 @@ public class ClaimUtils {
         }
         return resultClaim;
     }
-    
+
     /**
      * Removes Claims without values.
-     * 
+     *
      * @param processedClaims Collection of claims with and/or without values
      * @return Returns a collection of claims which contain values only
      */

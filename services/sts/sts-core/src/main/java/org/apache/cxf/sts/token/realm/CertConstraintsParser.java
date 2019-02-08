@@ -36,12 +36,12 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public class CertConstraintsParser {
     private static final Logger LOG = LogUtils.getL7dLogger(CertConstraintsParser.class);
-    
+
     /**
      * a collection of compiled regular expression patterns for the subject DN
      */
     private Collection<Pattern> subjectDNPatterns = new ArrayList<>();
-    
+
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
      * of a certificate
@@ -59,11 +59,11 @@ public class CertConstraintsParser {
             }
         }
     }
-    
+
     public Collection<Pattern> getCompiledSubjectContraints() {
         return subjectDNPatterns;
     }
-    
+
     /**
      * @return      true if the certificate's SubjectDN matches the constraints defined in the
      *              subject DNConstraints; false, otherwise. The certificate subject DN only
@@ -93,7 +93,7 @@ public class CertConstraintsParser {
                 return false;
             }
         }
-        
+
         return true;
     }
 }

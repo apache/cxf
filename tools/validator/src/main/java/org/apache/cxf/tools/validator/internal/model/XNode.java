@@ -22,6 +22,7 @@ package org.apache.cxf.tools.validator.internal.model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -41,7 +42,7 @@ public class XNode {
 
     private XNode failurePoint;
 
-    private Map<String, String> nsMap = new HashMap<String, String>();
+    private Map<String, String> nsMap = new HashMap<>();
 
     public void setFailurePoint(XNode point) {
         this.failurePoint = point;
@@ -82,14 +83,14 @@ public class XNode {
     public void setAttributeValue(final String newAttributeValue) {
         this.attributeValue = newAttributeValue;
     }
-    
+
     public void setDefaultAttributeValue(boolean b) {
         this.isDefaultAttributeValue = b;
     }
     public boolean isDefaultAttributeValue() {
         return this.isDefaultAttributeValue;
     }
-    
+
     public XNode getParentNode() {
         return parentNode;
     }
@@ -147,7 +148,7 @@ public class XNode {
     }
 
     private Stack<XNode> getParentNodes() {
-        Stack<XNode> parentNodes = new Stack<XNode>();
+        Stack<XNode> parentNodes = new Stack<>();
 
         XNode pNode = getParentNode();
         while (pNode != null) {
@@ -170,8 +171,8 @@ public class XNode {
         return sb.toString();
     }
 
-    
-    private boolean matches(Element el) { 
+
+    private boolean matches(Element el) {
         if (el.getLocalName().equals(name.getLocalPart())
             && el.getNamespaceURI().equals(name.getNamespaceURI())) {
             if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
@@ -205,9 +206,9 @@ public class XNode {
         }
         return false;
     }
-    
+
     public boolean matches(Document doc) {
-        Stack<XNode> nodes = new Stack<XNode>();
+        Stack<XNode> nodes = new Stack<>();
         nodes.push(this);
         XNode pNode = getParentNode();
         while (pNode != null) {
@@ -216,6 +217,6 @@ public class XNode {
         }
         pNode = nodes.pop();
         return pNode.matches(doc.getDocumentElement(), nodes);
-        
+
     }
 }

@@ -31,10 +31,15 @@ import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.common.model.JavaMethod;
 import org.apache.cxf.tools.fortest.withannotation.doc.GreeterArray;
 import org.apache.cxf.tools.fortest.xmllist.AddNumbersPortType;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class RequestWrapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class RequestWrapperTest {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
 
     private OperationInfo getOperation(Class<?> clz, String opName) {
@@ -47,16 +52,16 @@ public class RequestWrapperTest extends Assert {
                 return op;
             }
         }
-        return null;        
+        return null;
     }
-    
+
     @Test
     public void testBuildRequestFields() {
         // Test String[]
         Class<?> testingClass = GreeterArray.class;
         OperationInfo opInfo = getOperation(testingClass, "sayStringArray");
         assertNotNull(opInfo);
-        
+
         RequestWrapper requestWrapper = new RequestWrapper();
 
         MessageInfo message = opInfo.getUnwrappedOperation().getInput();
@@ -83,7 +88,7 @@ public class RequestWrapperTest extends Assert {
         assertEquals("int[]", field.getType());
 
         // Test TestDataBean[]
-        
+
         opInfo = getOperation(testingClass, "sayTestDataBeanArray");
         assertNotNull(opInfo);
 
@@ -100,7 +105,7 @@ public class RequestWrapperTest extends Assert {
     @Test
     public void testNoAnnotationNoClass() throws Exception {
         String pkgName = "org.apache.cxf.tools.fortest.classnoanno.docwrapped";
-        Class<?> testingClass = Class.forName(pkgName + ".Stock");        
+        Class<?> testingClass = Class.forName(pkgName + ".Stock");
 
         OperationInfo opInfo = getOperation(testingClass, "getPrice");
         Wrapper wrapper = new RequestWrapper();
@@ -119,7 +124,7 @@ public class RequestWrapperTest extends Assert {
         assertEquals(1, jFields.size());
         assertEquals("arg0", jFields.get(0).getName());
         assertEquals("java.lang.String", jFields.get(0).getClassName());
-        
+
         List<JavaMethod> jMethods = jClass.getMethods();
         assertEquals(2, jMethods.size());
 
@@ -165,13 +170,13 @@ public class RequestWrapperTest extends Assert {
         assertEquals(pkgName, wrapper.getJavaClass().getPackageName());
         assertEquals("SayHi", wrapper.getJavaClass().getName());
     }
-    
+
     @Test
     public void testCXF1752() throws Exception {
         OperationInfo opInfo = getOperation(AddNumbersPortType.class, "testCXF1752");
         RequestWrapper wrapper = new RequestWrapper();
         wrapper.setOperationInfo(opInfo);
-        
+
         wrapper.buildWrapperBeanClass();
         List<JavaField> fields = wrapper.getJavaClass().getFields();
         assertEquals(6, fields.size());

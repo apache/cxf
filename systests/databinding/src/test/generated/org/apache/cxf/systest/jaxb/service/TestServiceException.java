@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.jaxb.service;
 
 /**
- * Class used to test for unwanted serialization of exception fields. 
+ * Class used to test for unwanted serialization of exception fields.
  */
 public class TestServiceException extends Exception {
 
@@ -30,7 +30,7 @@ public class TestServiceException extends Exception {
     // CHECKSTYLE:ON
     @SuppressWarnings("unused")
     private int privateInt;
-    
+
 
     public TestServiceException() {
         privateInt = 2;

@@ -24,7 +24,6 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * A simulated-large message version of ServerPersistenceTest.
@@ -32,7 +31,7 @@ import org.junit.Test;
 public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTest {
     public static final String PORT = allocatePort(CachedOutServerPersistenceTest.class);
     public static final String DECOUPLED_PORT = allocatePort(CachedOutServerPersistenceTest.class, 1);
-   
+
     @BeforeClass
     public static void setProperties() throws Exception {
         RMTxStore.deleteDatabaseFiles("cospt-recovery", true);
@@ -40,17 +39,12 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
         startServers(PORT, "cospt");
         CachedOutputStream.setDefaultThreshold(16);
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cospt-recovery", false);
         RMTxStore.deleteDatabaseFiles("cospt-server", false);
-    }
-
-    @Test 
-    public void testRecovery() throws Exception {
-        super.testRecovery();
     }
 
     public String getPort() {

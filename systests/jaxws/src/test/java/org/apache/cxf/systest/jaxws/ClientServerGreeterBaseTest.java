@@ -25,8 +25,13 @@ import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ServerGreeterBase.class);
@@ -36,7 +41,7 @@ public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase
         assertTrue("server did not launch correctly",
                    launchServer(ServerGreeterBase.class, true));
     }
-    
+
     @Test
     public void testInvocation() throws Exception {
 
@@ -46,7 +51,7 @@ public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase
         try {
             Greeter greeter = service.getGreeterPort();
             updateAddressPort(greeter, PORT);
-            
+
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Bonjour", greeting);

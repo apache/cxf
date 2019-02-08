@@ -53,7 +53,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
-    public static final String KEEP_PARAMETERS_WRAPPER = DocLiteralInInterceptor.class.getName() 
+    public static final String KEEP_PARAMETERS_WRAPPER = DocLiteralInInterceptor.class.getName()
         + ".DocLiteralInInterceptor.keep-parameters-wrapper";
 
     private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
@@ -69,7 +69,6 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         }
 
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
-        DataReader<XMLStreamReader> dr = getDataReader(message);
         MessageContentsList parameters = new MessageContentsList();
 
         Exchange exchange = message.getExchange();
@@ -77,7 +76,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
         boolean client = isRequestor(message);
 
-        //if body is empty and we have BindingOperationInfo, we do not need to match 
+        //if body is empty and we have BindingOperationInfo, we do not need to match
         //operation anymore, just return
         if (bop != null && !StaxUtils.toNextElement(xmlReader)) {
             // body may be empty for partial response to decoupled request
@@ -90,14 +89,15 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         if (bop != null && bop.getBinding() != null) {
             forceDocLitBare = Boolean.TRUE.equals(bop.getBinding().getService().getProperty("soap.force.doclit.bare"));
         }
-        
+        DataReader<XMLStreamReader> dr = getDataReader(message);
+
         try {
             if (!forceDocLitBare && bop != null && bop.isUnwrappedCapable()) {
                 ServiceInfo si = bop.getBinding().getService();
                 // Wrapped case
                 MessageInfo msgInfo = setMessage(message, bop, client, si);
                 setDataReaderValidation(service, message, dr);
-                
+
                 // Determine if we should keep the parameters wrapper
                 if (shouldWrapParameters(msgInfo, message)) {
                     QName startQName = xmlReader.getName();
@@ -110,28 +110,28 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     parameters.put(mpi, wrappedObject);
                 } else {
                     // Unwrap each part individually if we don't have a wrapper
-    
+
                     bop = bop.getUnwrappedOperation();
-    
+
                     msgInfo = setMessage(message, bop, client, si);
                     List<MessagePartInfo> messageParts = msgInfo.getMessageParts();
                     Iterator<MessagePartInfo> itr = messageParts.iterator();
-    
+
                     // advance just past the wrapped element so we don't get
                     // stuck
                     if (xmlReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
                         StaxUtils.nextEvent(xmlReader);
                     }
-    
+
                     // loop through each child element
                     getPara(xmlReader, dr, parameters, itr, message);
                 }
-    
+
             } else {
                 //Bare style
                 BindingMessageInfo msgInfo = null;
 
-    
+
                 Endpoint ep = exchange.getEndpoint();
                 ServiceInfo si = ep.getEndpointInfo().getService();
                 if (bop != null) { //for xml binding or client side
@@ -148,11 +148,11 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     }
                     setMessage(message, bop, client, si, msgInfo.getMessageInfo());
                 }
-    
+
                 Collection<OperationInfo> operations = null;
-                operations = new ArrayList<OperationInfo>();
+                operations = new ArrayList<>();
                 operations.addAll(si.getInterface().getOperations());
-    
+
                 if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {
                     // empty input
                     getBindingOperationForEmptyBody(operations, ep, exchange);
@@ -160,21 +160,21 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 }
 
                 setDataReaderValidation(service, message, dr);
-                
+
                 int paramNum = 0;
-    
+
                 do {
                     QName elName = xmlReader.getName();
                     Object o = null;
-    
+
                     MessagePartInfo p;
-                    if (!client && msgInfo != null && msgInfo.getMessageParts() != null 
-                        && msgInfo.getMessageParts().size() == 0) {
+                    if (!client && msgInfo != null && msgInfo.getMessageParts() != null
+                        && msgInfo.getMessageParts().isEmpty()) {
                         //no input messagePartInfo
                         return;
                     }
-                    
-                    if (msgInfo != null && msgInfo.getMessageParts() != null 
+
+                    if (msgInfo != null && msgInfo.getMessageParts() != null
                         && msgInfo.getMessageParts().size() > 0) {
                         if (msgInfo.getMessageParts().size() > paramNum) {
                             p = msgInfo.getMessageParts().get(paramNum);
@@ -184,13 +184,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     } else {
                         p = findMessagePart(exchange, operations, elName, client, paramNum, message);
                     }
-                    
+
                     if (!forceDocLitBare) {
-                        //Make sure the elName found on the wire is actually OK for 
+                        //Make sure the elName found on the wire is actually OK for
                         //the purpose we need it
                         validatePart(p, elName, message);
                     }
-             
+
                     o = dr.read(p, xmlReader);
                     if (forceDocLitBare && parameters.isEmpty()) {
                         // webservice provider does not need to ensure size
@@ -198,15 +198,15 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     } else {
                         parameters.put(p, o);
                     }
-                    
+
                     paramNum++;
                     if (message.getContent(XMLStreamReader.class) == null || o == xmlReader) {
                         xmlReader = null;
                     }
                 } while (xmlReader != null && StaxUtils.toNextElement(xmlReader));
-    
+
             }
-    
+
             message.setContent(List.class, parameters);
         } catch (Fault f) {
             if (!isRequestor(message)) {
@@ -217,12 +217,12 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     }
 
     private void getBindingOperationForEmptyBody(Collection<OperationInfo> operations, Endpoint ep, Exchange exchange) {
-        // TO DO : check duplicate operation with no input and also check if the action matches 
+        // TO DO : check duplicate operation with no input and also check if the action matches
         for (OperationInfo op : operations) {
             MessageInfo bmsg = op.getInput();
             int bPartsNum = bmsg.getMessagePartsNumber();
             if (bPartsNum == 0
-                || (bPartsNum == 1 
+                || (bPartsNum == 1
                     && Constants.XSD_ANYTYPE.equals(bmsg.getFirstMessagePart().getTypeQName()))) {
                 BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
                 exchange.put(BindingOperationInfo.class, boi);
@@ -233,20 +233,20 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
     private BindingOperationInfo getBindingOperationInfo(DepthXMLStreamReader xmlReader, Exchange exchange,
                                                          BindingOperationInfo bop, boolean client) {
-        //bop might be a unwrapped, wrap it back so that we can get correct info 
+        //bop might be a unwrapped, wrap it back so that we can get correct info
         if (bop != null && bop.isUnwrapped()) {
             bop = bop.getWrappedOperation();
         }
 
         if (bop == null) {
-            QName startQName = xmlReader == null 
+            QName startQName = xmlReader == null
                 ? new QName("http://cxf.apache.org/jaxws/provider", "invoke")
                 : xmlReader.getName();
             bop = getBindingOperationInfo(exchange, startQName, client);
         }
         return bop;
     }
-    
+
     private void validatePart(MessagePartInfo p, QName elName, Message m) {
         if (p == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
@@ -262,10 +262,10 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 synth = b;
             }
         }
-        
+
         if (MessageUtils.getContextualBoolean(m, "soap.no.validate.parts", false)) {
             // something like a Provider service or similar that is forcing a
-            // doc/lit/bare on an endpoint that may not really be doc/lit/bare.  
+            // doc/lit/bare on an endpoint that may not really be doc/lit/bare.
             // we need to just let these through per spec so the endpoint
             // can process it
             synth = true;
@@ -288,13 +288,13 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             }
         }
     }
-    
+
     private void getPara(DepthXMLStreamReader xmlReader,
                          DataReader<XMLStreamReader> dr,
                          MessageContentsList parameters,
                          Iterator<MessagePartInfo> itr,
                          Message message) {
-        
+
         boolean hasNext = true;
         while (itr.hasNext()) {
             MessagePartInfo part = itr.next();
@@ -304,19 +304,19 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             Object obj = null;
             if (hasNext) {
                 QName rname = xmlReader.getName();
-                while (part != null 
+                while (part != null
                     && !rname.equals(part.getConcreteName())) {
                     if (part.getXmlSchema() instanceof XmlSchemaElement) {
                         //TODO - should check minOccurs=0 and throw validation exception
                         //thing if the part needs to be here
                         parameters.put(part, null);
-                    } 
+                    }
 
                     if (itr.hasNext()) {
                         part = itr.next();
                     } else {
                         part = null;
-                    }                
+                    }
                 }
                 if (part == null) {
                     return;
@@ -336,26 +336,25 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         return setMessage(message, operation, requestor, si, msgInfo);
     }
 
-    
+
     protected BindingOperationInfo getBindingOperationInfo(Exchange exchange, QName name,
                                                            boolean client) {
         BindingOperationInfo bop = ServiceModelUtil.getOperationForWrapperElement(exchange, name, client);
         if (bop == null) {
             bop = super.getBindingOperationInfo(exchange, name, client);
         }
-            
+
         if (bop != null) {
             exchange.put(BindingOperationInfo.class, bop);
         }
         return bop;
     }
-    
+
     protected boolean shouldWrapParameters(MessageInfo msgInfo, Message message) {
         Object keepParametersWrapperFlag = message.get(KEEP_PARAMETERS_WRAPPER);
         if (keepParametersWrapperFlag == null) {
             return msgInfo.getFirstMessagePart().getTypeClass() != null;
-        } else {
-            return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
         }
+        return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
     }
 }

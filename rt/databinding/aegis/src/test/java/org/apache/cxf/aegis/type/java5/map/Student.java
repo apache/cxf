@@ -24,12 +24,12 @@ package org.apache.cxf.aegis.type.java5.map;
 public class Student {
     private String name;
     private long id;
-    
+
     public Student() {
         name = "";
         id = Long.valueOf(0);
     }
-    
+
     public Student(String name, long id) {
         this.name = name;
         this.id = id;

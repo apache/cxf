@@ -33,10 +33,14 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RPCInInterceptorTest extends TestBase {
 
@@ -45,7 +49,7 @@ public class RPCInInterceptorTest extends TestBase {
     private static final String OPNAME = "sendReceiveData";
 
     private IMocksControl control = EasyMock.createNiceControl();
-    
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -60,7 +64,7 @@ public class RPCInInterceptorTest extends TestBase {
         boi.getOperationInfo().getOutput().getMessagePartByIndex(0).setIndex(0);
         soapMessage.getExchange().put(BindingOperationInfo.class, boi);
 
-        control.reset(); 
+        control.reset();
         Service service = control.createMock(Service.class);
         JAXBDataBinding dataBinding = new JAXBDataBinding(MyComplexStruct.class);
         service.getDataBinding();
@@ -69,7 +73,7 @@ public class RPCInInterceptorTest extends TestBase {
         List<ServiceInfo> list = Arrays.asList(si);
         EasyMock.expectLastCall().andReturn(list).anyTimes();
         EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
-        
+
         soapMessage.getExchange().put(Service.class, service);
         soapMessage.getExchange().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
         control.replay();

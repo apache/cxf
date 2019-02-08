@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonServiceRPC", 
-    serviceName = "PersonServiceRPC", 
+@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonServiceRPC",
+    serviceName = "PersonServiceRPC",
     targetNamespace = "http://org.apache.cxf/service/PersonService")
 public class PersonServiceRPCImpl implements PersonServiceRPC {
     @Override

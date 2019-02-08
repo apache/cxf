@@ -24,9 +24,9 @@ import java.io.Serializable;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 @WebService(targetNamespace = "http://jaxws.cxf.apache.org/")
 public interface GenericsService<DTO extends Entity<? extends Serializable>, QS extends QuerySummary> {
-    QueryResult<DTO, QS> read(String query, String uc); 
+    QueryResult<DTO, QS> read(String query, String uc);
 }

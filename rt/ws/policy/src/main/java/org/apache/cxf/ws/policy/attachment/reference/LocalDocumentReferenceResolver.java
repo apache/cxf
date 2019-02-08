@@ -28,20 +28,20 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class LocalDocumentReferenceResolver implements ReferenceResolver {
 
     private Document document;
     private PolicyBuilder builder;
-    
+
     public LocalDocumentReferenceResolver(Document di, PolicyBuilder b) {
         document = di;
         builder = b;
     }
     public Policy resolveReference(String uri) {
         return resolveReference(uri, document.getDocumentElement());
-    }    
+    }
     public Policy resolveReference(String uri, Element el) {
         if (el == null) {
             return null;

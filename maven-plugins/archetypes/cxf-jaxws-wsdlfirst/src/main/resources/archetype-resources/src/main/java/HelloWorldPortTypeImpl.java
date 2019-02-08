@@ -5,9 +5,9 @@
 ##    to you under the Apache License, Version 2.0 (the
 ##    "License"); you may not use this file except in compliance
 ##    with the License. You may obtain a copy of the License at
-##    
+##
 ##    http://www.apache.org/licenses/LICENSE-2.0
-##    
+##
 ##    Unless required by applicable law or agreed to in writing,
 ##    software distributed under the License is distributed on an
 ##    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,9 +19,9 @@ package ${package};
 import javax.jws.WebService;
 import org.apache.contract.helloworld.HelloWorldPortType;
 
-@WebService(targetNamespace = "http://www.apache.org/contract/HelloWorld", 
+@WebService(targetNamespace = "http://www.apache.org/contract/HelloWorld",
     portName="HelloWorldPort",
-    serviceName="HelloWorldService", 
+    serviceName="HelloWorldService",
     endpointInterface = "org.apache.contract.helloworld.HelloWorldPortType")
 public class HelloWorldPortTypeImpl implements HelloWorldPortType {
 

@@ -37,11 +37,11 @@ public class ConstVisitor extends VisitorBase {
                         WSDLASTVisitor wsdlVisitor) {
         super(scope, defn, schemaRef, wsdlVisitor);
     }
-    
+
     public static boolean accept(AST node) {
         return node.getType() == IDLTokenTypes.LITERAL_const;
     }
-    
+
     public void visit(AST constNode) {
         // <const_dcl> ::= "const" <const_type> <identifier> "=" <const_exp>
         // <const_type> ::= <integer_type>
@@ -54,8 +54,8 @@ public class ConstVisitor extends VisitorBase {
         //                | <fixed_pt_const_type>
         //                | <scoped_name>
         //                | <octet_type>
-        
-        
+
+
         AST constTypeNode = constNode.getFirstChild();
         AST constNameNode = TypesUtils.getCorbaTypeNameNode(constTypeNode);
         AST constValueNode = constNameNode.getNextSibling();
@@ -78,36 +78,36 @@ public class ConstVisitor extends VisitorBase {
             constValue.append(constValueNode.toString());
             constValueNode = constValueNode.getFirstChild();
         }
-        
+
         QName constQName = new QName(typeMap.getTargetNamespace(),
                                      new Scope(getScope(), constNameNode).toString());
 
         Visitor visitor = null;
-        if (PrimitiveTypesVisitor.accept(constTypeNode)) {           
-            visitor = new PrimitiveTypesVisitor(getScope(), definition, schema, schemas);           
+        if (PrimitiveTypesVisitor.accept(constTypeNode)) {
+            visitor = new PrimitiveTypesVisitor(getScope(), definition, schema, schemas);
         } else if (StringVisitor.accept(constTypeNode)) {
             // string_type_spec
             // wstring_type_spec
-            visitor = new StringVisitor(getScope(), definition, schema, wsdlVisitor, constTypeNode); 
-        } else if (FixedPtConstVisitor.accept(constTypeNode)) {           
-            visitor = new FixedPtConstVisitor(getScope(), definition, schema, schemas); 
+            visitor = new StringVisitor(getScope(), definition, schema, wsdlVisitor, constTypeNode);
+        } else if (FixedPtConstVisitor.accept(constTypeNode)) {
+            visitor = new FixedPtConstVisitor(getScope(), definition, schema, schemas);
         } else if (ScopedNameVisitor.accept(getScope(), definition, schema, constTypeNode, wsdlVisitor)) {
-            visitor = new ScopedNameVisitor(getScope(), definition, schema, wsdlVisitor);            
+            visitor = new ScopedNameVisitor(getScope(), definition, schema, wsdlVisitor);
         }
         if (visitor == null) {
             throw new RuntimeException("can't resolve type for const " + constNameNode.getText());
         }
-        visitor.visit(constTypeNode);                
+        visitor.visit(constTypeNode);
         XmlSchemaType constSchemaType = visitor.getSchemaType();
-        CorbaTypeImpl constCorbaType = visitor.getCorbaType();        
-        
-        // corba:const        
+        CorbaTypeImpl constCorbaType = visitor.getCorbaType();
+
+        // corba:const
         Const corbaConst = new Const();
         corbaConst.setQName(constQName);
-        corbaConst.setValue(constValue.toString());        
+        corbaConst.setValue(constValue.toString());
         corbaConst.setType(constSchemaType.getQName());
-        corbaConst.setIdltype(constCorbaType.getQName());        
-        
+        corbaConst.setIdltype(constCorbaType.getQName());
+
         typeMap.getStructOrExceptionOrUnion().add(corbaConst);
     }
 

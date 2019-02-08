@@ -22,51 +22,53 @@ package org.apache.cxf.systest.jaxrs.security;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSSimpleSecurityTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerSimpleSecurity.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerSimpleSecurity.class, true));
     }
-    
+
     @Test
     public void testGetBookUserAdminWithFaultInterceptor() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/security1/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/security1/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookUserAdminWithFilter() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/security2/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/security2/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookUserAdminWithAnnotationsInterceptor() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/security3/bookstorestorage/thebook/123"; 
+            "http://localhost:" + PORT + "/security3/bookstorestorage/thebook/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookUserAdminWithAnnotationsInterface() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/security5/bookstorestorage/thosebooks"; 
+            "http://localhost:" + PORT + "/security5/bookstorestorage/thosebooks";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookUserAdminWithAnnotationsFilter() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/security4/bookstorestorage/thebook/123"; 
+            "http://localhost:" + PORT + "/security4/bookstorestorage/thebook/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }

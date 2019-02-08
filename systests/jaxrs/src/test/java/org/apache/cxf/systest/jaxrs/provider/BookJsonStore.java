@@ -41,18 +41,18 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
 public class BookJsonStore {
-    private Map< Long, Book > books = new HashMap< Long, Book >();
+    private Map< Long, Book > books = new HashMap<>();
 
     @GET
     @Path("/books/{bookId}")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject getBook(@PathParam("bookId") Long id) {
         final Book book = books.get(id);
-        
+
         if (book == null) {
             return null;
         }
-        
+
         return bookToJson(book);
     }
 
@@ -61,11 +61,11 @@ public class BookJsonStore {
     @Produces(MediaType.APPLICATION_JSON)
     public JsonArray getBooks() {
         final JsonArrayBuilder builder = Json.createArrayBuilder();
-        
+
         for (final Book book: books.values()) {
             builder.add(bookToJson(book));
         }
-        
+
         return builder.build();
     }
 
@@ -75,12 +75,12 @@ public class BookJsonStore {
     public Response addBook(@Context final UriInfo uriInfo, JsonObject obj) {
         final Book book = bookFromJson(obj);
         books.put(book.getId(), book);
-        
+
         return Response.created(
             uriInfo
                 .getRequestUriBuilder()
                 .path(Long.toString(book.getId()))
-                .build()).build();    
+                .build()).build();
     }
 
     @DELETE
@@ -95,23 +95,23 @@ public class BookJsonStore {
                 .createObjectBuilder()
                 .add("id", book.getId())
                 .add("name", book.getName());
-        
+
         if (!book.getChapters().isEmpty()) {
             final JsonArrayBuilder chapters = Json.createArrayBuilder();
-            
+
             for (final BookChapter chapter: book.getChapters()) {
                 chapters.add(Json.createObjectBuilder()
                     .add("id", chapter.getId())
                     .add("title", chapter.getTitle())
                 );
             }
-            
+
             builder.add("chapters", chapters);
         }
-                
+
         return builder.build();
     }
-    
+
     private Book bookFromJson(JsonObject obj) {
         final Book book = new Book(obj.getString("name"), obj.getInt("id"));
         final JsonArray chapters = (JsonArray)obj.get("chapters");
@@ -120,7 +120,7 @@ public class BookJsonStore {
                 book.addChapter(chapter.getInt("id"), chapter.getString("title"));
             }
         }
-        
+
         return book;
     }
 

@@ -26,6 +26,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Import;
 import javax.wsdl.Types;
@@ -48,7 +49,7 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 public final class SchemaUtil {
     private final Map<String, Element> schemaList;
-    private final Map<String, String> catalogResolved = new HashMap<String, String>();
+    private final Map<String, String> catalogResolved = new HashMap<>();
     private final Bus bus;
 
     public SchemaUtil(final Bus b, final Map<String, Element> s) {
@@ -59,22 +60,22 @@ public final class SchemaUtil {
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();
         getSchemas(def, schemaCol, serviceInfo);
     }
-    public void getSchemas(final Definition def, 
-                           SchemaCollection schemaCol, 
+    public void getSchemas(final Definition def,
+                           SchemaCollection schemaCol,
                            ServiceInfo serviceInfo) {
         getSchemas(def, schemaCol, serviceInfo.getSchemas());
     }
 
-    public void getSchemas(final Definition def, 
+    public void getSchemas(final Definition def,
                            final SchemaCollection schemaCol,
                            List<SchemaInfo> schemas) {
-        List<Definition> defList = new ArrayList<Definition>();
+        List<Definition> defList = new ArrayList<>();
         parseImports(def, defList);
         extractSchema(def, schemaCol, schemas);
-        // added        
+        // added
         getSchemaList(def);
-        
-        Map<Definition, Definition> done = new IdentityHashMap<Definition, Definition>();
+
+        Map<Definition, Definition> done = new IdentityHashMap<>();
         done.put(def, def);
         for (Definition def2 : defList) {
             if (!done.containsKey(def2)) {
@@ -97,7 +98,7 @@ public final class SchemaUtil {
                     schemaElem = schema.getElement();
                 } else if (obj instanceof UnknownExtensibilityElement) {
                     org.w3c.dom.Element elem = ((UnknownExtensibilityElement)obj).getElement();
-                    if (elem.getLocalName().equals("schema")) {
+                    if ("schema".equals(elem.getLocalName())) {
                         schemaElem = elem;
                     }
                 }
@@ -107,17 +108,17 @@ public final class SchemaUtil {
                             String ns = (String)def.getNamespaces().get(prefix);
                             if ("".equals(prefix)) {
                                 if (!schemaElem.hasAttribute("xmlns")) {
-                                    Attr attr = 
+                                    Attr attr =
                                         schemaElem.getOwnerDocument()
-                                            .createAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI, 
+                                            .createAttributeNS(javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI,
                                                                "xmlns");
                                     attr.setValue(ns);
                                     schemaElem.setAttributeNodeNS(attr);
                                 }
                             } else if (!schemaElem.hasAttribute("xmlns:" + prefix)) {
                                 String namespace = javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-                                Attr attr = 
-                                    schemaElem.getOwnerDocument().createAttributeNS(namespace, 
+                                Attr attr =
+                                    schemaElem.getOwnerDocument().createAttributeNS(namespace,
                                                                                     "xmlns:" + prefix);
                                 attr.setValue(ns);
                                 schemaElem.setAttributeNodeNS(attr);
@@ -127,16 +128,16 @@ public final class SchemaUtil {
                         if (def.getDocumentBaseURI() != null
                             && def.getDocumentBaseURI().toUpperCase().endsWith(".XSD")
                             && def.getTargetNamespace() == null
-                            && obj instanceof Schema 
+                            && obj instanceof Schema
                             && ((Schema)obj).getDocumentBaseURI().equals(def.getDocumentBaseURI())) {
                             systemId = def.getDocumentBaseURI();
                         }
-    
+
                         schemaCol.setBaseUri(def.getDocumentBaseURI());
                         CatalogXmlSchemaURIResolver schemaResolver =
                             new CatalogXmlSchemaURIResolver(bus);
                         schemaCol.setSchemaResolver(schemaResolver);
-                        
+
                         XmlSchema xmlSchema = schemaCol.read(schemaElem, systemId);
                         catalogResolved.putAll(schemaResolver.getResolvedMap());
                         SchemaInfo schemaInfo = new SchemaInfo(xmlSchema.getTargetNamespace());
@@ -152,7 +153,7 @@ public final class SchemaUtil {
     }
 
     private void parseImports(Definition def, List<Definition> defList) {
-        List<Import> importList = new ArrayList<Import>();
+        List<Import> importList = new ArrayList<>();
 
         Collection<List<Import>> ilist = cast(def.getImports().values());
         for (List<Import> list : ilist) {
@@ -197,22 +198,22 @@ public final class SchemaUtil {
         }
 
         Map<String, List<?>> imports = CastUtils.cast(schema.getImports());
-        if (imports != null && imports.size() > 0) {
+        if (imports != null && !imports.isEmpty()) {
             for (Map.Entry<String, List<?>> entry : imports.entrySet()) {
                 String importNamespace = entry.getKey();
                 List<SchemaImport> schemaImports = CastUtils.cast(entry.getValue());
-                
+
                 for (SchemaImport schemaImport : schemaImports) {
-                    Schema tempImport = schemaImport.getReferencedSchema();                   
+                    Schema tempImport = schemaImport.getReferencedSchema();
                     String key = schemaImport.getSchemaLocationURI();
                     if (importNamespace == null && tempImport != null) {
                         importNamespace = tempImport.getDocumentBaseURI();
                     }
-                    
-                    if (tempImport != null && !catalogResolved.containsKey(key)) {                 
+
+                    if (tempImport != null && !catalogResolved.containsKey(key)) {
                         key = tempImport.getDocumentBaseURI();
                     }
-                    
+
                     if (tempImport != null
                         && !isSchemaParsed(key, importNamespace)
                         && !schemaList.containsValue(tempImport.getElement())) {

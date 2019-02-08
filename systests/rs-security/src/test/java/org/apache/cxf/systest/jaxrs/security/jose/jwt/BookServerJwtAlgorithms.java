@@ -26,23 +26,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-    
+
 public class BookServerJwtAlgorithms extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-jwt-algorithms");
     private static final URL SERVER_CONFIG_FILE =
         BookServerJwtAlgorithms.class.getResource("algorithms-server.xml");
-    
+
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
         Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
         BusFactory.setDefaultBus(springBus);
         setBus(springBus);
-        
+
         try {
             new BookServerJwtAlgorithms();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }        
+        }
     }
 
     public static void main(String[] args) {

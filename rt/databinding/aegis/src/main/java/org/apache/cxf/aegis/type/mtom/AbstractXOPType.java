@@ -52,13 +52,13 @@ public abstract class AbstractXOPType extends AegisType {
     public static final QName XML_MIME_CONTENT_TYPE = new QName(XML_MIME_NS, "contentType");
     public static final QName XOP_HREF = new QName("href");
     public static final QName XML_MIME_BASE64 = new QName(XML_MIME_NS, "base64Binary", "xmime");
-    
+
     private String expectedContentTypes;
-    // the base64 type knows how to deal with just plain base64 here, which is essentially always 
+    // the base64 type knows how to deal with just plain base64 here, which is essentially always
     // what we get in the absence of the optimization. So we need something of a coroutine.
     private Base64Type fallbackDelegate;
     private boolean useXmimeBinaryType;
-    
+
     /**
      * Create an XOP type. This type will use xmime to publish and receive the content type
      * via xmime:base64Binary if useXmimeBinaryType is true. If expectedContentTypes != null, then
@@ -77,7 +77,7 @@ public abstract class AbstractXOPType extends AegisType {
             setSchemaType(Constants.XSD_BASE64);
         }
     }
-    
+
     /**
      * This is called from base64Type when it recognizes an XOP attachment.
      * @param reader
@@ -107,13 +107,13 @@ public abstract class AbstractXOPType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         XMLStreamReader xreader = reader.getXMLStreamReader();
-        String contentType = 
+        String contentType =
             xreader.getAttributeValue(AbstractXOPType.XML_MIME_NS,
                                       AbstractXOPType.XML_MIME_CONTENT_TYPE.getLocalPart());
 
         Object thingRead = fallbackDelegate.readObject(reader, context);
         // If there was actually an attachment, the delegate will have called back to us and gotten
-        // the appropriate data type. If there wasn't an attachment, it just returned the bytes. 
+        // the appropriate data type. If there wasn't an attachment, it just returned the bytes.
         // Our subclass have to package them.
         if (thingRead.getClass() == (new byte[0]).getClass()) {
             return wrapBytes((byte[])thingRead, contentType);
@@ -121,7 +121,7 @@ public abstract class AbstractXOPType extends AegisType {
 
         return thingRead;
     }
-    
+
     private Object readInclude(String type, MessageReader reader,
                               Context context) throws DatabindingException {
         String href = reader.getAttributeReader(XOP_HREF).getValue().trim();
@@ -155,10 +155,10 @@ public abstract class AbstractXOPType extends AegisType {
             fallbackDelegate.writeObject(getBytes(object), writer, context);
             return;
         }
-        
+
         Collection<Attachment> attachments = context.getAttachments();
         if (attachments == null) {
-            attachments = new ArrayList<Attachment>();
+            attachments = new ArrayList<>();
             context.setAttachments(attachments);
         }
 
@@ -167,7 +167,7 @@ public abstract class AbstractXOPType extends AegisType {
         Attachment att = createAttachment(object, id);
 
         attachments.add(att);
-        
+
         MessageWriter include = writer.getElementWriter(XOP_INCLUDE);
         MessageWriter href = include.getAttributeWriter(XOP_HREF);
         href.writeValue("cid:" + id);
@@ -178,9 +178,9 @@ public abstract class AbstractXOPType extends AegisType {
     protected abstract Attachment createAttachment(Object object, String id);
 
     protected abstract String getContentType(Object object, Context context);
-    
+
     /**
-     * If one of these types arrives unoptimized, we need to convert it to the 
+     * If one of these types arrives unoptimized, we need to convert it to the
      * desired return type.
      * @param bareBytes the bytes pulled out of the base64.
      * @param contentType when we support xmime:contentType, this will be passed along.
@@ -197,14 +197,14 @@ public abstract class AbstractXOPType extends AegisType {
     @Override
     public void addToSchemaElement(XmlSchemaElement schemaElement) {
         if (expectedContentTypes != null) {
-            Map<String, Node> extAttrMap = new HashMap<String, Node>();
-            Attr theAttr = DOMUtils.createDocument().createAttributeNS(XML_MIME_NS, "xmime");
+            Map<String, Node> extAttrMap = new HashMap<>();
+            Attr theAttr = DOMUtils.getEmptyDocument().createAttributeNS(XML_MIME_NS, "xmime");
             theAttr.setNodeValue(expectedContentTypes);
             extAttrMap.put("xmime", theAttr);
             schemaElement.addMetaInfo(Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES, extAttrMap);
         }
     }
-    
+
     @Override
     public boolean usesXmime() {
         return useXmimeBinaryType || expectedContentTypes != null;

@@ -24,15 +24,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "wrapper", namespace = "http://books")
 public class BookWrapper {
     private Book book;
-    
+
     public BookWrapper() {
-        
+
     }
-    
+
     public void setBook(Book b) {
         this.book = b;
     }
-    
+
     public Book getBook() {
         return book;
     }

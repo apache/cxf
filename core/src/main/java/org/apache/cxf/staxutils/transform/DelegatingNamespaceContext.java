@@ -37,10 +37,10 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     public DelegatingNamespaceContext(NamespaceContext nc, Map<String, String> nsMap) {
         this.nc = nc;
         this.nsMap = nsMap;
-        namespaces = new LinkedList<Map<String, String>>();
-        prefixes = new LinkedList<Map<String, String>>();
+        namespaces = new LinkedList<>();
+        prefixes = new LinkedList<>();
     }
-    
+
     public void down() {
         namespaces.addFirst(new HashMap<String, String>(8));
         prefixes.addFirst(new HashMap<String, String>(8));
@@ -50,23 +50,23 @@ public class DelegatingNamespaceContext implements NamespaceContext {
         namespaces.removeFirst();
         prefixes.removeFirst();
     }
-    
+
     public void addPrefix(String prefix, String ns) {
         if (!namespaces.isEmpty()) {
             namespaces.getFirst().put(prefix, ns);
             prefixes.getFirst().put(ns, prefix);
         }
     }
-    
+
     public String findUniquePrefix(String ns) {
-        if (ns.length() == 0) {
+        if (ns.isEmpty()) {
             return null;
         }
         String existingPrefix = getPrefix(ns);
         if (existingPrefix != null) {
             return existingPrefix;
         }
-        
+
         int i = 0;
         while (true) {
             String prefix = "ps" + ++i;
@@ -76,7 +76,7 @@ public class DelegatingNamespaceContext implements NamespaceContext {
             }
         }
     }
-    
+
     public String getNamespaceURI(String prefix) {
         if (!namespaces.isEmpty()) {
             Map<String, String> cache = namespaces.getFirst();
@@ -103,17 +103,17 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     }
 
     public String getPrefix(String ns) {
-        if (ns.length() == 0) {
+        if (ns.isEmpty()) {
             return null;
         }
         String value = nsMap.get(ns);
-        if (value != null && value.length() == 0) {
+        if (value != null && value.isEmpty()) {
             return null;
         }
         if (value != null) {
             ns = value;
         }
-        
+
         if (!prefixes.isEmpty()) {
             Map<String, String> cache = prefixes.getFirst();
             for (Map<String, String> pfs : prefixes) {
@@ -131,7 +131,7 @@ public class DelegatingNamespaceContext implements NamespaceContext {
         } else if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(ns)) {
             return XMLConstants.XMLNS_ATTRIBUTE;
         }
-        
+
         String prefix = nc.getPrefix(ns);
         if (prefix != null) {
             addPrefix(prefix, ns);
@@ -140,7 +140,7 @@ public class DelegatingNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String ns) {
-        List<String> pl = new LinkedList<String>();
+        List<String> pl = new LinkedList<>();
         for (Map<String, String> nsp : namespaces) {
             for (Map.Entry<String, String> nse : nsp.entrySet()) {
                 if (ns.equals(nse.getValue()) && ns.equals(getNamespaceURI(nse.getKey()))) {
@@ -150,5 +150,5 @@ public class DelegatingNamespaceContext implements NamespaceContext {
         }
         return pl.iterator();
     }
-    
+
 }

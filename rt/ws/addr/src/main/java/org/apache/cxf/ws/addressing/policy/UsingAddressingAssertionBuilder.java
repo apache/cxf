@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 
 /**
- * 
+ *
  */
 public class UsingAddressingAssertionBuilder extends PrimitiveAssertionBuilder {
 
@@ -38,6 +38,6 @@ public class UsingAddressingAssertionBuilder extends PrimitiveAssertionBuilder {
     public UsingAddressingAssertionBuilder() {
         super(KNOWN_ELEMENTS);
     }
-    
-    
+
+
 }

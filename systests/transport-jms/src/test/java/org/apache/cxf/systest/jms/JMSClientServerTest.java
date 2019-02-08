@@ -33,12 +33,16 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.soap.interceptor.TibcoSoapActionInterceptor;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
 import org.apache.cxf.hello_world_jms.HWByteMsgService;
@@ -50,32 +54,39 @@ import org.apache.cxf.hello_world_jms.HelloWorldPubSubService;
 import org.apache.cxf.hello_world_jms.HelloWorldQueueDecoupledOneWaysService;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.JMSConfigFeature;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.apache.hello_world_doc_lit.SOAPService7;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JMSClientServerTest.class);
- 
+
     private static EmbeddedJMSBrokerLauncher broker;
-    private List<String> wsdlStrings = new ArrayList<String>();
-    
+    private List<String> wsdlStrings = new ArrayList<>();
+
     @BeforeClass
     public static void startServers() throws Exception {
         broker = new EmbeddedJMSBrokerLauncher("tcp://localhost:" + PORT);
@@ -83,17 +94,17 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         launchServer(new Server(broker));
         createStaticBus();
     }
-    
+
     @Before
     public void setUp() throws Exception {
         assertSame(getStaticBus(), BusFactory.getThreadDefaultBus(false));
     }
-   
-    @After 
+
+    @After
     public void tearDown() throws Exception {
         wsdlStrings.clear();
     }
-    
+
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         if (u == null) {
@@ -181,15 +192,15 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
         HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
-        final Thread thread = Thread.currentThread(); 
-        
+        final Thread thread = Thread.currentThread();
+
         class TestAsyncHandler implements AsyncHandler<String> {
             String expected;
-            
+
             TestAsyncHandler(String x) {
                 expected = x;
             }
-            
+
             public String getExpected() {
                 return expected;
             }
@@ -198,9 +209,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     Thread thread2 = Thread.currentThread();
                     assertNotSame(thread, thread2);
                     assertEquals("Hello " + expected, response.get());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -210,11 +219,11 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         TestAsyncHandler h3 = new TestAsyncHandler("Bart");
         TestAsyncHandler h4 = new TestAsyncHandler("Lisa");
         TestAsyncHandler h5 = new TestAsyncHandler("Marge");
-        
-        Future<?> f1 = greeter.greetMeAsync("Santa's Little Helper", 
+
+        Future<?> f1 = greeter.greetMeAsync("Santa's Little Helper",
                                             new TestAsyncHandler("Santa's Little Helper"));
         f1.get();
-        f1 = greeter.greetMeAsync("PauseForTwoSecs Santa's Little Helper", 
+        f1 = greeter.greetMeAsync("PauseForTwoSecs Santa's Little Helper",
                                   new TestAsyncHandler("Santa's Little Helper"));
         long start = System.currentTimeMillis();
         f1 = greeter.greetMeAsync("PauseForTwoSecs " + h1.getExpected(), h1);
@@ -237,14 +246,14 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         f3 = null;
         f4 = null;
         f5 = null;
-        
+
         ((java.io.Closeable)greeter).close();
         greeter = null;
         service = null;
-        
+
         System.gc();
     }
-    
+
     @Test
     public void testBasicConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -283,7 +292,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
         ((java.io.Closeable)greeter).close();
     }
-    
+
     @Test
     public void testByteMessage() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HWByteMsgService");
@@ -321,7 +330,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         Thread.sleep(50L);
         ((java.io.Closeable)greeter).close();
     }
-    
+
     @Test
     public void testJmsDestTopicConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "JmsDestinationPubSubService");
@@ -337,13 +346,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         Thread.sleep(50L);
         ((java.io.Closeable)greeter).close();
     }
-    
-    @Test 
+
+    @Test
     public void testConnectionsWithinSpring() throws Exception {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
-        
-        ClassPathXmlApplicationContext ctx = 
+
+        ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(
                 new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
         try {
@@ -351,38 +360,38 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             wsdlStrings.add(wsdlString2);
             broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
             HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
-            
+
             try {
-                
+
                 for (int idx = 0; idx < 5; idx++) {
                     String greeting = greeter.greetMe("Milestone-" + idx);
                     assertNotNull("no response received from service", greeting);
                     String exResponse = "Hello Milestone-" + idx;
                     assertEquals(exResponse, greeting);
-    
+
                     String reply = greeter.sayHi();
                     assertEquals("Bonjour", reply);
-                    
+
                     try {
                         greeter.testRpcLitFault("BadRecordLitFault");
                         fail("Should have thrown BadRecoedLitFault");
                     } catch (BadRecordLitFault ex) {
                         assertNotNull(ex.getFaultInfo());
                     }
-                    
+
                     try {
                         greeter.testRpcLitFault("NoSuchCodeLitFault");
                         fail("Should have thrown NoSuchCodeLitFault exception");
                     } catch (NoSuchCodeLitFault nslf) {
                         assertNotNull(nslf.getFaultInfo());
                         assertNotNull(nslf.getFaultInfo().getCode());
-                    } 
+                    }
                 }
             } catch (UndeclaredThrowableException ex) {
                 ctx.close();
                 throw (Exception)ex.getCause();
             }
-            
+
             HelloWorldOneWayPort greeter1 = (HelloWorldOneWayPort)ctx.getBean("jmsQueueOneWayServiceClient");
             assertNotNull(greeter1);
             try {
@@ -396,7 +405,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             BusFactory.setThreadDefaultBus(getBus());
         }
     }
-    
+
     @Test
     public void testOneWayQueueConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldOneWayQueueService");
@@ -415,9 +424,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @Ignore // FIXME
     public void testQueueDecoupledOneWaysConnection() throws Exception {
-        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", 
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms",
                                       "HelloWorldQueueDecoupledOneWaysService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldQueueDecoupledOneWaysPort");
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
@@ -425,24 +433,24 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         wsdlStrings.add(wsdl2);
         broker.updateWsdl(getBus(), wsdl2);
 
-        HelloWorldQueueDecoupledOneWaysService service = 
+        HelloWorldQueueDecoupledOneWaysService service =
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
         Endpoint requestEndpoint = null;
         Endpoint replyEndpoint = null;
         HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
         try {
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays();
-            requestEndpoint = Endpoint.publish("", requestServant);
-            GreeterImplQueueDecoupledOneWaysDeferredReply replyServant = 
+            requestEndpoint = Endpoint.publish(null, requestServant, new LoggingFeature());
+            GreeterImplQueueDecoupledOneWaysDeferredReply replyServant =
                 new GreeterImplQueueDecoupledOneWaysDeferredReply();
-            replyEndpoint = Endpoint.publish("", replyServant);
-            
-            BindingProvider  bp = (BindingProvider)greeter;
+            replyEndpoint = Endpoint.publish(null, replyServant, new LoggingFeature());
+
+            BindingProvider bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
             requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
-            String expectedRequest = "JMS:Queue:Request"; 
+            String expectedRequest = "JMS:Queue:Request";
             greeter.greetMeOneWay(expectedRequest);
             String request = requestServant.ackRequestReceived(5000);
             if (request == null) {
@@ -483,12 +491,12 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             ((java.io.Closeable)greeter).close();
         }
     }
-    
+
     @Test
     public void testQueueOneWaySpecCompliantConnection() throws Throwable {
-        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", 
+        QName serviceName = new QName("http://cxf.apache.org/hello_world_jms",
             "HelloWorldQueueDecoupledOneWaysService");
-        QName portName = new QName("http://cxf.apache.org/hello_world_jms", 
+        QName portName = new QName("http://cxf.apache.org/hello_world_jms",
             "HelloWorldQueueDecoupledOneWaysPort");
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
@@ -496,7 +504,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         wsdlStrings.add(wsdlString2);
         broker.updateWsdl(getBus(), wsdlString2);
 
-        HelloWorldQueueDecoupledOneWaysService service = 
+        HelloWorldQueueDecoupledOneWaysService service =
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
         assertNotNull(service);
         Endpoint requestEndpoint = null;
@@ -504,13 +512,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         try {
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
             requestEndpoint = Endpoint.publish(null, requestServant);
-            
-            BindingProvider  bp = (BindingProvider)greeter;
+
+            BindingProvider bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
             requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
-            String expectedRequest = "JMS:Queue:Request"; 
+            String expectedRequest = "JMS:Queue:Request";
             greeter.greetMeOneWay(expectedRequest);
             String request = requestServant.ackRequestReceived(5000);
             if (request == null) {
@@ -525,10 +533,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             boolean ack = requestServant.ackNoReplySent(5000);
             if (!ack) {
                 if (requestServant.getException() != null) {
+                    Throwable ex = requestServant.getException();
+                    if (ex.getMessage().contains("Request context was not null")) {
+                        return;
+                    }
                     throw requestServant.getException();
-                } else {
-                    fail("The decoupled one-way reply was sent");
                 }
+                fail("The decoupled one-way reply was sent");
             }
         } catch (Exception ex) {
             throw ex;
@@ -554,13 +565,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
         requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
         requestHeader.setJMSExpiration(3600000L);
-        JMSPropertyType propType = new JMSPropertyType();
-        propType.setName(testReturnPropertyName);
-        propType.setValue("mustReturn");
-        requestHeader.getProperty().add(propType);
-        propType = new JMSPropertyType();
-        propType.setName(testIgnoredPropertyName);
-        propType.setValue("mustNotReturn");
+        requestHeader.putProperty(testReturnPropertyName, "mustReturn");
+        requestHeader.putProperty(testIgnoredPropertyName, "mustNotReturn");
         requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
 
         String greeting = greeter.greetMe("Milestone-");
@@ -578,14 +584,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("CORRELATION ID should match :",
                    "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
         assertTrue("response Headers must conain the app property set in request context.",
-                   responseHdr.getProperty() != null);
+                   responseHdr.getPropertyKeys().size() > 0);
 
-        boolean found = false;
-        for (JMSPropertyType p : responseHdr.getProperty()) {
-            if (testReturnPropertyName.equals(p.getName())) {
-                found = true;
-            }
-        }
+
+        boolean found = responseHdr.getPropertyKeys().contains(testReturnPropertyName);
         assertTrue("response Headers must match the app property set in request context.", found);
         ((Closeable)greeter).close();
     }
@@ -605,8 +607,38 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String name = "FooBar";
         String reply = greeter.greetMe(name);
-        Assert.assertEquals("Hello " + name, reply);
+        assertEquals("Hello " + name, reply);
         ((Closeable)greeter).close();
+    }
+
+    @Test(expected = SOAPFaultException.class)
+    public void testReplyAndReplyToDestinations() throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setWsdlLocation("classpath:/wsdl/jms_test.wsdl");
+        factory.setServiceName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService"));
+        factory.setEndpointName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
+        factory.setAddress("jms://");
+        JMSConfigFeature feature = new JMSConfigFeature();
+        JMSConfiguration config = new JMSConfiguration();
+        config.setConnectionFactory(new ActiveMQConnectionFactory(broker.getBrokerURL()));
+        config.setRequestURI("test.jmstransport.text");
+        config.setTargetDestination("test.jmstransport.text");
+        // replyDestination and replyToDestination intentionally differ in this test scenario
+        // replyDestination = Destination name to listen on for reply messages
+        config.setReplyDestination("test.jmstransport.text.reply");
+        // replyToDestination = Destination name to send out as replyTo address in the message
+        config.setReplyToDestination("test.jmstransport.text.replyTo");
+        config.setReceiveTimeout(1000L);
+        feature.setJmsConfig(config);
+        factory.getFeatures().add(feature);
+        HelloWorldPortType greeter = factory.create(HelloWorldPortType.class);
+
+        try {
+            greeter.greetMe("FooBar");
+            // Timeout exception should be thrown
+        } finally {
+            ((java.io.Closeable)greeter).close();
+        }
     }
 
 }

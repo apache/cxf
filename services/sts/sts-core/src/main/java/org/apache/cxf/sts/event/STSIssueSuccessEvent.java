@@ -24,8 +24,8 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 public class STSIssueSuccessEvent extends AbstractSTSSuccessEvent implements TokenProviderParametersSupport {
 
     private static final String OPERATION = "Issue";
-    
-    
+
+
     public STSIssueSuccessEvent(TokenProviderParameters parameters, long duration) {
         super(parameters, duration);
     }

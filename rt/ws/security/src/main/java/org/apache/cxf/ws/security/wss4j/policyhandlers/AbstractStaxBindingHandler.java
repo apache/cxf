@@ -48,6 +48,7 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLCallback;
@@ -55,7 +56,7 @@ import org.apache.wss4j.common.saml.bean.KeyInfoBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.common.saml.bean.Version;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.IncludeTokenType;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -94,6 +95,7 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.ext.OutboundSecurityContext;
 import org.apache.xml.security.stax.ext.SecurePart;
 import org.apache.xml.security.stax.ext.SecurePart.Modifier;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.impl.securityToken.GenericOutboundSecurityToken;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -103,24 +105,24 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenConstants;
 import org.apache.xml.security.stax.securityToken.SecurityTokenProvider;
 
 /**
- * 
+ *
  */
 public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHandler {
     protected boolean timestampAdded;
     protected boolean signatureConfirmationAdded;
     protected Set<SecurePart> encryptedTokensList = new HashSet<>();
-    
+
     protected Map<AbstractToken, SecurePart> endEncSuppTokMap;
     protected Map<AbstractToken, SecurePart> endSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndEncSuppTokMap;
     protected Map<AbstractToken, SecurePart> sgndEndSuppTokMap;
     protected final OutboundSecurityContext outboundSecurityContext;
-    
+
     private final WSSSecurityProperties properties;
     private AbstractBinding binding;
-    
+
     public AbstractStaxBindingHandler(
-        WSSSecurityProperties properties, 
+        WSSSecurityProperties properties,
         SoapMessage msg,
         AbstractBinding binding,
         OutboundSecurityContext outboundSecurityContext
@@ -158,27 +160,27 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (usernameToken.isCreated()) {
             properties.setAddUsernameTokenCreated(true);
         }
-        
+
         // Check if a CallbackHandler was specified
         if (properties.getCallbackHandler() == null) {
-            String password = 
+            String password =
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
             if (password != null) {
-                String username = 
+                String username =
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
                 UTCallbackHandler callbackHandler = new UTCallbackHandler(username, password);
                 properties.setCallbackHandler(callbackHandler);
             }
         }
-        
-        return new SecurePart(WSSConstants.TAG_wsse_UsernameToken, Modifier.Element);
+
+        return new SecurePart(WSSConstants.TAG_WSSE_USERNAME_TOKEN, Modifier.Element);
     }
-    
+
     private static class UTCallbackHandler implements CallbackHandler {
-        
+
         private final String username;
         private final String password;
-        
+
         UTCallbackHandler(String username, String password) {
             this.username = username;
             this.password = password;
@@ -195,9 +197,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 }
             }
         }
-        
+
     }
-    
+
     protected SecurePart addKerberosToken(
         KerberosToken token, boolean signed, boolean endorsing, boolean encrypting
     ) throws WSSecurityException {
@@ -211,11 +213,20 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (secToken == null) {
             unassertPolicy(token, "Could not find KerberosToken");
         }
-        
+
+        // Get the kerberos token from the element
+        byte[] data = null;
+        if (secToken.getToken() != null) {
+            String text = XMLUtils.getElementText(secToken.getToken());
+            if (text != null) {
+                data = org.apache.xml.security.utils.XMLUtils.decode(text);
+            }
+        }
+
         // Convert to WSS4J token
-        final KerberosClientSecurityToken wss4jToken = 
-            new KerberosClientSecurityToken(secToken.getData(), secToken.getKey(), secToken.getId()) {
-            
+        final KerberosClientSecurityToken wss4jToken =
+            new KerberosClientSecurityToken(data, secToken.getKey(), secToken.getId()) {
+
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
                     if (secToken.getSecret() != null && algorithmURI != null && !"".equals(algorithmURI)) {
@@ -225,7 +236,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 }
             };
         wss4jToken.setSha1Identifier(secToken.getSHA1());
-        
+
         final SecurityTokenProvider<OutboundSecurityToken> kerberosSecurityTokenProvider =
             new SecurityTokenProvider<OutboundSecurityToken>() {
 
@@ -241,21 +252,21 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             };
         outboundSecurityContext.registerSecurityTokenProvider(
                 kerberosSecurityTokenProvider.getId(), kerberosSecurityTokenProvider);
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS, 
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_KERBEROS,
                 kerberosSecurityTokenProvider.getId());
-        
+
         if (encrypting) {
-            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+            outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
                     kerberosSecurityTokenProvider.getId());
         }
         if (endorsing) {
-            outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+            outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
                     kerberosSecurityTokenProvider.getId());
         }
-        
+
         // Action
         properties.addAction(WSSConstants.KERBEROS_TOKEN);
-        
+
         /*
         if (endorsing) {
             String action = (String)config.get(ConfigurationConstants.ACTION);
@@ -264,15 +275,15 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             // config.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
         }
         */
-        
-        SecurePart securePart = new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+
+        SecurePart securePart = new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
         securePart.setIdToSign(wss4jToken.getId());
-        
+
         return securePart;
     }
-    
+
     protected SecurePart addSamlToken(
-        SamlToken token, 
+        SamlToken token,
         boolean signed,
         boolean endorsing
     ) throws WSSecurityException {
@@ -281,7 +292,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (!isTokenRequired(includeToken)) {
             return null;
         }
-        
+
         //
         // Get the SAML CallbackHandler
         //
@@ -296,29 +307,29 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         } catch (Exception ex) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
-        
+
         // Action
         WSSConstants.Action actionToPerform = WSSConstants.SAML_TOKEN_UNSIGNED;
         if (signed || endorsing) {
             actionToPerform = WSSConstants.SAML_TOKEN_SIGNED;
         }
         properties.addAction(actionToPerform);
-        
-        QName qname = WSSConstants.TAG_saml2_Assertion;
+
+        QName qname = WSSConstants.TAG_SAML2_ASSERTION;
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
-            qname = WSSConstants.TAG_saml_Assertion;
+            qname = WSSConstants.TAG_SAML_ASSERTION;
         }
-        
+
         return new SecurePart(qname, Modifier.Element);
     }
-    
-    protected SecurePart addIssuedToken(AbstractToken token, SecurityToken secToken, 
+
+    protected SecurePart addIssuedToken(AbstractToken token, SecurityToken secToken,
                                   boolean signed, boolean endorsing) {
         assertToken(token);
         if (isTokenRequired(token.getIncludeTokenType())) {
             final Element el = secToken.getToken();
-            
+
             if (el != null && "Assertion".equals(el.getLocalName())
                 && (WSSConstants.NS_SAML.equals(el.getNamespaceURI())
                 || WSSConstants.NS_SAML2.equals(el.getNamespaceURI()))) {
@@ -327,7 +338,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                     actionToPerform = WSSConstants.SAML_TOKEN_SIGNED;
                 }
                 properties.addAction(actionToPerform);
-                
+
                 // Mock up a Subject so that the SAMLTokenOutProcessor can get access to the certificate
                 final SubjectBean subjectBean;
                 if (signed || endorsing) {
@@ -339,9 +350,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 } else {
                     subjectBean = null;
                 }
-                
+
                 CallbackHandler callbackHandler = new CallbackHandler() {
-    
+
                     @Override
                     public void handle(Callback[] callbacks) {
                         for (Callback callback : callbacks) {
@@ -349,8 +360,8 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                                 SAMLCallback samlCallback = (SAMLCallback)callback;
                                 samlCallback.setAssertionElement(el);
                                 samlCallback.setSubject(subjectBean);
-                                
-                                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
+
+                                if (WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())) {
                                     samlCallback.setSamlVersion(Version.SAML_11);
                                 } else {
                                     samlCallback.setSamlVersion(Version.SAML_20);
@@ -358,49 +369,49 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                             }
                         }
                     }
-                    
+
                 };
                 properties.setSamlCallbackHandler(callbackHandler);
-                
-                QName qname = WSSConstants.TAG_saml2_Assertion;
-                if (WSConstants.SAML_NS.equals(el.getNamespaceURI())) {
-                    qname = WSSConstants.TAG_saml_Assertion;
+
+                QName qname = WSSConstants.TAG_SAML2_ASSERTION;
+                if (WSS4JConstants.SAML_NS.equals(el.getNamespaceURI())) {
+                    qname = WSSConstants.TAG_SAML_ASSERTION;
                 }
-                
+
                 return new SecurePart(qname, Modifier.Element);
             } else if (isRequestor()) {
                 // An Encrypted Token...just include it as is
                 properties.addAction(WSSConstants.CUSTOM_TOKEN);
             }
         }
-        
+
         return null;
     }
-    
+
     protected void storeSecurityToken(AbstractToken policyToken, SecurityToken tok) {
         SecurityTokenConstants.TokenType tokenType = WSSecurityTokenConstants.EncryptedKeyToken;
         if (tok.getTokenType() != null) {
             if (tok.getTokenType().startsWith(WSSConstants.NS_KERBEROS11_TOKEN_PROFILE)) {
-                tokenType = WSSecurityTokenConstants.KerberosToken;
+                tokenType = WSSecurityTokenConstants.KERBEROS_TOKEN;
             } else if (tok.getTokenType().startsWith(WSSConstants.NS_SAML10_TOKEN_PROFILE)
                 || tok.getTokenType().startsWith(WSSConstants.NS_SAML11_TOKEN_PROFILE)) {
-                tokenType = WSSecurityTokenConstants.Saml11Token;
+                tokenType = WSSecurityTokenConstants.SAML_11_TOKEN;
             } else if (tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_02)
                 || tok.getTokenType().startsWith(WSSConstants.NS_WSC_05_12)) {
-                tokenType = WSSecurityTokenConstants.SecureConversationToken;
+                tokenType = WSSecurityTokenConstants.SECURE_CONVERSATION_TOKEN;
             }
         }
-        
+
         final Key key = tok.getKey();
         final byte[] secret = tok.getSecret();
         final X509Certificate[] certs = new X509Certificate[1];
         if (tok.getX509Certificate() != null) {
             certs[0] = tok.getX509Certificate();
         }
-        
-        final GenericOutboundSecurityToken encryptedKeySecurityToken = 
+
+        final GenericOutboundSecurityToken encryptedKeySecurityToken =
             new GenericOutboundSecurityToken(tok.getId(), tokenType, key, certs) {
-          
+
                 @Override
                 public Key getSecretKey(String algorithmURI) throws XMLSecurityException {
                     if (secret != null && algorithmURI != null && !"".equals(algorithmURI)) {
@@ -416,11 +427,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                         }
                         return new SecretKeySpec(secret, jceAlg);
                     }
-                
+
                     return super.getSecretKey(algorithmURI);
                 }
             };
-            
+
         // Store a DOM Element reference if it exists
         Element ref;
         if (isTokenRequired(policyToken.getIncludeTokenType())) {
@@ -444,27 +455,27 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 public String getId() {
                     return encryptedKeySecurityToken.getId();
                 }
-                
+
             };
         encryptedKeySecurityToken.setSha1Identifier(tok.getSHA1());
-        
+
         outboundSecurityContext.registerSecurityTokenProvider(
                 encryptedKeySecurityTokenProvider.getId(), encryptedKeySecurityTokenProvider);
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION, 
+        outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_ENCRYPTION,
                 encryptedKeySecurityTokenProvider.getId());
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE, 
+        outboundSecurityContext.put(XMLSecurityConstants.PROP_USE_THIS_TOKEN_ID_FOR_SIGNATURE,
                 encryptedKeySecurityTokenProvider.getId());
-        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN, 
+        outboundSecurityContext.put(WSSConstants.PROP_USE_THIS_TOKEN_ID_FOR_CUSTOM_TOKEN,
                 encryptedKeySecurityTokenProvider.getId());
     }
-    
+
     protected void configureTimestamp(AssertionInfoMap aim) {
         if (binding != null && binding.isIncludeTimestamp()) {
             timestampAdded = true;
             assertPolicy(new QName(binding.getName().getNamespaceURI(), SPConstants.INCLUDE_TIMESTAMP));
         }
     }
-    
+
     protected void configureLayout(AssertionInfoMap aim) {
         AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.LAYOUT);
         Layout layout = null;
@@ -472,18 +483,18 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             layout = (Layout)ai.getAssertion();
             ai.setAsserted(true);
         }
-        
+
         if (layout != null && layout.getLayoutType() != null) {
             assertPolicy(new QName(layout.getName().getNamespaceURI(), layout.getLayoutType().name()));
         }
-        
+
         if (!timestampAdded) {
             return;
         }
-        
-        boolean timestampLast = 
+
+        boolean timestampLast =
             layout != null && layout.getLayoutType() == LayoutType.LaxTsLast;
-        
+
         WSSConstants.Action actionToPerform = WSSConstants.TIMESTAMP;
         List<WSSConstants.Action> actionList = properties.getActions();
         if (timestampLast) {
@@ -500,7 +511,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     protected void configureSignature(
         AbstractToken token, boolean attached
     ) throws WSSecurityException {
-        
+
         if (token instanceof X509Token) {
             X509Token x509Token = (X509Token) token;
             TokenType tokenType = x509Token.getTokenType();
@@ -509,20 +520,20 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 properties.setUseSingleCert(false);
             }
         }
-        
+
         properties.setSignatureKeyIdentifier(getKeyIdentifierType(token));
 
         // Find out do we also need to include the token as per the Inclusion requirement
-        WSSecurityTokenConstants.KeyIdentifier keyIdentifier = properties.getSignatureKeyIdentifier();
-        if (token instanceof X509Token 
-            && isTokenRequired(token.getIncludeTokenType())
-            && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier.equals(keyIdentifier)
-                || WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference.equals(
-                    keyIdentifier))) {
-            properties.setIncludeSignatureToken(true);
-        } else {
-            properties.setIncludeSignatureToken(false);
+        properties.setIncludeSignatureToken(false);
+        for (SecurityTokenConstants.KeyIdentifier keyIdentifier : properties.getSignatureKeyIdentifiers()) {
+            if (token instanceof X509Token
+                && isTokenRequired(token.getIncludeTokenType())
+                && (WSSecurityTokenConstants.KeyIdentifier_IssuerSerial.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER.equals(keyIdentifier)
+                    || WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE.equals(
+                        keyIdentifier))) {
+                properties.setIncludeSignatureToken(true);
+            }
         }
 
         String userNameKey = SecurityConstants.SIGNATURE_USERNAME;
@@ -548,8 +559,13 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         properties.setSignatureDigestAlgorithm(algType.getDigest());
         // sig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
 
+        boolean includePrefixes =
+            MessageUtils.getContextualBoolean(
+                message, SecurityConstants.ADD_INCLUSIVE_PREFIXES, true
+            );
+        properties.setAddExcC14NInclusivePrefixes(includePrefixes);
     }
-    
+
     protected WSSecurityTokenConstants.KeyIdentifier getKeyIdentifierType(
         AbstractToken token
     ) {
@@ -561,12 +577,12 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             } else if (x509Token.isRequireKeyIdentifierReference()) {
                 identifier = WSSecurityTokenConstants.KeyIdentifier_SkiKeyIdentifier;
             } else if (x509Token.isRequireThumbprintReference()) {
-                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
+                identifier = WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER;
             }
         } else if (token instanceof KeyValueToken) {
             identifier = WSSecurityTokenConstants.KeyIdentifier_KeyValue;
         }
-        
+
         if (identifier != null) {
             return identifier;
         }
@@ -579,7 +595,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
             } else if (wss instanceof Wss11
                 && ((Wss11) wss).isMustSupportRefThumbprint()) {
-                identifier = WSSecurityTokenConstants.KeyIdentifier_ThumbprintIdentifier;
+                identifier = WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER;
             }
         } else if (token.getIncludeTokenType() == IncludeTokenType.INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT
             && !isRequestor() && token instanceof X509Token) {
@@ -588,25 +604,25 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             && isRequestor() && token instanceof X509Token) {
             identifier = WSSecurityTokenConstants.KeyIdentifier_IssuerSerial;
         }
-        
+
         if (identifier != null) {
             return identifier;
         }
-        
-        return WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference;
+
+        return WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE;
     }
-    
+
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
-        Collection<AssertionInfo> tokenAssertions, 
+        Collection<AssertionInfo> tokenAssertions,
         boolean signed,
         boolean endorse
     ) throws Exception {
         if (tokenAssertions != null && !tokenAssertions.isEmpty()) {
-            Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
+            Map<AbstractToken, SecurePart> ret = new HashMap<>();
             for (AssertionInfo assertionInfo : tokenAssertions) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
                     assertionInfo.setAsserted(true);
-                    handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(), 
+                    handleSupportingTokens((SupportingTokens)assertionInfo.getAssertion(),
                             signed, endorse, ret);
                 }
             }
@@ -614,7 +630,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         }
         return Collections.emptyMap();
     }
-                                                            
+
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
         SupportingTokens suppTokens,
         boolean signed,
@@ -622,9 +638,9 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     ) throws Exception {
         return handleSupportingTokens(suppTokens, signed, endorse, new HashMap<AbstractToken, SecurePart>());
     }
-                                                            
+
     protected Map<AbstractToken, SecurePart> handleSupportingTokens(
-        SupportingTokens suppTokens, 
+        SupportingTokens suppTokens,
         boolean signed,
         boolean endorse,
         Map<AbstractToken, SecurePart> ret
@@ -637,12 +653,12 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             if (!isTokenRequired(token.getIncludeTokenType())) {
                 continue;
             }
-            
+
             if (token instanceof UsernameToken) {
                 handleUsernameTokenSupportingToken(
                     (UsernameToken)token, endorse, suppTokens.isEncryptedToken(), ret
                 );
-            /* TODO else if (isRequestor() 
+            /* TODO else if (isRequestor()
                 && (token instanceof IssuedToken
                     || token instanceof SecureConversationToken
                     || token instanceof SecurityContextToken
@@ -651,7 +667,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             } */
             } else if (token instanceof IssuedToken) {
                 SecurityToken sigTok = getSecurityToken();
-                SecurePart securePart = addIssuedToken((IssuedToken)token, sigTok, signed, endorse);
+                SecurePart securePart = addIssuedToken(token, sigTok, signed, endorse);
                 if (securePart != null) {
                     ret.put(token, securePart);
                     if (suppTokens.isEncryptedToken()) {
@@ -670,11 +686,11 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 assertToken(token);
                 configureSignature(token, false);
                 if (suppTokens.isEncryptedToken()) {
-                    SecurePart part = 
-                        new SecurePart(WSSConstants.TAG_wsse_BinarySecurityToken, Modifier.Element);
+                    SecurePart part =
+                        new SecurePart(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, Modifier.Element);
                     encryptedTokensList.add(part);
                 }
-                ret.put(token, new SecurePart(WSSConstants.TAG_dsig_Signature, Modifier.Element));
+                ret.put(token, new SecurePart(XMLSecurityConstants.TAG_dsig_Signature, Modifier.Element));
             } else if (token instanceof SamlToken) {
                 SecurePart securePart = addSamlToken((SamlToken)token, signed, endorse);
                 if (securePart != null) {
@@ -693,144 +709,143 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
     ) throws Exception {
         if (endorse) {
             throw new Exception("Endorsing UsernameTokens are not supported in the streaming code");
-        } else {
-            SecurePart securePart = addUsernameToken(token);
-            if (securePart != null) {
-                ret.put(token, securePart);
-                //WebLogic and WCF always encrypt these
-                //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
-                //encryptedTokensIdList.add(utBuilder.getId());
-                if (encryptedToken
-                    || MessageUtils.getContextualBoolean(message, 
-                                                         SecurityConstants.ALWAYS_ENCRYPT_UT,
-                                                         true)) {
-                    encryptedTokensList.add(securePart);
-                }
+        }
+        SecurePart securePart = addUsernameToken(token);
+        if (securePart != null) {
+            ret.put(token, securePart);
+            //WebLogic and WCF always encrypt these
+            //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
+            //encryptedTokensIdList.add(utBuilder.getId());
+            if (encryptedToken
+                || MessageUtils.getContextualBoolean(message,
+                                                     SecurityConstants.ALWAYS_ENCRYPT_UT,
+                                                     true)) {
+                encryptedTokensList.add(securePart);
             }
         }
     }
-    
+
     protected void addSupportingTokens() throws Exception {
-        
-        Collection<AssertionInfo> sgndSuppTokens = 
+
+        Collection<AssertionInfo> sgndSuppTokens =
             getAllAssertionsByLocalname(SPConstants.SIGNED_SUPPORTING_TOKENS);
         if (!sgndSuppTokens.isEmpty()) {
-            Map<AbstractToken, SecurePart> sigSuppTokMap = 
+            Map<AbstractToken, SecurePart> sigSuppTokMap =
                 this.handleSupportingTokens(sgndSuppTokens, true, false);
             addSignatureParts(sigSuppTokMap);
         }
-        
-        Collection<AssertionInfo> endSuppTokens = 
+
+        Collection<AssertionInfo> endSuppTokens =
             getAllAssertionsByLocalname(SPConstants.ENDORSING_SUPPORTING_TOKENS);
         if (!endSuppTokens.isEmpty()) {
             endSuppTokMap = this.handleSupportingTokens(endSuppTokens, false, true);
         }
 
-        Collection<AssertionInfo> sgndEndSuppTokens 
+        Collection<AssertionInfo> sgndEndSuppTokens
             = getAllAssertionsByLocalname(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS);
         if (!sgndEndSuppTokens.isEmpty()) {
             sgndEndSuppTokMap = this.handleSupportingTokens(sgndEndSuppTokens, true, true);
             addSignatureParts(sgndEndSuppTokMap);
         }
-        
-        Collection<AssertionInfo> sgndEncryptedSuppTokens 
+
+        Collection<AssertionInfo> sgndEncryptedSuppTokens
             = getAllAssertionsByLocalname(SPConstants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS);
         if (!sgndEncryptedSuppTokens.isEmpty()) {
-            Map<AbstractToken, SecurePart> sgndEncSuppTokMap = 
+            Map<AbstractToken, SecurePart> sgndEncSuppTokMap =
                 this.handleSupportingTokens(sgndEncryptedSuppTokens, true, false);
             addSignatureParts(sgndEncSuppTokMap);
         }
-        
-        Collection<AssertionInfo> endorsingEncryptedSuppTokens 
+
+        Collection<AssertionInfo> endorsingEncryptedSuppTokens
             = getAllAssertionsByLocalname(SPConstants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         if (!endorsingEncryptedSuppTokens.isEmpty()) {
-            endEncSuppTokMap 
+            endEncSuppTokMap
                 = this.handleSupportingTokens(endorsingEncryptedSuppTokens, false, true);
         }
 
-        Collection<AssertionInfo> sgndEndEncSuppTokens 
+        Collection<AssertionInfo> sgndEndEncSuppTokens
             = getAllAssertionsByLocalname(SPConstants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         if (!sgndEndEncSuppTokens.isEmpty()) {
             sgndEndEncSuppTokMap = this.handleSupportingTokens(sgndEndEncSuppTokens, true, true);
             addSignatureParts(sgndEndEncSuppTokMap);
         }
 
-        Collection<AssertionInfo> supportingToks 
+        Collection<AssertionInfo> supportingToks
             = getAllAssertionsByLocalname(SPConstants.SUPPORTING_TOKENS);
         if (!supportingToks.isEmpty()) {
             this.handleSupportingTokens(supportingToks, false, false);
         }
 
-        Collection<AssertionInfo> encryptedSupportingToks 
+        Collection<AssertionInfo> encryptedSupportingToks
             = getAllAssertionsByLocalname(SPConstants.ENCRYPTED_SUPPORTING_TOKENS);
         if (!encryptedSupportingToks.isEmpty()) {
             this.handleSupportingTokens(encryptedSupportingToks, false, false);
         }
     }
-    
+
     protected void addSignatureParts(Map<AbstractToken, SecurePart> tokenMap) {
         if (tokenMap != null) {
             for (Map.Entry<AbstractToken, SecurePart> entry : tokenMap.entrySet()) {
                 SecurePart part = entry.getValue();
-    
+
                 QName name = part.getName();
                 List<WSSConstants.Action> actionList = properties.getActions();
-    
+
                 // Don't add a signed SAML Token as a part, as it will be automatically signed by WSS4J
-                if (!((WSSConstants.TAG_saml_Assertion.equals(name) 
-                    || WSSConstants.TAG_saml2_Assertion.equals(name))
+                if (!((WSSConstants.TAG_SAML_ASSERTION.equals(name)
+                    || WSSConstants.TAG_SAML2_ASSERTION.equals(name))
                     && actionList != null && actionList.contains(WSSConstants.SAML_TOKEN_SIGNED))) {
                     properties.addSignaturePart(part);
                 }
             }
         }
-        
+
     }
-    
+
     protected void addSignatureConfirmation(List<SecurePart> sigParts) {
         Wss10 wss10 = getWss10();
-        
-        if (!(wss10 instanceof Wss11) 
+
+        if (!(wss10 instanceof Wss11)
             || !((Wss11)wss10).isRequireSignatureConfirmation()) {
             //If we don't require sig confirmation simply go back :-)
             return;
         }
-        
+
         // Enable SignatureConfirmation
         if (isRequestor()) {
             properties.setEnableSignatureConfirmationVerification(true);
         } else {
             properties.getActions().add(WSSConstants.SIGNATURE_CONFIRMATION);
         }
-        
+
         if (sigParts != null) {
-            SecurePart securePart = 
-                new SecurePart(WSSConstants.TAG_wsse11_SignatureConfirmation, Modifier.Element);
+            SecurePart securePart =
+                new SecurePart(WSSConstants.TAG_WSSE11_SIG_CONF, Modifier.Element);
             sigParts.add(securePart);
         }
         signatureConfirmationAdded = true;
     }
-    
+
     /**
      * Identifies the portions of the message to be signed
      */
     protected List<SecurePart> getSignedParts() throws SOAPException {
         SignedParts parts = null;
         SignedElements elements = null;
-        
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         AssertionInfo assertionInfo = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
         if (assertionInfo != null) {
             parts = (SignedParts)assertionInfo.getAssertion();
             assertionInfo.setAsserted(true);
         }
-        
+
         assertionInfo = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (assertionInfo != null) {
             elements = (SignedElements)assertionInfo.getAssertion();
             assertionInfo.setAsserted(true);
         }
-        
+
         List<SecurePart> signedParts = new ArrayList<>();
         if (parts != null) {
             if (parts.isBody()) {
@@ -859,22 +874,22 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 signedParts.add(securePart);
             }
         }
-        
+
         if (elements != null && elements.getXPaths() != null) {
             for (XPath xPath : elements.getXPaths()) {
-                List<QName> qnames = 
+                List<QName> qnames =
                     org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
-                    SecurePart securePart = 
+                    SecurePart securePart =
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
                     signedParts.add(securePart);
                 }
             }
         }
-        
+
         return signedParts;
     }
-    
+
     /**
      * Identifies the portions of the message to be encrypted
      */
@@ -882,32 +897,32 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         EncryptedParts parts = null;
         EncryptedElements elements = null;
         ContentEncryptedElements celements = null;
-        
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 parts = (EncryptedParts)ai.getAssertion();
                 ai.setAsserted(true);
-            }            
+            }
         }
-        
+
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 elements = (EncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
-            }            
+            }
         }
-        
+
         ais = PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 celements = (ContentEncryptedElements)ai.getAssertion();
                 ai.setAsserted(true);
-            }            
+            }
         }
-        
+
         List<SecurePart> encryptedParts = new ArrayList<>();
         if (parts != null) {
             if (parts.isBody()) {
@@ -925,7 +940,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 securePart.setRequired(false);
                 encryptedParts.add(securePart);
             }
-            
+
             Attachments attachments = parts.getAttachments();
             if (attachments != null) {
                 SecurePart securePart = new SecurePart("cid:Attachments", Modifier.Element);
@@ -937,80 +952,78 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
                 encryptedParts.add(securePart);
             }
         }
-        
+
         if (elements != null && elements.getXPaths() != null) {
             for (XPath xPath : elements.getXPaths()) {
-                List<QName> qnames = 
+                List<QName> qnames =
                     org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
-                    SecurePart securePart = 
+                    SecurePart securePart =
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Element);
                     encryptedParts.add(securePart);
                 }
             }
         }
-        
+
         if (celements != null && celements.getXPaths() != null) {
             for (XPath xPath : celements.getXPaths()) {
-                List<QName> qnames = 
+                List<QName> qnames =
                     org.apache.wss4j.policy.stax.PolicyUtils.getElementPath(xPath);
                 if (!qnames.isEmpty()) {
-                    SecurePart securePart = 
+                    SecurePart securePart =
                         new SecurePart(qnames.get(qnames.size() - 1), Modifier.Content);
                     encryptedParts.add(securePart);
                 }
             }
         }
-        
+
         return encryptedParts;
     }
-    
-    protected org.apache.xml.security.stax.securityToken.SecurityToken 
+
+    protected org.apache.xml.security.stax.securityToken.SecurityToken
     findInboundSecurityToken(SecurityEventConstants.Event event) throws XMLSecurityException {
-        
+
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingEventList = 
+        final List<SecurityEvent> incomingEventList =
             (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (event == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
-                        ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
-                    return token;
+                    return ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
                 }
             }
         }
         return null;
     }
-    
+
     // Signature + Signed SAML Token actions are not allowed together
     protected void removeSignatureIfSignedSAML() {
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
             if (actionList.contains(WSSConstants.SAML_TOKEN_SIGNED)
-                && actionList.contains(WSSConstants.SIGNATURE)) {
-                actionList.remove(WSSConstants.SIGNATURE);
+                && actionList.contains(XMLSecurityConstants.SIGNATURE)) {
+                actionList.remove(XMLSecurityConstants.SIGNATURE);
             }
         }
     }
-    
+
     // Put the Signature action before the SignatureConfirmation action
     protected void prependSignatureToSC() {
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
             boolean sigConf = actionList.contains(WSSConstants.SIGNATURE_CONFIRMATION);
-            if (sigConf && actionList.contains(WSSConstants.SIGNATURE)) {
+            if (sigConf && actionList.contains(XMLSecurityConstants.SIGNATURE)) {
                 actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
-                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE) + 1, 
+                actionList.add(actionList.indexOf(XMLSecurityConstants.SIGNATURE) + 1,
                                WSSConstants.SIGNATURE_CONFIRMATION);
             } else if (sigConf && actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)) {
                 actionList.remove(WSSConstants.SIGNATURE_CONFIRMATION);
-                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY) + 1, 
+                actionList.add(actionList.indexOf(WSSConstants.SIGNATURE_WITH_DERIVED_KEY) + 1,
                                WSSConstants.SIGNATURE_CONFIRMATION);
             }
         }
     }
-    
+
     // If we have EncryptBeforeSigning, then we want to have the Signature component after
     // the Encrypt action, which is not the case if we have a Signed SAML Supporting Token
     protected void enforceEncryptBeforeSigningWithSignedSAML() {
@@ -1022,19 +1035,19 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
             }
         }
     }
-    
+
     // Reshuffle so that a IssuedToken/SecureConveration is above a Signature that references it
     protected void putCustomTokenAfterSignature() {
         if (properties.getActions() != null) {
             List<WSSConstants.Action> actionList = properties.getActions();
-            if ((actionList.contains(WSSConstants.SIGNATURE)
+            if ((actionList.contains(XMLSecurityConstants.SIGNATURE)
                 || actionList.contains(WSSConstants.SIGNATURE_WITH_DERIVED_KEY)
                 || actionList.contains(WSSConstants.SIGNATURE_WITH_KERBEROS_TOKEN))
                 && actionList.contains(WSSConstants.CUSTOM_TOKEN)) {
                 getProperties().getActions().remove(WSSConstants.CUSTOM_TOKEN);
                 getProperties().getActions().add(WSSConstants.CUSTOM_TOKEN);
             }
-      
+
         }
     }
 }

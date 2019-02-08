@@ -36,14 +36,19 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultipleEndpointObserver;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
 
     boolean service1Invoked;
     boolean service2Invoked;
-    
-    @Test    
+
+    @Test
     public void testMultipleSoapBindings() throws Exception {
         ServerFactoryBean svrBean1 = new ServerFactoryBean();
         svrBean1.setAddress("http://localhost/Hello");
@@ -56,7 +61,7 @@ public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
             }
         });
         svrBean1.create();
-        
+
         ServerFactoryBean svrBean2 = new ServerFactoryBean();
         svrBean2.setAddress("http://localhost/Hello");
         svrBean2.setServiceClass(HelloService.class);
@@ -67,45 +72,45 @@ public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
                 service2Invoked = true;
             }
         });
-        
+
         SoapBindingConfiguration config = new SoapBindingConfiguration();
         config.setVersion(Soap12.getInstance());
         svrBean2.setBindingConfig(config);
-        
+
         ServerImpl server2 = (ServerImpl)svrBean2.create();
-        
+
         Destination d = server2.getDestination();
         MessageObserver mo = d.getMessageObserver();
         assertTrue(mo instanceof MultipleEndpointObserver);
-        
+
         MultipleEndpointObserver meo = (MultipleEndpointObserver) mo;
         assertEquals(2, meo.getEndpoints().size());
-        
+
         Node nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap11.xml");
         assertEquals("http://schemas.xmlsoap.org/soap/envelope/", getNs(nd));
-        
+
         assertTrue(service1Invoked);
         assertFalse(service2Invoked);
-        
+
         service1Invoked = false;
-        
+
         nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap12.xml");
         assertEquals("http://www.w3.org/2003/05/soap-envelope", getNs(nd));
-        
+
         assertFalse(service1Invoked);
         assertTrue(service2Invoked);
-        
+
         server2.stop();
         server2.start();
-        
+
         nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap12.xml");
         assertEquals("http://www.w3.org/2003/05/soap-envelope", getNs(nd));
-        
+
         assertFalse(service1Invoked);
         assertTrue(service2Invoked);
-        
+
     }
-    
+
     private String getNs(Node nd) {
         if (nd instanceof Document) {
             return getNs(((Document)nd).getDocumentElement());

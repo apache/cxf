@@ -61,27 +61,27 @@ import org.apache.tika.parser.pdf.PDFParser;
 
 @Path("/catalog")
 public class BookCatalog {
-    private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());    
+    private final TikaLuceneContentExtractor extractor = new TikaLuceneContentExtractor(new PDFParser());
     private final Directory directory = new RAMDirectory();
-    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);    
+    private final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
     private final LuceneQueryVisitor<SearchBean> visitor = createVisitor();
-    
+
     @POST
     @Consumes("multipart/form-data")
     public Response addBook(final MultipartBody body) throws Exception {
         for (final Attachment attachment: body.getAllAttachments()) {
-            final DataHandler handler =  attachment.getDataHandler();
-            
+            final DataHandler handler = attachment.getDataHandler();
+
             if (handler != null) {
-                final String source = handler.getName();                
+                final String source = handler.getName();
                 final LuceneDocumentMetadata metadata = new LuceneDocumentMetadata()
                     .withSource(source)
                     .withField("modified", Date.class);
-                
+
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
-                if (document != null) {                    
+                if (document != null) {
                     final IndexWriter writer = getIndexWriter();
-                    
+
                     try {
                         writer.addDocument(document);
                         writer.commit();
@@ -90,16 +90,16 @@ public class BookCatalog {
                     }
                 }
             }
-        }        
-        
+        }
+
         return Response.ok().build();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ScoreDoc> findBook(@Context SearchContext searchContext) throws IOException {
         IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);        
+        IndexSearcher searcher = new IndexSearcher(reader);
 
         try {
             visitor.visit(searchContext.getCondition(SearchBean.class));
@@ -108,30 +108,30 @@ public class BookCatalog {
             reader.close();
         }
     }
-    
+
     @DELETE
     public Response delete() throws IOException {
         final IndexWriter writer = getIndexWriter();
-        
+
         try {
             writer.deleteAll();
             writer.commit();
         } finally {
             writer.close();
-        }  
-        
+        }
+
         return Response.ok().build();
     }
-    
+
     private IndexWriter getIndexWriter() throws IOException {
         return new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_4_9, analyzer));
     }
-    
+
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
-        final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
+        final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
-        
-        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");
+
+        LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
         visitor.setPrimitiveFieldTypeMap(fieldTypes);
         return visitor;
     }

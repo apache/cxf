@@ -42,17 +42,22 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyOperator;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class EndpointPolicyImplTest extends Assert {
+public class EndpointPolicyImplTest {
 
     private IMocksControl control;
 
@@ -72,11 +77,10 @@ public class EndpointPolicyImplTest extends Assert {
         control = EasyMock.createNiceControl();
     }
 
-    @SuppressWarnings("unchecked")
     private List<Interceptor<? extends Message>> createMockInterceptorList() {
         Interceptor<? extends Message> i = control.createMock(Interceptor.class);
         Interceptor<? extends Message> m = i;
-        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> a = new ArrayList<>();
         a.add(m);
         return a;
     }
@@ -182,7 +186,7 @@ public class EndpointPolicyImplTest extends Assert {
         control.reset();
         EasyMock.expect(engine.isEnabled()).andReturn(true).anyTimes();
         EasyMock.expect(engine.getAlternativeSelector()).andReturn(selector);
-        Collection<Assertion> alternative = new ArrayList<Assertion>();
+        Collection<Assertion> alternative = new ArrayList<>();
         EasyMock.expect(selector.selectAlternative(policy, engine, assertor, null, m)).andReturn(alternative);
         control.replay();
         epi.chooseAlternative(m);
@@ -327,8 +331,8 @@ public class EndpointPolicyImplTest extends Assert {
         PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);
 
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, requestor, null);
-        Collection<Assertion> v = new ArrayList<Assertion>();
-        Collection<Assertion> fv = new ArrayList<Assertion>();
+        Collection<Assertion> v = new ArrayList<>();
+        Collection<Assertion> fv = new ArrayList<>();
         QName aqn = new QName("http://x.y.z", "a");
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));

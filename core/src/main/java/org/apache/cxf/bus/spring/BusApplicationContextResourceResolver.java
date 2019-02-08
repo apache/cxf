@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.resource.ResourceResolver;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -32,17 +31,17 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 
 @NoJSR250Annotations
-public class BusApplicationContextResourceResolver 
+public class BusApplicationContextResourceResolver
     implements ResourceResolver, ApplicationContextAware {
-    
+
     ApplicationContext context;
-    
+
     public BusApplicationContextResourceResolver() {
     }
     public BusApplicationContextResourceResolver(ApplicationContext c) {
         context = c;
     }
-    
+
 
     public InputStream getAsStream(String name) {
         Resource r = context.getResource(name);
@@ -52,7 +51,7 @@ public class BusApplicationContextResourceResolver
             } catch (IOException e) {
                 //ignore and return null
             }
-        } 
+        }
         r = context.getResource("/" + name);
         if (r != null && r.exists()) {
             try {
@@ -60,16 +59,16 @@ public class BusApplicationContextResourceResolver
             } catch (IOException e) {
                 //ignore and return null
             }
-        } 
+        }
         return null;
     }
 
     public <T> T resolve(String resourceName, Class<T> resourceType) {
-           
+
         try {
             T resource = null;
             if (resourceName == null) {
-                String names[] = context.getBeanNamesForType(resourceType);
+                String[] names = context.getBeanNamesForType(resourceType);
                 if (names != null && names.length > 0) {
                     resource = resourceType.cast(context.getBean(names[0], resourceType));
                 }
@@ -98,7 +97,7 @@ public class BusApplicationContextResourceResolver
 
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;        
+        context = applicationContext;
     }
 
 }

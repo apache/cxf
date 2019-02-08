@@ -47,18 +47,18 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
     private JweDecryptionProvider decryptionProvider;
     private JwsSignatureVerifier signatureVerifier;
     private JsonMapObjectReaderWriter jsonp = new JsonMapObjectReaderWriter();
-    private boolean generateNonce; 
+    private boolean generateNonce;
     private boolean storeInSession;
     @Override
-    public MultivaluedMap<String, String> toRedirectState(MessageContext mc, 
+    public MultivaluedMap<String, String> toRedirectState(MessageContext mc,
                                                           MultivaluedMap<String, String> requestState) {
         JweEncryptionProvider theEncryptionProvider = getInitializedEncryptionProvider();
         JwsSignatureProvider theSigProvider = getInitializedSigProvider(theEncryptionProvider);
         if (theEncryptionProvider == null && theSigProvider == null) {
             throw new OAuthServiceException("The state can not be protected");
         }
-        MultivaluedMap<String, String> redirectMap = new MetadataMap<String, String>();
-        
+        MultivaluedMap<String, String> redirectMap = new MetadataMap<>();
+
         if (generateNonce && theSigProvider != null) {
             JwsCompactProducer nonceProducer = new JwsCompactProducer(OAuthUtils.generateRandomTokenKey());
             String nonceParam = nonceProducer.signWith(theSigProvider);
@@ -67,13 +67,13 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
         }
         Map<String, Object> stateMap = CastUtils.cast((Map<?, ?>)requestState);
         String json = jsonp.toJson(stateMap);
-        
+
         String stateParam = null;
         if (theSigProvider != null) {
             JwsCompactProducer stateProducer = new JwsCompactProducer(json);
             stateParam = stateProducer.signWith(theSigProvider);
         }
-        
+
         if (theEncryptionProvider != null) {
             stateParam = theEncryptionProvider.encrypt(StringUtils.toBytesUTF8(stateParam), null);
         }
@@ -83,20 +83,20 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
             stateParam = sessionStateAttribute;
         }
         redirectMap.putSingle(OAuthConstants.STATE, stateParam);
-        
+
         return redirectMap;
     }
 
     @Override
-    public MultivaluedMap<String, String> fromRedirectState(MessageContext mc, 
+    public MultivaluedMap<String, String> fromRedirectState(MessageContext mc,
                                                             MultivaluedMap<String, String> redirectState) {
-        
+
         String stateParam = redirectState.getFirst(OAuthConstants.STATE);
-        
+
         if (storeInSession) {
             stateParam = OAuthUtils.getSessionToken(mc, stateParam);
         }
-        
+
         JweDecryptionProvider jwe = getInitializedDecryptionProvider();
         if (jwe != null) {
             stateParam = jwe.decrypt(stateParam).getContentText();
@@ -107,20 +107,20 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
             throw new SecurityException();
         }
         String json = jws.getUnsignedEncodedSequence();
-        Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
         //CHECKSTYLE:OFF
-        return (MultivaluedMap<String, String>)map;
+        Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
+        return (MultivaluedMap<String, String>)map; //NOPMD
         //CHECKSTYLE:ON
     }
-    
+
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         this.sigProvider = signatureProvider;
     }
-    
+
     protected JwsSignatureProvider getInitializedSigProvider(JweEncryptionProvider theEncryptionProvider) {
         if (sigProvider != null) {
-            return sigProvider;    
-        } 
+            return sigProvider;
+        }
         JwsSignatureProvider theSigProvider = JwsUtils.loadSignatureProvider(false);
         if (theSigProvider == null && theEncryptionProvider != null) {
             theSigProvider = new NoneJwsSignatureProvider();
@@ -132,18 +132,18 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
     }
     protected JweDecryptionProvider getInitializedDecryptionProvider() {
         if (decryptionProvider != null) {
-            return decryptionProvider;    
-        } 
+            return decryptionProvider;
+        }
         return JweUtils.loadDecryptionProvider(false);
     }
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.signatureVerifier = signatureVerifier;
     }
-    
+
     protected JwsSignatureVerifier getInitializedSigVerifier() {
         if (signatureVerifier != null) {
-            return signatureVerifier;    
-        } 
+            return signatureVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(false);
     }
     public void setEncryptionProvider(JweEncryptionProvider encProvider) {
@@ -151,8 +151,8 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider() {
         if (encryptionProvider != null) {
-            return encryptionProvider;    
-        } 
+            return encryptionProvider;
+        }
         return JweUtils.loadEncryptionProvider(false);
     }
 
@@ -163,5 +163,5 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
     public void setStoreInSession(boolean storeInSession) {
         this.storeInSession = storeInSession;
     }
-    
+
 }

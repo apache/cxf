@@ -32,9 +32,9 @@ public class StaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
     //certain usages of CXF may require the Stax stream to remain open (example: streaming the stax stuff
     //directly to the client applications).  Provide a flag to turn off.
     public static final String STAX_IN_NOCLOSE = StaxInEndingInterceptor.class.getName() + ".dontClose";
-    
+
     public static final StaxInEndingInterceptor INSTANCE = new StaxInEndingInterceptor();
-    
+
     public StaxInEndingInterceptor() {
         super(Phase.PRE_INVOKE);
     }

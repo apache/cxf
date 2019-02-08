@@ -25,26 +25,28 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFManagedConnection;
 import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
 import org.apache.cxf.jca.cxf.ManagedConnectionImpl;
+
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HandlerTestBase extends Assert {
+import static org.junit.Assert.fail;
+
+public class HandlerTestBase {
     protected Bus mockBus = EasyMock.createMock(Bus.class);
-    protected CXFManagedConnection mockManagedConnection = 
+    protected CXFManagedConnection mockManagedConnection =
                 EasyMock.createMock(CXFManagedConnection.class);
 
-    protected CXFInvocationHandler mockHandler = 
+    protected CXFInvocationHandler mockHandler =
                 EasyMock.createMock(CXFInvocationHandler.class);
 
-    protected ManagedConnectionFactoryImpl mcf = 
+    protected ManagedConnectionFactoryImpl mcf =
                 EasyMock.createMock(ManagedConnectionFactoryImpl.class);
     protected ManagedConnectionImpl mci =
                 EasyMock.createMock(ManagedConnectionImpl.class);
     protected Method testMethod;
     protected TestTarget target = new TestTarget();
-    
+
     public HandlerTestBase() {
     }
 
@@ -53,11 +55,11 @@ public class HandlerTestBase extends Assert {
     public void setUp() {
         EasyMock.reset(mcf);
         EasyMock.reset(mci);
-    
+
         mcf.getBus();
         EasyMock.expectLastCall().andReturn(mockBus);
         EasyMock.replay(mcf);
-        
+
         mci.getManagedConnectionFactory();
         EasyMock.expectLastCall().andReturn(mcf);
         EasyMock.replay(mci);
@@ -66,12 +68,12 @@ public class HandlerTestBase extends Assert {
         } catch (NoSuchMethodException ex) {
             fail(ex.toString());
         }
-        
+
     }
 
     @Test
     public void testNullTestTarget() {
        // do nothing here ,just for avoid the junit test warning
     }
-    
+
 }

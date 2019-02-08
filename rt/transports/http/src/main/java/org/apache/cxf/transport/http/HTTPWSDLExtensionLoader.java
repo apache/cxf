@@ -29,15 +29,15 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl.http.AddressType;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
-public final class HTTPWSDLExtensionLoader implements WSDLExtensionLoader { 
-    
+public final class HTTPWSDLExtensionLoader implements WSDLExtensionLoader {
+
     public HTTPWSDLExtensionLoader(Bus b) {
         WSDLManager manager = b.getExtension(WSDLManager.class);
-        
-        createExtensor(manager, javax.wsdl.Port.class, 
+
+        createExtensor(manager, javax.wsdl.Port.class,
                        org.apache.cxf.transports.http.configuration.HTTPClientPolicy.class);
         createExtensor(manager, javax.wsdl.Port.class,
                        org.apache.cxf.transports.http.configuration.HTTPServerPolicy.class);
@@ -49,7 +49,7 @@ public final class HTTPWSDLExtensionLoader implements WSDLExtensionLoader {
                                 Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
-                                              parentType, 
+                                              parentType,
                                               elementType, null,
                                               this.getClass().getClassLoader());
         } catch (JAXBException e) {

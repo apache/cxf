@@ -50,22 +50,22 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
 public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
-    
-    public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType m, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+
+    public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType m,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
 
         if (genericType == null) {
             genericType = type;
         }
-        
+
         if (type == null) {
             type = messyCastToRawType(genericType);
         }
 
         AegisContext context = getAegisContext(type, genericType);
         AegisType typeToRead = context.getTypeMapping().getType(genericType);
-        
+
         AegisReader<XMLStreamReader> aegisReader = context.createXMLStreamReader();
         XMLStreamReader xmlStreamReader = null;
         try {
@@ -96,13 +96,13 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
         }
     }
 
-    protected XMLStreamReader createStreamReader(AegisType topType, InputStream is) 
+    protected XMLStreamReader createStreamReader(AegisType topType, InputStream is)
         throws Exception {
         return StaxUtils.createXMLStreamReader(is);
     }
-    
-    public void writeTo(T obj, Class<?> type, Type genericType, Annotation[] anns,  
-        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+
+    public void writeTo(T obj, Class<?> type, Type genericType, Annotation[] anns,
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (type == null) {
             type = obj.getClass();
@@ -125,7 +125,7 @@ public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
             throw ExceptionUtils.toInternalServerErrorException(e, null);
         }
     }
-    
+
     protected XMLStreamWriter createStreamWriter(QName typeQName,
                                                  String enc,
                                                  OutputStream os) throws Exception {

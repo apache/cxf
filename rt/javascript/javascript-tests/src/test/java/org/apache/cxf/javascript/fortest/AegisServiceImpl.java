@@ -37,7 +37,7 @@ public class AegisServiceImpl implements AegisService {
     private Collection<String> acceptedStrings;
     private Collection<Object> acceptedObjects;
     private CountDownLatch oneWayLatch;
-    
+
     public Collection<Object> getAcceptedObjects() {
         return acceptedObjects;
     }
@@ -46,7 +46,7 @@ public class AegisServiceImpl implements AegisService {
         acceptedString = null;
         acceptedCollection = null;
     }
-    
+
     /** {@inheritDoc}*/
     public void acceptAny(String before, Collection<Document> anything) {
         acceptedString = before;
@@ -93,22 +93,22 @@ public class AegisServiceImpl implements AegisService {
         bwata.setString("lima");
         Object[] obs = new Object[3];
         obs[0] = new Mammal();
-        obs[1] = new Integer(42);
+        obs[1] = Integer.valueOf(42);
         obs[2] = new Vegetable(); // this is NOT in the WSDL.
         bwata.setObjects(obs);
         return bwata;
     }
-    
+
     public void prepareToWaitForOneWay() {
         oneWayLatch = new CountDownLatch(1);
     }
-    
+
     public void waitForOneWay() {
         if (oneWayLatch != null) {
             try {
                 oneWayLatch.await();
             } catch (InterruptedException e) {
-                // 
+                //
             }
             oneWayLatch = null;
         }

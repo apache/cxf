@@ -32,19 +32,24 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.policy.PolicyException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to determine the behaviour of the HTTP client
@@ -66,25 +71,25 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         "org/apache/cxf/systest/ws/policy/http_client_policy_feature.xml";
     private static final QName GREETER_QNAME =
         new QName("http://cxf.apache.org/greeter_control", "BasicGreeterService");
-    
+
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus();
             setBus(bus);
             BusFactory.setDefaultBus(bus);
             LoggingInInterceptor in = new LoggingInInterceptor();
-            LoggingOutInterceptor out = new LoggingOutInterceptor();           
+            LoggingOutInterceptor out = new LoggingOutInterceptor();
             bus.getInInterceptors().add(in);
-            bus.getOutInterceptors().add(out);                    
+            bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             HttpGreeterImpl implementor = new HttpGreeterImpl();
             implementor.setThrowAlways(true);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             ep = Endpoint.publish(address, implementor);
-            LOG.info("Published greeter endpoint.");            
+            LOG.info("Published greeter endpoint.");
         }
         public void tearDown() {
             ep.stop();
@@ -92,48 +97,48 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         }
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
-         
+
     @Test
     public void testUsingHTTPClientPolicies() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus(POLICY_ENGINE_ENABLED_CFG);
         BusFactory.setDefaultBus(bus);
-        
+
         LoggingInInterceptor in = new LoggingInInterceptor();
         bus.getInInterceptors().add(in);
         bus.getInFaultInterceptors().add(in);
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-      
+
         // use a client wsdl with policies attached to endpoint, operation and message subjects
-        
+
         URL url = HTTPClientPolicyTest.class.getResource("http_client_greeter.wsdl");
-        
+
         BasicGreeterService gs = new BasicGreeterService(url, GREETER_QNAME);
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
-        
+
         // sayHi - this operation has message policies that are incompatible with
         // the endpoint policies
-       
+
         try {
             greeter.sayHi();
             fail("Did not receive expected PolicyException.");
@@ -146,10 +151,10 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
 
         greeter.greetMeOneWay("CXF");
 
-        // greetMe - operation policy specifies receive timeout and should cause every 
+        // greetMe - operation policy specifies receive timeout and should cause every
         // other invocation to fail
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
+        assertEquals("CXF", greeter.greetMe("cxf"));
 
         try {
             greeter.greetMe("cxf");
@@ -158,7 +163,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             //ex.printStackTrace();
             assertTrue(ex.getCause().getClass().getName(), ex.getCause() instanceof SocketTimeoutException);
         }
-     
+
         // pingMe - policy attached to binding operation fault should have no effect
 
         try {
@@ -167,37 +172,37 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         } catch (PingMeFault ex) {
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
-        } 
+        }
         ((Closeable)greeter).close();
 
     }
-    
+
     @Test
     public void testHTTPClientPolicyViaFeature() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus(POLICY_VIA_FEATURE_CFG);
         BusFactory.setDefaultBus(bus);
-        
+
         // use a WSDL sanitized of any policy assertions, instead
         // the HTTPClientPolicy is applied via a feature set on the
         // <jaxws:client> bean
         //
         URL url = HTTPClientPolicyTest.class.getResource("bare_greeter.wsdl");
-        
+
         BasicGreeterService gs = new BasicGreeterService(url, GREETER_QNAME);
         final Greeter greeter = gs.getGreeterPort();
         LOG.fine("Created greeter client.");
         updateAddressPort(greeter, PORT);
 
-        
+
         greeter.greetMeOneWay("CXF");
-        
-        HTTPConduit c = 
+
+        HTTPConduit c =
             (HTTPConduit)(ClientProxy.getClient(greeter).getConduit());
         assertNotNull("expected HTTPConduit", c);
-        assertNotNull("expected DecoupledEndpoint", 
+        assertNotNull("expected DecoupledEndpoint",
                       c.getClient().getDecoupledEndpoint());
-        assertEquals("unexpected DecoupledEndpoint", 
+        assertEquals("unexpected DecoupledEndpoint",
                      "http://localhost:9909/decoupled_endpoint",
                      c.getClient().getDecoupledEndpoint());
         ((Closeable)greeter).close();

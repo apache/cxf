@@ -22,14 +22,14 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 
 public class STSValidateSuccessEvent extends AbstractSTSSuccessEvent implements TokenValidatorParametersSupport {
-    
+
     private static final String OPERATION = "Validate";
-    
-    
+
+
     public STSValidateSuccessEvent(TokenValidatorParameters parameters, long duration) {
         super(parameters, duration);
     }
-    
+
     @Override
     public String getOperation() {
         return OPERATION;

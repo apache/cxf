@@ -27,7 +27,7 @@ import httpsdemo.common.CustomerService;
 
 public class CustomerServiceImpl implements CustomerService {
     long currentId = 123;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
+    Map<Long, Customer> customers = new HashMap<>();
 
     public CustomerServiceImpl() {
         init();
@@ -36,8 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer getCustomer(String id) {
         System.out.println("----invoking getCustomer, Customer id is: " + id);
         long idNumber = Long.parseLong(id);
-        Customer c = customers.get(idNumber);
-        return c;
+        return customers.get(idNumber);
     }
 
     public Response updateCustomer(Customer customer) {

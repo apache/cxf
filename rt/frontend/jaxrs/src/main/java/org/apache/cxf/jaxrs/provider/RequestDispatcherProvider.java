@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,177 +33,77 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-@Produces("text/html")
-@Provider
-public class RequestDispatcherProvider extends AbstractConfigurableProvider
-    implements MessageBodyWriter<Object> {
-    
+public class RequestDispatcherProvider extends AbstractResponseViewProvider {
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(RequestDispatcherProvider.class);
     private static final Logger LOG = LogUtils.getL7dLogger(RequestDispatcherProvider.class);
-    
+
     private static final String ABSOLUTE_PATH_PARAMETER = "absolute.path";
     private static final String BASE_PATH_PARAMETER = "base.path";
     private static final String WEBAPP_BASE_PATH_PARAMETER = "webapp.base.path";
     private static final String RELATIVE_PATH_PARAMETER = "relative.path";
-    
+
     private static final String REQUEST_SCOPE = "request";
     private static final String SESSION_SCOPE = "session";
-    
-    private static final String MESSAGE_RESOURCE_PATH_PROPERTY = "redirect.resource.path";
-    
+
     private static final String DEFAULT_RESOURCE_EXTENSION = ".jsp";
     private static final String DEFAULT_LOCATION_PREFIX = "/WEB-INF/";
-    
-    private String servletContextPath; 
-    private String resourcePath;
-    private Map<String, String> resourcePaths = Collections.emptyMap();
-    private Map<String, String> classResources = Collections.emptyMap();
-    private Map<? extends Enum<?>, String> enumResources = Collections.emptyMap();
-    private boolean useClassNames;
+
+    private String servletContextPath;
     
     private String scope = REQUEST_SCOPE;
-    private Map<String, String> beanNames = Collections.emptyMap();
-    private String beanName;
     private String dispatcherName;
     private String servletPath;
     private boolean useCurrentServlet;
     private boolean saveParametersAsAttributes;
-    private boolean logRedirects;
-    private boolean strictPathCheck;
-    private String locationPrefix;
-    private String resourceExtension;
-    private boolean includeResource; 
-    
-    private MessageContext mc; 
+    private boolean includeResource;
 
-    @Context
-    public void setMessageContext(MessageContext context) {
-        this.mc = context;
-    }
-
-    public void setStrictPathCheck(boolean use) {
-        strictPathCheck = use;
+    protected String getDefaultLocationPrefix() {
+        return DEFAULT_LOCATION_PREFIX;
     }
     
-    public void setUseClassNames(boolean use) {
-        useClassNames = use;
+    protected String getDefaultResourceExtension() {
+        return DEFAULT_RESOURCE_EXTENSION;
     }
     
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return -1;
-    }
-
-    private String getClassResourceName(Class<?> type) {
-        String resourceName = doGetClassResourceName(type);
-        if (resourceName == null) {
-            for (Class<?> in : type.getInterfaces()) {
-                resourceName = doGetClassResourceName(in);
-                if (resourceName != null) {
-                    break;
-                }
-            }
-        }
-        return resourceName;
-    }
-    private String doGetClassResourceName(Class<?> type) {
-        String simpleName = StringUtils.uncapitalize(type.getSimpleName());
-        String thePrefix = locationPrefix == null ? DEFAULT_LOCATION_PREFIX : locationPrefix;
-        String theExtension = resourceExtension == null ? DEFAULT_RESOURCE_EXTENSION : resourceExtension;
-        String resourceName = thePrefix + simpleName + theExtension;
-        if (ResourceUtils.getClasspathResourceURL(resourceName,
-                                                  RequestDispatcherProvider.class,
-                                                  getBus()) != null) {
-            return resourceName;
-        } else {
-            return null;
-        }
-    }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        
-        if (useClassNames && getClassResourceName(type) != null) {
-            return true;
-        }
-        if (resourcePath != null || classResourceSupported(type)) {
-            return true;
-        }
-        if (!resourcePaths.isEmpty()) {
-            String path = getRequestPath();
-            for (String requestPath : resourcePaths.keySet()) {
-                boolean result = strictPathCheck ? path.endsWith(requestPath) : path.contains(requestPath);  
-                if (result) {
-                    return true;
-                }
-            }
-        }
-        return mc != null && mc.get(MESSAGE_RESOURCE_PATH_PROPERTY) != null;
-    }
-
-    private boolean classResourceSupported(Class<?> type) {
-        String typeName = type.getName();
-        if (type.isEnum()) {
-            for (Object o : enumResources.keySet()) {
-                if (o.getClass().getName().equals(typeName)) {
-                    return true;
-                }
-            }
-            for (String name : classResources.keySet()) {
-                if (name.startsWith(typeName)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return classResources.containsKey(typeName);
-        }
-    }
-    
-    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
+    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations,
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        
+
         ServletContext sc = getServletContext();
-        HttpServletRequest servletRequest = mc.getHttpServletRequest();
-        
+        HttpServletRequest servletRequest = getMessageContext().getHttpServletRequest();
+
         String path = getResourcePath(clazz, o);
-        
-        String theServletPath = servletPath != null ? servletPath 
+
+        String theServletPath = servletPath != null ? servletPath
             : useCurrentServlet ? servletRequest.getServletPath() : "/";
-                
+
         if (theServletPath.endsWith("/") && path != null && path.startsWith("/")) {
-            theServletPath = theServletPath.length() == 1 ? "" 
+            theServletPath = theServletPath.length() == 1 ? ""
                 : theServletPath.substring(0, theServletPath.length() - 1);
         } else if (!theServletPath.endsWith("/") && path != null && !path.startsWith("/")) {
             path = "/" + path;
         }
-        
-        
+
+
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, theServletPath + path);
-        
+
         try {
             if (!includeResource) {
-                mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.TRUE);
+                getMessageContext().put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.TRUE);
             }
-            
+
             HttpServletRequestFilter requestFilter = new HttpServletRequestFilter(
                 servletRequest, path, theServletPath, saveParametersAsAttributes);
             String attributeName = getBeanName(o);
@@ -212,123 +111,56 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 requestFilter.setAttribute(attributeName, o);
             } else if (SESSION_SCOPE.equals(scope)) {
                 requestFilter.getSession(true).setAttribute(attributeName, o);
-            } 
+            }
             setRequestParameters(requestFilter);
             logRedirection(path, attributeName, o);
             if (includeResource) {
-                rd.include(requestFilter, mc.getHttpServletResponse());
+                rd.include(requestFilter, getMessageContext().getHttpServletResponse());
             } else {
-                rd.forward(requestFilter, mc.getHttpServletResponse());
+                rd.forward(requestFilter, getMessageContext().getHttpServletResponse());
             }
         } catch (Throwable ex) {
-            mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
-            LOG.warning(ExceptionUtils.getStackTrace(ex));
-            throw ExceptionUtils.toInternalServerErrorException(ex, null); 
+            handleViewRenderingException(theServletPath + path, ex);
         }
     }
 
     private void logRedirection(String path, String attributeName, Object o) {
-        Level level = logRedirects ? Level.INFO : Level.FINE;  
+        Level level = isLogRedirects() ? Level.INFO : Level.FINE;
         if (LOG.isLoggable(level)) {
-            String message = 
-                new org.apache.cxf.common.i18n.Message("RESPONSE_REDIRECTED_TO", 
+            String message =
+                new org.apache.cxf.common.i18n.Message("RESPONSE_REDIRECTED_TO",
                     BUNDLE, o.getClass().getName(), attributeName, path).toString();
             LOG.log(level, message);
         }
     }
-    
-    String getResourcePath(Class<?> cls, Object o) {
-        String currentResourcePath = getPathFromMessageContext();
-        if (currentResourcePath != null) {
-            return currentResourcePath;
-        }
-        
-        if (!resourcePaths.isEmpty()) {
-            
-            String path = getRequestPath();
-            for (Map.Entry<String, String> entry : resourcePaths.entrySet()) {
-                if (path.endsWith(entry.getKey())) {
-                    return entry.getValue();
-                }
-            }
-        }
-        if (!enumResources.isEmpty() || !classResources.isEmpty()) {
-            String name = cls.getName();
-            if (cls.isEnum()) {
-                String enumResource = enumResources.get(o);
-                if (enumResource != null) {
-                    return enumResource;
-                }
-                name += "." + o.toString();     
-            }
-            
-            String clsResourcePath = classResources.get(name);
-            if (clsResourcePath != null) {
-                return clsResourcePath;
-            }
-        }
-        
-        if (useClassNames) {
-            return getClassResourceName(cls);     
-        }
-        
-        return resourcePath;
-    }
-    
-    private String getPathFromMessageContext() {
-        if (mc != null) {
-            Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
-            if (resourcePathProp != null) {
-                StringBuilder sb = new StringBuilder();
-                if (locationPrefix != null) {
-                    sb.append(locationPrefix);
-                }
-                sb.append(resourcePathProp.toString());
-                if (resourceExtension != null) {
-                    sb.append(resourceExtension);
-                }
-                return sb.toString();
-            }
-        }
-        return null;
-    }
-    
-    private String getRequestPath() {
-        Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
-        return (String)inMessage.get(Message.REQUEST_URI);
-    }
-    
+
     protected ServletContext getServletContext() {
-        ServletContext sc = mc.getServletContext();
+        ServletContext sc = getMessageContext().getServletContext();
         if (servletContextPath != null) {
             sc = sc.getContext(servletContextPath);
             if (sc == null) {
-                String message = 
-                    new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND", 
+                String message =
+                    new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND",
                                                            BUNDLE, servletContextPath).toString();
                 LOG.severe(message);
                 throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
         }
-        return sc; 
+        return sc;
     }
-    
+
     protected RequestDispatcher getRequestDispatcher(ServletContext sc, Class<?> clazz, String path) {
-        
+
         RequestDispatcher rd = dispatcherName != null ? sc.getNamedDispatcher(dispatcherName)
                                                       : sc.getRequestDispatcher(path);
         if (rd == null) {
-            String message = 
-                new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND", 
+            String message =
+                new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND",
                                                        BUNDLE, path).toString();
             LOG.severe(message);
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         return rd;
-    }
-
-    public void setResourcePath(String resourcePath) {
-        this.resourcePath = resourcePath;
     }
 
     public void setServletContextPath(String servletContextPath) {
@@ -339,42 +171,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.scope = scope;
     }
 
-    public void setBeanNames(Map<String, String> beanNames) {
-        this.beanNames = beanNames;
-    }
-
-    public void setBeanName(String beanName) {
-        this.beanName = beanName;
-    }
-    
-    public void setLogRedirects(String value) {
-        this.logRedirects = Boolean.valueOf(value);
-    }
-
-    protected String getBeanName(Object bean) {
-        if (beanName != null) {
-            return beanName;
-        }
-        String name = beanNames.get(bean.getClass().getName());
-        if (name != null) {
-            return name;
-        } 
-        Class<?> resourceClass = bean.getClass();
-        if (useClassNames && doGetClassResourceName(resourceClass) == null) {
-            for (Class<?> cls : bean.getClass().getInterfaces()) {
-                if (doGetClassResourceName(cls) != null) {
-                    resourceClass = cls;
-                    break;
-                }
-            }
-        }
-        
-        return resourceClass.getSimpleName().toLowerCase();
-    }
-
     protected void setRequestParameters(HttpServletRequestFilter request) {
-        if (mc != null) {
-            UriInfo ui = mc.getUriInfo();
+        if (getMessageContext() != null) {
+            UriInfo ui = getMessageContext().getUriInfo();
             MultivaluedMap<String, String> params = ui.getPathParameters();
             for (Map.Entry<String, List<String>> entry : params.entrySet()) {
                 String value = entry.getValue().get(0);
@@ -384,48 +183,36 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 }
                 request.setParameter(entry.getKey(), value);
             }
-            
+
             List<PathSegment> segments = ui.getPathSegments();
-            if (segments.size() > 0) {
+            if (!segments.isEmpty()) {
                 doSetRequestParameters(request, segments.get(segments.size() - 1).getMatrixParameters());
             }
             doSetRequestParameters(request, ui.getQueryParameters());
             request.setParameter(ABSOLUTE_PATH_PARAMETER, ui.getAbsolutePath().toString());
             request.setParameter(RELATIVE_PATH_PARAMETER, ui.getPath());
             request.setParameter(BASE_PATH_PARAMETER, ui.getBaseUri().toString());
-            request.setParameter(WEBAPP_BASE_PATH_PARAMETER, (String)mc.get("http.base.path"));
+            request.setParameter(WEBAPP_BASE_PATH_PARAMETER, (String)getMessageContext().get("http.base.path"));
         }
     }
-    
-    protected void doSetRequestParameters(HttpServletRequestFilter req, 
+
+    protected void doSetRequestParameters(HttpServletRequestFilter req,
                                           MultivaluedMap<String, String> params) {
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             req.setParameters(entry.getKey(), entry.getValue());
         }
     }
-    
+
     public void setDispatcherName(String name) {
         this.dispatcherName = name;
     }
-    
+
     public void setServletPath(String path) {
         this.servletPath = path;
     }
 
-    public void setResourcePaths(Map<String, String> resourcePaths) {
-        this.resourcePaths = resourcePaths;
-    }
-    
-    public void setClassResources(Map<String, String> resources) {
-        this.classResources = resources;
-    }
-
     public void setSaveParametersAsAttributes(boolean saveParametersAsAttributes) {
         this.saveParametersAsAttributes = saveParametersAsAttributes;
-    }
-
-    public void setEnumResources(Map<? extends Enum<?>, String> enumResources) {
-        this.enumResources = enumResources;
     }
 
     public void setUseCurrentServlet(boolean useCurrentServlet) {
@@ -436,50 +223,42 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.includeResource = includeResource;
     }
 
-    public void setLocationPrefix(String locationPrefix) {
-        this.locationPrefix = locationPrefix;
-    }
-
-    public void setResourceExtension(String resourceExtension) {
-        this.resourceExtension = resourceExtension;
-    }
-
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
-        
+
         private Map<String, String[]> params;
         private String path;
         private String servletPath;
         private boolean saveParamsAsAttributes;
-        
-        public HttpServletRequestFilter(HttpServletRequest request, 
-                                        String path, 
+
+        public HttpServletRequestFilter(HttpServletRequest request,
+                                        String path,
                                         String servletPath,
                                         boolean saveParamsAsAttributes) {
             super(request);
             this.path = path;
             this.servletPath = servletPath;
             this.saveParamsAsAttributes = saveParamsAsAttributes;
-            params = new HashMap<String, String[]>(request.getParameterMap());
+            params = new HashMap<>(request.getParameterMap());
         }
-        
+
         @Override
         public String getServletPath() {
             return servletPath;
         }
-        
+
         @Override
         public String getPathInfo() {
             return path;
         }
-        
+
         public void setParameter(String name, String value) {
             doSetParameters(name, new String[]{value});
         }
-        
+
         public void setParameters(String name, List<String> values) {
-            doSetParameters(name, values.toArray(new String[values.size()]));
+            doSetParameters(name, values.toArray(new String[0]));
         }
-        
+
         private void doSetParameters(String name, String[] values) {
             if (saveParamsAsAttributes) {
                 super.setAttribute(name, values);
@@ -487,7 +266,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 params.put(name, values);
             }
         }
-        
+
         @Override
         public String getParameter(String name) {
             String[] values = params.get(name);
@@ -496,11 +275,18 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
             return values[0];
         }
-        
+
         @Override
         public Map<String, String[]> getParameterMap() {
             return params;
         }
-        
+
+    }
+
+    @Override
+    protected boolean resourceAvailable(String resourceName) {
+        return ResourceUtils.getClasspathResourceURL(resourceName,
+                                              RequestDispatcherProvider.class,
+                                              getBus()) != null;
     }
 }

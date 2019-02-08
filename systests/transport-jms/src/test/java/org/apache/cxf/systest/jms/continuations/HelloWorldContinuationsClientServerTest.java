@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.systest.jms.AbstractVmJMSTest;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,32 +38,32 @@ public class HelloWorldContinuationsClientServerTest extends AbstractVmJMSTest {
     @BeforeClass
     public static void startServers() throws Exception {
         startBusAndJMS(HelloWorldContinuationsClientServerTest.class);
-        publish(new HelloWorldWithContinuationsJMS());        
+        publish(new HelloWorldWithContinuationsJMS());
     }
-    
+
     @Test
     public void testHelloWorldContinuations() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
-        
+
         URL wsdlURL = getClass().getClassLoader().getResource(WSDL_PATH);
-        
+
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         final HelloContinuation helloPort = markForClose(service.getPort(HelloContinuation.class, cff));
         ExecutorService executor = Executors.newCachedThreadPool();
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch helloDoneSignal = new CountDownLatch(5);
-        
+
         executor.execute(new HelloWorker(helloPort, "Fred", "", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Barry", "Jameson", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Harry", "", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Rob", "Davidson", startSignal, helloDoneSignal));
         executor.execute(new HelloWorker(helloPort, "James", "ServiceMix", startSignal, helloDoneSignal));
-        
+
         startSignal.countDown();
         helloDoneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         Assert.assertEquals("Some invocations are still running", 0, helloDoneSignal.getCount());
 
     }
-        
+
 }

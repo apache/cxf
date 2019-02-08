@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.transport.jms;
 
-import java.util.concurrent.Executors;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -32,8 +30,9 @@ import javax.jms.TextMessage;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class PooledConnectionTempQueueTest {
 
@@ -41,28 +40,26 @@ public class PooledConnectionTempQueueTest {
 
     @Test
     public void testTempQueueIssue() throws JMSException, InterruptedException {
-        final PooledConnectionFactory cf = new PooledConnectionFactory("vm://localhost?broker.persistent=false");
+        final ConnectionFactory cf = new PooledConnectionFactory("vm://localhost?broker.persistent=false");
 
         Connection con1 = cf.createConnection();
         con1.start();
-        
+
         // This order seems to matter to reproduce the issue
         con1.close();
-        
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                try {
-                    receiveAndRespondWithMessageIdAsCorrelationId(cf, SERVICE_QUEUE);
-                } catch (JMSException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
-        sendWithReplyToTemp(cf, SERVICE_QUEUE);        
+        new Thread(() -> {
+            try {
+                receiveAndRespondWithMessageIdAsCorrelationId(cf, SERVICE_QUEUE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        sendWithReplyToTemp(cf, SERVICE_QUEUE);
     }
 
-    private void sendWithReplyToTemp(ConnectionFactory cf, String serviceQueue) throws JMSException,
+    private static void sendWithReplyToTemp(ConnectionFactory cf, String serviceQueue) throws JMSException,
         InterruptedException {
         Connection con = cf.createConnection();
         con.start();
@@ -74,13 +71,13 @@ public class PooledConnectionTempQueueTest {
         producer.send(msg);
 
         // This sleep also seems to matter
-        Thread.sleep(500);
-        
+        Thread.sleep(500L);
+
         MessageConsumer consumer = session.createConsumer(tempQueue);
         Message replyMsg = consumer.receive();
-        Assert.assertNotNull(replyMsg);
+        assertNotNull(replyMsg);
         //System.out.println(replyMsg.getJMSCorrelationID());
-        
+
         consumer.close();
 
         producer.close();
@@ -88,7 +85,7 @@ public class PooledConnectionTempQueueTest {
         con.close();
     }
 
-    public void receiveAndRespondWithMessageIdAsCorrelationId(ConnectionFactory connectionFactory,
+    public static void receiveAndRespondWithMessageIdAsCorrelationId(ConnectionFactory connectionFactory,
                                                               String queueName) throws JMSException {
         Connection con = connectionFactory.createConnection();
         Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -102,7 +99,7 @@ public class PooledConnectionTempQueueTest {
         final MessageProducer producer = session.createProducer(inMessage.getJMSReplyTo());
         //System.out.println("Sending reply to " + inMessage.getJMSReplyTo());
         producer.send(replyMessage);
-        
+
         producer.close();
         consumer.close();
         session.close();

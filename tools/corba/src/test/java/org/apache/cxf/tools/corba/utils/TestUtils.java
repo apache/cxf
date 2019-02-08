@@ -29,9 +29,9 @@ public class TestUtils {
     private String mDetailedUsage;
 
     public TestUtils() {
-        
+
     }
-    
+
     public TestUtils(String toolName, InputStream in) throws Exception {
         ToolSpec spec = new ToolSpec(in, false);
         CommandLineParser parser = new CommandLineParser(spec);
@@ -44,9 +44,9 @@ public class TestUtils {
         mDetailedUsage += parser.getToolUsage() + System.getProperty("line.separator")
                            + System.getProperty("line.separator");
     }
-    
+
     public void init() {
-        
+
     }
 
     public String getUsage() throws Exception {

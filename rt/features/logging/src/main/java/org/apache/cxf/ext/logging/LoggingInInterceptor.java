@@ -19,32 +19,80 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 
 /**
  * 
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
+    class LoggingInFaultInterceptor extends AbstractPhaseInterceptor<Message> {
+        LoggingInFaultInterceptor() {
+            super(Phase.RECEIVE);
+        }
+
+        @Override
+        public void handleMessage(Message message) throws Fault {
+        }
+
+        @Override
+        public void handleFault(Message message) throws Fault {
+            LoggingInInterceptor.this.handleMessage(message);
+        }
+    }
+
+    public LoggingInInterceptor() {
+        this(new Slf4jVerboseEventSender());
+    }
+
+    public LoggingInInterceptor(PrintWriter writer) {
+        this(new PrintWriterEventSender(writer));
+    }
 
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);
     }
 
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
+        ret.add(new WireTapIn(getWireTapLimit(), threshold));
+        ret.add(new LoggingInFaultInterceptor());
+        return ret;
+    }
+
     public void handleMessage(Message message) throws Fault {
+        if (isLoggingDisabledNow(message)) {
+            return;
+        }
         createExchangeId(message);
         final LogEvent event = new DefaultLogEventMapper().map(message);
+        if (shouldLogContent(event)) {
+            addContent(message, event);
+        } else {
+            event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
+        }
+        sender.send(event);
+    }
+
+    private void addContent(Message message, final LogEvent event) {
         try {
             CachedOutputStream cos = message.getContent(CachedOutputStream.class);
             if (cos != null) {
@@ -58,12 +106,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         } catch (IOException e) {
             throw new Fault(e);
         }
-
-        sender.send(event);
     }
 
     private void handleOutputStream(final LogEvent event, Message message, CachedOutputStream cos) throws IOException {
-        String encoding = (String)message.get(Message.ENCODING);
+        String encoding = (String) message.get(Message.ENCODING);
         if (StringUtils.isEmpty(encoding)) {
             encoding = StandardCharsets.UTF_8.name();
         }
@@ -85,5 +131,19 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         event.setFullContentFile(writer.getTempFile());
     }
 
+    int getWireTapLimit() {
+        if (limit == -1) {
+            return -1;
+        } else if (limit == Integer.MAX_VALUE) {
+            return limit;
+        } else {
+            // add limit +1 as limit for the wiretab in order to read one byte more, so that truncated
+            // is correctly calculated in LogginInIntecepteor! 
+            // See code line :  boolean isTruncated = cos.size() > limit && limit != -1; 
+            // cos is here the outputstream read by the wiretab which will return for cos.size() the 
+            // limit in the truncated case!
+            return limit + 1;
+        }
+    }
 
 }

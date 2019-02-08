@@ -23,5 +23,5 @@ import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 //import org.apache.cxf.tools.wsdlto.core.FrontEndGenerator;
 
 public class JAXWSProfile extends FrontEndProfile {
-    
+
 }

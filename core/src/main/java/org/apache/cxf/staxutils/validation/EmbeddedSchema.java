@@ -30,7 +30,7 @@ public class EmbeddedSchema {
 
     /**
      * Create object to represent one of the schemas in a WSDL
-     * 
+     *
      * @param systemId schema system Id.
      * @param schemaElement Element for the schema.
      */

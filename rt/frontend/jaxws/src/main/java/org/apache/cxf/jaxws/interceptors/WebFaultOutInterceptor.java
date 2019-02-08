@@ -35,6 +35,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -61,7 +62,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     public WebFaultOutInterceptor() {
         super();
     }
-    
+
     private QName getFaultName(WebFault wf, Class<?> cls, OperationInfo op) {
         String ns = wf.targetNamespace();
         if (StringUtils.isEmpty(ns)) {
@@ -73,7 +74,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
         return new QName(ns, name);
     }
-    
+
 
     private WebFault getWebFaultAnnotation(Class<?> t) {
         WebFault fault = t.getAnnotation(WebFault.class);
@@ -84,7 +85,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
         return fault;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         Fault f = (Fault)message.getContent(Exception.class);
         if (f == null) {
@@ -99,20 +100,23 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 sf = (SOAPFaultException)thr.getCause();
             }
             if (sf != null) {
-                if (f instanceof SoapFault) {
-                    for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
-                        ((SoapFault) f).addSubCode(it.next());    
+                SoapVersion soapVersion = (SoapVersion)message.get(SoapVersion.class.getName());
+                if (soapVersion != null && soapVersion.getVersion() != 1.1) {
+                    if (f instanceof SoapFault) {
+                        for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
+                            ((SoapFault) f).addSubCode(it.next());
+                        }
                     }
-                }
-                if (sf.getFault().getFaultReasonLocales().hasNext()) {
-                    Locale lang = (Locale) sf.getFault()
-                           .getFaultReasonLocales().next();
-                    String convertedLang = lang.getLanguage();
-                    String country = lang.getCountry();
-                    if (country.length() > 0) {
-                        convertedLang = convertedLang + '-' + country;
+                    if (sf.getFault().getFaultReasonLocales().hasNext()) {
+                        Locale lang = (Locale) sf.getFault()
+                                .getFaultReasonLocales().next();
+                        String convertedLang = lang.getLanguage();
+                        String country = lang.getCountry();
+                        if (country.length() > 0) {
+                            convertedLang = convertedLang + '-' + country;
+                        }
+                        f.setLang(convertedLang);
                     }
-                    f.setLang(convertedLang);
                 }
                 message.setContent(Exception.class, f);
             }
@@ -123,6 +127,12 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         WebFault fault = null;
         if (cause != null) {
             fault = getWebFaultAnnotation(cause.getClass());
+            if (fault == null && cause.getCause() != null) {
+                fault = getWebFaultAnnotation(cause.getCause().getClass());
+                if (fault != null || cause instanceof RuntimeException) {
+                    cause = cause.getCause();
+                }
+            }
         }
         if (cause instanceof Exception && fault != null) {
             Exception ex = (Exception)cause;
@@ -132,20 +142,18 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 faultInfo = method.invoke(cause, new Object[0]);
             } catch (NoSuchMethodException e) {
                 faultInfo = createFaultInfoBean(fault, cause);
-                
+
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOCATION_TARGET_EXC", BUNDLE), e);
-            } catch (IllegalAccessException e) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_INVOKE", BUNDLE), e);
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalAccessException | IllegalArgumentException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_INVOKE", BUNDLE), e);
             }
             Service service = message.getExchange().getService();
 
             try {
-                DataWriter<XMLStreamWriter> writer 
+                DataWriter<XMLStreamWriter> writer
                     = service.getDataBinding().createWriter(XMLStreamWriter.class);
-                
+
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
                     Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
                                                                      message.getExchange().getBus());
@@ -163,7 +171,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                         f.setDetail(null);
                     }
                 }
-    
+
                 f.setMessage(ex.getMessage());
             } catch (Exception nex) {
                 if (nex instanceof Fault) {
@@ -193,7 +201,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 if (cls != null) {
                     Object ret = cls.newInstance();
                     //copy props
-                    Method meth[] = cause.getClass().getMethods();
+                    Method[] meth = cause.getClass().getMethods();
                     for (Method m : meth) {
                         if (m.getParameterTypes().length == 0
                             && (m.getName().startsWith("get")
@@ -214,17 +222,13 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                     }
                     return ret;
                 }
-            } catch (ClassNotFoundException e1) {
-                //ignore
-            } catch (InstantiationException e) {
-                //ignore
-            } catch (IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e1) {
                 //ignore
             }
         }
 
         LOG.fine("Using @WebFault annotated class "
-                 + cause.getClass().getName() 
+                 + cause.getClass().getName()
                  + " as faultInfo since getFaultInfo() was not found");
         return cause;
     }
@@ -238,12 +242,12 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 } else {
                     ns = mpi.getTypeQName().getNamespaceURI();
                 }
-                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart()) 
+                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart())
                         && qname.getNamespaceURI().equals(ns)) {
                     return mpi;
                 }
             }
-            
+
         }
         return null;
     }

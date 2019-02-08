@@ -27,20 +27,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPHandler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.websocket.WebSocketFactory;
+import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
 
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
 class JettyWebSocketHandler extends JettyHTTPHandler {
-    private WebSocketFactory webSocketFactory;;
+    private WebSocketServerFactory webSocketFactory;;
 
     JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
-                                 WebSocketFactory webSocketFactory) {
+                          WebSocketServerFactory webSocketFactory) {
         super(jhd, cmExact);
         this.webSocketFactory = webSocketFactory;
     }
-    
+
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {

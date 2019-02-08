@@ -34,19 +34,16 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class EnumType extends AegisType {
-    @SuppressWarnings("unchecked")
     @Override
     public Object readObject(MessageReader reader, Context context) {
         String value = reader.getValue();
-        @SuppressWarnings("rawtypes")
-        Class<? extends Enum> cls = (Class<? extends Enum>)getTypeClass();
-        return Enum.valueOf(cls, value.trim());
+        return matchValue(value);
     }
 
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
         // match the reader.
-        writer.writeValue(((Enum<?>)object).name());
+        writer.writeValue(getValue(object));
     }
 
     @Override
@@ -77,9 +74,37 @@ public class EnumType extends AegisType {
         List<XmlSchemaFacet> facets = restriction.getFacets();
         for (Object constant : constants) {
             XmlSchemaEnumerationFacet f = new XmlSchemaEnumerationFacet();
-            f.setValue(((Enum<?>)constant).name());
+            f.setValue(getValue(constant));
             facets.add(f);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Enum<?> matchValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        @SuppressWarnings("rawtypes")
+        Class<? extends Enum> enumClass = (Class<? extends Enum>)getTypeClass();
+        for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
+            if (value.equals(AnnotationReader.getEnumValue(enumConstant))) {
+                return enumConstant;
+            }
+        }
+        return Enum.valueOf(enumClass, value.trim());
+    }
+
+
+    private Object getValue(Object constant) {
+        if (!(constant instanceof Enum<?>)) {
+            return null;
+        }
+        Enum<?> enumConstant = (Enum<?>)constant;
+        String annotatedValue = AnnotationReader.getEnumValue(enumConstant);
+        if (annotatedValue != null) {
+            return annotatedValue;
+        }
+        return enumConstant.name();
     }
 
     @Override

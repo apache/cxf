@@ -33,13 +33,17 @@ import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.spi.http.HttpContext;
 
 import org.apache.cxf.testutil.common.TestUtil;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.jvnet.jax_ws_commons.transport.grizzly_httpspi.GrizzlyHttpContextFactory;
 
-public class EndpointAPITest extends Assert {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class EndpointAPITest {
 
     private static int counter;
     private static int currentPort;
@@ -56,7 +60,7 @@ public class EndpointAPITest extends Assert {
         server.stop();
         server = null;
     }
-    
+
     @Test
     public void testSingleEndpoint() throws Exception {
 
@@ -68,14 +72,14 @@ public class EndpointAPITest extends Assert {
 
         Endpoint endpoint = Endpoint.create(new EndpointBean());
         endpoint.publish(context); // Use grizzly HTTP context for publishing
-        
+
         server.start();
 
         invokeEndpoint(address);
-        
+
         endpoint.stop();
     }
-    
+
     @Test
     public void testMultiplePublishSameAddress() throws Exception {
         server.start();
@@ -94,7 +98,7 @@ public class EndpointAPITest extends Assert {
             endpoint.stop();
         }
     }
-    
+
     @Test
     public void testMultipleEndpointsSameContext() throws Exception {
         server.start();
@@ -152,9 +156,9 @@ public class EndpointAPITest extends Assert {
         checkBasicInvocations(service);
         checkMTOMInvocation(service);
     }
-    
+
     private static void checkBasicInvocations(Service service) {
-        EndpointInterface port = (EndpointInterface)service.getPort(EndpointInterface.class);
+        EndpointInterface port = service.getPort(EndpointInterface.class);
         String helloWorld = "Hello world!";
         assertEquals(0, port.getCount());
         Object retObj = port.echo(helloWorld);
@@ -188,7 +192,7 @@ public class EndpointAPITest extends Assert {
                 return null;
             }
         };
-        EndpointInterface port = (EndpointInterface)service.getPort(EndpointInterface.class,
+        EndpointInterface port = service.getPort(EndpointInterface.class,
                                                                     new MTOMFeature(true));
         DataHandler dh = new DataHandler(ds);
         DHResponse response = port.echoDataHandler(new DHRequest(dh));

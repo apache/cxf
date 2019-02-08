@@ -30,7 +30,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
     private String partName;
 
     private JavaMethod javaMethod;
-    private Map<String, JAnnotation> annotations = new HashMap<String, JAnnotation>();
+    private Map<String, JAnnotation> annotations = new HashMap<>();
 
     /**
      * Describe callback here.
@@ -67,7 +67,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
         this.annotations.put(tag, ann);
 
     }
-    
+
     public JAnnotation getAnnotation(String tag) {
         return annotations.get(tag);
     }
@@ -117,7 +117,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
 
     /**
      * Get the <code>Callback</code> value.
-     * 
+     *
      * @return a <code>boolean</code> value
      */
     public final boolean isCallback() {
@@ -126,7 +126,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
 
     /**
      * Set the <code>Callback</code> value.
-     * 
+     *
      * @param newCallback The new Callback value.
      */
     public final void setCallback(final boolean newCallback) {

@@ -46,52 +46,52 @@ import org.apache.cxf.service.model.EndpointInfo;
 
 public class WrappedMessageContext implements MessageContext {
     public static final String SCOPES = WrappedMessageContext.class.getName() + ".SCOPES";
-    
-    private static Map<String, String> cxf2jaxwsMap = new HashMap<String, String>();
-    private static Map<String, String> jaxws2cxfMap = new HashMap<String, String>();
-    
+
+    private static Map<String, String> cxf2jaxwsMap = new HashMap<>();
+    private static Map<String, String> jaxws2cxfMap = new HashMap<>();
+
     static {
-        cxf2jaxwsMap.put(Message.ENDPOINT_ADDRESS, 
+        cxf2jaxwsMap.put(Message.ENDPOINT_ADDRESS,
                           BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
         cxf2jaxwsMap.put(Message.MAINTAIN_SESSION,
                          BindingProvider.SESSION_MAINTAIN_PROPERTY);
-        
+
         cxf2jaxwsMap.put(Message.HTTP_REQUEST_METHOD,
                           MessageContext.HTTP_REQUEST_METHOD);
-        cxf2jaxwsMap.put(Message.RESPONSE_CODE, 
-                          MessageContext.HTTP_RESPONSE_CODE);        
-        cxf2jaxwsMap.put(Message.PATH_INFO, 
+        cxf2jaxwsMap.put(Message.RESPONSE_CODE,
+                          MessageContext.HTTP_RESPONSE_CODE);
+        cxf2jaxwsMap.put(Message.PATH_INFO,
                           MessageContext.PATH_INFO);
-        cxf2jaxwsMap.put(Message.QUERY_STRING, 
+        cxf2jaxwsMap.put(Message.QUERY_STRING,
                           MessageContext.QUERY_STRING);
-        cxf2jaxwsMap.put("HTTP.REQUEST", 
+        cxf2jaxwsMap.put("HTTP.REQUEST",
                          MessageContext.SERVLET_REQUEST);
-        cxf2jaxwsMap.put("HTTP.RESPONSE", 
+        cxf2jaxwsMap.put("HTTP.RESPONSE",
                          MessageContext.SERVLET_RESPONSE);
-        cxf2jaxwsMap.put("HTTP.CONTEXT", 
+        cxf2jaxwsMap.put("HTTP.CONTEXT",
                          MessageContext.SERVLET_CONTEXT);
-       
-        jaxws2cxfMap.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+
+        jaxws2cxfMap.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                          Message.ENDPOINT_ADDRESS);
-        jaxws2cxfMap.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, 
+        jaxws2cxfMap.put(BindingProvider.SESSION_MAINTAIN_PROPERTY,
                          Message.MAINTAIN_SESSION);
-                
+
         jaxws2cxfMap.put(MessageContext.HTTP_REQUEST_METHOD,
                          Message.HTTP_REQUEST_METHOD);
         jaxws2cxfMap.put(MessageContext.HTTP_RESPONSE_CODE,
-                         Message.RESPONSE_CODE);        
+                         Message.RESPONSE_CODE);
         jaxws2cxfMap.put(MessageContext.PATH_INFO,
                          Message.PATH_INFO);
         jaxws2cxfMap.put(MessageContext.QUERY_STRING,
                          Message.QUERY_STRING);
-        
-        jaxws2cxfMap.put(MessageContext.SERVLET_REQUEST, 
-                         "HTTP.REQUEST"); 
-        jaxws2cxfMap.put(MessageContext.SERVLET_RESPONSE, 
+
+        jaxws2cxfMap.put(MessageContext.SERVLET_REQUEST,
+                         "HTTP.REQUEST");
+        jaxws2cxfMap.put(MessageContext.SERVLET_RESPONSE,
                          "HTTP.RESPONSE");
-        jaxws2cxfMap.put(MessageContext.SERVLET_CONTEXT, 
+        jaxws2cxfMap.put(MessageContext.SERVLET_CONTEXT,
                         "HTTP.CONTEXT");
-        
+
         jaxws2cxfMap.put(BindingProvider.SOAPACTION_URI_PROPERTY, SoapBindingConstants.SOAP_ACTION);
     }
 
@@ -106,13 +106,13 @@ public class WrappedMessageContext implements MessageContext {
     }
     public WrappedMessageContext(Message m, Scope defScope) {
         this(m, m.getExchange(), defScope);
-    }    
+    }
     public WrappedMessageContext(Map<String, Object> m, Exchange ex, Scope defScope) {
         message = m;
         exchange = ex;
         defaultScope = defScope;
         scopes = CastUtils.cast((Map<?, ?>)message.get(SCOPES));
-        
+
         if (isResponse() && exchange != null) {
             if (isRequestor()) {
                 reqMessage = exchange.getOutMessage();
@@ -122,7 +122,7 @@ public class WrappedMessageContext implements MessageContext {
         } else {
             reqMessage = null;
         }
-        
+
         if (scopes == null && reqMessage != null) {
             scopes = CastUtils.cast((Map<?, ?>)reqMessage.get(SCOPES));
             if (scopes != null) {
@@ -131,7 +131,7 @@ public class WrappedMessageContext implements MessageContext {
             }
         }
         if (scopes == null) {
-            scopes = new HashMap<String, Scope>();
+            scopes = new HashMap<>();
             message.put(SCOPES, scopes);
         }
     }
@@ -140,7 +140,7 @@ public class WrappedMessageContext implements MessageContext {
             message.put(s, msg.get(s));
         }
     }
-    
+
     private String mapKey(String key) {
         String k2 = jaxws2cxfMap.get(key);
         if (k2 != null) {
@@ -158,8 +158,8 @@ public class WrappedMessageContext implements MessageContext {
         }
         return key;
     }
-    
-    
+
+
     protected final boolean isResponse() {
         return isOutbound() ^ isRequestor();
     }
@@ -167,28 +167,34 @@ public class WrappedMessageContext implements MessageContext {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
     protected final boolean isOutbound() {
-        return message != null 
+        return message != null
             && exchange != null
             && (message == exchange.getOutMessage()
                 || message == exchange.getOutFaultMessage());
     }
-    
+
     public final Message getWrappedMessage() {
         return message instanceof Message ? (Message)message : null;
     }
     public final Map<String, Object> getWrappedMap() {
         return message;
     }
-    
+
     public void clear() {
-        //just clear the JAXWS things....
-        for (String key : jaxws2cxfMap.keySet()) {
-            remove(key);
+        if (message instanceof Message) {
+            //server side, just clear the JAXWS things....
+            //Otherwise lots of CXF things will not be found
+            for (String key : jaxws2cxfMap.keySet()) {
+                remove(key);
+            }
+        } else {
+            message.clear();
         }
     }
 
     public final boolean containsKey(Object key) {
-        return message.containsKey(mapKey((String)key));
+        return message.containsKey(mapKey((String)key))
+            || get(key) != null;
     }
 
     public final boolean containsValue(Object value) {
@@ -215,11 +221,11 @@ public class WrappedMessageContext implements MessageContext {
                 if (isRequestor() && isOutbound()) {
                     ret = null;
                 } else if (isOutbound()) {
-                    ret = createAttachments(reqMessage, 
+                    ret = createAttachments(reqMessage,
                                             MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
                 } else {
-                    ret = createAttachments(message, 
-                                            MessageContext.INBOUND_MESSAGE_ATTACHMENTS);                    
+                    ret = createAttachments(message,
+                                            MessageContext.INBOUND_MESSAGE_ATTACHMENTS);
                 }
             } else if (MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key)) {
                 if (isRequestor() && !isOutbound()) {
@@ -297,14 +303,14 @@ public class WrappedMessageContext implements MessageContext {
                 }
             }
 
-            
-            if (ret == null && reqMessage != null) { 
+
+            if (ret == null && reqMessage != null) {
                 ret = reqMessage.get(mappedkey);
             }
         }
         return ret;
     }
-    
+
     private static BindingOperationInfo getBindingOperationInfo(Exchange exchange) {
         if (exchange != null && exchange.getBindingOperationInfo() != null) {
             return exchange.getBindingOperationInfo();
@@ -367,24 +373,24 @@ public class WrappedMessageContext implements MessageContext {
             dataHandlers = ((WrappedAttachments) attachments).getAttachments();
         } else {
             if (attachments == null) {
-                attachments = new ArrayList<Attachment>();
+                attachments = new ArrayList<>();
                 mc.put(Message.ATTACHMENTS, attachments);
             }
             dataHandlers = AttachmentUtil.getDHMap(attachments);
-            mc.put(propertyName, 
+            mc.put(propertyName,
                    dataHandlers);
             scopes.put(propertyName, Scope.APPLICATION);
         }
         return dataHandlers;
-    }    
-        
+    }
+
     public final boolean isEmpty() {
         return message.isEmpty();
     }
 
     // map to jaxws
     public final Set<String> keySet() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for (String s : message.keySet()) {
             set.add(s);
             set.add(mapKeyReverse(s));
@@ -392,10 +398,10 @@ public class WrappedMessageContext implements MessageContext {
         return Collections.unmodifiableSet(set);
     }
     public final Set<Entry<String, Object>> entrySet() {
-        Set<Entry<String, Object>> set = new HashSet<Entry<String, Object>>();
+        Set<Entry<String, Object>> set = new HashSet<>();
         for (Map.Entry<String, Object> s : message.entrySet()) {
             set.add(s);
-            
+
             final String s2 = mapKeyReverse(s.getKey());
             final Object o = s.getValue();
             if (s2.equals(s.getKey())) {
@@ -427,16 +433,14 @@ public class WrappedMessageContext implements MessageContext {
         }
         Object ret = null;
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
-            || MessageContext.HTTP_RESPONSE_CODE.equals(key)
             || MessageContext.HTTP_RESPONSE_CODE.equals(key))
-            && !isResponse() && !isRequestor()) { 
+            && !isResponse() && !isRequestor()) {
             Message tmp = createResponseMessage();
             if (tmp != null) {
                 if (MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
                     return tmp.put(Message.PROTOCOL_HEADERS, value);
-                } else {
-                    return tmp.put(mappedKey, value);
                 }
+                return tmp.put(mappedKey, value);
             }
         } else if (BindingProvider.USERNAME_PROPERTY.equals(key)) {
             AuthorizationPolicy authPolicy =
@@ -482,7 +486,7 @@ public class WrappedMessageContext implements MessageContext {
     public final Object remove(Object key) {
         key = mapKey((String)key);
         scopes.remove(key);
-        if (BindingProvider.PASSWORD_PROPERTY.equals(key) 
+        if (BindingProvider.PASSWORD_PROPERTY.equals(key)
             || BindingProvider.USERNAME_PROPERTY.equals(key)) {
             message.remove(AuthorizationPolicy.class.getName());
         }
@@ -500,9 +504,9 @@ public class WrappedMessageContext implements MessageContext {
     public final void setScope(String key, Scope arg1) {
         String mappedKey = mapKey(key);
         if (!this.containsKey(mappedKey) && !scopes.containsKey(mappedKey)) {
-            throw new IllegalArgumentException("non-existant property-" + key + "is specified");    
+            throw new IllegalArgumentException("non-existant property-" + key + "is specified");
         }
-        scopes.put(mappedKey, arg1);        
+        scopes.put(mappedKey, arg1);
     }
 
     public final Scope getScope(String key) {
@@ -515,9 +519,9 @@ public class WrappedMessageContext implements MessageContext {
         }
         throw new IllegalArgumentException("non-existant property-" + key + "is specified");
     }
-    
+
     public final Map<String, Scope> getScopes() {
         return scopes;
     }
-    
+
 }

@@ -24,13 +24,13 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class RSAKeyDecryptionAlgorithm extends WrappedKeyDecryptionAlgorithm {
-    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey) {
         this(privateKey, KeyAlgorithm.RSA_OAEP);
     }
-    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo) {
         this(privateKey, supportedAlgo, true);
     }
-    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo, boolean unwrap) {    
+    public RSAKeyDecryptionAlgorithm(RSAPrivateKey privateKey, KeyAlgorithm supportedAlgo, boolean unwrap) {
         super(privateKey, supportedAlgo, unwrap);
         JweUtils.checkEncryptionKeySize(privateKey);
     }

@@ -21,9 +21,13 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
@@ -45,9 +49,16 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements WriterInterceptor {
+    private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS = 
+        new HashSet<>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
+    private Set<String> protectedHttpHeaders = DEFAULT_PROTECTED_HTTP_HEADERS;
+    private boolean protectHttpHeaders;
+    
     private boolean contentTypeRequired = true;
     private boolean useJwsOutputStream;
+    private boolean encodePayload = true;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+    
     @Override
     public void aroundWriteTo(WriterInterceptorContext ctx) throws IOException, WebApplicationException {
         if (ctx.getEntity() == null) {
@@ -57,23 +68,34 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         JwsHeaders headers = new JwsHeaders();
         JwsSignatureProvider sigProvider = getInitializedSigProvider(headers);
         setContentTypeIfNeeded(headers, ctx);
+        if (!encodePayload) {
+            headers.setPayloadEncodingStatus(false);
+        }
+        protectHttpHeadersIfNeeded(ctx, headers);
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
             JoseUtils.traceHeaders(headers);
-            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
+            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature, true);
             byte[] headerBytes = StringUtils.toBytesUTF8(writer.toJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});
-                        
-            Base64UrlOutputStream base64Stream = new Base64UrlOutputStream(jwsStream);
-            ctx.setOutputStream(base64Stream);
+
+            Base64UrlOutputStream base64Stream = null;
+            if (encodePayload) {
+                base64Stream = new Base64UrlOutputStream(jwsStream);
+                ctx.setOutputStream(base64Stream);
+            } else {
+                ctx.setOutputStream(jwsStream);
+            }
             ctx.proceed();
             setJoseMediaType(ctx);
-            base64Stream.flush();
+            if (base64Stream != null) {
+                base64Stream.flush();
+            }
             jwsStream.flush();
         } else {
-            CachedOutputStream cos = new CachedOutputStream(); 
+            CachedOutputStream cos = new CachedOutputStream();
             ctx.setOutputStream(cos);
             ctx.proceed();
             JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), StandardCharsets.UTF_8));
@@ -81,18 +103,18 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             writeJws(p, sigProvider, actualOs);
         }
     }
-    
+
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
     }
-    
+
     public void setUseJwsOutputStream(boolean useJwsOutputStream) {
         this.useJwsOutputStream = useJwsOutputStream;
     }
-    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {    
+    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
-            if (mt != null 
+            if (mt != null
                 && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
@@ -102,9 +124,28 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
         }
     }
-    
+
     private void setJoseMediaType(WriterInterceptorContext ctx) {
         MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
         ctx.setMediaType(joseMediaType);
+    }
+    public void setEncodePayload(boolean encodePayload) {
+        this.encodePayload = encodePayload;
+    }
+    protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JwsHeaders jwsHeaders) {
+        if (protectHttpHeaders) {
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
+                                              jwsHeaders, 
+                                              protectedHttpHeaders);
+        }
+        
+    }
+
+    public void setProtectHttpHeaders(boolean protectHttpHeaders) {
+        this.protectHttpHeaders = protectHttpHeaders;
+    }
+
+    public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
+        this.protectedHttpHeaders = protectedHttpHeaders;
     }
 }

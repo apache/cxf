@@ -27,26 +27,29 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=";
-    
+
     static EmbeddedJMSBrokerLauncher broker;
-    
+
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             try {
@@ -77,7 +80,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     @AfterClass
     public static void clearProperty() {
         System.clearProperty("EmbeddedBrokerURL");
-    }    
+    }
     @Test
     public void testSwa() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -88,27 +91,27 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         SwAService port = factory.create(SwAService.class);
-        
-        
-        Holder<String> textHolder = new Holder<String>();
-        Holder<DataHandler> data = new Holder<DataHandler>();
-        
+
+
+        Holder<String> textHolder = new Holder<>();
+        Holder<DataHandler> data = new Holder<>();
+
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);
-        
+
         data.value = handler;
-        
+
         textHolder.value = "Hi";
 
         port.echoData(textHolder, data);
         InputStream bis = null;
         bis = data.value.getDataSource().getInputStream();
-        byte b[] = new byte[10];
+        byte[] b = new byte[10];
         bis.read(b, 0, 10);
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
         assertEquals("Hi", textHolder.value);
-        
+
         if (port instanceof Closeable) {
             ((Closeable)port).close();
         }

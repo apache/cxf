@@ -26,8 +26,8 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
-@WebService(serviceName = "NumberService", 
-            endpointInterface = "org.apache.cxf.factory_pattern.Number", 
+@WebService(serviceName = "NumberService",
+            endpointInterface = "org.apache.cxf.factory_pattern.Number",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class HttpNumberImpl extends NumberImpl {
     @Resource

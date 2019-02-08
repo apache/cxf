@@ -32,7 +32,7 @@ public class BookLoginModule implements LoginModule {
 
     private LoginModule module;
     private String fileResource;
-    
+
     public BookLoginModule() {
         try {
             module = LOGIN_MODULE_C.newInstance();
@@ -53,13 +53,13 @@ public class BookLoginModule implements LoginModule {
         Class<?> clz = null;
         try {
             // try the jetty9 version
-            clz = Class.forName("org.eclipse.jetty.jaas.spi.PropertyFileLoginModule", 
+            clz = Class.forName("org.eclipse.jetty.jaas.spi.PropertyFileLoginModule",
                                            true, BookLoginModule.class.getClassLoader());
         } catch (Throwable t) {
             if (clz == null) {
                 try {
                     // try the jetty8 version
-                    clz = Class.forName("org.eclipse.jetty.plus.jaas.spi.PropertyFileLoginModule", 
+                    clz = Class.forName("org.eclipse.jetty.plus.jaas.spi.PropertyFileLoginModule",
                                                    true, BookLoginModule.class.getClassLoader());
                 } catch (Throwable t2) {
                     // ignore
@@ -79,10 +79,10 @@ public class BookLoginModule implements LoginModule {
 
     public void initialize(Subject subject, CallbackHandler handler,
                            Map<String, ? extends Object> sharedState, Map<String, ? extends Object> options) {
-        
-        Map<String, String> customOptions = new HashMap<String, String>();
+
+        Map<String, String> customOptions = new HashMap<>();
         customOptions.put("file", fileResource);
-        
+
         module.initialize(subject, handler, sharedState, customOptions);
     }
 

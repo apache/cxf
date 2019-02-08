@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Vector;
 
 public abstract class AbstractValidator {
-    protected List<String> errorMessages = new Vector<String>();
-    
+    protected List<String> errorMessages = new Vector<>();
+
     public AbstractValidator() {
     }
 

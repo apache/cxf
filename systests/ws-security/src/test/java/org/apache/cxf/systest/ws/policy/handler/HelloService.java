@@ -33,9 +33,9 @@ public interface HelloService {
     @WebMethod(action = "checkHello")
     @WebResult(name = "result")
     @Policies({
-        @Policy(uri = "classpath:/handler_policies/inputPolicy.xml", 
+        @Policy(uri = "classpath:/handler_policies/inputPolicy.xml",
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT),
-        @Policy(uri = "classpath:/handler_policies/outputPolicy.xml", 
+        @Policy(uri = "classpath:/handler_policies/outputPolicy.xml",
         placement = Policy.Placement.PORT_TYPE_OPERATION_OUTPUT)
     })
     boolean checkHello(@WebParam(name = "input") String input) throws MyFault;

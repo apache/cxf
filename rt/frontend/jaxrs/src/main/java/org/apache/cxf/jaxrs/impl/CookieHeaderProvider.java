@@ -21,70 +21,64 @@ package org.apache.cxf.jaxrs.impl;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
-import org.apache.cxf.common.util.StringUtils;
-
 public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
 
     private static final String VERSION = "$Version";
     private static final String PATH = "$Path";
     private static final String DOMAIN = "$Domain";
-    
-    private static final String DOUBLE_QUOTE = "\""; 
-    
+
     public Cookie fromString(String c) {
-        
+
         if (c == null) {
             throw new IllegalArgumentException("Cookie value can not be null");
         }
-        
+
         int version = 0;
         String name = null;
         String value = null;
         String path = null;
         String domain = null;
-        
+
         // ignore the fact the possible version may be seperated by ','
-        String[] tokens = StringUtils.split(c, ";");
+        String[] tokens = c.split(";");
         for (String token : tokens) {
             String theToken = token.trim();
             if (theToken.startsWith(VERSION)) {
-                version = Integer.parseInt(stripQuotes(theToken.substring(VERSION.length() + 1)));
+                version = Integer.parseInt(
+                    NewCookieHeaderProvider.stripQuotes(theToken.substring(VERSION.length() + 1)));
             } else if (theToken.startsWith(PATH)) {
-                path = stripQuotes(theToken.substring(PATH.length() + 1));
+                path = NewCookieHeaderProvider.stripQuotes(theToken.substring(PATH.length() + 1));
             } else if (theToken.startsWith(DOMAIN)) {
-                domain = stripQuotes(theToken.substring(DOMAIN.length() + 1));
+                domain = NewCookieHeaderProvider.stripQuotes(theToken.substring(DOMAIN.length() + 1));
             } else {
                 int i = theToken.indexOf('=');
                 if (i != -1) {
                     name = theToken.substring(0, i);
-                    value = i == theToken.length()  + 1 ? "" : stripQuotes(theToken.substring(i + 1));
+                    value = i == theToken.length()  + 1 ? ""
+                        : NewCookieHeaderProvider.stripQuotes(theToken.substring(i + 1));
                 }
             }
         }
-        
+
         if (name == null || value == null) {
             throw new IllegalArgumentException("Cookie is malformed : " + c);
         }
-        
+
         return new Cookie(name, value, path, domain, version);
     }
 
-    private String stripQuotes(String value) {
-        return value.replaceAll(DOUBLE_QUOTE, "");
-    }
-    
     public String toString(Cookie c) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (c.getVersion() != 0) {
             sb.append(VERSION).append('=').append(c.getVersion()).append(';');
         }
-        sb.append(c.getName()).append('=').append(c.getValue());
+        sb.append(c.getName()).append('=').append(NewCookieHeaderProvider.maybeQuoteAll(c.getValue()));
         if (c.getPath() != null) {
-            sb.append(';').append(PATH).append('=').append(c.getPath());
+            sb.append(';').append(PATH).append('=').append(NewCookieHeaderProvider.maybeQuotePath(c.getPath()));
         }
         if (c.getDomain() != null) {
-            sb.append(';').append(DOMAIN).append('=').append(c.getDomain());
+            sb.append(';').append(DOMAIN).append('=').append(NewCookieHeaderProvider.maybeQuoteAll(c.getDomain()));
         }
         return sb.toString();
     }

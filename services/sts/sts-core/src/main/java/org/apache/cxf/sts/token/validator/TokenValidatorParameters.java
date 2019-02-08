@@ -20,8 +20,7 @@
 package org.apache.cxf.sts.token.validator;
 
 import java.security.Principal;
-
-import javax.xml.ws.WebServiceContext;
+import java.util.Map;
 
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.request.KeyRequirements;
@@ -38,13 +37,13 @@ public class TokenValidatorParameters {
 
     private STSPropertiesMBean stsProperties;
     private Principal principal;
-    private WebServiceContext webServiceContext;
+    private Map<String, Object> messageContext;
     private KeyRequirements keyRequirements;
     private TokenRequirements tokenRequirements;
     private TokenStore tokenStore;
     private String realm;
     private ReceivedToken token;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -60,7 +59,7 @@ public class TokenValidatorParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -76,7 +75,7 @@ public class TokenValidatorParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
@@ -84,29 +83,29 @@ public class TokenValidatorParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
-    public WebServiceContext getWebServiceContext() {
-        return webServiceContext;
-    }
 
-    public void setWebServiceContext(WebServiceContext webServiceContext) {
-        this.webServiceContext = webServiceContext;
-    }
-    
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
-    
+
+    public Map<String, Object> getMessageContext() {
+        return messageContext;
+    }
+
+    public void setMessageContext(Map<String, Object> messageContext) {
+        this.messageContext = messageContext;
+    }
+
 }

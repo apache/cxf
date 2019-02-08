@@ -21,32 +21,36 @@ package org.apache.cxf.ws.rm.persistence.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.apache.cxf.ws.rm.ProtocolVariation;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.persistence.RMStoreException;
 import org.apache.cxf.ws.rm.v200702.Identifier;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
 public class RMTxStoreTest extends RMTxStoreTestBase {
-    @BeforeClass 
+    @BeforeClass
     public static void setUpOnce() {
         RMTxStoreTestBase.setUpOnce();
-        
+
         RMTxStore.deleteDatabaseFiles();
 
         store = new RMTxStore();
         store.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
         store.init();
     }
-    
+
     @AfterClass
     public static void tearDownOnce() {
         /*
@@ -58,14 +62,14 @@ public class RMTxStoreTest extends RMTxStoreTestBase {
         */
         RMTxStore.deleteDatabaseFiles(RMTxStore.DEFAULT_DATABASE_NAME, false);
     }
-    
-    
+
+
     @Test
     public void testReconnect() throws Exception {
         // set the initial reconnect delay to 100 msec for testing
         long ird = store.getInitialReconnectDelay();
         store.setInitialReconnectDelay(100);
-        
+
         SourceSequence seq = control.createMock(SourceSequence.class);
         Identifier sid1 = RMUtils.getWSRMFactory().createIdentifier();
         sid1.setValue("sequence1");
@@ -74,41 +78,41 @@ public class RMTxStoreTest extends RMTxStoreTestBase {
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
         EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
-        
+
         // intentionally invalidate the connection
         try {
             store.getConnection().close();
         } catch (SQLException ex) {
             // ignore
         }
-        
+
         control.replay();
         try {
-            store.createSourceSequence(seq);  
+            store.createSourceSequence(seq);
             fail("Expected RMStoreException was not thrown.");
         } catch (RMStoreException ex) {
             SQLException se = (SQLException)ex.getCause();
             // expects a transient or non-transient connection exception
             assertTrue(se.getSQLState().startsWith("08"));
         }
-        
+
         // wait 200 msecs to make sure an reconnect is attempted
         Thread.sleep(200);
-        
+
         control.reset();
         EasyMock.expect(seq.getIdentifier()).andReturn(sid1);
         EasyMock.expect(seq.getExpires()).andReturn(null);
         EasyMock.expect(seq.getOfferingSequenceIdentifier()).andReturn(null);
         EasyMock.expect(seq.getEndpointIdentifier()).andReturn(CLIENT_ENDPOINT_ID);
         EasyMock.expect(seq.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408);
-        
+
         control.replay();
         store.createSourceSequence(seq);
         control.verify();
-        
+
         // revert to the old initial reconnect delay
         store.setInitialReconnectDelay(ird);
-        
+
         store.removeSourceSequence(sid1);
     }
 

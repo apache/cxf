@@ -36,16 +36,18 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyDataEngineImpl;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class PolicyUtilsTest extends Assert {
+public class PolicyUtilsTest {
 
     private IMocksControl control;
 
@@ -54,28 +56,28 @@ public class PolicyUtilsTest extends Assert {
         control = EasyMock.createNiceControl();
     }
 
-    
+
     @Test
     public void testAssertClientPolicyNoop() {
         testAssertPolicyNoop(true);
     }
-    
+
     @Test
     public void testAssertServerPolicyNoop() {
         testAssertPolicyNoop(false);
     }
-    
+
     void testAssertPolicyNoop(boolean isRequestor) {
         PolicyDataEngine pde = new PolicyDataEngineImpl(null);
         Message message = control.createMock(Message.class);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(null);
         control.replay();
-        
+
         pde.assertMessage(message, null, new ClientPolicyCalculator());
         control.verify();
 
         control.reset();
-        Collection<PolicyAssertion> as = new ArrayList<PolicyAssertion>();
+        Collection<PolicyAssertion> as = new ArrayList<>();
         AssertionInfoMap aim = new AssertionInfoMap(as);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
         control.replay();
@@ -97,10 +99,10 @@ public class PolicyUtilsTest extends Assert {
     public void testAssertClientPolicyInbound() {
         testAssertClientPolicy(false);
     }
-    
+
     public AssertionInfo getClientPolicyAssertionInfo(HTTPClientPolicy policy) {
-        JaxbAssertion<HTTPClientPolicy> assertion = 
-            new JaxbAssertion<HTTPClientPolicy>(new ClientPolicyCalculator().getDataClassName(), false);
+        JaxbAssertion<HTTPClientPolicy> assertion =
+            new JaxbAssertion<>(new ClientPolicyCalculator().getDataClassName(), false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }
@@ -109,7 +111,7 @@ public class PolicyUtilsTest extends Assert {
         Message message = control.createMock(Message.class);
         HTTPClientPolicy ep = new HTTPClientPolicy();
         HTTPClientPolicy cmp = new HTTPClientPolicy();
-        
+
         cmp.setConnectionTimeout(60000L);
         HTTPClientPolicy icmp = new HTTPClientPolicy();
         icmp.setAllowChunking(false);
@@ -120,7 +122,7 @@ public class PolicyUtilsTest extends Assert {
 
         AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         ais.add(eai);
         ais.add(cmai);
         ais.add(icmai);
@@ -138,10 +140,10 @@ public class PolicyUtilsTest extends Assert {
         pde.assertMessage(message, ep, new ClientPolicyCalculator());
         assertTrue(eai.isAsserted());
         assertTrue(cmai.isAsserted());
-        assertTrue(outbound ? !icmai.isAsserted() : icmai.isAsserted());
+        assertTrue(icmai.isAsserted());
         control.verify();
     }
-    
+
     @Test
     public void testAssertServerPolicyOutbound() {
         testAssertServerPolicy(true);
@@ -151,10 +153,10 @@ public class PolicyUtilsTest extends Assert {
     public void testAssertServerPolicyInbound() {
         testAssertServerPolicy(false);
     }
-    
+
     public AssertionInfo getServerPolicyAssertionInfo(HTTPServerPolicy policy) {
-        JaxbAssertion<HTTPServerPolicy> assertion = 
-            new JaxbAssertion<HTTPServerPolicy>(new ServerPolicyCalculator().getDataClassName(), false);
+        JaxbAssertion<HTTPServerPolicy> assertion =
+            new JaxbAssertion<>(new ServerPolicyCalculator().getDataClassName(), false);
         assertion.setData(policy);
         return new AssertionInfo(assertion);
     }
@@ -163,22 +165,22 @@ public class PolicyUtilsTest extends Assert {
         Message message = control.createMock(Message.class);
         HTTPServerPolicy ep = new HTTPServerPolicy();
         HTTPServerPolicy mp = new HTTPServerPolicy();
-        HTTPServerPolicy cmp = new HTTPServerPolicy(); 
+        HTTPServerPolicy cmp = new HTTPServerPolicy();
         cmp.setReceiveTimeout(60000L);
         HTTPServerPolicy icmp = new HTTPServerPolicy();
         icmp.setSuppressClientSendErrors(true);
 
         AssertionInfo eai = getServerPolicyAssertionInfo(ep);
-        AssertionInfo mai = getServerPolicyAssertionInfo(mp); 
-        AssertionInfo cmai = getServerPolicyAssertionInfo(cmp); 
+        AssertionInfo mai = getServerPolicyAssertionInfo(mp);
+        AssertionInfo cmai = getServerPolicyAssertionInfo(cmp);
         AssertionInfo icmai = getServerPolicyAssertionInfo(icmp);
 
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         ais.add(eai);
         ais.add(mai);
         ais.add(cmai);
         ais.add(icmai);
-        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST, 
+        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         aim.put(new ServerPolicyCalculator().getDataClassName(), ais);
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim).atLeastOnce();
@@ -190,7 +192,7 @@ public class PolicyUtilsTest extends Assert {
         }
 
         control.replay();
-        new PolicyDataEngineImpl(null).assertMessage(message, ep, 
+        new PolicyDataEngineImpl(null).assertMessage(message, ep,
                                                      new ServerPolicyCalculator());
         assertTrue(eai.isAsserted());
         assertTrue(mai.isAsserted());

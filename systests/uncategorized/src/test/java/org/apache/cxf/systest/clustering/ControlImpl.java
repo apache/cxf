@@ -38,35 +38,35 @@ import org.apache.cxf.greeter_control.types.StartGreeterResponse;
 import org.apache.cxf.greeter_control.types.StopGreeterResponse;
 
 
-@WebService(serviceName = "ControlService", 
-            portName = "ControlPort", 
-            endpointInterface = "org.apache.cxf.greeter_control.Control", 
+@WebService(serviceName = "ControlService",
+            portName = "ControlPort",
+            endpointInterface = "org.apache.cxf.greeter_control.Control",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 public class ControlImpl implements Control {
-    
+
     private static final Logger LOG = LogUtils.getLogger(ControlImpl.class);
-    
-    private Map<String, Greeter> implementors; 
+
+    private Map<String, Greeter> implementors;
     private Map<String, Endpoint> endpoints;
-    
+
     ControlImpl() {
-        implementors = new HashMap<String, Greeter>();
+        implementors = new HashMap<>();
         implementors.put(FailoverTest.REPLICA_A, new GreeterImplA());
         implementors.put(FailoverTest.REPLICA_B, new GreeterImplB());
         implementors.put(FailoverTest.REPLICA_C, new GreeterImplC());
         implementors.put(FailoverTest.REPLICA_D, new GreeterImplD());
         implementors.put(FailoverTest.REPLICA_E, new GreeterImplE());
-        endpoints = new HashMap<String, Endpoint>();
+        endpoints = new HashMap<>();
     }
-    
+
     public boolean startGreeter(String address) {
         endpoints.put(address,
                       Endpoint.publish(address, implementors.get(address)));
         LOG.info("Published greeter endpoint on: " + address);
-        return true;        
+        return true;
     }
 
-    public boolean stopGreeter(String address) {  
+    public boolean stopGreeter(String address) {
         Endpoint endpoint = endpoints.get(address);
         if (null != endpoint) {
             LOG.info("Stopping Greeter endpoint on: " + address);
@@ -77,13 +77,13 @@ public class ControlImpl implements Control {
         endpoint = null;
         return true;
     }
-    
+
     //--Irrelevant Boilerplate
 
     public void setFaultLocation(FaultLocation fl) {
         // never called
     }
-    
+
     public Future<?> startGreeterAsync(String requestType, AsyncHandler<StartGreeterResponse> asyncHandler) {
         // never called
         return null;
@@ -106,27 +106,22 @@ public class ControlImpl implements Control {
     }
 
     public Response<?> setFaultLocationAsync(FaultLocation in) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> setFaultLocationAsync(FaultLocation in, AsyncHandler<?> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Response<?> setRobustInOnlyModeAsync(boolean in) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Future<?> setRobustInOnlyModeAsync(boolean in, AsyncHandler<?> asyncHandler) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void setRobustInOnlyMode(boolean in) {
-        // TODO Auto-generated method stub
-        
+
     }
 }

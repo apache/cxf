@@ -21,9 +21,9 @@ package org.apache.cxf.jaxb_element_test;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "jaxb_element_test", 
-        portName = "jaxb_element_testSOAP", 
-        targetNamespace = "http://cxf.apache.org/jaxb_element_test/", 
+@WebService(serviceName = "jaxb_element_test",
+        portName = "jaxb_element_testSOAP",
+        targetNamespace = "http://cxf.apache.org/jaxb_element_test/",
         endpointInterface = "org.apache.cxf.jaxb_element_test.JaxbElementTest",
         wsdlLocation = "testutils/jaxb_element_test.wsdl")
 public class JaxbElementTestImpl implements JaxbElementTest {
@@ -31,8 +31,7 @@ public class JaxbElementTestImpl implements JaxbElementTest {
     public String newOperation(String in) {
         if (in == null) {
             return "in=null";
-        } else {
-            return "in=" + in;
         }
+        return "in=" + in;
     }
 }

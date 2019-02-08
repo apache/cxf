@@ -34,20 +34,20 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 
 /**
- * Generate JavaScript names for QNames. 
- * This might belong on the CXF bus. 
+ * Generate JavaScript names for QNames.
+ * This might belong on the CXF bus.
  */
 public class BasicNameManager implements NameManager {
-    
+
     private Map<String, String> nsPrefixMap;
-    
+
     /**
      * For unit testing, we allow a very meaningless version.
      * Real uses use the factory methods.
      */
     BasicNameManager() {
     }
-    
+
     /**
      * Factory that just takes a service. Used in tools and unit tests.
      * @param service
@@ -58,9 +58,9 @@ public class BasicNameManager implements NameManager {
         nameManager.initialize(service, null);
         return nameManager;
     }
-    
+
     /**
-     * 
+     *
      * @param service
      * @param endpoint
      * @return
@@ -72,30 +72,30 @@ public class BasicNameManager implements NameManager {
     }
 
     private void initialize(ServiceInfo service, Endpoint endpoint) {
-        nsPrefixMap = new HashMap<String, String>();
+        nsPrefixMap = new HashMap<>();
         if (endpoint != null) {
             JavascriptOptionsFeature options = getOptions(endpoint);
             if (options.getNamespacePrefixMap() != null) {
                 nsPrefixMap.putAll(options.getNamespacePrefixMap());
             }
         }
-        
-        Set<String> poorPrefixURIs = new HashSet<String>();
+
+        Set<String> poorPrefixURIs = new HashSet<>();
         for (SchemaInfo schemaInfo : service.getSchemas()) {
             NamespacePrefixList schemaPrefixList = schemaInfo.getSchema().getNamespaceContext();
             for (String declaredPrefix : schemaPrefixList.getDeclaredPrefixes()) {
                 String uri = schemaPrefixList.getNamespaceURI(declaredPrefix);
-                
+
                 if (!nsPrefixMap.containsKey(uri)) { // first schema to define a prefix wins.
                     if (declaredPrefix.startsWith("ns") || "tns".equals(declaredPrefix)) {
                         poorPrefixURIs.add(uri);
-                    } else { 
+                    } else {
                         nsPrefixMap.put(uri, declaredPrefix.toUpperCase());
                     }
                 }
             }
         }
-        
+
         for (String uri : poorPrefixURIs) {
             defineFallbackPrefix(uri);
         }
@@ -140,7 +140,7 @@ public class BasicNameManager implements NameManager {
         if (nsprefix == null) {
             nsprefix = defineFallbackPrefix(qname.getNamespaceURI());
         }
-        return nsprefix 
+        return nsprefix
                + "_"
                + qname.getLocalPart();
     }

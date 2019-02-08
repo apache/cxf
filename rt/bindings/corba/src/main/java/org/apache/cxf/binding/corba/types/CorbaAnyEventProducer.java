@@ -24,7 +24,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
@@ -66,22 +66,22 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
 
             XMLEventFactory factory = XMLEventFactory.newInstance();
 
-            attributes = new ArrayList<Attribute>();
-            attributes.add(factory.createAttribute(new QName(W3CConstants.NU_SCHEMA_XSI, "type"), 
-                                                   ANY_TYPE_PREFIX + ":" 
-                                                   + containedSchemaType.getLocalPart())); 
-            namespaces = new ArrayList<Namespace>();
+            attributes = new ArrayList<>();
+            attributes.add(factory.createAttribute(new QName(W3CConstants.NU_SCHEMA_XSI, "type"),
+                                                   ANY_TYPE_PREFIX + ":"
+                                                   + containedSchemaType.getLocalPart()));
+            namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace(ANY_TYPE_PREFIX,
                                                    containedSchemaType.getNamespaceURI()));
         }
 
-        CorbaTypeEventProducer containedProducer = 
+        CorbaTypeEventProducer containedProducer =
             CorbaHandlerUtils.getTypeEventProducer(containedType, serviceInfo, orb);
         if (containedProducer instanceof AbstractStartEndEventProducer) {
             iterator = ((AbstractStartEndEventProducer)containedProducer).getNestedTypes();
         } else {
-            List<CorbaTypeEventProducer> prods = new ArrayList<CorbaTypeEventProducer>();
-            CorbaSimpleAnyContainedTypeEventProducer simpleProducer = 
+            List<CorbaTypeEventProducer> prods = new ArrayList<>();
+            CorbaSimpleAnyContainedTypeEventProducer simpleProducer =
                 new CorbaSimpleAnyContainedTypeEventProducer(containedProducer.getText());
             prods.add(simpleProducer);
             producers = prods.iterator();
@@ -94,9 +94,8 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
         // contained type and we CAN'T have the anys attributes used (It causes big problems)
         if (currentEventProducer == null) {
             return attributes;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public List<Namespace> getNamespaces() {
@@ -145,7 +144,7 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
 
     class CorbaSimpleAnyContainedTypeEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.CHARACTERS};
+        int[] states = {XMLStreamConstants.CHARACTERS};
         String value;
 
         CorbaSimpleAnyContainedTypeEventProducer(String text) {

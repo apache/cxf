@@ -23,7 +23,7 @@ import org.apache.cxf.message.Exchange;
 
 /**
  * Always returns a single instance of the bean.
- * 
+ *
  * This is generally the default.
  */
 public class SingletonFactory implements Factory {
@@ -52,7 +52,7 @@ public class SingletonFactory implements Factory {
             bean = factory.create(e);
         }
     }
-    
+
     /** {@inheritDoc}*/
     public void release(Exchange ex, Object o) {
         //nothing to do

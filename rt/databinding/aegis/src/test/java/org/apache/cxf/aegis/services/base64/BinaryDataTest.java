@@ -21,6 +21,7 @@ package org.apache.cxf.aegis.services.base64;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
+
 import org.junit.Test;
 
 public class BinaryDataTest extends AbstractAegisTest {
@@ -29,8 +30,8 @@ public class BinaryDataTest extends AbstractAegisTest {
         createService(BinaryDataService.class);
 
         runTests();
-    }    
-      
+    }
+
     private void runTests() throws Exception {
         Node res = invoke("BinaryDataService",
                           "/org/apache/cxf/aegis/services/base64/binary.xml");
@@ -38,7 +39,7 @@ public class BinaryDataTest extends AbstractAegisTest {
         addNamespace("b", "http://base64.services.aegis.cxf.apache.org");
         assertValid("//b:return[text()='OK']", res);
 
-        res = invoke("BinaryDataService",                     
+        res = invoke("BinaryDataService",
                      "/org/apache/cxf/aegis/services/base64/binaryEmpty.xml");
         assertValid("//b:return[text()='OK']", res);
     }

@@ -34,11 +34,11 @@ import javax.xml.ws.Holder;
 @SOAPBinding(style = SOAPBinding.Style.RPC,
              use = SOAPBinding.Use.LITERAL)
 public interface RpcLitCodeFirstService {
-    
+
     @WebMethod(operationName = "ConvertToString")
     @WebResult(name = "stringNumbers")
     String[] convertToString(@WebParam(name = "intNumbers") int[] numbers);
-    
+
     @WebMethod
     String[] arrayOutput();
 
@@ -48,14 +48,14 @@ public interface RpcLitCodeFirstService {
 
     @WebMethod
     Vector<String> listOutput();
-    
+
     @WebMethod
     String listInput(List<String> inputs);
 
     @WebMethod
     String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y);
-    
-    
+
+
     @WebMethod
     String multiInOut(@WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> a,
@@ -71,7 +71,7 @@ public interface RpcLitCodeFirstService {
                       Holder<String> f,
                       @WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> g);
-    
+
     @WebMethod
     String multiHeaderInOut(
                         @WebParam(mode = WebParam.Mode.OUT, header = true)
@@ -88,7 +88,7 @@ public interface RpcLitCodeFirstService {
                         Holder<String> f,
                         @WebParam(mode = WebParam.Mode.OUT)
                         Holder<String> g);
-    
+
     @WebMethod
     List<Foo> listObjectOutput();
 
@@ -97,10 +97,10 @@ public interface RpcLitCodeFirstService {
 
     class Foo  {
         String name;
-        
+
         public Foo() {
         }
-        
+
         public void setName(String n) {
             name = n;
         }
@@ -108,6 +108,6 @@ public interface RpcLitCodeFirstService {
             return name;
         }
     }
-    
+
 
 }

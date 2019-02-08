@@ -23,50 +23,48 @@ import javax.xml.namespace.QName;
 
 /**
  * Represents the SOAP 1.2 version
- * 
+ *
  */
 public final class Soap12 implements SoapVersion {
     public static final String SOAP_NAMESPACE = "http://www.w3.org/2003/05/soap-envelope";
-    
-    private static Soap12 instance = new Soap12();
 
-    private final double version = 1.2;
+    private static final Soap12 INSTANCE = new Soap12();
 
-    private final String namespace = SOAP_NAMESPACE;
+    private static final double VERSION = 1.2;
 
-    private final String noneRole = namespace + "/role/none";
+    private static final String NONE_ROLE = SOAP_NAMESPACE + "/role/none";
 
-    private final String ultimateReceiverRole = namespace + "/role/ultimateReceiver";
+    private static final String ULTIMATE_RECEIVER_ROLE = SOAP_NAMESPACE + "/role/ultimateReceiver";
 
-    private final String nextRole = namespace + "/role/next";
+    private static final String NEXT_ROLE = SOAP_NAMESPACE + "/role/next";
 
-    private final String soapEncodingStyle = "http://www.w3.org/2003/05/soap-encoding";
+    private static final String SOAP_ENCODING_STYLE = "http://www.w3.org/2003/05/soap-encoding";
 
-    private final QName envelope = new QName(namespace, "Envelope");
+    private final QName envelope = new QName(SOAP_NAMESPACE, "Envelope");
 
-    private final QName header = new QName(namespace, "Header");
+    private final QName header = new QName(SOAP_NAMESPACE, "Header");
 
-    private final QName body = new QName(namespace, "Body");
+    private final QName body = new QName(SOAP_NAMESPACE, "Body");
 
-    private final QName fault = new QName(namespace, "Fault");
+    private final QName fault = new QName(SOAP_NAMESPACE, "Fault");
 
     private Soap12() {
-       // Singleton 
+       // Singleton
     }
-    
+
     public static Soap12 getInstance() {
-        return instance;
+        return INSTANCE;
     }
     public String getBindingId() {
         return SoapBindingConstants.SOAP12_BINDING_ID;
     }
 
     public double getVersion() {
-        return version;
+        return VERSION;
     }
 
     public String getNamespace() {
-        return namespace;
+        return SOAP_NAMESPACE;
     }
 
     public QName getEnvelope() {
@@ -84,25 +82,25 @@ public final class Soap12 implements SoapVersion {
     public QName getFault() {
         return fault;
     }
-    
+
     public String getSoapEncodingStyle() {
-        return soapEncodingStyle;
+        return SOAP_ENCODING_STYLE;
     }
 
     // Role URIs
     // -------------------------------------------------------------------------
     public String getNoneRole() {
-        return noneRole;
+        return NONE_ROLE;
     }
 
     public String getUltimateReceiverRole() {
-        return ultimateReceiverRole;
+        return ULTIMATE_RECEIVER_ROLE;
     }
 
     public String getNextRole() {
-        return nextRole;
+        return NEXT_ROLE;
     }
-    
+
     public String getAttrNameRole() {
         return "role";
     }

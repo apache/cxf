@@ -29,23 +29,23 @@ public abstract class AbstractAttributedInterceptorProvider extends ConcurrentHa
     implements InterceptorProvider {
 
     private static final long serialVersionUID = -1915876045710441978L;
-    private List<Interceptor<? extends Message>> in 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> out 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outFault  
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> inFault 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> in
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> out
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> outFault
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> inFault
+        = new ModCountCopyOnWriteArrayList<>();
 
-    
+
     public Object put(String s, Object o) {
         if (o == null) {
             return super.remove(s);
         }
         return super.put(s, o);
     }
-    
+
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
@@ -84,9 +84,9 @@ public abstract class AbstractAttributedInterceptorProvider extends ConcurrentHa
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode() {     //NOPMD
         return super.hashCode();
     }
-    
-    
+
+
 }

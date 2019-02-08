@@ -34,9 +34,9 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     protected IdlScopeBase(IdlScopeBase parent, String name) {
         super(parent, name);
-        defns = new Vector<IdlDefn>();
-        hold = new Stack<IdlDefn>();
-        park = new Vector<IdlDefn>();
+        defns = new Vector<>();
+        hold = new Stack<>();
+        park = new Vector<>();
     }
 
     public IdlDefn addToScope(IdlDefn def) {
@@ -51,7 +51,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         return result;
     }
 
-    
+
     public IdlDefn holdForScope(IdlDefn def) {
         hold.push(def);
         return def;
@@ -98,7 +98,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         if (undefined) {
             return result;
         }
-        
+
         for (IdlDefn nextDef : defns) {
             if (nextDef.localName().equals(nm)) {
                 result = nextDef;
@@ -116,12 +116,12 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     public IdlDefn lookup(IdlScopedName name, boolean undefined) {
         IdlScopeBase scope = this;
-        String parents[] = name.parentNames();
+        String[] parents = name.parentNames();
 
         if (parents != null) {
             IdlDefn defn = lookup(parents, undefined);
 
-            if (!(defn instanceof IdlScopeBase)) { 
+            if (!(defn instanceof IdlScopeBase)) {
                 //|| defn == null) {
                 return null;
             }
@@ -133,11 +133,11 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
     }
 
 
-    public IdlDefn lookup(String scopedName[]) {
+    public IdlDefn lookup(String[] scopedName) {
         return lookup(scopedName, false);
     }
 
-    public IdlDefn lookup(String scopedName[], boolean undefined) {
+    public IdlDefn lookup(String[] scopedName, boolean undefined) {
         IdlScopeBase scope = this;
 
         for (;;) {
@@ -171,7 +171,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
         return result;
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         if (doneDefn.contains(this)) {
             return (this == startScope) ? this : null;

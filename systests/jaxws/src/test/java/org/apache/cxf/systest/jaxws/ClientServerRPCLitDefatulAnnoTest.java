@@ -24,8 +24,13 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClientServerRPCLitDefatulAnnoTest extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
@@ -59,7 +64,7 @@ public class ClientServerRPCLitDefatulAnnoTest extends AbstractClientServerTestB
     @Test
     public void testBasicConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");
-        HelloService service = new HelloService(getClass().getResource("/wsdl/others/hello.wsdl"), 
+        HelloService service = new HelloService(getClass().getResource("/wsdl/others/hello.wsdl"),
                                                 serviceName);
         assertNotNull(service);
         Hello hello = service.getHelloPort();

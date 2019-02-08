@@ -24,27 +24,27 @@ import java.util.List;
 import org.apache.cxf.message.Message;
 
 /**
- * The <code>InterceptorProvider</code> interface is implemented by objects 
- * that have interceptor chains associated with them. The methods in this 
+ * The <code>InterceptorProvider</code> interface is implemented by objects
+ * that have interceptor chains associated with them. The methods in this
  * interface provide the ability to add and remove interceptors to the chains
  * of the InterceptorProvider.
  */
 public interface InterceptorProvider {
-    
+
     /**
      * Returns the list of interceptors attached to the incoming interceptor
      * chain of the object.
      * @return <code>List<Interceptor></code> incoming interceptor chain
      */
     List<Interceptor<? extends Message>> getInInterceptors();
-    
+
     /**
      * Returns the list of interceptors attached to the outgoing interceptor
      * chain of the object.
      * @return <code>List<Interceptor></code> outgoing interceptor chain
      */
     List<Interceptor<? extends Message>> getOutInterceptors();
-    
+
     /**
      * Returns the list of interceptors attached to the incoming fault interceptor
      * chain of the object.
@@ -58,5 +58,5 @@ public interface InterceptorProvider {
      * @return <code>List<Interceptor></code> outgoing fault interceptor chain
      */
     List<Interceptor<? extends Message>> getOutFaultInterceptors();
-    
+
 }

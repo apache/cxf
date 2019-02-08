@@ -24,16 +24,16 @@ import java.util.Map;
 
 
 public class BookStoreNoAnnotations {
-    
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    
+
+    private Map<Long, Book> books = new HashMap<>();
+
     public BookStoreNoAnnotations() {
         Book b = new Book();
         b.setId(123L);
         b.setName("CXF in Action");
         books.put(b.getId(), b);
     }
-    
+
     public Book getBook(Long id) {
         return books.get(id);
     }

@@ -22,15 +22,15 @@ package org.apache.cxf.rs.security.saml;
  * Some constant configuration options
  */
 public final class SAMLConstants {
-    
+
     /**
      * This tag refers to a DOM Element representation of a SAML Token. If a SAML Token
-     * is stored on the Message Context, then the SamlFormOutInterceptor and 
+     * is stored on the Message Context, then the SamlFormOutInterceptor and
      * SamlHeaderOutInterceptor will use this token instead of creating a new SAML Token.
      */
     public static final String SAML_TOKEN_ELEMENT = "rs-security.saml.token.element";
     public static final String WS_SAML_TOKEN_ELEMENT = "ws-security.token.element";
-    
+
     private SAMLConstants() {
         // complete
     }

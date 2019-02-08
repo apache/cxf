@@ -28,15 +28,15 @@ import org.apache.cxf.tools.common.model.DefaultValueWriter;
 public class DummyDataBinding implements org.apache.cxf.tools.wsdlto.core.DataBindingProfile {
     public void generate(ToolContext context) throws ToolException {
     }
-    
+
     public void initialize(ToolContext c) throws ToolException {
-        
+
     }
-    
+
     public String getType(QName qn, boolean element) {
         return null;
     }
-    
+
     public String getWrappedElementType(QName parent, QName qn) {
         return null;
     }

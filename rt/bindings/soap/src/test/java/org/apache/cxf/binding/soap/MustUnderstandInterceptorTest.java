@@ -42,8 +42,13 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MustUnderstandInterceptorTest extends TestBase {
 
@@ -60,15 +65,15 @@ public class MustUnderstandInterceptorTest extends TestBase {
     public void setUp() throws Exception {
 
         super.setUp();
-        
+
         Bus bus = BusFactory.getDefaultBus();
 
         rhi = new ReadHeadersInterceptor(bus, "phase1");
         chain.add(rhi);
-        
+
         sbi = new StartBodyInterceptor("phase1.5");
         chain.add(sbi);
-        
+
         mui = new MustUnderstandInterceptor("phase2");
         chain.add(mui);
 
@@ -112,7 +117,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
     public void testHandleMessageWithSoapHeader11Param() throws Exception {
         prepareSoapMessage("test-soap-header.xml");
         dsi.getUnderstoodHeaders().add(RESERVATION);
-        
+
         ServiceInfo serviceInfo = getMockedServiceModel(getClass().getResource("test-soap-header.wsdl")
             .toString());
 
@@ -146,7 +151,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
         assertEquals("DummaySoapInterceptor getUnderstood has been called!", true, dsi
             .isCalledGetUnderstood());
     }
-    
+
     private void prepareSoapMessage(String payloadFileName) throws Exception {
 
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
@@ -164,8 +169,8 @@ public class MustUnderstandInterceptorTest extends TestBase {
         private boolean calledGetRoles;
         private boolean calledGetUnderstood;
 
-        private Set<URI> roles = new HashSet<URI>();
-        private Set<QName> understood = new HashSet<QName>();
+        private Set<URI> roles = new HashSet<>();
+        private Set<QName> understood = new HashSet<>();
 
 
         DummySoapInterceptor(String phase) {
@@ -177,7 +182,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
 
         public Set<URI> getRoles() {
             calledGetRoles = true;
-            if (roles.size() == 0) {
+            if (roles.isEmpty()) {
                 try {
                     roles.add(new URI("http://www.w3.org/2003/05/soap-envelope/role/next"));
                     roles.add(new URI("http://www.w3.org/2003/05/soap-envelope/role/none"));

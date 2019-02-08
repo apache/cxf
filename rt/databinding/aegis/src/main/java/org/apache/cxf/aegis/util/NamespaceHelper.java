@@ -40,20 +40,20 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Namespace utilities.
  */
 public final class NamespaceHelper {
-    
+
     private NamespaceHelper() {
         //utility class
     }
     /**
      * Create a unique namespace uri/prefix combination.
-     * 
+     *
      * @param nsUri
      * @return The namespace with the specified URI. If one doesn't exist, one
      *         is created.
      */
     public static String getUniquePrefix(Element element, String namespaceURI) {
         String prefix = getPrefix(element, namespaceURI);
-        // it is OK to have both namespace URI and prefix be empty. 
+        // it is OK to have both namespace URI and prefix be empty.
         if (prefix == null) {
             if ("".equals(namespaceURI)) {
                 return "";
@@ -73,7 +73,7 @@ public final class NamespaceHelper {
 
     /**
      * Create a unique namespace uri/prefix combination.
-     * 
+     *
      * @param nsUri
      * @return The namespace with the specified URI. If one doesn't exist, one
      *         is created.
@@ -83,8 +83,8 @@ public final class NamespaceHelper {
         throws XMLStreamException {
         return getUniquePrefix(writer, namespaceURI, null, declare);
     }
-    
-    
+
+
     /**
      * Make a unique prefix.
      * @param writer target writer.
@@ -94,26 +94,26 @@ public final class NamespaceHelper {
      * @return the prefix.
      * @throws XMLStreamException
      */
-    public static String getUniquePrefix(XMLStreamWriter writer, 
+    public static String getUniquePrefix(XMLStreamWriter writer,
                                          String namespaceURI,
                                          String preferred,
                                          boolean declare)
         throws XMLStreamException {
-        
+
         if (preferred != null) {
             String existing = writer.getNamespaceContext().getNamespaceURI(preferred);
             if (namespaceURI.equals(existing)) {
                 return preferred;
             }
         }
-        String prefix = preferred; 
+        String prefix = preferred;
         if (prefix == null) {
             prefix = writer.getNamespaceContext().getPrefix(namespaceURI);
             if (prefix != null) {
                 declare = false;
             }
         }
-        
+
         if (prefix == null) {
             prefix = StaxUtils.getUniquePrefix(writer);
         }
@@ -135,7 +135,7 @@ public final class NamespaceHelper {
      * <code>org.codehaus.xfire.services.Echo</code>, and the protocol is
      * <code>http</code>, the resulting namespace would be
      * <code>http://services.xfire.codehaus.org</code>.
-     * 
+     *
      * @param className the class name
      * @param protocol the protocol (eg. <code>http</code>)
      * @return the namespace
@@ -174,7 +174,7 @@ public final class NamespaceHelper {
 
     /**
      * Method makePackageName
-     * 
+     *
      * @param namespace
      * @return
      */
@@ -243,7 +243,7 @@ public final class NamespaceHelper {
      * Massage <tt>word</tt> into a form suitable for use in a Java package
      * name. Append it to the target string buffer with a <tt>.</tt> delimiter
      * iff <tt>word</tt> is not the first word in the package name.
-     * 
+     *
      * @param sb the buffer to append to
      * @param word the word to append
      * @param firstWord a flag indicating whether this is the first word
@@ -283,7 +283,7 @@ public final class NamespaceHelper {
     /**
      * Reads a QName from the element text. Reader must be positioned at the
      * start tag.
-     * 
+     *
      * @param reader
      * @return
      * @throws XMLStreamException
@@ -318,12 +318,11 @@ public final class NamespaceHelper {
         int index = value.indexOf(':');
         if (index == -1) {
             return new QName(nc.getNamespaceURI(""), value, "");
-        } else {
-            String prefix = value.substring(0, index);
-            String localName = value.substring(index + 1);
-            String ns = nc.getNamespaceURI(prefix);
-            return new QName(ns, localName, prefix);
         }
+        String prefix = value.substring(0, index);
+        String localName = value.substring(index + 1);
+        String ns = nc.getNamespaceURI(prefix);
+        return new QName(ns, localName, prefix);
     }
 
     public static QName createQName(Element e, String value, String defaultNamespace) {
@@ -343,7 +342,7 @@ public final class NamespaceHelper {
         if (jNS == null) {
             throw new DatabindingException("No namespace was found for prefix: " + prefix);
         }
-        
+
         if (localName == null) {
             throw new DatabindingException("Invalid QName in mapping: " + value);
         }

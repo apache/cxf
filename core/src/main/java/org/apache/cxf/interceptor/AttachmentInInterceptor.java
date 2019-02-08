@@ -41,7 +41,7 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
     public AttachmentInInterceptor() {
         super(Phase.RECEIVE);
     }
-    
+
     public void handleMessage(Message message) {
         if (isGET(message)) {
             LOG.fine("AttachmentInInterceptor skipped in HTTP GET method");
@@ -50,7 +50,7 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (message.getContent(InputStream.class) == null) {
             return;
         }
-        
+
         String contentType = (String) message.get(Message.CONTENT_TYPE);
         if (AttachmentUtil.isTypeSupported(contentType, getSupportedTypes())) {
             AttachmentDeserializer ad = new AttachmentDeserializer(message, getSupportedTypes());

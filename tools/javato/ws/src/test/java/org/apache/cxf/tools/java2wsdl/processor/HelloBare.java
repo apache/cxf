@@ -28,6 +28,6 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 public class HelloBare {
     @WebMethod
     public void add(int a, String b) {
-        
+
     }
 }

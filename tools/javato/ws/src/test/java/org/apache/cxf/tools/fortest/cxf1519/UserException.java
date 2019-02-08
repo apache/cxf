@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.ws.WebFault;
 
 @WebFault(name = "UserExceptionFault", targetNamespace = "http://cxf.apache.org/cxf1519/faults")
-@XmlType(name = "UserException", 
-         namespace = "http://cxf.apache.org/cxf1519/exceptions", 
+@XmlType(name = "UserException",
+         namespace = "http://cxf.apache.org/cxf1519/exceptions",
          propOrder = { "message" }
 )
 public class UserException extends Exception {

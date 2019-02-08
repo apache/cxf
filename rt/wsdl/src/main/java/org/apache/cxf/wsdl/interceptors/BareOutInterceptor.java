@@ -38,16 +38,16 @@ public class BareOutInterceptor extends AbstractOutDatabindingInterceptor {
     public void handleMessage(Message message) {
         Exchange exchange = message.getExchange();
         BindingOperationInfo operation = exchange.getBindingOperationInfo();
-        
+
         if (operation == null) {
             return;
         }
 
         MessageContentsList objs = MessageContentsList.getContentsList(message);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return;
         }
-        
+
         List<MessagePartInfo> parts = null;
         BindingMessageInfo bmsg = null;
         boolean client = isRequestor(message);
@@ -64,7 +64,7 @@ public class BareOutInterceptor extends AbstractOutDatabindingInterceptor {
             bmsg = operation.getInput();
             parts = bmsg.getMessageParts();
         }
-        
+
         writeParts(message, exchange, operation, objs, parts);
     }
 

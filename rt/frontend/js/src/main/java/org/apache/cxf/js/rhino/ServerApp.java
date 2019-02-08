@@ -21,7 +21,6 @@ package org.apache.cxf.js.rhino;
 
 import java.io.File;
 import java.io.FileFilter;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -140,9 +139,8 @@ public class ServerApp {
             if (f.isFile()) {
                 String name = f.getName();
                 return name.endsWith(".js") || name.endsWith(".jsx");
-            } else {
-                return false;
             }
+            return false;
         }
     }
 }

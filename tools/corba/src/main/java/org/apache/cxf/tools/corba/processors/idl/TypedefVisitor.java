@@ -32,18 +32,18 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class TypedefVisitor extends VisitorBase {
-    
+
     public TypedefVisitor(Scope scope,
                           Definition defn,
                           XmlSchema schemaRef,
                           WSDLASTVisitor wsdlVisitor) {
         super(scope, defn, schemaRef, wsdlVisitor);
     }
-    
+
     public static boolean accept(AST node) {
         return node.getType() == IDLTokenTypes.LITERAL_typedef;
     }
-    
+
     public void visit(AST typedefNode) {
         // "typedef" <type_declarator>
         // <type_declarator> ::= <type_spec> <declarators>
@@ -61,7 +61,7 @@ public class TypedefVisitor extends VisitorBase {
         CorbaType corbaType = typesVisitor.getCorbaType();
         Scope fullyQualifiedName = typesVisitor.getFullyQualifiedName();
         Scope typedefScope = new Scope(getScope(), identifierNode);
-        
+
         if (SequenceVisitor.accept(typeDeclaratorNode)
             || FixedVisitor.accept(typeDeclaratorNode)) {
             // Handle cases "typedef sequence"
@@ -89,11 +89,11 @@ public class TypedefVisitor extends VisitorBase {
                                                                             corbaType,
                                                                             fullyQualifiedName);
                 declaratorVisitor.visit(identifierNode);
-  
+
             } else {
                 // unbounded string type is already in the XmlSchema and only needs to be added
                 // to the CorbaTypeMap, therefore we cannot use DeclaratorVisitor here.
-                
+
                 while (identifierNode != null) {
                     if (ArrayVisitor.accept(identifierNode)) {
                         ArrayVisitor arrayVisitor = new ArrayVisitor(new Scope(getScope(),
@@ -136,20 +136,20 @@ public class TypedefVisitor extends VisitorBase {
                                                                         corbaType,
                                                                         fullyQualifiedName);
             declaratorVisitor.visit(identifierNode);
-        
+
         }
 
 
         setSchemaType(schemaType);
         setCorbaType(corbaType);
         setFullyQualifiedName(fullyQualifiedName);
-    }    
-    
+    }
+
     private void generateAlias(AST identifierNode,
                                XmlSchemaType schemaType,
                                CorbaType corbaType,
                                Scope fqName) {
-    
+
         Scope scopedName = new Scope(getScope(), identifierNode);
         // corba:alias
         Alias alias = new Alias();
@@ -160,28 +160,28 @@ public class TypedefVisitor extends VisitorBase {
         } else if (schemaType == null) {
             wsdlVisitor.getDeferredActions().
                 add(fqName, new TypedefDeferredAction(alias));
-            scopedNames.add(scopedName);         
+            scopedNames.add(scopedName);
         }
         alias.setRepositoryID(scopedName.toIDLRepositoryID());
-        
+
         // add corba:alias
         setCorbaType(alias);
     }
-    
+
     private void generateStringAlias(AST typeDeclaratorNode,
                                      AST identifierNode,
                                      XmlSchemaType schemaType,
                                      CorbaType corbaType,
                                      Scope fqName) {
-        
+
         Scope typedefScope = new Scope(getScope(), identifierNode);
-        
+
         Alias corbaString = new Alias();
         if (typeDeclaratorNode.getType() == IDLTokenTypes.LITERAL_string) {
             corbaString.setBasetype(CorbaConstants.NT_CORBA_STRING);
         } else if (typeDeclaratorNode.getType() == IDLTokenTypes.LITERAL_wstring) {
             corbaString.setBasetype(CorbaConstants.NT_CORBA_WSTRING);
-        } else { 
+        } else {
             // should never get here
             throw new RuntimeException("[TypedefVisitor] Attempted to visit an invalid node: "
                                        + typeDeclaratorNode.toString());
@@ -189,11 +189,11 @@ public class TypedefVisitor extends VisitorBase {
         Scope newScope = new Scope(typedefScope.getParent(), identifierNode);
         corbaString.setQName(new QName(typeMap.getTargetNamespace(), newScope.toString()));
         corbaString.setType(Constants.XSD_STRING);
-        corbaString.setRepositoryID(newScope.toIDLRepositoryID());       
+        corbaString.setRepositoryID(newScope.toIDLRepositoryID());
 
         typeMap.getStructOrExceptionOrUnion().add(corbaString);
 
     }
-    
-    
+
+
 }

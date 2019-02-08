@@ -22,7 +22,7 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 
 public interface TokenCancellerParametersSupport {
-    
+
     TokenCancellerParameters getTokenParameters();
-    
+
 }

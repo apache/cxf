@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.spring;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,12 +52,12 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanDefinitionParser {
-    
+
     public JAXRSClientFactoryBeanDefinitionParser() {
         super();
         setBeanClass(Object.class);
     }
-    
+
     @Override
     protected Class<?> getFactoryClass() {
         return JAXRSSpringClientFactoryBean.class;
@@ -71,7 +72,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
     protected String getSuffix() {
         return ".jaxrs-client";
     }
-    
+
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
         if ("serviceName".equals(name)) {
@@ -79,9 +80,9 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             bean.addPropertyValue(name, q);
         } else if ("basePackages".equals(name)) {
             bean.addPropertyValue("basePackages", ClasspathScanner.parsePackages(val));
-        } else { 
+        } else {
             mapToProperty(bean, name, val);
-        } 
+        }
     }
 
     @Override
@@ -90,7 +91,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             Map<?, ?> map = ctx.getDelegate().parseMapElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, map);
         } else if ("executor".equals(name)) {
-            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");         
+            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");
         } else if ("binding".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, "bindingConfig");
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
@@ -105,48 +106,47 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             List<UserResource> resources = ResourceUtils.getResourcesFromElement(el);
             bean.addPropertyValue("modelBeans", resources);
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
 
     public static class JAXRSSpringClientFactoryBean extends JAXRSClientFactoryBean
         implements ApplicationContextAware {
-    
+
         private List<String> basePackages;
-        
+
         public JAXRSSpringClientFactoryBean() {
             super();
         }
-    
+
         public void setBasePackages(List<String> basePackages) {
             this.basePackages = basePackages;
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             try {
                 if (basePackages != null) {
-                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                         ClasspathScanner.findClasses(basePackages, Path.class, Provider.class);
-                    
+
                     if (classes.get(Path.class).size() > 1) {
-                        throw new NoUniqueBeanDefinitionException(Path.class, classes.get(Path.class).size(), 
+                        throw new NoUniqueBeanDefinitionException(Path.class, classes.get(Path.class).size(),
                             "More than one service class (@Path) has been discovered");
-                    } else {
-                        AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
-                        for (final Class< ? > providerClass: classes.get(Provider.class)) {
-                            Object bean = null;
-                            try {
-                                bean = beanFactory.createBean(providerClass, 
-                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-                            } catch (Exception ex) {
-                                bean = beanFactory.createBean(providerClass);
-                            }
-                            setProvider(bean);
+                    }
+                    AutowireCapableBeanFactory beanFactory = ctx.getAutowireCapableBeanFactory();
+                    for (final Class< ? > providerClass: classes.get(Provider.class)) {
+                        Object bean = null;
+                        try {
+                            bean = beanFactory.createBean(providerClass,
+                                                   AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+                        } catch (Exception ex) {
+                            bean = beanFactory.createBean(providerClass);
                         }
-                        
-                        for (final Class< ? > serviceClass: classes.get(Path.class)) {                        
-                            setServiceClass(serviceClass);
-                        }
+                        setProvider(bean);
+                    }
+
+                    for (final Class< ? > serviceClass: classes.get(Path.class)) {
+                        setServiceClass(serviceClass);
                     }
                 }
             } catch (IOException ex) {
@@ -154,11 +154,34 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             } catch (ClassNotFoundException ex) {
                 throw new BeanCreationException("Failed to create bean from classfile", ex);
             }
-                
+
             if (bus == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
             }
         }
     }
 
+    static Class<?> getServiceClass(Collection<Class<?>> rootClasses) {
+        for (Class<?> cls : rootClasses) {
+            if (cls.isInterface()) {
+                return cls;
+            }
+        }
+        return rootClasses.iterator().next();
+    }
+    static List<Object> getProviders(ApplicationContext context, Collection<Class<?>> providerClasses) {
+        List<Object> providers = new LinkedList<>();
+        AutowireCapableBeanFactory beanFactory = context.getAutowireCapableBeanFactory();
+        for (final Class< ? > providerClass: providerClasses) {
+            Object bean = null;
+            try {
+                bean = beanFactory.createBean(providerClass,
+                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+            } catch (Exception ex) {
+                bean = beanFactory.createBean(providerClass);
+            }
+            providers.add(bean);
+        }
+        return providers;
+    }
 }

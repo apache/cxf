@@ -32,21 +32,20 @@ public class ApplicationInfo extends ProviderInfo<Application> {
     public ApplicationInfo(Application provider, Bus bus) {
         this(provider, null, bus);
     }
-    public ApplicationInfo(Application provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+    public ApplicationInfo(Application provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus) {
         super(provider, constructorProxies, bus, true);
     }
-    
+
     public Map<String, Object> getProperties() {
         Map<String, Object> appProps = super.getProvider().getProperties();
         if (overridingProps.isEmpty()) {
             return appProps;
-        } else {
-            Map<String, Object> props = new HashMap<String, Object>(appProps);
-            props.putAll(overridingProps);
-            return props;
         }
+        Map<String, Object> props = new HashMap<>(appProps);
+        props.putAll(overridingProps);
+        return props;
     }
     public void setOverridingProps(Map<String, Object> overridingProps) {
         this.overridingProps = overridingProps;

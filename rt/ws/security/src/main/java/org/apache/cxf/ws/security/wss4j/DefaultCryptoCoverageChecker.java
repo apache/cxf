@@ -29,62 +29,62 @@ import org.apache.wss4j.dom.WSConstants;
  * if the SOAP (1.1 + 1.2) Body was signed and/or encrypted, if the Timestamp was signed,
  * if the WS-Addressing ReplyTo and FaultTo headers were signed, and if the UsernameToken
  * was encrypted.
- * 
+ *
  * The default configuration is that the SOAP Body, Timestamp must be signed, WS-Addressing
  * ReplyTo and FaultTo headers must be signed, and a WSS UsernameToken must be encrypted
  * (if they exist in the message payload).
  */
 public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
-    
+
     public static final String SOAP_NS = WSConstants.URI_SOAP11_ENV;
     public static final String SOAP12_NS = WSConstants.URI_SOAP12_ENV;
     public static final String WSU_NS = WSConstants.WSU_NS;
     public static final String WSSE_NS = WSConstants.WSSE_NS;
     public static final String WSA_NS = Names.WSA_NAMESPACE_NAME;
-    
+
     private boolean signBody;
     private boolean signTimestamp;
     private boolean encryptBody;
     private boolean signAddressingHeaders;
     private boolean signUsernameToken;
     private boolean encryptUsernameToken;
-    
+
     /**
      * Creates a new instance. Enforces that the SOAP Body, Timestamp, and WS-Addressing
      * ReplyTo and FaultTo headers must be signed (if they exist in the message payload).
      */
     public DefaultCryptoCoverageChecker() {
         super(null, null);
-        
+
         prefixMap.put("soapenv", SOAP_NS);
         prefixMap.put("soapenv12", SOAP12_NS);
         prefixMap.put("wsu", WSU_NS);
         prefixMap.put("wsse", WSSE_NS);
         prefixMap.put("wsa", WSA_NS);
-        
+
         // Sign SOAP Body
         setSignBody(true);
-        
+
         // Sign Timestamp
         setSignTimestamp(true);
-        
+
         // Sign Addressing Headers
         setSignAddressingHeaders(true);
-        
+
         // Encrypt UsernameToken
         setEncryptUsernameToken(true);
     }
-    
+
     public boolean isSignBody() {
         return signBody;
     }
 
     public final void setSignBody(boolean signBody) {
         this.signBody = signBody;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression("/soapenv:Envelope/soapenv:Body", CoverageType.SIGNED);
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression("/soapenv12:Envelope/soapenv12:Body", CoverageType.SIGNED);
 
         if (signBody) {
@@ -110,18 +110,18 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
 
     public final void setSignTimestamp(boolean signTimestamp) {
         this.signTimestamp = signTimestamp;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression(
-                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsu:Timestamp", 
+                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsu:Timestamp",
                 CoverageType.SIGNED
             );
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression(
-                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsu:Timestamp", 
+                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsu:Timestamp",
                 CoverageType.SIGNED
             );
-        
+
         if (signTimestamp) {
             if (!xPaths.contains(soap11Expression)) {
                 xPaths.add(soap11Expression);
@@ -145,11 +145,11 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
 
     public final void setEncryptBody(boolean encryptBody) {
         this.encryptBody = encryptBody;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression("/soapenv:Envelope/soapenv:Body", CoverageType.ENCRYPTED,
                     CoverageScope.CONTENT);
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression("/soapenv12:Envelope/soapenv12:Body", CoverageType.ENCRYPTED,
                     CoverageScope.CONTENT);
 
@@ -176,25 +176,25 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
 
     public final void setSignAddressingHeaders(boolean signAddressingHeaders) {
         this.signAddressingHeaders = signAddressingHeaders;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression(
-                "/soapenv:Envelope/soapenv:Header/wsa:ReplyTo", 
+                "/soapenv:Envelope/soapenv:Header/wsa:ReplyTo",
                 CoverageType.SIGNED
             );
-        XPathExpression soap11Expression2 = 
+        XPathExpression soap11Expression2 =
             new XPathExpression(
-                "/soapenv:Envelope/soapenv:Header/wsa:FaultTo", 
+                "/soapenv:Envelope/soapenv:Header/wsa:FaultTo",
                 CoverageType.SIGNED
             );
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression(
-                "/soapenv12:Envelope/soapenv12:Header/wsa:ReplyTo", 
+                "/soapenv12:Envelope/soapenv12:Header/wsa:ReplyTo",
                 CoverageType.SIGNED
             );
-        XPathExpression soap12Expression2 = 
+        XPathExpression soap12Expression2 =
             new XPathExpression(
-                "/soapenv12:Envelope/soapenv12:Header/wsa:FaultTo", 
+                "/soapenv12:Envelope/soapenv12:Header/wsa:FaultTo",
                 CoverageType.SIGNED
             );
 
@@ -231,17 +231,17 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
         return encryptUsernameToken;
     }
 
-    public void setEncryptUsernameToken(boolean encryptUsernameToken) {
+    public final void setEncryptUsernameToken(boolean encryptUsernameToken) {
         this.encryptUsernameToken = encryptUsernameToken;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression(
-                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken", 
+                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken",
                 CoverageType.ENCRYPTED
             );
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression(
-                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken", 
+                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken",
                 CoverageType.ENCRYPTED
             );
 
@@ -268,15 +268,15 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
 
     public void setSignUsernameToken(boolean signUsernameToken) {
         this.signUsernameToken = signUsernameToken;
-        
-        XPathExpression soap11Expression = 
+
+        XPathExpression soap11Expression =
             new XPathExpression(
-                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken", 
+                "/soapenv:Envelope/soapenv:Header/wsse:Security/wsse:UsernameToken",
                 CoverageType.SIGNED
             );
-        XPathExpression soap12Expression = 
+        XPathExpression soap12Expression =
             new XPathExpression(
-                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken", 
+                "/soapenv12:Envelope/soapenv12:Header/wsse:Security/wsse:UsernameToken",
                 CoverageType.SIGNED
             );
 
@@ -296,5 +296,5 @@ public class DefaultCryptoCoverageChecker extends CryptoCoverageChecker {
             }
         }
     }
-    
+
 }

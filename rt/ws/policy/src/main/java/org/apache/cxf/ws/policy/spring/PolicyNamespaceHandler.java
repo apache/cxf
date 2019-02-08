@@ -22,6 +22,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class PolicyNamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("Policy", new PolicyBeanDefinitionParser()); 
+        registerBeanDefinitionParser("Policy", new PolicyBeanDefinitionParser());
     }
 }

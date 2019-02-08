@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.AddNumbers;
 import org.apache.cxf.aegis.services.ArrayService;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +38,7 @@ import org.junit.Test;
  */
 public class ParameterMappingTest extends AbstractAegisTest {
 
-    @Before 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         setEnableJDOM(true); // there are JDOM types in here.
@@ -53,8 +54,8 @@ public class ParameterMappingTest extends AbstractAegisTest {
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
         assertValid("/wsdl:definitions/wsdl:types/"
                     + "xsd:schema[@targetNamespace='http://services.aegis.cxf.apache.org']"
-                    + "/xsd:complexType[@name='add']" 
-                    + "/xsd:sequence" 
+                    + "/xsd:complexType[@name='add']"
+                    + "/xsd:sequence"
                     + "/xsd:element[@name='value1']", doc);
         assertValid(
                     "/wsdl:definitions/wsdl:types/"
@@ -62,7 +63,7 @@ public class ParameterMappingTest extends AbstractAegisTest {
                         + "/xsd:complexType[@name='unmappedAdd']" + "/xsd:sequence"
                         + "/xsd:element[@name='one']", doc);
     }
-    
+
     @Test
     public void testNamedParameter() throws Exception {
         Node doc = getWSDLDocument("ArrayService");
@@ -71,8 +72,8 @@ public class ParameterMappingTest extends AbstractAegisTest {
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
         assertValid("/wsdl:definitions/wsdl:types/"
                     + "xsd:schema[@targetNamespace= 'http://services.aegis.cxf.apache.org']"
-                    + "/xsd:complexType[@name='verifyCustomParamName']" 
-                    + "/xsd:sequence" 
+                    + "/xsd:complexType[@name='verifyCustomParamName']"
+                    + "/xsd:sequence"
                     + "/xsd:element[@name='custom']", doc);
     }
 
@@ -84,8 +85,8 @@ public class ParameterMappingTest extends AbstractAegisTest {
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(def, sink);
         assertXPathEquals("/wsdl:definitions/wsdl:types/"
                     + "xsd:schema[@targetNamespace= 'http://services.aegis.cxf.apache.org']"
-                    + "/xsd:complexType[@name='ArrayOfString-2-50']" 
-                    + "/xsd:sequence" 
+                    + "/xsd:complexType[@name='ArrayOfString-2-50']"
+                    + "/xsd:sequence"
                     + "/xsd:element[@name='string']/@minOccurs", "2", doc);
     }
 }

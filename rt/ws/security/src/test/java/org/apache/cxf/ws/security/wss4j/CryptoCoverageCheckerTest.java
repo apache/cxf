@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
@@ -40,21 +41,22 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageChecker.XPathExpression;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageScope;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ConfigurationConstants;
+
 import org.junit.Test;
 
-
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
-    
+
     @Test
     public void testOrder() throws Exception {
         //make sure the interceptors get ordered correctly
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(new Phase(Phase.PRE_PROTOCOL, 1));
-        
-        List<Interceptor<? extends Message>> lst = 
-            new ArrayList<Interceptor<? extends Message>>();
+
+        List<Interceptor<? extends Message>> lst = new ArrayList<>();
         lst.add(new MustUnderstandInterceptor());
         lst.add(new WSS4JInInterceptor());
         lst.add(new SAAJInInterceptor());
@@ -65,7 +67,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
         assertTrue(output.contains("MustUnderstandInterceptor, SAAJInInterceptor, "
                 + "WSS4JInInterceptor, CryptoCoverageChecker"));
     }
-    
+
     @Test
     public void testSignedWithIncompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -74,7 +76,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 false);
-        
+
         // This is mostly testing that things work with no prefixes.
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
@@ -82,7 +84,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//*", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 false);
-        
+
         // This is mostly testing that things work with no expressions.
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
@@ -90,7 +92,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 null,
                 true);
     }
-    
+
     @Test
     public void testSignedWithCompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -98,7 +100,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 null,
                 null,
                 true);
-        
+
         this.runInterceptorAndValidate(
                 "signed_x509_issuer_serial.xml",
                 this.getPrefixes(),
@@ -106,7 +108,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                         "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 true);
     }
-    
+
     @Test
     public void testEncryptedWithIncompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -115,14 +117,14 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 false);
-        
+
         this.runInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 this.getPrefixes(),
                 Arrays.asList(new XPathExpression(
                         "//soap:Body", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 false);
-        
+
         this.runInterceptorAndValidate(
                 "encrypted_body_element.xml",
                 this.getPrefixes(),
@@ -130,7 +132,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                         "//soap:Body", CoverageType.ENCRYPTED, CoverageScope.CONTENT)),
                 false);
     }
-    
+
     @Test
     public void testEncryptedWithCompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -139,14 +141,14 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 Arrays.asList(new XPathExpression(
                         "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 true);
-        
+
         this.runInterceptorAndValidate(
                 "encrypted_body_element.xml",
                 this.getPrefixes(),
                 Arrays.asList(new XPathExpression(
                         "//soap:Body", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 true);
-        
+
         this.runInterceptorAndValidate(
                 "encrypted_body_content.xml",
                 this.getPrefixes(),
@@ -154,7 +156,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                         "//soap:Body", CoverageType.ENCRYPTED, CoverageScope.CONTENT)),
                 true);
     }
-    
+
     @Test
     public void testEncryptedSignedWithIncompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -164,7 +166,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                         "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
                 false);
     }
-    
+
     @Test
     public void testEncryptedSignedWithCompleteCoverage() throws Exception {
         this.runInterceptorAndValidate(
@@ -176,7 +178,7 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                         new XPathExpression(
                                 "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 true);
-        
+
         this.runInterceptorAndValidate(
                "wss-242.xml",
                this.getPrefixes(),
@@ -197,28 +199,28 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                                 "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
                 true);
     }
-    
+
     private Map<String, String> getPrefixes() {
-        final Map<String, String> prefixes = new HashMap<String, String>();
+        final Map<String, String> prefixes = new HashMap<>();
         prefixes.put("ser", "http://www.sdj.pl");
         prefixes.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
-        
+
         return prefixes;
     }
-    
+
     private void runInterceptorAndValidate(
             String document,
-            Map<String, String> prefixes, 
+            Map<String, String> prefixes,
             List<XPathExpression> xpaths,
             boolean pass) throws Exception {
-        
+
         final Document doc = this.readDocument(document);
         final SoapMessage msg = this.getSoapMessageForDom(doc);
         final CryptoCoverageChecker checker = new CryptoCoverageChecker(prefixes, xpaths);
         final PhaseInterceptor<SoapMessage> wss4jInInterceptor = this.getWss4jInInterceptor();
-        
+
         wss4jInInterceptor.handleMessage(msg);
-        
+
         try {
             checker.handleMessage(msg);
             if (!pass) {
@@ -228,25 +230,25 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
             if (pass) {
                 fail("Failed interceptor erroneously.");
             }
-            
+
             assertTrue(e.getMessage().contains("element found matching XPath"));
         }
     }
-    
+
     private PhaseInterceptor<SoapMessage> getWss4jInInterceptor() {
         final WSS4JInInterceptor inHandler = new WSS4JInInterceptor(true);
-        final String action = WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT;
-        
-        inHandler.setProperty(WSHandlerConstants.ACTION, action);
-        inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, 
+        final String action = ConfigurationConstants.SIGNATURE + " " + ConfigurationConstants.ENCRYPT;
+
+        inHandler.setProperty(ConfigurationConstants.ACTION, action);
+        inHandler.setProperty(ConfigurationConstants.SIG_VER_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+        inHandler.setProperty(ConfigurationConstants.DEC_PROP_FILE,
                 "insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
+        inHandler.setProperty(ConfigurationConstants.PW_CALLBACK_CLASS,
                 TestPwdCallback.class.getName());
-        inHandler.setProperty(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
-        inHandler.setProperty(WSHandlerConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
-        
+        inHandler.setProperty(ConfigurationConstants.IS_BSP_COMPLIANT, "false");
+        inHandler.setProperty(ConfigurationConstants.ALLOW_RSA15_KEY_TRANSPORT_ALGORITHM, "true");
+
         return inHandler;
     }
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -38,11 +39,11 @@ import org.apache.cxf.common.util.StringUtils;
  * location, it will just walk into it instead of creating a new element
  */
 public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
+    protected boolean isOverlaid = true;
 
-    List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
-    boolean isOverlaid = true;
+    List<Boolean> isOverlaidStack = new LinkedList<>();
     Boolean textOverlay;
-    
+
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
     }
@@ -53,6 +54,11 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     public OverlayW3CDOMStreamWriter(Document doc, Element e) {
         super(doc, e);
     }
+    public OverlayW3CDOMStreamWriter(Document doc, DocumentFragment frag) {
+        super(doc, frag);
+        isOverlaid = false;
+    }
+
 
     @Override
     protected void createAndAddElement(String prefix, String local, String namespace) {
@@ -101,7 +107,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } catch (Throwable t) {
                     //ignore - non DOM level 3
                 }
-                if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                if (nd2.getNodeType() == Node.ELEMENT_NODE
                     && local.equals(nd2.getLocalName())
                     && StringUtils.isEmpty(nd2.getNamespaceURI())
                     && userData != null) {
@@ -142,7 +148,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } catch (Throwable t) {
                     //ignore - non DOM level 3
                 }
-                if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                if (nd2.getNodeType() == Node.ELEMENT_NODE
                     && local.equals(nd2.getLocalName())
                     && namespace.equals(nd2.getNamespaceURI())
                     && userData == null) {
@@ -164,7 +170,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
     }
 
     public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
+        if (prefix == null || prefix.isEmpty()) {
             writeStartElement(namespace, local);
         } else {
             isOverlaidStack.add(0, isOverlaid);
@@ -176,7 +182,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } else {
                     nd2 = nd.getFirstChild();
                 }
-                
+
                 while (nd2 != null) {
                     Object userData = null;
                     try {
@@ -185,7 +191,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                         //ignore - non DOM level 3
                     }
 
-                    if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                    if (nd2.getNodeType() == Node.ELEMENT_NODE
                         && local.equals(nd2.getLocalName())
                         && namespace.equals(nd2.getNamespaceURI())
                         && userData == null) {
@@ -206,7 +212,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             textOverlay = false;
         }
     }
-    
+
     public void writeCharacters(String text) throws XMLStreamException {
         if (!isOverlaid || textOverlay == null) {
             super.writeCharacters(text);
@@ -220,8 +226,8 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             }
             super.writeCharacters(text);
         }
-        
+
     }
 
-    
+
 }

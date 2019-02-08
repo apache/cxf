@@ -36,10 +36,10 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
  * Tokens with HolderOfKey Subject Confirmation.
  */
 public class HOKDelegationHandler extends SAMLDelegationHandler {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(HOKDelegationHandler.class);
-    
+
     /**
      * Is Delegation allowed for a particular token
      */
@@ -73,5 +73,5 @@ public class HOKDelegationHandler extends SAMLDelegationHandler {
 
         return true;
     }
-    
+
 }

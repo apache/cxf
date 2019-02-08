@@ -25,11 +25,14 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.test.AbstractCXFSpringTest;
-import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 /**
- * 
+ *
  */
 public class MissingQualification1226Test extends AbstractCXFSpringTest {
 
@@ -43,7 +46,7 @@ public class MissingQualification1226Test extends AbstractCXFSpringTest {
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Test
     public void lookForMissingNamespace() throws Exception {
         EndpointImpl endpoint = getBean(EndpointImpl.class, "helloWorld");

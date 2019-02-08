@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.xkms.crypto.CryptoProviderException;
 import org.apache.cxf.xkms.crypto.CryptoProviderFactory;
 import org.apache.wss4j.common.crypto.Crypto;
@@ -33,27 +32,27 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 /**
  * For usage in OSGi this factory will be published as a service.
- * Outside OSGi it can be used directly 
+ * Outside OSGi it can be used directly
  */
 public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
-    
+
     private final XKMSPortType xkmsConsumer;
-        
+
     public XkmsCryptoProviderFactory(XKMSPortType xkmsConsumer) {
         this.xkmsConsumer = xkmsConsumer;
     }
 
     @Override
     public Crypto create(Message message) {
-        Object crypto = 
-            SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
+        Object crypto = SecurityUtils
+            .getSecurityPropertyValue(org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_CRYPTO, message);
         if (crypto instanceof Crypto) {
             new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
         }
-        
+
         Properties keystoreProps = CryptoProviderUtils
             .loadKeystoreProperties(message,
-                                    SecurityConstants.SIGNATURE_PROPERTIES);
+                                    org.apache.cxf.rt.security.SecurityConstants.SIGNATURE_PROPERTIES);
         try {
             Crypto defaultCrypto = CryptoFactory.getInstance(keystoreProps);
             return new XkmsCryptoProvider(xkmsConsumer, defaultCrypto);

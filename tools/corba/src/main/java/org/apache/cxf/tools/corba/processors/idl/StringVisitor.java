@@ -73,7 +73,7 @@ public class StringVisitor extends VisitorBase {
 
         stringNode = node;
         boundNode = stringNode.getFirstChild();
-        
+
         //get chance to check if bound is symbol name which defined as const,
         //if so, replace the symbol name with defined const
         if (boundNode != null) {
@@ -129,7 +129,7 @@ public class StringVisitor extends VisitorBase {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
             anonstring.setQName(new QName(typeMap.getTargetNamespace(), stringScopedName.toString()));
-            anonstring.setBound(Long.valueOf(boundNode.toString()));
+            anonstring.setBound(Long.parseLong(boundNode.toString()));
             anonstring.setType(simpleType.getQName());
 
             anon = anonstring;
@@ -138,7 +138,7 @@ public class StringVisitor extends VisitorBase {
             // corba:anonwstring
             Anonwstring anonwstring = new Anonwstring();
             anonwstring.setQName(new QName(typeMap.getTargetNamespace(), stringScopedName.toString()));
-            anonwstring.setBound(Long.valueOf(boundNode.toString()));
+            anonwstring.setBound(Long.parseLong(boundNode.toString()));
             anonwstring.setType(simpleType.getQName());
 
             anon = anonwstring;
@@ -174,7 +174,7 @@ public class StringVisitor extends VisitorBase {
             // corba:anonstring
             Anonstring anonstring = new Anonstring();
             anonstring.setQName(new QName(typeMap.getTargetNamespace(), anonstringName));
-            anonstring.setBound(Long.valueOf(boundNode.toString()));
+            anonstring.setBound(Long.parseLong(boundNode.toString()));
             anonstring.setType(simpleType.getQName());
 
             anon = anonstring;

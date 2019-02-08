@@ -36,7 +36,6 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerDelegate;
 import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
-
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
@@ -59,36 +58,36 @@ import org.apache.cxf.management.jmx.type.JMXConnectorPolicyType;
 /**
  * The manager class for the JMXManagedComponent which hosts the JMXManagedComponents.
  */
-public class InstrumentationManagerImpl extends JMXConnectorPolicyType 
+public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     implements InstrumentationManager, BusLifeCycleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(InstrumentationManagerImpl.class);
 
-    private static Map<String, String>mbeanServerIDMap = new HashMap<String, String>();
+    private static Map<String, String>mbeanServerIDMap = new HashMap<>();
 
     private Bus bus;
-    private MBServerConnectorFactory mcf;    
+    private MBServerConnectorFactory mcf;
     private MBeanServer mbs;
-    private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
+    private Set<ObjectName> busMBeans = new HashSet<>();
     private boolean connectFailed;
     private String persistentBusId;
-    
+
     /**
      * For backward compatibility, {@link #createMBServerConnectorFactory} is <code>true</code> by default.
      */
     private boolean createMBServerConnectorFactory = true;
     private String mbeanServerName = ManagementConstants.DEFAULT_DOMAIN_NAME;
     private boolean usePlatformMBeanServer;
-    
+
     public InstrumentationManagerImpl() {
         super();
     }
-    
+
     public InstrumentationManagerImpl(Bus bus) {
         this();
         readJMXProperties(bus);
         this.bus = bus;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -118,20 +117,20 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public void setServerName(String s) {
         mbeanServerName = s;
     }
-    
+
     public void setCreateMBServerConnectorFactory(boolean createMBServerConnectorFactory) {
         this.createMBServerConnectorFactory = createMBServerConnectorFactory;
     }
-    
+
     public void setUsePlatformMBeanServer(Boolean flag) {
         usePlatformMBeanServer = flag;
     }
 
     @Deprecated
-    public void register() {    
+    public void register() {
     }
-    
-    @PostConstruct     
+
+    @PostConstruct
     public void init() {
         if (bus != null && bus.getExtension(MBeanServer.class) != null) {
             enabled = true;
@@ -149,7 +148,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     if (mbeanServerID != null) {
                         servers = CastUtils.cast(MBeanServerFactory.findMBeanServer(mbeanServerID));
                     }
-                    if (servers == null || servers.size() == 0) {
+                    if (servers == null || servers.isEmpty()) {
                         mbs = MBeanServerFactory.createMBeanServer(mbeanServerName);
                         try {
                             mbeanServerID = (String) mbs.getAttribute(getDelegateName(),
@@ -163,7 +162,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                     }
                 }
             }
-            
+
             if (createMBServerConnectorFactory) {
                 mcf = MBServerConnectorFactory.getInstance();
                 mcf.setMBeanServer(mbs);
@@ -178,11 +177,11 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 }
             }
 
-            if (!connectFailed && null != bus) {            
+            if (!connectFailed && null != bus) {
                 try {
-                    //Register Bus here since we can guarantee that Instrumentation 
+                    //Register Bus here since we can guarantee that Instrumentation
                     //infrastructure has been initialized.
-                    ManagedBus mbus = new ManagedBus(bus);                    
+                    ManagedBus mbus = new ManagedBus(bus);
                     register(mbus);
                     if (LOG.isLoggable(Level.INFO)) {
                         LOG.info("registered " + mbus.getObjectName());
@@ -198,10 +197,10 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             BusLifeCycleManager blcm = bus.getExtension(BusLifeCycleManager.class);
             if (null != blcm) {
                 blcm.registerLifeCycleListener(this);
-            }    
-        }        
+            }
+        }
     }
-    
+
     private ObjectName getDelegateName() throws JMException {
         try {
             return (ObjectName)MBeanServerDelegate.class.getField("DELEGATE_NAME").get(null);
@@ -218,65 +217,65 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
 
     public void register(Object obj, ObjectName name) throws JMException {
-        register(obj, name, false);        
+        register(obj, name, false);
     }
-    
+
     public void register(Object obj, ObjectName name, boolean forceRegistration) throws JMException {
         if (!isEnabled() || connectFailed) {
-            return;           
+            return;
         }
         //Try to register as a Standard MBean
         try {
-            registerMBeanWithServer(obj, persist(name), forceRegistration);           
-        } catch (NotCompliantMBeanException e) {        
+            registerMBeanWithServer(obj, persist(name), forceRegistration);
+        } catch (NotCompliantMBeanException e) {
             //If this is not a "normal" MBean, then try to deploy it using JMX annotations
             ModelMBeanAssembler assembler = new ModelMBeanAssembler();
             ModelMBeanInfo mbi = assembler.getModelMbeanInfo(obj.getClass());
             register(obj, name, mbi, forceRegistration);
-        }                
+        }
     }
 
     public ObjectName register(ManagedComponent i) throws JMException {
-        ObjectName name = register(i, false);
-        
-        return name;
+        return register(i, false);
     }
-    
+
     public ObjectName register(ManagedComponent i, boolean forceRegistration) throws JMException {
         ObjectName name = i.getObjectName();
         register(i, name, forceRegistration);
-        
         return name;
-    }    
+    }
 
-    
+
     public void unregister(ManagedComponent component) throws JMException {
         ObjectName name = component.getObjectName();
         unregister(persist(name));
     }
-    
-    public void unregister(ObjectName name) throws JMException {  
+
+    public void unregister(ObjectName name) throws JMException {
         if (!isEnabled() || connectFailed) {
-            return;           
+            return;
         }
-        
-        busMBeans.remove(name);       
-        mbs.unregisterMBean(name);                    
-    }  
-    
-    public MBeanServer getMBeanServer() {        
+
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("unregistering MBean " + name);
+        }
+        busMBeans.remove(name);
+        mbs.unregisterMBean(name);
+    }
+
+    public MBeanServer getMBeanServer() {
         return mbs;
     }
 
     public void setServer(MBeanServer server) {
         this.mbs = server;
     }
-    
+
     public void shutdown() {
         if (!isEnabled()) {
-            return;           
+            return;
         }
-        
+
         if (mcf != null) {
             try {
                 mcf.destroy();
@@ -284,7 +283,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 LOG.log(Level.SEVERE, "STOP_CONNECTOR_FAILURE_MSG", new Object[] {ex});
             }
         }
-        
+
         //Using the array to hold the busMBeans to avoid the CurrentModificationException
         Object[] mBeans = busMBeans.toArray();
         for (Object name : mBeans) {
@@ -298,20 +297,20 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
 
     public void initComplete() {
-        
+
     }
-    
+
     public void preShutdown() {
-                
+
     }
-   
+
     public void postShutdown() {
         this.shutdown();
     }
-    
-    private void register(Object obj, ObjectName name, ModelMBeanInfo mbi, boolean forceRegistration) 
-        throws JMException {                  
-        RequiredModelMBean rtMBean = 
+
+    private void register(Object obj, ObjectName name, ModelMBeanInfo mbi, boolean forceRegistration)
+        throws JMException {
+        RequiredModelMBean rtMBean =
             (RequiredModelMBean)mbs.instantiate("javax.management.modelmbean.RequiredModelMBean");
         rtMBean.setModelMBeanInfo(mbi);
         try {
@@ -322,23 +321,23 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         registerMBeanWithServer(rtMBean, persist(name), forceRegistration);
     }
 
-    private void registerMBeanWithServer(Object obj, ObjectName name, boolean forceRegistration) 
+    private void registerMBeanWithServer(Object obj, ObjectName name, boolean forceRegistration)
         throws JMException {
         ObjectInstance instance = null;
         try {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("registering MBean " + name + ": " + obj);
             }
-            instance = mbs.registerMBean(obj, name);           
-        } catch (InstanceAlreadyExistsException e) {            
+            instance = mbs.registerMBean(obj, name);
+        } catch (InstanceAlreadyExistsException e) {
             if (forceRegistration) {
-                mbs.unregisterMBean(name);                
+                mbs.unregisterMBean(name);
                 instance = mbs.registerMBean(obj, name);
             } else {
                 throw e;
             }
         }
-        
+
         if (instance != null) {
             busMBeans.add(name);
         }
@@ -351,23 +350,23 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     public void setPersistentBusId(String id) {
         persistentBusId = sanitize(id);
     }
-    
+
     private ObjectName persist(ObjectName original) throws JMException {
         ObjectName persisted = original;
-        if (!(persistentBusId == null 
-              || "".equals(persistentBusId) 
+        if (!(persistentBusId == null
+              || "".equals(persistentBusId)
               || persistentBusId.startsWith("${"))) {
             String originalStr = original.toString();
             if (originalStr.indexOf(ManagementConstants.BUS_ID_PROP) != -1) {
-                String persistedStr = 
-                    originalStr.replaceFirst(ManagementConstants.BUS_ID_PROP + "=" + bus.getId(), 
+                String persistedStr =
+                    originalStr.replaceFirst(ManagementConstants.BUS_ID_PROP + "=" + bus.getId(),
                                              ManagementConstants.BUS_ID_PROP + "=" + persistentBusId);
                 persisted = new ObjectName(persistedStr);
             }
         }
         return persisted;
     }
-    
+
     private String sanitize(String in) {
         StringBuilder str = new StringBuilder(in.length());
         for (int x = 0; x < in.length(); x++) {
@@ -387,15 +386,15 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         }
         return str.toString();
     }
-    
+
     private void readJMXProperties(Bus b) {
         if (b != null) {
             persistentBusId = getBusProperty(b, "bus.jmx.persistentBusId", persistentBusId);
-            mbeanServerName = 
+            mbeanServerName =
                 getBusProperty(b, "bus.jmx.serverName", mbeanServerName);
-            usePlatformMBeanServer = 
+            usePlatformMBeanServer =
                 getBusProperty(b, "bus.jmx.usePlatformMBeanServer", usePlatformMBeanServer);
-            createMBServerConnectorFactory = 
+            createMBServerConnectorFactory =
                 getBusProperty(b, "bus.jmx.createMBServerConnectorFactory", createMBServerConnectorFactory);
             daemon = getBusProperty(b, "bus.jmx.daemon", daemon);
             threaded = getBusProperty(b, "bus.jmx.threaded", threaded);
@@ -414,7 +413,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         if (v instanceof Boolean) {
             return (Boolean)v;
         }
-        return v != null ? Boolean.valueOf(v.toString()) : dflt;       
+        return v != null ? Boolean.valueOf(v.toString()) : dflt;
     }
 }
 

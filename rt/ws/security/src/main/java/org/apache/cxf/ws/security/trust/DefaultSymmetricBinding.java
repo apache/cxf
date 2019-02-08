@@ -47,19 +47,19 @@ public class DefaultSymmetricBinding extends SymmetricBinding {
     public void setProtectionToken(ProtectionToken protectionToken) {
         super.setProtectionToken(protectionToken);
     }
-    
+
     public void setOnlySignEntireHeadersAndBody(boolean onlySignEntireHeadersAndBody) {
         super.setOnlySignEntireHeadersAndBody(onlySignEntireHeadersAndBody);
     }
-    
+
     public void setProtectTokens(boolean protectTokens) {
         super.setProtectTokens(protectTokens);
     }
-    
+
     public void setIncludeTimestamp(boolean includeTimestamp) {
         super.setIncludeTimestamp(includeTimestamp);
     }
-    
+
     public void setAlgorithmSuite(AlgorithmSuite algorithmSuite) {
         super.setAlgorithmSuite(algorithmSuite);
     }

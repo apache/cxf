@@ -38,11 +38,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 final class SpecExceptions {
-    
+
     private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
-    
+
     static {
-        EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
+        EXCEPTIONS_MAP = new HashMap<>();
         EXCEPTIONS_MAP.put(400, BadRequestException.class);
         EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
         EXCEPTIONS_MAP.put(403, ForbiddenException.class);
@@ -53,10 +53,10 @@ final class SpecExceptions {
         EXCEPTIONS_MAP.put(500, InternalServerErrorException.class);
         EXCEPTIONS_MAP.put(503, ServiceUnavailableException.class);
     }
-    
-    private SpecExceptions() {        
+
+    private SpecExceptions() {
     }
-    
+
     public static Class<?> getWebApplicationExceptionClass(Response exResponse,
                                                            Class<?> defaultExceptionType) {
         int status = exResponse.getStatus();
@@ -73,56 +73,55 @@ final class SpecExceptions {
         }
         return cls == null ? defaultExceptionType : cls;
     }
-    
+
     public static InternalServerErrorException toInternalServerErrorException(Throwable cause, Response response) {
-        
+
         return new InternalServerErrorException(checkResponse(response, 500), cause);
     }
-    
+
     public static BadRequestException toBadRequestException(Throwable cause, Response response) {
-        
+
         return new BadRequestException(checkResponse(response, 400), cause);
     }
-    
+
     public static NotFoundException toNotFoundException(Throwable cause, Response response) {
-        
+
         return new NotFoundException(checkResponse(response, 404), cause);
     }
-    
+
     public static NotAuthorizedException toNotAuthorizedException(Throwable cause, Response response) {
-        
+
         return new NotAuthorizedException(checkResponse(response, 401), cause);
     }
-    
+
     public static ForbiddenException toForbiddenException(Throwable cause, Response response) {
-        
+
         return new ForbiddenException(checkResponse(response, 403), cause);
     }
-    
+
     public static NotAcceptableException toNotAcceptableException(Throwable cause, Response response) {
-        
+
         return new NotAcceptableException(checkResponse(response, 406), cause);
     }
-    
+
     public static NotSupportedException toNotSupportedException(Throwable cause, Response response) {
-        
+
         return new NotSupportedException(checkResponse(response, 415), cause);
     }
-    
+
     public static WebApplicationException toHttpException(Throwable cause, Response response) {
-        
+
         if (response == null) {
             throw new WebApplicationException(cause);
         }
-        throw response.getStatus() >= 500 ? new ServerErrorException(response, cause) 
+        throw response.getStatus() >= 500 ? new ServerErrorException(response, cause)
             : new ClientErrorException(response, cause);
     }
-    
+
     private static Response checkResponse(Response r, int status) {
         if (r == null) {
             return JAXRSUtils.toResponse(status);
-        } else {
-            return r;
         }
+        return r;
     }
 }

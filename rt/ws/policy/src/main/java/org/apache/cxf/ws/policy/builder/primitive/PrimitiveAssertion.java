@@ -29,19 +29,19 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
- * 
+ *
  */
-public class PrimitiveAssertion 
+public class PrimitiveAssertion
     extends org.apache.neethi.builders.PrimitiveAssertion {
 
     public PrimitiveAssertion() {
         super();
     }
-    
+
     public PrimitiveAssertion(QName n) {
         super(n, false);
     }
-    
+
     public PrimitiveAssertion(QName n, boolean o) {
         super(n, o);
     }
@@ -51,13 +51,13 @@ public class PrimitiveAssertion
     public PrimitiveAssertion(QName n, boolean o, boolean i, Map<QName, String> atts) {
         super(n, o, i, atts);
     }
-    
+
     public PrimitiveAssertion(Element element) {
         super(new QName(element.getNamespaceURI(), element.getLocalName()),
               XMLPrimitiveAssertionBuilder.isOptional(element),
               XMLPrimitiveAssertionBuilder.isIgnorable(element));
     }
-    
+
     @Override
     protected Assertion clone(boolean opt) {
         if (opt == this.optional) {

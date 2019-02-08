@@ -50,15 +50,19 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocOutInterceptorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.fail;
+
+public class ColocOutInterceptorTest {
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocOutInterceptor colocOut;
@@ -68,7 +72,7 @@ public class ColocOutInterceptorTest extends Assert {
     public ColocOutInterceptorTest() {
         control.makeThreadSafe(true);
     }
-    
+
     @Before
     public void setUp() throws Exception {
         colocOut = new ColocOutInterceptor();
@@ -163,15 +167,15 @@ public class ColocOutInterceptorTest extends Assert {
     @Test
     public void testColocOutIsColocatedPropertySet() throws Exception {
         colocOut = new TestColocOutInterceptor1();
-        
+
         Bus bus = setupBus();
         ServerRegistry sr = control.createMock(ServerRegistry.class);
         EasyMock.expect(bus.getExtension(ServerRegistry.class)).andReturn(sr);
 
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         ex.put(Endpoint.class, sep);
         QName op = new QName("E", "F");
@@ -187,7 +191,7 @@ public class ColocOutInterceptorTest extends Assert {
         OperationInfo roi = rii.getOperation(op);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
         BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
-        
+
         ex.put(BindingOperationInfo.class, sboi);
         //Local var
         Service ses = control.createMock(Service.class);
@@ -197,7 +201,7 @@ public class ColocOutInterceptorTest extends Assert {
         Service res = control.createMock(Service.class);
         BindingInfo rbi = control.createMock(BindingInfo.class);
         EndpointInfo rei = control.createMock(EndpointInfo.class);
-        
+
         EasyMock.expect(sr.getServers()).andReturn(list);
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
@@ -220,7 +224,7 @@ public class ColocOutInterceptorTest extends Assert {
         msg.setInterceptorChain(chain);
         EasyMock.expect(sboi.getBinding()).andReturn(sbi);
         EasyMock.expect(sbi.getInterface()).andReturn(sii);
-        
+
         control.replay();
         colocOut.handleMessage(msg);
         assertEquals("COLOCATED property should be set",
@@ -229,10 +233,10 @@ public class ColocOutInterceptorTest extends Assert {
                      op, msg.get(Message.WSDL_OPERATION));
         assertEquals("Message.WSDL_INTERFACE property should be set",
                      intf, msg.get(Message.WSDL_INTERFACE));
-        
-        control.verify();        
+
+        control.verify();
     }
-    
+
     @Test
     public void testInvokeInboundChain() {
         //Reset Exchange on msg
@@ -243,13 +247,13 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(pm).times(2);
 
         Endpoint ep = control.createMock(Endpoint.class);
-        Binding  bd = control.createMock(Binding.class);
+        Binding bd = control.createMock(Binding.class);
         Service srv = control.createMock(Service.class);
         ex.setInMessage(msg);
         ex.put(Bus.class, bus);
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
-        
+
         EasyMock.expect(ep.getBinding()).andReturn(bd);
         EasyMock.expect(bd.createMessage()).andReturn(new MessageImpl());
         EasyMock.expect(ep.getInInterceptors())
@@ -259,7 +263,7 @@ public class ColocOutInterceptorTest extends Assert {
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(bus.getInInterceptors())
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        
+
         control.replay();
         colocOut.invokeInboundChain(ex, ep);
         Message inMsg = ex.getInMessage();
@@ -274,7 +278,7 @@ public class ColocOutInterceptorTest extends Assert {
                       Boolean.TRUE, ex.get(ClientImpl.FINISHED));
         control.verify();
     }
-    
+
     private void verifyIsColocatedWithNullList() {
         Server val = colocOut.isColocated(null, null, null);
         assertEquals("Is not a colocated call",
@@ -284,7 +288,7 @@ public class ColocOutInterceptorTest extends Assert {
     }
 
     private void verifyIsColocatedWithEmptyList() {
-        List<Server> list = new ArrayList<Server>();
+        List<Server> list = new ArrayList<>();
         //Local var
         Endpoint sep = control.createMock(Endpoint.class);
         Service ses = control.createMock(Service.class);
@@ -292,7 +296,7 @@ public class ColocOutInterceptorTest extends Assert {
 
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, null);
         assertEquals("Is not a colocated call",
@@ -304,8 +308,8 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentService() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         //Local var
         Service ses = control.createMock(Service.class);
@@ -318,7 +322,7 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(rep.getService()).andReturn(res);
         EasyMock.expect(ses.getName()).andReturn(new QName("A", "C"));
         EasyMock.expect(res.getName()).andReturn(new QName("A", "B"));
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, null);
         assertEquals("Is not a colocated call",
@@ -330,8 +334,8 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentEndpoint() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
         //Local var
@@ -351,7 +355,7 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(res.getName()).andReturn(new QName("A", "B"));
         EasyMock.expect(rei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(sei.getName()).andReturn(new QName("C", "E"));
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, sboi);
         assertEquals("Is not a colocated call",
@@ -363,14 +367,14 @@ public class ColocOutInterceptorTest extends Assert {
     private void verifyIsColocatedWithDifferentOperation() {
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
         //Local var
         Service ses = control.createMock(Service.class);
         ServiceInfo ssi = control.createMock(ServiceInfo.class);
-        EndpointInfo sei = control.createMock(EndpointInfo.class);        
+        EndpointInfo sei = control.createMock(EndpointInfo.class);
         TestBindingInfo rbi = new TestBindingInfo(ssi, "testBinding");
         Endpoint rep = control.createMock(Endpoint.class);
         Service res = control.createMock(Service.class);
@@ -390,13 +394,13 @@ public class ColocOutInterceptorTest extends Assert {
         //Causes ConcurrentModification intermittently
         //QName op = new QName("E", "F");
         //EasyMock.expect(rbi.getOperation(op).andReturn(null);
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, sboi);
         assertEquals("Is not a colocated call",
                      null,
                      val);
-        assertEquals("BindingOperation.getOperation was not called", 
+        assertEquals("BindingOperation.getOperation was not called",
                      1, rbi.getOpCount());
         control.reset();
     }
@@ -405,8 +409,8 @@ public class ColocOutInterceptorTest extends Assert {
         colocOut = new TestColocOutInterceptor1();
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
 
@@ -418,7 +422,7 @@ public class ColocOutInterceptorTest extends Assert {
         Service res = control.createMock(Service.class);
         EndpointInfo rei = control.createMock(EndpointInfo.class);
         BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
-        
+
         QName op = new QName("E", "F");
         QName intf = new QName("G", "H");
         QName inmi = new QName("M", "in");
@@ -431,14 +435,14 @@ public class ColocOutInterceptorTest extends Assert {
         MessageInfo mio = new MessageInfo(soi, MessageInfo.Type.OUTPUT, outmi);
         soi.setInput("in", mii);
         soi.setOutput("out", mio);
-        
+
         ServiceInfo rsi = new ServiceInfo();
         InterfaceInfo rii = new InterfaceInfo(rsi, intf);
         rii.addOperation(op);
         OperationInfo roi = rii.getOperation(op);
         roi.setInput("in", mii);
         roi.setOutput("out", mio);
-        
+
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
         EasyMock.expect(s1.getEndpoint()).andReturn(rep);
@@ -449,13 +453,13 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(rei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(sei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(rei.getBinding()).andReturn(rbi);
-        
+
         EasyMock.expect(sboi.getName()).andReturn(op);
         EasyMock.expect(sboi.getOperationInfo()).andReturn(soi);
         EasyMock.expect(rboi.getName()).andReturn(op);
         EasyMock.expect(rboi.getOperationInfo()).andReturn(roi);
         EasyMock.expect(rbi.getOperation(op)).andReturn(rboi);
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, sboi);
         assertEquals("Expecting a colocated call",
@@ -468,8 +472,8 @@ public class ColocOutInterceptorTest extends Assert {
         colocOut = new TestColocOutInterceptor1();
         //Funtion Param
         Server s1 = control.createMock(Server.class);
-        List<Server> list = new ArrayList<Server>();
-        list.add(s1);        
+        List<Server> list = new ArrayList<>();
+        list.add(s1);
         Endpoint sep = control.createMock(Endpoint.class);
         BindingOperationInfo sboi = control.createMock(BindingOperationInfo.class);
 
@@ -481,7 +485,7 @@ public class ColocOutInterceptorTest extends Assert {
         Service res = control.createMock(Service.class);
         EndpointInfo rei = control.createMock(EndpointInfo.class);
         BindingOperationInfo rboi = control.createMock(BindingOperationInfo.class);
-        
+
         QName op = new QName("E", "F");
         QName intf = new QName("G", "H");
         QName inmi = new QName("M", "in");
@@ -498,7 +502,7 @@ public class ColocOutInterceptorTest extends Assert {
         mpi.setTypeClass(Source.class);
         soi.setInput("in", mii);
         soi.setOutput("out", mio);
-        
+
         ServiceInfo rsi = new ServiceInfo();
         InterfaceInfo rii = new InterfaceInfo(rsi, intf);
         rii.addOperation(op);
@@ -511,7 +515,7 @@ public class ColocOutInterceptorTest extends Assert {
         mpi.setTypeClass(Object.class);
         roi.setInput("in", mii);
         roi.setOutput("out", mio);
-        
+
         EasyMock.expect(sep.getService()).andReturn(ses);
         EasyMock.expect(sep.getEndpointInfo()).andReturn(sei);
         EasyMock.expect(s1.getEndpoint()).andReturn(rep);
@@ -522,13 +526,13 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(rei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(sei.getName()).andReturn(new QName("C", "D"));
         EasyMock.expect(rei.getBinding()).andReturn(rbi);
-        
+
         EasyMock.expect(sboi.getName()).andReturn(op);
         EasyMock.expect(sboi.getOperationInfo()).andReturn(soi);
         EasyMock.expect(rboi.getName()).andReturn(op);
         EasyMock.expect(rboi.getOperationInfo()).andReturn(roi);
         EasyMock.expect(rbi.getOperation(op)).andReturn(rboi);
-        
+
         control.replay();
         Server val = colocOut.isColocated(list, sep, sboi);
         assertEquals("Expecting a colocated call",
@@ -536,39 +540,39 @@ public class ColocOutInterceptorTest extends Assert {
                      val);
         control.reset();
     }
-    
+
     private Bus setupBus() {
         Bus bus = control.createMock(Bus.class);
         BusFactory.setDefaultBus(bus);
         return bus;
     }
-    
+
     class TestColocOutInterceptor1 extends ColocOutInterceptor {
         public void invokeColocObserver(Message outMsg, Endpoint inboundEndpoint) {
             //No Op
         }
-        
+
         public void invokeInboundChain(Exchange exchange, Endpoint ep) {
             //No Op
         }
-        
+
     }
-    
+
     class TestBindingInfo extends BindingInfo {
         private int opCount;
         TestBindingInfo(ServiceInfo si, String bindingId) {
             super(si, bindingId);
         }
-        
+
         public int getOpCount() {
             return opCount;
         }
-        
+
         public BindingOperationInfo getOperation(QName opName) {
             BindingOperationInfo boi = super.getOperation(opName);
             ++opCount;
             return boi;
         }
-        
+
     }
 }

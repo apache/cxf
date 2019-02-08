@@ -21,14 +21,17 @@ package org.apache.cxf.testutil.common;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,11 +44,11 @@ import org.apache.cxf.common.util.StringUtils;
 public class ServerLauncher {
     public static final int DEFAULT_TIMEOUT = 3 * 60 * 1000;
 
-    protected static final String SERVER_FAILED = 
+    protected static final String SERVER_FAILED =
         "server startup failed (not a log message)";
 
     private static final boolean DEFAULT_IN_PROCESS = false;
-    
+
     private static final Logger LOG = LogUtils.getLogger(ServerLauncher.class);
 
     boolean serverPassed;
@@ -55,7 +58,7 @@ public class ServerLauncher {
     private final boolean debug = false;
     private boolean inProcess = DEFAULT_IN_PROCESS;
     private AbstractTestServerBase inProcessServer;
-    
+
     private final String javaExe;
     private Process process;
     private boolean serverIsReady;
@@ -145,18 +148,17 @@ public class ServerLauncher {
                 ex.printStackTrace();
                 throw new IOException(ex.getMessage());
             }
-        } else {
-            if (process != null) {
-                if (!serverIsStopped) {
-                    try {
-                        signalStop();
-                    } catch (IOException ex) {
-                        //ignore
-                    }
+        }
+        if (process != null) {
+            if (!serverIsStopped) {
+                try {
+                    signalStop();
+                } catch (IOException ex) {
+                    //ignore
                 }
-                waitForServerToStop();
-                process.destroy();
             }
+            waitForServerToStop();
+            process.destroy();
         }
         return serverPassed;
     }
@@ -168,7 +170,7 @@ public class ServerLauncher {
 
         if (inProcess) {
             Class<?> cls;
-            Map<String, String> old = new HashMap<String, String>();
+            Map<String, String> old = new HashMap<>();
             try {
                 if (null != properties) {
                     for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -182,7 +184,7 @@ public class ServerLauncher {
                 }
                 if (inProcessServer == null) {
                     cls = Class.forName(className);
-                    Class<? extends AbstractTestServerBase> svcls = 
+                    Class<? extends AbstractTestServerBase> svcls =
                         cls.asSubclass(AbstractTestServerBase.class);
                     if (null == serverArgs) {
                         inProcessServer = svcls.newInstance();
@@ -221,14 +223,14 @@ public class ServerLauncher {
             if (debug) {
                 System.err.print("CMD: " + cmd);
             }
-            
-            
+
+
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.redirectErrorStream(true);
             process = pb.start();
-    
+
             OutputMonitorThread out = launchOutputMonitorThread(process.getInputStream(), System.out);
-    
+
             synchronized (mutex) {
                 TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                 while (!(serverIsReady || serverLaunchFailed)) {
@@ -245,7 +247,7 @@ public class ServerLauncher {
             if (serverLaunchFailed || !serverIsReady) {
                 System.err.println(out.getServerOutput());
             }
-            
+
         }
         return serverIsReady && !serverLaunchFailed;
     }
@@ -282,29 +284,33 @@ public class ServerLauncher {
 
         public void run() {
             String outputDir = System.getProperty("server.output.dir", "target/surefire-reports/");
-            FileOutputStream fos = null;
+            OutputStream os = null;
             try {
                 try {
-                    fos = new FileOutputStream(outputDir + className + ".out");
-                } catch (FileNotFoundException fex) {
-                    outputDir = System.getProperty("basedir");
-                    if (outputDir == null) {
-                        outputDir = "target/surefire-reports/";
+                    os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
+                } catch (IOException ioe) {
+                    if (ioe instanceof FileNotFoundException || ioe instanceof NoSuchFileException) {
+                        outputDir = System.getProperty("basedir");
+                        if (outputDir == null) {
+                            outputDir = "target/surefire-reports/";
+                        } else {
+                            outputDir += "/target/surefire-reports/";
+                        }
+
+                        File file = new File(outputDir);
+                        file.mkdirs();
+                        os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
                     } else {
-                        outputDir += "/target/surefire-reports/";
+                        throw ioe;
                     }
-    
-                    File file = new File(outputDir);
-                    file.mkdirs();
-                    fos = new FileOutputStream(outputDir + className + ".out");
                 }
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
                     ex.printStackTrace();
                 }
             }
-            
-            try (PrintStream ps = new PrintStream(fos)) {
+
+            try (PrintStream ps = new PrintStream(os)) {
                 boolean running = true;
                 StringBuilder serverOutput = new StringBuilder();
                 for (int ch = in.read(); ch != -1; ch = in.read()) {
@@ -369,9 +375,9 @@ public class ServerLauncher {
 
     private List<String> getCommand() throws URISyntaxException {
 
-        List<String> cmd = new ArrayList<String>();
+        List<String> cmd = new ArrayList<>();
         cmd.add(javaExe);
-        
+
         if (null != properties) {
             for (Map.Entry<String, String> entry : properties.entrySet()) {
                 cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
@@ -393,7 +399,7 @@ public class ServerLauncher {
             }
             cmd.add(vmargs);
         }
-        
+
         String portClose = System.getProperty("org.apache.cxf.transports.http_jetty.DontClosePort");
         if (portClose != null) {
             cmd.add("-Dorg.apache.cxf.transports.http_jetty.DontClosePort=" + portClose);
@@ -401,10 +407,10 @@ public class ServerLauncher {
         String loggingPropertiesFile = System.getProperty("java.util.logging.config.file");
         if (null != loggingPropertiesFile) {
             cmd.add("-Djava.util.logging.config.file=" + loggingPropertiesFile);
-        } 
-        
+        }
+
         cmd.add("-classpath");
-        
+
         ClassLoader loader = this.getClass().getClassLoader();
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (classpath.indexOf("/.compatibility/") != -1) {
@@ -415,7 +421,7 @@ public class ServerLauncher {
             int idx2 = classpath.indexOf(":", idx);
             classpath.replace(idx1, idx2, ":");
         }
-        
+
         if (loader instanceof URLClassLoader) {
             for (URL url : ((URLClassLoader)loader).getURLs()) {
                 classpath.append(File.pathSeparatorChar);
@@ -423,7 +429,7 @@ public class ServerLauncher {
             }
         }
         cmd.add(classpath.toString());
-        
+
 
         // If the client set the transformer factory property,
         // we want the server to also set that property.
@@ -443,7 +449,7 @@ public class ServerLauncher {
         if (null != tmp) {
             cmd.add("-Djava.io.tmpdir=" + tmp);
         }
-        
+
         cmd.add(className);
 
         if (null != serverArgs) {

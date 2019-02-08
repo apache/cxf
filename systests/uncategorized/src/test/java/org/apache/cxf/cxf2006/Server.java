@@ -23,25 +23,25 @@ import java.net.URL;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
 
-public class Server extends AbstractBusTestServerBase {        
+public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
     Endpoint ep;
     String wsdlLocation;
-    
+
     public Server() {
         this(new String[] {"/wsdl_systest/cxf2006.wsdl"});
     }
-    
+
     public Server(String[] args) {
         wsdlLocation = args.length > 0 ? args[0] : "/wsdl_systest/cxf2006.wsdl";
     }
-    
+
     protected void run()  {
         String address;
         Object implementor = new RPCLitGreeterImpl();
@@ -54,20 +54,20 @@ public class Server extends AbstractBusTestServerBase {
         ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
         ep.publish(address);
     }
-    
+
     public void tearDown() {
         ep.stop();
         ep = null;
     }
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

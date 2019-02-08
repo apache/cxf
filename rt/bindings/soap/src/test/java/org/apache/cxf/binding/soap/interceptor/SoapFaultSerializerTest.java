@@ -35,8 +35,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -53,12 +51,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SoapFaultSerializerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class SoapFaultSerializerTest {
     private void assertValid(String xpathExpression, Document doc) {
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
         namespaces.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
@@ -68,11 +69,11 @@ public class SoapFaultSerializerTest extends Assert {
         namespaces.put("xml", "http://www.w3.org/XML/1998/namespace");
         XPathUtils xpu = new XPathUtils(namespaces);
         if (!xpu.isExist(xpathExpression, doc, XPathConstants.NODE)) {
-            throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpathExpression
-                                           + " from document:\n" + StaxUtils.toString(doc));
+            fail("Failed to select any nodes for expression:\n" + xpathExpression
+                 + " from document:\n" + StaxUtils.toString(doc));
         }
     }
-    
+
     @Test
     public void testSoap11Out() throws Exception {
         String faultString = "Hadrian caused this Fault!";
@@ -112,18 +113,18 @@ public class SoapFaultSerializerTest extends Assert {
         assertEquals(fault.getMessage(), fault2.getMessage());
         assertEquals(Soap11.getInstance().getSender(), fault2.getFaultCode());
     }
-    
+
     @Test
     public void testSoap12Out() throws Exception {
         String faultString = "Hadrian caused this Fault!";
         SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
-        
+
         QName qname = new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode");
         fault.setSubCode(qname);
 
         SoapMessage m = new SoapMessage(new MessageImpl());
         m.setVersion(Soap12.getInstance());
-        
+
         m.setContent(Exception.class, fault);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -140,15 +141,15 @@ public class SoapFaultSerializerTest extends Assert {
         writer.close();
 
         Document faultDoc = StaxUtils.read(new ByteArrayInputStream(out.toByteArray()));
-        
-        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
+
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap']", 
+                    + "soap12env:Value[text()='cxffaultcode:invalidsoap']",
                     faultDoc);
-        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']",
                     faultDoc);
-        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[text()='" + faultString + "']", 
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[text()='" + faultString + "']",
                     faultDoc);
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(out.toByteArray()));
@@ -162,21 +163,21 @@ public class SoapFaultSerializerTest extends Assert {
         SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
-        assertEquals(fault.getMessage(), fault2.getMessage());        
+        assertEquals(fault.getMessage(), fault2.getMessage());
         assertEquals(fault.getSubCode(), fault2.getSubCode());
     }
-    
+
     @Test
     public void testSoap12WithMultipleSubCodesOut() throws Exception {
         String faultString = "Hadrian caused this Fault!";
         SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
-        
-        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
+
+        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap"));
         fault.addSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
 
         SoapMessage m = new SoapMessage(new MessageImpl());
         m.setVersion(Soap12.getInstance());
-        
+
         m.setContent(Exception.class, fault);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -193,18 +194,18 @@ public class SoapFaultSerializerTest extends Assert {
         writer.close();
 
         Document faultDoc = StaxUtils.read(new ByteArrayInputStream(out.toByteArray()));
-        
-        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
+
+        assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap']", 
+                    + "soap12env:Value[text()='ns2:invalidsoap']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap2']", 
+                    + "soap12env:Value[text()='cxffaultcode2:invalidsoap2']",
                     faultDoc);
-        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']",
                     faultDoc);
-        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[text()='" + faultString + "']", 
+        assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[text()='" + faultString + "']",
                     faultDoc);
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(out.toByteArray()));
@@ -218,7 +219,7 @@ public class SoapFaultSerializerTest extends Assert {
         SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
-        assertEquals(fault.getMessage(), fault2.getMessage());        
+        assertEquals(fault.getMessage(), fault2.getMessage());
         assertEquals(fault.getSubCodes(), fault2.getSubCodes());
     }
     @Test
@@ -227,24 +228,24 @@ public class SoapFaultSerializerTest extends Assert {
         Fault fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
         verifyFaultToSoapFault(fault, null, true, Soap11.getInstance());
         verifyFaultToSoapFault(fault, null, true, Soap12.getInstance());
-        
+
         fault = new Fault(ex, Fault.FAULT_CODE_SERVER);
         verifyFaultToSoapFault(fault, null, false, Soap11.getInstance());
         verifyFaultToSoapFault(fault, null, false, Soap12.getInstance());
-        
+
         fault.setMessage("fault-one");
         verifyFaultToSoapFault(fault, "fault-one", false, Soap11.getInstance());
 
         ex = new Exception("fault-two");
         fault = new Fault(ex, Fault.FAULT_CODE_CLIENT);
         verifyFaultToSoapFault(fault, "fault-two", true, Soap11.getInstance());
-        
+
         fault = new Fault(ex, new QName("http://cxf.apache.org", "myFaultCode"));
         SoapFault f = verifyFaultToSoapFault(fault, "fault-two", false, Soap12.getInstance());
         assertEquals("myFaultCode", f.getSubCodes().get(0).getLocalPart());
 
     }
-    
+
     private SoapFault verifyFaultToSoapFault(Fault fault, String msg, boolean sender, SoapVersion v) {
         SoapFault sf = SoapFault.createFault(fault, v);
         assertEquals(sender ? v.getSender() : v.getReceiver(), sf.getFaultCode());
@@ -256,7 +257,7 @@ public class SoapFaultSerializerTest extends Assert {
     public void testCXF1864() throws Exception {
 
         SoapMessage m = new SoapMessage(new MessageImpl());
-        m.setVersion(Soap12.getInstance());        
+        m.setVersion(Soap12.getInstance());
 
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
@@ -278,7 +279,7 @@ public class SoapFaultSerializerTest extends Assert {
         //Try WITH SAAJ
         SoapMessage m = new SoapMessage(new MessageImpl());
         m.put(Message.HTTP_REQUEST_METHOD, "POST");
-        m.setVersion(Soap12.getInstance());        
+        m.setVersion(Soap12.getInstance());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
                                                                  .getResourceAsStream("cxf4181.xml"));
 
@@ -291,23 +292,23 @@ public class SoapFaultSerializerTest extends Assert {
         new Soap12FaultInInterceptor().handleMessage(m);
 
         Node nd = m.getContent(Node.class);
-        
+
         SOAPPart part = (SOAPPart)nd;
         assertEquals("S", part.getEnvelope().getPrefix());
         assertEquals("S2", part.getEnvelope().getHeader().getPrefix());
         assertEquals("S3", part.getEnvelope().getBody().getPrefix());
         SOAPFault fault = part.getEnvelope().getBody().getFault();
         assertEquals("S", fault.getPrefix());
-        
+
         assertEquals("Authentication Failure", fault.getFaultString());
-        
+
         SoapFault fault2 = (SoapFault)m.getContent(Exception.class);
         assertNotNull(fault2);
-        
+
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
-        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
+        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"),
                      fault2.getSubCode());
-        
+
         Element el = part.getEnvelope().getBody();
         nd = el.getFirstChild();
         int count = 0;
@@ -318,11 +319,11 @@ public class SoapFaultSerializerTest extends Assert {
             nd = nd.getNextSibling();
         }
         assertEquals(1, count);
-        
-        
+
+
         //Try WITHOUT SAAJ
         m = new SoapMessage(new MessageImpl());
-        m.setVersion(Soap12.getInstance());  
+        m.setVersion(Soap12.getInstance());
         reader = StaxUtils.createXMLStreamReader(this.getClass()
                                                  .getResourceAsStream("cxf4181.xml"));
 
@@ -339,16 +340,16 @@ public class SoapFaultSerializerTest extends Assert {
         assertNotNull(fault2);
 
         assertEquals(Soap12.getInstance().getSender(), fault2.getFaultCode());
-        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"), 
+        assertEquals(new QName("http://schemas.xmlsoap.org/ws/2005/02/trust", "FailedAuthentication"),
              fault2.getSubCode());
     }
-    
-    
+
+
     @Test
     public void testCXF5493() throws Exception {
 
         SoapMessage m = new SoapMessage(new MessageImpl());
-        m.setVersion(Soap11.getInstance());        
+        m.setVersion(Soap11.getInstance());
 
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(this.getClass()
@@ -365,12 +366,12 @@ public class SoapFaultSerializerTest extends Assert {
         assertNotNull(fault2);
         assertEquals(Soap11.getInstance().getReceiver(), fault2.getFaultCode());
         assertEquals("some text containing a xml tag <xml-tag>", fault2.getMessage());
-        
-        
-        
+
+
+
         m = new SoapMessage(new MessageImpl());
         m.put(Message.HTTP_REQUEST_METHOD, "POST");
-        m.setVersion(Soap11.getInstance());        
+        m.setVersion(Soap11.getInstance());
         reader = StaxUtils.createXMLStreamReader(this.getClass().getResourceAsStream("cxf5493.xml"));
 
         m.setContent(XMLStreamReader.class, reader);

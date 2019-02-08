@@ -21,29 +21,31 @@ package org.apache.cxf.binding.corba;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class CorbaTypeMapTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class CorbaTypeMapTest {
 
     @Test
     public void testCorbaTypeMap() throws Exception {
         CorbaTypeMap typeMap = new CorbaTypeMap("http://yoko.apache.org/ComplexTypes");
-                
+
         String targetNamespace = typeMap.getTargetNamespace();
         assertEquals(targetNamespace, "http://yoko.apache.org/ComplexTypes");
-        
+
         QName type = new QName("http://yoko.apache.org/ComplexTypes",
                                "xsd1:Test.MultiPart.Colour", "");
-                
+
         CorbaType corbaTypeImpl = new CorbaType();
         corbaTypeImpl.setType(type);
         corbaTypeImpl.setName("Test.MultiPart.Colour");
         typeMap.addType("Test.MultiPart.Colour", corbaTypeImpl);
-        
+
         CorbaType corbatype = typeMap.getType("Test.MultiPart.Colour");
         assertEquals(corbatype.getName(), "Test.MultiPart.Colour");
         assertEquals(corbatype.getType().getLocalPart(), "xsd1:Test.MultiPart.Colour");
     }
-    
+
 }

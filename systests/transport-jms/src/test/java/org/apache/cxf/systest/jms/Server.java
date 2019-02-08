@@ -27,20 +27,20 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
-    
+
     EmbeddedJMSBrokerLauncher broker;
     public Server(EmbeddedJMSBrokerLauncher b) {
         broker = b;
     }
-    
+
     protected void run()  {
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
-        
+
         broker.updateWsdl(bus, "testutils/hello_world_doc_lit.wsdl");
         broker.updateWsdl(bus, "testutils/jms_test.wsdl");
         broker.updateWsdl(bus, "testutils/jms_test_mtom.wsdl");
-        
+
         Endpoint.publish(null, new GreeterImplDoc());
         Endpoint.publish(null, new GreeterImplTwoWayJMS());
         Endpoint.publish(null, new GreeterImplQueueOneWay());

@@ -25,9 +25,10 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
-import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
@@ -40,30 +41,30 @@ import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
 
     private CallbackHandler callbackHandler;
-    
+
     static {
         WSSConfig.init();
     }
-    
+
     @Override
-    public UserSubject createSubject(String user, String pass) {
-        Document doc = DOMUtils.createDocument();
-        UsernameToken token = new UsernameToken(false, doc, 
-                                                WSConstants.PASSWORD_TEXT);
+    public UserSubject createSubject(Client client, String user, String pass) {
+        Document doc = DOMUtils.getEmptyDocument();
+        UsernameToken token = new UsernameToken(false, doc,
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(user);
         token.setPassword(pass);
-        
+
         Credential credential = new Credential();
         credential.setUsernametoken(token);
-        
+
         RequestData data = new RequestData();
         data.setMsgContext(PhaseInterceptorChain.getCurrentMessage());
         data.setCallbackHandler(callbackHandler);
         UsernameTokenValidator validator = new UsernameTokenValidator();
-        
+
         try {
             credential = validator.validate(credential, data);
-            
+
             UserSubject subject = new UserSubject();
             subject.setLogin(user);
             return subject;
@@ -71,7 +72,7 @@ public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
-    
+
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
     }

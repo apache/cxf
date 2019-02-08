@@ -30,24 +30,24 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.intfault.BadRecordLitFault;
 import org.apache.intfault.types.BareDocumentResponse;
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/intfault", 
+@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/intfault",
                       endpointInterface = "org.apache.intfault.Greeter",
                       wsdlLocation = "testutils/hello_world_fault.wsdl")
 public class GreeterImpl {
     @Resource
     protected WebServiceContext context;
-    
+
     public BareDocumentResponse testDocLitFault(String in) throws BadRecordLitFault {
         //System.out.println("Executing testDocLitFault sayHi\n");
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Header header = null;
         try {
-            header = new Header(new QName("http://test", "test"), 
+            header = new Header(new QName("http://test", "test"),
                                 new String("test"), new JAXBDataBinding(String.class));
         } catch (JAXBException e) {
             e.printStackTrace();
-        }                        
+        }
         headers.add(header);
         context.getMessageContext().put(Header.HEADER_LIST, headers);
         throw new BadRecordLitFault("int fault", 5);

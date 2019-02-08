@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 /**
  * Can be used to nominate oneway methods
- * 
+ *
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

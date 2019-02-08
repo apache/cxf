@@ -30,7 +30,7 @@ public abstract class AbstractJwtBearerGrant implements AccessTokenGrant {
     private static final long serialVersionUID = 5754722119855372511L;
     private String assertion;
     private String scope;
-    private boolean encoded; 
+    private boolean encoded;
     private String grantType;
     protected AbstractJwtBearerGrant(String grantType, String assertion, boolean encoded, String scope) {
         this.grantType = grantType;
@@ -38,13 +38,13 @@ public abstract class AbstractJwtBearerGrant implements AccessTokenGrant {
         this.encoded = encoded;
         this.scope = scope;
     }
-    
+
     public String getType() {
         return grantType;
     }
 
     protected MultivaluedMap<String, String> initMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, grantType);
         return map;
     }
@@ -54,12 +54,12 @@ public abstract class AbstractJwtBearerGrant implements AccessTokenGrant {
             map.putSingle(OAuthConstants.SCOPE, scope);
         }
     }
-    
+
     protected String encodeAssertion() {
         if (encoded) {
             return assertion;
         }
-        
+
         try {
             return Base64UrlUtility.encode(assertion);
         } catch (Exception ex) {

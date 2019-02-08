@@ -29,7 +29,7 @@ import org.apache.cxf.transport.MessageObserver;
 
 
 /**
- * Strategy for retreival of a pre-existing Conduit to mediate an 
+ * Strategy for retreival of a pre-existing Conduit to mediate an
  * outbound message.
  */
 public class PreexistingConduitSelector implements
@@ -40,16 +40,16 @@ public class PreexistingConduitSelector implements
 
     /**
      * Constructor.
-     * 
+     *
      * @param c the pre-existing Conduit.
      */
     public PreexistingConduitSelector(Conduit c) {
         this(c, null);
     }
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param c the pre-existing Conduit.
      * @param e the target Endpoint
      */
@@ -60,11 +60,11 @@ public class PreexistingConduitSelector implements
 
     /**
      * Called prior to the interceptor chain being traversed.
-     * 
+     *
      * @param message the current Message
      */
     public void prepare(Message message) {
-        MessageObserver observer = 
+        MessageObserver observer =
             message.getExchange().get(MessageObserver.class);
         if (observer != null) {
             selectedConduit.setMessageObserver(observer);
@@ -73,7 +73,7 @@ public class PreexistingConduitSelector implements
 
     /**
      * Called when a Conduit is actually required.
-     * 
+     *
      * @param message
      * @return the Conduit to use for mediation of the message
      */
@@ -83,7 +83,7 @@ public class PreexistingConduitSelector implements
 
     /**
      * Called on completion of the MEP for which the Conduit was required.
-     * 
+     *
      * @param exchange represents the completed MEP
      */
     public void complete(Exchange exchange) {
@@ -95,7 +95,7 @@ public class PreexistingConduitSelector implements
             //IGNORE
         }
     }
-    
+
     /**
      * @return the encapsulated Endpoint
      */

@@ -19,9 +19,11 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
@@ -38,24 +40,30 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
 /**
- * The default per-request resource provider which creates 
+ * The default per-request resource provider which creates
  * a new resource instance per every request
  */
 public class PerRequestResourceProvider implements ResourceProvider {
     private Constructor<?> c;
     private Method postConstructMethod;
     private Method preDestroyMethod;
-   
+    private final Class<?>[] params;
+    private final Annotation[][] anns;
+    private final Type[] genericTypes;
+
     public PerRequestResourceProvider(Class<?> clazz) {
         c = ResourceUtils.findResourceConstructor(clazz, true);
         if (c == null) {
             throw new RuntimeException("Resource class " + clazz
                                        + " has no valid constructor");
         }
+        params = c.getParameterTypes();
+        anns = c.getParameterAnnotations();
+        genericTypes = c.getGenericParameterTypes();
         postConstructMethod = ResourceUtils.findPostConstructMethod(clazz);
         preDestroyMethod = ResourceUtils.findPreDestroyMethod(clazz);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -66,16 +74,16 @@ public class PerRequestResourceProvider implements ResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public Object getInstance(Message m) {  
+    public Object getInstance(Message m) {
         return createInstance(m);
     }
-    
+
     protected Object createInstance(Message m) {
-        ProviderInfo<?> application = 
+        ProviderInfo<?> application =
             (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
-        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
+        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null
             : Collections.singletonMap(Application.class, application.getProvider()));
-        Object[] values = ResourceUtils.createConstructorArguments(c, m, true, mapValues);
+        Object[] values = ResourceUtils.createConstructorArguments(c, m, true, mapValues, params, anns, genericTypes);
         try {
             Object instance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
@@ -98,13 +106,13 @@ public class PerRequestResourceProvider implements ResourceProvider {
                 + " due to InvocationTargetException";
             throw ExceptionUtils.toInternalServerErrorException(null, serverError(msg));
         }
-        
+
     }
 
     private Response serverError(String msg) {
         return JAXRSUtils.toResponseBuilder(500).entity(msg).build();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -118,6 +126,6 @@ public class PerRequestResourceProvider implements ResourceProvider {
     public Class<?> getResourceClass() {
         return c.getDeclaringClass();
     }
-    
-    
+
+
 }

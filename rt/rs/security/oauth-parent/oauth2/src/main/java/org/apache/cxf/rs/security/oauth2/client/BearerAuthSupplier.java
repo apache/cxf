@@ -32,9 +32,9 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 
 public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuthSupplier {
-    private Consumer consumer; 
+    private Consumer consumer;
     private String accessTokenServiceUri;
-    private boolean refreshEarly; 
+    private boolean refreshEarly;
     public BearerAuthSupplier() {
         super(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
     }
@@ -50,8 +50,8 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         if (getClientAccessToken().getTokenKey() == null) {
             return null;
         }
-        
-        
+
+
         if (fullHeader == null) {
             // regular authorization
             if (refreshEarly) {
@@ -62,18 +62,16 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         // the last call resulted in 401, trying to refresh the token(s)
         if (refreshAccessToken(authPolicy)) {
             return createAuthorizationHeader();
-        } else {
-            return null;
-            
         }
+        return null;
     }
     private void refreshAccessTokenIfExpired(AuthorizationPolicy authPolicy) {
         ClientAccessToken at = getClientAccessToken();
-        if (OAuthUtils.isExpired(at.getIssuedAt(), 
+        if (OAuthUtils.isExpired(at.getIssuedAt(),
                                  at.getExpiresIn())) {
             refreshAccessToken(authPolicy);
         }
-        
+
     }
 
 
@@ -84,11 +82,11 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         }
         // Client id and secret are needed to refresh the tokens
         // AuthorizationPolicy can hold them by default, Consumer can also be injected into this supplier
-        // and checked if the policy is null. 
+        // and checked if the policy is null.
         // Client TLS authentication is also fine as an alternative authentication mechanism,
         // how can we check here that a 2-way TLS has been set up ?
         Consumer theConsumer = consumer;
-        if (theConsumer == null 
+        if (theConsumer == null
             && authPolicy != null && authPolicy.getUserName() != null && authPolicy.getPassword() != null) {
             theConsumer = new Consumer(authPolicy.getUserName(), authPolicy.getPassword());
             return false;
@@ -99,8 +97,8 @@ public class BearerAuthSupplier extends AbstractAuthSupplier implements HttpAuth
         // Can WebCient be safely constructed at HttpConduit initialization time ?
         // If yes then createAccessTokenServiceClient() can be called inside
         // setAccessTokenServiceUri, though given that the token refreshment would
-        // not be done on every request the current approach is quite reasonable 
-        
+        // not be done on every request the current approach is quite reasonable
+
         WebClient accessTokenService = createAccessTokenServiceClient();
         setClientAccessToken(OAuthClientUtils.refreshAccessToken(accessTokenService, theConsumer, at));
         return true;

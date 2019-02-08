@@ -25,10 +25,11 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 import org.apache.cxf.rs.security.oidc.common.UserInfo;
 
-public class UserInfoClient extends AbstractTokenValidator {
+public class UserInfoClient extends OidcClaimsValidator {
     private boolean sendTokenAsFormParameter;
     private WebClient profileClient;
     private boolean getUserInfoFromJwt;
@@ -38,24 +39,21 @@ public class UserInfoClient extends AbstractTokenValidator {
             if (getUserInfoFromJwt) {
                 String jwt = profileClient.get(String.class);
                 return getUserInfoFromJwt(jwt, idToken, client);
-            } else {
-                UserInfo profile = profileClient.get(UserInfo.class);
-                validateUserInfo(profile, idToken, client);
-                return profile;
             }
-        } else {
-            Form form = new Form().param("access_token", at.getTokenKey());
-            if (getUserInfoFromJwt) {
-                String jwt = profileClient.form(form).readEntity(String.class);
-                return getUserInfoFromJwt(jwt, idToken, client);
-            } else {
-                UserInfo profile = profileClient.form(form).readEntity(UserInfo.class);
-                validateUserInfo(profile, idToken, client);
-                return profile;
-            }
+            UserInfo profile = profileClient.get(UserInfo.class);
+            validateUserInfo(profile, idToken, client);
+            return profile;
         }
+        Form form = new Form().param("access_token", at.getTokenKey());
+        if (getUserInfoFromJwt) {
+            String jwt = profileClient.form(form).readEntity(String.class);
+            return getUserInfoFromJwt(jwt, idToken, client);
+        }
+        UserInfo profile = profileClient.form(form).readEntity(UserInfo.class);
+        validateUserInfo(profile, idToken, client);
+        return profile;
     }
-    public UserInfo getUserInfoFromJwt(String profileJwtToken, 
+    public UserInfo getUserInfoFromJwt(String profileJwtToken,
                                        IdToken idToken,
                                        Consumer client) {
         JwtToken jwt = getUserInfoJwt(profileJwtToken, client);
@@ -73,7 +71,7 @@ public class UserInfoClient extends AbstractTokenValidator {
         validateJwtClaims(profile, client.getClientId(), false);
         // validate subject
         if (!idToken.getSubject().equals(profile.getSubject())) {
-            throw new SecurityException("Invalid subject");
+            throw new OAuthServiceException("Invalid subject");
         }
     }
     public void setUserInfoServiceClient(WebClient client) {
@@ -85,5 +83,5 @@ public class UserInfoClient extends AbstractTokenValidator {
     public void setGetUserInfoFromJwt(boolean getUserInfoFromJwt) {
         this.getUserInfoFromJwt = getUserInfoFromJwt;
     }
-    
+
 }

@@ -25,24 +25,24 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
  * A MultiplexDestination is a transport-level endpoint capable of receiving
- * unsolicited incoming messages from different peers for multiple targets 
+ * unsolicited incoming messages from different peers for multiple targets
  * identified by a unique id.
  * The disambiguation of targets is handled by higher layers as the target
  * address is made available as a context property or as a WS-A-To header
  */
 
 public interface MultiplexDestination extends Destination {
-    
+
     /**
-     * @return the a reference containing the id that is 
+     * @return the a reference containing the id that is
      * associated with this Destination
      */
     EndpointReferenceType getAddressWithId(String id);
-    
+
     /**
-     * @param contextMap for this invocation. Obtained for example from 
+     * @param contextMap for this invocation. Obtained for example from
      * JAX-WS WebServiceContext.getMessageContext(). The context will
-     * either contain the WS-A To content and/or some property that 
+     * either contain the WS-A To content and/or some property that
      * identifies the target address, eg MessageContext.PATH_INFO for
      * the current invocation
      * @return the id associated with the current invocation

@@ -34,7 +34,7 @@ public abstract class Token {
     private List<OAuthPermission> scopes = Collections.emptyList();
     private UserSubject subject;
     private boolean preAuthorized;
-    
+
     protected Token(Client client, String tokenKey,
                     String tokenSecret, long lifetime, long issuedAt) {
         this.client = client;
@@ -99,9 +99,9 @@ public abstract class Token {
     public void setScopes(List<OAuthPermission> scopes) {
         this.scopes = scopes;
     }
-    
+
     /**
-     * Sets a subject capturing the login name 
+     * Sets a subject capturing the login name
      * the end user used to login to the resource server
      * when authorizing a given client request
      * @param subject
@@ -111,7 +111,7 @@ public abstract class Token {
     }
 
     /**
-     * Returns a subject capturing the login name 
+     * Returns a subject capturing the login name
      * the end user used to login to the resource server
      * when authorizing a given client request
      * @return UserSubject

@@ -71,14 +71,14 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     private final Class<?> preferred;
     private Schema schema;
     private Message message;
-    
+
     public XMLStreamDataReader() {
         preferred = null;
     }
     public XMLStreamDataReader(Class<?> cls) {
         preferred = cls;
     }
-    
+
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         return read(null, input, part.getTypeClass());
     }
@@ -161,9 +161,9 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());
-        } 
+        }
     }
-    
+
     private Object createStaxSource(XMLStreamReader input, Class<?> type) {
         try {
             return type.getConstructor(XMLStreamReader.class).newInstance(input);
@@ -180,11 +180,11 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 message.getInterceptorChain().remove(StaxInEndingInterceptor.INSTANCE);
                 message.getInterceptorChain().add(new StaxInEndingInterceptor(Phase.POST_INVOKE));
             }
-            
+
             message.removeContent(XMLStreamReader.class);
             final InputStream ins = message.getContent(InputStream.class);
             message.removeContent(InputStream.class);
-            
+
             input = new FragmentStreamReader(input, true) {
                 boolean closed;
                 public boolean hasNext() throws XMLStreamException {
@@ -233,14 +233,14 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         }
         //check if the impl can still validate after the setup, possible issue loading schemas or similar
         if (impl.canValidate()) {
-            //Can use the MSV libs and woodstox to handle the schema validation during 
+            //Can use the MSV libs and woodstox to handle the schema validation during
             //parsing and processing.   Much faster and single traversal
             //filter xop node
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds);
-            XMLStreamReader filteredReader = 
-                StaxUtils.createFilteredReader(reader, 
+            XMLStreamReader filteredReader =
+                StaxUtils.createFilteredReader(reader,
                                                new StaxStreamFilter(new QName[] {XOP}));
-            
+
             StaxUtils.copy(filteredReader, nullWriter);
         } else {
             //MSV not available, use a slower method of cloning the data, replace the xop's, validate
@@ -248,7 +248,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             Element newElement = rootElement;
             if (DOMUtils.hasElementWithName(rootElement, "http://www.w3.org/2004/08/xop/include", "Include")) {
                 newElement = (Element)rootElement.cloneNode(true);
-                List<Element> elems = DOMUtils.findAllElementsByTagNameNS(newElement, 
+                List<Element> elems = DOMUtils.findAllElementsByTagNameNS(newElement,
                                                                           "http://www.w3.org/2004/08/xop/include",
                                                                           "Include");
                 for (Element include : elems) {
@@ -265,19 +265,19 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 throw new XMLStreamException(e.getMessage(), e);
             }
         }
-        return rootElement;        
+        return rootElement;
     }
 
-    private InputStream getInputStream(XMLStreamReader input) 
+    private InputStream getInputStream(XMLStreamReader input)
         throws XMLStreamException, IOException {
-        
+
         try (CachedOutputStream out = new CachedOutputStream()) {
             StaxUtils.copy(input, out);
             return out.getInputStream();
         }
     }
     public DOMSource read(XMLStreamReader reader) {
-        // Use a DOMSource for now, we should really use a StaxSource/SAXSource though for 
+        // Use a DOMSource for now, we should really use a StaxSource/SAXSource though for
         // performance reasons
         try {
             XMLStreamReader reader2 = reader;
@@ -289,20 +289,19 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 DOMSource o = new DOMSource(domreader.getCurrentElement());
                 domreader.consumeFrame();
                 return o;
-            } else {
-                Document document = StaxUtils.read(reader);
-                if (reader.hasNext()) {
-                    //need to actually consume the END_ELEMENT
-                    reader.next();
-                }
-                return new DOMSource(document);
             }
+            Document document = StaxUtils.read(reader);
+            if (reader.hasNext()) {
+                //need to actually consume the END_ELEMENT
+                reader.next();
+            }
+            return new DOMSource(document);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());
         }
     }
-    
+
     public void setSchema(Schema s) {
         schema = s;
     }
@@ -315,8 +314,8 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             message = (Message)value;
         }
     }
-    
-    class NUllOutputStream extends OutputStream {
+
+    static class NUllOutputStream extends OutputStream {
         public void write(byte[] b, int off, int len) {
         }
         public void write(int b) {

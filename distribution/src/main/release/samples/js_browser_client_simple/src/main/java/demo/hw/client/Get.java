@@ -35,9 +35,9 @@ import javax.xml.transform.stream.StreamSource;
 public final class Get {
 
     private Get() {
-    } 
+    }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         // Sent HTTP GET request to invoke sayHi
         String target = "http://localhost:9000/SoapContext/SoapPort/sayHi";
         URL url = new URL(target);
@@ -99,11 +99,13 @@ public final class Get {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             StreamResult sr = new StreamResult(bos);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             Properties oprops = new Properties();
             oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            trans.setOutputProperties(oprops);
-            trans.transform(source, sr);
+            transformer.setOutputProperties(oprops);
+            transformer.transform(source, sr);
             System.out.println();
             System.out.println("**** Response ******");
             System.out.println();
@@ -113,5 +115,5 @@ public final class Get {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }    
+    }
 }

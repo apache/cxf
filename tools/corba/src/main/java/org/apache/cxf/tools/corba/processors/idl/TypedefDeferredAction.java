@@ -25,19 +25,19 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class TypedefDeferredAction implements SchemaDeferredAction {
 
-    protected Alias alias;    
-    
-    public TypedefDeferredAction(Alias aliasType) {                         
-        alias = aliasType;                
-    }                   
-    
-    public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {  
-        if (alias != null) {
-            alias.setBasetype(ctype.getQName());            
-            alias.setType(stype.getQName());
-        }        
+    protected Alias alias;
+
+    public TypedefDeferredAction(Alias aliasType) {
+        alias = aliasType;
     }
-       
+
+    public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
+        if (alias != null) {
+            alias.setBasetype(ctype.getQName());
+            alias.setType(stype.getQName());
+        }
+    }
+
 }
 
 

@@ -19,7 +19,8 @@
 
 package org.apache.cxf.ws.security.sts.provider.operation;
 
-import javax.xml.ws.WebServiceContext;
+import java.security.Principal;
+import java.util.Map;
 
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenCollectionType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseCollectionType;
@@ -28,6 +29,7 @@ public interface RequestCollectionOperation {
 
     RequestSecurityTokenResponseCollectionType requestCollection(
             RequestSecurityTokenCollectionType requestCollection,
-            WebServiceContext context);
+            Principal principal,
+            Map<String, Object> messageContext);
 
 }

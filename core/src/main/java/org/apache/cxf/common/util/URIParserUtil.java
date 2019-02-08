@@ -25,12 +25,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.helpers.JavaUtils;
 
 public final class URIParserUtil {
     private static final String EXCLUDED_CHARS = "<>\"{}|\\^`";
@@ -68,157 +65,9 @@ public final class URIParserUtil {
         return urls;
     }
 
-    public static String parsePackageName(String namespace, String defaultPackageName) {
-        String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
-            ? defaultPackageName : null;
-
-        if (packageName == null) {
-            packageName = getPackageName(namespace);
-        }
-        return packageName;
-    }
-
-    public static String getPackageName(String nameSpaceURI) {
-        int idx = nameSpaceURI.indexOf(':');
-        String scheme = "";
-        if (idx >= 0) {
-            scheme = nameSpaceURI.substring(0, idx);
-            if ("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme)) {
-                nameSpaceURI = nameSpaceURI.substring(idx + 1);
-            }
-        }
-
-        List<String> tokens = tokenize(nameSpaceURI, "/: ");
-        if (tokens.size() == 0) {
-            return "cxf"; 
-        }
-
-        if (tokens.size() > 1) {
-            String lastToken = tokens.get(tokens.size() - 1);
-            idx = lastToken.lastIndexOf('.');
-            if (idx > 0) {
-                //lastToken = lastToken.substring(0, idx);
-                lastToken = lastToken.replace('.', '_');
-                tokens.set(tokens.size() - 1, lastToken);
-            }
-        }
-
-        String domain = tokens.get(0);
-        idx = domain.indexOf(':');
-        if (idx >= 0) {
-            domain = domain.substring(0, idx);
-        }
-        List<String> r = reverse(tokenize(domain, "urn".equals(scheme) ? ".-" : "."));
-        if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
-            // remove leading www
-            r.remove(r.size() - 1);
-        }
-
-        // replace the domain name with tokenized items
-        tokens.addAll(1, r);
-        tokens.remove(0);
-
-        // iterate through the tokens and apply xml->java name algorithm
-        for (int i = 0; i < tokens.size(); i++) {
-
-            // get the token and remove illegal chars
-            String token = tokens.get(i);
-            token = removeIllegalIdentifierChars(token);
-
-            // this will check for reserved keywords
-            if (containsReservedKeywords(token)) {
-                token = '_' + token;
-            }
-
-            tokens.set(i, token.toLowerCase());
-        }
-
-        // concat all the pieces and return it
-        return combine(tokens, '.');
-    }
-
-    public static String getNamespace(String packageName) {
-        if (packageName == null || packageName.length() == 0) {
-            return null;
-        }
-        StringTokenizer tokenizer = new StringTokenizer(packageName, ".");
-        String[] tokens;
-        if (tokenizer.countTokens() == 0) {
-            tokens = new String[0];
-        } else {
-            tokens = new String[tokenizer.countTokens()];
-            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
-                tokens[i] = tokenizer.nextToken();
-            }
-        }
-        StringBuilder namespace = new StringBuilder("http://");
-        String dot = "";
-        for (int i = 0; i < tokens.length; i++) {
-            if (i == 1) {
-                dot = ".";
-            }
-            namespace.append(dot + tokens[i]);
-        }
-        namespace.append('/');
-        return namespace.toString();
-    }
-
-    private static List<String> tokenize(String str, String sep) {
-        StringTokenizer tokens = new StringTokenizer(str, sep);
-        List<String> r = new ArrayList<String>();
-
-        while (tokens.hasMoreTokens()) {
-            r.add(tokens.nextToken());
-        }
-        return r;
-    }
-
-    private static String removeIllegalIdentifierChars(String token) {
-        StringBuilder newToken = new StringBuilder();
-        for (int i = 0; i < token.length(); i++) {
-            char c = token.charAt(i);
-
-            if (i == 0 && !Character.isJavaIdentifierStart(c)) {
-                // prefix an '_' if the first char is illegal
-                newToken.append("_" + c);
-            } else if (!Character.isJavaIdentifierPart(c)) {
-                // replace the char with an '_' if it is illegal
-                newToken.append('_');
-            } else {
-                // add the legal char
-                newToken.append(c);
-            }
-        }
-        return newToken.toString();
-    }
-
-    private static String combine(List<String> r, char sep) {
-        StringBuilder buf = new StringBuilder(r.get(0));
-
-        for (int i = 1; i < r.size(); i++) {
-            buf.append(sep);
-            buf.append(r.get(i));
-        }
-
-        return buf.toString();
-    }
-
-    private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<T>();
-
-        for (int i = a.size() - 1; i >= 0; i--) {
-            r.add(a.get(i));
-        }
-        return r;
-    }
-
-    public static boolean containsReservedKeywords(String token) {
-        return JavaUtils.isJavaKeyword(token);
-    }
-
     public static String escapeChars(String s) {
         StringBuilder b = new StringBuilder(s.length());
-        
+
         for (int x = 0; x < s.length(); x++) {
             char ch = s.charAt(x);
             if (isExcluded(ch)) {
@@ -242,7 +91,7 @@ public final class URIParserUtil {
             result = escapeChars(url.toURI().normalize().toString().replace("\\", "/"));
         } catch (MalformedURLException e1) {
             try {
-                if (uri.startsWith("classpath:")) {                  
+                if (uri.startsWith("classpath:")) {
                     url = ClassLoaderUtils.getResource(uri.substring(10), URIParserUtil.class);
                     return url != null ? url.toExternalForm() : uri;
                 }
@@ -279,14 +128,13 @@ public final class URIParserUtil {
                     return uri.normalize().toString();
                 }
                 return new File("").toURI().resolve(uri.getPath()).toString();
-            } else {
-                return normalize(arg);
             }
+            return normalize(arg);
         } catch (Exception e2) {
             return normalize(arg);
         }
     }
-    
+
     public static String relativize(String base, String toBeRelativized) throws URISyntaxException {
         if (base == null || toBeRelativized == null) {
             return null;
@@ -298,7 +146,7 @@ public final class URIParserUtil {
      * This is a custom implementation for doing what URI.relativize(URI uri) should be
      * doing but is not actually doing when URI roots do not fully match.
      * See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6226081
-     * 
+     *
      * @param base              The base URI
      * @param toBeRelativized   The URI to be realivized
      * @return                  The string value of the URI you'd expect to get as result

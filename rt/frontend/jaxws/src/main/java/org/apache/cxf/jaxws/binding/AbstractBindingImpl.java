@@ -29,18 +29,18 @@ import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 
 public abstract class AbstractBindingImpl implements Binding {
     @SuppressWarnings("rawtypes")
-    private List<Handler> handlerChain = new ArrayList<Handler>();
+    private List<Handler> handlerChain = new ArrayList<>();
     private final JaxWsEndpointImpl endpoint;
-    
+
     public AbstractBindingImpl(JaxWsEndpointImpl imp) {
         endpoint = imp;
     }
-    
-    
+
+
     @SuppressWarnings("rawtypes")
     public List<Handler> getHandlerChain() {
         //per spec, this should be a copy
-        return new ArrayList<Handler>(handlerChain);
+        return new ArrayList<>(handlerChain);
     }
 
     public void setHandlerChain(@SuppressWarnings("rawtypes") List<Handler> hc) {

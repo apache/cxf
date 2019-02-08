@@ -56,16 +56,16 @@ import org.apache.cxf.tools.plugin.Generator;
 import org.apache.cxf.tools.plugin.Plugin;
 
 public final class PluginLoader {
-    public static final Logger LOG = LogUtils.getL7dLogger(PluginLoader.class);
     public static final String DEFAULT_PROVIDER_NAME = "cxf.apache.org";
+    public static final Logger LOG = LogUtils.getL7dLogger(PluginLoader.class);
     private static PluginLoader pluginLoader;
     private static final String PLUGIN_FILE_NAME = "META-INF/tools-plugin.xml";
 
-    private Map<String, Plugin> plugins = new LinkedHashMap<String, Plugin>();
+    private Map<String, Plugin> plugins = new LinkedHashMap<>();
 
-    private Map<String, FrontEnd> frontends = new LinkedHashMap<String, FrontEnd>();
+    private Map<String, FrontEnd> frontends = new LinkedHashMap<>();
 
-    private Map<String, DataBinding> databindings = new TreeMap<String, DataBinding>();
+    private Map<String, DataBinding> databindings = new TreeMap<>();
 
     private JAXBContext jaxbContext;
 
@@ -188,19 +188,16 @@ public final class PluginLoader {
 
     protected Plugin getPlugin(URL url) throws IOException, JAXBException, FileNotFoundException {
         Plugin plugin = plugins.get(url.toString());
-        InputStream is = null;
         if (plugin == null) {
-            is = url.openStream();
-            plugin = getPlugin(is);
+            try (InputStream is = url.openStream()) {
+                plugin = getPlugin(is);
+            }
             if (plugin == null || StringUtils.isEmpty(plugin.getName())) {
                 Message msg = new Message("PLUGIN_LOAD_FAIL", LOG, url);
                 LOG.log(Level.SEVERE, msg.toString());
                 throw new ToolException(msg);
             }
             plugins.put(url.toString(), plugin);
-        }
-        if (is == null) {
-            return getPlugin(url.toString());
         }
         return plugin;
     }
@@ -268,7 +265,7 @@ public final class PluginLoader {
     }
 
     private List<FrontEndGenerator> getFrontEndGenerators(FrontEnd frontend) {
-        List<FrontEndGenerator> generators = new ArrayList<FrontEndGenerator>();
+        List<FrontEndGenerator> generators = new ArrayList<>();
 
         String fullClzName = null;
         try {

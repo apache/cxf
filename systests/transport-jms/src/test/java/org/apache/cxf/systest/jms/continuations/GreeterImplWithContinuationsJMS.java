@@ -27,31 +27,31 @@ import org.apache.cxf.continuations.ContinuationProvider;
 
 
 
-@WebService(serviceName = "HelloWorldService", 
+@WebService(serviceName = "HelloWorldService",
             portName = "HelloWorldPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterImplWithContinuationsJMS {    
-    
+public class GreeterImplWithContinuationsJMS {
+
     @Resource
     protected WebServiceContext context;
-    private volatile boolean suspended; 
-    
+    private volatile boolean suspended;
+
     public void greetMeOneWay(String name) {
         throw new UnsupportedOperationException();
     }
-    
+
     public String sayHi() {
         throw new UnsupportedOperationException();
     }
-    
+
     public void testRpcLitFault(String s) {
         throw new UnsupportedOperationException();
     }
-    
+
     public String greetMe(String name) {
-        
+
         Continuation continuation = getContinuation(name);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
@@ -74,7 +74,7 @@ public class GreeterImplWithContinuationsJMS {
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append(name);
-                
+
                 Object userObject = continuation.getObject();
                 if (userObject != null) {
                     sb.append(' ').append(userObject.toString());
@@ -84,12 +84,12 @@ public class GreeterImplWithContinuationsJMS {
             }
         }
         // unreachable
-        return null;        
+        return null;
     }
-    
+
     private Continuation getContinuation(String name) {
-        
-        ContinuationProvider provider = 
+
+        ContinuationProvider provider =
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());
         return provider.getContinuation();
     }

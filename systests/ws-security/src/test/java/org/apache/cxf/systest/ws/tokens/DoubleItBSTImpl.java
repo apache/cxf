@@ -33,40 +33,41 @@ import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItBSTImpl implements DoubleItPortType {
-    
+
     @Resource
     WebServiceContext wsContext;
-    
+
     public int doubleIt(int numberToDouble) throws DoubleItFault {
         if (numberToDouble == 0) {
             throw new DoubleItFault("0 can't be doubled!");
         }
-        
-        List<WSHandlerResult> results = 
+
+        List<WSHandlerResult> results =
             CastUtils.cast((List<?>)wsContext.getMessageContext().get(WSHandlerConstants.RECV_RESULTS));
         Assert.assertNotNull("Security Results cannot be null", results);
-        Assert.assertTrue(results.size() > 0);
-        
+        Assert.assertFalse(results.isEmpty());
+
         WSHandlerResult result = results.get(0);
         List<WSSecurityEngineResult> securityResults = result.getResults();
         Assert.assertNotNull("Security Results cannot be null", securityResults);
-        Assert.assertTrue(securityResults.size() > 0);
-        
+        Assert.assertFalse(securityResults.isEmpty());
+
         WSSecurityEngineResult securityResult = securityResults.get(0);
-        BinarySecurity binarySecurityToken = 
+        BinarySecurity binarySecurityToken =
             (BinarySecurity)securityResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertNotNull(binarySecurityToken);
-        
+
         Assert.assertTrue(Arrays.equals(binarySecurityToken.getToken(), "This is a token".getBytes()));
-        
+
         return numberToDouble * 2;
     }
-    
+
 }

@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.common.util.URIParserUtil;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.util.PropertyUtil;
 
@@ -33,13 +33,13 @@ public class ProcessorEnvironment {
 
     private Map<String, Object> paramMap;
     private String packageName;
-    private Map<String, String> namespacePackageMap = new HashMap<String, String>();
-    private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
-    private final Map<String, InputSource> jaxbBindingFiles = new HashMap<String, InputSource>();
+    private Map<String, String> namespacePackageMap = new HashMap<>();
+    private Map<String, String> excludeNamespacePackageMap = new HashMap<>();
+    private final Map<String, InputSource> jaxbBindingFiles = new HashMap<>();
 
     public ProcessorEnvironment() {
     }
-    
+
     public void loadDefaultNS2Pck()  {
         try {
             PropertyUtil properties = new PropertyUtil();
@@ -49,7 +49,7 @@ public class ProcessorEnvironment {
             e.printStackTrace();
         }
     }
-    
+
     public void loadDefaultExcludes()  {
         try {
             PropertyUtil properties = new PropertyUtil();
@@ -63,11 +63,11 @@ public class ProcessorEnvironment {
     private InputStream getResourceAsStream(String file) throws IOException {
         return ProcessorEnvironment.class.getResourceAsStream(file);
     }
-    
+
     public void setParameters(Map<String, Object> map) {
         this.paramMap = map;
     }
-    
+
     public boolean containsKey(String key) {
         return (paramMap == null) ? false : paramMap.containsKey(key);
     }
@@ -79,9 +79,8 @@ public class ProcessorEnvironment {
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {
             return defaultValue;
-        } else {
-            return get(key);
         }
+        return get(key);
     }
 
     public boolean getBooleanValue(String key, String defaultValue) {
@@ -90,7 +89,7 @@ public class ProcessorEnvironment {
 
     public void put(String key, Object value) {
         if (paramMap == null) {
-            paramMap = new HashMap<String, Object>();
+            paramMap = new HashMap<>();
         }
         paramMap.put(key, value);
     }
@@ -137,7 +136,7 @@ public class ProcessorEnvironment {
     public void setPackageName(String pkgName) {
         this.packageName = pkgName;
     }
-    
+
     public String getPackageName() {
         return this.packageName;
     }
@@ -145,13 +144,12 @@ public class ProcessorEnvironment {
     public String mapPackageName(String ns) {
         if (hasNamespace(ns)) {
             return mapNamespaceToPackageName(ns);
-        } else {
-            return getPackageName();
         }
+        return getPackageName();
     }
 
     public String getCustomizedNS(String ns) {
-        return URIParserUtil.getNamespace(mapPackageName(ns));
+        return PackageUtils.getNamespace(mapPackageName(ns));
     }
 
     public void addJaxbBindingFile(String location, InputSource is) {
@@ -162,7 +160,7 @@ public class ProcessorEnvironment {
         return this.jaxbBindingFiles;
     }
 
-    public boolean isExcludeNamespaceEnabled() {        
-        return excludeNamespacePackageMap.size() > 0;
+    public boolean isExcludeNamespaceEnabled() {
+        return !excludeNamespacePackageMap.isEmpty();
     }
 }

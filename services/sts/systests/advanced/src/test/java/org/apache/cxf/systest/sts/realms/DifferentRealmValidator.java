@@ -31,10 +31,10 @@ import org.opensaml.saml.saml2.core.Assertion;
  * subject.
  */
 public class DifferentRealmValidator extends STSTokenValidator {
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        
+
         SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"B-Issuer".equals(transformedToken.getIssuerString())) {
@@ -45,7 +45,7 @@ public class DifferentRealmValidator extends STSTokenValidator {
         if (!"B-Principal".equals(assertion.getSubject().getNameID().getValue())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         return validatedCredential;
     }
 

@@ -29,17 +29,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.activation.DataSource;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 public class AttachmentDeserializer {
     public static final String ATTACHMENT_PART_HEADERS = AttachmentDeserializer.class.getName() + ".headers";
@@ -49,24 +53,32 @@ public class AttachmentDeserializer {
 
     public static final String ATTACHMENT_MAX_SIZE = "attachment-max-size";
 
+    /**
+     * The maximum MIME Header Length. The default is 300.
+     */
+    public static final String ATTACHMENT_MAX_HEADER_SIZE = "attachment-max-header-size";
+    public static final int DEFAULT_MAX_HEADER_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.attachment-max-header-size", 300);
+
     public static final int THRESHOLD = 1024 * 100; //100K (byte unit)
 
     private static final Pattern CONTENT_TYPE_BOUNDARY_PATTERN = Pattern.compile("boundary=\"?([^\";]*)");
 
-    // TODO: Is there a better way to detect boundaries in the message content?
-    // It seems constricting to assume the boundary will start with ----=_Part_
     private static final Pattern INPUT_STREAM_BOUNDARY_PATTERN =
             Pattern.compile("^--(\\S*)$", Pattern.MULTILINE);
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AttachmentDeserializer.class);
+
+    private static final int PUSHBACK_AMOUNT = 2048;
+
     private boolean lazyLoading = true;
 
-    private int pbAmount = 2048;
     private PushbackInputStream stream;
-    private int createCount; 
+    private int createCount;
     private int closedCount;
     private boolean closed;
 
-    private byte boundary[];
+    private byte[] boundary;
 
     private String contentType;
 
@@ -75,9 +87,11 @@ public class AttachmentDeserializer {
     private Message message;
 
     private InputStream body;
-    
-    private Set<DelegatingInputStream> loaded = new HashSet<DelegatingInputStream>();
+
+    private Set<DelegatingInputStream> loaded = new HashSet<>();
     private List<String> supportedTypes;
+
+    private int maxHeaderLength = DEFAULT_MAX_HEADER_SIZE;
 
     public AttachmentDeserializer(Message message) {
         this(message, Collections.singletonList("multipart/related"));
@@ -86,8 +100,12 @@ public class AttachmentDeserializer {
     public AttachmentDeserializer(Message message, List<String> supportedTypes) {
         this.message = message;
         this.supportedTypes = supportedTypes;
+
+        // Get the maximum Header length from configuration
+        maxHeaderLength = MessageUtils.getContextualInteger(message, ATTACHMENT_MAX_HEADER_SIZE,
+                                                            DEFAULT_MAX_HEADER_SIZE);
     }
-    
+
     public void initializeAttachments() throws IOException {
         initializeRootMessage();
 
@@ -108,7 +126,7 @@ public class AttachmentDeserializer {
 
         if (AttachmentUtil.isTypeSupported(contentType.toLowerCase(), supportedTypes)) {
             String boundaryString = findBoundaryFromContentType(contentType);
-            if (null == boundaryString) {                
+            if (null == boundaryString) {
                 boundaryString = findBoundaryFromInputStream();
             }
             // If a boundary still wasn't found, throw an exception
@@ -117,8 +135,7 @@ public class AttachmentDeserializer {
             }
             boundary = boundaryString.getBytes("utf-8");
 
-            stream = new PushbackInputStream(message.getContent(InputStream.class),
-                                             pbAmount);
+            stream = new PushbackInputStream(message.getContent(InputStream.class), PUSHBACK_AMOUNT);
             if (!readTillFirstBoundary(stream, boundary)) {
                 throw new IOException("Couldn't find MIME boundary: " + boundaryString);
             }
@@ -132,9 +149,14 @@ public class AttachmentDeserializer {
                     message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
                 }
             }
+            val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
 
-            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
-                                             this);
+            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT);
+            InputStream ins = AttachmentUtil.decode(mmps, val);
+            if (ins != mmps) {
+                ih.remove("Content-Transfer-Encoding");
+            }
+            body = new DelegatingInputStream(ins, this);
             createCount++;
             message.setContent(InputStream.class, body);
         }
@@ -150,11 +172,18 @@ public class AttachmentDeserializer {
         InputStream is = message.getContent(InputStream.class);
         //boundary should definitely be in the first 2K;
         PushbackInputStream in = new PushbackInputStream(is, 4096);
-        byte buf[] = new byte[2048];
+        byte[] buf = new byte[2048];
         int i = in.read(buf);
-        String msg = IOUtils.newStringFromBytes(buf, 0, i);
-        in.unread(buf, 0, i);
-        
+        int len = i;
+        while (i > 0 && len < buf.length) {
+            i = in.read(buf, len, buf.length - len);
+            if (i > 0) {
+                len += i;
+            }
+        }
+        String msg = IOUtils.newStringFromBytes(buf, 0, len);
+        in.unread(buf, 0, len);
+
         // Reset the input stream since we'll need it again later
         message.setContent(InputStream.class, in);
 
@@ -162,7 +191,7 @@ public class AttachmentDeserializer {
         Matcher m = INPUT_STREAM_BOUNDARY_PATTERN.matcher(msg);
         return m.find() ? "--" + m.group(1) : null;
     }
-    
+
     public AttachmentImpl readNext() throws IOException {
         // Cache any mime parts that are currently being streamed
         cacheStreamedAttachments();
@@ -184,10 +213,10 @@ public class AttachmentDeserializer {
         if (body instanceof DelegatingInputStream
             && !((DelegatingInputStream) body).isClosed()) {
 
-            cache((DelegatingInputStream) body, true);
+            cache((DelegatingInputStream) body);
         }
 
-        List<Attachment> atts = new ArrayList<Attachment>(attachments.getLoadedAttachments());
+        List<Attachment> atts = new ArrayList<>(attachments.getLoadedAttachments());
         for (Attachment a : atts) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
@@ -196,14 +225,14 @@ public class AttachmentDeserializer {
                     ads.cache(message);
                 }
             } else if (s.getInputStream() instanceof DelegatingInputStream) {
-                cache((DelegatingInputStream) s.getInputStream(), false);
+                cache((DelegatingInputStream) s.getInputStream());
             } else {
                 //assume a normal stream that is already cached
             }
         }
     }
 
-    private void cache(DelegatingInputStream input, boolean deleteOnClose) throws IOException {
+    private void cache(DelegatingInputStream input) throws IOException {
         if (loaded.contains(input)) {
             return;
         }
@@ -223,7 +252,7 @@ public class AttachmentDeserializer {
      *
      * @param pushbackInStream
      * @param boundary
-     * @throws MessagingException
+     * @throws IOException
      */
     private static boolean readTillFirstBoundary(PushbackInputStream pbs, byte[] bp) throws IOException {
 
@@ -263,10 +292,11 @@ public class AttachmentDeserializer {
      * @throws IOException
      */
     private Attachment createAttachment(Map<String, List<String>> headers) throws IOException {
-        InputStream partStream = 
-            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
+        InputStream partStream =
+            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, PUSHBACK_AMOUNT),
                                       this);
         createCount++;
+
         return AttachmentUtil.createAttachment(partStream, headers);
     }
 
@@ -308,77 +338,46 @@ public class AttachmentDeserializer {
         stream.unread(v);
         return true;
     }
-    
-    
+
+
 
     private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
-        List<String> headerLines = new ArrayList<String>(10);
         StringBuilder buffer = new StringBuilder(128);
-        String line;
+        StringBuilder b = new StringBuilder(128);
+        Map<String, List<String>> heads = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
         // loop until we hit the end or a null line
-        while ((line = readLine(in)) != null) {
+        while (readLine(in, b)) {
             // lines beginning with white space get special handling
-            if (line.startsWith(" ") || line.startsWith("\t")) {
-                // this gets handled using the logic defined by
-                // the addHeaderLine method.  If this line is a continuation, but
-                // there's nothing before it, just call addHeaderLine to add it
-                // to the last header in the headers list
-                if (buffer.length() == 0) {
-                    addHeaderLine(headerLines, line);
-                } else {
+            char c = b.charAt(0);
+            if (c == ' ' || c == '\t') {
+                if (buffer.length() != 0) {
                     // preserve the line break and append the continuation
                     buffer.append("\r\n");
-                    buffer.append(line);
+                    buffer.append(b);
                 }
             } else {
                 // if we have a line pending in the buffer, flush it
                 if (buffer.length() > 0) {
-                    addHeaderLine(headerLines, buffer.toString());
+                    addHeaderLine(heads, buffer);
                     buffer.setLength(0);
                 }
                 // add this to the accumulator
-                buffer.append(line);
+                buffer.append(b);
             }
         }
 
         // if we have a line pending in the buffer, flush it
         if (buffer.length() > 0) {
-            addHeaderLine(headerLines, buffer.toString());
-        }
-        Map<String, List<String>> heads = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        for (String h: headerLines) {
-            int separator = h.indexOf(':');
-            String name = null;
-            String value = "";
-            if (separator == -1) {
-                name = h.trim();
-            } else {
-                name = h.substring(0, separator);
-                // step past the separator.  Now we need to remove any leading white space characters.
-                separator++;
-
-                while (separator < h.length()) {
-                    char ch = h.charAt(separator);
-                    if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') {
-                        break;
-                    }
-                    separator++;
-                }
-                value = h.substring(separator);
-            }
-            List<String> v = heads.get(name);
-            if (v == null) {
-                v = new ArrayList<String>(1);
-                heads.put(name, v);
-            }
-            v.add(value);
+            addHeaderLine(heads, buffer);
         }
         return heads;
     }
 
-    private String readLine(InputStream in) throws IOException {
-        StringBuilder buffer = new StringBuilder(128);
-
+    private boolean readLine(InputStream in, StringBuilder buffer) throws IOException {
+        if (buffer.length() != 0) {
+            buffer.setLength(0);
+        }
         int c;
 
         while ((c = in.read()) != -1) {
@@ -393,36 +392,48 @@ public class AttachmentDeserializer {
                 // just add to the buffer
                 buffer.append((char)c);
             }
+
+            if (buffer.length() > maxHeaderLength) {
+                LOG.fine("The attachment header size has exceeded the configured parameter: " + maxHeaderLength);
+                throw new HeaderSizeExceededException();
+            }
         }
 
         // no characters found...this was either an eof or a null line.
-        if (buffer.length() == 0) {
-            return null;
-        }
+        return buffer.length() != 0;
+    }
 
-        return buffer.toString();
-    }    
-    private void addHeaderLine(List<String> headers, String line) {
+    private void addHeaderLine(Map<String, List<String>> heads, StringBuilder line) {
         // null lines are a nop
-        if (line.length() == 0) {
+        final int size = line.length();
+        if (size == 0) {
             return;
         }
-
-        // we need to test the first character to see if this is a continuation whitespace
-        char ch = line.charAt(0);
-
-        // tabs and spaces are special.  This is a continuation of the last header in the list.
-        if (ch == ' ' || ch == '\t') {
-            int size = headers.size();
-            // it's possible that we have a leading blank line.
-            if (size > 0) {
-                line = headers.remove(size - 1) + line;
-                headers.add(line);
-            }
+        int separator = line.indexOf(":");
+        String name = null;
+        String value = "";
+        if (separator == -1) {
+            name = line.toString().trim();
         } else {
-            // this just gets appended to the end, preserving the addition order.
-            headers.add(line);
+            name = line.substring(0, separator);
+            // step past the separator.  Now we need to remove any leading white space characters.
+            separator++;
+
+            while (separator < size) {
+                char ch = line.charAt(separator);
+                if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') {
+                    break;
+                }
+                separator++;
+            }
+            value = line.substring(separator);
         }
+        List<String> v = heads.get(name);
+        if (v == null) {
+            v = new ArrayList<>(1);
+            heads.put(name, v);
+        }
+        v.add(value);
     }
 
 }

@@ -35,36 +35,36 @@ import javax.net.ssl.SSLSocketFactory;
 import org.apache.cxf.common.logging.LogUtils;
 
 class SSLSocketFactoryWrapper extends SSLSocketFactory {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SSLSocketFactoryWrapper.class);
-    
+
     private SSLSocketFactory sslSocketFactory;
     private String[] ciphers;
     private String protocol;
-    
+
     SSLSocketFactoryWrapper(
         SSLSocketFactory sslSocketFactoryParam,
         String[]         ciphersParam,
         String           protocolParam
     ) {
         sslSocketFactory = sslSocketFactoryParam;
-        ciphers          = ciphersParam;
-        protocol         = protocolParam;
+        ciphers = ciphersParam;
+        protocol = protocolParam;
     }
 
     public String[] getDefaultCipherSuites() {
         return sslSocketFactory.getDefaultCipherSuites();
     }
-    
+
     public String[] getSupportedCipherSuites() {
-        return sslSocketFactory.getSupportedCipherSuites(); 
+        return sslSocketFactory.getSupportedCipherSuites();
     }
-    
+    /*
     public Socket createSocket() throws IOException {
-        return enableCipherSuites(sslSocketFactory.createSocket(), 
+        return enableCipherSuites(sslSocketFactory.createSocket(),
                                   new Object[] {"unconnected", "unconnected"});
     }
-        
+    */
     public Socket createSocket(Socket s, String host, int port, boolean autoClose)
         throws IOException, UnknownHostException  {
         return enableCipherSuites(sslSocketFactory.createSocket(s, host, port, autoClose),
@@ -76,7 +76,7 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
                                   new Object[]{host, port});
     }
 
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) 
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
         throws IOException, UnknownHostException {
         return enableCipherSuites(sslSocketFactory.createSocket(host, port, localHost, localPort),
                                   new Object[]{host, port});
@@ -87,24 +87,24 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
                                   new Object[]{host, port});
     }
 
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) 
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
         throws IOException {
         return enableCipherSuites(sslSocketFactory.createSocket(address, port, localAddress, localPort),
                                   new Object[]{address, port});
     }
-    
+
     private Socket enableCipherSuites(Socket s, Object[] logParams) {
         SSLSocket socket = (SSLSocket)s;
-        
+
         if (socket == null) {
             LogUtils.log(LOG, Level.SEVERE,
-                         "PROBLEM_CREATING_OUTBOUND_REQUEST_SOCKET", 
+                         "PROBLEM_CREATING_OUTBOUND_REQUEST_SOCKET",
                          logParams);
             return socket;
         }
 
         if (protocol != null) {
-            String p[] = findProtocols(protocol, socket.getSupportedProtocols());
+            String[] p = findProtocols(protocol, socket.getSupportedProtocols());
             if (p != null) {
                 socket.setEnabledProtocols(p);
             }
@@ -113,10 +113,10 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
             socket.setEnabledCipherSuites(ciphers);
         }
 
-        return socket;        
+        return socket;
     }
     private String[] findProtocols(String p, String[] options) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String s : options) {
             if (s.equals(p)) {
                 return new String[] {p};
@@ -127,9 +127,9 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         if (list.isEmpty()) {
             return null;
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
-    
+
     /*
      * For testing only
      */

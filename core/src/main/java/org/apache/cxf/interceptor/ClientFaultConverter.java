@@ -39,6 +39,7 @@ import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
@@ -75,7 +76,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     public void handleMessage(Message msg) {
         Fault fault = (Fault) msg.getContent(Exception.class);
 
-        if (fault.getDetail() != null 
+        if (fault.getDetail() != null
             && !MessageUtils.getContextualBoolean(msg,
                                                  DISABLE_FAULT_MAPPING,
                                                  false)) {
@@ -96,7 +97,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 }
             }
         }
-        
+
         msg.getExchange().put(FaultMode.class, faultMode);
     }
 
@@ -164,22 +165,22 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             reader.setProperty(DataReader.FAULT, fault);
             e = reader.read(part, xsr);
         }
-        
+
         if (!(e instanceof Exception)) {
-            
+
             try {
                 Class<?> exClass = faultWanted.getProperty(Class.class.getName(), Class.class);
                 if (exClass == null) {
                     return;
                 }
-                if (e == null) { 
-                    Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-                    e = constructor.newInstance(new Object[]{fault.getMessage()});
+                if (e == null) {
+                    Constructor<?> constructor = exClass.getConstructor(String.class);
+                    e = constructor.newInstance(fault.getMessage());
                 } else {
-                
+
                     try {
                         Constructor<?> constructor = getConstructor(exClass, e);
-                        e = constructor.newInstance(new Object[]{fault.getMessage(), e});
+                        e = constructor.newInstance(fault.getMessage(), e);
                     } catch (NoSuchMethodException e1) {
                         //Use reflection to convert fault bean to exception
                         e = convertFaultBean(exClass, e, fault);
@@ -203,10 +204,10 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             msg.setContent(Exception.class, e);
         }
     }
-    
+
     private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
         Class<?> beanClass = e.getClass();
-        Constructor<?> cons[] = faultClass.getConstructors();
+        Constructor<?>[] cons = faultClass.getConstructors();
         for (Constructor<?> c : cons) {
             if (c.getParameterTypes().length == 2
                 && String.class.equals(c.getParameterTypes()[0])
@@ -215,14 +216,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             }
         }
         try {
-            return faultClass.getConstructor(new Class[]{String.class, beanClass});
+            return faultClass.getConstructor(String.class, beanClass);
         } catch (NoSuchMethodException ex) {
             Class<?> cls = getPrimitiveClass(beanClass);
             if (cls != null) {
-                return faultClass.getConstructor(new Class[]{String.class, cls});
-            } else {
-                throw ex;
+                return faultClass.getConstructor(String.class, cls);
             }
+            throw ex;
         }
 
     }
@@ -236,15 +236,15 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         }
         return supportsDOM;
     }
-    
+
     private void setStackTrace(Fault fault, Message msg) {
         Throwable cause = null;
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         XPathUtils xu = new XPathUtils(ns);
         ns.put("s", Fault.STACKTRACE_NAMESPACE);
         String ss = (String) xu.getValue("//s:" + Fault.STACKTRACE + "/text()", fault.getDetail(),
                 XPathConstants.STRING);
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         if (!StringUtils.isEmpty(ss)) {
             Iterator<String> linesIterator = Arrays.asList(CAUSE_SUFFIX_SPLITTER.split(ss)).iterator();
             while (linesIterator.hasNext()) {
@@ -255,7 +255,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 }
                 stackTraceList.add(parseStackTrackLine(oneLine));
             }
-            if (stackTraceList.size() > 0 || cause != null) {
+            if (!stackTraceList.isEmpty() || cause != null) {
                 Exception e = msg.getContent(Exception.class);
                 if (!stackTraceList.isEmpty()) {
                     StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
@@ -295,7 +295,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         if (res == null) {
             res = new Throwable(firstLine);
         }
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         while (linesIterator.hasNext()) {
             String oneLine = linesIterator.next();
             if (oneLine.startsWith("Caused by:")) {
@@ -309,13 +309,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         res.setStackTrace(stackTraceList.toArray(stackTraceElement));
         return res;
     }
-    
+
     private static StackTraceElement parseStackTrackLine(String oneLine) {
         StringTokenizer stInner = new StringTokenizer(oneLine, "!");
         return new StackTraceElement(stInner.nextToken(), stInner.nextToken(),
                 stInner.nextToken(), Integer.parseInt(stInner.nextToken()));
     }
-    
+
     private Class<?> getPrimitiveClass(Class<?> cls) {
         if (cls.isPrimitive()) {
             return cls;
@@ -332,13 +332,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         }
         return null;
     }
-    
+
     private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
-        Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-        Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
+        Constructor<?> constructor = exClass.getConstructor(String.class);
+        Exception e = (Exception)constructor.newInstance(fault.getMessage());
 
         //Copy fault bean fields to exception
-        for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {   
+        for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {
             Field[] fields = obj.getDeclaredFields();
             for (Field f : fields) {
                 try {
@@ -349,10 +349,10 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 } catch (NoSuchFieldException e1) {
                     //do nothing
                 }
-            }            
+            }
         }
         //also use/try public getter/setter methods
-        Method meth[] = faultBean.getClass().getMethods();
+        Method[] meth = faultBean.getClass().getMethods();
         for (Method m : meth) {
             if (m.getParameterTypes().length == 0
                 && (m.getName().startsWith("get")

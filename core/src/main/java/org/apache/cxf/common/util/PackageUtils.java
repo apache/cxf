@@ -19,7 +19,10 @@
 
 package org.apache.cxf.common.util;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -27,20 +30,19 @@ import org.apache.cxf.helpers.JavaUtils;
 
 
 public final class PackageUtils {
-      
+
     private PackageUtils() {
-        
+
     }
-    
+
     static String getPackageName(String className) {
         int pos = className.lastIndexOf('.');
         if (pos != -1) {
             return className.substring(0, pos);
-        } else {
-            return "";
         }
+        return "";
     }
-    
+
     public static String getPackageName(Class<?> clazz) {
         String className = clazz.getName();
         if (className.startsWith("[L")) {
@@ -48,29 +50,59 @@ public final class PackageUtils {
         }
         return getPackageName(className);
     }
-    
-    public static String parsePackageName(String namespace, String defaultPackageName) {
-        String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
-            ? defaultPackageName : null;
 
-        if (packageName == null) {
-            packageName = getPackageNameByNameSpaceURI(namespace);
+    public static String getSharedPackageName(List<Class<?>> classes) {
+        if (classes.isEmpty()) {
+            return "";
         }
-        return packageName;
+        List<List<String>> lParts = new ArrayList<>(classes.size());
+        List<String> currentParts = new ArrayList<>();
+        for (Class<?> cls : classes) {
+            if (!Proxy.isProxyClass(cls)) {
+                lParts.add(Arrays.asList(getPackageName(cls).split("\\.")));
+            }
+        }
+        for (int i = 0; i < lParts.get(0).size(); i++) {
+            int j = 1;
+            for (; j < lParts.size(); j++) {
+                if (i > (lParts.get(j).size() - 1) || !lParts.get(j).get(i).equals(lParts.get(0).get(i))) {
+                    break;
+                }
+            }
+            if (j == lParts.size()) {
+                currentParts.add(lParts.get(j - 1).get(i));
+            } else {
+                break;
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String part : currentParts) {
+            if (sb.length() > 0) {
+                sb.append('.');
+            }
+            sb.append(part);
+        }
+        return sb.toString();
     }
-    
+
+    public static String parsePackageName(String namespace, String defaultPackageName) {
+        return (defaultPackageName != null && !defaultPackageName.trim().isEmpty())
+            ? defaultPackageName : getPackageNameByNameSpaceURI(namespace.trim());
+    }
+
     public static String getPackageNameByNameSpaceURI(String nameSpaceURI) {
         int idx = nameSpaceURI.indexOf(':');
-        String scheme = "";
+        boolean urnScheme = false;
         if (idx >= 0) {
-            scheme = nameSpaceURI.substring(0, idx);
-            if ("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme)) {
-                nameSpaceURI = nameSpaceURI.substring(idx + 1);
+            final String scheme = nameSpaceURI.substring(0, idx);
+            urnScheme = "urn".equalsIgnoreCase(scheme);
+            if ("http".equalsIgnoreCase(scheme) || urnScheme) {
+                nameSpaceURI = nameSpaceURI.substring(idx + (urnScheme ? 1 : 3)); //
             }
         }
 
-        List<String> tokens = tokenize(nameSpaceURI, "/: ");
-        if (tokens.size() == 0) {
+        List<String> tokens = tokenize(nameSpaceURI, "/:");
+        if (tokens.isEmpty()) {
             return null;
         }
 
@@ -78,25 +110,27 @@ public final class PackageUtils {
             String lastToken = tokens.get(tokens.size() - 1);
             idx = lastToken.lastIndexOf('.');
             if (idx > 0) {
-                lastToken = lastToken.substring(0, idx);
+                //lastToken = lastToken.substring(0, idx);
+                lastToken = lastToken.replace('.', '_');
                 tokens.set(tokens.size() - 1, lastToken);
             }
         }
 
-        String domain = tokens.get(0);
-        idx = domain.indexOf(':');
-        if (idx >= 0) {
-            domain = domain.substring(0, idx);
-        }
-        List<String> r = reverse(tokenize(domain, "urn".equals(scheme) ? ".-" : "."));
+        String domain = tokens.remove(0);
+        // comma was removed by tokenize
+//        idx = domain.indexOf(':');
+//        if (idx >= 0) {
+//            domain = domain.substring(0, idx);
+//        }
+        List<String> r = tokenize(domain, urnScheme ? ".-" : ".");
+        Collections.reverse(r);
         if ("www".equalsIgnoreCase(r.get(r.size() - 1))) {
             // remove leading www
             r.remove(r.size() - 1);
         }
 
         // replace the domain name with tokenized items
-        tokens.addAll(1, r);
-        tokens.remove(0);
+        tokens.addAll(0, r);
 
         // iterate through the tokens and apply xml->java name algorithm
         for (int i = 0; i < tokens.size(); i++) {
@@ -106,7 +140,7 @@ public final class PackageUtils {
             token = removeIllegalIdentifierChars(token);
 
             // this will check for reserved keywords
-            if (containsReservedKeywords(token)) {
+            if (JavaUtils.isJavaKeyword(token)) {
                 token = '_' + token;
             }
 
@@ -114,24 +148,15 @@ public final class PackageUtils {
         }
 
         // concat all the pieces and return it
-        return combine(tokens, '.');
+        return String.join(".", tokens);
     }
 
     private static List<String> tokenize(String str, String sep) {
         StringTokenizer tokens = new StringTokenizer(str, sep);
-        List<String> r = new ArrayList<String>();
+        List<String> r = new ArrayList<>();
 
         while (tokens.hasMoreTokens()) {
             r.add(tokens.nextToken());
-        }
-        return r;
-    }
-
-    private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<T>();
-
-        for (int i = a.size() - 1; i >= 0; i--) {
-            r.add(a.get(i));
         }
         return r;
     }
@@ -155,45 +180,13 @@ public final class PackageUtils {
         return newToken.toString();
     }
 
-    private static String combine(List<?> r, char sep) {
-        StringBuilder buf = new StringBuilder(r.get(0).toString());
-
-        for (int i = 1; i < r.size(); i++) {
-            buf.append(sep);
-            buf.append(r.get(i));
-        }
-
-        return buf.toString();
-    }
-
-    private static boolean containsReservedKeywords(String token) {
-        return JavaUtils.isJavaKeyword(token);
-    }
-
     public static String getNamespace(String packageName) {
-        if (packageName == null || packageName.length() == 0) {
+        if (packageName == null || packageName.isEmpty()) {
             return null;
         }
-        StringTokenizer tokenizer = new StringTokenizer(packageName, ".");
-        String[] tokens;
-        if (tokenizer.countTokens() == 0) {
-            tokens = new String[0];
-        } else {
-            tokens = new String[tokenizer.countTokens()];
-            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
-                tokens[i] = tokenizer.nextToken();
-            }
-        }
-        StringBuilder namespace = new StringBuilder("http://");
-        String dot = "";
-        for (int i = 0; i < tokens.length; i++) {
-            if (i == 1) {
-                dot = ".";
-            }
-            namespace.append(dot + tokens[i]);
-        }
-        namespace.append('/');
-        return namespace.toString();
+        final List<String> parts = Arrays.asList(packageName.split("\\."));
+        Collections.reverse(parts); 
+        return "http://" + String.join(".", parts) + '/';
     }
-    
+
 }

@@ -24,7 +24,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 
 @WebService(targetNamespace = "http://cxf.apache.org/AuthService", name = "AuthService")
@@ -34,7 +34,7 @@ public interface AuthService {
     java.util.List<java.lang.String> getRoles(
                                               String sid
     );
-    
+
     java.lang.String[] getRolesAsArray(String sid);
 
     @WebMethod(operationName = "authenticate1")
@@ -47,7 +47,7 @@ public interface AuthService {
     //test bean mode
     @WebMethod(operationName = "authenticate2")
     boolean authenticate(Authenticate auth);
-    
+
     String getAuthentication(String sid);
-    
+
 }

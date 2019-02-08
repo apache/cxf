@@ -29,16 +29,20 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class AnnotationTestUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+
+public class AnnotationTestUtilsTest {
 
     @Test
     public void testGetAnnotatedMethodFromInterface() throws Exception {
-        
-        Method m = 
-            Customer.class.getMethod("setUriInfoContext", 
+
+        Method m =
+            Customer.class.getMethod("setUriInfoContext",
                                      new Class[]{UriInfo.class});
         assertEquals(0, m.getAnnotations().length);
         assertEquals(0, m.getParameterAnnotations()[0].length);
@@ -46,34 +50,34 @@ public class AnnotationTestUtilsTest extends Assert {
         assertNotSame(m, annotatedMethod);
         assertEquals(1, annotatedMethod.getParameterAnnotations()[0].length);
     }
-    
+
     @Test
     public void testGetAnnotatedMethodFromClass() throws Exception {
-        
-        Method m = 
-            Customer.class.getMethod("getContextResolver", 
+
+        Method m =
+            Customer.class.getMethod("getContextResolver",
                                      new Class[]{});
         assertEquals(0, m.getAnnotations().length);
         Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(Customer.class, m);
         assertSame(m, annotatedMethod);
     }
-    
+
     @Test
     public void testCustomHttpMethodValue() throws Exception {
         Method m = ResourceClass.class.getMethod("update", new Class[]{});
         assertEquals("UPDATE", AnnotationUtils.getHttpMethodValue(m));
     }
-    
+
     @Target({ElementType.METHOD })
     @Retention(RetentionPolicy.RUNTIME)
     @HttpMethod("UPDATE")
-    public @interface UPDATE { 
+    public @interface UPDATE {
     }
-    
+
     public class ResourceClass {
         @UPDATE
         public void update() {
-            
+
         }
     }
 }

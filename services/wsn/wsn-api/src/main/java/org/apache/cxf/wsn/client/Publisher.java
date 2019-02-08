@@ -113,7 +113,7 @@ public class Publisher implements NotificationProducer, Referencable {
             InvalidFilterFault, UnsupportedPolicyRequestFault, InvalidMessageContentExpressionFault,
             SubscribeCreationFailedFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault {
         //CHECKSYTLE:ON
-        
+
         TopicExpressionType topic = null;
         if (subscribeRequest.getFilter() != null) {
             for (Object f : subscribeRequest.getFilter().getAny()) {
@@ -147,14 +147,14 @@ public class Publisher implements NotificationProducer, Referencable {
     }
 
     public GetCurrentMessageResponse getCurrentMessage(
-            @WebParam(partName = "GetCurrentMessageRequest", name = "GetCurrentMessage", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2") 
-                GetCurrentMessage getCurrentMessageRequest) 
+            @WebParam(partName = "GetCurrentMessageRequest", name = "GetCurrentMessage",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2")
+                GetCurrentMessage getCurrentMessageRequest)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws InvalidTopicExpressionFault, ResourceUnknownFault, TopicExpressionDialectUnknownFault, 
+        throws InvalidTopicExpressionFault, ResourceUnknownFault, TopicExpressionDialectUnknownFault,
             MultipleTopicsSpecifiedFault, NoCurrentMessageOnTopicFault, TopicNotSupportedFault {
         //CHECKSTYLE:ON
-        
+
         NoCurrentMessageOnTopicFaultType fault = new NoCurrentMessageOnTopicFaultType();
         throw new NoCurrentMessageOnTopicFault("There is no current message on this topic.", fault);
     }
@@ -181,8 +181,8 @@ public class Publisher implements NotificationProducer, Referencable {
         }
 
         public UnsubscribeResponse unsubscribe(
-                @WebParam(partName = "UnsubscribeRequest", 
-                          name = "Unsubscribe", 
+                @WebParam(partName = "UnsubscribeRequest",
+                          name = "Unsubscribe",
                           targetNamespace = "http://docs.oasis-open.org/wsn/b-2")
                     Unsubscribe unsubscribeRequest)
             throws ResourceUnknownFault, UnableToDestroySubscriptionFault {
@@ -192,7 +192,7 @@ public class Publisher implements NotificationProducer, Referencable {
 
         public RenewResponse renew(
                 @WebParam(partName = "RenewRequest", name = "Renew",
-                          targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Renew renewRequest) 
+                          targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Renew renewRequest)
             throws ResourceUnknownFault, UnacceptableTerminationTimeFault {
             throw new UnsupportedOperationException();
         }

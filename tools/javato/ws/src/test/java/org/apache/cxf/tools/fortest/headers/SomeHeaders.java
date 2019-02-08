@@ -29,7 +29,7 @@ public interface SomeHeaders {
 
     // using four parameters where two being headers
     @WebMethod()
-    @WebResult (name = "someHeadersResponse") 
+    @WebResult (name = "someHeadersResponse")
     String hello(
                  @WebParam(name = "body1") String body1,
                  @WebParam(name = "body2") String body2,

@@ -29,7 +29,7 @@ import org.apache.cxf.tools.wsdlto.core.AbstractGenerator;
 
 public abstract class AbstractSimpleGenerator extends AbstractGenerator {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractSimpleGenerator.class);
-    protected static final String TEMPLATE_BASE = "org/apache/cxf/tools" 
+    protected static final String TEMPLATE_BASE = "org/apache/cxf/tools"
         + "/java2wsdl/processor/internal/simple/generator/template";
 
     public abstract boolean passthrough();
@@ -37,10 +37,10 @@ public abstract class AbstractSimpleGenerator extends AbstractGenerator {
     public abstract void generate(ToolContext penv) throws ToolException;
 
     public void register(final ClassCollector collector, String packageName, String fileName) {
-        
+
     }
     public String getOutputDir() {
-        return (String)env.get(ToolConstants.CFG_SOURCEDIR);           
-    } 
-    
+        return (String)env.get(ToolConstants.CFG_SOURCEDIR);
+    }
+
 }

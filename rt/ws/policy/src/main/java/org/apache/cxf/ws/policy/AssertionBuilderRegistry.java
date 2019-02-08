@@ -26,21 +26,21 @@ import org.apache.neethi.AssertionBuilderFactory;
  * create Assertion objects from given xml elements.
  */
 public interface AssertionBuilderRegistry extends AssertionBuilderFactory {
-    
+
     /**
      * Indicates if unknown assertions should simply be ignored.
      * If set to false, the policy engine will throw an exception upon
      * encountering an assertion type for which no AssertionBuilder
      * has been registered.
-     * @return false if unknown assertions will result in an exception 
+     * @return false if unknown assertions will result in an exception
      */
     boolean isIgnoreUnknownAssertions();
-    
+
     /**
      * Indicates if unknown assertions should simply be ignored.
      * If set to false, the policy engine will throw an exception upon
      * encountering an assertion type for which no AssertionBuilder
-     * has been registered. 
+     * has been registered.
      * @param ignoreUnknownAssertions if unknown assertions should be ignored
      */
     void setIgnoreUnknownAssertions(boolean ignoreUnknownAssertions);

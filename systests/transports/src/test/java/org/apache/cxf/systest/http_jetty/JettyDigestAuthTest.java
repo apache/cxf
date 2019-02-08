@@ -29,14 +29,13 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -52,8 +51,13 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests thread pool config.
@@ -62,15 +66,15 @@ import org.junit.Test;
 public class JettyDigestAuthTest extends AbstractClientServerTestBase {
     private static final String PORT = allocatePort(JettyDigestAuthTest.class);
     private static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-    private static final QName SERVICE_NAME = 
+    private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
     private Greeter greeter;
 
-    
+
     public static class JettyDigestServer extends AbstractBusTestServerBase  {
         Endpoint ep;
-        
+
         protected void run()  {
             String configurationFile = "jettyDigestServer.xml";
             URL configure =
@@ -78,13 +82,13 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             Bus bus = new SpringBusFactory().createBus(configure, true);
             bus.getInInterceptors().add(new LoggingInInterceptor());
             bus.getOutInterceptors().add(new LoggingOutInterceptor());
-            SpringBusFactory.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
             setBus(bus);
 
             GreeterImpl implementor = new GreeterImpl();
             ep = Endpoint.publish(ADDRESS, implementor);
         }
-        
+
         public void tearDown() throws Exception {
             if (ep != null) {
                 ep.stop();
@@ -92,11 +96,11 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             }
         }
     }
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(JettyDigestServer.class, true));
     }
 
@@ -105,7 +109,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
         greeter = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
         BindingProvider bp = (BindingProvider)greeter;
         ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
-        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor()); 
+        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    ADDRESS);
         HTTPConduit cond = (HTTPConduit)ClientProxy.getClient(greeter).getConduit();
@@ -125,10 +129,10 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, "pswd");
             cond.setAuthSupplier(new DigestAuthSupplier());
         }
-        
+
         ClientProxy.getClient(greeter).getOutInterceptors()
             .add(new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM_ENDING) {
-                
+
                 public void handleMessage(Message message) throws Fault {
                     Map<String, ?> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
                     if (headers.containsKey("Proxy-Authorization")) {
@@ -147,11 +151,11 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
     }
     @Test
     public void testDigestAuthAsyncClient() throws Exception {
-        //We'll let HTTP async handle it.  Useful for things like NTLM 
+        //We'll let HTTP async handle it.  Useful for things like NTLM
         //which async client can handle but we cannot.
         doTest(true);
     }
-  
+
     private void doTest(boolean async) throws Exception {
         setupClient(async);
         assertEquals("Hello Alice", greeter.greetMe("Alice"));
@@ -172,14 +176,14 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             //ignore - expected
         }
     }
-    
+
     @org.junit.Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());
-       
+
         MyHTTPConduitConfigurer myHttpConduitConfig = new MyHTTPConduitConfigurer();
         bus.setExtension(myHttpConduitConfig, HTTPConduitConfigurer.class);
         JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance(bus);

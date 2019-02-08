@@ -34,15 +34,19 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PhaseInterceptorChainTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
+public class PhaseInterceptorChainTest {
 
     private IMocksControl control;
 
@@ -59,7 +63,7 @@ public class PhaseInterceptorChainTest extends Assert {
         Phase phase1 = new Phase("phase1", 1);
         Phase phase2 = new Phase("phase2", 2);
         Phase phase3 = new Phase("phase3", 3);
-        SortedSet<Phase> phases = new TreeSet<Phase>();
+        SortedSet<Phase> phases = new TreeSet<>();
         phases.add(phase1);
         phases.add(phase2);
         phases.add(phase3);
@@ -75,10 +79,10 @@ public class PhaseInterceptorChainTest extends Assert {
     @Test
     public void testState() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p = setUpPhaseInterceptor("phase1", "p1");
-       
+
         control.replay();
         chain.add(p);
-        
+
         assertSame("Initial state is State.EXECUTING",
                    InterceptorChain.State.EXECUTING, chain.getState());
         chain.pause();
@@ -91,34 +95,34 @@ public class PhaseInterceptorChainTest extends Assert {
         assertSame("Aborting chain should lead to State.ABORTED",
                    InterceptorChain.State.ABORTED, chain.getState());
     }
-    
+
     @Test
     public void testSuspendedException() throws Exception {
-        CountingPhaseInterceptor p1 = 
+        CountingPhaseInterceptor p1 =
             new CountingPhaseInterceptor("phase1", "p1");
-        SuspendedInvocationInterceptor p2 = 
+        SuspendedInvocationInterceptor p2 =
             new SuspendedInvocationInterceptor("phase2", "p2");
-        
+
         message.getInterceptorChain();
         EasyMock.expectLastCall().andReturn(chain).anyTimes();
 
         control.replay();
-        
+
         chain.add(p1);
         chain.add(p2);
-        
+
         try {
             chain.doIntercept(message);
             fail("Suspended invocation swallowed");
         } catch (SuspendedInvocationException ex) {
             // ignore
         }
-        
+
         assertSame("No previous interceptor selected", p1, chain.iterator().next());
         assertSame("Suspended invocation should lead to State.PAUSED",
                    InterceptorChain.State.PAUSED, chain.getState());
     }
-    
+
     @Test
     public void testAddOneInterceptor() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p = setUpPhaseInterceptor("phase1", "p1");
@@ -126,9 +130,9 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
-    
+
     @Test
     public void testForceAddSameInterceptor() throws Exception {
 
@@ -138,14 +142,14 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p, true);
         it = chain.iterator();
         assertSame(p, it.next());
         assertSame(p, it.next());
-        assertTrue(!it.hasNext()); 
+        assertFalse(it.hasNext());
     }
-    
+
     @Test
     public void testForceAddSameInterceptorType() throws Exception {
 
@@ -156,18 +160,18 @@ public class PhaseInterceptorChainTest extends Assert {
         chain.add(p2, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p2, true);
         it = chain.iterator();
         assertSame(p1, it.next());
         assertSame(p2, it.next());
-        assertTrue(!it.hasNext()); 
+        assertFalse(it.hasNext());
     }
 
     @Test
     public void testAddTwoInterceptorsSamePhase() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p1 = setUpPhaseInterceptor("phase1", "p1");
-        Set<String> after = new HashSet<String>();
+        Set<String> after = new HashSet<>();
         after.add("p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p2", null, after);
         control.replay();
@@ -177,28 +181,28 @@ public class PhaseInterceptorChainTest extends Assert {
 
         assertSame("Unexpected interceptor at this position.", p1, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
-        
+
     @Test
     public void testThreeInterceptorSamePhaseWithOrder() throws Exception {
         AbstractPhaseInterceptor<? extends Message> p1 = setUpPhaseInterceptor("phase1", "p1");
-        Set<String> before = new HashSet<String>();
+        Set<String> before = new HashSet<>();
         before.add("p1");
         AbstractPhaseInterceptor<? extends Message> p2 = setUpPhaseInterceptor("phase1", "p2", before, null);
-        Set<String> before1 = new HashSet<String>();
+        Set<String> before1 = new HashSet<>();
         before1.add("p2");
         AbstractPhaseInterceptor<? extends Message> p3 = setUpPhaseInterceptor("phase1", "p3", before1, null);
         control.replay();
         chain.add(p3);
         chain.add(p1);
         chain.add(p2);
-        
+
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame("Unexpected interceptor at this position.", p3, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
         assertSame("Unexpected interceptor at this position.", p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -333,7 +337,7 @@ public class PhaseInterceptorChainTest extends Assert {
 
         AbstractPhaseInterceptor<Message> p2 = setUpPhaseInterceptor("phase1", "p2");
         setUpPhaseInterceptorInvocations(p2, false, false);
-        Set<String> after3 = new HashSet<String>();
+        Set<String> after3 = new HashSet<>();
         after3.add("p2");
         AbstractPhaseInterceptor<Message> p3 = setUpPhaseInterceptor("phase1", "p3", null, after3);
         setUpPhaseInterceptorInvocations(p3, false, false);
@@ -391,30 +395,29 @@ public class PhaseInterceptorChainTest extends Assert {
         assertEquals(0, p2.invoked);
         assertEquals(1, p3.invoked);
     }
-    
+
     AbstractPhaseInterceptor<Message> setUpPhaseInterceptor(String phase, String id) throws Exception {
         return setUpPhaseInterceptor(phase, id, null, null);
     }
 
-    AbstractPhaseInterceptor<Message> setUpPhaseInterceptor(final String phase, 
+    AbstractPhaseInterceptor<Message> setUpPhaseInterceptor(final String phase,
                                                    final String id,
                                                    Set<String> b,
                                                    Set<String> a) throws Exception {
-        
-        @SuppressWarnings("unchecked")
+
         AbstractPhaseInterceptor<Message> p = control
             .createMock(AbstractPhaseInterceptor.class);
-        
+
         if (a == null) {
-            a = new SortedArraySet<String>();
+            a = new SortedArraySet<>();
         }
         if (b == null) {
-            b = new SortedArraySet<String>();
+            b = new SortedArraySet<>();
         }
         Field f = AbstractPhaseInterceptor.class.getDeclaredField("before");
         ReflectionUtil.setAccessible(f);
         f.set(p, b);
-        
+
         f = AbstractPhaseInterceptor.class.getDeclaredField("after");
         ReflectionUtil.setAccessible(f);
         f.set(p, a);
@@ -429,7 +432,7 @@ public class PhaseInterceptorChainTest extends Assert {
 
         return p;
     }
-    
+
     void setUpPhaseInterceptorInvocations(AbstractPhaseInterceptor<Message> p,
             boolean fail, boolean expectFault) {
         p.handleMessage(message);
@@ -447,8 +450,8 @@ public class PhaseInterceptorChainTest extends Assert {
         }
     }
 
-    private void setUpCustomLogger(boolean useCustomLogger, 
-                                   boolean expectFault, 
+    private void setUpCustomLogger(boolean useCustomLogger,
+                                   boolean expectFault,
                                    boolean returnFromCustomLogger) {
         if (useCustomLogger) {
             FaultListener customLogger = control.createMock(FaultListener.class);
@@ -456,7 +459,7 @@ public class PhaseInterceptorChainTest extends Assert {
             EasyMock.expectLastCall().andReturn(customLogger);
             if (expectFault) {
                 customLogger.faultOccurred(EasyMock.isA(Exception.class),
-                                 EasyMock.isA(String.class), 
+                                 EasyMock.isA(String.class),
                                  EasyMock.isA(Message.class));
                 EasyMock.expectLastCall().andReturn(returnFromCustomLogger);
                 if (returnFromCustomLogger) {
@@ -513,7 +516,7 @@ public class PhaseInterceptorChainTest extends Assert {
             invoked++;
         }
     }
-    
+
     public class WrapperingPhaseInterceptor extends CountingPhaseInterceptor {
         public WrapperingPhaseInterceptor(String phase, String id) {
             super(phase, id);
@@ -526,11 +529,11 @@ public class PhaseInterceptorChainTest extends Assert {
     }
 
     public class SuspendedInvocationInterceptor extends AbstractPhaseInterceptor<Message> {
-        
+
         public SuspendedInvocationInterceptor(String phase, String id) {
             super(id, phase);
         }
-        
+
         public void handleMessage(Message m) {
             m.getInterceptorChain().suspend();
         }

@@ -22,10 +22,11 @@ package org.apache.cxf.wsdl11;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class NSManagerTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class NSManagerTest {
     @Test
     public void testGetPrefix() {
         NSManager nsMan = new NSManager();

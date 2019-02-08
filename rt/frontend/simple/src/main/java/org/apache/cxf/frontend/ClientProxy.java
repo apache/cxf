@@ -65,7 +65,7 @@ public class ClientProxy implements InvocationHandler, Closeable {
         } else if (method.getDeclaringClass().isInstance(client)) {
             return method.invoke(client, args);
         }
-        
+
         MethodDispatcher dispatcher = (MethodDispatcher)endpoint.getService().get(MethodDispatcher.class
                                                                                       .getName());
         BindingOperationInfo oi = dispatcher.getBindingOperation(method, endpoint);
@@ -80,9 +80,9 @@ public class ClientProxy implements InvocationHandler, Closeable {
 
         Object o = invokeSync(method, oi, params);
         //call a virtual method passing the object.  This causes the IBM JDK
-        //to keep the "this" pointer references and thus "this" doesn't get 
+        //to keep the "this" pointer references and thus "this" doesn't get
         //finalized in the midst of an invoke operation
-        return adjustObject(o); 
+        return adjustObject(o);
     }
     protected Object adjustObject(Object o) {
         return o;
@@ -93,13 +93,12 @@ public class ClientProxy implements InvocationHandler, Closeable {
         if (client == null) {
             throw new IllegalStateException("The client has been closed.");
         }
-        Object rawRet[] = client.invoke(oi, params);
+        Object[] rawRet = client.invoke(oi, params);
 
         if (rawRet != null && rawRet.length > 0) {
             return rawRet[0];
-        } else {
-            return null;
         }
+        return null;
     }
     public Map<String, Object> getRequestContext() {
         if (client == null) {

@@ -22,32 +22,35 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class ResourceAdapterInternalExceptionTest extends Assert {
-    private static final Logger EXCEPTION_LOGGER = 
+
+public class ResourceAdapterInternalExceptionTest {
+    private static final Logger EXCEPTION_LOGGER =
         LogUtils.getLogger(ResourceAdapterInternalException.class);
-    private Level logLevel;  
+    private Level logLevel;
 
-    @Before    
-    public void setUp() throws Exception { 
+    @Before
+    public void setUp() throws Exception {
         logLevel = EXCEPTION_LOGGER.getLevel();
         EXCEPTION_LOGGER.setLevel(Level.SEVERE);
-    } 
-    
+    }
+
     @After
     public void tearDown() throws Exception {
         EXCEPTION_LOGGER.setLevel(logLevel);
     }
-    
+
     @Test
     public void testMessage() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         Exception e = new ResourceAdapterInternalException(msg);
         assertTrue(e.toString().indexOf(msg) != -1);
@@ -57,15 +60,14 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
 
     @Test
     public void testMessageWithNullTx() {
-        final String msg = "msg1";
-        msg.intern();
+        final String msg = "msg1".intern();
 
         javax.resource.spi.ResourceAdapterInternalException e = new ResourceAdapterInternalException(msg,
                                                                                                      null);
         assertTrue(e.toString().indexOf(msg) != -1);
         assertTrue(e.toString().indexOf("reason") == -1);
         assertEquals(e.getMessage(), msg);
-        assertNull(e.getCause());        
+        assertNull(e.getCause());
     }
 
     @Test
@@ -94,7 +96,7 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
         assertTrue(e.toString().indexOf(msg) != -1);
         assertTrue(e.toString().indexOf("reason") != -1);
         assertTrue(e.toString().indexOf(causeMsg) != -1);
-        assertEquals(e.getCause(), cause);       
+        assertEquals(e.getCause(), cause);
 
     }
 
@@ -104,11 +106,11 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
         final String causeMsg = "cause";
 
         Exception cause = new RuntimeException(causeMsg);
-        javax.resource.spi.ResourceAdapterInternalException re = 
+        javax.resource.spi.ResourceAdapterInternalException re =
             new ResourceAdapterInternalException(
-                msg, 
+                msg,
                 new java.lang.reflect.InvocationTargetException(cause));
-        
+
         assertTrue(re.toString().indexOf(msg) != -1);
         assertTrue(re.toString().indexOf("reason") != -1);
         assertTrue(re.toString().indexOf(causeMsg) != -1);
@@ -122,14 +124,14 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
         final String causeMsg = "cause";
 
         java.lang.Throwable cause = new java.lang.UnknownError(causeMsg);
-        ResourceAdapterInternalException re = 
+        ResourceAdapterInternalException re =
             new ResourceAdapterInternalException(
                 msg,
                 new java.lang.reflect.InvocationTargetException(cause));
         assertEquals(re.getCause(), cause);
     }
 
-    
+
     @Test
     public void testGetLinkedExceptionReturnNullIfNoCause() throws Exception {
         ResourceAdapterInternalException re = new ResourceAdapterInternalException("ex");
@@ -149,5 +151,5 @@ public class ResourceAdapterInternalExceptionTest extends Assert {
         ResourceAdapterInternalException re = new ResourceAdapterInternalException("ex", cause);
         assertEquals("get same exception", cause, re.getLinkedException());
     }
-    
+
 }

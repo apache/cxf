@@ -34,31 +34,31 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
 
     @Override
     protected void parseChildElements(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        mapElementToJaxbProperty(element, bean, 
+        mapElementToJaxbProperty(element, bean,
                 new QName(RM_NS, "deliveryAssurance"), "deliveryAssurance");
-        mapElementToJaxbProperty(element, bean, 
+        mapElementToJaxbProperty(element, bean,
                 new QName(RM_NS, "sourcePolicy"), "sourcePolicy");
-        mapElementToJaxbProperty(element, bean, 
+        mapElementToJaxbProperty(element, bean,
                 new QName(RM_NS, "destinationPolicy"), "destinationPolicy");
-        mapElementToJaxbProperty(element, bean, 
+        mapElementToJaxbProperty(element, bean,
                 new QName(RM_NS, "RM10AddressingNamespace"), "RM10AddressingNamespace");
-        mapElementToJaxbProperty(element, bean, 
-                new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"), 
+        mapElementToJaxbProperty(element, bean,
+                new QName("http://schemas.xmlsoap.org/ws/2005/02/rm/policy", "RMAssertion"),
                 "RMAssertion",
                 org.apache.cxf.ws.rmp.v200502.RMAssertion.class);
         // TODO: handle
-//        mapElementToJaxbProperty(element, bean, 
-//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"), 
+//        mapElementToJaxbProperty(element, bean,
+//                new QName("http://docs.oasis-open.org/ws-rx/wsrmp/200702", "RMAssertion"),
 //                "RMAssertion",
 //                org.apache.cxf.ws.rmp.v200702.RMAssertion.class);
-        
-        super.parseChildElements(element, ctx, bean);                
+
+        super.parseChildElements(element, ctx, bean);
         ctx.getDelegate().parsePropertyElements(element, bean.getBeanDefinition());
     }
-    
+
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
-        if ("store".equals(name)) {            
+        if ("store".equals(name)) {
             setFirstChildAsProperty(e, ctx, bean, name);
         }
     }
@@ -72,12 +72,12 @@ public class RMFeatureBeanDefinitionParser extends AbstractBeanDefinitionParser 
     protected boolean shouldGenerateIdAsFallback() {
         return true;
     }
-    
+
     @Override
     protected String getJaxbPackage() {
         return "org.apache.cxf.ws.rm.manager";
     }
-    
-    
+
+
 
 }

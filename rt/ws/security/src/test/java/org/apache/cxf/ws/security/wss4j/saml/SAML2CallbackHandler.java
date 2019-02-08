@@ -39,9 +39,9 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
  * authentication assertion using Sender Vouches.
  */
 public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
-    
+
     private boolean signAssertion;
-    
+
     public SAML2CallbackHandler() throws Exception {
         if (certs == null) {
             Crypto crypto = CryptoFactory.getInstance("alice.properties");
@@ -49,17 +49,17 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
             cryptoType.setAlias("alice");
             certs = crypto.getX509Certificates(cryptoType);
         }
-        
+
         subjectName = "uid=alice,ou=people,ou=saml-demo,o=example.com";
         subjectQualifier = "www.example.com";
         confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
     }
-    
+
     public SAML2CallbackHandler(boolean multivalue) throws Exception {
         this();
         this.multiValue = multivalue;
     }
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
@@ -67,7 +67,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setIssuer("www.example.com");
                 callback.setSamlVersion(Version.SAML_20);
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
@@ -81,7 +81,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
                 }
                 callback.setSubject(subjectBean);
                 createAndSetStatement(null, callback);
-                
+
                 try {
                     Crypto crypto = CryptoFactory.getInstance("outsecurity.properties");
                     callback.setIssuerCrypto(crypto);
@@ -96,7 +96,7 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
             }
         }
     }
-    
+
     public boolean isSignAssertion() {
         return signAssertion;
     }
@@ -104,5 +104,5 @@ public class SAML2CallbackHandler extends AbstractSAMLCallbackHandler {
     public void setSignAssertion(boolean signAssertion) {
         this.signAssertion = signAssertion;
     }
-    
+
 }

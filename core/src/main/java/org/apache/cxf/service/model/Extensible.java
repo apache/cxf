@@ -25,22 +25,22 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *
  */
 public interface Extensible {
 
     <T> T getExtensor(Class<T> cls);
-    
+
     <T> List<T> getExtensors(Class<T> cls);
-    
+
     void addExtensor(Object el);
-    
+
     Object getExtensionAttribute(QName name);
-    
+
     Map<QName, Object> getExtensionAttributes();
-    
+
     void addExtensionAttribute(QName name, Object attr);
-    
+
     void setExtensionAttributes(Map<QName, Object> attrs);
-      
+
 }

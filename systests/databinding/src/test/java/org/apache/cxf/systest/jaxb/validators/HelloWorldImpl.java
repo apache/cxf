@@ -24,10 +24,10 @@ public class HelloWorldImpl implements HelloWorld {
     public PassedObject sayHi(PassedObject name) {
         return new PassedObject("Hello", name.getName());
     }
-    
+
     public PassedObject returnNull(PassedObject name) {
         return new PassedObject("Hello", null);
     }
-    
+
 }
 

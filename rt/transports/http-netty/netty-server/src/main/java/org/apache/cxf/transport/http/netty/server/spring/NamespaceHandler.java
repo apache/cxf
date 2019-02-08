@@ -22,7 +22,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("engine-factory", 
+        registerBeanDefinitionParser("engine-factory",
                 new NettyHttpServerEngineFactoryBeanDefinitionParser());
         registerBeanDefinitionParser("engine",
                                      new NettyHttpServerEngineBeanDefinitionParser());

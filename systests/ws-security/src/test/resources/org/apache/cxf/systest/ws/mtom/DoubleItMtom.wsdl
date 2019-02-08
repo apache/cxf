@@ -52,6 +52,42 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricBinaryEncryptBeforeSigningBinding" type="tns:DoubleItMtomPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricEncryptBeforeSigningPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt4">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItSymmetricBinaryBinding" type="tns:DoubleItMtomPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt4">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -108,8 +144,8 @@
         <wsdl:port name="DoubleItSignedMTOMInlinePort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSignedMTOMInline"/>
         </wsdl:port>
-        <wsdl:port name="DoubleItSignedMTOMSwAPort" binding="tns:DoubleItNoSecurityBinding">
-            <soap:address location="http://localhost:9001/DoubleItSignedMTOMSwA"/>
+        <wsdl:port name="DoubleItSignedMTOMActionPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSignedMTOMAction"/>
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricPort" binding="tns:DoubleItAsymmetricBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric"/>
@@ -122,6 +158,12 @@
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricBinaryPort" binding="tns:DoubleItAsymmetricBinaryBinding">
             <soap:address location="http://localhost:9001/DoubleItX509AsymmetricBinary"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricBinaryEncryptBeforeSigningPort" binding="tns:DoubleItAsymmetricBinaryEncryptBeforeSigningBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricBinaryEncryptBeforeSigning"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricBinaryPort" binding="tns:DoubleItSymmetricBinaryBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509SymmetricBinary"/>
         </wsdl:port>
     </wsdl:service>
     
@@ -166,6 +208,48 @@
         </wsp:ExactlyOne>
     </wsp:Policy>
     
+     <wsp:Policy wsu:Id="DoubleItAsymmetricEncryptBeforeSigningPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:AsymmetricBinding>
+                    <wsp:Policy>
+                        <sp:InitiatorToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:RecipientToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                        <sp:EncryptBeforeSigning/>
+                    </wsp:Policy>
+                </sp:AsymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    
     <wsp:Policy wsu:Id="DoubleItSymmetricPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
@@ -204,9 +288,9 @@
                 <sp:EncryptedParts>
                     <sp:Body/>
                 </sp:EncryptedParts>
-                <!--<sp:SignedParts>
+                <sp:SignedParts>
                     <sp:Body/>
-                </sp:SignedParts>-->
+                </sp:SignedParts>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
@@ -217,9 +301,9 @@
                 <sp:EncryptedParts>
                     <sp:Body/>
                 </sp:EncryptedParts>
-                <!--<sp:SignedParts>
+                <sp:SignedParts>
                     <sp:Body/>
-                </sp:SignedParts>-->
+                </sp:SignedParts>
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>

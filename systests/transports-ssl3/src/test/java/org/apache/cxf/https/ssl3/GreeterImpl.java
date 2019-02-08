@@ -27,21 +27,21 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.hello_world.Greeter;
 
 
-@WebService(serviceName = "SOAPService", 
-            endpointInterface = "org.apache.hello_world.Greeter", 
+@WebService(serviceName = "SOAPService",
+            endpointInterface = "org.apache.hello_world.Greeter",
             targetNamespace = "http://apache.org/hello_world")
 public class GreeterImpl implements Greeter {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getLogger(GreeterImpl.class,
                            null,
                            GreeterImpl.class.getPackage().getName());
     private String myName;
-    
+
     public GreeterImpl() {
         this("defaultGreeter");
     }
-    
+
     public GreeterImpl(String name) {
         myName = name;
     }
@@ -51,15 +51,15 @@ public class GreeterImpl implements Greeter {
         LOG.info("Message received: " + me);
         return "Hello " + me;
     }
-    
+
 
     public String sayHi() {
-        LOG.info("Executing operation sayHi");        
+        LOG.info("Executing operation sayHi");
         return "Bonjour from " + myName;
     }
-    
+
     public void pingMe() {
     }
 
-    
+
 }

@@ -36,6 +36,7 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 import org.apache.cxf.xkms.model.xkms.ResultType;
 import org.apache.cxf.xkms.model.xkms.RevokeRequestType;
 import org.apache.cxf.xkms.model.xkms.RevokeResultType;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -112,7 +113,7 @@ public class CheckXKRSS {
 
     XKMSService createXKMSService(boolean enableXKRSS) {
         XKMSService xkmsService = new XKMSService();
-        List<Register> keyRegisterHandlers = new ArrayList<Register>();
+        List<Register> keyRegisterHandlers = new ArrayList<>();
         keyRegisterHandlers.add(new Register() {
 
             @Override

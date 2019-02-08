@@ -38,6 +38,7 @@ import org.apache.cxf.systest.jms.AbstractVmJMSTest;
 import org.apache.cxf.transport.common.gzip.GZIPFeature;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         ep.getFeatures().add(cff);
         ep.publish("jms:queue:test.cxf.jmstransport.queue6");
     }
-    
+
     @Test
     public void testSpecJMS() throws Exception {
         QName serviceName = new QName(SERVICE_NS, "JMSGreeterService");
@@ -106,7 +107,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         JMSMessageHeadersType responseHeader = (JMSMessageHeadersType)responseContext
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         Assert.assertEquals("1.0", responseHeader.getSOAPJMSBindingVersion());
-        Assert.assertEquals(null, responseHeader.getSOAPJMSSOAPAction());
+        Assert.assertEquals("\"test\"", responseHeader.getSOAPJMSSOAPAction());
         Assert.assertEquals(DeliveryMode.PERSISTENT, responseHeader.getJMSDeliveryMode());
         Assert.assertEquals(7, responseHeader.getJMSPriority());
     }
@@ -152,7 +153,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
             Assert.assertTrue(responseHdr.isSOAPJMSIsFault());
         }
     }
-    
+
     @Test
     public void testGzip() throws Exception {
         URL wsdl = getWSDLURL(WSDL);
@@ -163,8 +164,8 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         factory.getFeatures().add(cff);
         factory.getFeatures().add(new GZIPFeature());
         factory.setAddress("jms:queue:test.cxf.jmstransport.queue6");
-        JMSGreeterPortType greeter = (JMSGreeterPortType)markForClose(factory.create()); 
-        
+        JMSGreeterPortType greeter = (JMSGreeterPortType)markForClose(factory.create());
+
         for (int idx = 0; idx < 5; idx++) {
 
             greeter.greetMeOneWay("test String");

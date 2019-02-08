@@ -33,27 +33,27 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
 public class SecureBookStore extends AbstractSecureBookStore implements SecureBookInterface {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private SecureBookInterface subresource;
-    private UriInfo uriInfo; 
-    
+    private UriInfo uriInfo;
+
     public SecureBookStore() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     @Context
     public void setUriInfo(UriInfo ui) {
         uriInfo = ui;
     }
-    
+
     @Resource
     public void setBookStore(SecureBookInterface sb) {
         subresource = sb;
     }
-    
+
     public Book getThatBook(Long id) {
         return books.get(id);
     }
@@ -64,7 +64,7 @@ public class SecureBookStore extends AbstractSecureBookStore implements SecureBo
         }
         return books.get(id);
     }
-    
+
     public Book getThatBook() throws BookNotFoundFault {
         if (!uriInfo.getBaseUri().getScheme().startsWith("http")) {
             throw new WebApplicationException(500);
@@ -84,7 +84,7 @@ public class SecureBookStore extends AbstractSecureBookStore implements SecureBo
     public Book getDefaultBook() throws BookNotFoundFault {
         return books.get(123L);
     }
-    
+
     @Path("/securebook")
     public SecureBook getSecureBook() throws BookNotFoundFault {
         return new SecureBook("CXF in Action", 123L);

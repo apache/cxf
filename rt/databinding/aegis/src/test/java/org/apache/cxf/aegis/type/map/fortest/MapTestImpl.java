@@ -27,7 +27,7 @@ import org.apache.cxf.aegis.type.map.ns2.ObjectWithAMapNs2;
 public class MapTestImpl implements MapTest {
 
     public Map<String, Long> getMapStringToLong() {
-        Map<String, Long> map = new HashMap<String, Long>();
+        Map<String, Long> map = new HashMap<>();
         map.put("one", Long.valueOf(1));
         map.put("twenty-seven", Long.valueOf(27));
         return map;
@@ -45,7 +45,7 @@ public class MapTestImpl implements MapTest {
     }
 
     public Map<Long, String> getMapLongToString() {
-        Map<Long, String> map = new HashMap<Long, String>();
+        Map<Long, String> map = new HashMap<>();
         map.put(Long.valueOf(1), "one");
         map.put(Long.valueOf(2), null);
         map.put(Long.valueOf(27), "twenty-seven");
@@ -66,7 +66,7 @@ public class MapTestImpl implements MapTest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Map<?, ?> getRawMapStringToInteger() {
         Map r = new HashMap();
-        r.put("key", new Integer(12));
+        r.put("key", Integer.valueOf(12));
         return r;
     }
 

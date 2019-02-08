@@ -21,17 +21,16 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jax_rs_description_swagger2</artifactId>
     <name>JAX-RS Swagger2 Demo</name>
-    <description>JAX-RS Basic Demo</description>
+    <description>JAX-RS Swagger2 Basic Demo using Jetty</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <httpclient.version>3.1</httpclient.version>
     </properties>
 
     <profiles>
@@ -60,90 +59,30 @@
         </profile>
     </profiles>
     
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.9</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.webjars</groupId>
-                                    <artifactId>swagger-ui</artifactId>
-                                    <version>2.1.0</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                </artifactItem>                                
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    
     <dependencies>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                     <groupId>javax.ws.rs</groupId>
-                     <artifactId>jsr311-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>3.20.5</version>
         </dependency>
-        <dependency>
-              <groupId>org.webjars</groupId>
-              <artifactId>swagger-ui</artifactId>
-              <version>2.1.0</version>
-              <scope>provided</scope>
-        </dependency>
-        <dependency>
-              <groupId>com.fasterxml.jackson.jaxrs</groupId>
-              <artifactId>jackson-jaxrs-json-provider</artifactId>
-              <version>2.4.1</version>
-        </dependency>           
-           <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-               <artifactId>jackson-core</artifactId>
-               <version>2.4.1</version>
-           </dependency>    
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
-        </dependency>
-        <!-- This dependency is needed if you're using the Jetty container -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>3.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-rs-service-description</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
+            <version>3.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>                
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

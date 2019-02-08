@@ -26,17 +26,20 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 
+import io.netty.channel.EventLoopGroup;
+
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import io.netty.channel.EventLoopGroup;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 
-public class NettyHttpConduitFactoryTest extends Assert {
+
+public class NettyHttpConduitFactoryTest {
     Bus bus;
 
     @BeforeClass
@@ -72,10 +75,10 @@ public class NettyHttpConduitFactoryTest extends Assert {
         assertNotNull("Cannot get HTTPConduitFactory", factory);
 
         assertTrue(NettyHttpConduitFactory.class.isInstance(factory));
-        
+
 
     }
-    
+
     @Test
     public void testShutdownEventLoopGroup() throws Exception {
         bus = BusFactory.getDefaultBus(true);
@@ -88,19 +91,19 @@ public class NettyHttpConduitFactoryTest extends Assert {
         assertNotNull("Cannot get NettyHttpTransportFactory", factory);
 
         ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.setName(new QName("bla", "Service"));        
+        serviceInfo.setName(new QName("bla", "Service"));
         EndpointInfo ei = new EndpointInfo(serviceInfo, "");
         ei.setName(new QName("bla", "Port"));
         ei.setAddress("netty://foo");
-        
+
         // The EventLoopGroup is put into bus when create a new netty http conduit
         factory.getConduit(ei, null, bus);
-        
+
         bus.shutdown(true);
-        
+
         EventLoopGroup eventLoopGroup = bus.getExtension(EventLoopGroup.class);
         assertNotNull("We should find the EventLoopGroup here.", eventLoopGroup);
         assertTrue("The eventLoopGroup should be shutdown.", eventLoopGroup.isShutdown());
- 
+
     }
 }

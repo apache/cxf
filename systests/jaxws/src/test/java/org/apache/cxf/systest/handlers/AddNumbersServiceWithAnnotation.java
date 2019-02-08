@@ -27,13 +27,14 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
+
 import org.apache.handlers.AddNumbers;
 /**
- * 
+ *
  */
 
-@WebServiceClient(name = "AddNumbersService", 
-                  targetNamespace = "http://apache.org/handlers", 
+@WebServiceClient(name = "AddNumbersService",
+                  targetNamespace = "http://apache.org/handlers",
                   wsdlLocation = "file:/D:/svn/cxf/trunk/testutils/src/main/resources/wsdl/addNumbers.wsdl")
 @HandlerChain(file = "./handlers_smallnumbers.xml", name = "TestHandlerChain")
 public class AddNumbersServiceWithAnnotation extends Service {
@@ -41,7 +42,7 @@ public class AddNumbersServiceWithAnnotation extends Service {
     private static final URL WSDL_LOCATION;
     private static final QName SERVICE = new QName("http://apache.org/handlers", "AddNumbersService");
     private static final QName ADDNUMBERS_PORT = new QName("http://apache.org/handlers", "AddNumbersPort");
-    
+
     static {
         URL url = null;
         try {
@@ -61,7 +62,7 @@ public class AddNumbersServiceWithAnnotation extends Service {
     }
 
     /**
-     * 
+     *
      * @return
      *     returns AddNumbersPort
      */

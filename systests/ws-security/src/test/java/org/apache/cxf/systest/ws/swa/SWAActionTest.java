@@ -25,12 +25,16 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * A set of tests for the SwA specification (SOAP with Attachments)
@@ -40,7 +44,7 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -50,7 +54,7 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -64,24 +68,24 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureContentActionPort");
-        DoubleItSwaPortType port = 
+        DoubleItSwaPortType port =
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSWASignatureCompleteAction() throws Exception {
 
@@ -89,24 +93,24 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureCompleteActionPort");
-        DoubleItSwaPortType port = 
+        DoubleItSwaPortType port =
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSWAEncryptionContentAction() throws Exception {
 
@@ -114,24 +118,24 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWAEncryptionContentActionPort");
-        DoubleItSwaPortType port = 
+        DoubleItSwaPortType port =
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSWAEncryptionCompleteAction() throws Exception {
 
@@ -139,22 +143,46 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
         URL busFile = SWAActionTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSWAEncryptionCompleteActionPort");
-        DoubleItSwaPortType port = 
+        DoubleItSwaPortType port =
                 service.getPort(portQName, DoubleItSwaPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
         port.doubleIt3(doubleIt, "12345".getBytes());
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
+    @org.junit.Test
+    public void testSWASignatureEncryptionContentAction() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = SWAActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = SWAActionTest.class.getResource("DoubleItSwa.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSWASignatureEncryptionContentActionPort");
+        DoubleItSwaPortType port =
+                service.getPort(portQName, DoubleItSwaPortType.class);
+        updateAddressPort(port, PORT);
+
+        DoubleIt3 doubleIt = new DoubleIt3();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt3(doubleIt, "12345".getBytes());
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }

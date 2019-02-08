@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
  */
 public class ServiceInvocationAtMostOnceAckTest extends ServiceInvocationAckBase {
     static final String PORT = allocatePort(ServiceInvocationAtMostOnceAckTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServer(PORT, "");

@@ -40,13 +40,13 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
 
     private ExtendedURIResolver resolver;
     private Bus bus;
-    private Map<String, String> resolved = new HashMap<String, String>();
+    private Map<String, String> resolved = new HashMap<>();
 
     public CatalogXmlSchemaURIResolver(Bus bus) {
         this.resolver = new TransportURIResolver(bus);
-        this.bus = bus; 
+        this.bus = bus;
     }
-    
+
     public Map<String, String> getResolvedMap() {
         return resolved;
     }
@@ -55,12 +55,12 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
         String resolvedSchemaLocation = null;
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
         try {
-            resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver, 
+            resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver,
                                           schemaLocation, baseUri);
         } catch (Exception e) {
             throw new RuntimeException("Catalog resolution failed", e);
         }
-        
+
         InputSource in = null;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);
@@ -69,7 +69,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
             in = this.resolver.resolve(resolvedSchemaLocation, baseUri);
         }
 
-        // XXX: If we return null, a NPE is raised in SchemaBuilder.
+        // If we return null, a NPE is raised in SchemaBuilder.
         // If we return new InputSource(), a XmlSchemaException is raised
         // but without any nice error message. So let's just throw a nice error here.
         if (in == null) {
@@ -81,7 +81,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
         } else if (in.getByteStream() != null
             && !(in.getByteStream() instanceof ByteArrayInputStream)) {
             //workaround bug in XmlSchema - XmlSchema is not closing the InputStreams
-            //that are returned for imports.  Thus, with a lot of services starting up 
+            //that are returned for imports.  Thus, with a lot of services starting up
             //or a lot of schemas imported or similar, it's easy to run out of
             //file handles.  We'll just load the file into a byte[] and return that.
             try {

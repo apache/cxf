@@ -68,7 +68,7 @@ public class RandomValueProvider implements DefaultValueProvider {
     public String getStringValue(String path) {
         return path.substring(path.lastIndexOf('/') + 1) + getIntValue(path);
     }
-    
+
     public QName getQNameValue(String path) {
         return new QName("http://" + getStringValue(path) + ".com",
                          getStringValue(path));
@@ -93,7 +93,7 @@ public class RandomValueProvider implements DefaultValueProvider {
         s += Long.toString(Math.abs(nextLong));
         return new BigDecimal(s);
     }
-    
+
     public BigInteger getBigIntegerValue(String path) {
         String s = Long.toString(random.nextLong());
         long nextLong = random.nextLong();
@@ -104,7 +104,7 @@ public class RandomValueProvider implements DefaultValueProvider {
         return new BigInteger(s);
     }
 
-    
+
     public String getXMLGregorianCalendarValueString(String path) {
         try {
             return javax.xml.datatype.DatatypeFactory.newInstance()
@@ -114,7 +114,7 @@ public class RandomValueProvider implements DefaultValueProvider {
         }
         return null;
     }
-    
+
     public String getDurationValueString(String path) {
         try {
             return javax.xml.datatype.DatatypeFactory.newInstance().newDuration(random.nextLong()).toString();

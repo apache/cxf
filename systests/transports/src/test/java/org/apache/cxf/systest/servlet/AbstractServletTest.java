@@ -36,6 +36,9 @@ import org.apache.cxf.test.AbstractCXFTest;
 import org.junit.After;
 import org.junit.Before;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public abstract class AbstractServletTest extends AbstractCXFTest {
     public static final String CONTEXT = "/mycontext";
     public static final String CONTEXT_URL = "http://localhost/mycontext";
@@ -49,10 +52,11 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
             sr.newClient().getResponse(CONTEXT_URL + "/services");
         } catch (HttpNotFoundException e) {
             // ignore, we just want to boot up the servlet
-        }   
-        
+        }
+
         HttpUnitOptions.setExceptionsThrownOnErrorStatus(true);
-    } 
+        configurationStream.close();
+    }
     @After
     public void tearDown() throws Exception {
         if (sr != null) {
@@ -76,7 +80,7 @@ public abstract class AbstractServletTest extends AbstractCXFTest {
      * text is omitted as it doesnt work. It would never work on java1.3, but
      * one may have expected java1.4+ to have access to the error stream in
      * responses. Clearly not.
-     * 
+     *
      * @param request
      * @param errorCode
      * @param errorText optional text string to search for

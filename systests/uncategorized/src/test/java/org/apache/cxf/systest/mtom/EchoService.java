@@ -31,15 +31,15 @@ public class EchoService {
 //            IOUtils.copy(input.getSomeData().getInputStream(), out);
 //            out.close();
 //            System.out.println("RECEIVED " + out.size());
-//        
-//            ByteArrayDataSource source = new ByteArrayDataSource(out.toByteArray(), 
+//
+//            ByteArrayDataSource source = new ByteArrayDataSource(out.toByteArray(),
 //                                 "application/octet-stream");
 //            input.setSomeData(new DataHandler(source));
 //        } catch (IOException e) {
 //            // do nothing
 //        }
-//        
-        
+//
+
         return input;
     }
 }

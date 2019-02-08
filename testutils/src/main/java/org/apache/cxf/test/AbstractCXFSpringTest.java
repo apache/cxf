@@ -21,17 +21,19 @@ package org.apache.cxf.test;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
-import org.junit.After;
-import org.junit.Before;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
+import org.junit.After;
+import org.junit.Before;
+
+
 /**
  * Base class for tests that use a Spring bean specification to load up components for testing.
- * Unlike the classes that come with Spring, it doesn't drag in the JUnit 3 hierarchy, and it 
+ * Unlike the classes that come with Spring, it doesn't drag in the JUnit 3 hierarchy, and it
  * doesn't inject into the test itself from the beans.
  */
 public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
@@ -42,11 +44,10 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     private Class<?> configContextClass = AbstractCXFSpringTest.class;
     /**
      * Load up all the beans from the XML files returned by the getConfigLocations method.
-     * @throws Exception 
      */
     protected AbstractCXFSpringTest() {
     }
-    
+
     @Before
     public void setupBeans() throws Exception {
         if (applicationContext != null) {
@@ -63,25 +64,24 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
         applicationContext.refresh();
         super.setUpBus();
     }
-    
+
     @Before
     public void setUpBus() throws Exception {
         // override the super before method
     }
-    
-    public Bus createBus() throws BusException {        
+
+    public Bus createBus() throws BusException {
         return getBean(Bus.class, "cxf");
     }
-    
+
     @After
     public void teardownBeans() {
         applicationContext.close();
-        applicationContext.destroy();
         applicationContext = null;
     }
-    
+
     /**
-     * Return an array of resource specifications. 
+     * Return an array of resource specifications.
      * @see org.springframework.core.io.DefaultResourceLoader for the syntax.
      * @return array of resource specifications.
      */
@@ -90,11 +90,11 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     protected ApplicationContext getApplicationContext() {
         return applicationContext;
     }
-    
+
     /**
      * subclasses may override this.
      * @param context
-     * @throws Exception 
+     * @throws Exception
      */
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
         //default - do nothing
@@ -102,7 +102,7 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
 
     /**
      * Convenience method for the common case of retrieving a bean from the context.
-     * One would expect Spring to have this. 
+     * One would expect Spring to have this.
      * @param <T> Type of the bean object.
      * @param type Type of the bean object.
      * @param beanName ID of the bean.

@@ -23,4 +23,8 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 public interface JwsSignatureVerifier {
     SignatureAlgorithm getAlgorithm();
     boolean verify(JwsHeaders headers, String unsignedText, byte[] signature);
+    /**
+     * Create a verification signature handler capable of accumulating the input (optional operation)
+     */
+    JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers);
 }

@@ -25,12 +25,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 @XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class AttributeTestBean {
-    
+
     //CHECKSTYLE:OFF
     @XmlElement
     public String element1;

@@ -33,8 +33,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
@@ -51,33 +51,32 @@ import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.stax.impl.util.IDGenerator;
-import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.EncryptionConstants;
 
 public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(XmlEncOutInterceptor.class);
     private static final String DEFAULT_RETRIEVAL_METHOD_TYPE =
         "http://www.w3.org/2001/04/xmlenc#EncryptedKey";
-    
+
     private boolean encryptSymmetricKey = true;
     private SecretKey symmetricKey;
-    
+
     private EncryptionProperties encProps = new EncryptionProperties();
-    
+
     public XmlEncOutInterceptor() {
         addAfter(XmlSigOutInterceptor.class.getName());
-    } 
+    }
 
     public void setEncryptionProperties(EncryptionProperties props) {
         this.encProps = props;
     }
-    
+
     public void setKeyIdentifierType(String type) {
-        encProps.setEncryptionKeyIdType(type);   
+        encProps.setEncryptionKeyIdType(type);
     }
-    
+
     public void setSymmetricEncAlgorithm(String algo) {
         if (!(algo.startsWith(EncryptionConstants.EncryptionSpecNS)
             || algo.startsWith(EncryptionConstants.EncryptionSpec11NS))) {
@@ -85,51 +84,51 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         }
         encProps.setEncryptionSymmetricKeyAlgo(algo);
     }
-    
+
     public void setKeyEncAlgorithm(String algo) {
         encProps.setEncryptionKeyTransportAlgo(algo);
     }
-    
+
     public void setDigestAlgorithm(String algo) {
         encProps.setEncryptionDigestAlgo(algo);
     }
-    
-    protected Document processDocument(Message message, Document payloadDoc) 
+
+    protected Document processDocument(Message message, Document payloadDoc)
         throws Exception {
         return encryptDocument(message, payloadDoc);
     }
-    
-    protected Document encryptDocument(Message message, Document payloadDoc) 
+
+    protected Document encryptDocument(Message message, Document payloadDoc)
         throws Exception {
-        
-        String symEncAlgo = encProps.getEncryptionSymmetricKeyAlgo() == null 
+
+        String symEncAlgo = encProps.getEncryptionSymmetricKeyAlgo() == null
             ? XMLCipher.AES_256 : encProps.getEncryptionSymmetricKeyAlgo();
-        
+
         byte[] secretKey = getSymmetricKey(symEncAlgo);
 
         Document encryptedDataDoc = DOMUtils.createDocument();
         Element encryptedDataElement = createEncryptedDataElement(encryptedDataDoc, symEncAlgo);
         if (encryptSymmetricKey) {
             X509Certificate receiverCert = null;
-            
-            String userName = 
+
+            String userName =
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
             if (RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
-                receiverCert = 
+                receiverCert =
                     (X509Certificate)message.getExchange().getInMessage().get(
                         AbstractXmlSecInHandler.SIGNING_CERT);
                 if (receiverCert == null) {
-                    receiverCert = 
+                    receiverCert =
                         (X509Certificate)message.getExchange().getInMessage().get(
                             SecurityConstants.ENCRYPT_CERT);
                 }
             } else {
                 CryptoLoader loader = new CryptoLoader();
-                Crypto crypto = loader.getCrypto(message, 
+                Crypto crypto = loader.getCrypto(message,
                                           SecurityConstants.ENCRYPT_CRYPTO,
                                           SecurityConstants.ENCRYPT_PROPERTIES);
-                
+
                 userName = RSSecurityUtils.getUserName(crypto, userName);
                 if (StringUtils.isEmpty(userName)) {
                     throw new Exception("User name is not available");
@@ -143,53 +142,53 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             String keyEncAlgo = encProps.getEncryptionKeyTransportAlgo() == null
                 ? XMLCipher.RSA_OAEP : encProps.getEncryptionKeyTransportAlgo();
             String digestAlgo = encProps.getEncryptionDigestAlgo();
-            
+
             byte[] encryptedSecretKey = encryptSymmetricKey(secretKey, receiverCert,
                                                             keyEncAlgo, digestAlgo);
             addEncryptedKeyElement(encryptedDataElement, receiverCert, encryptedSecretKey,
                                    keyEncAlgo, digestAlgo);
         }
-               
+
         // encrypt payloadDoc
-        XMLCipher xmlCipher = 
+        XMLCipher xmlCipher =
             EncryptionUtils.initXMLCipher(symEncAlgo, XMLCipher.ENCRYPT_MODE, symmetricKey);
-        
+
         Document result = xmlCipher.doFinal(payloadDoc, payloadDoc.getDocumentElement(), false);
         NodeList list = result.getElementsByTagNameNS(ENC_NS, "CipherValue");
         if (list.getLength() != 1) {
             throw new Exception("Payload CipherData is missing");
         }
         String cipherText = ((Element)list.item(0)).getTextContent().trim();
-        Element cipherValue = 
+        Element cipherValue =
             createCipherValue(encryptedDataDoc, encryptedDataDoc.getDocumentElement());
         cipherValue.appendChild(encryptedDataDoc.createTextNode(cipherText));
-         
+
         //StaxUtils.copy(new DOMSource(encryptedDataDoc), System.out);
         return encryptedDataDoc;
     }
-    
+
     private byte[] getSymmetricKey(String symEncAlgo) throws Exception {
         synchronized (this) {
             if (symmetricKey == null) {
                 KeyGenerator keyGen = KeyUtils.getKeyGenerator(symEncAlgo);
                 symmetricKey = keyGen.generateKey();
-            } 
+            }
             return symmetricKey.getEncoded();
         }
     }
-    
+
     private X509Certificate getReceiverCertificateFromCrypto(Crypto crypto, String user) throws Exception {
         X509Certificate[] certs = RSSecurityUtils.getCertificates(crypto, user);
         return certs[0];
     }
-    
-    // Apache Security XMLCipher does not support 
+
+    // Apache Security XMLCipher does not support
     // Certificates for encrypting the keys
-    protected byte[] encryptSymmetricKey(byte[] keyBytes, 
+    protected byte[] encryptSymmetricKey(byte[] keyBytes,
                                          X509Certificate remoteCert,
                                          String keyEncAlgo,
                                          String digestAlgo) throws WSSecurityException {
-        Cipher cipher = 
+        Cipher cipher =
             EncryptionUtils.initCipherWithCert(
                 keyEncAlgo, digestAlgo, Cipher.ENCRYPT_MODE, remoteCert
             );
@@ -210,64 +209,64 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_ENCRYPTION, ex
             );
         }
-       
+
         return encryptedEphemeralKey;
-       
+
     }
-    
+
     private void addEncryptedKeyElement(Element encryptedDataElement,
                                         X509Certificate cert,
                                         byte[] encryptedKey,
                                         String keyEncAlgo,
                                         String digestAlgo) throws Exception {
-        
+
         Document doc = encryptedDataElement.getOwnerDocument();
-        
-        String encodedKey = Base64Utility.encode(encryptedKey);
+
+        String encodedKey = org.apache.xml.security.utils.XMLUtils.encodeToString(encryptedKey);
         Element encryptedKeyElement = createEncryptedKeyElement(doc, keyEncAlgo, digestAlgo);
         String encKeyId = IDGenerator.generateID("EK-");
         encryptedKeyElement.setAttributeNS(null, "Id", encKeyId);
-                
+
         Element keyInfoElement = createKeyInfoElement(doc, cert);
         encryptedKeyElement.appendChild(keyInfoElement);
-        
+
         Element xencCipherValue = createCipherValue(doc, encryptedKeyElement);
         xencCipherValue.appendChild(doc.createTextNode(encodedKey));
-        
-        Element topKeyInfoElement = 
+
+        Element topKeyInfoElement =
             doc.createElementNS(SIG_NS, SIG_PREFIX + ":KeyInfo");
-        Element retrievalMethodElement = 
+        Element retrievalMethodElement =
             doc.createElementNS(SIG_NS, SIG_PREFIX + ":RetrievalMethod");
-        
+
         retrievalMethodElement.setAttribute("Type", DEFAULT_RETRIEVAL_METHOD_TYPE);
         topKeyInfoElement.appendChild(retrievalMethodElement);
-        
+
         topKeyInfoElement.appendChild(encryptedKeyElement);
-        
+
         encryptedDataElement.appendChild(topKeyInfoElement);
     }
-    
+
     protected Element createCipherValue(Document doc, Element encryptedKey) {
-        Element cipherData = 
+        Element cipherData =
             doc.createElementNS(ENC_NS, ENC_PREFIX + ":CipherData");
-        Element cipherValue = 
+        Element cipherValue =
             doc.createElementNS(ENC_NS, ENC_PREFIX + ":CipherValue");
         cipherData.appendChild(cipherValue);
         encryptedKey.appendChild(cipherData);
         return cipherValue;
     }
-    
+
     private Element createKeyInfoElement(Document encryptedDataDoc,
                                          X509Certificate remoteCert) throws Exception {
-        Element keyInfoElement = 
+        Element keyInfoElement =
             encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":KeyInfo");
-        
+
         String keyIdType = encProps.getEncryptionKeyIdType() == null
             ? RSSecurityUtils.X509_CERT : encProps.getEncryptionKeyIdType();
-        
-        Node keyIdentifierNode = null; 
+
+        Node keyIdentifierNode = null;
         if (keyIdType.equals(RSSecurityUtils.X509_CERT)) {
-            byte data[] = null;
+            byte[] data = null;
             try {
                 data = remoteCert.getEncoded();
             } catch (CertificateEncodingException e) {
@@ -275,17 +274,17 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
                     WSSecurityException.ErrorCode.SECURITY_TOKEN_UNAVAILABLE, e, "encodeError"
                 );
             }
-            Text text = encryptedDataDoc.createTextNode(Base64.encode(data));
+            Text text = encryptedDataDoc.createTextNode(org.apache.xml.security.utils.XMLUtils.encodeToString(data));
             Element cert = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Certificate");
             cert.appendChild(text);
             Element x509Data = encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":X509Data");
-            
+
             x509Data.appendChild(cert);
             keyIdentifierNode = x509Data;
         } else if (keyIdType.equals(RSSecurityUtils.X509_ISSUER_SERIAL)) {
             String issuer = remoteCert.getIssuerDN().getName();
             java.math.BigInteger serialNumber = remoteCert.getSerialNumber();
-            DOMX509IssuerSerial domIssuerSerial = 
+            DOMX509IssuerSerial domIssuerSerial =
                 new DOMX509IssuerSerial(
                     encryptedDataDoc, issuer, serialNumber
                 );
@@ -294,24 +293,24 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         } else {
             throw new Exception("Unsupported key identifier:" + keyIdType);
         }
- 
+
         keyInfoElement.appendChild(keyIdentifierNode);
-        
+
         return keyInfoElement;
     }
-    
-    protected Element createEncryptedKeyElement(Document encryptedDataDoc, 
+
+    protected Element createEncryptedKeyElement(Document encryptedDataDoc,
                                                 String keyEncAlgo,
                                                 String digestAlgo) {
-        Element encryptedKey = 
+        Element encryptedKey =
             encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptedKey");
 
-        Element encryptionMethod = 
-            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX 
+        Element encryptionMethod =
+            encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX
                                              + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", keyEncAlgo);
         if (digestAlgo != null) {
-            Element digestMethod = 
+            Element digestMethod =
                 encryptedDataDoc.createElementNS(SIG_NS, SIG_PREFIX + ":DigestMethod");
             digestMethod.setAttributeNS(null, "Algorithm", digestAlgo);
             encryptionMethod.appendChild(digestMethod);
@@ -319,22 +318,22 @@ public class XmlEncOutInterceptor extends AbstractXmlSecOutInterceptor {
         encryptedKey.appendChild(encryptionMethod);
         return encryptedKey;
     }
-    
+
     protected Element createEncryptedDataElement(Document encryptedDataDoc, String symEncAlgo) {
-        Element encryptedData = 
+        Element encryptedData =
             encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptedData");
 
         XMLUtils.setNamespace(encryptedData, ENC_NS, ENC_PREFIX);
-        
-        Element encryptionMethod = 
+
+        Element encryptionMethod =
             encryptedDataDoc.createElementNS(ENC_NS, ENC_PREFIX + ":EncryptionMethod");
         encryptionMethod.setAttributeNS(null, "Algorithm", symEncAlgo);
         encryptedData.appendChild(encryptionMethod);
         encryptedDataDoc.appendChild(encryptedData);
-        
+
         return encryptedData;
     }
-    
-    
-    
+
+
+
 }

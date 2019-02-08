@@ -31,7 +31,7 @@ import org.apache.wss4j.dom.saml.DOMSAMLUtil;
  * Some abstract functionality for validating SAML Assertions
  */
 public abstract class AbstractSamlPolicyValidator extends AbstractSecurityPolicyValidator {
-    
+
     /**
      * Check the holder-of-key requirements against the received assertion. The subject
      * credential of the SAML Assertion must have been used to sign some portion of
@@ -64,5 +64,5 @@ public abstract class AbstractSamlPolicyValidator extends AbstractSecurityPolicy
     ) {
         return DOMSAMLUtil.compareCredentials(subjectKeyInfo, signedResults, tlsCerts);
     }
-    
+
 }

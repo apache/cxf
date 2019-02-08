@@ -35,9 +35,9 @@ import org.apache.cxf.management.annotation.ManagedResource;
 
 public class ModelMBeanAssembler {
     private ModelMBeanInfoSupporter supporter = new ModelMBeanInfoSupporter();
-   
+
     public ManagedResource getManagedResource(Class<?> clazz) {
-        return clazz.getAnnotation(ManagedResource.class);        
+        return clazz.getAnnotation(ManagedResource.class);
     }
 
     public ManagedAttribute getManagedAttribute(Method method) {
@@ -60,12 +60,12 @@ public class ModelMBeanAssembler {
     }
 
     public ManagedNotification[] getManagedNotifications(Class<?> clazz) {
-        ManagedNotifications notificationsAnn = 
+        ManagedNotifications notificationsAnn =
             clazz.getAnnotation(ManagedNotifications.class);
         ManagedNotification[] result = null;
         if (null == notificationsAnn) {
             return new ManagedNotification[0];
-        }        
+        }
         result = notificationsAnn.value();
         return result;
     }
@@ -78,30 +78,30 @@ public class ModelMBeanAssembler {
             return methodName.substring(3);
         }
         if (methodName.indexOf("is") == 0) {
-            return methodName.substring(2); 
+            return methodName.substring(2);
         }
         return null;
     }
-    
+
     public static boolean checkMethod(Method[] methods, String methodName) {
         boolean result = false;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().compareTo(methodName) == 0) {
                 result = true;
-                break;                
-            }                
+                break;
+            }
         }
         return result;
     }
-    
+
     public static String getAttributeType(Method[] methods, String attributeName) {
         String result = null;
         String searchMethod = "get" + attributeName;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().compareTo(searchMethod) == 0) {
                 result = methods[i].getReturnType().getName();
-                break;                
-            }                
+                break;
+            }
         }
         // check it is "is " attribute
         if (null == result) {
@@ -109,26 +109,26 @@ public class ModelMBeanAssembler {
             for (int i = 0; i < methods.length; i++) {
                 if (methods[i].getName().compareTo(searchMethod) == 0) {
                     result = methods[i].getReturnType().getName();
-                    break;                
-                } 
+                    break;
+                }
             }
         }
         return result;
     }
-    
-    class ManagedAttributeInfo {
+
+    static class ManagedAttributeInfo {
         String fname;
         String ftype;
         String description;
         boolean read;
         boolean write;
-        boolean is;        
+        boolean is;
     };
-    
-    
-    //get the attribut information for the method 
-    public ManagedAttributeInfo getAttributInfo(Method[] methods, 
-                                               String attributName, 
+
+
+    //get the attribut information for the method
+    public ManagedAttributeInfo getAttributInfo(Method[] methods,
+                                               String attributName,
                                                String attributType,
                                                ManagedAttribute managedAttribute) {
         ManagedAttributeInfo mai = new ManagedAttributeInfo();
@@ -137,103 +137,102 @@ public class ModelMBeanAssembler {
         mai.description = managedAttribute.description();
         mai.is = checkMethod(methods, "is" + attributName);
         mai.write = checkMethod(methods, "set" + attributName);
-        
+
         if (mai.is) {
             mai.read = true;
         } else {
             mai.read = checkMethod(methods, "get" + attributName);
         }
-        
+
         return mai;
-        
+
     }
-    
-    Method findMethodByName(Method methods[], String methodName) {
+
+    Method findMethodByName(Method[] methods, String methodName) {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().compareTo(methodName) == 0) {
                 return methods[i];
-            } else {
-                continue;
             }
-                
-        } 
+            continue;
+
+        }
         return null;
-        
+
     }
-    
-    void addAttributeOperation(Method method) {    
-        Descriptor operationDescriptor = 
+
+    void addAttributeOperation(Method method) {
+        Descriptor operationDescriptor =
             supporter.buildAttributeOperationDescriptor(method.getName());
-        
-        Class<?>[] types = method.getParameterTypes();                    
-        
+
+        Class<?>[] types = method.getParameterTypes();
+
         String[] paramTypes = new String[types.length];
-        String[] paramNames = new String[types.length];                    
+        String[] paramNames = new String[types.length];
         String[] paramDescs = new String[types.length];
-        
+
         for (int j = 0; j < types.length; j++) {
             paramTypes[j] = types[j].getName();
             paramDescs[j] = "";
-            paramNames[j] = types[j].getName();                    
-        }                    
-       
+            paramNames[j] = types[j].getName();
+        }
+
         supporter.addModelMBeanMethod(method.getName(),
                                     paramTypes,
                                     paramNames,
                                     paramDescs,
-                                    "", 
+                                    "",
                                     method.getReturnType().getName(),
                                     operationDescriptor);
     }
-    
+
     public ModelMBeanInfo getModelMbeanInfo(Class<?> clazz) {
         supporter.clear();
         ManagedResource mr = getManagedResource(clazz);
         if (mr == null) {
             // the class is not need to expose to jmx
             return null;
-        }            
+        }
         // Clazz get all the method which should be managemed
-        Descriptor mbeanDescriptor = supporter.buildMBeanDescriptor(mr);  
-        
+        Descriptor mbeanDescriptor = supporter.buildMBeanDescriptor(mr);
+
         // add the notification
         ManagedNotification[] mns = getManagedNotifications(clazz);
-        for (int k = 0; k < mns.length; k++) {             
+        for (int k = 0; k < mns.length; k++) {
             supporter.addModelMBeanNotification(mns[k].notificationTypes(),
                                           mns[k].name(),
                                           mns[k].description(), null);
         }
-        
+
         Method[] methods = clazz.getDeclaredMethods();
-        
+
         for (int i = 0; i < methods.length; i++) {
             ManagedAttribute ma = getManagedAttribute(methods[i]);
             //add Attribute to the ModelMBean
             if (ma != null) {
-                String attributeName = getAttributeName(methods[i].getName());                
+                String attributeName = getAttributeName(methods[i].getName());
                 if (!supporter.checkAttribute(attributeName)) {
                     String attributeType = getAttributeType(methods, attributeName);
                     ManagedAttributeInfo mai = getAttributInfo(methods,
                                                                attributeName,
                                                                attributeType,
-                                                               ma); 
-                    Descriptor attributeDescriptor = 
-                        supporter.buildAttributeDescriptor(ma, 
+                                                               ma);
+                    Descriptor attributeDescriptor =
+                        supporter.buildAttributeDescriptor(ma,
                                                          attributeName,
-                                                         mai.is, mai.read, mai.write);                
-                
+                                                         mai.is, mai.read, mai.write);
+
                     // should setup the description
-                    supporter.addModelMBeanAttribute(mai.fname, 
-                                                   mai.ftype,                                                
+                    supporter.addModelMBeanAttribute(mai.fname,
+                                                   mai.ftype,
                                                    mai.read,
                                                    mai.write,
                                                    mai.is,
                                                    mai.description,
                                                    attributeDescriptor);
-                    
+
                     Method method;
                     // add the attribute methode to operation
-                    if (mai.read) {                        
+                    if (mai.read) {
                         if (mai.is) {
                             method = findMethodByName(methods, "is" + attributeName);
                         } else {
@@ -246,20 +245,20 @@ public class ModelMBeanAssembler {
                         addAttributeOperation(method);
                     }
                 }
-              
-            } else {   
+
+            } else {
                 // add Operation to the ModelMBean
-                ManagedOperation mo = getManagedOperation(methods[i]); 
-                
+                ManagedOperation mo = getManagedOperation(methods[i]);
+
                 if (mo != null) {
-                    Class<?>[] types = methods[i].getParameterTypes();                    
+                    Class<?>[] types = methods[i].getParameterTypes();
                     ManagedOperationParameter[] mop = getManagedOperationParameters(methods[i]);
                     String[] paramTypes = new String[types.length];
-                    String[] paramNames = new String[types.length];                    
+                    String[] paramNames = new String[types.length];
                     String[] paramDescs = new String[types.length];
-                    
+
                     for (int j = 0; j < types.length; j++) {
-                        paramTypes[j] = types[j].getName();                       
+                        paramTypes[j] = types[j].getName();
                         if (j < mop.length) {
                             paramDescs[j] = mop[j].description();
                             paramNames[j] = mop[j].name();
@@ -267,20 +266,20 @@ public class ModelMBeanAssembler {
                             paramDescs[j] = "";
                             paramNames[j] = types[j].getName();
                         }
-                    }                    
-                    Descriptor operationDescriptor = 
+                    }
+                    Descriptor operationDescriptor =
                         supporter.buildOperationDescriptor(mo, methods[i].getName());
                     supporter.addModelMBeanMethod(methods[i].getName(),
                                                 paramTypes,
                                                 paramNames,
                                                 paramDescs,
-                                                mo.description(), 
+                                                mo.description(),
                                                 methods[i].getReturnType().getName(),
                                                 operationDescriptor);
                 }
             }
-            
-        }  
+
+        }
         return supporter.buildModelMBeanInfo(mbeanDescriptor);
     }
 }

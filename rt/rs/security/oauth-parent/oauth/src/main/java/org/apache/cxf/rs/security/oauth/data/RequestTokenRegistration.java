@@ -22,23 +22,23 @@ import java.util.List;
 
 /**
  * Captures the information associated with the request token registration request.
- * @see RequestToken  
+ * @see RequestToken
  */
 public class RequestTokenRegistration {
-    private Client client; 
+    private Client client;
     private String state;
     private String callback;
     private List<String> scopes;
     private long lifetime;
     private long issuedAt;
-    
+
     public void setClient(Client client) {
         this.client = client;
     }
     public Client getClient() {
         return client;
     }
-    
+
     public void setCallback(String callback) {
         this.callback = callback;
     }
@@ -46,7 +46,7 @@ public class RequestTokenRegistration {
     public String getCallback() {
         return callback;
     }
-    
+
     public void setState(String state) {
         this.state = state;
     }

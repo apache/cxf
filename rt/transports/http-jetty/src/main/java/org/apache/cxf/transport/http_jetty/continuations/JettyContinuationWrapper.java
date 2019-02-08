@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.http_jetty.continuations;
 
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,22 +30,24 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.eclipse.jetty.continuation.ContinuationListener;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
+@SuppressWarnings("deprecation")
 public class JettyContinuationWrapper implements Continuation, ContinuationListener {
     volatile boolean isNew;
     volatile boolean isResumed;
     volatile boolean isPending;
+    volatile boolean isTimeout;
     volatile long pendingTimeout;
     volatile Object obj;
-    
+
     private Message message;
     private org.eclipse.jetty.continuation.Continuation continuation;
     private ContinuationCallback callback;
-    
-    public JettyContinuationWrapper(HttpServletRequest request, 
-                                    HttpServletResponse resp, 
+
+    public JettyContinuationWrapper(HttpServletRequest request,
+                                    HttpServletResponse resp,
                                     Message m) {
         continuation = ContinuationSupport.getContinuation(request);
-        
+
         message = m;
         isNew = request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
         if (isNew) {
@@ -80,15 +83,20 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         return isResumed;
     }
 
+    public boolean isExpired() {
+        return continuation.isExpired();
+    }
+
     public void reset() {
         try {
             continuation.complete();
         } catch (Throwable ex) {
-            // explicit complete call does not seem to work 
+            // explicit complete call does not seem to work
             // with the non-Servlet3 Jetty Continuation
         }
         obj = null;
         pendingTimeout = 0;
+        isTimeout = false;
     }
 
 
@@ -99,9 +107,9 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
             pendingTimeout = timeout;
         }
         isNew = false;
-        
+
         message.getExchange().getInMessage().getInterceptorChain().suspend();
-        
+
         continuation.setTimeout(pendingTimeout);
         if (!isPending) {
             continuation.suspend();
@@ -109,7 +117,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         return true;
     }
-    
+
     protected Message getMessage() {
         Message m = message;
         if (m != null && m.getExchange().getInMessage() != null) {
@@ -117,13 +125,13 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         return m;
     }
-    
+
 
     public void onComplete(org.eclipse.jetty.continuation.Continuation cont) {
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
         isPending = false;
         pendingTimeout = 0;
-        //REVISIT: isResumed = false;
+        isResumed = false;
         if (callback != null) {
             callback.onComplete();
         }
@@ -132,7 +140,18 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public void onTimeout(org.eclipse.jetty.continuation.Continuation cont) {
         isPending = false;
         pendingTimeout = 0;
-        //isResumed = true;
+        isResumed = true;
+        isTimeout = true;
     }
-    
+
+    @Override
+    public boolean isReadyForWrite() {
+        return true;
+    }
+
+    @Override
+    public boolean isTimeout() {
+        return isTimeout;
+    }
+
 }

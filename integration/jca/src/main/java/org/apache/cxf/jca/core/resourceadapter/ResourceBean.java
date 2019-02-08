@@ -37,13 +37,13 @@ public class ResourceBean implements Serializable {
 
     public static final String DEFAULT_VALUE_STRING = "DEFAULT";
     public static final String LOG_LEVEL = "log.level";
-    
-    public static final String DEFAULT_MONITOR_POLL_INTERVAL = "120";    
+
+    public static final String DEFAULT_MONITOR_POLL_INTERVAL = "120";
     public static final String EJB_SERVICE_PROPERTIES_URL = "ejb.service.properties.url";
     public static final String MONITOR_EJB_SERVICE_PROPERTIES = "monitor.ejb.service.properties";
-    public static final String MONITOR_POLL_INTERVAL = "monitor.poll.interval"; 
+    public static final String MONITOR_POLL_INTERVAL = "monitor.poll.interval";
     public static final String EJB_SERVANT_BASE_URL = "ejb.servant.base.url";
-    
+
     private static final long serialVersionUID = -2373577203597864072L;
 
     static {
@@ -67,8 +67,8 @@ public class ResourceBean implements Serializable {
         if (disable) {
             LoggerHelper.disableConsoleLogging();
         }
-    }    
-   
+    }
+
     public Properties getPluginProps() {
         return pluginProps;
     }
@@ -83,7 +83,7 @@ public class ResourceBean implements Serializable {
         }
     }
 
-    
+
     protected URL getPropsURL(String propsUrl) throws ResourceException {
         URL ret = null;
         if (propsUrl != null) {
@@ -110,6 +110,6 @@ public class ResourceBean implements Serializable {
             throw new ResourceAdapterInternalException(msg, ioe);
         }
     }
-    
+
 
 }

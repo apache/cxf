@@ -26,9 +26,9 @@ import org.apache.cxf.message.Message;
  * if EH-Cache is available. Otherwise it returns a MemoryTokenStoreFactory.
  */
 public abstract class TokenStoreFactory {
-    
+
     private static boolean ehCacheInstalled;
-    
+
     static {
         try {
             Class<?> cacheManagerClass = Class.forName("net.sf.ehcache.CacheManager");
@@ -39,19 +39,19 @@ public abstract class TokenStoreFactory {
             //ignore
         }
     }
-    
+
     public static synchronized boolean isEhCacheInstalled() {
         return ehCacheInstalled;
     }
-    
+
     public static TokenStoreFactory newInstance() {
         if (isEhCacheInstalled()) {
             return new EHCacheTokenStoreFactory();
         }
-        
+
         return new MemoryTokenStoreFactory();
     }
-    
+
     public abstract TokenStore newTokenStore(String key, Message message);
-    
+
 }

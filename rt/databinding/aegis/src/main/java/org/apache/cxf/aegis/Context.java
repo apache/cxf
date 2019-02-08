@@ -27,7 +27,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 
 /**
- * Holds information about the message request and response. Applications should not need to 
+ * Holds information about the message request and response. Applications should not need to
  * work with this class.
  */
 public class Context {
@@ -36,11 +36,11 @@ public class Context {
     private Fault fault;
     private Map<Class<?>, Object> properties;
     private Map<String, Object> namedProperties;
-    
+
     public Context(AegisContext aegisContext) {
         this.globalContext = aegisContext;
-        this.properties = new HashMap<Class<?>, Object>();
-        this.namedProperties = new HashMap<String, Object>();
+        this.properties = new HashMap<>();
+        this.namedProperties = new HashMap<>();
     }
 
     public TypeMapping getTypeMapping() {
@@ -83,16 +83,16 @@ public class Context {
     public <T> T getProperty(Class<T> key) {
         return key.cast(properties.get(key));
     }
-    
+
     public void setProperty(Object value) {
         properties.put(value.getClass(), value);
     }
-    
+
     //named properties to solve other problems
     public void setProperty(String name, Object value) {
         namedProperties.put(name, value);
     }
-    
+
     public <T> T getProperty(String name, Class<T> type) {
         return type.cast(namedProperties.get(name));
     }

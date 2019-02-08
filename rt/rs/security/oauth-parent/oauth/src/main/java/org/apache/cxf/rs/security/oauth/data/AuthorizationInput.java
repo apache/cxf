@@ -22,11 +22,11 @@ import java.util.List;
 
 /**
  * Represents the user approval of the client RequestToken.
- * It also contains the set of approved scopes which may be 
+ * It also contains the set of approved scopes which may be
  * more restricted than the original list requested by the client
  */
 public class AuthorizationInput {
-    
+
     private RequestToken token;
     private List<OAuthPermission> approvedScopes;
     public void setToken(RequestToken token) {

@@ -30,31 +30,31 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.client.ClientTokenContextManager;
-import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 @Path("rp")
 public class OidcRpAuthenticationService {
     private ClientTokenContextManager stateManager;
     private String defaultLocation;
     @Context
-    private MessageContext mc; 
-    
+    private MessageContext mc;
+
     @POST
     @Path("signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response completeScriptAuthentication(@Context IdToken idToken) {
+    public Response completeScriptAuthentication(@Context IdTokenContext idTokenContext) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
-        ctx.setIdToken(idToken);
-        return completeAuthentication(ctx);   
+        ctx.setIdToken(idTokenContext.getIdToken());
+        return completeAuthentication(ctx);
     }
-    
+
     @GET
     @Path("complete")
     public Response completeAuthentication(@Context OidcClientTokenContext oidcContext) {
         stateManager.setClientTokenContext(mc, oidcContext);
-        
+
         URI redirectUri = null;
         MultivaluedMap<String, String> state = oidcContext.getState();
         String location = state != null ? state.getFirst("state") : null;
@@ -62,13 +62,12 @@ public class OidcRpAuthenticationService {
             String basePath = (String)mc.get("http.base.path");
             redirectUri = UriBuilder.fromUri(basePath).path(defaultLocation).build();
         } else if (location != null) {
-            redirectUri = URI.create(location);
+            redirectUri = URI.create(UrlUtils.urlDecode(location));
         }
         if (redirectUri != null) {
             return Response.seeOther(redirectUri).build();
-        } else {
-            return Response.ok(oidcContext).build();
         }
+        return Response.ok(oidcContext).build();
     }
 
     public void setDefaultLocation(String defaultLocation) {

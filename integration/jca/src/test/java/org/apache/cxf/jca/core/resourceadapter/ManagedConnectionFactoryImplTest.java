@@ -33,10 +33,15 @@ import javax.security.auth.Subject;
 
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ManagedConnectionFactoryImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ManagedConnectionFactoryImplTest {
     DummyManagedConnectionFactoryImpl mcf = new DummyManagedConnectionFactoryImpl();
 
 
@@ -49,7 +54,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
     @Test
     public void testMatchConnectionSameConnectioRequestInfoNotBound() throws Exception {
         Subject subject = null;
-        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<AbstractManagedConnectionImpl>();
+        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<>();
         ConnectionRequestInfo cri = new DummyConnectionRequestInfo();
         DummyManagedConnectionImpl con1 = new DummyManagedConnectionImpl(mcf, cri, subject);
         connectionSet.add(con1);
@@ -61,7 +66,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
     @Test
     public void testMatchConnectionSameConnectioRequestInfoBound() throws Exception {
         Subject subject = null;
-        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<AbstractManagedConnectionImpl>();
+        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<>();
         ConnectionRequestInfo cri = new DummyConnectionRequestInfo();
         DummyManagedConnectionImpl con1 = new DummyManagedConnectionImpl(mcf, cri, subject);
         con1.setBound(true);
@@ -79,7 +84,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         Subject subject = null;
         assertTrue("request info object are differnt", cri1 != cri2);
 
-        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<AbstractManagedConnectionImpl>();
+        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<>();
         DummyManagedConnectionImpl con1 = new DummyManagedConnectionImpl(mcf, cri1, subject);
         connectionSet.add(con1);
 
@@ -96,19 +101,19 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 
         assertTrue("request info object are differnt", cri1 != cri2);
 
-        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<AbstractManagedConnectionImpl>();
+        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<>();
         DummyManagedConnectionImpl con1 = new DummyManagedConnectionImpl(mcf, cri1, subject);
         con1.setBound(true);
         connectionSet.add(con1);
 
         ManagedConnection mcon = mcf.matchManagedConnections(connectionSet, subject, cri2);
-        assertTrue("should not get a match", mcon == null);
+        assertNull("should not get a match", mcon);
     }
 
     @Test
     public void testMatchConnectionInvalidatedWithSameConnectioRequestInfo() throws Exception {
         Subject subject = null;
-        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<AbstractManagedConnectionImpl>();
+        Set<AbstractManagedConnectionImpl> connectionSet = new HashSet<>();
         ConnectionRequestInfo cri = new DummyConnectionRequestInfo();
 
         DummyManagedConnectionImpl con1 = new DummyManagedConnectionImpl(mcf, cri, subject);
@@ -117,12 +122,12 @@ public class ManagedConnectionFactoryImplTest extends Assert {
         connectionSet.add(con1);
 
         ManagedConnection mcon = mcf.matchManagedConnections(connectionSet, subject, cri);
-        assertTrue("Connection must be null", mcon == null);
+        assertNull("Connection must be null", mcon);
     }
 
     @Test
     public void testGetSetLogWriter() throws Exception {
-        PrintWriter writer = EasyMock.createMock(PrintWriter.class); 
+        PrintWriter writer = EasyMock.createMock(PrintWriter.class);
         writer.write(EasyMock.isA(String.class));
         EasyMock.expectLastCall().anyTimes();
         writer.flush();

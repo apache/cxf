@@ -30,15 +30,15 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 
 @Path("/")
 public class BookStoreWithSingleSlash {
-    
+
     @QueryParam("name")
     private String name;
-    
+
     @PathParam("id")
     public void setId(int id) {
     }
-    
-    
+
+
     @GET
     @Path("book")
     @ElementClass(response = Book.class)

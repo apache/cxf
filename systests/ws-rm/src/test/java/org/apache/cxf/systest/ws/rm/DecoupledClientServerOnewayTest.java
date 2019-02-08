@@ -30,17 +30,19 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the addition of WS-RM properties to application messages and the
@@ -54,7 +56,7 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/exactlyonce-inorder-decoupled.xml");
             BusFactory.setDefaultBus(bus);
@@ -67,14 +69,14 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
             out.setPrettyLogging(true);
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             implementor.useLastOnewayArg(true);
             implementor.setDelay(5000);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
@@ -85,14 +87,14 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
             ep.stop();
             ep = null;
         }
-    }    
-    
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }
-            
+
     @Test
     public void testDecoupledOneway() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -106,16 +108,16 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
         out.setPrettyLogging(true);
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-        
+
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, 
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                            Boolean.TRUE);
         LOG.fine("Created greeter client.");
-       
+
         ConnectionHelper.setKeepAliveConnection(greeter, true);
         greeter.greetMeOneWay("oneway");
-        
+
     }
 }

@@ -33,34 +33,35 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.Filter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class HBaseVisitorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class HBaseVisitorTest {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
-    
+
     Table table;
     @Before
     public void setUp() throws Exception {
         try {
-            Configuration hBaseConfig =  HBaseConfiguration.create();
+            Configuration hBaseConfig = HBaseConfiguration.create();
             Connection connection = ConnectionFactory.createConnection(hBaseConfig);
             table = connection.getTable(TableName.valueOf("books"));
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
-    
+
     @Test
     @Ignore("Enable as soon as it is understood how to run HBase tests in process")
     public void testScanWithFilterVisitor() throws Exception {
         Scan scan = new Scan();
-        
-        SearchCondition<SearchBean> sc = new FiqlParser<SearchBean>(SearchBean.class).parse("name==CXF");
-        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<SearchBean>("book");
+
+        SearchCondition<SearchBean> sc = new FiqlParser<>(SearchBean.class).parse("name==CXF");
+        HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<>("book");
         sc.accept(visitor);
         Filter filter = visitor.getQuery();
         scan.setFilter(filter);
@@ -74,10 +75,10 @@ public class HBaseVisitorTest extends Assert {
             }
             assertEquals(1, count);
         } finally {
-            rs.close();  
+            rs.close();
         }
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (table != null) {

@@ -26,20 +26,20 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 /**
- * 
+ *
  */
 public final class EndpointCreationLoop3 {
-    
-    
+
+
     private EndpointCreationLoop3() {
     }
-    
+
     private void iteration() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setAddress("http://localhost:9000/test");
         sf.setServiceClass(org.apache.cxf.systest.jaxb.service.TestServiceImpl.class);
         sf.setStart(false);
-        
+
         Server server = sf.create();
         server.start();
         server.stop();
@@ -53,7 +53,7 @@ public final class EndpointCreationLoop3 {
         EndpointCreationLoop3 ecl = new EndpointCreationLoop3();
         int count = Integer.parseInt(args[0]);
         ecl.iteration();
-        
+
         Controller.startCPURecording(true);
         Controller.startAllocRecording(true);
         for (int x = 0; x < count; x++) {

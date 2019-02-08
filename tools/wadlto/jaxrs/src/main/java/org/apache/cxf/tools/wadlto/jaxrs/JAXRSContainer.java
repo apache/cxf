@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wadlto.jaxrs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -50,13 +51,13 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     private static final Map<String, String> DEFAULT_JAVA_TYPE_MAP;
     private static final String TOOL_NAME = "wadl2java";
     private static final String EPR_TYPE_KEY = "org.w3._2005._08.addressing.EndpointReference";
-    
+
     static {
-        DEFAULT_JAVA_TYPE_MAP = Collections.singletonMap(EPR_TYPE_KEY, 
+        DEFAULT_JAVA_TYPE_MAP = Collections.singletonMap(EPR_TYPE_KEY,
                 "javax.xml.ws.wsaddressing.W3CEndpointReference");
     }
-    
-    
+
+
     public JAXRSContainer(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
@@ -67,9 +68,9 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         }
 
         buildToolContext();
-        
+
         processWadl();
-        
+
     }
 
     public void execute(boolean exitOnFinish) throws ToolException {
@@ -101,7 +102,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
     }
 
     public Set<String> getArrayKeys() {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(WadlToolConstants.CFG_BINDING);
         set.add(WadlToolConstants.CFG_SCHEMA_PACKAGENAME);
         set.add(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
@@ -109,13 +110,13 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         set.add(WadlToolConstants.CFG_XJC_ARGS);
         return set;
     }
-    
+
     private void processWadl() {
         File outDir = new File((String)context.get(WadlToolConstants.CFG_OUTPUTDIR));
         String wadlURL = getAbsoluteWadlURL();
-        
-        String wadl = readWadl(wadlURL);
-        
+        String authentication = (String)context.get(WadlToolConstants.CFG_AUTHENTICATION);
+        String wadl = readWadl(wadlURL, authentication);
+
         SourceGenerator sg = new SourceGenerator();
         sg.setBus(getBus());
 
@@ -127,36 +128,40 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         sg.setPackageName((String)context.get(WadlToolConstants.CFG_PACKAGENAME));
         sg.setResourceName((String)context.get(WadlToolConstants.CFG_RESOURCENAME));
         sg.setEncoding((String)context.get(WadlToolConstants.CFG_ENCODING));
+        sg.setAuthentication(authentication);
 
         String wadlNs = (String)context.get(WadlToolConstants.CFG_WADL_NAMESPACE);
         if (wadlNs != null) {
             sg.setWadlNamespace(wadlNs);
         }
-        
+        sg.setJaxbClassNameSuffix((String)context.get(WadlToolConstants.CFG_JAXB_CLASS_NAME_SUFFIX));
+
         sg.setSupportMultipleXmlReps(context.optionSet(WadlToolConstants.CFG_MULTIPLE_XML_REPS));
+        sg.setSupportBeanValidation(context.optionSet(WadlToolConstants.CFG_BEAN_VALIDATION));
         sg.setCreateJavaDocs(context.optionSet(WadlToolConstants.CFG_CREATE_JAVA_DOCS));
         // set the base path
         sg.setWadlPath(wadlURL);
-                
+
         CustomizationParser parser = new CustomizationParser(context);
         parser.parse(context);
-        
+
         List<InputSource> bindingFiles = parser.getJaxbBindings();
         sg.setBindingFiles(bindingFiles);
-        
+
         sg.setCompilerArgs(parser.getCompilerArgs());
-        
+
         List<InputSource> schemaPackageFiles = parser.getSchemaPackageFiles();
         sg.setSchemaPackageFiles(schemaPackageFiles);
         sg.setSchemaPackageMap(context.getNamespacePackageMap());
-        
+
         sg.setJavaTypeMap(DEFAULT_JAVA_TYPE_MAP);
         sg.setSchemaTypeMap(getSchemaTypeMap());
         sg.setMediaTypeMap(getMediaTypeMap());
 
         sg.setSuspendedAsyncMethods(getSuspendedAsyncMethods());
         sg.setResponseMethods(getResponseMethods());
-                
+        sg.setOnewayMethods(getOnewayMethods());
+
         sg.setGenerateEnums(context.optionSet(WadlToolConstants.CFG_GENERATE_ENUMS));
         sg.setValidateWadl(context.optionSet(WadlToolConstants.CFG_VALIDATE_WADL));
         boolean inheritResourceParams = context.optionSet(WadlToolConstants.CFG_INHERIT_PARAMS);
@@ -165,73 +170,83 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             sg.setInheritResourceParamsFirst(isInheritResourceParamsFirst());
         }
         sg.setSkipSchemaGeneration(context.optionSet(WadlToolConstants.CFG_NO_TYPES));
-        
+
         boolean noVoidForEmptyResponses = context.optionSet(WadlToolConstants.CFG_NO_VOID_FOR_EMPTY_RESPONSES);
         if (noVoidForEmptyResponses) {
             sg.setUseVoidForEmptyResponses(false);
         }
-        
+
         sg.setGenerateResponseIfHeadersSet(context.optionSet(WadlToolConstants.CFG_GENERATE_RESPONSE_IF_HEADERS_SET));
-        
+
         // generate
         String codeType = context.optionSet(WadlToolConstants.CFG_TYPES)
             ? SourceGenerator.CODE_TYPE_GRAMMAR : SourceGenerator.CODE_TYPE_PROXY;
         sg.generateSource(wadl, outDir, codeType);
-        
-        // compile 
+
+        // compile
         if (context.optionSet(WadlToolConstants.CFG_COMPILE)) {
             ClassCollector collector = createClassCollector();
             List<String> generatedServiceClasses = sg.getGeneratedServiceClasses();
             for (String className : generatedServiceClasses) {
                 int index = className.lastIndexOf(".");
-                collector.addServiceClassName(className.substring(0, index), 
-                                              className.substring(index + 1), 
+                collector.addServiceClassName(className.substring(0, index),
+                                              className.substring(index + 1),
                                               className);
             }
-            
+
             List<String> generatedTypeClasses = sg.getGeneratedTypeClasses();
             for (String className : generatedTypeClasses) {
                 int index = className.lastIndexOf(".");
-                collector.addTypesClassName(className.substring(0, index), 
-                                              className.substring(index + 1), 
+                collector.addTypesClassName(className.substring(0, index),
+                                              className.substring(index + 1),
                                               className);
             }
-            
+
             context.put(ClassCollector.class, collector);
             new ClassUtils().compile(context);
         }
 
     }
-    
-    protected String readWadl(String wadlURI) {
+
+    protected String readWadl(String wadlURI, String authentication) {
         try {
             URL url = new URL(wadlURI);
-            Reader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
+            InputStream is = null;
+            if (wadlURI.startsWith("https") && authentication != null) {
+                is = SecureConnectionHelper.getStreamFromSecureConnection(url, authentication);
+            } else {
+                is = url.openStream();
+            }
+            Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
             return IOUtils.toString(reader);
         } catch (IOException e) {
             throw new ToolException(e);
         }
     }
-    
+
     protected String getAbsoluteWadlURL() {
         String wadlURL = (String)context.get(WadlToolConstants.CFG_WADLURL);
         String absoluteWadlURL = URIParserUtil.getAbsoluteURI(wadlURL);
         context.put(WadlToolConstants.CFG_WADLURL, absoluteWadlURL);
         return absoluteWadlURL;
     }
-    
+
     public Set<String> getSuspendedAsyncMethods() {
         return parseMethodList(WadlToolConstants.CFG_SUSPENDED_ASYNC);
     }
-    
+
     public Set<String> getResponseMethods() {
         return parseMethodList(WadlToolConstants.CFG_GENERATE_RESPONSE_FOR_METHODS);
     }
-    
+
+    public Set<String> getOnewayMethods() {
+        return parseMethodList(WadlToolConstants.CFG_ONEWAY);
+    }
+
     private Set<String> parseMethodList(String paramName) {
         Object value = context.get(paramName);
         if (value != null) {
-            Set<String> methods = new HashSet<String>();
+            Set<String> methods = new HashSet<>();
             String[] values = value.toString().split(",");
             for (String s : values) {
                 String actual = s.trim();
@@ -243,20 +258,18 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 methods.add("*");
             }
             return methods;
-        } else {
-            return Collections.emptySet();
         }
+        return Collections.emptySet();
     }
     private boolean isInheritResourceParamsFirst() {
         Object value = context.get(WadlToolConstants.CFG_INHERIT_PARAMS);
         if (StringUtils.isEmpty((String)value)) {
             return true;
-        } else {
-            return "first".equals(value.toString().trim());
         }
+        return "first".equals(value.toString().trim());
     }
-    
-    //TODO: this belongs to JAXB Databinding, should we just reuse 
+
+    //TODO: this belongs to JAXB Databinding, should we just reuse
     // org.apache.cxf.tools.wsdlto.databinding.jaxb ?
     private void setPackageAndNamespaces() {
         String[] schemaPackageNamespaces = new String[]{};
@@ -274,22 +287,22 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 context.addNamespacePackageMap(ns, packagename);
             } else {
                 // this is the default schema package name
-                // if CFG_PACKAGENAME is set then it's only used for JAX-RS resource 
+                // if CFG_PACKAGENAME is set then it's only used for JAX-RS resource
                 // classes
                 context.put(WadlToolConstants.CFG_SCHEMA_PACKAGENAME, packagename);
             }
         }
-        
+
     }
-    
+
     private Map<String, String> getSchemaTypeMap() {
         return getMap(WadlToolConstants.CFG_SCHEMA_TYPE_MAP);
     }
-    
+
     private Map<String, String> getMediaTypeMap() {
         return getMap(WadlToolConstants.CFG_MEDIA_TYPE_MAP);
     }
-    
+
     private Map<String, String> getMap(String parameterName) {
         String[] typeToClasses = new String[]{};
         Object value = context.get(parameterName);
@@ -297,7 +310,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             typeToClasses = value instanceof String ? new String[]{(String)value}
                                                    : (String[])value;
         }
-        Map<String, String> typeMap = new HashMap<String, String>();
+        Map<String, String> typeMap = new HashMap<>();
         for (int i = 0; i < typeToClasses.length; i++) {
             int pos = typeToClasses[i].indexOf("=");
             if (pos != -1) {

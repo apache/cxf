@@ -50,6 +50,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     static String serverPort = TestUtil.getPortNumber(Server.class);
 
@@ -63,7 +67,7 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                 launchServer(Server.class, true));
     }
-    
+
     @Before
     public void createConnection() throws Exception {
         url = new URL("http://localhost:" + serverPort + "/test/foo");
@@ -72,13 +76,13 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     }
 
 
-    @Test 
-    public void invokeOnServer() throws Exception { 
+    @Test
+    public void invokeOnServer() throws Exception {
         url = new URL("http://localhost:" + serverPort + "/test/foo");
         conn = (HttpURLConnection) url.openConnection();
-        printSource(new StreamSource(conn.getInputStream())); 
+        printSource(new StreamSource(conn.getInputStream()));
     }
-    
+
     @Test
     public void postAttachmentToServer() throws Exception {
         String contentType = "multipart/related; type=\"text/xml\"; "
@@ -90,9 +94,9 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
 
         conn.setRequestMethod("POST");
         conn.addRequestProperty("Content-Type", contentType);
-        OutputStream out = conn.getOutputStream();
-        IOUtils.copy(in, out);
-        out.close();
+        try (OutputStream out = conn.getOutputStream()) {
+            IOUtils.copy(in, out);
+        }
         MimeMultipart mm = readAttachmentParts(conn.getContentType(),
                                                conn.getInputStream());
 
@@ -101,22 +105,22 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     }
 
     private void printSource(Source source) {
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             StreamResult sr = new StreamResult(bos);
-            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = transformerFactory.newTransformer();
             Properties oprops = new Properties();
             oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            trans.setOutputProperties(oprops);
-            trans.transform(source, sr);
+            transformer.setOutputProperties(oprops);
+            transformer.transform(source, sr);
             assertEquals(bos.toString(), "<doc><response>Hello</response></doc>");
-            bos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    public static MimeMultipart readAttachmentParts(String contentType, InputStream bais) throws 
+
+    public static MimeMultipart readAttachmentParts(String contentType, InputStream bais) throws
         MessagingException, IOException {
         DataSource source = new ByteArrayDataSource(bais, contentType);
         MimeMultipart mpart = new MimeMultipart(source);

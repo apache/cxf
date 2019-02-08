@@ -27,23 +27,20 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
-import org.junit.Assert;
+import org.osgi.framework.Constants;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
-import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
-import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
-import org.osgi.framework.Constants;
-import static org.ops4j.pax.exam.CoreOptions.maven;
+
+import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -53,10 +50,10 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
     public void testJmsEndpoint() throws Exception {
         Greeter greeter = greeterJms();
         String res = greeter.greetMe("Chris");
-        Assert.assertEquals("Hi Chris", res);
+        assertEquals("Hi Chris", res);
     }
 
-    private Greeter greeterJms() {
+    private static Greeter greeterJms() {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("jms:queue:greeter");
@@ -65,8 +62,8 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
         return factory.create(Greeter.class);
     }
 
-    private ActiveMQConnectionFactory createConnectionFactory() {
-        ActiveMQConnectionFactory connectionFactory 
+    private static ActiveMQConnectionFactory createConnectionFactory() {
+        ActiveMQConnectionFactory connectionFactory
             = new ActiveMQConnectionFactory("vm://JmsServiceTest");
         connectionFactory.setUserName("karaf");
         connectionFactory.setPassword("karaf");
@@ -75,22 +72,22 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
 
     @Configuration
     public Option[] config() {
-        MavenUrlReference activeMQFeature = maven().groupId("org.apache.activemq")
-            .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
         return new Option[] {
             cxfBaseConfig(),
-            testUtils(),
             features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            KarafDistributionOption.keepRuntimeFolder(),
-            logLevel(LogLevel.INFO),
-            features(activeMQFeature, "activemq-broker-noweb"),
+            features(springLegacyUrl, "spring/4.3.18.RELEASE_1"),
+            features(amqUrl, "shell-compat", "activemq-broker-noweb"),
             provision(serviceBundle())
         };
     }
 
-    private InputStream serviceBundle() {
-        return TinyBundles.bundle().add(JmsTestActivator.class).add(Greeter.class).add(GreeterImpl.class)
-            .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName()).build(TinyBundles.withBnd());
+    private static InputStream serviceBundle() {
+        return TinyBundles.bundle()
+                .add(JmsTestActivator.class)
+                .add(Greeter.class)
+                .add(GreeterImpl.class)
+                .set(Constants.BUNDLE_ACTIVATOR, JmsTestActivator.class.getName())
+                .build(TinyBundles.withBnd());
     }
 
 }

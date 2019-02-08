@@ -21,5 +21,5 @@ package org.apache.cxf.endpoint;
 
 public interface ClientLifeCycleListener {
     void clientCreated(Client client);
-    void clientDestroyed(Client client); 
+    void clientDestroyed(Client client);
 }

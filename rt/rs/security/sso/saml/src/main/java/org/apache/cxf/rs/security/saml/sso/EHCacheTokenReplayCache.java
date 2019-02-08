@@ -31,49 +31,48 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
- * An in-memory EHCache implementation of the TokenReplayCache interface. 
+ * An in-memory EHCache implementation of the TokenReplayCache interface.
  * The default TTL is 60 minutes and the max TTL is 12 hours.
  */
 public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
-    
+
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
     public static final String CACHE_KEY = "cxf.samlp.replay.cache";
     private static final String DEFAULT_CONFIG_URL = "/cxf-samlp-ehcache.xml";
-    
+
     private Ehcache cache;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
-    
+
     public EHCacheTokenReplayCache() {
         this(DEFAULT_CONFIG_URL, null);
     }
-    
+
     public EHCacheTokenReplayCache(Bus bus) {
         this(DEFAULT_CONFIG_URL, bus);
     }
-    
+
     public EHCacheTokenReplayCache(String configFileURL) {
         this(configFileURL, null);
     }
-    
+
     public EHCacheTokenReplayCache(String configFileURL, Bus bus) {
         createCache(configFileURL, bus);
     }
-    
+
     private void createCache(String configFile, Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus(true);
         }
         URL configFileURL = null;
         try {
-            configFileURL = 
+            configFileURL =
                 ResourceUtils.getClasspathResourceURL(configFile, EHCacheTokenReplayCache.class, bus);
         } catch (Exception ex) {
             // ignore
@@ -82,7 +81,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
             cacheManager = EHCacheUtil.createCacheManager();
         } else {
             Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-            
+
             if (bus != null) {
                 conf.setName(bus.getId());
                 DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
@@ -92,16 +91,16 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
                     conf.getDiskStoreConfiguration().setPath(path);
                 }
             }
-            
+
             cacheManager = EHCacheUtil.createCacheManager(conf);
         }
-        
+
         CacheConfiguration cc = EHCacheUtil.getCacheConfiguration(CACHE_KEY, cacheManager);
-        
+
         Ehcache newCache = new Cache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
     }
-    
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -109,7 +108,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     public void setTTL(long newTtl) {
         ttl = newTtl;
     }
-    
+
     /**
      * Get the (default) TTL value in seconds
      * @return the (default) TTL value in seconds
@@ -117,7 +116,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     public long getTTL() {
         return ttl;
     }
-    
+
     /**
      * Add the given identifier to the cache. It will be cached for a default amount of time.
      * @param id The identifier to be added
@@ -125,7 +124,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
     public void putId(String id) {
         putId(id, ttl);
     }
-    
+
     /**
      * Add the given identifier to the cache.
      * @param identifier The identifier to be added
@@ -135,12 +134,12 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         if (id == null || "".equals(id)) {
             return;
         }
-        
+
         int parsedTTL = (int)timeToLive;
-        if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+        if (timeToLive != parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
             // Default to configured value
             parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
+            if (ttl != parsedTTL) {
                 // Fall back to 60 minutes if the default TTL is set incorrectly
                 parsedTTL = 3600;
             }
@@ -149,7 +148,7 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         element.resetAccessStatistics();
         cache.put(element);
     }
-    
+
     /**
      * Return the given identifier if it is contained in the cache, otherwise null.
      * @param id The identifier to check
@@ -173,5 +172,5 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
             cache = null;
         }
     }
-    
+
 }

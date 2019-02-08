@@ -32,6 +32,7 @@ import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
 import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMConfiguration;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
+import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 import org.apache.neethi.builders.PrimitiveAssertion;
@@ -40,24 +41,24 @@ import org.apache.neethi.builders.PrimitiveAssertion;
  * Utilities for working with policies and configurations.
  */
 public final class RMPolicyUtilities {
-    
+
     private static final List<QName> ASSERTION_NAMES;
     static {
-        ASSERTION_NAMES = new ArrayList<QName>();
+        ASSERTION_NAMES = new ArrayList<>();
         ASSERTION_NAMES.addAll(RM10AssertionBuilder.KNOWN_ELEMENTS);
         for (QName qn : RM12AssertionBuilder.KNOWN_ELEMENTS) {
             ASSERTION_NAMES.add(qn);
         }
         ASSERTION_NAMES.add(RSPAssertionBuilder.CONFORMANT_QNAME);
     }
-    
+
     private RMPolicyUtilities() {
     }
-    
+
     /**
      * Returns an RMAssertion that is compatible with the default value and all RMAssertions pertaining to the
      * message (can never be null).
-     * 
+     *
      * @param rma the default value (non-<code>null</code>)
      * @param message the message
      * @return the compatible RMAssertion
@@ -82,12 +83,12 @@ public final class RMPolicyUtilities {
     /**
      * Collect RMAssertions from map. This checks both namespaces defined for WS-RM policy assertions, along with the
      * WS-I RSP namespace.
-     * 
+     *
      * @param aim map, may be <code>null</code>
      * @return merged collection, never <code>null</code>
      */
     public static Collection<AssertionInfo> collectRMAssertions(AssertionInfoMap aim) {
-        Collection<AssertionInfo> mergedAsserts = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> mergedAsserts = new ArrayList<>();
         if (aim != null) {
             for (QName qn : ASSERTION_NAMES) {
                 Collection<AssertionInfo> ais = aim.get(qn);
@@ -103,48 +104,48 @@ public final class RMPolicyUtilities {
         if (a == b) {
             return true;
         }
-        
+
         Long aval = null;
         if (null != a.getInactivityTimeout()) {
             aval = a.getInactivityTimeout().getMilliseconds();
         }
         Long bval = null;
         if (null != b.getInactivityTimeout()) {
-            bval = b.getInactivityTimeout().getMilliseconds();            
+            bval = b.getInactivityTimeout().getMilliseconds();
         }
         if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
-            
+
         aval = null;
         if (null != a.getBaseRetransmissionInterval()) {
             aval = a.getBaseRetransmissionInterval().getMilliseconds();
         }
         bval = null;
         if (null != b.getBaseRetransmissionInterval()) {
-            bval = b.getBaseRetransmissionInterval().getMilliseconds();            
+            bval = b.getBaseRetransmissionInterval().getMilliseconds();
         }
         if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
-        
+
         aval = null;
         if (null != a.getAcknowledgementInterval()) {
             aval = a.getAcknowledgementInterval().getMilliseconds();
         }
         bval = null;
         if (null != b.getAcknowledgementInterval()) {
-            bval = b.getAcknowledgementInterval().getMilliseconds(); 
+            bval = b.getAcknowledgementInterval().getMilliseconds();
         }
         if (!RMUtils.equalLongs(aval, bval)) {
             return false;
         }
-        
+
         return null == a.getExponentialBackoff()
-            ? null == b.getExponentialBackoff() 
-            : null != b.getExponentialBackoff();         
+            ? null == b.getExponentialBackoff()
+            : null != b.getExponentialBackoff();
     }
-    
+
     public static boolean equals(RMConfiguration a, RMConfiguration b) {
         if (a == b) {
             return true;
@@ -183,10 +184,10 @@ public final class RMPolicyUtilities {
                && RMUtils.equalLongs(a.getBaseRetransmissionInterval(), b.getBaseRetransmissionInterval())
                && RMUtils.equalLongs(a.getInactivityTimeout(), b.getInactivityTimeout());
     }
-    
+
     /**
      * Intersect a policy with a supplied configuration.
-     * 
+     *
      * @param rma
      * @param cfg
      * @return result configuration
@@ -195,14 +196,14 @@ public final class RMPolicyUtilities {
         if (isCompatible(rma, cfg)) {
             return cfg;
         }
-        
+
         RMConfiguration compatible = new RMConfiguration(cfg);
-        
+
         // if supplied, policy value overrides default inactivity timeout
         Long aval = cfg.getInactivityTimeout();
         Long bval = null;
         if (null != rma.getInactivityTimeout()) {
-            bval = rma.getInactivityTimeout().getMilliseconds();            
+            bval = rma.getInactivityTimeout().getMilliseconds();
         }
         if (null != aval || null != bval) {
             Long use;
@@ -213,12 +214,12 @@ public final class RMPolicyUtilities {
             }
             compatible.setInactivityTimeout(use);
         }
-        
+
         // if supplied, policy value overrides base retransmission interval
         aval = cfg.getBaseRetransmissionInterval();
         bval = null;
         if (null != rma.getBaseRetransmissionInterval()) {
-            bval = rma.getBaseRetransmissionInterval().getMilliseconds();            
+            bval = rma.getBaseRetransmissionInterval().getMilliseconds();
         }
         if (null != aval || null != bval) {
             Long use;
@@ -229,12 +230,12 @@ public final class RMPolicyUtilities {
             }
             compatible.setBaseRetransmissionInterval(use);
         }
-        
+
         // if supplied, policy value overrides acknowledgement interval
         aval = cfg.getAcknowledgementInterval();
         bval = null;
         if (null != rma.getAcknowledgementInterval()) {
-            bval = rma.getAcknowledgementInterval().getMilliseconds(); 
+            bval = rma.getAcknowledgementInterval().getMilliseconds();
         }
         if (null != aval || null != bval) {
             Long use;
@@ -245,17 +246,17 @@ public final class RMPolicyUtilities {
             }
             compatible.setAcknowledgementInterval(use);
         }
-    
+
         // backoff parameter
         if (cfg.isExponentialBackoff() || null != rma.getExponentialBackoff()) {
             compatible.setExponentialBackoff(true);
         }
         return compatible;
     }
-    
+
     /**
      * Check if a policy is compatible with a supplied configuration.
-     * 
+     *
      * @param asser
      * @param cfg
      * @return <code>true</code> if compatible, <code>false</code> if not
@@ -263,36 +264,36 @@ public final class RMPolicyUtilities {
     public static boolean isCompatible(RMAssertion asser, RMConfiguration cfg) {
         Long aval = null;
         if (null != asser.getInactivityTimeout()) {
-            aval = asser.getInactivityTimeout().getMilliseconds();            
+            aval = asser.getInactivityTimeout().getMilliseconds();
         }
         if (!RMUtils.equalLongs(cfg.getInactivityTimeout(), aval)) {
             return false;
         }
-            
+
         aval = null;
         if (null != asser.getBaseRetransmissionInterval()) {
-            aval = asser.getBaseRetransmissionInterval().getMilliseconds();            
+            aval = asser.getBaseRetransmissionInterval().getMilliseconds();
         }
         if (!RMUtils.equalLongs(cfg.getBaseRetransmissionInterval(), aval)) {
             return false;
         }
-        
+
         aval = null;
         if (null != asser.getAcknowledgementInterval()) {
-            aval = asser.getAcknowledgementInterval().getMilliseconds(); 
+            aval = asser.getAcknowledgementInterval().getMilliseconds();
         }
         if (!RMUtils.equalLongs(cfg.getAcknowledgementInterval(), aval)) {
             return false;
         }
-        
+
         return cfg.isExponentialBackoff()
-            ? null == asser.getExponentialBackoff() 
-            : null != asser.getExponentialBackoff();         
+            ? null == asser.getExponentialBackoff()
+            : null != asser.getExponentialBackoff();
     }
-    
+
     /**
      * Intersect a policy with a supplied configuration.
-     * 
+     *
      * @param rma
      * @param cfg
      * @return result configuration
@@ -303,7 +304,7 @@ public final class RMPolicyUtilities {
         }
         RMConfiguration compatible = new RMConfiguration(cfg);
         String lname = rma.getName().getLocalPart();
-        if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
+        if (RMConstants.RMASSERTION_NAME.equals(lname)) {
             compatible.setRMNamespace(RM11Constants.NAMESPACE_URI);
         } else if (RM12AssertionBuilder.SEQUENCESTR_NAME.equals(lname)) {
             compatible.setSequenceSTRRequired(true);
@@ -320,10 +321,10 @@ public final class RMPolicyUtilities {
         }
         return compatible;
     }
-    
+
     /**
      * Check if a policy is compatible with a supplied configuration.
-     * 
+     *
      * @param rma
      * @param cfg
      * @return <code>true</code> if compatible, <code>false</code> if not
@@ -331,7 +332,7 @@ public final class RMPolicyUtilities {
     public static boolean isCompatible(PrimitiveAssertion rma, RMConfiguration cfg) {
         String lname = rma.getName().getLocalPart();
         boolean compatible = true;
-        if (RM11Constants.RMASSERTION_NAME.equals(lname)) {
+        if (RMConstants.RMASSERTION_NAME.equals(lname)) {
             compatible = RM11Constants.WSRMP_NAMESPACE_URI.equals(cfg.getRMNamespace());
         } else if (RM12AssertionBuilder.SEQUENCESTR_NAME.equals(lname)) {
             compatible = cfg.isSequenceSTRRequired();

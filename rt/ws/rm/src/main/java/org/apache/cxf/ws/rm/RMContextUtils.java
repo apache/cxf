@@ -44,17 +44,17 @@ public final class RMContextUtils {
 
     /**
      * Determine if message is currently being processed on server side.
-     * 
+     *
      * @param message the current Message
      * @return true if message is currently being processed on server side
      */
     public static boolean isServerSide(Message message) {
         return message.getExchange().getDestination() != null;
     }
-    
+
     /**
      * Checks if the action String belongs to an RM protocol message.
-     * 
+     *
      * @param action the action
      * @return true if the action is not one of the RM protocol actions.
      */
@@ -64,7 +64,7 @@ public final class RMContextUtils {
 
     /**
      * Retrieve the RM properties from the current message.
-     * 
+     *
      * @param message the current message
      * @param outbound true if the message direction is outbound
      * @return the RM properties
@@ -72,20 +72,19 @@ public final class RMContextUtils {
     public static RMProperties retrieveRMProperties(Message message, boolean outbound) {
         if (outbound) {
             return (RMProperties)message.get(getRMPropertiesKey(true));
+        }
+        Message m = null;
+        if (MessageUtils.isOutbound(message)) {
+            // the in properties are only available on the in message
+            m = message.getExchange().getInMessage();
+            if (null == m) {
+                m = message.getExchange().getInFaultMessage();
+            }
         } else {
-            Message m = null;
-            if (MessageUtils.isOutbound(message)) {
-                // the in properties are only available on the in message
-                m = message.getExchange().getInMessage();
-                if (null == m) {
-                    m = message.getExchange().getInFaultMessage();
-                }
-            } else {
-                m = message;
-            }
-            if (null != m) {
-                return (RMProperties)m.get(getRMPropertiesKey(false));
-            }
+            m = message;
+        }
+        if (null != m) {
+            return (RMProperties)m.get(getRMPropertiesKey(false));
         }
         return null;
 
@@ -93,7 +92,7 @@ public final class RMContextUtils {
 
     /**
      * Store the RM properties in the current message.
-     * 
+     *
      * @param message the current message
      * @param rmps the RM properties
      * @param outbound if the message direction is outbound
@@ -105,7 +104,7 @@ public final class RMContextUtils {
 
     /**
      * Retrieves the addressing properties from the current message.
-     * 
+     *
      * @param message the current message
      * @param isProviderContext true if the binding provider request context
      *            available to the client application as opposed to the message
@@ -113,7 +112,7 @@ public final class RMContextUtils {
      * @param isOutbound true if the message is outbound
      * @return the current addressing properties
      */
-    public static AddressingProperties retrieveMAPs(Message message, 
+    public static AddressingProperties retrieveMAPs(Message message,
                                                     boolean isProviderContext,
                                                     boolean isOutbound) {
         return org.apache.cxf.ws.addressing.ContextUtils.retrieveMAPs(message, isProviderContext, isOutbound);
@@ -121,7 +120,7 @@ public final class RMContextUtils {
 
     /**
      * Store MAPs in the message.
-     * 
+     *
      * @param maps the MAPs to store
      * @param message the current message
      * @param isOutbound true if the message is outbound

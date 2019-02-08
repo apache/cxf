@@ -27,15 +27,15 @@ public class SoapOperationInfo {
     public String getAction() {
         return action;
     }
-    
+
     public void setAction(String action) {
         this.action = action;
     }
-    
+
     public String getStyle() {
         return style;
     }
-    
+
     public void setStyle(String style) {
         this.style = style;
     }

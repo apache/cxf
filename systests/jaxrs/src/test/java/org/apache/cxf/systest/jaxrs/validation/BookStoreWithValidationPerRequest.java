@@ -30,11 +30,11 @@ import javax.ws.rs.core.Response;
 
 @Path("/bookstore/")
 public class BookStoreWithValidationPerRequest  {
-    private Map<String, BookWithValidation> books = new HashMap<String, BookWithValidation>(); 
+    private Map<String, BookWithValidation> books = new HashMap<>();
     @NotNull private String id;
-    
+
     public BookStoreWithValidationPerRequest() {
-        books.put("123", new BookWithValidation("CXF", "123")); 
+        books.put("123", new BookWithValidation("CXF", "123"));
         books.put("124", new BookWithValidation("123"));
     }
 
@@ -42,17 +42,17 @@ public class BookStoreWithValidationPerRequest  {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public String getId() {
         return this.id;
     }
-    
+
     @GET
     @Path("book")
     @Valid @NotNull public BookWithValidation book() {
         return books.get(id);
     }
-    
+
     @GET
     @Path("bookResponse")
     @Valid @NotNull public Response bookResponse() {

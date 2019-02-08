@@ -21,26 +21,27 @@ package org.apache.cxf.transport;
 
 import java.net.URL;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class HttpUriMapperTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class HttpUriMapperTest {
 
     @Test
     public void testGetContext() throws Exception {
         URL url = new URL("http://localhost:8080/SoapContext/SoapPort");
         String path = url.getPath();
         assertEquals("/SoapContext", HttpUriMapper.getContextName(path));
-        
+
         url = new URL("http://localhost:8080/SoapContext/SoapPort/");
         path = url.getPath();
         assertEquals("/SoapContext/SoapPort", HttpUriMapper.getContextName(path));
-        
+
         url = new URL("http://localhost:8080/");
         path = url.getPath();
         assertEquals("", HttpUriMapper.getContextName(path));
     }
-    
+
     @Test
     public void testGetResourceBase() throws Exception {
         URL url = new URL("http://localhost:8080/SoapContext/SoapPort");

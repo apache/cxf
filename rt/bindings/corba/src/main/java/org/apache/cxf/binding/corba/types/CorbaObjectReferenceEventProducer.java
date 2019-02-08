@@ -28,7 +28,7 @@ import javax.wsdl.Binding;
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
@@ -51,14 +51,14 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     static final List<Attribute> IS_NIL_OBJ_REF_ATTRS;
     static {
         XMLEventFactory factory = XMLEventFactory.newInstance();
-        IS_NIL_OBJ_REF_ATTRS = new ArrayList<Attribute>();
+        IS_NIL_OBJ_REF_ATTRS = new ArrayList<>();
         IS_NIL_OBJ_REF_ATTRS.add(factory.createAttribute(new QName(XSI_NAMESPACE_URI, "nil", "xsi"), "true"));
     }
     private static final String INFER_FROM_TYPE_ID = "InferFromTypeId";
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaObjectReferenceEventProducer.class);
 
-    List<Attribute> refAttrs;    
-       
+    List<Attribute> refAttrs;
+
     public CorbaObjectReferenceEventProducer(CorbaObjectHandler h, ServiceInfo service, ORB orbRef) {
         CorbaObjectReferenceHandler handler = (CorbaObjectReferenceHandler) h;
         name = CorbaUtils.processQName(handler.getName(), service);
@@ -71,13 +71,13 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
             return;
         }
 
-        List<CorbaTypeEventProducer> objRefProducers = new ArrayList<CorbaTypeEventProducer>();
-        
+        List<CorbaTypeEventProducer> objRefProducers = new ArrayList<>();
+
         String address = orb.object_to_string(handler.getReference());
         objRefProducers.add(new CorbaAddressEventProducer(address));
 
         Definition wsdlDef = (Definition)serviceInfo.getProperty(WSDLServiceBuilder.WSDL_DEFINITION);
-        
+
         // Get the TypeImpl of the object reference so that we can determine the binding
         // needed for this object reference
         org.apache.cxf.binding.corba.wsdl.Object objType =
@@ -85,7 +85,7 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         QName bindingName = objType.getBinding();
         if (bindingName != null) {
             EprMetaData eprInfo = null;
-            if (INFER_FROM_TYPE_ID.equalsIgnoreCase(bindingName.getLocalPart())) { 
+            if (INFER_FROM_TYPE_ID.equalsIgnoreCase(bindingName.getLocalPart())) {
                 String typeId = CorbaObjectReferenceHelper.extractTypeIdFromIOR(address);
                 if (!StringUtils.isEmpty(typeId)) {
                     eprInfo = getEprMetadataForTypeId(wsdlDef, typeId);
@@ -93,12 +93,12 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                     LOG.log(Level.SEVERE, "For binding with value \"" + INFER_FROM_TYPE_ID
                                     + "\" the type_id of the object reference IOR must be set to its most"
                                     + " derived type. It is currently null indicating CORBA:Object."
-                                    + " Address Url=" + address); 
+                                    + " Address Url=" + address);
                 }
-            } else {               
+            } else {
                 eprInfo = getEprMetadataForBindingName(wsdlDef, bindingName);
             }
-            
+
             if (eprInfo.isValid()) {
                 LOG.log(Level.FINE, "Epr metadata " + eprInfo);
                 // Create the meta data producer and add its child producers.
@@ -109,20 +109,20 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                 CorbaInterfaceNameEventProducer interfaceProducer =
                     new CorbaInterfaceNameEventProducer(interfaceName);
                 CorbaMetaDataEventProducer metaProducer =
-                    new CorbaMetaDataEventProducer(wsdlLoc, nameProducer, interfaceProducer);  
+                    new CorbaMetaDataEventProducer(wsdlLoc, nameProducer, interfaceProducer);
                 objRefProducers.add(metaProducer);
             }
         }
         producers = objRefProducers.iterator();
     }
-    
+
     private EprMetaData getEprMetadataForBindingName(Definition wsdlDef, QName bindingName) {
-        EprMetaData info = getObjectReferenceBinding(wsdlDef, bindingName); 
+        EprMetaData info = getObjectReferenceBinding(wsdlDef, bindingName);
         CorbaObjectReferenceHelper.populateEprInfo(info);
         return info;
     }
 
-    private EprMetaData getEprMetadataForTypeId(Definition wsdlDef, String typeId) {        
+    private EprMetaData getEprMetadataForTypeId(Definition wsdlDef, String typeId) {
         EprMetaData info = CorbaObjectReferenceHelper.getBindingForTypeId(typeId, wsdlDef);
         CorbaObjectReferenceHelper.populateEprInfo(info);
         return info;
@@ -134,15 +134,15 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         }
         return refAttrs;
     }
-    
+
     protected EprMetaData getObjectReferenceBinding(Definition wsdlDef, QName bindingName) {
         EprMetaData info = new EprMetaData();
         Binding wsdlBinding = wsdlDef.getBinding(bindingName);
-        
-        // If the binding name does not have a namespace associated with it, then we'll need to 
+
+        // If the binding name does not have a namespace associated with it, then we'll need to
         // get the list of all bindings and compare their local parts against our name.
-        if (wsdlBinding == null && bindingName.getNamespaceURI().equals("")
-            && !bindingName.getLocalPart().equals("")) {
+        if (wsdlBinding == null && bindingName.getNamespaceURI().isEmpty()
+            && !bindingName.getLocalPart().isEmpty()) {
             Collection<Binding> bindingsCollection = CastUtils.cast(wsdlDef.getBindings().values());
             for (Binding b : bindingsCollection) {
                 if (b.getQName().getLocalPart().equals(bindingName.getLocalPart())) {
@@ -151,12 +151,12 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
                 }
             }
         }
-        
+
         if (wsdlBinding != null) {
             info.setBinding(wsdlBinding);
             info.setCandidateWsdlDef(wsdlDef);
         }
-        
+
         return info;
     }
 
@@ -164,9 +164,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     class CorbaAddressEventProducer implements CorbaTypeEventProducer {
         int state;
 
-        int[] states = {XMLStreamReader.START_ELEMENT, 
-                        XMLStreamReader.CHARACTERS, 
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         final String address;
 
         CorbaAddressEventProducer(String value) {
@@ -213,13 +213,13 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         CorbaMetaDataEventProducer(CorbaServiceNameEventProducer svc) {
             this(null, svc, null);
         }
-        
+
         CorbaMetaDataEventProducer(String location,
                                           CorbaServiceNameEventProducer svc,
                                           CorbaInterfaceNameEventProducer intf) {
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_NAMESPACE_URI, "Metadata");
 
-            List<CorbaTypeEventProducer> metaDataProducers = new ArrayList<CorbaTypeEventProducer>();
+            List<CorbaTypeEventProducer> metaDataProducers = new ArrayList<>();
             metaDataProducers.add(svc);
 
             if (intf != null) {
@@ -227,10 +227,10 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
             }
 
             producers = metaDataProducers.iterator();
-            
+
             if (location != null) {
                 XMLEventFactory factory = XMLEventFactory.newInstance();
-                metaAttrs = new ArrayList<Attribute>();
+                metaAttrs = new ArrayList<>();
                 metaAttrs.add(factory.createAttribute(
                         new QName(WSDLI_NAMESPACE_URI, "wsdlLocation", "objrefns1"), location));
             }
@@ -240,19 +240,18 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         public List<Attribute> getAttributes() {
             if (currentEventProducer != null) {
                 return currentEventProducer.getAttributes();
-            } else {
-                return metaAttrs;
             }
+            return metaAttrs;
         }
-   
+
     }
 
     // An event producer to handle the production of the ServiceName XML data.
     class CorbaServiceNameEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.START_ELEMENT,
-                        XMLStreamReader.CHARACTERS,
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         QName serviceName;
         QName name;
 
@@ -264,13 +263,13 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
 
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_WSDL_NAMESPACE_URI,
                              "ServiceName");
-            
+
             XMLEventFactory factory = XMLEventFactory.newInstance();
 
-            attributes = new ArrayList<Attribute>();
+            attributes = new ArrayList<>();
             attributes.add(factory.createAttribute("EndpointName", ep));
 
-            namespaces = new ArrayList<Namespace>();
+            namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace("objrefns2", svc.getNamespaceURI()));
         }
 
@@ -306,9 +305,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     // An event producer to handle the production of the InterfaceName XML data.
     class CorbaInterfaceNameEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.START_ELEMENT,
-                        XMLStreamReader.CHARACTERS,
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         QName interfaceName;
         QName name;
         List<Namespace> namespaces;
@@ -318,9 +317,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
 
             name = new QName(CorbaObjectReferenceHelper.ADDRESSING_WSDL_NAMESPACE_URI,
                              "InterfaceName");
-            
+
             XMLEventFactory factory = XMLEventFactory.newInstance();
-            namespaces = new ArrayList<Namespace>();
+            namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace("objrefns2", intf.getNamespaceURI()));
         }
 

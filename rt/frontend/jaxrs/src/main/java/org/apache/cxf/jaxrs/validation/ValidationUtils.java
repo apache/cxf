@@ -43,10 +43,9 @@ public final class ValidationUtils {
             String error = "Service object is not a singleton, use a custom invoker to validate";
             LOG.warning(error);
             return null;
-        } else {
-            return resourceProvider.getInstance(message);
         }
+        return resourceProvider.getInstance(message);
     }
-    
-    
+
+
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.transport.http;
 
 import java.net.URI;
@@ -29,8 +29,8 @@ import java.net.URL;
  */
 public class HttpURLConnectionInfo extends URLConnectionInfo {
 
-    private final String httpRequestMethod; 
-    
+    private final String httpRequestMethod;
+
     /**
      * This constructor takes the HttpURLConnection and extracts
      * the httpRequestMethod.
@@ -39,7 +39,7 @@ public class HttpURLConnectionInfo extends URLConnectionInfo {
         super(url);
         httpRequestMethod = method;
     }
-    
+
     /**
      * This constructor takes the HttpURLConnection and extracts
      * the httpRequestMethod.
@@ -48,7 +48,7 @@ public class HttpURLConnectionInfo extends URLConnectionInfo {
         super(uri);
         httpRequestMethod = method;
     }
-    
+
     /**
      * This method returns the request method on the represented
      * HttpURLConnection.

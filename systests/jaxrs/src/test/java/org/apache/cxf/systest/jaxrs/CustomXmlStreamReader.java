@@ -26,7 +26,7 @@ public class CustomXmlStreamReader extends DepthXMLStreamReader {
     public CustomXmlStreamReader(XMLStreamReader reader) {
         super(reader);
     }
-    
+
     @Override
     public String getNamespaceURI() {
         return "http://www.example.org/books";

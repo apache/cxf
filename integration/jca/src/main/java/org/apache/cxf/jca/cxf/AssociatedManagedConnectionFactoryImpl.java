@@ -31,7 +31,7 @@ import javax.resource.spi.ResourceAdapterAssociation;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 
-public class AssociatedManagedConnectionFactoryImpl 
+public class AssociatedManagedConnectionFactoryImpl
     extends ManagedConnectionFactoryImpl implements ResourceAdapterAssociation {
 
     private static final long serialVersionUID = 4305487562182780773L;
@@ -65,7 +65,7 @@ public class AssociatedManagedConnectionFactoryImpl
     public ResourceAdapter getResourceAdapter() {
         return ra;
     }
-    
+
     /**
      * If outbound-resourceAdapter and the resourceAdapter has same property,
      * the outbound-resourceAdapter property's value would take precedence.
@@ -88,20 +88,20 @@ public class AssociatedManagedConnectionFactoryImpl
         if (ra == null) {
             throw new ResourceAdapterInternalException("ResourceAdapter can not be null");
         }
-        
+
         ((ResourceAdapterImpl)ra).registerBus(getBus());
     }
 
     protected Object getBootstrapContext() {
         return ((ResourceAdapterImpl)ra).getBootstrapContext();
     }
-    
-    //Explicit override these two methods, 
+
+    //Explicit override these two methods,
     //otherwise when deploy rar to weblogic9.1, it would complaint about this.
     public int hashCode() {
         return super.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         return super.equals(o);
     }

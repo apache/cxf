@@ -19,17 +19,18 @@
 
 package org.apache.cxf.ws.rm.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
- * 
+ *
  */
-public class RMBPHandlerTest extends Assert {
+public class RMBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         RMBPHandler handler = new RMBPHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/ws/rm/manager"));
         assertNotNull(handler.getSchemaLocation("http://schemas.xmlsoap.org/ws/2005/02/rm/policy"));
         assertNotNull(handler.getSchemaLocation("http://docs.oasis-open.org/ws-rx/wsrmp/200702"));

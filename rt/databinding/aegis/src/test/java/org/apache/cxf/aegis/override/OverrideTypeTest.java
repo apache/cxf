@@ -30,24 +30,29 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.inheritance.Employee;
 import org.apache.cxf.databinding.DataReader;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
 public class OverrideTypeTest extends AbstractAegisTest {
-    
+
     @Test
     public void testOverrideBean() throws Exception {
         AegisDatabinding aegisDatabinding = new AegisDatabinding();
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         types.add("org.apache.cxf.aegis.inheritance.Employee");
         aegisDatabinding.setOverrideTypes(types);
-        DataReader<XMLStreamReader> dataReader = 
+        DataReader<XMLStreamReader> dataReader =
             aegisDatabinding.createReader(XMLStreamReader.class);
-        InputStream employeeBytes = 
+        InputStream employeeBytes =
             testUtilities.getResourceAsStream("/org/apache/cxf/aegis/override/employee.xml");
-        
+
         XMLInputFactory readerFactory = XMLInputFactory.newInstance();
         XMLStreamReader reader = readerFactory.createXMLStreamReader(employeeBytes);
         Object objectRead = dataReader.read(reader);

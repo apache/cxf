@@ -29,21 +29,21 @@ import java.util.TreeSet;
 
 public class ClassCollector {
 
-    private Map<String, String> seiClassNames 
-        = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-    private Map<String, String> typesClassNames = new HashMap<String, String>();
-    private Map<String, String> exceptionClassNames = new HashMap<String, String>();
-    private Map<String, String> serviceClassNames = new HashMap<String, String>();
-    private Map<String, String> implClassNames = new HashMap<String, String>();
-    private final Map<String, String> clientClassNames = new HashMap<String, String>();
-    private final Map<String, String> serverClassNames = new HashMap<String, String>();
-    private final Map<String, String> reservedClassNames = new HashMap<String, String>();
-    
+    private Map<String, String> seiClassNames
+        = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, String> typesClassNames = new HashMap<>();
+    private Map<String, String> exceptionClassNames = new HashMap<>();
+    private Map<String, String> serviceClassNames = new HashMap<>();
+    private Map<String, String> implClassNames = new HashMap<>();
+    private final Map<String, String> clientClassNames = new HashMap<>();
+    private final Map<String, String> serverClassNames = new HashMap<>();
+    private final Map<String, String> reservedClassNames = new HashMap<>();
 
-    private final Set<String> typesPackages = new HashSet<String>();
-    
+
+    private final Set<String> typesPackages = new HashSet<>();
+
     public ClassCollector() {
-        
+
     }
     public void reserveClass(String fullName) {
         String cls = fullName;
@@ -52,7 +52,7 @@ public class ClassCollector {
         if (idx != -1) {
             pkg = cls.substring(0, idx);
             cls = cls.substring(idx + 1);
-        }        
+        }
         reservedClassNames.put(key(pkg, cls), fullName);
 
         addSeiClassName(pkg, cls, fullName);
@@ -63,7 +63,7 @@ public class ClassCollector {
         addServiceClassName(pkg, cls, fullName);
         addExceptionClassName(pkg, cls, fullName);
     }
-    
+
     public boolean isReserved(String packagename, String type) {
         return reservedClassNames.containsKey(key(packagename, type));
     }
@@ -145,7 +145,7 @@ public class ClassCollector {
     }
 
     public Collection<String> getGeneratedFileInfo() {
-        Set<String> generatedFileList = new TreeSet<String>();
+        Set<String> generatedFileList = new TreeSet<>();
         generatedFileList.addAll(seiClassNames.values());
         generatedFileList.addAll(typesClassNames.values());
         generatedFileList.addAll(exceptionClassNames.values());
@@ -154,7 +154,7 @@ public class ClassCollector {
         generatedFileList.addAll(clientClassNames.values());
         return generatedFileList;
     }
-    
+
     public Map<String, String> getSeiClassNames() {
         return seiClassNames;
     }
@@ -185,5 +185,5 @@ public class ClassCollector {
     public void setImplClassNames(Map<String, String> implClassNames) {
         this.implClassNames = implClassNames;
     }
-    
+
 }

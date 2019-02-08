@@ -22,18 +22,18 @@ package org.apache.cxf.tools.fortest.exception;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * 
+ *
  */
 public class TransientMessageException extends Exception {
     private static final long serialVersionUID = 1L;
     int idCode;
-    
+
     public TransientMessageException() {
     }
     public TransientMessageException(int i) {
         idCode = i;
     }
-    
+
     public TransientMessageException(int i, String message) {
         super(message);
         idCode = i;
@@ -50,7 +50,7 @@ public class TransientMessageException extends Exception {
     public String getMessage() {
         return super.getMessage();
     }
-    
+
     public int getIDCode() {
         return idCode;
     }

@@ -34,7 +34,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -60,42 +59,48 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
 import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
-    
-    public static final String OUTPUT_STREAM_HOLDER = 
+
+    public static final String OUTPUT_STREAM_HOLDER =
         WSS4JStaxOutInterceptor.class.getName() + ".outputstream";
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxOutInterceptor.class);
     private WSS4JStaxOutInterceptorInternal ending;
-    
+
     private boolean mtomEnabled;
-    
+
     public WSS4JStaxOutInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        
+        getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
         ending = createEndingInterceptor();
     }
 
     public WSS4JStaxOutInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        getAfter().add(LoggingOutInterceptor.class.getName());
+        getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
         ending = createEndingInterceptor();
     }
-    
+
     public WSS4JStaxOutInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.PRE_STREAM);
         getBefore().add(StaxOutInterceptor.class.getName());
-        getAfter().add(LoggingOutInterceptor.class.getName());
+        getAfter().add("org.apache.cxf.interceptor.LoggingOutInterceptor");
+        getAfter().add("org.apache.cxf.ext.logging.LoggingOutInterceptor");
         ending = createEndingInterceptor();
     }
-    
+
     public boolean isAllowMTOM() {
         return mtomEnabled;
     }
-    
+
     /**
      * Enable or disable mtom with WS-Security. MTOM is disabled if we are signing or
      * encrypting the message Body, as otherwise attachments would not get encrypted
@@ -106,20 +111,15 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         this.mtomEnabled = allowMTOM;
     }
 
-    @Override
-    public Object getProperty(Object msgContext, String key) {
-        return super.getProperty(msgContext, key);
-    }
-    
     protected void handleSecureMTOM(SoapMessage mc, WSSSecurityProperties secProps) {
         if (mtomEnabled) {
             return;
         }
-        
+
         //must turn off mtom when using WS-Sec so binary is inlined so it can
         //be properly signed/encrypted/etc...
         String mtomKey = org.apache.cxf.message.Message.MTOM_ENABLED;
-        if (mc.get(mtomKey) == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(mc.get(mtomKey))) {
             LOG.warning("MTOM will be disabled as the WSS4JOutInterceptor.mtomEnabled property"
                     + " is set to false");
         }
@@ -128,6 +128,16 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
     public void handleMessage(SoapMessage mc) throws Fault {
         OutputStream os = mc.getContent(OutputStream.class);
+        if (os == null) {
+            String error =
+                "The message outputstream is null - Multiple WSS4JStaxOutInterceptor instances are not supported";
+            WSSecurityException exception = new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
+                                          "empty",
+                                          new Object[] {error});
+            LOG.warning(error);
+            throw new Fault(exception);
+        }
+
         String encoding = getEncoding(mc);
 
         XMLStreamWriter newXMLStreamWriter;
@@ -135,37 +145,35 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             WSSSecurityProperties secProps = createSecurityProperties();
             translateProperties(mc, secProps);
             configureCallbackHandler(mc, secProps);
-            
+
             final OutboundSecurityContext outboundSecurityContext = new OutboundSecurityContextImpl();
             configureProperties(mc, outboundSecurityContext, secProps);
-            if (secProps.getActions() == null || secProps.getActions().size() == 0) {
+            if (secProps.getActions() == null || secProps.getActions().isEmpty()) {
                 // If no actions configured then return
                 return;
             }
 
             handleSecureMTOM(mc, secProps);
-            
+
             if (secProps.getAttachmentCallbackHandler() == null) {
                 secProps.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
             }
-            
-            SecurityEventListener securityEventListener = 
+
+            SecurityEventListener securityEventListener =
                 configureSecurityEventListener(mc, secProps);
-            
+
             OutboundWSSec outboundWSSec = WSSec.getOutboundWSSec(secProps);
-            
+
             @SuppressWarnings("unchecked")
-            final List<SecurityEvent> requestSecurityEvents = 
+            final List<SecurityEvent> requestSecurityEvents =
                 (List<SecurityEvent>) mc.getExchange().get(SecurityEvent.class.getName() + ".in");
-            
+
             outboundSecurityContext.putList(SecurityEvent.class, requestSecurityEvents);
             outboundSecurityContext.addSecurityEventListener(securityEventListener);
-            
+
             newXMLStreamWriter = outboundWSSec.processOutMessage(os, encoding, outboundSecurityContext);
             mc.setContent(XMLStreamWriter.class, newXMLStreamWriter);
-        } catch (WSSecurityException e) {
-            throw new Fault(e);
-        } catch (WSSPolicyException e) {
+        } catch (WSSecurityException | WSSPolicyException e) {
             throw new Fault(e);
         }
 
@@ -181,20 +189,20 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
 
         // Add a final interceptor to write end elements
         mc.getInterceptorChain().add(ending);
-        
+
     }
-    
+
     protected SecurityEventListener configureSecurityEventListener(
         final SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> outgoingSecurityEventList = new LinkedList<>();
         msg.getExchange().put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".out", outgoingSecurityEventList);
-        
-        final SecurityEventListener securityEventListener = new SecurityEventListener() {
+
+        return new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws XMLSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SamlToken) {
+                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.SAML_TOKEN) {
                     // Store SAML keys in case we need them on the inbound side
                     TokenSecurityEvent<?> tokenSecurityEvent = (TokenSecurityEvent<?>)securityEvent;
                     WSS4JUtils.parseAndStoreStreamingSecurityToken(tokenSecurityEvent.getSecurityToken(), msg);
@@ -204,10 +212,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         };
-
-        return securityEventListener;
     }
-    
+
     protected void configureProperties(
         SoapMessage msg, OutboundSecurityContext outboundSecurityContext,
         WSSSecurityProperties securityProperties
@@ -216,21 +222,21 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         if (user != null) {
             securityProperties.setTokenUser(user);
         }
-        String sigUser = 
+        String sigUser =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_USERNAME, msg);
         if (sigUser != null) {
             securityProperties.setSignatureUser(sigUser);
         }
-        String encUser = 
+        String encUser =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, msg);
         if (encUser != null) {
             securityProperties.setEncryptionUser(encUser);
         }
-        
+
         // Crypto loading only applies for Map
         Map<String, Object> config = getProperties();
         if (config != null && !config.isEmpty()) {
-            Crypto sigCrypto = 
+            Crypto sigCrypto =
                 loadCrypto(
                     msg,
                     ConfigurationConstants.SIG_PROP_FILE,
@@ -245,8 +251,8 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                     securityProperties.setSignatureUser(sigCrypto.getDefaultX509Identifier());
                 }
             }
-            
-            Crypto encCrypto = 
+
+            Crypto encCrypto =
                 loadCrypto(
                     msg,
                     ConfigurationConstants.ENC_PROP_FILE,
@@ -264,20 +270,20 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             ConfigurationConverter.parseCrypto(config, securityProperties);
         } else {
             Crypto sigCrypto = securityProperties.getSignatureCrypto();
-            if (sigCrypto != null && sigUser == null 
+            if (sigCrypto != null && sigUser == null
                 && sigCrypto.getDefaultX509Identifier() != null) {
                 // Fall back to default identifier
                 securityProperties.setSignatureUser(sigCrypto.getDefaultX509Identifier());
             }
-            
+
             Crypto encrCrypto = securityProperties.getEncryptionCrypto();
-            if (encrCrypto != null && encUser == null 
+            if (encrCrypto != null && encUser == null
                 && encrCrypto.getDefaultX509Identifier() != null) {
                 // Fall back to default identifier
                 securityProperties.setEncryptionUser(encrCrypto.getDefaultX509Identifier());
             }
         }
-        
+
         if (securityProperties.getSignatureUser() == null && user != null) {
             securityProperties.setSignatureUser(user);
         }
@@ -285,11 +291,11 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
             securityProperties.setEncryptionUser(user);
         }
     }
-    
+
     public final WSS4JStaxOutInterceptorInternal createEndingInterceptor() {
         return new WSS4JStaxOutInterceptorInternal();
     }
-    
+
     private String getEncoding(Message message) {
         Exchange ex = message.getExchange();
         String encoding = (String) message.get(Message.ENCODING);
@@ -304,13 +310,13 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         return encoding;
     }
-    
+
     final class WSS4JStaxOutInterceptorInternal extends AbstractPhaseInterceptor<Message> {
         WSS4JStaxOutInterceptorInternal() {
             super(Phase.PRE_STREAM_ENDING);
             getBefore().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
         }
-        
+
         public void handleMessage(Message message) throws Fault {
             Object provider = message.getExchange().get(Provider.class);
             final boolean useCustomProvider = provider != null && ThreadLocalSecurityProvider.isInstalled();
@@ -325,7 +331,7 @@ public class WSS4JStaxOutInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         }
-        
+
         private void handleMessageInternal(Message mc) throws Fault {
             try {
                 XMLStreamWriter xtw = mc.getContent(XMLStreamWriter.class);

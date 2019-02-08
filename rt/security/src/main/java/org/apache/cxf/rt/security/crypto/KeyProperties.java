@@ -29,10 +29,10 @@ public class KeyProperties {
     private SecureRandom secureRandom;
     private AlgorithmParameterSpec algoSpec;
     private boolean compressionSupported;
-    
+
     public KeyProperties() {
     }
-    
+
     public KeyProperties(String keyAlgo) {
         this(keyAlgo, -1);
     }
@@ -82,7 +82,7 @@ public class KeyProperties {
     public void setAdditionalData(byte[] additionalData) {
         this.additionalData = additionalData;
     }
-    
-    
-    
+
+
+
 }

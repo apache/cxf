@@ -20,4 +20,4 @@ package org.apache.cxf.jca.servant;
 
 public interface Greeter extends java.rmi.Remote {
     String sayHi() throws java.rmi.RemoteException;
-} 
+}

@@ -26,30 +26,34 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.search.odata.ODataParser;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerODataSearchTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        final Map< String, Object > properties = new HashMap< String, Object >();        
+        final Map< String, Object > properties = new HashMap<>();
         properties.put("search.query.parameter.name", "$filter");
         properties.put("search.parser", new ODataParser< Book >(Book.class));
-        
+
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(new BookServer(properties)));
         createStaticBus();
     }
-        
+
     @Test
     public void testSearchBook123WithWebClient() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/search";
-                          
+
         WebClient client = WebClient.create(address);
         Book b = client.query("$filter", "name eq 'CXF*' and id ge 123 and id lt 124").get(Book.class);
         assertEquals(b.getId(), 123L);
-        
+
     }
 }

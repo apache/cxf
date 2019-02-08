@@ -28,58 +28,61 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 import org.apache.neethi.util.PolicyComparator;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class NormalizeTest extends Assert {
-    
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class NormalizeTest {
+
     private IMocksControl control;
-    
-    
+
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
     }
-    
+
     @After
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testNormalize() throws Exception {
         Bus bus = createBus(Constants.URI_POLICY_13_NS);
         PolicyBuilderImpl builder = createBuilder(bus);
-        
+
         int n = 26;
         for (int i = 1; i < n; i++) {
             String sample = "/samples/test" + i + ".xml";
             String normalized = "/normalized/test" + i + ".xml";
             doTestNormalize(builder, sample, normalized);
-        }       
+        }
     }
-    
+
     @Test
     public void testNormalizeDefaultNs() throws Exception {
         Bus bus = createBus(Constants.URI_POLICY_NS);
         PolicyBuilderImpl builder = createBuilder(bus);
-        
+
         String sample = "/samples/test1DefaultNs.xml";
         String normalized = "/normalized/test1DefaultNs.xml";
         doTestNormalize(builder, sample, normalized);
     }
-    
+
     private PolicyBuilderImpl createBuilder(Bus bus) {
         PolicyBuilderImpl builder = new PolicyBuilderImpl();
         builder.setBus(bus);
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         builder.setAssertionBuilderRegistry(abr);
         PrimitiveAssertionBuilder ab = new PrimitiveAssertionBuilder();
-       
+
         abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityToken"), ab);
         abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "SecurityHeader"), ab);
         abr.registerBuilder(new QName("http://schemas.xmlsoap.org/ws/2002/12/secext", "Integrity"), ab);
@@ -88,28 +91,28 @@ public class NormalizeTest extends Assert {
         abr.registerBuilder(new QName("http://sample.org/Assertions", "C"), ab);
         return builder;
     }
-    
+
     private Bus createBus(String policyNamespace) {
         Bus bus = control.createMock(Bus.class);
         control.replay();
         return bus;
     }
-    
+
     private void doTestNormalize(
         PolicyBuilderImpl builder, String sample, String normalized) throws Exception {
-        
+
         InputStream sampleIn = NormalizeTest.class.getResourceAsStream(sample);
         assertNotNull("Could not get input stream for resource " + sample, sampleIn);
         InputStream normalisedIn = NormalizeTest.class.getResourceAsStream(normalized);
         assertNotNull("Could not get input stream for resource " + normalized, normalisedIn);
-                    
+
         Policy samplePolicy = builder.getPolicy(sampleIn);
         Policy normalisedPolicy = builder.getPolicy(normalisedIn);
         assertNotNull(samplePolicy);
         assertNotNull(normalisedPolicy);
-        
+
         Policy normalisedSamplePolicy = samplePolicy.normalize(true);
         assertTrue(PolicyComparator.compare(normalisedPolicy, normalisedSamplePolicy));
     }
-    
+
 }

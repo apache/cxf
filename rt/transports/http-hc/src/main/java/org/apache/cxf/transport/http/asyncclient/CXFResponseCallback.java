@@ -24,5 +24,5 @@ import org.apache.http.HttpResponse;
 interface CXFResponseCallback {
 
     void responseReceived(HttpResponse response);
-    
+
 }

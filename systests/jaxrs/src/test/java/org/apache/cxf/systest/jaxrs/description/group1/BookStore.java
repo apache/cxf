@@ -31,47 +31,30 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-//FIXME swagger-jaxrs 1.5.3 can't handle a self-recursive sub resource like Book. so hide Book for now
-//import org.apache.cxf.systest.jaxrs.Book;
+import org.apache.cxf.systest.jaxrs.Book;
 
-@Path("/bookstore") 
+import io.swagger.annotations.Api;
+
+@Path("/bookstore")
+@Api("/bookstore")
 public class BookStore {
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    @GET
-//    public Response getBooks(
-//        @QueryParam("page") @DefaultValue("1") int page) {
-//        return Response.ok(
-//            Arrays.asList(
-//                new Book("Book 1", 1),
-//                new Book("Book 2", 2)
-//            )
-//        ).build();
-//    }
-//    
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    @Path("/{id}")
-//    @GET
-//    public Book getBook(@PathParam("id") Long id) {
-//        return new Book("Book", id);
-//    }
-
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
-    @Path("/names")
-    public Response getBookNames(
+    public Response getBooks(
         @QueryParam("page") @DefaultValue("1") int page) {
         return Response.ok(
             Arrays.asList(
-                "Book 1",
-                "Book 2"
+                new Book("Book 1", 1),
+                new Book("Book 2", 2)
             )
         ).build();
     }
-  
-    @Path("/name/{id}")
+
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/{id}")
     @GET
-    public String getBookName(@PathParam("id") String id) {
-        return "Book of " + id;
+    public Book getBook(@PathParam("id") Long id) {
+        return new Book("Book", id);
     }
 
     @Path("/{id}")

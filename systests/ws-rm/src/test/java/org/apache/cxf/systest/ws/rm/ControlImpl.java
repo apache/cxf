@@ -40,20 +40,20 @@ import org.w3c.dom.Node;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
-@WebService(serviceName = "ControlService", 
-            portName = "ControlPort", 
-            endpointInterface = "org.apache.cxf.greeter_control.Control", 
+@WebService(serviceName = "ControlService",
+            portName = "ControlPort",
+            endpointInterface = "org.apache.cxf.greeter_control.Control",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
-    
+
     private static final Logger LOG = LogUtils.getLogger(ControlImpl.class);
-    
+
     String dbName = "rmdb";
     public void setDbName(String s) {
         dbName = s;
@@ -63,17 +63,19 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
     public boolean startGreeter(String cfgResource) {
         SpringBusFactory bf = new SpringBusFactory();
         System.setProperty("db.name", dbName);
-        greeterBus = bf.createBus(cfgResource);
+        if (StringUtils.isEmpty(cfgResource)) {
+            greeterBus = bf.createBus();
+        } else {
+            greeterBus = bf.createBus(cfgResource);
+        }
         System.clearProperty("db.name");
         BusFactory.setDefaultBus(greeterBus);
         LOG.info("Initialised bus " + greeterBus + " with cfg file resource: " + cfgResource);
         LOG.fine("greeterBus inInterceptors: " + greeterBus.getInInterceptors());
 
-        LoggingInInterceptor logIn = new LoggingInInterceptor();
-        LoggingOutInterceptor logOut = new LoggingOutInterceptor();
-        greeterBus.getInInterceptors().add(logIn);
-        greeterBus.getOutInterceptors().add(logOut);
-        greeterBus.getOutFaultInterceptors().add(logOut);
+        LoggingFeature lf = new LoggingFeature();
+        lf.setPrettyLogging(true);
+        lf.initialize(greeterBus);
 
         if (cfgResource.indexOf("provider") == -1) {
             endpoint = Endpoint.publish(address, implementor);
@@ -82,8 +84,8 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
             endpoint = Endpoint.publish(address, new GreeterProvider());
             LOG.info("Published greeter provider.");
         }
-        
-        return true;        
+
+        return true;
     }
 
     @WebService(serviceName = "GreeterService",
@@ -104,8 +106,8 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
             if (el instanceof Document) {
                 el = ((Document)el).getDocumentElement();
             }
-            
-            Map<String, String> ns = new HashMap<String, String>();
+
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://cxf.apache.org/greeter_control/types");
             XPathUtils xp = new XPathUtils(ns);
             String s = (String)xp.getValue("/ns:greetMe/ns:requestType",
@@ -118,15 +120,14 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
                                         XPathConstants.STRING);
                 //System.out.println("greetMeOneWay arg: " + s);
                 return null;
-            } else {
-                //System.out.println("greetMe arg: " + s);
-                String resp =
-                    "<greetMeResponse "
-                        + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
-                        + "<responseType>" + s.toUpperCase() + "</responseType>"
-                    + "</greetMeResponse>";
-                return new StreamSource(new StringReader(resp));
             }
+            //System.out.println("greetMe arg: " + s);
+            String resp =
+                "<greetMeResponse "
+                    + "xmlns=\"http://cxf.apache.org/greeter_control/types\">"
+                    + "<responseType>" + s.toUpperCase() + "</responseType>"
+                + "</greetMeResponse>";
+            return new StreamSource(new StringReader(resp));
         }
-    }    
+    }
 }

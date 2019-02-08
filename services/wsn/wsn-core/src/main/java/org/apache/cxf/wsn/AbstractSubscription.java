@@ -19,6 +19,7 @@
 package org.apache.cxf.wsn;
 
 import java.util.GregorianCalendar;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -109,23 +110,24 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
     }
 
     /**
-     * 
+     *
      * @param renewRequest
      * @return returns org.oasis_open.docs.wsn.b_1.RenewResponse
      * @throws UnacceptableTerminationTimeFault
      * @throws ResourceUnknownFault
      */
     @WebMethod(operationName = "Renew")
-    @WebResult(name = "RenewResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "RenewResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "RenewResponse")
     public RenewResponse renew(
-            @WebParam(name = "Renew", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "Renew",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "RenewRequest")
             Renew renewRequest) throws ResourceUnknownFault, UnacceptableTerminationTimeFault {
 
         XMLGregorianCalendar time = validateTerminationTime(renewRequest.getTerminationTime());
+        this.setTerminationTime(time);
         renew(time);
         RenewResponse response = new RenewResponse();
         response.setTerminationTime(time);
@@ -134,19 +136,19 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
     }
 
     /**
-     * 
+     *
      * @param unsubscribeRequest
      * @return returns org.oasis_open.docs.wsn.b_1.UnsubscribeResponse
      * @throws UnableToDestroySubscriptionFault
      * @throws ResourceUnknownFault
      */
     @WebMethod(operationName = "Unsubscribe")
-    @WebResult(name = "UnsubscribeResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "UnsubscribeResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "UnsubscribeResponse")
     public UnsubscribeResponse unsubscribe(
-            @WebParam(name = "Unsubscribe", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "Unsubscribe",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "UnsubscribeRequest")
             Unsubscribe unsubscribeRequest) throws ResourceUnknownFault, UnableToDestroySubscriptionFault {
 
@@ -155,19 +157,19 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
     }
 
     /**
-     * 
+     *
      * @param pauseSubscriptionRequest
      * @return returns org.oasis_open.docs.wsn.b_1.PauseSubscriptionResponse
      * @throws PauseFailedFault
      * @throws ResourceUnknownFault
      */
     @WebMethod(operationName = "PauseSubscription")
-    @WebResult(name = "PauseSubscriptionResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "PauseSubscriptionResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "PauseSubscriptionResponse")
     public PauseSubscriptionResponse pauseSubscription(
-            @WebParam(name = "PauseSubscription", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "PauseSubscription",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "PauseSubscriptionRequest")
             PauseSubscription pauseSubscriptionRequest) throws PauseFailedFault, ResourceUnknownFault {
 
@@ -176,19 +178,19 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
     }
 
     /**
-     * 
+     *
      * @param resumeSubscriptionRequest
      * @return returns org.oasis_open.docs.wsn.b_1.ResumeSubscriptionResponse
      * @throws ResumeFailedFault
      * @throws ResourceUnknownFault
      */
     @WebMethod(operationName = "ResumeSubscription")
-    @WebResult(name = "ResumeSubscriptionResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "ResumeSubscriptionResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "ResumeSubscriptionResponse")
     public ResumeSubscriptionResponse resumeSubscription(
-            @WebParam(name = "ResumeSubscription", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "ResumeSubscription",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "ResumeSubscriptionRequest")
             ResumeSubscription resumeSubscriptionRequest) throws ResourceUnknownFault, ResumeFailedFault {
 
@@ -196,19 +198,19 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         return new ResumeSubscriptionResponse();
     }
 
-    protected XMLGregorianCalendar validateInitialTerminationTime(String value) 
+    protected XMLGregorianCalendar validateInitialTerminationTime(String value)
         throws UnacceptableInitialTerminationTimeFault {
         XMLGregorianCalendar tt = parseTerminationTime(value);
         if (tt == null) {
-            UnacceptableInitialTerminationTimeFaultType fault 
+            UnacceptableInitialTerminationTimeFaultType fault
                 = new UnacceptableInitialTerminationTimeFaultType();
-            throw new UnacceptableInitialTerminationTimeFault("Unable to parse initial termination time: '" 
+            throw new UnacceptableInitialTerminationTimeFault("Unable to parse initial termination time: '"
                 + value + "'", fault);
         }
         XMLGregorianCalendar ct = getCurrentTime();
         int c = tt.compare(ct);
         if (c == DatatypeConstants.LESSER || c == DatatypeConstants.EQUAL) {
-            UnacceptableInitialTerminationTimeFaultType fault 
+            UnacceptableInitialTerminationTimeFaultType fault
                 = new UnacceptableInitialTerminationTimeFaultType();
             fault.setMinimumTime(ct);
             throw new UnacceptableInitialTerminationTimeFault("Invalid initial termination time", fault);
@@ -216,12 +218,12 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         return tt;
     }
 
-    protected XMLGregorianCalendar validateTerminationTime(String value) 
+    protected XMLGregorianCalendar validateTerminationTime(String value)
         throws UnacceptableTerminationTimeFault {
         XMLGregorianCalendar tt = parseTerminationTime(value);
         if (tt == null) {
             UnacceptableTerminationTimeFaultType fault = new UnacceptableTerminationTimeFaultType();
-            throw new UnacceptableTerminationTimeFault("Unable to parse termination time: '" 
+            throw new UnacceptableTerminationTimeFault("Unable to parse termination time: '"
                 + value + "'", fault);
         }
         XMLGregorianCalendar ct = getCurrentTime();
@@ -279,14 +281,14 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
         this.terminationTime = terminationTime;
     }
 
-    public void create(Subscribe subscribeRequest) 
+    public void create(Subscribe subscribeRequest)
         //CHECKSTYLE:OFF
         throws InvalidFilterFault, InvalidMessageContentExpressionFault,
         InvalidProducerPropertiesExpressionFault, InvalidTopicExpressionFault, SubscribeCreationFailedFault,
         TopicExpressionDialectUnknownFault, TopicNotSupportedFault, UnacceptableInitialTerminationTimeFault,
         UnrecognizedPolicyRequestFault, UnsupportedPolicyRequestFault {
         //CHECKSTYLE:ON
-        
+
         validateSubscription(subscribeRequest);
         start();
     }
@@ -341,14 +343,14 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
                     topic = (TopicExpressionType) f;
                 } else if (f instanceof QueryExpressionType) {
                     if (e != null && e.getName().equals(QNAME_PRODUCER_PROPERTIES)) {
-                        InvalidProducerPropertiesExpressionFaultType fault = 
+                        InvalidProducerPropertiesExpressionFaultType fault =
                             new InvalidProducerPropertiesExpressionFaultType();
                         throw new InvalidProducerPropertiesExpressionFault(
                             "ProducerProperties are not supported",
                             fault);
                     } else if (e != null && e.getName().equals(QNAME_MESSAGE_CONTENT)) {
                         if (contentFilter != null) {
-                            InvalidMessageContentExpressionFaultType fault = 
+                            InvalidMessageContentExpressionFaultType fault =
                                 new InvalidMessageContentExpressionFaultType();
                             throw new InvalidMessageContentExpressionFault(
                                     "Only one MessageContent filter can be specified", fault);
@@ -360,12 +362,12 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
                         }
                     } else {
                         InvalidFilterFaultType fault = new InvalidFilterFaultType();
-                        throw new InvalidFilterFault("Unrecognized filter: " 
+                        throw new InvalidFilterFault("Unrecognized filter: "
                             + (e != null ? e.getName() : f), fault);
                     }
                 } else {
                     InvalidFilterFaultType fault = new InvalidFilterFaultType();
-                    throw new InvalidFilterFault("Unrecognized filter: " 
+                    throw new InvalidFilterFault("Unrecognized filter: "
                         + (e != null ? e.getName() : f), fault);
                 }
             }
@@ -401,12 +403,7 @@ public abstract class AbstractSubscription extends AbstractEndpoint implements P
             throw new InvalidMessageContentExpressionFault("Unsupported MessageContent dialect: '"
                     + contentFilter.getDialect() + "'", fault);
         }
-        if (terminationTime != null) {
-            UnacceptableInitialTerminationTimeFaultType fault 
-                = new UnacceptableInitialTerminationTimeFaultType();
-            throw new UnacceptableInitialTerminationTimeFault("InitialTerminationTime is not supported", 
-                                                              fault);
-        }
+
     }
 
     public AbstractNotificationBroker getBroker() {

@@ -48,7 +48,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
                                     boolean responseContext) {
         super(m, responseContext);
     }
-    
+
     @Override
     public MediaType getMediaType() {
         if (!hasEntity()) {
@@ -57,7 +57,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         Object mt = HttpUtils.getModifiableHeaders(m).getFirst(HttpHeaders.CONTENT_TYPE);
         return mt instanceof MediaType ? (MediaType)mt : JAXRSUtils.toMediaType(mt.toString());
     }
-    
+
     @Override
     public Client getClient() {
         return (Client)m.getContextualProperty(Client.class.getName());
@@ -68,15 +68,15 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         ClientProviderFactory cpf = ClientProviderFactory.getInstance(m);
         return cpf.getConfiguration(m);
     }
-    
+
     private Object getMessageContent() {
         MessageContentsList objs = MessageContentsList.getContentsList(m);
-        if (objs == null || objs.size() == 0) {
+        if (objs == null || objs.isEmpty()) {
             return null;
         }
         return objs.get(0);
-    } 
-    
+    }
+
     @Override
     public Object getEntity() {
         return getMessageContent();
@@ -91,7 +91,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     @Override
     public Class<?> getEntityClass() {
         Object entity = getEntity();
-        return entity == null ? null : entity.getClass(); 
+        return entity == null ? null : entity.getClass();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         Type t = m.get(Type.class);
         return t != null ? t : getEntityClass();
     }
-    
+
     @Override
     public OutputStream getEntityStream() {
         return m.getContent(OutputStream.class);
@@ -109,7 +109,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
     public boolean hasEntity() {
         return getEntity() != null;
     }
-    
+
     @Override
     public void setEntity(Object entity, Annotation[] anns, MediaType mt) {
         if (mt != null) {
@@ -122,7 +122,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         }
         doSetEntity(entity);
     }
-    
+
     @Override
     public void setEntity(Object entity) {
         doSetEntity(entity);
@@ -130,7 +130,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
 
     private void doSetEntity(Object entity) {
         Object actualEntity = InjectionUtils.getEntity(entity);
-        m.setContent(List.class, actualEntity == null ? new MessageContentsList() 
+        m.setContent(List.class, actualEntity == null ? new MessageContentsList()
             : new MessageContentsList(actualEntity));
         Type type = null;
         if (entity != null) {
@@ -142,9 +142,9 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
             m.put(Type.class, type);
             m.remove("org.apache.cxf.empty.request");
         }
-        
+
     }
-    
+
     @Override
     public URI getUri() {
         String requestURI = (String)m.get(Message.REQUEST_URI);
@@ -153,7 +153,7 @@ public class ClientRequestContextImpl extends AbstractRequestContextImpl
         }
         if (requestURI.startsWith("/")) {
             String endpointAddress = (String)m.get(Message.ENDPOINT_ADDRESS);
-            requestURI = requestURI.length() == 1 ? endpointAddress : endpointAddress + requestURI;     
+            requestURI = requestURI.length() == 1 ? endpointAddress : endpointAddress + requestURI;
         }
         return URI.create(requestURI);
     }

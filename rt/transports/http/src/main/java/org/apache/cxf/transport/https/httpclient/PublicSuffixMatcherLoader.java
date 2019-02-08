@@ -26,13 +26,14 @@
 package org.apache.cxf.transport.https.httpclient;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,25 +45,25 @@ import org.apache.cxf.common.logging.LogUtils;
  * Copied from httpclient.
  */
 public final class PublicSuffixMatcherLoader {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PublicSuffixMatcherLoader.class);
     private static volatile PublicSuffixMatcher defaultInstance;
-    
+
     private PublicSuffixMatcherLoader() {
         //
     }
 
     private static PublicSuffixMatcher load(final InputStream in) throws IOException {
-        final PublicSuffixList list = new PublicSuffixListParser().parse(
+        final List<PublicSuffixList> lists = new PublicSuffixListParser().parseByType(
                 new InputStreamReader(in, StandardCharsets.UTF_8));
-        return new PublicSuffixMatcher(list.getRules(), list.getExceptions());
+        return new PublicSuffixMatcher(lists);
     }
 
     public static PublicSuffixMatcher load(final URL url) throws IOException {
         if (url == null) {
             throw new IllegalArgumentException("URL is null");
         }
-        try (final InputStream in = url.openStream()) {
+        try (InputStream in = url.openStream()) {
             return load(in);
         }
     }
@@ -71,7 +72,7 @@ public final class PublicSuffixMatcherLoader {
         if (file == null) {
             throw new IllegalArgumentException("File is null");
         }
-        try (final InputStream in = new FileInputStream(file)) {
+        try (InputStream in = Files.newInputStream(file.toPath())) {
             return load(in);
         }
     }
@@ -85,11 +86,11 @@ public final class PublicSuffixMatcherLoader {
                     if (url != null) {
                         try {
                             defaultInstance = load(url);
-                        } catch (IOException ex) {
+                        } catch (final IOException ex) {
                             // Should never happen
                             if (LOG.isLoggable(Level.WARNING)) {
-                                LOG.log(Level.WARNING, 
-                                        "Failure loading public suffix list from default resource", 
+                                LOG.log(Level.WARNING,
+                                        "Failure loading public suffix list from default resource",
                                         ex);
                             }
                         }

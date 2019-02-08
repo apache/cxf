@@ -29,8 +29,6 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.header_test.SOAPHeaderService;
@@ -58,33 +56,32 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class HeaderClientServerTest extends AbstractJaxWsTest {
     private final QName serviceName = new QName("http://apache.org/header_test",
-                                                "SOAPHeaderService");    
+                                                "SOAPHeaderService");
     private final QName portName = new QName("http://apache.org/header_test",
                                              "SoapHeaderPort");
 
-    private EndpointImpl endpoint;   
+    private EndpointImpl endpoint;
     private EndpointImpl rpcEndpoint;
-    
+
     @Before
     public void setUp() throws Exception {
         BusFactory.setDefaultBus(getBus());
-        
+
         Object implementor = new TestHeaderImpl();
         String address = "http://localhost:9104/SoapHeaderContext/SoapHeaderPort";
-        endpoint = (EndpointImpl) Endpoint.publish(address, implementor);        
-        endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-        
+        endpoint = (EndpointImpl) Endpoint.publish(address, implementor);
+
         implementor = new TestRPCHeaderImpl();
         address = "http://localhost:9104/SoapHeaderRPCContext/SoapHeaderRPCPort";
-        rpcEndpoint = (EndpointImpl)Endpoint.publish(address, implementor);        
-        rpcEndpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        rpcEndpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        rpcEndpoint = (EndpointImpl)Endpoint.publish(address, implementor);
     }
-    
+
     @After
     public void stopendpoints() {
         if (endpoint != null) {
@@ -100,7 +97,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
     public void testInHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
@@ -114,50 +111,50 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    } 
+    }
 
     @Test
     public void testOutHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
         try {
             TestHeader2 in = new TestHeader2();
             String val = new String(TestHeader2Response.class.getSimpleName());
-            Holder<TestHeader2Response> out = new Holder<TestHeader2Response>();
-            Holder<TestHeader2Response> outHeader = new Holder<TestHeader2Response>();
+            Holder<TestHeader2Response> out = new Holder<>();
+            Holder<TestHeader2Response> outHeader = new Holder<>();
             for (int idx = 0; idx < 2; idx++) {
-                val += idx;                
+                val += idx;
                 in.setRequestType(val);
                 proxy.testHeader2(in, out, outHeader);
-                
+
                 assertEquals(val, out.value.getResponseType());
                 assertEquals(val, outHeader.value.getResponseType());
             }
         } catch (UndeclaredThrowableException ex) {
             ex.printStackTrace();
             throw (Exception)ex.getCause();
-        } 
-    } 
+        }
+    }
 
     @Test
     public void testInOutHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
-        
+
         try {
             TestHeader3 in = new TestHeader3();
             String val = new String(TestHeader3.class.getSimpleName());
-            Holder<TestHeader3> inoutHeader = new Holder<TestHeader3>();
+            Holder<TestHeader3> inoutHeader = new Holder<>();
             for (int idx = 0; idx < 2; idx++) {
-                val += idx;                
+                val += idx;
                 in.setRequestType(val);
                 inoutHeader.value = new TestHeader3();
                 TestHeader3Response returnVal = proxy.testHeader3(in, inoutHeader);
@@ -166,7 +163,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
                 assertNotNull(returnVal);
                 assertNull(returnVal.getResponseType());
                 assertEquals(val, inoutHeader.value.getRequestType());
-                
+
                 in.setRequestType(null);
                 inoutHeader.value.setRequestType(val);
                 returnVal = proxy.testHeader3(in, inoutHeader);
@@ -176,24 +173,24 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
-        } 
+        }
     }
 
     @Test
     public void testReturnHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
         try {
-            Holder<TestHeader5ResponseBody> out = new Holder<TestHeader5ResponseBody>();
-            Holder<TestHeader5> outHeader = new Holder<TestHeader5>();
+            Holder<TestHeader5ResponseBody> out = new Holder<>();
+            Holder<TestHeader5> outHeader = new Holder<>();
             TestHeader5 in = new TestHeader5();
             String val = new String(TestHeader5.class.getSimpleName());
             for (int idx = 0; idx < 2; idx++) {
-                val += idx;            
+                val += idx;
                 in.setRequestType(val);
                 proxy.testHeader5(out, outHeader, in);
                 assertEquals(1000, out.value.getResponseType());
@@ -201,23 +198,23 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
-        } 
-    } 
-    
+        }
+    }
+
     @Test
     public void testHeaderPartBeforeBodyPart() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
-    
+
         TestHeader6 in = new TestHeader6();
         String val = new String(TestHeader6.class.getSimpleName());
-        Holder<TestHeader3> inoutHeader = new Holder<TestHeader3>();
+        Holder<TestHeader3> inoutHeader = new Holder<>();
         for (int idx = 0; idx < 1; idx++) {
-            val += idx;                
+            val += idx;
             in.setRequestType(val);
             inoutHeader.value = new TestHeader3();
             TestHeader6Response returnVal = proxy.testHeaderPartBeforeBodyPart(inoutHeader, in);
@@ -226,7 +223,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             assertNotNull(returnVal);
             assertNull(returnVal.getResponseType());
             assertEquals(val, inoutHeader.value.getRequestType());
-            
+
             in.setRequestType(null);
             inoutHeader.value.setRequestType(val);
             returnVal = proxy.testHeaderPartBeforeBodyPart(inoutHeader, in);
@@ -235,12 +232,12 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             assertNull(inoutHeader.value.getRequestType());
         }
     }
-    
+
     @Test
     public void testHeader4() {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
@@ -255,7 +252,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
     public void testHeader7() {
         URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
@@ -265,16 +262,16 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
     public void testRPCInHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader_rpc.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPRPCHeaderService service
-            = new SOAPRPCHeaderService(wsdl, 
+            = new SOAPRPCHeaderService(wsdl,
                 new QName("http://apache.org/header_test/rpc", "SOAPRPCHeaderService"));
         assertNotNull(service);
         TestRPCHeader proxy = service.getSoapRPCHeaderPort();
-        try { 
+        try {
             HeaderMessage header = new HeaderMessage();
             header.setHeaderVal("header");
-            
+
             for (int idx = 0; idx < 2; idx++) {
                 String returnVal = proxy.testHeader1(header, "part");
                 assertNotNull(returnVal);
@@ -283,26 +280,26 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    } 
-    
+    }
+
     @Test
     public void testRPCInOutHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader_rpc.wsdl");
         assertNotNull(wsdl);
-        
+
         SOAPRPCHeaderService service
-            = new SOAPRPCHeaderService(wsdl, 
+            = new SOAPRPCHeaderService(wsdl,
                 new QName("http://apache.org/header_test/rpc", "SOAPRPCHeaderService"));
         assertNotNull(service);
         TestRPCHeader proxy = service.getSoapRPCHeaderPort();
-        try { 
+        try {
             HeaderMessage header = new HeaderMessage();
-            Holder<HeaderMessage> holder = new Holder<HeaderMessage>(header);
-            
+            Holder<HeaderMessage> holder = new Holder<>(header);
+
             for (int idx = 0; idx < 2; idx++) {
                 holder.value.setHeaderVal("header" + idx);
                 String returnVal = proxy.testInOutHeader("part" + idx, holder);
-                
+
                 assertNotNull(returnVal);
                 assertEquals("header" + idx, returnVal);
                 assertEquals("part" + idx, holder.value.getHeaderVal());
@@ -310,9 +307,9 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-    } 
-    
-    
+    }
+
+
 
     @Test
     public void testHolderOutIsTheFirstMessagePart() throws Exception {
@@ -321,7 +318,7 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
         assertNotNull(service);
         TestHeader proxy = service.getPort(portName, TestHeader.class);
-        Holder<SimpleAll> simpleAll = new Holder<SimpleAll>();
+        Holder<SimpleAll> simpleAll = new Holder<>();
         SimpleAll sa = new SimpleAll();
         sa.setVarAttrString("varAttrString");
         sa.setVarInt(100);
@@ -334,5 +331,5 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
         assertEquals(ss.getVarInt(), 200);
         assertEquals(ss.getVarAttrString(), "varAttrStringRet");
     }
-   
+
 }

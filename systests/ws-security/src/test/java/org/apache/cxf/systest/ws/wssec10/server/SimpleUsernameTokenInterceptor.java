@@ -29,38 +29,38 @@ import org.apache.cxf.interceptor.security.AbstractUsernameTokenInInterceptor;
 import org.apache.cxf.security.SecurityContext;
 
 public class SimpleUsernameTokenInterceptor extends AbstractUsernameTokenInInterceptor {
-    
+
     protected Subject createSubject(UsernameToken ut) {
         return createSubject(ut.getName(), ut.getPassword(), ut.isHashed(),
                              ut.getNonce(), ut.getCreatedTime());
     }
-    
+
     protected SecurityContext createSecurityContext(Principal p, Subject subject) {
         if (p == null || p != subject.getPrincipals().toArray()[0]) {
             throw new SecurityException();
         }
         return super.createSecurityContext(p, subject);
     }
-    
-    protected Subject createSubject(String name, 
-                                    String password, 
+
+    protected Subject createSubject(String name,
+                                    String password,
                                     boolean isDigest,
                                     String nonce,
                                     String created) throws SecurityException {
         Subject subject = new Subject();
-        
+
         // delegate to the external security system if possible
-        
+
         // authenticate the user somehow
         subject.getPrincipals().add(new SimplePrincipal(name));
-        
+
         // add roles this user is in
         String roleName = "Alice".equals(name) ? "developers" : "pms";
         subject.getPrincipals().add(new SimpleGroup(roleName, name));
         subject.setReadOnly();
         return subject;
     }
-    
+
 }
 
 

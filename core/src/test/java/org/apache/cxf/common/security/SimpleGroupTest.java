@@ -19,38 +19,40 @@
 package org.apache.cxf.common.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class SimpleGroupTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class SimpleGroupTest {
 
     @Test
     public void testName() {
         assertEquals("group", new SimpleGroup("group", "friend").getName());
         assertEquals("group", new SimpleGroup("group", new SimplePrincipal("friend")).getName());
     }
-    
+
     @Test
     public void testIsMember() {
         assertTrue(new SimpleGroup("group", "friend").isMember(new SimplePrincipal("friend")));
         assertFalse(new SimpleGroup("group", "friend").isMember(new SimplePrincipal("frogs")));
     }
-        
+
     @Test
     public void testAddRemoveMembers() {
-        
-        Group group = new SimpleGroup("group");   
+
+        GroupPrincipal group = new SimpleGroup("group");
         assertFalse(group.members().hasMoreElements());
-        
+
         group.addMember(new SimpleGroup("group", "friend"));
-        
+
         Enumeration<? extends Principal> members = group.members();
         assertEquals(new SimpleGroup("group", "friend"), members.nextElement());
         assertFalse(members.hasMoreElements());
-        
+
         group.removeMember(new SimpleGroup("group", "friend"));
         assertFalse(group.members().hasMoreElements());
     }

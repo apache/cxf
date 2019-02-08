@@ -31,12 +31,14 @@ import org.apache.cxf.aegis.services.BeanService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class WrappedTest extends AbstractAegisTest {
-    
+
     private ArrayService arrayService;
     private Document arrayWsdlDoc;
-    
-    @Before 
+
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         setEnableJDOM(true);
@@ -45,7 +47,7 @@ public class WrappedTest extends AbstractAegisTest {
         createService(BeanService.class, "BeanService");
         arrayWsdlDoc = getWSDLDocument("Array");
     }
-    
+
     @Test
     public void testBeanService() throws Exception {
         Node response = invoke("BeanService", "bean11.xml");
@@ -57,13 +59,13 @@ public class WrappedTest extends AbstractAegisTest {
         assertValid("//sb:getSimpleBeanResponse/sb:return/beanz:howdy[text()=\"howdy\"]", response);
         assertValid("//sb:getSimpleBeanResponse/sb:return/beanz:bleh[text()=\"bleh\"]", response);
     }
-    
+
     @Test
     public void testArrayWsdl() throws Exception {
         NodeList stuff = assertValid("//xsd:complexType[@name='ArrayOfString-2-50']", arrayWsdlDoc);
         assertEquals(1, stuff.getLength());
     }
-    
+
     @Test
     public void testXmlConfigurationOfParameterTypeSchema() throws Exception {
         assertValid(
@@ -73,7 +75,7 @@ public class WrappedTest extends AbstractAegisTest {
                         + "[@type=\"xsd:long\"]",
                     arrayWsdlDoc);
     }
-    
+
     @Test
     public void testXmlConfigurationOfParameterType() throws Exception {
         invoke("Array", "takeNumber.xml");
@@ -86,7 +88,7 @@ public class WrappedTest extends AbstractAegisTest {
 
         assertValid("/wsdl:definitions/wsdl:types", doc);
         assertValid("/wsdl:definitions/wsdl:types/xsd:schema", doc);
-        assertValid("/wsdl:definitions/wsdl:types/" 
+        assertValid("/wsdl:definitions/wsdl:types/"
                     + "xsd:schema[@targetNamespace='http://services.aegis.cxf.apache.org']",
                     doc);
         assertValid("//xsd:schema[@targetNamespace='http://services.aegis.cxf.apache.org']/"
@@ -122,28 +124,7 @@ public class WrappedTest extends AbstractAegisTest {
                     doc);
     }
 
-    @org.junit.Ignore // uses Jaxen.
-    @Test 
-    public void testSubmitJDOMArray() throws Exception {
-        
-        org.jdom.xpath.XPath jxpathWalrus = 
-            org.jdom.xpath.XPath.newInstance("/a:anyType/iam:walrus");
-        jxpathWalrus.addNamespace("a", "urn:Array");
-        jxpathWalrus.addNamespace("iam", "uri:iam");
-        jxpathWalrus.addNamespace("linux", "uri:linux");
-        jxpathWalrus.addNamespace("planets", "uri:planets");
-
-        invoke("Array", "/org/apache/cxf/aegis/integration/anyTypeArrayJDOM.xml");
-        assertEquals("before items", arrayService.getBeforeValue());
-        assertEquals(3, arrayService.getJdomArray().length);
-        org.jdom.Element e = (org.jdom.Element)
-            jxpathWalrus.selectSingleNode(arrayService.getJdomArray()[0]);
-        assertNotNull(e);
-        assertEquals("tusks", e.getText());
-        assertEquals("after items", arrayService.getAfterValue());
-    }
-    
-    @Test 
+    @Test
     public void testSubmitW3CArray() throws Exception {
         addNamespace("a", "urn:Array");
         addNamespace("iam", "uri:iam");

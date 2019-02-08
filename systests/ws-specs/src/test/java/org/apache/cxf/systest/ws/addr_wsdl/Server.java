@@ -38,7 +38,6 @@ import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.Addressing;
 import javax.xml.xpath.XPathConstants;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
@@ -49,20 +48,20 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
-    List<Endpoint> eps = new LinkedList<Endpoint>();
+    List<Endpoint> eps = new LinkedList<>();
 
     protected void run() {
         Object implementor = new AddNumberImpl();
         String address = "http://localhost:" + PORT + "/jaxws/add";
-        
-        EndpointImpl ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+
+        EndpointImpl ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
 
         ep.publish(address);
         eps.add(ep);
-        
+
         eps.add(Endpoint.publish(address + "-provider", new AddNumberProvider()));
         eps.add(Endpoint.publish(address + "-providernows", new AddNumberProviderNoWsdl()));
     }
@@ -72,7 +71,7 @@ public class Server extends AbstractBusTestServerBase {
         }
         eps = null;
     }
-    
+
     private String getWsdl() {
         try {
             java.net.URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
@@ -81,7 +80,7 @@ public class Server extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
         return null;
-    }    
+    }
 
     public static void main(String[] args) {
         try {
@@ -94,8 +93,8 @@ public class Server extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
-    
+
+
     @WebServiceProvider(serviceName = "AddNumbersService",
                         portName = "AddNumbersOnlyAnonPort",
                         targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/",
@@ -107,19 +106,19 @@ public class Server extends AbstractBusTestServerBase {
             //CHECK the incoming
             Element el;
             try {
-                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
+                el = StaxUtils.read(obj).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            
-            Map<String, String> ns = new HashMap<String, String>();
+
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("/ns:addNumbers/ns:number1", el, XPathConstants.STRING);
             String o2 = (String)xp.getValue("/ns:addNumbers/ns:number2", el, XPathConstants.STRING);
             int i = Integer.parseInt(o);
             int i2 = Integer.parseInt(o2);
-            
+
             String resp = "<addNumbersResponse xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
                 + "<return>" + (i + i2) + "</return></addNumbersResponse>";
             return new StreamSource(new StringReader(resp));
@@ -134,25 +133,25 @@ public class Server extends AbstractBusTestServerBase {
     public static class AddNumberProviderNoWsdl implements Provider<Source> {
         @Resource
         WebServiceContext ctx;
-        
+
         public Source invoke(Source obj) {
             //CHECK the incoming
-            
+
             Element el;
             try {
-                el = ((Document)StaxUtils.read(obj)).getDocumentElement();
+                el = StaxUtils.read(obj).getDocumentElement();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("/ns:addNumbers/ns:number1", el, XPathConstants.STRING);
             String o2 = (String)xp.getValue("/ns:addNumbers/ns:number2", el, XPathConstants.STRING);
             int i = Integer.parseInt(o);
             int i2 = Integer.parseInt(o2);
-            
-            
+
+
             ctx.getMessageContext()
                 .put(BindingProvider.SOAPACTION_URI_PROPERTY,
                     "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/addNumbersResponse");

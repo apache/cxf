@@ -27,12 +27,12 @@ import org.apache.cxf.jaxrs.resources.Book;
 public class GenericEntityImpl2<T extends Book> implements GenericEntity2<T> {
 
     private T book;
-    
+
     @POST
     public void postEntity(T object) {
         book = object;
     }
-    
+
     public T getEntity() {
         return book;
     }

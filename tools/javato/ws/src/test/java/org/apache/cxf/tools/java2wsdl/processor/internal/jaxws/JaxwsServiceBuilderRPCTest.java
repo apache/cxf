@@ -33,6 +33,9 @@ import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
     JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
     WSDL11Generator generator = new WSDL11Generator();
@@ -62,10 +65,10 @@ public class JaxwsServiceBuilderRPCTest extends ProcessorTestBase {
 
         File expectedFile = new File(this.getClass()
             .getResource("expected/rpc_greeter.wsdl").toURI());
-        
+
         //MOXy doesn't put a final attribute on the array types, we can ignore that
         //for the purpose of this test
-        List<String> ignores = new ArrayList<String>(DEFAULT_IGNORE_ATTR);
+        List<String> ignores = new ArrayList<>(DEFAULT_IGNORE_ATTR);
         ignores.add("final");
         assertWsdlEquals(expectedFile, output, ignores, DEFAULT_IGNORE_TAG);
     }

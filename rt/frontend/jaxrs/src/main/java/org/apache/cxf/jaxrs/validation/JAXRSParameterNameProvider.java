@@ -31,25 +31,25 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 public class JAXRSParameterNameProvider implements ParameterNameProvider {
     @Override
     public List<String> getParameterNames(final Constructor< ? > constructor) {
-        final List< String > parameterNames = new ArrayList< String >();
-        
+        final List< String > parameterNames = new ArrayList<>();
+
         for (int i = 0; i < constructor.getParameterTypes().length; ++i) {
             parameterNames.add("arg" + i);
         }
-        
+
         return parameterNames;
     }
 
     @Override
     public List<String> getParameterNames(final Method method) {
         final List< Parameter > parameters = ResourceUtils.getParameters(method);
-        final List< String > parameterNames = new ArrayList< String >();
+        final List< String > parameterNames = new ArrayList<>();
 
         for (int i = 0; i < parameters.size(); ++i) {
             final StringBuilder sb = new StringBuilder();
             sb.append("arg" + i);
             sb.append("(");
-            
+
             Parameter parameter = parameters.get(i);
             if (parameter.getName() != null) {
                 sb.append(parameter.getType().toString());
@@ -57,14 +57,14 @@ public class JAXRSParameterNameProvider implements ParameterNameProvider {
                 sb.append(" ");
             }
             sb.append(method.getParameterTypes()[i].getSimpleName());
-            
+
             sb.append(")");
             parameterNames.add(sb.toString());
         }
-        
+
         return parameterNames;
     }
-    
-    
+
+
 
 }

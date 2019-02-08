@@ -31,13 +31,13 @@ import javax.xml.namespace.QName;
 public abstract class AbstractPropertiesHolder implements Extensible {
     private AbstractPropertiesHolder delegate;
     private boolean delegateProperties;
-    
-    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<Map<String, Object>>();
-    private AtomicReference<Object[]> extensors = new AtomicReference<Object[]>();
+
+    private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<>();
+    private AtomicReference<Object[]> extensors = new AtomicReference<>();
     private Map<QName, Object> extensionAttributes;
     private String documentation;
-    
-    
+
+
     public final void setDelegate(AbstractPropertiesHolder p, boolean props) {
         delegate = p;
         delegateProperties = props;
@@ -65,7 +65,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             propertyMap.set(null);
         }
     }
-    
+
     public String getDocumentation() {
         if (delegate != null) {
             return delegate.getDocumentation();
@@ -103,7 +103,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return propertyMap.get().remove(name);
     }
-    
+
     public <T> T getProperty(String name, Class<T> cls) {
         return cls.cast(getProperty(name));
     }
@@ -117,7 +117,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return false;
     }
-    
+
     public void setProperty(String name, Object v) {
         if (delegate != null && delegateProperties) {
             delegate.setProperty(name, v);
@@ -132,13 +132,13 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             propertyMap.get().put(name, v);
         }
     }
-    
+
     public boolean containsExtensor(Object el) {
         if (delegate != null) {
             return delegate.containsExtensor(el);
         }
 
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts != null) {
             for (Object o : exts) {
                 if (o == el) {
@@ -153,8 +153,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             delegate.addExtensor(el);
             return;
         }
-        Object exts[] = extensors.get();
-        Object exts2[];
+        Object[] exts = extensors.get();
+        Object[] exts2;
         if (exts == null) {
             exts2 = new Object[1];
         } else {
@@ -174,7 +174,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (delegate != null) {
             return delegate.getExtensor(cls);
         }
-        Object exts[] = extensors.get();
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }
@@ -189,12 +189,12 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (delegate != null) {
             return delegate.getExtensors(cls);
         }
-   
-        Object exts[] = extensors.get();
+
+        Object[] exts = extensors.get();
         if (exts == null) {
             return null;
         }
-        List<T> list = new ArrayList<T>(exts.length);
+        List<T> list = new ArrayList<>(exts.length);
         for (int x = 0; x < exts.length; x++) {
             if (cls.isInstance(exts[x])) {
                 list.add(cls.cast(exts[x]));
@@ -209,9 +209,9 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return extensors;
     }
-    
-      
-    public Object getExtensionAttribute(QName name) {        
+
+
+    public Object getExtensionAttribute(QName name) {
         if (delegate != null) {
             return delegate.getExtensionAttribute(name);
         }
@@ -224,31 +224,31 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return extensionAttributes;
     }
-    
+
     public void addExtensionAttribute(QName name, Object attr) {
         if (delegate != null) {
             delegate.addExtensionAttribute(name, attr);
             return;
         }
         if (null == extensionAttributes) {
-            extensionAttributes = new HashMap<QName, Object>();
+            extensionAttributes = new HashMap<>();
         }
         extensionAttributes.put(name, attr);
     }
-   
+
     public void setExtensionAttributes(Map<QName, Object> attrs) {
         if (delegate != null) {
             delegate.setExtensionAttributes(attrs);
             return;
         }
-        extensionAttributes = attrs;        
+        extensionAttributes = attrs;
     }
 
     /**
      * Lookup a configuration value. This may be found in the properties holder supplied
      * (i.e. an EndpointInfo or ServiceInfo), or it may be a property on the Bus itself.
      * If no value is found, the defaultValue is returned.
-     * 
+     *
      * @param defaultValue the default value
      * @param type the extensor type
      * @return the configuration value or the default
@@ -263,8 +263,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return extensor;
     }
-    
-    
+
+
 
     protected static final boolean equals(Object o1, Object o2) {
         if (o1 == null && o2 != null
@@ -273,5 +273,5 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return o1 == null ? true : o1.equals(o2);
     }
-    
+
 }

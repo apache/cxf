@@ -40,7 +40,7 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public InMessageRecorder() {
         super(Phase.RECEIVE);
-        inbound = new CopyOnWriteArrayList<byte[]>();
+        inbound = new CopyOnWriteArrayList<>();
     }
 
     public void handleMessage(Message message) throws Fault {
@@ -55,9 +55,9 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
             IOUtils.copy(is, bos);
             is.close();
             bos.close();
-            byte bytes[] = bos.toByteArray();
+            byte[] bytes = bos.toByteArray();
             synchronized (inbound) {
-                inbound.add(bytes);    
+                inbound.add(bytes);
             }
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound: " + bos.toString());
@@ -71,5 +71,5 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public List<byte[]> getInboundMessages() {
         return inbound;
-    } 
+    }
 }

@@ -30,15 +30,18 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
 public class MTOMTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(MTOMTest.class);
@@ -46,16 +49,16 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
 
     public static class ObjectWithHashMapData {
         private String name;
-        private Map<String, byte[]> keyData = new LinkedHashMap<String, byte[]>();
+        private Map<String, byte[]> keyData = new LinkedHashMap<>();
 
         public ObjectWithHashMapData() {
         }
-        
+
         @XmlJavaTypeAdapter(HashMapAdapter.class)
         public Map<String, byte[]> getKeyData() {
             return keyData;
         }
-        
+
         public void setKeyData(Map<String, byte[]> d) {
             keyData = d;
         }
@@ -68,7 +71,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
             this.name = name;
         }
     }
-    
+
     @Logging(pretty = true)
     @WebService
     @MTOM(threshold = 1)
@@ -87,7 +90,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
         }
 
         private byte[] generateByteData(int x) {
-            byte bytes[] = new byte[x];
+            byte[] bytes = new byte[x];
             for (int y = 0; y < x; y++) {
                 int z = 'A' + y;
                 if (z > 'z') {
@@ -96,9 +99,9 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
                 bytes[y] = (byte)z;
             }
             return bytes;
-        }        
+        }
     }
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Endpoint.publish(ADDRESS, new MTOMServer());
@@ -119,19 +122,19 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testMTOMInHashMap() throws Exception {
         Service service = Service.create(new QName("http://foo", "bar"));
-        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING, 
+        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING,
                         ADDRESS);
         MTOMService port = service.getPort(new QName("http://foo", "bar"),
                                            MTOMService.class);
-        
+
         final int count = 99;
         ObjectWithHashMapData data = port.getHashMapData(count);
         for (int y = 1;  y < count; y++) {
-            byte bytes[] = data.getKeyData().get(Integer.toHexString(y));
+            byte[] bytes = data.getKeyData().get(Integer.toHexString(y));
             assertEquals(y, bytes.length);
         }
     }

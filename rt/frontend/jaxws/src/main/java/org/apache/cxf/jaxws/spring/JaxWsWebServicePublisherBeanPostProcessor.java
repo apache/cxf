@@ -39,7 +39,6 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -55,29 +54,29 @@ import org.springframework.web.servlet.mvc.Controller;
  * Bean to scan context for potential web services. This scans the beans for classes that
  * are annotated with @WebService. Excepting those already declared via the JAX-WS Spring
  * schema, it launches each as an endpoint.
- * 
+ *
  * By default, it sets up a default JaxWsServiceFactory and JAX-B data binding,
  * and then creates a URL under /services/ based on the service name. Properties of the bean
  * permit you to configure this; if you set prototypeServiceFactoryBeanName, the code
  * will fetch that bean. It must be a prototype, since service factory object can't be used
- * for more than one endpoint. Similarly, prototypeDataBindingBeanName can be used to 
+ * for more than one endpoint. Similarly, prototypeDataBindingBeanName can be used to
  * control the data binding.
- * 
- * Note that this class uses {@link org.apache.cxf.transport.servlet#CXFServlet} from the 
- * cxf-rt-transports-http-jetty library, which is not part of 
+ *
+ * Note that this class uses {@link org.apache.cxf.transport.servlet#CXFServlet} from the
+ * cxf-rt-transports-http-jetty library, which is not part of
  * the standard dependencies of the JAX-WS front
  * end.
- * 
+ *
  * If you use this processor in an environment with no servlet, it will still launch the
  * endpoints using the embedded CXF server.
- * 
+ *
  */
-public class JaxWsWebServicePublisherBeanPostProcessor 
+public class JaxWsWebServicePublisherBeanPostProcessor
              extends AbstractUrlHandlerMapping implements BeanPostProcessor,
     ServletConfigAware, BeanFactoryAware {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsWebServicePublisherBeanPostProcessor.class);
-    
+
     private static final String CXF_SERVLET_CLASS_NAME = "org.apache.cxf.transport.servlet.CXFServlet";
     private Class<?> servletClass;
     private Method servletGetBusMethod;
@@ -90,8 +89,8 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     // for testing
     private boolean customizedServerFactory;
     private boolean customizedDataBinding;
-    
-    public JaxWsWebServicePublisherBeanPostProcessor() throws SecurityException, 
+
+    public JaxWsWebServicePublisherBeanPostProcessor() throws SecurityException,
            NoSuchMethodException, ClassNotFoundException {
         try {
             servletClass = ClassLoaderUtils.loadClass(CXF_SERVLET_CLASS_NAME, getClass());
@@ -102,7 +101,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         }
         servletGetBusMethod = servletClass.getMethod("getBus");
     }
-    
+
     private Bus getServletBus() {
         try {
             if (shadowCxfServlet == null) {
@@ -111,12 +110,12 @@ public class JaxWsWebServicePublisherBeanPostProcessor
             }
             return (Bus) servletGetBusMethod.invoke(shadowCxfServlet);
         } catch (Exception e) {
-            // CXF internally inconsistent? 
+            // CXF internally inconsistent?
             throw new RuntimeException(e);
         }
     }
 
-  
+
     /**
      * Set the prefix for the generated endpoint URLs.
      * @param urlPrefix
@@ -128,7 +127,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
-    
+
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = ClassHelper.getRealClass(getServletBus(), bean);
 
@@ -143,25 +142,25 @@ public class JaxWsWebServicePublisherBeanPostProcessor
             createAndPublishEndpoint(url, bean);
             registerHandler(url, new ServletAdapter(shadowCxfServlet));
         } else {
-            
+
             Message message = new Message("REJECTED_NO_ANNOTATION", LOG, beanName,
                                               clazz.getName());
             LOG.fine(message.toString());
-            
+
         }
 
         return bean;
     }
-    
+
     private void createAndPublishEndpoint(String url, Object implementor) {
         ServerFactoryBean serverFactory = null;
         if (prototypeServerFactoryBeanName != null) {
             if (!beanFactory.isPrototype(prototypeServerFactoryBeanName)) {
-                throw 
+                throw
                     new IllegalArgumentException(
                         "prototypeServerFactoryBeanName must indicate a scope='prototype' bean");
             }
-            serverFactory = beanFactory.getBean(prototypeServerFactoryBeanName, 
+            serverFactory = beanFactory.getBean(prototypeServerFactoryBeanName,
                                  ServerFactoryBean.class);
             customizedServerFactory = true;
         } else {
@@ -171,21 +170,21 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         serverFactory.setServiceBean(implementor);
         serverFactory.setServiceClass(ClassHelper.getRealClass(implementor));
         serverFactory.setAddress(url);
-        
+
         DataBinding dataBinding = null;
         if (prototypeDataBindingBeanName != null) {
             if (!beanFactory.isPrototype(prototypeDataBindingBeanName)) {
-                throw 
+                throw
                     new IllegalArgumentException(
                         "prototypeDataBindingBeanName must indicate a scope='prototype' bean");
             }
             customizedDataBinding = true;
-            dataBinding = beanFactory.getBean(prototypeDataBindingBeanName, 
-                                 DataBinding.class); 
+            dataBinding = beanFactory.getBean(prototypeDataBindingBeanName,
+                                 DataBinding.class);
         } else {
             dataBinding = new JAXBDataBinding();
         }
-        
+
         serverFactory.setDataBinding(dataBinding);
         serverFactory.setBus(getServletBus());
         serverFactory.create();
@@ -194,9 +193,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     public void setServletConfig(ServletConfig servletConfig) {
         try {
             shadowCxfServlet = (Servlet)servletClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         try {
@@ -222,37 +219,37 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     }
 
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory; 
-        
+        this.beanFactory = beanFactory;
+
     }
-    
+
     public String getPrototypeServerFactoryBeanName() {
         return prototypeServerFactoryBeanName;
     }
 
     /**
-     * Set the server factory for all services launched by this bean. This must be the name of a 
-     * scope='prototype' bean that implements 
+     * Set the server factory for all services launched by this bean. This must be the name of a
+     * scope='prototype' bean that implements
      * {@link org.apache.cxf.frontend#ServerFactoryBean}.
      * @param prototypeServerFactoryBeanName
      */
     public void setPrototypeServerFactoryBeanName(String prototypeServerFactoryBeanName) {
         this.prototypeServerFactoryBeanName = prototypeServerFactoryBeanName;
     }
-    
+
     public String getPrototypeDataBindingBeanName() {
         return prototypeDataBindingBeanName;
     }
 
     /**
-     * Set the data binding for all services launched by this bean. This must be the name of a 
+     * Set the data binding for all services launched by this bean. This must be the name of a
      * scope='prototype' bean that implements {@link org.apache.cxf.databinding#DataBinding}.
      * @param prototypeDataBindingBeanName
      */
     public void setPrototypeDataBindingBeanName(String prototypeDataBindingBeanName) {
         this.prototypeDataBindingBeanName = prototypeDataBindingBeanName;
     }
-    
+
     /**
      * For Unit Test.
      * @return

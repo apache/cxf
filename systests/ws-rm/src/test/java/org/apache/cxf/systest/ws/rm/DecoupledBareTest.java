@@ -39,9 +39,13 @@ import org.apache.hello_world_soap_http.DocLitBare;
 import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.SOAPServiceAddressingDocLitBare;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the addition of WS-RM properties to application messages and the
@@ -50,22 +54,22 @@ import org.junit.Test;
 public class DecoupledBareTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String DECOUPLE_PORT = allocatePort(DecoupledBareTest.class);
-    
+
     private static final Logger LOG = LogUtils.getLogger(DecoupledBareTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
-        
+
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/decoupled_bare.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            
+
             Object implementor = new DocLitBareGreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
@@ -75,19 +79,19 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
             ep.stop();
             ep = null;
         }
-    }    
-    
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testDecoupled() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/decoupled_bare.xml");
         BusFactory.setDefaultBus(bus);
-       
+
         SOAPServiceAddressingDocLitBare service = new SOAPServiceAddressingDocLitBare();
         assertNotNull(service);
 
@@ -96,7 +100,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
         ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
-       
+
         BareDocumentResponse bareres = greeter.testDocLitBare("MySimpleDocument");
         assertNotNull("no response for operation testDocLitBare", bareres);
         assertEquals("CXF", bareres.getCompany());

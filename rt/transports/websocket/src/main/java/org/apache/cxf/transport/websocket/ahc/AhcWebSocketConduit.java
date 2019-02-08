@@ -33,14 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ws.WebSocket;
-import com.ning.http.client.ws.WebSocketByteListener;
-import com.ning.http.client.ws.WebSocketTextListener;
-import com.ning.http.client.ws.WebSocketUpgradeHandler;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.Address;
@@ -51,9 +47,19 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.AsyncHttpClientConfig;
+import org.asynchttpclient.DefaultAsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
+import org.asynchttpclient.Realm;
+import org.asynchttpclient.Realm.AuthScheme;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketByteListener;
+import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 
 /**
- * 
+ *
  */
 public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     private static final Logger LOG = LogUtils.getL7dLogger(AhcWebSocketConduit.class);
@@ -64,12 +70,11 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     //REVISIT make these keys configurable
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
     private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
-    
-    private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<String, RequestResponse>();
+
+    private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<>();
 
     public AhcWebSocketConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
         super(b, ei, t);
-        ahcclient = new AsyncHttpClient();
     }
 
     @Override
@@ -81,7 +86,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         if (!"ws".equals(s) && !"wss".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);
         }
-        
+
         message.put("http.scheme", currentURL.getScheme());
         String httpRequestMethod =
                 (String)message.get(Message.HTTP_REQUEST_METHOD);
@@ -94,16 +99,41 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
         request.setReceiveTimeout(rtimeout);
         message.put(AhcWebSocketConduitRequest.class, request);
+
+
+    }
+
+    private synchronized AsyncHttpClient getAsyncHttpClient(Message message) {
+        if (ahcclient == null) {
+            DefaultAsyncHttpClientConfig.Builder builder = new DefaultAsyncHttpClientConfig.Builder();
+            AuthorizationPolicy ap = getEffectiveAuthPolicy(message);
+            if (ap != null
+                && (!StringUtils.isEmpty(ap.getAuthorizationType())
+                    || !StringUtils.isEmpty(ap.getUserName()))) {
+                Realm.Builder rb = new Realm.Builder(ap.getUserName(), ap.getPassword());
+                if (ap.getAuthorizationType() == null) {
+                    rb.setScheme(AuthScheme.BASIC);
+                } else {
+                    rb.setScheme(AuthScheme.valueOf(ap.getAuthorizationType().toUpperCase()));
+                }
+                rb.setUsePreemptiveAuth(true);
+                builder.setRealm(rb.build());
+            }
+
+            AsyncHttpClientConfig config = builder.build();
+            ahcclient = new DefaultAsyncHttpClient(config);
+        }
+        return ahcclient;
     }
 
     @Override
     protected OutputStream createOutputStream(Message message, boolean needToCacheRequest,
                                               boolean isChunking, int chunkThreshold) throws IOException {
+
+
         AhcWebSocketConduitRequest entity = message.get(AhcWebSocketConduitRequest.class);
-        AhcWebSocketWrappedOutputStream out =
-            new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
-                                                getConduitName(), entity.getUri());
-        return out;
+        return new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
+                                                   getConduitName(), entity.getUri());
     }
 
     public class AhcWebSocketWrappedOutputStream extends WrappedOutputStream {
@@ -139,10 +169,10 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             wrappedStream = new OutputStream() {
 
                 @Override
-                public void write(byte b[], int off, int len) throws IOException {
+                public void write(byte[] b, int off, int len) throws IOException {
                     //REVISIT support multiple writes and flush() to write the entire block data?
                     // or provides the fragment mode?
-                    Map<String, String> headers = new HashMap<String, String>();
+                    Map<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", entity.getContentType());
                     headers.put(requestIdKey, entity.getId());
                     websocket.sendMessage(WebSocketUtils.buildRequest(
@@ -165,7 +195,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         @Override
         protected void handleNoOutput() throws IOException {
             connect();
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, String> headers = new HashMap<>();
             headers.put(requestIdKey, entity.getId());
             websocket.sendMessage(WebSocketUtils.buildRequest(
                 entity.getMethod(), entity.getPath(),
@@ -272,7 +302,9 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             LOG.log(Level.FINE, "connecting");
             if (websocket == null) {
                 try {
-                    websocket = ahcclient.prepareGet(url.toASCIIString()).execute(
+                    websocket = getAsyncHttpClient(outMessage)
+                        .prepareGet(url.toASCIIString())
+                        .execute(
                             new WebSocketUpgradeHandler.Builder()
                             .addWebSocketListener(new AhcWebSocketListener()).build()).get();
                     LOG.log(Level.FINE, "connected");
@@ -383,9 +415,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                 if (first && isStatusCode(line)) {
                     statusCode = Integer.parseInt(line);
                     continue;
-                } else {
-                    first = false;
                 }
+                first = false;
                 int del = line.indexOf(':');
                 String h = line.substring(0, del).trim();
                 String v = line.substring(del + 1).trim();
@@ -399,7 +430,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                 entity = ((String)data).substring(pos);
             } else if (data instanceof byte[]) {
                 entity = new byte[((byte[])data).length - pos];
-                System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
+                System.arraycopy(data, pos, entity, 0, ((byte[])entity).length);
             }
         }
 

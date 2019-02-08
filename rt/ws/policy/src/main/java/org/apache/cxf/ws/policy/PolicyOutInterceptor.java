@@ -43,57 +43,57 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
     public static final PolicyOutInterceptor INSTANCE = new PolicyOutInterceptor();
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyOutInterceptor.class);
-    
+
     public PolicyOutInterceptor() {
         super(PolicyConstants.POLICY_OUT_INTERCEPTOR_ID, Phase.SETUP);
     }
-    
-    protected void handle(Message msg) {        
+
+    protected void handle(Message msg) {
         Exchange exchange = msg.getExchange();
         Bus bus = exchange.getBus();
-        
+
         BindingOperationInfo boi = exchange.getBindingOperationInfo();
         if (null == boi) {
             LOG.fine("No binding operation info.");
             return;
         }
-        
+
         Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
         }
         EndpointInfo ei = e.getEndpointInfo();
-        
+
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
         }
 
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
 
         // 1. Check overridden policy
         Policy p = (Policy)msg.getContextualProperty(PolicyConstants.POLICY_OVERRIDE);
         if (p != null) {
             EndpointPolicyImpl endpi = new EndpointPolicyImpl(p);
             EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
-            effectivePolicy.initialise(endpi, (PolicyEngineImpl)pe, false, msg);
+            effectivePolicy.initialise(endpi, pe, false, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
-            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
+            PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ",
                                   effectivePolicy.getPolicy());
-            
+
             addInterceptors(effectivePolicy.getInterceptors(), msg);
             assertions.addAll(effectivePolicy.getChosenAlternative());
         } else if (MessageUtils.isRequestor(msg)) {
             // 2. Process client policy
             Conduit conduit = exchange.getConduit(msg);
-            
+
             // add the required interceptors
             EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(ei, boi, conduit, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
@@ -107,9 +107,9 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
         } else {
             // 3. Process server policy
             Destination destination = exchange.getDestination();
-            List<List<Assertion>> incoming 
+            List<List<Assertion>> incoming
                 = CastUtils.cast((List<?>)exchange.get("ws-policy.validated.alternatives"));
-            EffectivePolicy effectivePolicy 
+            EffectivePolicy effectivePolicy
                 = pe.getEffectiveServerResponsePolicy(ei, boi, destination, incoming, msg);
             msg.put(EffectivePolicy.class, effectivePolicy);
             if (effectivePolicy != null) {
@@ -120,8 +120,8 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
                 assertions.addAll(effectivePolicy.getChosenAlternative());
             }
         }
-        
-        // insert assertions of endpoint's fault vocabulary into message        
+
+        // insert assertions of endpoint's fault vocabulary into message
         if (null != assertions && !assertions.isEmpty()) {
             if (LOG.isLoggable(Level.FINEST)) {
                 StringBuilder buf = new StringBuilder();
@@ -137,7 +137,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             msg.getInterceptorChain().add(PolicyVerificationOutInterceptor.INSTANCE);
         }
     }
-    
+
     private static void addInterceptors(List<Interceptor<? extends Message>> interceptors, Message msg) {
         for (Interceptor<? extends Message> oi : interceptors) {
             msg.getInterceptorChain().add(oi);

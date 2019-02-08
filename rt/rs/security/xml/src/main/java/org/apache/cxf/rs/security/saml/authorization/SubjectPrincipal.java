@@ -23,49 +23,49 @@ import org.apache.cxf.rs.security.saml.assertion.Subject;
 
 public class SubjectPrincipal extends SimplePrincipal {
     private static final long serialVersionUID = 1L;
-    
+
     private Subject subject;
     public SubjectPrincipal(String principalName, Subject subject) {
         super(principalName);
         this.subject = subject;
     }
-    
+
     public Subject getSubject() {
         return subject;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        
+
         if (!super.equals(obj)) {
             return false;
         }
-        
+
         if (!(obj instanceof SubjectPrincipal)) {
             return false;
         }
-        
+
         if (subject == null && ((SubjectPrincipal)obj).getSubject() != null) {
             return false;
         } else if (subject != null
             && !subject.equals(((SubjectPrincipal)obj).getSubject())) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     public int hashCode() {
         int hashCode = super.hashCode();
         if (subject != null) {
             hashCode = 31 * hashCode + subject.hashCode();
         }
-        
+
         return hashCode;
-        
+
     }
 }

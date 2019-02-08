@@ -37,13 +37,13 @@ import org.apache.maven.project.MavenProject;
 public final class WsdlOptionLoader {
     private static final String WSDL_OPTIONS = "-options$";
     private static final String WSDL_BINDINGS = "-binding-?\\d*.xml$";
-    
+
     private WsdlOptionLoader() {
     }
-    
-    public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
+
+    public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project,
                                                                           File outputDir) {
-        List<GenericWsdlOption> options = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> options = new ArrayList<>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {
             WsdlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
@@ -58,26 +58,25 @@ public final class WsdlOptionLoader {
         WsdlOption option = new WsdlOption();
         if (WsdlUtilities.fillWsdlOptionFromArtifact(option, artifact, outputDir)) {
             return option;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
      * Scan files in a directory and generate one wsdlOption per file found. Extra args for code generation
      * can be defined in a file that is named like the wsdl file and ends in -options. Binding files can be
      * defined in files named like the wsdl file and end in -binding-*.xml
-     * 
+     *
      * @param wsdlBasedir
      * @param includes file name patterns to include
      * @param excludes file name patterns to exclude
-     * @param defaultOptions options that should be used if no special file is given
+     * @param defaultOutputDir output directory that should be used if no special file is given
      * @return list of one WsdlOption object for each wsdl found
      * @throws MojoExecutionException
      */
-    public static List<GenericWsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir, 
-                                                                   String includes[],
-                                                                   String excludes[],
+    public static List<GenericWsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir,
+                                                                   String[] includes,
+                                                                   String[] excludes,
                                                                    File defaultOutputDir)
         throws MojoExecutionException {
 
@@ -90,8 +89,8 @@ public final class WsdlOptionLoader {
         }
 
         List<File> wsdlFiles = WsdlUtilities.getWsdlFiles(wsdlBasedir, includes, excludes);
-        List<GenericWsdlOption> wsdlOptions 
-            = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> wsdlOptions
+            = new ArrayList<>();
         for (File wsdl : wsdlFiles) {
             WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOutputDir);
             if (wsdlOption != null) {
@@ -123,7 +122,7 @@ public final class WsdlOptionLoader {
         }
     }
 
-    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl, 
+    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl,
                                                            File defaultOutputDir)
         throws MojoExecutionException {
 

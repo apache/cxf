@@ -42,16 +42,16 @@ import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
 public final class CorbaAnyHelper {
-   
-    private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<QName, QName>();
-    private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<QName, QName>();
-    
+
+    private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<>();
+    private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<>();
+
     private static Constructor<?> fixedAnyConstructor;
-    
+
     private CorbaAnyHelper() {
         //utility class
     }
-    
+
     public static Any createAny(ORB orb) {
         Any value = orb.create_any();
         if ("com.sun.corba.se.impl.corba.AnyImpl".equals(value.getClass().getName())) {
@@ -67,7 +67,7 @@ public final class CorbaAnyHelper {
     public static boolean isPrimitiveIdlType(QName idlType) {
         return IDL_TO_SCHEMA_TYPES.get(idlType) != null;
     }
-    
+
     public static QName convertPrimitiveSchemaToIdlType(QName schemaType) {
         return SCHEMA_TO_IDL_TYPES.get(schemaType);
     }
@@ -177,7 +177,7 @@ public final class CorbaAnyHelper {
             a.insert_wstring((String)primitive.getValue());
             break;
         default:
-            throw new CorbaBindingException("Unable to insert type into any.  Kind = " 
+            throw new CorbaBindingException("Unable to insert type into any.  Kind = "
                                             + primitive.getTypeCode().kind().value());
         }
     }
@@ -228,7 +228,7 @@ public final class CorbaAnyHelper {
             primitive.setValue(a.extract_wstring());
             break;
         default:
-            throw new CorbaBindingException("Unable to extract type from any.  Kind = " 
+            throw new CorbaBindingException("Unable to extract type from any.  Kind = "
                                             + primitive.getTypeCode().kind().value());
         }
     }
@@ -271,7 +271,7 @@ public final class CorbaAnyHelper {
         IDL_TO_SCHEMA_TYPES.put(CorbaConstants.NT_CORBA_WSTRING, W3CConstants.NT_SCHEMA_STRING);
         IDL_TO_SCHEMA_TYPES.put(CorbaConstants.NT_CORBA_ANY, W3CConstants.NT_SCHEMA_ANYTYPE);
     }
-    
+
     private static Any createFixedAny(ORB orb, Any any) {
         createFixedAnyConstructor();
         try {
@@ -284,13 +284,13 @@ public final class CorbaAnyHelper {
         if (fixedAnyConstructor != null) {
             return;
         }
-        
+
         ASMHelper helper = new ASMHelper();
         ClassWriter cw = helper.createClassWriter();
         FieldVisitor fv;
 
         cw.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER,
-                 "org/apache/cxf/binding/corba/utils/FixedAnyImpl", 
+                 "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                  null, "com/sun/corba/se/impl/corba/AnyImpl", null);
 
         cw.visitSource("FixedAnyImpl.java", null);
@@ -302,11 +302,11 @@ public final class CorbaAnyHelper {
         addExtractOverride(helper, cw);
         addWriteOverride(helper, cw);
         addReadOverride(helper, cw);
-        
+
         cw.visitEnd();
 
         byte[] b = cw.toByteArray();
-        Class<?> c = helper.loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl", 
+        Class<?> c = helper.loadClass("org.apache.cxf.binding.corba.utils.FixedAnyImpl",
                                       CorbaAnyHelper.class, b);
         try {
             fixedAnyConstructor = c.getConstructor(ORB.class, Any.class);
@@ -316,8 +316,8 @@ public final class CorbaAnyHelper {
     }
 
     private static void addReadOverride(ASMHelper helper, ClassWriter cw) {
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "read_value", 
-                            "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V", 
+        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "read_value",
+                            "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V",
                             null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
@@ -332,10 +332,10 @@ public final class CorbaAnyHelper {
         mv.visitLabel(l2);
         mv.visitLineNumber(55, l2);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl", 
+        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable", 
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
                            "_read", "(Lorg/omg/CORBA/portable/InputStream;)V", true);
         Label l3 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.GOTO, l3);
@@ -344,8 +344,8 @@ public final class CorbaAnyHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitVarInsn(Opcodes.ALOAD, 2);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl", 
-                           "read_value", 
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "com/sun/corba/se/impl/corba/AnyImpl",
+                           "read_value",
                            "(Lorg/omg/CORBA/portable/InputStream;Lorg/omg/CORBA/TypeCode;)V", false);
         mv.visitLabel(l3);
         mv.visitLineNumber(59, l3);
@@ -359,9 +359,9 @@ public final class CorbaAnyHelper {
         mv.visitMaxs(3, 3);
         mv.visitEnd();
     }
-        
+
     private static void addWriteOverride(ASMHelper helper, ClassWriter cw) {
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "write_value", 
+        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "write_value",
                             "(Lorg/omg/CORBA/portable/OutputStream;)V", null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
@@ -378,7 +378,7 @@ public final class CorbaAnyHelper {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
-        
+
         Label l3 = helper.createLabel();
         mv.visitVarInsn(Opcodes.ALOAD, 1);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/omg/CORBA/portable/Streamable",
@@ -400,11 +400,10 @@ public final class CorbaAnyHelper {
         mv.visitLocalVariable("os", "Lorg/omg/CORBA/portable/OutputStream;", null, l0, l4, 1);
         mv.visitMaxs(2, 2);
         mv.visitEnd();
-        
+
     }
 
     private static void addExtractOverride(ASMHelper helper, ClassWriter cw) {
-        // TODO Auto-generated method stub
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "extract_Streamable",
                             "()Lorg/omg/CORBA/portable/Streamable;", null, null);
         mv.visitCode();
@@ -412,7 +411,7 @@ public final class CorbaAnyHelper {
         mv.visitLabel(l0);
         mv.visitLineNumber(47, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
-        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl", 
+        mv.visitFieldInsn(Opcodes.GETFIELD, "org/apache/cxf/binding/corba/utils/FixedAnyImpl",
                           "obj", "Lorg/omg/CORBA/portable/Streamable;");
         Label l1 = helper.createLabel();
         mv.visitJumpInsn(Opcodes.IFNULL, l1);
@@ -434,12 +433,12 @@ public final class CorbaAnyHelper {
         mv.visitLocalVariable("this", "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;", null, l0, l3, 0);
         mv.visitMaxs(1, 1);
         mv.visitEnd();
-        
+
     }
 
     private static void addInsertOverride(ASMHelper helper, ClassWriter cw) {
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC,
-                            "insert_Streamable", 
+                            "insert_Streamable",
                             "(Lorg/omg/CORBA/portable/Streamable;)V", null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
@@ -447,17 +446,17 @@ public final class CorbaAnyHelper {
         mv.visitLineNumber(43, l0);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, 
-                           "com/sun/corba/se/impl/corba/AnyImpl", 
-                           "insert_Streamable", 
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
+                           "com/sun/corba/se/impl/corba/AnyImpl",
+                           "insert_Streamable",
                            "(Lorg/omg/CORBA/portable/Streamable;)V", false);
         Label l1 = helper.createLabel();
         mv.visitLabel(l1);
         mv.visitLineNumber(44, l1);
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitFieldInsn(Opcodes.PUTFIELD, 
-                          "org/apache/cxf/binding/corba/utils/FixedAnyImpl", "obj", 
+        mv.visitFieldInsn(Opcodes.PUTFIELD,
+                          "org/apache/cxf/binding/corba/utils/FixedAnyImpl", "obj",
                           "Lorg/omg/CORBA/portable/Streamable;");
         Label l2 = helper.createLabel();
         mv.visitLabel(l2);
@@ -491,13 +490,13 @@ public final class CorbaAnyHelper {
         Label l2 = helper.createLabel();
         mv.visitLabel(l2);
         mv.visitLocalVariable("this",
-                              "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;", 
+                              "Lorg/apache/cxf/binding/corba/utils/FixedAnyImpl;",
                               null, l0, l2, 0);
         mv.visitLocalVariable("orb", "Lorg/omg/CORBA/ORB;", null, l0, l2, 1);
         mv.visitMaxs(2, 2);
         mv.visitEnd();
 
-        
+
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
                             "(Lorg/omg/CORBA/ORB;Lorg/omg/CORBA/Any;)V",
                             null, null);
@@ -525,6 +524,6 @@ public final class CorbaAnyHelper {
         mv.visitLocalVariable("any", "Lorg/omg/CORBA/Any;", null, l0, l2, 2);
         mv.visitMaxs(3, 3);
         mv.visitEnd();
-        
+
     }
 }

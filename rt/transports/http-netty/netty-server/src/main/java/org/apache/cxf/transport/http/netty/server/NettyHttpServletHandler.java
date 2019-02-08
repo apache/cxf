@@ -50,12 +50,13 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 
 public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpServletHandler.class);
-   
+
     private final ChannelGroup allChannels;
 
     private final NettyHttpServletPipelineFactory pipelineFactory;
@@ -71,7 +72,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             NettyInterceptor interceptor) {
 
         if (this.interceptors == null) {
-            this.interceptors = new ArrayList<NettyInterceptor>();
+            this.interceptors = new ArrayList<>();
         }
         this.interceptors.add(interceptor);
         return this;
@@ -84,19 +85,19 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
         allChannels.add(ctx.channel());
     }
 
-   
+
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleState) {
-            IdleState e = (IdleState) evt;
-            if (e == IdleState.READER_IDLE || e == IdleState.WRITER_IDLE) {
-                LOG.log(Level.FINE, "Closing idle channel: {}", e);
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            if (e.state() == IdleState.READER_IDLE || e.state() == IdleState.WRITER_IDLE) {
+                LOG.log(Level.FINE, "Closing idle channel: {}", e.state());
                 ctx.close();
-            } 
+            }
         }
     }
-    
-    
+
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         HttpRequest request = (HttpRequest) msg;
@@ -114,22 +115,22 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    
+
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
     }
-   
+
     protected void handleHttpServletRequest(ChannelHandlerContext ctx,
                                             HttpRequest request, NettyHttpContextHandler nettyHttpContextHandler)
         throws Exception {
 
         interceptOnRequestReceived(ctx, request);
-        
+
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
         NettyServletResponse nettyServletResponse = buildHttpServletResponse(response);
-        NettyHttpServletRequest nettyServletRequest = 
+        NettyHttpServletRequest nettyServletRequest =
             buildHttpServletRequest(request, nettyHttpContextHandler.getContextPath(), ctx);
 
         nettyHttpContextHandler.handle(nettyServletRequest.getRequestURI(), nettyServletRequest, nettyServletResponse);
@@ -160,7 +161,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        
+
         LOG.log(Level.SEVERE, "UNEXPECTED_EXCEPCTION_IN_NETTY_SERVLET_HANDLER", cause);
 
         interceptOnRequestFailed(ctx, cause);
@@ -187,11 +188,11 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
 
     private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
         ByteBuf content = Unpooled.copiedBuffer("Failure: " + status.toString() + "\r\n", CharsetUtil.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, 
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                                                                 status,
                                                                 content);
         response.headers().set(Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        
+
         ctx.write(response).addListener(ChannelFutureListener.CLOSE);
     }
 
@@ -227,7 +228,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
 
     protected NettyServletResponse buildHttpServletResponse(
             HttpResponse response) {
-        // need to access the 
+        // need to access the
         return new NettyServletResponse(response);
     }
 
@@ -235,5 +236,5 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
             HttpRequest request, String contextPath, ChannelHandlerContext ctx) {
         return new NettyHttpServletRequest(request, contextPath, ctx);
     }
-    
+
 }

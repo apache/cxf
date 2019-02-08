@@ -36,16 +36,16 @@ import org.apache.cxf.message.Message;
 public class ThreadLocalProviders extends AbstractThreadLocalProxy<Providers>
        implements Providers {
 
-    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, 
-                                                         Type genericType, 
+    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type,
+                                                         Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType) {
         Providers p = getCurrentProviders();
         return p != null ? p.getMessageBodyReader(type, genericType, annotations, mediaType) : null;
     }
 
-    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, 
-                                                         Type genericType, 
+    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type,
+                                                         Type genericType,
                                                          Annotation[] annotations,
                                                          MediaType mediaType) {
         Providers p = getCurrentProviders();

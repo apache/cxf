@@ -48,7 +48,12 @@ import org.apache.hello_world_soap12_http.types.FaultDetail;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap12_http",
@@ -80,7 +85,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             FaultDetail detail = ex.getFaultInfo();
             assertEquals((short)2, detail.getMajor());
             assertEquals((short)1, detail.getMinor());
-            assertEquals("PingMeFault raised by server", ex.getMessage());            
+            assertEquals("PingMeFault raised by server", ex.getMessage());
         }
     }
     String stripSpaces(String s) {
@@ -90,13 +95,13 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             s2 = s.replace(" ", "");
         }
         return s2;
-    }    
+    }
     @Test
     public void testSayHiSoap12ToSoap11() throws Exception {
-        HttpURLConnection httpConnection = 
+        HttpURLConnection httpConnection =
             getHttpConnection("http://localhost:" + PORT + "/SoapContext/Soap11Port/sayHi");
         httpConnection.setDoOutput(true);
-        
+
         InputStream reqin = Soap12ClientServerTest.class.getResourceAsStream("sayHiSOAP12Req.xml");
         assertNotNull("could not load test data", reqin);
 
@@ -107,25 +112,25 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         reqout.close();
 
         assertEquals(500, httpConnection.getResponseCode());
-        
+
         InputStream respin = httpConnection.getErrorStream();
         assertNotNull(respin);
-        
+
         // we expect a soap 1.1 fault from the soap 1.1 test service that does not support soap 1.2
         assertEquals("text/xml;charset=utf-8", stripSpaces(httpConnection.getContentType().toLowerCase()));
-       
+
         Document doc = StaxUtils.read(respin);
         assertNotNull(doc);
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap11", Soap11.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);
         Node fault = (Node) xu.getValue("/soap11:Envelope/soap11:Body/soap11:Fault", doc, XPathConstants.NODE);
         assertNotNull(fault);
-        String codev = (String) xu.getValue("//faultcode/text()", 
-                                            fault, 
+        String codev = (String) xu.getValue("//faultcode/text()",
+                                            fault,
                                             XPathConstants.STRING);
-        
+
         assertNotNull(codev);
         assertTrue("VersionMismatch expected", codev.endsWith("VersionMismatch"));
     }
@@ -136,7 +141,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is ull ", service);
-        
+
         Greeter g = service.getPort(portName, Greeter.class);
         updateAddressPort(g, PORT);
         return g;

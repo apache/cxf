@@ -20,11 +20,12 @@
 package org.apache.cxf.jaxrs.ext.multipart;
 
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ContentDispositionTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class ContentDispositionTest {
+
     @Test
     public void testContentDisposition() {
         ContentDisposition cd = new ContentDisposition(" attachment ; bar=foo ; baz = baz1");
@@ -46,5 +47,12 @@ public class ContentDispositionTest extends Assert {
         assertEquals("foo;txt", cd.getParameter("bar"));
         assertEquals("baz1", cd.getParameter("baz"));
     }
-    
+
+    @Test
+    public void testContentDispositionWithCreationDate() {
+        ContentDisposition cd = new ContentDisposition(" attachment ; creation-date=\"21:08:08 14:00:00\"");
+        assertEquals("attachment", cd.getType());
+        assertEquals("21:08:08 14:00:00", cd.getParameter("creation-date"));
+    }
+
 }

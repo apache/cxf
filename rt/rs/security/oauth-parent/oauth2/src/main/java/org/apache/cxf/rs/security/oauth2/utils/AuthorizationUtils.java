@@ -42,9 +42,8 @@ public final class AuthorizationUtils {
         String[] parts = AuthorizationUtils.getAuthorizationParts(mc);
         if (parts.length == 2) {
             return getBasicAuthParts(parts[1]);
-        } else {
-            return null;
         }
+        return null;
     }
     public static String[] getBasicAuthParts(String basicAuthData) {
         String authDecoded = null;
@@ -53,46 +52,50 @@ public final class AuthorizationUtils {
         } catch (Exception ex) {
             throw ExceptionUtils.toNotAuthorizedException(ex, null);
         }
-        String authInfo[] = authDecoded.split(":");
+        String[] authInfo = authDecoded.split(":");
         if (authInfo.length == 2) {
             return authInfo;
         }
         throw ExceptionUtils.toNotAuthorizedException(null, null);
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc) {
         return getAuthorizationParts(mc, Collections.singleton("Basic"));
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc,
                                                  Set<String> challenges) {
         return getAuthorizationParts(mc, challenges, null);
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc,
                                                  Set<String> challenges,
                                                  String realm) {
         List<String> headers = mc.getHttpHeaders().getRequestHeader("Authorization");
         if (headers != null && headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
-            if (parts.length > 0 
-                && (challenges == null || challenges.isEmpty() 
+            if (parts.length > 0
+                && (challenges == null || challenges.isEmpty()
                 || challenges.contains(parts[0])
                 || challenges.size() == 1 && challenges.contains("*"))) {
-                return parts;       
+                return parts;
             }
         }
         throwAuthorizationFailure(challenges, realm);
         return null;
     }
-    
+
     public static void throwAuthorizationFailure(Set<String> challenges) {
         throwAuthorizationFailure(challenges, null);
     }
-    
+
     public static void throwAuthorizationFailure(Set<String> challenges, String realm) {
+        throwAuthorizationFailure(challenges, realm, null);
+    }
+
+    public static void throwAuthorizationFailure(Set<String> challenges, String realm, Throwable cause) {
         ResponseBuilder rb = JAXRSUtils.toResponseBuilder(401);
-        
+
         StringBuilder sb = new StringBuilder();
         for (String challenge : challenges) {
             if ("*".equals(challenge)) {
@@ -109,8 +112,12 @@ public final class AuthorizationUtils {
             }
             rb.header(HttpHeaders.WWW_AUTHENTICATE, sb.toString());
         }
-        Response r = rb.build();
-        throw ExceptionUtils.toNotAuthorizedException(null, r);
+        Response r = null;
+        if (cause != null) {
+            r = rb.entity(cause.getMessage()).build();
+        } else {
+            r = rb.build();
+        }
+        throw ExceptionUtils.toNotAuthorizedException(cause, r);
     }
-
 }

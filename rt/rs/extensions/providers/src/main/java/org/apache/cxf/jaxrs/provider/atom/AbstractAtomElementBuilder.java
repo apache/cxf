@@ -26,13 +26,13 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 /**
  * A callback-style provider which can be used to map an object to Atom Feed or Entry
  * without having to deal directly with types representing Atom feeds or entries
- * 
+ *
  * @param <T> Type of objects which will be mapped to feeds or entries
  */
 public abstract class AbstractAtomElementBuilder<T> {
-    
+
     private MessageContext mc;
-    
+
     /**
      * Sets MessageContext
      * @param context message context
@@ -40,7 +40,7 @@ public abstract class AbstractAtomElementBuilder<T> {
     public void setMessageContext(MessageContext context) {
         mc = context;
     }
-    
+
     /**
      * returns MessageContext
      * @return message context
@@ -48,27 +48,27 @@ public abstract class AbstractAtomElementBuilder<T> {
     public MessageContext getMessageContext() {
         return mc;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element title
      */
     public String getTitle(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element author
      */
     public String getAuthor(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element id
      */
@@ -77,41 +77,41 @@ public abstract class AbstractAtomElementBuilder<T> {
     }
 
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return base uri
      */
     public String getBaseUri(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element updated date
      */
     public String getUpdated(T pojo) {
         return null;
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element categories
      */
     public List<String> getCategories(T pojo) {
         return null;
     }
-    
-    
+
+
     //CHECKSTYLE:OFF
     /**
-     * Returns a map of link URI to link relations type pairs 
+     * Returns a map of link URI to link relations type pairs
      * See {@link <a href="http://www.iana.org/assignments/link-relations/link-relations.xml">Atom Link Relations</a>}.
      *
      * @param pojo Object which is being mapped
-     * @return the map of link URI to link relations type pairs 
+     * @return the map of link URI to link relations type pairs
      */
     //CHECKSTYLE:ON
     public Map<String, String> getLinks(T pojo) {

@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 public class Inner implements Serializable {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1009032817440459241L;
 

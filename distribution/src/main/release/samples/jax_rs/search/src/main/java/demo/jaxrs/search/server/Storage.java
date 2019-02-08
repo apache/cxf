@@ -32,47 +32,47 @@ import org.apache.cxf.helpers.IOUtils;
 
 public class Storage {
     private final File folder = new File("files");
-    
+
     public Storage() throws IOException {
         if (!folder.exists() && !folder.mkdirs()) {
             throw new IOException("Unable to initialize FS storage:" + folder.getAbsolutePath());
         }
-        
+
         if (!folder.isDirectory() || !folder.canWrite() || !folder.canWrite()) {
             throw new IOException("Unable to access FS storage:" + folder.getAbsolutePath());
-        }        
+        }
     }
-    
+
     public void addDocument(final String name, final byte[] content) throws IOException {
         try (InputStream in = new ByteArrayInputStream(content)) {
             addDocument(name, in);
         }
     }
-    
-    public void addDocument(final String name, final InputStream in) throws IOException { 
+
+    public void addDocument(final String name, final InputStream in) throws IOException {
         final File f = new File(folder, name);
-        
+
         if (f.exists() && !f.delete()) {
             throw new IOException("Unable to delete FS file:" + f.getAbsolutePath());
-        } 
-        
+        }
+
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
             out.write(IOUtils.readBytesFromStream(in));
-            
+
             f.deleteOnExit();
         }
     }
-    
+
     public InputStream getDocument(final String name) throws IOException {
         final File f = new File(folder, name);
-        
+
         if (!f.exists() || !f.isFile()) {
             throw new FileNotFoundException("Unable to access FS file:" + f.getAbsolutePath());
         }
-        
+
         return new FileInputStream(f);
     }
-    
+
     public void deleteAll() throws IOException {
         for (final File f: folder.listFiles()) {
             if (!f.delete()) {

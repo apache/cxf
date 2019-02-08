@@ -19,29 +19,74 @@
 
 package org.apache.cxf.common.util;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class UrlUtilsTest extends Assert {
-    
+
+public class UrlUtilsTest {
+
     @Test
     public void testUrlDecode() {
         assertEquals("+ ", UrlUtils.urlDecode("%2B+"));
     }
-    
+
     @Test
     public void testUrlDecodeSingleCharMultipleEscapes() {
         String s = "ß";
         String encoded = UrlUtils.urlEncode(s);
         assertEquals(s, UrlUtils.urlDecode(encoded));
     }
-    
+
     @Test
     public void testUrlDecodeReserved() {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
     }
-    
+
+    @Test
+    public void testUrlDecodeIncompleteEscapePatterns() {
+
+        try {
+            UrlUtils.urlDecode("%");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("a%%%%");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("a%2B%");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+
+        try {
+            UrlUtils.urlDecode("%2");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+    }
+
+    @Test
+    public void testUrlDecodeInvalidEscapePattern() {
+        try {
+            UrlUtils.urlDecode("%2$");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
+        }
+    }
+
     @Test
     public void testPathDecode() {
         assertEquals("+++", UrlUtils.pathDecode("+%2B+"));

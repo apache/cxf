@@ -19,17 +19,18 @@
 
 package org.apache.cxf.transport.http_jetty.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
- * 
+ *
  */
-public class HTTPJettyTransportNamespaceHandlerTest extends Assert {
+public class HTTPJettyTransportNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         HTTPJettyTransportNamespaceHandler handler = new HTTPJettyTransportNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/transports/http-jetty/configuration"));
     }
 

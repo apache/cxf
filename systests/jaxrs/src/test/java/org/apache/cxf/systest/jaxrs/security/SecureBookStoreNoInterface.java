@@ -41,15 +41,15 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
 public class SecureBookStoreNoInterface {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-  
+    private Map<Long, Book> books = new HashMap<>();
+
     public SecureBookStoreNoInterface() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     @POST
     @Path("/bookforms")
     @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
@@ -61,7 +61,7 @@ public class SecureBookStoreNoInterface {
         }
         return new Book(name, id);
     }
-    
+
     @POST
     @Path("/bookforms2")
     @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
@@ -75,7 +75,7 @@ public class SecureBookStoreNoInterface {
         }
         return new Book(name, id);
     }
-    
+
     @GET
     @Path("/thosebooks/{bookId}/{id}")
     @Produces("application/xml")
@@ -86,7 +86,7 @@ public class SecureBookStoreNoInterface {
         }
         return books.get(id);
     }
-    
+
     @GET
     @Path("/thosebooks/{bookId}/")
     @Produces("application/xml")
@@ -102,12 +102,12 @@ public class SecureBookStoreNoInterface {
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
     }
-    
+
     @Path("/securebook")
     public SecureBook getSecureBook() throws BookNotFoundFault {
         return new SecureBook("CXF in Action", 123L);
     }
-    
+
     @GET
     @Path("/thebook/{bookId}")
     @Produces("application/xml")

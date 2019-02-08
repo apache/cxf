@@ -24,8 +24,7 @@ import java.util.List;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.sts.claims.ClaimsManager;
-import org.apache.cxf.sts.claims.ClaimsParameters;
+import org.apache.cxf.sts.claims.ClaimsUtils;
 import org.apache.cxf.sts.claims.ProcessedClaim;
 import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.request.ReceivedToken;
@@ -34,13 +33,13 @@ import org.apache.cxf.sts.token.provider.AttributeStatementProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipal;
 import org.apache.wss4j.common.principal.SAMLTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.saml.bean.AttributeBean;
 import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
-import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A custom AttributeStatementProvider implementation for use in the tests.
@@ -51,34 +50,14 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      * Get an AttributeStatementBean using the given parameters.
      */
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributeList = new ArrayList<>();
 
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
-        
+
         // Handle Claims
-        ClaimsManager claimsManager = providerParameters.getClaimsManager();
-        ProcessedClaimCollection retrievedClaims = new ProcessedClaimCollection();
-        if (claimsManager != null) {
-            ClaimsParameters params = new ClaimsParameters();
-            params.setAdditionalProperties(providerParameters.getAdditionalProperties());
-            params.setAppliesToAddress(providerParameters.getAppliesToAddress());
-            params.setEncryptionProperties(providerParameters.getEncryptionProperties());
-            params.setKeyRequirements(providerParameters.getKeyRequirements());
-            params.setPrincipal(providerParameters.getPrincipal());
-            params.setRealm(providerParameters.getRealm());
-            params.setStsProperties(providerParameters.getStsProperties());
-            params.setTokenRequirements(providerParameters.getTokenRequirements());
-            params.setTokenStore(providerParameters.getTokenStore());
-            params.setWebServiceContext(providerParameters.getWebServiceContext());
-            retrievedClaims = 
-                claimsManager.retrieveClaimValues(
-                    providerParameters.getRequestedPrimaryClaims(),
-                    providerParameters.getRequestedSecondaryClaims(),
-                    params
-                );
-        }
-        
+        ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
+
         AttributeStatementBean attrBean = new AttributeStatementBean();
         Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
@@ -86,25 +65,25 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             AttributeBean attributeBean = createDefaultAttribute(tokenType);
             attributeList.add(attributeBean);
         }
-        
+
         while (claimIterator.hasNext()) {
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = createAttributeFromClaim(claim, tokenType);
             attributeList.add(attributeBean);
         }
-        
+
         ReceivedToken onBehalfOf = tokenRequirements.getOnBehalfOf();
         ReceivedToken actAs = tokenRequirements.getActAs();
         try {
             if (onBehalfOf != null) {
-                AttributeBean parameterBean = 
+                AttributeBean parameterBean =
                     handleAdditionalParameters(false, onBehalfOf.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
                 }
             }
             if (actAs != null) {
-                AttributeBean parameterBean = 
+                AttributeBean parameterBean =
                     handleAdditionalParameters(true, actAs.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
@@ -113,29 +92,29 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         } catch (WSSecurityException ex) {
             throw new STSException(ex.getMessage(), ex);
         }
-        
+
         attrBean.setSamlAttributes(attributeList);
-        
+
         return attrBean;
     }
-    
+
     /**
      * Create a default attribute
      */
     private AttributeBean createDefaultAttribute(String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
 
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
             attributeBean.setQualifiedName("token-requestor");
             attributeBean.setNameFormat("http://cxf.apache.org/sts/custom");
         } else {
             attributeBean.setSimpleName("token-requestor");
             attributeBean.setQualifiedName("http://cxf.apache.org/sts/custom");
         }
-        
+
         attributeBean.addAttributeValue("authenticated");
-        
+
         return attributeBean;
     }
 
@@ -143,14 +122,14 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      * Handle ActAs or OnBehalfOf elements.
      */
     private AttributeBean handleAdditionalParameters(
-        boolean actAs, 
-        Object parameter, 
+        boolean actAs,
+        Object parameter,
         String tokenType
     ) throws WSSecurityException {
         AttributeBean parameterBean = new AttributeBean();
 
         String claimType = actAs ? "CustomActAs" : "CustomOnBehalfOf";
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSS4JConstants.SAML2_NS.equals(tokenType)) {
             parameterBean.setQualifiedName(claimType);
             parameterBean.setNameFormat("http://cxf.apache.org/sts/custom/" + claimType);
         } else {
@@ -175,14 +154,14 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      */
     private AttributeBean createAttributeFromClaim(ProcessedClaim claim, String tokenType) {
         AttributeBean attributeBean = new AttributeBean();
-        if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
+        if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
             attributeBean.setQualifiedName(claim.getClaimType().toString());
         } else {
             attributeBean.setSimpleName(claim.getClaimType().toString());
         }
         attributeBean.setAttributeValues(claim.getValues());
-        
+
         return attributeBean;
     }
 

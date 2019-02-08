@@ -27,10 +27,10 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.validator.AbstractValidator;
 
 public abstract class AbstractDefinitionValidator extends AbstractValidator {
-    
+
     protected Definition def;
     protected ToolContext env;
-    
+
     private final Bus bus;
 
     public AbstractDefinitionValidator() {

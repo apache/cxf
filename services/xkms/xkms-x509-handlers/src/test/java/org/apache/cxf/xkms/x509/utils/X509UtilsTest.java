@@ -30,12 +30,15 @@ import org.apache.cxf.xkms.exception.XKMSRequestException;
 import org.apache.cxf.xkms.model.xkms.ValidateRequestType;
 import org.apache.cxf.xkms.x509.validator.BasicValidationTest;
 import org.apache.cxf.xkms.x509.validator.ValidateRequestParser;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class X509UtilsTest extends BasicValidationTest {
     private static final String CERT_DN = "CN=www.anothersts.com, L=CGN, ST=NRW, C=DE, O=AnotherSTS";
 
+    @Test
+    @org.junit.Ignore
     public void extractValidatingCertsOK() throws JAXBException {
         InputStream is = this.getClass().getResourceAsStream("/validateRequestOK.xml");
         @SuppressWarnings("unchecked")

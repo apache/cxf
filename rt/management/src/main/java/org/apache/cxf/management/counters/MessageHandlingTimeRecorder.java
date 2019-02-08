@@ -22,44 +22,44 @@ package org.apache.cxf.management.counters;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 
-/* recoder the message actually handle begin and end time */ 
+/* recoder the message actually handle begin and end time */
 public class MessageHandlingTimeRecorder {
     private Exchange exchange;
     private long beginTime;
     private long endTime;
     private FaultMode faultMode;
     private boolean oneWay;
-    
+
     public MessageHandlingTimeRecorder(Exchange ex) {
         exchange = ex;
         exchange.put(MessageHandlingTimeRecorder.class, this);
     }
-    
+
     public boolean isOneWay() {
         return oneWay;
     }
-    
+
     public void setOneWay(boolean ow) {
         oneWay = ow;
     }
-    
+
     public Exchange getHandleExchange() {
-        return exchange;    
+        return exchange;
     }
-    
+
     public void beginHandling() {
         beginTime = System.nanoTime() / 1000;
     }
-    
+
     public void endHandling() {
         endTime = System.nanoTime() / 1000;
     }
-    
+
     public long getEndTime() {
         return endTime;
     }
-    
-    public long getHandlingTime() {        
+
+    public long getHandlingTime() {
         return endTime - beginTime;
     }
 
@@ -70,7 +70,7 @@ public class MessageHandlingTimeRecorder {
     public void setFaultMode(FaultMode faultMode) {
         this.faultMode = faultMode;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

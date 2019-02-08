@@ -22,21 +22,20 @@ package org.apache.cxf.systest.jaxws.types;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 @XmlType(name = "bar")
 public class BarImpl implements Bar {
     String name;
     public BarImpl() {
-        
+
     }
     public BarImpl(String s) {
         name = s;
     }
-    
+
     /** {@inheritDoc}*/
     public String getName() {
-        // TODO Auto-generated method stub
         return name;
     }
 

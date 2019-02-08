@@ -21,22 +21,17 @@ package org.apache.cxf.jaxrs.fortest.jaxb.jaxbelement;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-@SuppressWarnings({
-    "unchecked", "rawtypes"
-})
-//CHECKSTYLE:OFF
 public class ParamJAXBElement extends JAXBElement<ParamType> {
 
+    protected static final QName NAME = new QName("http://jaxbelement/10", "param");
     private static final long serialVersionUID = 4994571526736505284L;
-    protected final static QName NAME = new QName("http://jaxbelement/10", "param");
-    
+
     public ParamJAXBElement(ParamType value) {
-        super(NAME, ((Class) ParamType.class), null, value);
+        super(NAME, ParamType.class, null, value);
     }
 
     public ParamJAXBElement() {
-        super(NAME, ((Class) ParamType.class), null, null);
+        super(NAME, ParamType.class, null, null);
     }
 
 }
-//CHECKSTYLE:ON

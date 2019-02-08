@@ -30,7 +30,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
-import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class TokenStoreCallbackHandler implements CallbackHandler {
     private CallbackHandler internal;
@@ -39,7 +39,7 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
         internal = in;
         store = st;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (Callback callback : callbacks) {
             if (callback instanceof WSPasswordCallback) {
@@ -64,11 +64,11 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
             internal.handle(callbacks);
         }
     }
-    
+
     private static String getSHA1(byte[] input) {
         try {
             byte[] digestBytes = KeyUtils.generateDigest(input);
-            return Base64.encode(digestBytes);
+            return XMLUtils.encodeToString(digestBytes);
         } catch (WSSecurityException e) {
             //REVISIT
         }

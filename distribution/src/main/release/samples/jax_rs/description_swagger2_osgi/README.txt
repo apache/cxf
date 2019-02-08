@@ -6,7 +6,7 @@ using JAX-RS 2.0 (JSR-339). In this demo, the Swagger2Feature is configured usin
 
 Building and running the demo
 ---------------------------------------
-(Note this demo currently uses the snapshot version of some componens)
+(Note this demo currently uses the snapshot version of some components)
 
 From the base directory of this sample (i.e., where this README file is
 located), the Maven pom.xml file can be used to build and run the demo. 
@@ -15,7 +15,6 @@ located), the Maven pom.xml file can be used to build and run the demo.
 Using either UNIX or Windows:
 
   mvn install
-
 
 Starting Karaf (refer to http://karaf.apache.org/manual/latest-3.0.x/quick-start.html)
 
@@ -39,16 +38,17 @@ In order to install CXF's features, you need to add the CXF's features repo usin
 
   feature:repo-add cxf 3.n.m
 
- where 3.n.m corresponds to a valid CXF version number (e.g., 3.1.4).
+ where 3.n.m corresponds to a valid CXF version number (e.g., 3.3.0).
 
 Install CXF's cxf-rs-description-swagger2 feature that installs all the required bundles
 for this demo bundle.
 
   feature:install cxf-rs-description-swagger2
+  feature:install aries-blueprint
 
-Install this demo bundle
-
-  install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi
+Install this demo bundle (using the appropriate bundle version number)
+  
+  install -s mvn:org.apache.cxf.samples/jax_rs_description_swagger2_osgi/3.n.m
 
 You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and started.
 
@@ -56,7 +56,7 @@ You can verify if the CXF JAX-RS Swagger2 Blueprint Demo is installed and starte
   START LEVEL 100 , List Threshold: 50
    ID | State  | Lvl | Version | Name                              
   -----------------------------------------------------------------
-  122 | Active |  80 | 3.1.4   | CXF JAX-RS Swagger2 Blueprint Demo
+  122 | Active |  80 | 3.3.0   | CXF JAX-RS Swagger2 Blueprint Demo
   karaf@root()>
 
 Now, you will be able to access this CXF JAXRS demo service on your Karaf instance at

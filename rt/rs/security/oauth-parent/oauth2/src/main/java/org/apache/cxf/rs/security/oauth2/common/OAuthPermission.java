@@ -22,7 +22,15 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Cacheable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OrderColumn;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
+
 
 /**
  * Provides the complete information about a given opaque permission.
@@ -32,24 +40,39 @@ import javax.xml.bind.annotation.XmlRootElement;
  * a limited set of HTTP verbs and request URIs
  */
 @XmlRootElement
+@Entity
+@Cacheable
 public class OAuthPermission implements Serializable {
     private static final long serialVersionUID = -6486616235830491290L;
-    private List<String> httpVerbs = new LinkedList<String>();
-    private List<String> uris = new LinkedList<String>();
+    private List<String> httpVerbs = new LinkedList<>();
+    private List<String> uris = new LinkedList<>();
     private String permission;
     private String description;
-    private boolean isDefault;
+    private boolean isDefaultPermission;
     private boolean invisibleToClient;
-    
     public OAuthPermission() {
-        
+
     }
-    
+
+    public OAuthPermission(String permission) {
+        this.permission = permission;
+    }
+
     public OAuthPermission(String permission, String description) {
         this.description = description;
         this.permission = permission;
     }
-    
+
+    /**
+     * Gets the optional list of HTTP verbs
+     * @return the list of HTTP verbs
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getHttpVerbs() {
+        return httpVerbs;
+    }
+
     /**
      * Sets the optional list of HTTP verbs, example,
      * "GET" and "POST", etc
@@ -60,11 +83,13 @@ public class OAuthPermission implements Serializable {
     }
 
     /**
-     * Gets the optional list of HTTP verbs
-     * @return the list of HTTP verbs
+     * Gets the optional list of relative request URIs
+     * @return the list of URIs
      */
-    public List<String> getHttpVerbs() {
-        return httpVerbs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getUris() {
+        return uris;
     }
 
     /**
@@ -75,14 +100,7 @@ public class OAuthPermission implements Serializable {
         this.uris = uri;
     }
 
-    /**
-     * Gets the optional list of relative request URIs
-     * @return the list of URIs
-     */
-    public List<String> getUris() {
-        return uris;
-    }
-    
+
     /**
      * Gets the permission description
      * @return the description
@@ -103,6 +121,7 @@ public class OAuthPermission implements Serializable {
      * Get the permission value such as "read_calendar"
      * @return the value
      */
+    @Id
     public String getPermission() {
         return permission;
     }
@@ -119,18 +138,24 @@ public class OAuthPermission implements Serializable {
      * Indicates if this permission has been allocated by default or not.
      * Authorization View handlers may use this property to optimize the way the user selects the
      * scopes.
-     * For example, assume that read', 'add' and 'update' scopes are supported and the 
+     * For example, assume that read', 'add' and 'update' scopes are supported and the
      * 'read' scope is always allocated. This can be presented at the UI level as follows:
      * the read-only check-box control will represent a 'read' scope and a user will be able to
-     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one. 
+     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one.
      * @param isDefault true if the permission has been allocated by default
      */
-    public void setDefault(boolean value) {
-        this.isDefault = value;
+    public void setDefaultPermission(boolean value) {
+        this.isDefaultPermission = value;
     }
 
+    public boolean isDefaultPermission() {
+        return isDefaultPermission;
+    }
+
+    @Deprecated
+    @Transient
     public boolean isDefault() {
-        return isDefault;
+        return isDefaultPermission;
     }
 
     public boolean isInvisibleToClient() {
@@ -138,7 +163,7 @@ public class OAuthPermission implements Serializable {
     }
 
     /**
-     * Set the visibility status; by default all the scopes approved by a user can 
+     * Set the visibility status; by default all the scopes approved by a user can
      * be optionally reported to the client in access token responses. Some scopes may need
      * to stay 'invisible' to client.
      * @param invisibleToClient
@@ -146,59 +171,58 @@ public class OAuthPermission implements Serializable {
     public void setInvisibleToClient(boolean invisibleToClient) {
         this.invisibleToClient = invisibleToClient;
     }
-    
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof OAuthPermission)) {
             return false;
         }
-        
+
+        if (object == this) {
+            return true;
+        }
+
         OAuthPermission that = (OAuthPermission)object;
-        if (this.httpVerbs != null && that.httpVerbs == null
-            || this.httpVerbs == null && that.httpVerbs != null
-            || this.httpVerbs != null && !this.httpVerbs.equals(that.httpVerbs)) {
+        if (getHttpVerbs() != null && that.getHttpVerbs() == null
+            || getHttpVerbs() == null && that.getHttpVerbs() != null
+            || getHttpVerbs() != null && !getHttpVerbs().equals(that.getHttpVerbs())) {
             return false;
         }
-        if (this.uris != null && that.uris == null
-            || this.uris == null && that.uris != null
-            || this.uris != null && !this.uris.equals(that.uris)) {
+        if (getUris() != null && that.getUris() == null
+            || getUris() == null && that.getUris() != null
+            || getUris() != null && !getUris().equals(that.getUris())) {
             return false;
         }
-        if (this.permission != null && that.permission == null
-            || this.permission == null && that.permission != null
-            || this.permission != null && !this.permission.equals(that.permission)) {
+        if (!getPermission().equals(that.getPermission())) {
             return false;
         }
-        if (this.description != null && that.description == null
-            || this.description == null && that.description != null
-            || this.description != null && !this.description.equals(that.description)) {
+        if (getDescription() != null && that.getDescription() == null
+            || getDescription() == null && that.getDescription() != null
+            || getDescription() != null && !getDescription().equals(that.getDescription())) {
             return false;
         }
-        if (this.invisibleToClient != that.invisibleToClient || this.isDefault != that.isDefault) { //NOPMD
+        if (isInvisibleToClient() != that.isInvisibleToClient() //NOPMD
+            || isDefaultPermission() != that.isDefaultPermission()) { //NOPMD
             return false;
         }
-        
+
         return true;
     }
-    
     @Override
     public int hashCode() {
         int hashCode = 17;
-        if (httpVerbs != null) {
-            hashCode = 31 * hashCode + httpVerbs.hashCode();
+        if (getHttpVerbs() != null) {
+            hashCode = 31 * hashCode + getHttpVerbs().hashCode();
         }
-        if (uris != null) {
-            hashCode = 31 * hashCode + uris.hashCode();
+        if (getUris() != null) {
+            hashCode = 31 * hashCode + getUris().hashCode();
         }
-        if (permission != null) {
-            hashCode = 31 * hashCode + permission.hashCode();
+        hashCode = 31 * hashCode + getPermission().hashCode();
+        if (getDescription() != null) {
+            hashCode = 31 * hashCode + getDescription().hashCode();
         }
-        if (description != null) {
-            hashCode = 31 * hashCode + description.hashCode();
-        }
-        hashCode = 31 * hashCode + Boolean.hashCode(invisibleToClient);
-        hashCode = 31 * hashCode + Boolean.hashCode(isDefault);
-        
+        hashCode = 31 * hashCode + Boolean.hashCode(isInvisibleToClient());
+        hashCode = 31 * hashCode + Boolean.hashCode(isDefaultPermission());
+
         return hashCode;
     }
 }

@@ -25,13 +25,15 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FlatArrayTest extends AbstractAegisTest {
 
@@ -53,8 +55,7 @@ public class FlatArrayTest extends AbstractAegisTest {
         sf.setServiceBean(service);
         sf.setAddress("local://FlatArray");
         sf.setDataBinding(new AegisDatabinding());
-        Server s = sf.create();
-        s.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+        sf.create();
 
         arrayWsdlDoc = getWSDLDocument("FlatArrayServiceInterface");
     }
@@ -69,7 +70,7 @@ public class FlatArrayTest extends AbstractAegisTest {
                                             + "/xsd:sequence/xsd:element" + "[@name='array']", arrayWsdlDoc);
         Element typeElement = (Element)typeList.item(0);
         String nillableValue = typeElement.getAttribute("nillable");
-        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals("nillableValue"));
+        assertTrue(nillableValue == null || "".equals(nillableValue) || "false".equals(nillableValue));
         String typeString = typeElement.getAttribute("type");
         assertEquals("xsd:string", typeString); // no ArrayOf
 

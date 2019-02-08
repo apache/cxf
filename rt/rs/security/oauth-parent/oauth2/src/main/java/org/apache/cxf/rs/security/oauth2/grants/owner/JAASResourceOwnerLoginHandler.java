@@ -22,34 +22,35 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.interceptor.security.JAASLoginInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
 
 public class JAASResourceOwnerLoginHandler implements ResourceOwnerLoginHandler {
-    
+
     private JAASLoginInterceptor jaasInterceptor = new JAASLoginInterceptor();
-    
-    
-    public UserSubject createSubject(String name, String password) {
+
+
+    public UserSubject createSubject(Client client, String name, String password) {
         Message message = setupMessage(name, password);
         jaasInterceptor.handleMessage(message);
-        
+
         return OAuthUtils.createSubject(message.get(SecurityContext.class));
     }
 
     public void setContextName(String name) {
         jaasInterceptor.setContextName(name);
     }
-    
+
     public void setRoleClassifier(String value) {
         jaasInterceptor.setRoleClassifier(value);
     }
-    
+
     public void setRoleClassifierType(String value) {
         jaasInterceptor.setRoleClassifierType(value);
     }
-    
+
     private Message setupMessage(String name, String password) {
         AuthorizationPolicy policy = new AuthorizationPolicy();
         policy.setUserName(name);

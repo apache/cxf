@@ -36,16 +36,16 @@ import org.apache.cxf.management.annotation.ManagedResource;
  * The ManagedRMManager is a JMX managed bean for RMManager.
  *
  */
-@ManagedResource(componentName = "RMManager", 
+@ManagedResource(componentName = "RMManager",
                  description = "Responsible for managing RMEndpoints.")
 public class ManagedRMManager implements ManagedComponent {
 
     private RMManager manager;
-    
+
     public ManagedRMManager(RMManager manager) {
         this.manager = manager;
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.cxf.management.ManagedComponent#getObjectName()
      */
@@ -53,21 +53,21 @@ public class ManagedRMManager implements ManagedComponent {
         return RMUtils.getManagedObjectName(manager);
     }
 
-    @ManagedOperation       
+    @ManagedOperation
     public void shutdown() {
         manager.shutdown();
     }
-    
+
     @ManagedOperation
     public String[] getEndpointIdentifiers() {
-        Set<String> identifiers = new HashSet<String>();
+        Set<String> identifiers = new HashSet<>();
         for (Endpoint ep : manager.getReliableEndpointsMap().keySet()) {
             identifiers.add(RMUtils.getEndpointIdentifier(ep, manager.getBus()));
         }
-        return identifiers.toArray(new String[identifiers.size()]);
+        return identifiers.toArray(new String[0]);
     }
 
-    
+
     @ManagedAttribute(description = "Using Store")
     public boolean isUsingStore() {
         return manager.getStore() != null;

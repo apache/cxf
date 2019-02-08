@@ -35,7 +35,7 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
  * Builds a FIQL search condition.
  * <p>
  * Examples:
- * 
+ *
  * <pre>
  * SearchConditionBuilder b = SearchConditionBuilder.instance("fiql");
  * b.is(&quot;price&quot;).equalTo(123.5).query();
@@ -43,10 +43,10 @@ import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
  * b.is(&quot;price&quot;).greaterThan(30).and().is(&quot;price&quot;).lessThan(50).query();
  * // gives &quot;price=gt=30.0;price=lt=50.0&quot;
  * </pre>
- * 
+ *
  * For very complex junctions nested "and"/"or" are allowed (breaking a bit fluency of interface) and looks
  * like the following example:
- * 
+ *
  * <pre>
  * SearchConditionBuilder b = SearchConditionBuilder.instance("fiql");
  * b.is(&quot;price&quot;).lessThan(100).and().or(
@@ -70,7 +70,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
     protected Builder newBuilderInstance() {
         return new Builder(properties);
     }
-    
+
     public String query() {
         return "";
     }
@@ -79,15 +79,15 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         return newBuilderInstance().is(property);
     }
 
-    public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, 
+    public CompleteCondition and(CompleteCondition c1, CompleteCondition c2,
                                  CompleteCondition... cn) {
         return newBuilderInstance().and(c1, c2, cn);
     }
-    
+
     public CompleteCondition and(List<CompleteCondition> conditions) {
         return newBuilderInstance().and(conditions);
     }
-    
+
     public CompleteCondition or(List<CompleteCondition> conditions) {
         return newBuilderInstance().or(conditions);
     }
@@ -131,9 +131,8 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         protected String buildPartial(Builder exclude) {
             if (parent != null && !parent.equals(exclude)) {
                 return parent.buildPartial(exclude) + result;
-            } else {
-                return result;
             }
+            return result;
         }
 
         public CompleteCondition after(Date date) {
@@ -145,35 +144,35 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         }
 
         public CompleteCondition comparesTo(ConditionType type, String value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition comparesTo(ConditionType type, Double value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition comparesTo(ConditionType type, Integer value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition comparesTo(ConditionType type, Long value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition comparesTo(ConditionType type, Date value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition comparesTo(ConditionType type, Duration value) {
-            
+
             return condition(toFiqlPrimitiveCondition(type), value);
         }
-        
+
         public CompleteCondition equalTo(String value, String...moreValues) {
             return condition(FiqlParser.EQ, value, (Object[])moreValues);
         }
@@ -181,11 +180,11 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         public CompleteCondition equalTo(Double number, Double... moreValues) {
             return condition(FiqlParser.EQ, number, (Object[])moreValues);
         }
-        
+
         public CompleteCondition equalTo(Long number, Long... moreValues) {
             return condition(FiqlParser.EQ, number, (Object[])moreValues);
         }
-        
+
         public CompleteCondition equalTo(Integer number, Integer... moreValues) {
             return condition(FiqlParser.EQ, number, (Object[])moreValues);
         }
@@ -198,15 +197,15 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             return condition(FiqlParser.EQ, distanceFromNow, (Object[])moreValues);
         }
 
-        
+
         public CompleteCondition greaterOrEqualTo(Double number) {
             return condition(FiqlParser.GE, number);
         }
-        
+
         public CompleteCondition greaterOrEqualTo(Long number) {
             return condition(FiqlParser.GE, number);
         }
-        
+
         public CompleteCondition greaterOrEqualTo(Integer number) {
             return condition(FiqlParser.GE, number);
         }
@@ -214,11 +213,11 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         public CompleteCondition greaterThan(Double number) {
             return condition(FiqlParser.GT, number);
         }
-        
+
         public CompleteCondition greaterThan(Long number) {
             return condition(FiqlParser.GT, number);
         }
-        
+
         public CompleteCondition greaterThan(Integer number) {
             return condition(FiqlParser.GT, number);
         }
@@ -226,11 +225,11 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         public CompleteCondition lessOrEqualTo(Double number) {
             return condition(FiqlParser.LE, number);
         }
-        
+
         public CompleteCondition lessOrEqualTo(Long number) {
             return condition(FiqlParser.LE, number);
         }
-        
+
         public CompleteCondition lessOrEqualTo(Integer number) {
             return condition(FiqlParser.LE, number);
         }
@@ -238,11 +237,11 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         public CompleteCondition lessThan(Double number) {
             return condition(FiqlParser.LT, number);
         }
-        
+
         public CompleteCondition lessThan(Long number) {
             return condition(FiqlParser.LT, number);
         }
-        
+
         public CompleteCondition lessThan(Integer number) {
             return condition(FiqlParser.LT, number);
         }
@@ -278,11 +277,11 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
         public CompleteCondition notEqualTo(Double number) {
             return condition(FiqlParser.NEQ, number);
         }
-        
+
         public CompleteCondition notEqualTo(Long number) {
             return condition(FiqlParser.NEQ, number);
         }
-        
+
         public CompleteCondition notEqualTo(Integer number) {
             return condition(FiqlParser.NEQ, number);
         }
@@ -322,9 +321,9 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             }
             return this;
         }
-        
+
         public PartialCondition and() {
-            if (currentCompositeOp == FiqlParser.OR 
+            if (currentCompositeOp == FiqlParser.OR
                 || parent != null && parent.currentCompositeOp == FiqlParser.OR) {
                 if (parent != null) {
                     parent.result = "(" + parent.result;
@@ -337,7 +336,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             result += FiqlParser.AND;
             return this;
         }
-        
+
         public Property and(String name) {
             return and().is(name);
         }
@@ -356,7 +355,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             result += FiqlParser.OR;
             return this;
         }
-        
+
         public Property or(String name) {
             return or().is(name);
         }
@@ -366,7 +365,7 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             this.currentCompositeOp = null;
             return this;
         }
-        
+
         public CompleteCondition and(CompleteCondition c1, CompleteCondition c2, CompleteCondition... cn) {
             result += "(" + ((Builder)c1).buildPartial(this) + FiqlParser.AND
                       + ((Builder)c2).buildPartial(this);
@@ -386,21 +385,21 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
             result += ")";
             return this;
         }
-        
+
         public CompleteCondition and(List<CompleteCondition> conditions) {
             return conditionsList(FiqlParser.AND, conditions);
         }
-        
+
         public CompleteCondition or(List<CompleteCondition> conditions) {
             return conditionsList(FiqlParser.OR, conditions);
         }
-        
+
         protected CompleteCondition conditionsList(String op, List<CompleteCondition> conditions) {
             if (conditions.size() == 1) {
                 result += ((Builder)conditions.get(0)).buildPartial(this);
             } else {
                 result += "(";
-                
+
                 for (Iterator<CompleteCondition> it = conditions.iterator(); it.hasNext();) {
                     result += ((Builder)it.next()).buildPartial(this);
                     if (it.hasNext()) {
@@ -409,10 +408,10 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
                 }
                 result += ")";
             }
-            
+
             return this;
         }
-        
+
 
         public Property is(String property) {
             Builder b = new Builder(this);
@@ -430,14 +429,12 @@ public class FiqlSearchConditionBuilder extends SearchConditionBuilder {
                     // zone in XML is "+01:00" in Java is "+0100"; adding semicolon
                     int len = s.length();
                     return s.substring(0, len - 2) + ":" + s.substring(len - 2, len);
-                } else {
-                    return s;
                 }
-            } else {
-                return value.toString();
+                return s;
             }
+            return value.toString();
         }
-        
+
         protected String toFiqlPrimitiveCondition(ConditionType type) {
             String fiqlType = FiqlParser.CONDITION_MAP.get(type);
             if (fiqlType == null) {

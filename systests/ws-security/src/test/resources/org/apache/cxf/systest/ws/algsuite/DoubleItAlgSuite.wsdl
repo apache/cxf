@@ -68,5 +68,8 @@
         <wsdl:port name="DoubleItSignaturePort2" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="http://localhost:9010/DoubleItSignatureno2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItMultipleAlgSuitesPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="http://localhost:9010/DoubleItMultipleAlgSuites"/>
+        </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

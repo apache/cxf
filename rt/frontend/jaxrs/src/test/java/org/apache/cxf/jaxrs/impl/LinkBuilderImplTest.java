@@ -27,11 +27,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class LinkBuilderImplTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class LinkBuilderImplTest {
+
 
     @Test
     public void testBuild() throws Exception {
@@ -39,7 +43,7 @@ public class LinkBuilderImplTest extends Assert {
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").build();
         assertEquals("<http://example.com/page1>;rel=\"previous\"", prevLink.toString());
     }
-    
+
     @Test
     public void testBuildObjects() throws Exception {
         StringBuilder path1 = new StringBuilder().append("p1");
@@ -50,20 +54,20 @@ public class LinkBuilderImplTest extends Assert {
             }
         };
         URI path3 = new URI("p3");
-        
+
         String expected = "<" + "http://host.com:888/" + "p1/p2/p3" + ">";
         Link.Builder builder = Link.fromUri("http://host.com:888/" + "{x1}/{x2}/{x3}");
         Link link = builder.build(path1, path2, path3);
         assertNotNull(link);
         assertEquals(link.toString(), expected);
     }
-    
+
     @Test
     public void testSelfLink() throws Exception {
         Link link = new LinkBuilderImpl().baseUri("http://localhost:8080/resource/1").rel("self").build();
         assertEquals("<http://localhost:8080/resource/1>;rel=\"self\"", link.toString());
     }
-    
+
     @Test
     public void testBuildManyRels() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
@@ -73,13 +77,13 @@ public class LinkBuilderImplTest extends Assert {
 
     @Test
     public void testBuildRelativized() throws Exception {
-        
+
         Link.Builder linkBuilder = new LinkBuilderImpl();
         URI base = URI.create("http://example.com/page2");
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").buildRelativized(base);
         assertEquals("<page1>;rel=\"previous\"", prevLink.toString());
     }
-    
+
     @Test
     public void testRelativeLink() throws Exception {
         Link.Builder linkBuilder = Link.fromUri("relative");
@@ -87,7 +91,7 @@ public class LinkBuilderImplTest extends Assert {
         Link link = linkBuilder.rel("next").build();
         assertEquals("<http://localhost:8080/base/relative>;rel=\"next\"", link.toString());
     }
-    
+
     @Test
     public void testRelativeLink2() throws Exception {
         Link.Builder linkBuilder = Link.fromUri("/relative");
@@ -95,14 +99,14 @@ public class LinkBuilderImplTest extends Assert {
         Link link = linkBuilder.rel("next").build();
         assertEquals("<http://localhost:8080/relative>;rel=\"next\"", link.toString());
     }
-    
+
     @Test
     public void testSeveralAttributes() throws Exception {
         Link.Builder linkBuilder = new LinkBuilderImpl();
         Link prevLink = linkBuilder.uri("http://example.com/page1").rel("previous").title("A title").build();
         assertEquals("<http://example.com/page1>;rel=\"previous\";title=\"A title\"", prevLink.toString());
     }
-    
+
     @Test
     public void testCreateFromMethod() throws Exception {
         Link.Builder linkBuilder = Link.fromMethod(TestResource.class, "consumesAppJson");
@@ -110,7 +114,18 @@ public class LinkBuilderImplTest extends Assert {
         String resource = link.toString();
         assertTrue(resource.contains("<consumesappjson>"));
     }
-    
+
+    @Test
+    public void testInvalidString() throws Exception {
+        try {
+            Link.Builder linkBuilder = Link.fromMethod(TestResource.class, "consumesAppJson");
+            linkBuilder.link("</cxf>>");
+            fail("IllegalArgumentException is expected");
+        } catch (java.lang.IllegalArgumentException e) {
+            // expected
+        }
+    }
+
     @Path("resource")
     public static class TestResource {
         @POST

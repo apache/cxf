@@ -22,20 +22,20 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 public class HelloServiceProxyFactory implements FactoryBean<Object> {
-    
+
     public Object getObject() throws Exception {
 
         return new ProxyFactory(HelloService.class, new HelloServiceInterceptor()).getProxy();
     }
-    
+
     public Class<?> getObjectType() {
 
         return HelloServiceInterceptor.class;
     }
-    
+
     public boolean isSingleton() {
 
         return true;
     }
-    
+
 }

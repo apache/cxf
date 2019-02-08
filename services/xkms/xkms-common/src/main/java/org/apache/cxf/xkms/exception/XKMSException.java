@@ -25,7 +25,7 @@ import org.apache.cxf.xkms.model.xkms.ResultMinorEnum;
 public class XKMSException extends RuntimeException {
 
     private static final long serialVersionUID = 7247415453067157299L;
-    
+
     private ResultMajorEnum resultMajor;
     private ResultMinorEnum resultMinor;
 

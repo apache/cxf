@@ -29,9 +29,9 @@ import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 
-@WebServiceProvider(serviceName = "SOAPRPCHeaderService", 
-                    portName = "SoapRPCHeaderPort", 
-                    targetNamespace = "http://apache.org/header_test/rpc", 
+@WebServiceProvider(serviceName = "SOAPRPCHeaderService",
+                    portName = "SoapRPCHeaderPort",
+                    targetNamespace = "http://apache.org/header_test/rpc",
                     wsdlLocation = "testutils/soapheader_rpc.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)
 public class TestRPCHeaderProvider implements Provider<SOAPMessage> {

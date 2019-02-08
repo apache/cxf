@@ -27,15 +27,15 @@ import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class AddressingFeatureApplier implements WSAddressingFeature.WSAddressingFeatureApplier {
 
     public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider, Bus bus) {
-        MAPCodec mapCodec = new MAPCodec();
+        MAPCodec mapCodec = MAPCodec.getInstance(bus);
         MAPAggregatorImpl mapAggregator = new MAPAggregatorImpl();
-        
+
         mapAggregator.setAllowDuplicates(feature.isAllowDuplicates());
         mapAggregator.setUsingAddressingAdvisory(feature.isUsingAddressingAdvisory());
         mapAggregator.setAddressingRequired(feature.isAddressingRequired());
@@ -43,16 +43,16 @@ public class AddressingFeatureApplier implements WSAddressingFeature.WSAddressin
             mapAggregator.setMessageIdCache(feature.getMessageIdCache());
         }
         mapAggregator.setAddressingResponses(feature.getResponses());
-        
+
         provider.getInInterceptors().add(mapAggregator);
         provider.getInInterceptors().add(mapCodec);
-        
+
         provider.getOutInterceptors().add(mapAggregator);
         provider.getOutInterceptors().add(mapCodec);
-        
+
         provider.getInFaultInterceptors().add(mapAggregator);
         provider.getInFaultInterceptors().add(mapCodec);
-        
+
         provider.getOutFaultInterceptors().add(mapAggregator);
         provider.getOutFaultInterceptors().add(mapCodec);
     }

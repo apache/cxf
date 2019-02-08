@@ -24,14 +24,13 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * A simulated-large message version of ClientPersistenceTest.
  */
 public class CachedOutClientPersistenceTest extends AbstractClientPersistenceTest {
     private static final String PORT = allocatePort(CachedOutClientPersistenceTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("cocpt-server", true);
@@ -39,17 +38,12 @@ public class CachedOutClientPersistenceTest extends AbstractClientPersistenceTes
         startServers(PORT, "cocpt");
         CachedOutputStream.setDefaultThreshold(16);
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cocpt-server", false);
         RMTxStore.deleteDatabaseFiles("cocpt-client", false);
-    }
-    
-    @Test 
-    public void testRecovery() throws Exception {
-        super.testRecovery();
     }
 
     @Override

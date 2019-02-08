@@ -59,6 +59,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
@@ -71,7 +72,6 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXBUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.DocumentDepthProperties;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -85,7 +85,7 @@ import org.codehaus.jettison.util.StringIndenter;
 @Consumes({"application/json", "application/*+json" })
 @Provider
 public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
-    
+
     private static final String MAPPED_CONVENTION = "mapped";
     private static final String BADGER_FISH_CONVENTION = "badgerfish";
     private static final String DROP_ROOT_CONTEXT_PROPERTY = "drop.json.root.element";
@@ -96,9 +96,9 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     static {
         new SimpleConverter();
     }
-    
-    private ConcurrentHashMap<String, String> namespaceMap = 
-        new ConcurrentHashMap<String, String>();
+
+    private ConcurrentHashMap<String, String> namespaceMap =
+        new ConcurrentHashMap<>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
     private List<String> primitiveArrayKeys;
@@ -119,103 +119,90 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     private boolean attributesToElements;
     private boolean writeNullAsString = true;
     private boolean escapeForwardSlashesAlways;
-    
+
     @Override
     public void setAttributesToElements(boolean value) {
         this.attributesToElements = value;
     }
-    
+
     public void setConvention(String value) {
         if (!MAPPED_CONVENTION.equals(value) && !BADGER_FISH_CONVENTION.equals(value)) {
             throw new IllegalArgumentException("Unsupported convention \"" + value);
         }
         convention = value;
     }
-    
+
     public void setConvertTypesToStrings(boolean convert) {
         if (convert) {
             this.setTypeConverter(new SimpleConverter());
         }
     }
-    
+
     public void setTypeConverter(TypeConverter converter) {
         this.typeConverter = converter;
     }
-    
+
     public void setIgnoreNamespaces(boolean ignoreNamespaces) {
         this.ignoreNamespaces = ignoreNamespaces;
     }
-    
+
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
     }
-    
+
     public void setDropRootElement(boolean drop) {
         this.dropRootElement = drop;
     }
-    
+
     public void setDropCollectionWrapperElement(boolean drop) {
         this.dropCollectionWrapperElement = drop;
     }
-    
+
     public void setIgnoreMixedContent(boolean ignore) {
         this.ignoreMixedContent = ignore;
     }
-    
+
     public void setSupportUnwrapped(boolean unwrap) {
         this.unwrapped = unwrap;
     }
-    
+
     public void setWrapperName(String wName) {
         wrapperName = wName;
     }
-    
+
     public void setWrapperMap(Map<String, String> map) {
         wrapperMap = map;
     }
-    
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-    
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-    
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-    
+
     public void setSerializeAsArray(boolean asArray) {
         this.serializeAsArray = asArray;
     }
-    
+
     public void setArrayKeys(List<String> keys) {
         this.arrayKeys = keys;
     }
-    
+
     public void setNamespaceMap(Map<String, String> namespaceMap) {
         this.namespaceMap.putAll(namespaceMap);
     }
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return super.isReadable(type, genericType, anns, mt) || Document.class.isAssignableFrom(type);    
+        return super.isReadable(type, genericType, anns, mt) || Document.class.isAssignableFrom(type);
     }
-    
-    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+
+    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        
+
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
-        
+
         XMLStreamReader reader = null;
         String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
         Unmarshaller unmarshaller = null;
@@ -230,12 +217,12 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             Class<?> theType = getActualType(theGenericType, genericType, anns);
-            
+
             unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             XMLStreamReader xsr = createReader(type, realStream, isCollection, enc);
-            
+
             Object response = null;
-            if (JAXBElement.class.isAssignableFrom(type) 
+            if (JAXBElement.class.isAssignableFrom(type)
                 || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
                 response = unmarshaller.unmarshal(xsr, theType);
@@ -243,25 +230,24 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 response = unmarshaller.unmarshal(xsr);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
-                response = ((JAXBElement<?>)response).getValue();    
+                response = ((JAXBElement<?>)response).getValue();
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(
-                               unmarshaller, theType, type, genericType, 
-                               org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns)); 
+                               unmarshaller, theType, type, genericType,
+                               org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns));
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
             return type.cast(response);
-            
+
         } catch (JAXBException e) {
             handleJAXBException(e, true);
         } catch (XMLStreamException e) {
             if (e.getCause() instanceof JSONSequenceTooLargeException) {
                 throw new WebApplicationException(413);
-            } else {
-                handleXMLStreamException(e, true);
             }
+            handleXMLStreamException(e, true);
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
@@ -278,31 +264,31 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         return null;
     }
 
-    protected XMLStreamReader createReader(Class<?> type, InputStream is, boolean isCollection, String enc) 
+    protected XMLStreamReader createReader(Class<?> type, InputStream is, boolean isCollection, String enc)
         throws Exception {
         XMLStreamReader reader = createReader(type, is, enc);
         return isCollection ? new JAXBCollectionWrapperReader(reader) : reader;
     }
-    
-    protected XMLStreamReader createReader(Class<?> type, InputStream is, String enc) 
+
+    protected XMLStreamReader createReader(Class<?> type, InputStream is, String enc)
         throws Exception {
         XMLStreamReader reader = null;
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             reader = JSONUtils.createBadgerFishReader(is, enc);
         } else {
-            reader = JSONUtils.createStreamReader(is, 
-                                                  readXsiType, 
+            reader = JSONUtils.createStreamReader(is,
+                                                  readXsiType,
                                                   namespaceMap,
                                                   namespaceSeparator,
                                                   primitiveArrayKeys,
-                                                  getDepthProperties(), 
+                                                  getDepthProperties(),
                                                   enc);
         }
         reader = createTransformReaderIfNeeded(reader, is);
-        
+
         return reader;
     }
-    
+
     protected InputStream getInputStream(Class<T> cls, Type type, InputStream is) throws Exception {
         if (unwrapped) {
             String rootName = getRootName(cls, type);
@@ -310,25 +296,24 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             String after = "}";
             InputStream isAfter = new ByteArrayInputStream(after.getBytes());
             final InputStream[] streams = new InputStream[]{isBefore, is, isAfter};
-            
+
             Enumeration<InputStream> list = new Enumeration<InputStream>() {
-                private int index; 
+                private int index;
                 public boolean hasMoreElements() {
                     return index < streams.length;
                 }
 
                 public InputStream nextElement() {
                     return streams[index++];
-                }  
-                
+                }
+
             };
             return new SequenceInputStream(list);
-        } else {
-            return is;
         }
-                 
+        return is;
+
     }
-    
+
     protected String getRootName(Class<T> cls, Type type) throws Exception {
         String name = null;
         if (wrapperName != null) {
@@ -346,21 +331,21 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 }
             }
         }
-        
+
         if (name == null) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
+
         return "{\"" + name + "\":";
     }
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        
+
         return super.isWriteable(type, genericType, anns, mt)
             || Document.class.isAssignableFrom(type);
     }
-    
-    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,  
+
+    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (os == null) {
@@ -374,7 +359,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         XMLStreamWriter writer = null;
         try {
-            
+
             String enc = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             if (Document.class.isAssignableFrom(cls)) {
                 writer = createWriter(obj, cls, genericType, enc, os, false);
@@ -385,15 +370,15 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 marshalCollection(cls, obj, genericType, enc, os, m, anns);
             } else {
                 Object actualObject = checkAdapter(obj, cls, anns, true);
-                Class<?> actualClass = obj != actualObject || cls.isInterface() 
+                Class<?> actualClass = obj != actualObject || cls.isInterface()
                     ? actualObject.getClass() : cls;
                 if (cls == genericType) {
                     genericType = actualClass;
                 }
-                
+
                 marshal(actualObject, actualClass, genericType, enc, os);
             }
-            
+
         } catch (JAXBException e) {
             handleJAXBException(e, false);
         } catch (XMLStreamException e) {
@@ -405,26 +390,26 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
     }
 
-    protected void copyReaderToWriter(XMLStreamReader reader, XMLStreamWriter writer) 
+    protected void copyReaderToWriter(XMLStreamReader reader, XMLStreamWriter writer)
         throws Exception {
         writer.writeStartDocument();
         StaxUtils.copy(reader, writer);
         writer.writeEndDocument();
     }
-    
-    protected void marshalCollection(Class<?> originalCls, Object collection, 
-                                     Type genericType, String encoding, 
-                                     OutputStream os, MediaType m, Annotation[] anns) 
+
+    protected void marshalCollection(Class<?> originalCls, Object collection,
+                                     Type genericType, String encoding,
+                                     OutputStream os, MediaType m, Annotation[] anns)
         throws Exception {
-        
+
         Class<?> actualClass = InjectionUtils.getActualType(genericType);
         actualClass = getActualType(actualClass, genericType, anns);
-        
-        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+
+        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection)
                                              : (Collection<?>) collection;
 
         Iterator<?> it = c.iterator();
-        
+
         Object firstObj = it.hasNext() ? it.next() : null;
 
         String startTag = null;
@@ -459,51 +444,52 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             startTag = "{";
             endTag = "}";
         }
-        
+
         os.write(startTag.getBytes());
         if (firstObj != null) {
-            XmlJavaTypeAdapter adapter = 
+            XmlJavaTypeAdapter adapter =
                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
             marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true),
                                     actualClass, genericType, encoding, os);
             while (it.hasNext()) {
                 os.write(",".getBytes());
-                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), 
+                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true),
                                         actualClass, genericType, encoding, os);
             }
         }
         os.write(endTag.getBytes());
     }
-    
+
     protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType,
                                            String enc, OutputStream os) throws Exception {
         if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement<?>)obj).getValue();    
+            obj = ((JAXBElement<?>)obj).getValue();
         } else {
             obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         }
-        
+
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
         }
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         marshal(ms, obj, cls, genericType, enc, os, true);
-        
+
     }
-    
-    protected void marshal(Marshaller ms, Object actualObject, Class<?> actualClass, 
+
+    protected void marshal(Marshaller ms, Object actualObject, Class<?> actualClass,
                   Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
-        OutputStream actualOs = os; 
-        
+        OutputStream actualOs = os;
+
         MessageContext mc = getContext();
-        if (mc != null && MessageUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
-            actualOs = new CachedOutputStream();    
+        if (mc != null && PropertyUtils.isTrue(mc.get(Marshaller.JAXB_FORMATTED_OUTPUT))) {
+            actualOs = new CachedOutputStream();
         }
-        XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
+        XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc,
                                               actualOs, isCollection);
         if (namespaceMap.size() > 1 || namespaceMap.size() == 1 && !namespaceMap.containsKey(JSONUtils.XSI_URI)) {
             setNamespaceMapper(ms, namespaceMap);
         }
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(actualObject, writer);
         writer.close();
         if (os != actualOs) {
@@ -514,28 +500,28 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
             outWriter.close();
         }
     }
-    
-    protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
+
+    protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass,
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
-        
+
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishWriter(os, enc);
         }
-        boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY, 
+        boolean dropElementsInXmlStreamProp = getBooleanJsonProperty(DROP_ELEMENT_IN_XML_PROPERTY,
                                                                      dropElementsInXmlStream);
-        
+
         boolean dropRootNeeded = getBooleanJsonProperty(DROP_ROOT_CONTEXT_PROPERTY, dropRootElement);
         boolean dropRootInXmlNeeded = dropRootNeeded && dropElementsInXmlStreamProp;
-        
-        QName qname = actualClass == Document.class 
-            ? org.apache.cxf.helpers.DOMUtils.getElementQName(((Document)actualObject).getDocumentElement()) 
+
+        QName qname = actualClass == Document.class
+            ? org.apache.cxf.helpers.DOMUtils.getElementQName(((Document)actualObject).getDocumentElement())
             : getQName(actualClass, genericType, actualObject);
-        if (qname != null && ignoreNamespaces && (isCollection || dropRootInXmlNeeded)) {        
+        if (qname != null && ignoreNamespaces && (isCollection || dropRootInXmlNeeded)) {
             qname = new QName(qname.getLocalPart());
         }
-        
-        Configuration config = 
-            JSONUtils.createConfiguration(namespaceMap, 
+
+        Configuration config =
+            JSONUtils.createConfiguration(namespaceMap,
                                           writeXsiType && !ignoreNamespaces,
                                           attributesToElements,
                                           typeConverter);
@@ -552,39 +538,39 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         if (ignoreEmpty) {
             config.setIgnoreEmptyArrayValues(ignoreEmpty);
         }
-        
+
         if (escapeForwardSlashesAlways) {
             config.setEscapeForwardSlashAlways(escapeForwardSlashesAlways);
         }
-        
-        
+
+
         boolean dropRootInJsonStream = dropRootNeeded && !dropElementsInXmlStreamProp;
         if (dropRootInJsonStream) {
             config.setDropRootElement(true);
         }
-         
+
         List<String> theArrayKeys = getArrayKeys();
         boolean rootIsArray = isRootArray(theArrayKeys);
-        
+
         if (ignoreNamespaces && rootIsArray && (theArrayKeys == null || dropRootInJsonStream)) {
             if (theArrayKeys == null) {
-                theArrayKeys = new LinkedList<String>();
+                theArrayKeys = new LinkedList<>();
             } else if (dropRootInJsonStream) {
-                theArrayKeys = new LinkedList<String>(theArrayKeys);
+                theArrayKeys = new LinkedList<>(theArrayKeys);
             }
             if (qname != null) {
                 theArrayKeys.add(qname.getLocalPart());
             }
         }
-        
-        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
+
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname,
              writeXsiType && !ignoreNamespaces, config, rootIsArray, theArrayKeys,
              isCollection || dropRootInXmlNeeded, enc);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces, !writeXsiType);
         return createTransformWriterIfNeeded(writer, os, dropElementsInXmlStreamProp);
     }
-    
+
     protected List<String> getArrayKeys() {
         MessageContext mc = getContext();
         if (mc != null) {
@@ -595,36 +581,36 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         return arrayKeys;
     }
-    
+
     protected boolean isRootArray(List<String> theArrayKeys) {
         return theArrayKeys != null ? true : getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
     }
-    
-    
+
+
     protected boolean getBooleanJsonProperty(String name, boolean defaultValue) {
         MessageContext mc = getContext();
         if (mc != null) {
             Object prop = mc.get(name);
             if (prop != null) {
-                return MessageUtils.isTrue(prop);
+                return PropertyUtils.isTrue(prop);
             }
         }
         return defaultValue;
     }
-    
-    protected void marshal(Object actualObject, Class<?> actualClass, 
+
+    protected void marshal(Object actualObject, Class<?> actualClass,
                            Type genericType, String enc, OutputStream os) throws Exception {
-        
+
         actualObject = convertToJaxbElementIfNeeded(actualObject, actualClass, genericType);
         if (actualObject instanceof JAXBElement && actualClass != JAXBElement.class) {
             actualClass = JAXBElement.class;
         }
-        
+
         Marshaller ms = createMarshaller(actualObject, actualClass, genericType, enc);
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
     }
-    
-    private QName getQName(Class<?> cls, Type type, Object object) 
+
+    private QName getQName(Class<?> cls, Type type, Object object)
         throws Exception {
         QName qname = getJaxbQName(cls, type, object, false);
         if (qname != null) {
@@ -633,16 +619,16 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         return null;
     }
-    
+
     private String getPrefix(String namespace) {
         String prefix = namespaceMap.get(namespace);
         return prefix == null ? "" : prefix;
     }
-    
+
     public void setWriteXsiType(boolean writeXsiType) {
         this.writeXsiType = writeXsiType;
     }
-    
+
     public void setReadXsiType(boolean readXsiType) {
         this.readXsiType = readXsiType;
     }
@@ -677,11 +663,11 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
                 DocumentDepthProperties.INNER_ELEMENT_LEVEL);
             if (totalElementCountStr != null || innerElementCountStr != null || elementLevelStr != null) {
                 try {
-                    int totalElementCount = totalElementCountStr != null 
-                        ? Integer.valueOf(totalElementCountStr) : -1;
-                    int elementLevel = elementLevelStr != null ? Integer.valueOf(elementLevelStr) : -1;
-                    int innerElementCount = innerElementCountStr != null 
-                        ? Integer.valueOf(innerElementCountStr) : -1;
+                    int totalElementCount = totalElementCountStr != null
+                        ? Integer.parseInt(totalElementCountStr) : -1;
+                    int elementLevel = elementLevelStr != null ? Integer.parseInt(elementLevelStr) : -1;
+                    int innerElementCount = innerElementCountStr != null
+                        ? Integer.parseInt(innerElementCountStr) : -1;
                     return new DocumentDepthProperties(totalElementCount, elementLevel, innerElementCount);
                 } catch (Exception ex) {
                     throw ExceptionUtils.toInternalServerErrorException(ex, null);

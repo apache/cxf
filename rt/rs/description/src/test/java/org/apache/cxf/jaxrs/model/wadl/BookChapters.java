@@ -33,5 +33,5 @@ public class BookChapters {
     public Chapter getChapter() {
         return new Chapter(1);
     }
-    
+
 }

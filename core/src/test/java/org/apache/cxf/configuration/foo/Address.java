@@ -28,9 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for address complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="address">
  *   &lt;complexContent>
@@ -45,8 +45,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "address",
@@ -67,11 +67,11 @@ public class Address {
 
     /**
      * Gets the value of the city property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getCity() {
         return city;
@@ -79,11 +79,11 @@ public class Address {
 
     /**
      * Sets the value of the city property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setCity(String value) {
         this.city = value;
@@ -91,7 +91,7 @@ public class Address {
 
     /**
      * Gets the value of the zip property.
-     * 
+     *
      */
     public int getZip() {
         return zip;
@@ -99,7 +99,7 @@ public class Address {
 
     /**
      * Sets the value of the zip property.
-     * 
+     *
      */
     public void setZip(int value) {
         this.zip = value;
@@ -107,11 +107,11 @@ public class Address {
 
     /**
      * Gets the value of the street property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getStreet() {
         return street;
@@ -119,11 +119,11 @@ public class Address {
 
     /**
      * Sets the value of the street property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setStreet(String value) {
         this.street = value;
@@ -131,11 +131,11 @@ public class Address {
 
     /**
      * Gets the value of the nr property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getNr() {
         return nr;
@@ -143,11 +143,11 @@ public class Address {
 
     /**
      * Sets the value of the nr property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setNr(Integer value) {
         this.nr = value;

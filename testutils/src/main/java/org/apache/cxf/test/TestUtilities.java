@@ -65,7 +65,7 @@ import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
  * contents, as well as some test methods for invoking services.
  */
 public class TestUtilities {
-    
+
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static String preKeepAlive;
     private static String basedirPath;
@@ -76,26 +76,26 @@ public class TestUtilities {
     /**
      * Namespaces for the XPath expressions.
      */
-    private Map<String, String> namespaces = new HashMap<String, String>();
+    private Map<String, String> namespaces = new HashMap<>();
 
     /**
      * This class provides utilities to several conflicting inheritance stacks
      * of test support. Thus, it can't be a base class, and so can't use
      * getClass() to find resources. Users should pass getClass() to this
      * constructor instead.
-     * 
+     *
      * @param classpathReference
      */
     public TestUtilities(Class<?> classpathReference) {
         classpathAnchor = classpathReference;
         xmlInputFactory = XMLInputFactory.newInstance();
     }
-    
+
     public static void setKeepAliveSystemProperty(boolean setAlive) {
         preKeepAlive = System.getProperty("http.keepAlive");
         System.setProperty("http.keepAlive", Boolean.toString(setAlive));
     }
-    
+
     public static void recoverKeepAliveSystemProperty() {
         if (preKeepAlive != null) {
             System.setProperty("http.keepAlive", preKeepAlive);
@@ -113,7 +113,7 @@ public class TestUtilities {
         addNamespace("soap12env", "http://www.w3.org/2003/05/soap-envelope");
         addNamespace("xml", "http://www.w3.org/XML/1998/namespace");
     }
-    
+
     /**
      * Handy function for checking correctness of qualifies names in schema attribute values.
      * @param prefix
@@ -137,17 +137,17 @@ public class TestUtilities {
 
     /**
      * Assert that the following XPath query selects one or more nodes.
-     * 
+     *
      * @param xpath
      * @throws Exception
      */
     public NodeList assertValid(String xpath, Node node) throws Exception {
         return XPathAssert.assertValid(xpath, node, namespaces);
     }
-    
+
     /**
      * Assert that the following XPath query selects a boolean value.
-     * 
+     *
      * @param xpath
      * @throws Exception
      */
@@ -158,7 +158,7 @@ public class TestUtilities {
 
     /**
      * Assert that the following XPath query selects no nodes.
-     * 
+     *
      * @param xpath
      */
     public NodeList assertInvalid(String xpath, Node node) throws Exception {
@@ -168,7 +168,7 @@ public class TestUtilities {
     /**
      * Assert that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
@@ -179,7 +179,7 @@ public class TestUtilities {
     /**
      * Assert that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
@@ -190,7 +190,7 @@ public class TestUtilities {
 
     /**
      * Assert that this node is not a Soap fault body.
-     * 
+     *
      * @param node
      * @throws Exception
      */
@@ -226,10 +226,9 @@ public class TestUtilities {
         is.close();
         os.close();
 
-        byte[] bs = obs.getResponseStream().toByteArray();
-        
-        return bs;
+        return obs.getResponseStream().toByteArray();
     }
+
     public byte[] invokeBytes(String address, String transport, byte[] message) throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress(address);
@@ -275,7 +274,7 @@ public class TestUtilities {
     public Reader getResourceAsReader(String resource) {
         return new InputStreamReader(getResourceAsStream(resource), UTF8);
     }
-    
+
     public XMLStreamReader getResourceAsXMLStreamReader(String resource) throws XMLStreamException {
         return xmlInputFactory.createXMLStreamReader(getResourceAsStream(resource));
     }
@@ -300,7 +299,7 @@ public class TestUtilities {
 
     /**
      * Return a DOM tree for the WSDL for a server.
-     * 
+     *
      * @param server the server.
      * @return the DOM tree.
      * @throws WSDLException
@@ -313,7 +312,7 @@ public class TestUtilities {
 
     /**
      * Return a WSDL definition model for a server.
-     * 
+     *
      * @param server the server.
      * @return the definition.
      * @throws WSDLException
@@ -336,7 +335,7 @@ public class TestUtilities {
         }
         return null;
     }
-    
+
     public Server getServerForAddress(String address) throws WSDLException {
         ServerRegistry svrMan = bus.getExtension(ServerRegistry.class);
         for (Server s : svrMan.getServers()) {
@@ -387,7 +386,7 @@ public class TestUtilities {
 
     /**
      * Add a namespace that will be used for XPath expressions.
-     * 
+     *
      * @param ns Namespace name.
      * @param uri The namespace uri.
      */
@@ -397,7 +396,7 @@ public class TestUtilities {
 
     /**
      * retrieve the entire namespace map.
-     * 
+     *
      * @return
      */
     public Map<String, String> getNamespaces() {
@@ -406,7 +405,7 @@ public class TestUtilities {
 
     /**
      * Return the CXF bus used.
-     * 
+     *
      * @return
      */
     public Bus getBus() {
@@ -415,7 +414,7 @@ public class TestUtilities {
 
     /**
      * Set the CXF bus.
-     * 
+     *
      * @param bus
      */
     public void setBus(Bus bus) {

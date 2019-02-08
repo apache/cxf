@@ -25,30 +25,34 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class DestinationRegistryImplTest extends Assert {
+public class DestinationRegistryImplTest {
     private static final String ADDRESS = "http://bar/snafu";
     private static final QName QNAME = new QName(ADDRESS, "foobar");
 
     private static final String[] REGISTERED_PATHS = {"/soap", "/soap2", "/soappath", "/soap/test",
                                                       "/test/tst", "/test2/"};
-    private static final String[] REQUEST_PATHS = {"/soap", "/soap/2", "/soap2", "/soap3", 
-                                                   "/soap/test", "/soap/tst", "/soap/", "/test/tst/2", 
+    private static final String[] REQUEST_PATHS = {"/soap", "/soap/2", "/soap2", "/soap3",
+                                                   "/soap/test", "/soap/tst", "/soap/", "/test/tst/2",
                                                    "/test/2", "/test2", "/test2/", "/test2/3"};
-    private static final int[] MATCHED_PATH_INDEXES = {0, 0, 1, -1, 
-                                                       3, 0, 0, 4, 
+    private static final int[] MATCHED_PATH_INDEXES = {0, 0, 1, -1,
+                                                       3, 0, 0, 4,
                                                        -1, 5, 5, 5};
-    private IMocksControl control; 
+    private IMocksControl control;
     private DestinationRegistry registry;
     private MessageObserver observer;
 
@@ -58,34 +62,34 @@ public class DestinationRegistryImplTest extends Assert {
         registry = new DestinationRegistryImpl();
         observer = control.createMock(MessageObserver.class);
     }
-    
+
     @After
     public void tearDown() {
         control = null;
         registry = null;
     }
-    
+
     @Test
     public void testAddAndGetDestinations() throws Exception {
         setUpDestinations();
 
         Set<String> paths = registry.getDestinationsPaths();
         assertEquals(REGISTERED_PATHS.length, paths.size());
-        
+
         for (int i = 0; i < REGISTERED_PATHS.length; i++) {
             assertTrue(paths.contains(REGISTERED_PATHS[i]));
-            
+
             AbstractHTTPDestination path = registry.getDestinationForPath(REGISTERED_PATHS[i]);
             assertNotNull(path);
         }
     }
-    
+
     @Test
     public void testCheckRestfulRequest() throws Exception {
         setUpDestinations();
         for (int i = 0; i < REQUEST_PATHS.length; i++) {
             final int mi = MATCHED_PATH_INDEXES[i];
-            
+
             for (int j = 0; j < REGISTERED_PATHS.length; j++) {
                 AbstractHTTPDestination target = registry.getDestinationForPath(REGISTERED_PATHS[j]);
                 if (mi == j) {
@@ -98,27 +102,27 @@ public class DestinationRegistryImplTest extends Assert {
                 } else {
                     EasyMock.expect(target.getMessageObserver()).andReturn(observer).anyTimes();
                 }
-                
+
             }
-            
+
             control.replay();
-            
+
             AbstractHTTPDestination destination = registry.checkRestfulRequest(REQUEST_PATHS[i]);
-            
+
             if (0 <= mi) {
                 EndpointInfo endpoint = destination.getEndpointInfo();
                 assertNotNull(endpoint);
-                
+
                 assertEquals(endpoint.getAddress(), REGISTERED_PATHS[mi]);
             } else {
                 assertNull(destination);
             }
-            
+
             control.verify();
-            
+
             control.reset();
         }
-        
+
     }
 
     private void setUpDestinations() {
@@ -133,6 +137,6 @@ public class DestinationRegistryImplTest extends Assert {
             registry.addDestination(destination);
             control.reset();
         }
-        
+
     }
 }

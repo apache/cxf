@@ -23,7 +23,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 public final class WSDLLibrary {
     private static final boolean AVAILABLE;
-    
+
     static {
         boolean libraryAvailable = true;
         try {
@@ -33,11 +33,11 @@ public final class WSDLLibrary {
         }
         AVAILABLE = libraryAvailable;
     }
-    
+
     private WSDLLibrary() {
-        
+
     }
-    
+
     public static boolean isAvailable() {
         return AVAILABLE;
     }

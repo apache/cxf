@@ -27,15 +27,15 @@ import corba.common.AccountPOA;
 
 
 public class AccountImpl extends AccountPOA {
-    
+
     // The servants default POA
     private POA poa_;
 
     private float balance;
-    
+
     public AccountImpl(POA poa) {
         poa_ = poa;
-        
+
         balance = 0.0f;
     }
 

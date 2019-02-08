@@ -20,6 +20,14 @@
 -->
 <!-- START SNIPPET: webxml -->
 <web-app>
+  <filter> 
+    <filter-name>xforwarded</filter-name>
+    <filter-class>org.apache.cxf.systest.jaxrs.XForwardedServletFilter</filter-class> 
+  </filter> 
+  <filter-mapping> 
+    <filter-name>xforwarded</filter-name>
+    <url-pattern>/v1/*</url-pattern> 
+  </filter-mapping> 
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/beans.xml</param-value>
@@ -33,8 +41,12 @@
         <servlet-name>CXFServlet</servlet-name>
         <display-name>CXF Servlet</display-name>
         <servlet-class>
-                        org.apache.cxf.transport.servlet.CXFServlet
-                </servlet-class>
+             org.apache.cxf.transport.servlet.CXFServlet
+        </servlet-class>
+        <init-param>
+            <param-name>use-x-forwarded-headers</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

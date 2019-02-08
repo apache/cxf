@@ -59,9 +59,9 @@ public final class WSDLParameter {
                                   List<ArgType> returns, boolean simpleOrdering) throws Exception {
 
         definition = def;
-        List<ParamType> inputs = new ArrayList<ParamType>();
-        List<ParamType> outputs = new ArrayList<ParamType>();
-        List<ArgType> returnOutputs = new ArrayList<ArgType>();
+        List<ParamType> inputs = new ArrayList<>();
+        List<ParamType> outputs = new ArrayList<>();
+        List<ArgType> returnOutputs = new ArrayList<>();
         boolean isWrapped = isWrappedOperation(operation, xmlSchemaList);
 
         if (isWrapped) {
@@ -302,10 +302,10 @@ public final class WSDLParameter {
 
     private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
-        if (outputs.size() > 0) {
+        if (!outputs.isEmpty()) {
             ParamType d2 = outputs.get(0);
 
-            if (d2.getMode().value().equals("out")) {
+            if ("out".equals(d2.getMode().value())) {
                 ArgType argType = new ArgType();
                 argType.setName(d2.getName());
                 argType.setIdltype(d2.getIdltype());
@@ -320,13 +320,13 @@ public final class WSDLParameter {
 
         while (inputit.hasNext()) {
             ParamType d2 = inputit.next();
-            if (d2.getMode().value().equals("inout")) {
+            if ("inout".equals(d2.getMode().value())) {
                 ListIterator<ParamType> it = outputs.listIterator();
 
                 while (it.hasNext()) {
                     ParamType d3 = it.next();
-                    if (!d3.getName().equals(d2.getName()) && (!simpleOrdering)
-                        && (!d3.getMode().value().equals("inout"))) {
+                    if (!d3.getName().equals(d2.getName()) && !simpleOrdering
+                        && !"inout".equals(d3.getMode().value())) {
                         // the in/outs are in a different order in the
                         // output than the input
                         // we'll try and use the input oder for the INOUT's,
@@ -420,13 +420,12 @@ public final class WSDLParameter {
         }
         if (schemaElement != null) {
             return schemaElement;
-        } else {
-            for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
-                if (!(ext instanceof XmlSchemaImport)) {
-                    schemaElement = findElement(ext.getSchema(), elName);
-                    if (schemaElement != null) {
-                        return schemaElement;
-                    }
+        }
+        for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
+            if (!(ext instanceof XmlSchemaImport)) {
+                schemaElement = findElement(ext.getSchema(), elName);
+                if (schemaElement != null) {
+                    return schemaElement;
                 }
             }
         }
@@ -493,14 +492,13 @@ public final class WSDLParameter {
                                                                                 annotation, false);
         if (corbaTypeImpl == null) {
             throw new Exception("Couldn't convert schema type to corba type : " + typeName);
+        }
+        if (nill) {
+            QName qname = corbaTypeImpl.getQName();
+            idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
+                                                                                   + "_nil");
         } else {
-            if (nill) {
-                QName qname = corbaTypeImpl.getQName();
-                idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
-                                                                                       + "_nil");
-            } else {
-                idltype = corbaTypeImpl.getQName();
-            }
+            idltype = corbaTypeImpl.getQName();
         }
         return idltype;
     }

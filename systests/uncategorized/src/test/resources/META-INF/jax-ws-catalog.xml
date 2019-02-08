@@ -21,4 +21,8 @@
     <rewriteSystem systemIdStartString="http://www.w3.org/2006/03/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
     <rewriteSystem systemIdStartString="http://www.w3.org/2005/08/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
     <rewriteURI rewritePrefix="../wsdl_systest/envelope.xsd" uriStartString="http://schemas.xmlsoap.org/soap/envelope/"/>
+
+    <system systemId="./type_test_1.xsd" uri="classpath:/wsdl/type_test/type_test_1_validation.xsd"/>
+    <uri name="./type_test_1.xsd" uri="classpath:/wsdl/type_test/type_test_1_validation.xsd"/>
+    
 </catalog>

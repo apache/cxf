@@ -26,13 +26,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 public interface BookInterface {
-    
+
     @GET
     @Path("/path2")
     @Produces("text/bar2")
     @Consumes("text/foo2")
     String getAuthor();
-    
+
     @Path("/books/{bookId}")
     Book getBook(@PathParam("bookId") String id);
 }

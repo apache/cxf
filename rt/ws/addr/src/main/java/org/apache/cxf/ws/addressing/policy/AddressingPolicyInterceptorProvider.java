@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.impl.MAPAggregatorImpl;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
@@ -39,10 +40,9 @@ public class AddressingPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final long serialVersionUID = -1018053541795476992L;
     private static final Collection<QName> ASSERTION_TYPES;
     private static final MAPAggregator MAP_AGGREGATOR = new MAPAggregatorImpl();
-    private static final MAPCodec MAP_CODEC = new MAPCodec();
-    
+
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
         types.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
         types.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
@@ -51,20 +51,23 @@ public class AddressingPolicyInterceptorProvider extends AbstractPolicyIntercept
         types.add(MetadataConstants.USING_ADDRESSING_2006_QNAME);
         ASSERTION_TYPES = types;
     }
-    
-    public AddressingPolicyInterceptorProvider() {
+
+    public AddressingPolicyInterceptorProvider(Bus b) {
         super(ASSERTION_TYPES);
+        
+        MAPCodec mapCodec = MAPCodec.getInstance(b);
+
         getInInterceptors().add(MAP_AGGREGATOR);
-        getInInterceptors().add(MAP_CODEC);
-        
+        getInInterceptors().add(mapCodec);
+
         getOutInterceptors().add(MAP_AGGREGATOR);
-        getOutInterceptors().add(MAP_CODEC);
-        
+        getOutInterceptors().add(mapCodec);
+
         getInFaultInterceptors().add(MAP_AGGREGATOR);
-        getInFaultInterceptors().add(MAP_CODEC);
-        
+        getInFaultInterceptors().add(mapCodec);
+
         getOutFaultInterceptors().add(MAP_AGGREGATOR);
-        getOutFaultInterceptors().add(MAP_CODEC);
+        getOutFaultInterceptors().add(mapCodec);
     }
-    
+
 }

@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
@@ -39,28 +40,29 @@ import org.apache.abdera.parser.ParserOptions;
 import org.apache.abdera.writer.Writer;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
-public abstract class AbstractAtomProvider<T extends Element> 
+public abstract class AbstractAtomProvider<T extends Element>
     implements MessageBodyWriter<T>, MessageBodyReader<T> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractAtomProvider.class);
     private static final Abdera ATOM_ENGINE = new Abdera();
     private boolean autodetectCharset;
     private boolean formattedOutput;
-    
+
     public long getSize(T element, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
-    public void writeTo(T element, Class<?> clazz, Type type, Annotation[] a, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+    public void writeTo(T element, Class<?> clazz, Type type, Annotation[] a,
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (MediaType.APPLICATION_JSON_TYPE.isCompatible(mt)) {
             Writer w = createWriter("json");
             if (w == null) {
                 throw ExceptionUtils.toNotSupportedException(null, null);
             }
-            element.writeTo(w, os);   
+            element.writeTo(w, os);
         } else if (formattedOutput) {
             Writer w = createWriter("prettyxml");
             if (w != null) {
@@ -80,9 +82,9 @@ public abstract class AbstractAtomProvider<T extends Element>
         }
         return w;
     }
-    
-    public T readFrom(Class<T> clazz, Type t, Annotation[] a, MediaType mt, 
-                         MultivaluedMap<String, String> headers, InputStream is) 
+
+    public T readFrom(Class<T> clazz, Type t, Annotation[] a, MediaType mt,
+                         MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         Parser parser = ATOM_ENGINE.getParser();
         synchronized (parser) {
@@ -91,7 +93,8 @@ public abstract class AbstractAtomProvider<T extends Element>
                 options.setAutodetectCharset(autodetectCharset);
             }
         }
-        Document<T> doc = parser.parse(is);
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
+        Document<T> doc = parser.parse(reader);
         return doc.getRoot();
     }
 

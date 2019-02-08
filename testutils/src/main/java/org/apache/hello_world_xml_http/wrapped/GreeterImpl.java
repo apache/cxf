@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.hello_world_xml_http.wrapped.types.FaultDetail;
 
-@javax.jws.WebService(serviceName = "XMLService", 
+@javax.jws.WebService(serviceName = "XMLService",
                       portName = "XMLPort",
                       endpointInterface = "org.apache.hello_world_xml_http.wrapped.Greeter",
                       targetNamespace = "http://apache.org/hello_world_xml_http/wrapped",
@@ -33,11 +33,11 @@ import org.apache.hello_world_xml_http.wrapped.types.FaultDetail;
 @javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 
 public class GreeterImpl implements Greeter {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class); 
+
+    private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);
 
 
-    public String greetMe(String me) {        
+    public String greetMe(String me) {
         LOG.info("Executing operation greetMe\n" + me);
         return "Hello " + me;
     }

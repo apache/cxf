@@ -21,14 +21,17 @@ package org.apache.cxf.transport.servlet.servicelist;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.servlet.ServletDestination;
 
 public class UnformattedServiceListWriter implements ServiceListWriter {
     boolean renderWsdlList;
-
-    public UnformattedServiceListWriter(boolean renderWsdlList) {
+    Bus bus;
+    public UnformattedServiceListWriter(boolean renderWsdlList, Bus bus) {
         this.renderWsdlList = renderWsdlList;
+        this.bus = bus;
     }
 
     public String getContentType() {
@@ -36,17 +39,21 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
     }
 
     public void writeServiceList(PrintWriter writer,
-                                 String baseAddress,
+                                 String basePath,
                                  AbstractDestination[] soapDestinations,
                                  AbstractDestination[] restDestinations) throws IOException {
         if (soapDestinations.length > 0 || restDestinations.length > 0) {
-            writeUnformattedSOAPEndpoints(writer, baseAddress, soapDestinations);
-            writeUnformattedRESTfulEndpoints(writer, baseAddress, restDestinations);
+            if (soapDestinations.length > 0) {
+                writeUnformattedSOAPEndpoints(writer, basePath, soapDestinations);
+            }
+            if (restDestinations.length > 0) {
+                writeUnformattedRESTfulEndpoints(writer, basePath, restDestinations);
+            }
         } else {
             writer.write("No services have been found.");
         }
     }
-    
+
     private void writeUnformattedSOAPEndpoints(PrintWriter writer,
                                                String baseAddress,
                                                AbstractDestination[] destinations) throws IOException {
@@ -67,7 +74,21 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
                                                   AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
             String address = getAbsoluteAddress(baseAddress, sd);
-            writer.write(address + "?_wadl\n");
+            boolean wadlAvailable = bus != null
+                && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"));
+            boolean swaggerAvailable = bus != null
+                && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"));
+            if (!wadlAvailable && !swaggerAvailable) {
+                writer.write(address + "\n");
+                return;
+            }
+            if (wadlAvailable) {
+                writer.write(address + "?_wadl\n");
+            }
+            if (swaggerAvailable) {
+                writer.write(address + "/swagger.json\n");
+            }
+
         }
     }
 

@@ -28,28 +28,28 @@ import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
 /**
- * 
+ *
  */
 
 @WebService(targetNamespace = "http://cxf.apache.org/greeter_control", name = "Greeter")
 
 public interface GreeterNoWsdl {
 
-    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                     className = "org.apache.cxf.greeter_control.types.SayHiResponse", 
+    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                     className = "org.apache.cxf.greeter_control.types.SayHiResponse",
                      localName = "sayHiResponse")
-    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                    className = "org.apache.cxf.greeter_control.types.SayHi", 
+    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                    className = "org.apache.cxf.greeter_control.types.SayHi",
                     localName = "sayHi")
     @WebResult(targetNamespace = "http://cxf.apache.org/greeter_control/types", name = "responseType")
     @WebMethod(operationName = "sayHi")
     java.lang.String sayHi();
 
-    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                     className = "org.apache.cxf.greeter_control.types.GreetMeResponse", 
+    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                     className = "org.apache.cxf.greeter_control.types.GreetMeResponse",
                      localName = "greetMeResponse")
-    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                    className = "org.apache.cxf.greeter_control.types.GreetMe", 
+    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                    className = "org.apache.cxf.greeter_control.types.GreetMe",
                     localName = "greetMe")
     @WebResult(targetNamespace = "http://cxf.apache.org/greeter_control/types", name = "responseType")
     @WebMethod(operationName = "greetMe")
@@ -59,8 +59,8 @@ public interface GreeterNoWsdl {
     );
 
     @Oneway
-    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                    className = "org.apache.cxf.greeter_control.types.GreetMeOneWay", 
+    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                    className = "org.apache.cxf.greeter_control.types.GreetMeOneWay",
                     localName = "greetMeOneWay")
     @WebMethod(operationName = "greetMeOneWay")
     void greetMeOneWay(
@@ -68,11 +68,11 @@ public interface GreeterNoWsdl {
         java.lang.String requestType
     );
 
-    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                     className = "org.apache.cxf.greeter_control.types.PingMeResponse", 
+    @ResponseWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                     className = "org.apache.cxf.greeter_control.types.PingMeResponse",
                      localName = "pingMeResponse")
-    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types", 
-                    className = "org.apache.cxf.greeter_control.types.PingMe", 
+    @RequestWrapper(targetNamespace = "http://cxf.apache.org/greeter_control/types",
+                    className = "org.apache.cxf.greeter_control.types.PingMe",
                     localName = "pingMe")
     @WebMethod(operationName = "pingMe")
     void pingMe() throws PingMeFault;

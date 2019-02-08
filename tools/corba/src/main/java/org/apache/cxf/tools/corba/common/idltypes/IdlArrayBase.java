@@ -26,13 +26,13 @@ import java.util.Vector;
 
 public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     private IdlType elemType;
-    private List<Integer> dims;    
+    private List<Integer> dims;
     private int size;
 
     protected IdlArrayBase(IdlScopeBase parent, String name, IdlType elem, int length) {
         super(parent, name);
         this.size = length;
-        dims = new Vector<Integer>();
+        dims = new Vector<>();
 
         if (elem instanceof IdlAnonArray) {
             IdlAnonArray arr = (IdlAnonArray)elem;
@@ -44,8 +44,8 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
         } else {
             elemType = elem;
         }
-        
-        dims.add(0, Integer.valueOf(size));            
+
+        dims.add(0, Integer.valueOf(size));
     }
 
     public void write(PrintWriter pw) {
@@ -67,7 +67,7 @@ public class IdlArrayBase extends IdlDefnImplBase implements IdlType {
     public boolean isEmptyDef() {
         return elemType.isEmptyDef();
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         return elemType.getCircularScope(startScope, doneDefn);
     }

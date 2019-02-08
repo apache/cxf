@@ -44,63 +44,63 @@ import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 
 
 public class EJBEndpoint {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(EJBEndpoint.class);
-    
+
     private static final int DEFAULT_HTTP_PORT = 80;
-    
+
     private static final String HTTPS_PREFIX = "https";
-    
+
     private EJBServantConfig config;
-    
+
     private Context jndiContext;
-    
+
     private EJBHome ejbHome;
-    
+
     private String ejbServantBaseURL;
-    
+
     private WorkManager workManager;
-    
+
     public EJBEndpoint(EJBServantConfig ejbConfig) {
         this.config = ejbConfig;
     }
-    
+
     public Server publish() throws Exception {
         jndiContext = new InitialContext();
         Object obj = jndiContext.lookup(config.getJNDIName());
         ejbHome = (EJBHome) PortableRemoteObject.narrow(obj, EJBHome.class);
-        
+
         Class<?> interfaceClass = Class.forName(getServiceClassName());
         boolean isJaxws = isJaxWsServiceInterface(interfaceClass);
         ServerFactoryBean factory = isJaxws ? new JaxWsServerFactoryBean() : new ServerFactoryBean();
         factory.setServiceClass(interfaceClass);
-        
+
         if (config.getWsdlURL() != null) {
             factory.getServiceFactory().setWsdlURL(config.getWsdlURL());
         }
-        
+
         factory.setInvoker(new EJBInvoker(ejbHome));
-        
-        String baseAddress = isNotNull(getEjbServantBaseURL()) ? getEjbServantBaseURL() 
+
+        String baseAddress = isNotNull(getEjbServantBaseURL()) ? getEjbServantBaseURL()
                                                                : getDefaultEJBServantBaseURL();
         String address = baseAddress + "/" + config.getJNDIName();
         factory.setAddress(address);
-        
+
         if (address.length() >= 5 && HTTPS_PREFIX.equalsIgnoreCase(address.substring(0, 5))) {
             throw new UnsupportedOperationException("EJBEndpoint creation by https protocol is unsupported");
         }
-        
+
         if (getWorkManager() != null) {
             setWorkManagerThreadPoolToJetty(factory.getBus(), baseAddress);
         }
-        
+
         Server server = factory.create();
         LOG.info("Published EJB Endpoint of [" + config.getJNDIName() + "] at [" + address + "]");
-        
+
         return server;
     }
-    
-    
+
+
     protected void setWorkManagerThreadPoolToJetty(Bus bus, String baseAddress) {
         JettyHTTPServerEngineFactory engineFactory = bus.getExtension(JettyHTTPServerEngineFactory.class);
         int port = getAddressPort(baseAddress);
@@ -110,19 +110,17 @@ public class EJBEndpoint {
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
         engine.setThreadPool(new WorkManagerThreadPool(getWorkManager()));
         engine.setPort(port);
-        
-        List<JettyHTTPServerEngine> engineList = new ArrayList<JettyHTTPServerEngine>();
+
+        List<JettyHTTPServerEngine> engineList = new ArrayList<>();
         engineList.add(engine);
         engineFactory.setEnginesList(engineList);
     }
-    
+
     public String getServiceClassName() throws Exception {
         String packageName = PackageUtils.parsePackageName(config.getServiceName().getNamespaceURI(), null);
-        String interfaceName = packageName + "." 
-                               + config.getJNDIName().substring(0, config.getJNDIName().length() - 4);
-        return interfaceName;
+        return packageName + "." + config.getJNDIName().substring(0, config.getJNDIName().length() - 4);
     }
-    
+
     public String getDefaultEJBServantBaseURL() throws Exception {
         String hostName = "";
         try {
@@ -133,7 +131,7 @@ public class EJBEndpoint {
         }
         return "http://" + hostName + ":9999";
     }
-    
+
     public int getAddressPort(String address) {
         int index = address.lastIndexOf(":");
         int end = address.lastIndexOf("/");
@@ -141,11 +139,11 @@ public class EJBEndpoint {
             return DEFAULT_HTTP_PORT;
         }
         if (end < index) {
-            return Integer.valueOf(address.substring(index + 1)).intValue();
-        } 
-        return Integer.valueOf(address.substring(index + 1, end)).intValue();
+            return Integer.parseInt(address.substring(index + 1));
+        }
+        return Integer.parseInt(address.substring(index + 1, end));
     }
-    
+
     private static boolean isJaxWsServiceInterface(Class<?> cls) {
         if (cls == null) {
             return false;
@@ -160,7 +158,7 @@ public class EJBEndpoint {
     public void setEjbServantBaseURL(String ejbServantBaseURL) {
         this.ejbServantBaseURL = ejbServantBaseURL;
     }
-    
+
     private static boolean isNotNull(String value) {
         return value != null && !"".equals(value.trim());
     }
@@ -172,7 +170,7 @@ public class EJBEndpoint {
     public void setWorkManager(WorkManager workManager) {
         this.workManager = workManager;
     }
-    
-    
-    
+
+
+
 }

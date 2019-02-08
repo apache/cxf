@@ -27,35 +27,35 @@ import javax.ws.rs.core.Response;
 
 public class BookStoreNoAnnotations {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    
+    private Map<Long, Book> books = new HashMap<>();
+
     public BookStoreNoAnnotations() {
         Book b = new Book();
         b.setId(123L);
         b.setName("CXF in Action");
         books.put(b.getId(), b);
     }
-    
+
     public Book getBook(Long id) throws BookNotFoundFault {
         return books.get(id);
     }
-    
+
     public ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault {
         Book b = books.get(id);
         Chapter ch = b.getChapter(1);
-        
+
         ChapterNoAnnotations ch2 = new ChapterNoAnnotations();
         ch2.setId(ch.getId());
         ch2.setTitle(ch.getTitle());
         return ch2;
     }
-    
+
     public Book getBookWithAuthorization(Long id, String authorizationHeader) throws BookNotFoundFault {
-        
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Basic")) {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
-        
+
         return books.get(id);
     }
 }

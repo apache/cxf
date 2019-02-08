@@ -21,26 +21,28 @@ package org.apache.cxf.ws.rm;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class AbstractSequenceTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class AbstractSequenceTest {
 
     @Test
     public void testIdentifierEquals() {
         Identifier id1 = null;
-        Identifier id2 = null;   
+        Identifier id2 = null;
         assertTrue(AbstractSequence.identifierEquals(id1, id2));
-        
+
         ObjectFactory factory = new ObjectFactory();
         id1 = factory.createIdentifier();
-        id1.setValue("seq1"); 
-        assertTrue(!AbstractSequence.identifierEquals(id1, id2));
-        
+        id1.setValue("seq1");
+        assertFalse(AbstractSequence.identifierEquals(id1, id2));
+
         id2 = factory.createIdentifier();
-        id2.setValue("seq2"); 
-        assertTrue(!AbstractSequence.identifierEquals(id1, id2));
-        
+        id2.setValue("seq2");
+        assertFalse(AbstractSequence.identifierEquals(id1, id2));
+
         id2.setValue("seq1");
         assertTrue(AbstractSequence.identifierEquals(id1, id2));
     }

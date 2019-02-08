@@ -42,16 +42,16 @@ public interface ConduitInitiatorManager {
      * <code>ConduitInitiator</code>.
      */
     void deregisterConduitInitiator(String name);
-    
+
     /**
-     * Returns the <code>ConduitInitiator</code> registered with the specified name, 
+     * Returns the <code>ConduitInitiator</code> registered with the specified name,
      * loading the appropriate plugin if necessary.
-     * 
+     *
      * @param name
      * @return the registered <code>ConduitInitiator</code>
      * @throws BusException
      */
     ConduitInitiator getConduitInitiator(String name) throws BusException;
-    
+
     ConduitInitiator getConduitInitiatorForUri(String uri);
 }

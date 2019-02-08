@@ -1,0 +1,41 @@
+== Spring Boot - Eureka Registry Application 
+
+This sample project shows how to start Eureka Registry.  
+
+
+= Starting the registry =
+
+The sample uses Maven. It can be built and run from the command line using Maven, Java or Docker:
+
+---- With Maven ----
+
+$ mvn spring-boot:run
+
+---- With Java ----
+
+$ java -jar target/spring-boot-sample-rs-scan-eureka.jar
+
+---- With Docker ----
+
+Install Docker, create the demo image:
+--
+$ mvn dockerfile:build
+--
+
+Optional step, push the image. 
+Create a DockerHub id, for example, make this id set to your current ${username}
+--
+$ docker login
+$ mvn dockerfile:push
+--
+
+Run the container:
+--
+docker run -p 8761:8761 -t ${username}/apachecxf:spring-boot-sample-rs-scan-eureka
+--
+
+= Testing the registry =
+
+Check the registry is live with typing "http://localhost:8761/eureka/apps" in a browser.
+
+Next run the demo server and once the registration record is available - the command line client.

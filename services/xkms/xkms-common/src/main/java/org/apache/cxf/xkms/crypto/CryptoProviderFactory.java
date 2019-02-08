@@ -33,24 +33,24 @@ public interface CryptoProviderFactory {
     Crypto create(Message message);
 
     /**
-     * Create without fallback crypto 
-     * 
+     * Create without fallback crypto
+     *
      * @param cryptoProperties
      * @return xkms crypto
      */
     Crypto create();
-    
+
     /**
      * Create with fallback crypto
-     * 
+     *
      * @param fallbackCrypto
      * @return
      */
     Crypto create(Crypto fallbackCrypto);
-    
+
     /**
      * Create with overridden keystoreProperties to create default Crypto
-     * 
+     *
      * @param xkmsClient
      * @param keystoreProperties
      * @return
@@ -59,16 +59,16 @@ public interface CryptoProviderFactory {
 
     /**
      * Create with overridden XKMSPortType and fallbackCrypto
-     * 
+     *
      * @param xkmsClient
      * @param fallbackCrypto
      * @return
      */
     Crypto create(XKMSPortType xkmsClient, Crypto fallbackCrypto);
-    
+
     /**
      * Create with overridden XKMSPortType, fallbackCrypto and control of getting X509 from local keystore
-     * 
+     *
      * @param xkmsClient
      * @param fallbackCrypto
      * @param allowX509FromJKS

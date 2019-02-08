@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -50,7 +51,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class BareInInterceptor extends AbstractInDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(BareInInterceptor.class);
 
-    private static Set<String> filter = new HashSet<String>();
+    private static Set<String> filter = new HashSet<>();
 
     static {
         filter.add("void");
@@ -76,18 +77,15 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
         Endpoint ep = exchange.getEndpoint();
         BindingOperationInfo bop = exchange.getBindingOperationInfo();
         ServiceInfo si = ep.getEndpointInfo().getService();
-        // XXX - Should the BindingMessageInfo.class be put on
-        // the message?
-        //MessageInfo msgInfo = message.get(MessageInfo.class);
         BindingMessageInfo msgInfo = null;
 
         boolean client = isRequestor(message);
 
         Collection<OperationInfo> ops = null;
         if (bop == null) {
-            ops = new ArrayList<OperationInfo>();
+            ops = new ArrayList<>();
             ops.addAll(si.getInterface().getOperations());
-            if (xmlReader.getEventType() == XMLStreamReader.END_ELEMENT && !client) {
+            if (xmlReader.getEventType() == XMLStreamConstants.END_ELEMENT && !client) {
                 //empty input
                 //TO DO : check duplicate operation with no input
                 for (OperationInfo op : ops) {
@@ -101,11 +99,6 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
             }
         } else {
-            // XXX - Is the call to
-            // AbstractInDatabindingInterceptor.getMessageInfo()
-            // necessary?  Should we put the BindingMessageInfo on
-            // the message instead of the MessageInfo?
-            // msgInfo = getMessageInfo(message, bop, exchange);
             getMessageInfo(message, bop);
             if (client) {
                 msgInfo = bop.getOutput();
@@ -116,7 +109,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
 
         int paramNum = 0;
 
-        
+
         while (StaxUtils.toNextElement(xmlReader)) {
             QName elName = xmlReader.getName();
             Object o = null;
@@ -135,7 +128,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
             }
 
             try {
-                o = dr.read(p, xmlReader);                
+                o = dr.read(p, xmlReader);
             } catch (Fault fault) {
                 if (!isRequestor(message)) {
                     fault.setFaultCode(Fault.FAULT_CODE_CLIENT);
@@ -148,7 +141,7 @@ public class BareInInterceptor extends AbstractInDatabindingInterceptor {
             }
             paramNum++;
         }
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
         }
     }

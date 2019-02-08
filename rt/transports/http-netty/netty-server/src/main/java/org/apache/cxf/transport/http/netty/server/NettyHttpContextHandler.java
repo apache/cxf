@@ -23,9 +23,9 @@ package org.apache.cxf.transport.http.netty.server;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +38,7 @@ public class NettyHttpContextHandler {
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpContextHandler.class);
     private final ServletContext servletContext;
-    private List<NettyHttpHandler> nettyHttpHandlerList = new CopyOnWriteArrayList<NettyHttpHandler>();
+    private List<NettyHttpHandler> nettyHttpHandlerList = new CopyOnWriteArrayList<>();
 
     public NettyHttpContextHandler(String contextPath) {
         servletContext = new NettyServletContext(contextPath);

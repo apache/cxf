@@ -57,8 +57,8 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
         }
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
-        
-            if (javaModel.getServiceClasses().size() == 0) {
+
+            if (javaModel.getServiceClasses().isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_CLIENT", LOG, wsdl);
@@ -67,7 +67,7 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
                 }
                 return;
             }
-    
+
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
             for (JavaServiceClass js : javaModel.getServiceClasses().values()) {
                 for (JavaPort jp : js.getPorts()) {
@@ -77,19 +77,19 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
                         interfaceName = jp.getPortType();
                         intf = interfaces.get(interfaceName);
                     }
-                    
+
                     String clientClassName = interfaceName + "_"
                                              + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Client";
-    
+
                     clientClassName = mapClassName(intf.getPackageName(), clientClassName, penv);
                     clearAttributes();
                     setAttributes("clientClassName", clientClassName);
                     setAttributes("intf", intf);
                     setAttributes("service", js);
                     setAttributes("port", jp);
-    
+
                     setCommonAttributes();
-    
+
                     doWrite(CLT_TEMPLATE, parseOutputName(intf.getPackageName(), clientClassName));
                 }
             }

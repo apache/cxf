@@ -29,22 +29,22 @@ import javax.xml.ws.ResponseWrapper;
 public interface SayHi {
 
     @WebResult(name = "return", targetNamespace = "")
-    @RequestWrapper(localName = "sayHiArray", 
-                    targetNamespace = "http://apache.org/sayHi2", 
+    @RequestWrapper(localName = "sayHiArray",
+                    targetNamespace = "http://apache.org/sayHi2",
                     className = "org.apache.sayhi2.SayHiArray")
     @WebMethod
-    @ResponseWrapper(localName = "sayHiArrayResponse", 
-                     targetNamespace = "http://apache.org/sayHi2", 
+    @ResponseWrapper(localName = "sayHiArrayResponse",
+                     targetNamespace = "http://apache.org/sayHi2",
                      className = "org.apache.sayhi2.SayHiArrayResponse")
-    java.util.List<String> sayHiArray(@WebParam(name = "arg0", targetNamespace = "") 
+    java.util.List<String> sayHiArray(@WebParam(name = "arg0", targetNamespace = "")
                                                        java.util.List<String> arg0);
 
     @WebResult(name = "return", targetNamespace = "http://apache.org/sayHi1")
-    @RequestWrapper(localName = "sayHi", targetNamespace = "http://apache.org/sayHi1", 
+    @RequestWrapper(localName = "sayHi", targetNamespace = "http://apache.org/sayHi1",
                     className = "org.apache.sayhi1.SayHi")
     @WebMethod
-    @ResponseWrapper(localName = "sayHiResponse", 
-                     targetNamespace = "http://apache.org/sayHi1", 
+    @ResponseWrapper(localName = "sayHiResponse",
+                     targetNamespace = "http://apache.org/sayHi1",
                      className = "org.apache.sayhi1.SayHiResponse")
     String sayHi(@WebParam(name = "arg0", targetNamespace = "http://apache.org/sayHi1") String arg0);
 }

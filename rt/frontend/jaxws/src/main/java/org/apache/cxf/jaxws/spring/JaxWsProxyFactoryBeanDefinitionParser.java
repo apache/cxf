@@ -27,7 +27,6 @@ import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.spring.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -40,8 +39,8 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         super();
         setBeanClass(JAXWSSpringClientProxyFactoryBean.class);
     }
-    
-    
+
+
     protected Class<?> getRawFactoryClass() {
         return JaxWsProxyFactoryBean.class;
     }
@@ -68,7 +67,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         public JAXWSSpringClientProxyFactoryBean(ClientFactoryBean fact) {
             super(fact);
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
@@ -90,7 +89,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         public boolean isSingleton() {
             return true;
         }
-        
+
 
         public void destroy() throws Exception {
             if (obj != null) {

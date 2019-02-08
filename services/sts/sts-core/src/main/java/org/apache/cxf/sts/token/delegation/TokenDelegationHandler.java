@@ -26,16 +26,16 @@ import org.apache.cxf.sts.request.ReceivedToken;
  * OnBehalfOf or ActAs another token.
  */
 public interface TokenDelegationHandler {
-    
+
     /**
      * Return true if this TokenDelegationHandler implementation is capable of handling the
      * ReceivedToken argument.
      */
     boolean canHandleToken(ReceivedToken delegateTarget);
-    
+
     /**
      * See if delegation is allowed for a Token using the given TokenDelegationParameters.
      */
     TokenDelegationResponse isDelegationAllowed(TokenDelegationParameters tokenParameters);
-    
+
 }

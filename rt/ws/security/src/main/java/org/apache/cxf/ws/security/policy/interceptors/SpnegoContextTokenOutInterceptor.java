@@ -42,7 +42,7 @@ import org.apache.wss4j.common.spnego.SpnegoTokenContext;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
-import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.XMLUtils;
 
 class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     SpnegoContextTokenOutInterceptor() {
@@ -52,7 +52,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
+            Collection<AssertionInfo> ais =
                 PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SPNEGO_CONTEXT_TOKEN);
             if (ais.isEmpty()) {
                 return;
@@ -62,7 +62,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 SecurityToken tok = null;
                 if (tokId != null) {
                     tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
-                    
+
                     if (tok != null && tok.isExpired()) {
                         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
                         message.getExchange().remove(SecurityConstants.TOKEN_ID);
@@ -70,7 +70,7 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                         tok = null;
                     }
                 }
-                
+
                 if (tok == null) {
                     tok = issueToken(message, aim);
                 }
@@ -86,39 +86,39 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 // server side should be checked on the way in
                 for (AssertionInfo ai : ais) {
                     ai.setAsserted(true);
-                }                   
+                }
             }
         }
     }
-    
-    
+
+
     private SecurityToken issueToken(SoapMessage message, AssertionInfoMap aim) {
         //
         // Get a SPNEGO token
         //
-        String jaasContext = 
+        String jaasContext =
             (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
-        String kerberosSpn = 
+        String kerberosSpn =
             (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
-        
+
         SpnegoTokenContext spnegoToken = new SpnegoTokenContext();
-        Object spnegoClientAction = 
+        Object spnegoClientAction =
             message.getContextualProperty(SecurityConstants.SPNEGO_CLIENT_ACTION);
         if (spnegoClientAction instanceof SpnegoClientAction) {
             spnegoToken.setSpnegoClientAction((SpnegoClientAction)spnegoClientAction);
         }
-        
+
         try {
-            CallbackHandler callbackHandler = 
+            CallbackHandler callbackHandler =
                 SecurityUtils.getCallbackHandler(
                     SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message)
                 );
-            
+
             spnegoToken.retrieveServiceTicket(jaasContext, callbackHandler, kerberosSpn);
         } catch (Exception e) {
             throw new Fault(e);
         }
-        
+
         //
         // Now initiate WS-Trust exchange
         //
@@ -134,12 +134,13 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (maps != null) {
                     client.setAddressingNamespace(maps.getNamespaceURI());
                 }
-                SecurityToken tok = client.requestSecurityToken(s, Base64.encode(spnegoToken.getToken()));
-                
+                SecurityToken tok =
+                    client.requestSecurityToken(s, XMLUtils.encodeToString(spnegoToken.getToken()));
+
                 byte[] wrappedTok = spnegoToken.unwrapKey(tok.getSecret());
                 tok.setSecret(wrappedTok);
                 spnegoToken.clear();
-                
+
                 return tok;
             } catch (RuntimeException e) {
                 throw e;
@@ -154,5 +155,5 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             }
         }
     }
-    
+
 }

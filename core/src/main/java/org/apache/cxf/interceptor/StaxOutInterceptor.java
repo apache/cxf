@@ -48,13 +48,13 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
     public static final String WRITER_HOLDER = StaxOutInterceptor.class.getName() + ".writer";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
-    public static final StaxOutEndingInterceptor ENDING 
+    public static final StaxOutEndingInterceptor ENDING
         = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER, WRITER_HOLDER);
-    
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
-    private static Map<Object, XMLOutputFactory> factories = new HashMap<Object, XMLOutputFactory>();
 
-    
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
+    private static Map<Object, XMLOutputFactory> factories = new HashMap<>();
+
+
     public StaxOutInterceptor() {
         super(Phase.PRE_STREAM);
         addAfter(AttachmentOutInterceptor.class.getName());
@@ -73,12 +73,12 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         String encoding = getEncoding(message);
-        
+
         try {
             XMLOutputFactory factory = getXMLOutputFactory(message);
             if (factory == null) {
                 if (writer == null) {
-                    os = setupOutputStream(message, os);
+                    os = setupOutputStream(os);
                     xwriter = StaxUtils.createXMLStreamWriter(os, encoding);
                 } else {
                     xwriter = StaxUtils.createXMLStreamWriter(writer);
@@ -86,7 +86,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             } else {
                 synchronized (factory) {
                     if (writer == null) {
-                        os = setupOutputStream(message, os);
+                        os = setupOutputStream(os);
                         xwriter = factory.createXMLStreamWriter(os, encoding);
                     } else {
                         xwriter = factory.createXMLStreamWriter(writer);
@@ -108,7 +108,8 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(ENDING);
     }
-    private OutputStream setupOutputStream(Message message, OutputStream os) {
+
+    private OutputStream setupOutputStream(OutputStream os) {
         if (!(os instanceof AbstractWrappedOutputStream)) {
             os = new AbstractWrappedOutputStream(os) { };
         }
@@ -136,7 +137,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             encoding = (String) ex.getInMessage().get(Message.ENCODING);
             message.put(Message.ENCODING, encoding);
         }
-        
+
         if (encoding == null) {
             encoding = StandardCharsets.UTF_8.name();
             message.put(Message.ENCODING, encoding);
@@ -164,16 +165,14 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                         throw new Fault(e);
                     }
                 } else {
-                    throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY", 
+                    throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY",
                                                                            BUNDLE, o));
                 }
 
                 try {
                     xif = (XMLOutputFactory)(cls.newInstance());
                     factories.put(o, xif);
-                } catch (InstantiationException e) {
-                    throw new Fault(e);
-                } catch (IllegalAccessException e) {
+                } catch (InstantiationException | IllegalAccessException e) {
                     throw new Fault(e);
                 }
             }
@@ -184,5 +183,5 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         return null;
     }
-    
+
 }

@@ -28,7 +28,7 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
 
     private QName pname;
     private AbstractMessageContainer mInfo;
-    
+
     private boolean isElement;
     private QName typeName;
     private QName elementName;
@@ -36,12 +36,12 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
     private XmlSchemaAnnotated xmlSchema;
     private Class<?> typeClass;
     private int index;
-    
+
     public MessagePartInfo(QName n, AbstractMessageContainer info) {
         mInfo = info;
         pname = n;
     }
-    
+
     public void setMessageContainer(AbstractMessageContainer info) {
         mInfo = info;
     }
@@ -58,22 +58,22 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
     public void setName(QName n) {
         pname = n;
     }
-    
+
     public QName getConcreteName() {
         return concreteName;
     }
-    
+
     public void setConcreteName(QName concreteName) {
         this.concreteName = concreteName;
     }
 
-    public boolean isElement() { 
+    public boolean isElement() {
         return isElement;
     }
     public void setElement(boolean b) {
         isElement = b;
     }
-    
+
     public QName getElementQName() {
         if (isElement) {
             return elementName;
@@ -100,7 +100,7 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
         elementName = qn;
         concreteName = qn;
     }
-    
+
     public AbstractMessageContainer getMessageInfo() {
         return mInfo;
     }
@@ -136,11 +136,11 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
             .append(", ConcreteName=")
             .append(getConcreteName()).toString();
     }
-    
+
     public int hashCode() {
         return pname == null ? -1 : pname.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -149,7 +149,7 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
             return false;
         }
         MessagePartInfo oi = (MessagePartInfo)o;
-        return equals(pname, oi.pname) 
+        return equals(pname, oi.pname)
             && isElement == oi.isElement
             && equals(typeName, oi.typeName)
             && equals(elementName, oi.elementName)
@@ -157,5 +157,5 @@ public final class MessagePartInfo extends AbstractPropertiesHolder implements N
             && equals(typeClass, oi.typeClass);
     }
 
-    
+
 }

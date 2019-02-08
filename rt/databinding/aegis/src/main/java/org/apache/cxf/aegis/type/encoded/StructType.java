@@ -50,7 +50,7 @@ public class StructType extends BeanType {
     public StructType(BeanTypeInfo info) {
         super(info);
     }
-    
+
     //soap-encoding always allow xsi:nil=true to be set
     protected boolean alwaysAllowNillables() {
         return true;
@@ -77,7 +77,7 @@ public class StructType extends BeanType {
             BeanTypeInfo beanTypeInfo,
             MessageReader reader,
             Context context) {
-        
+
         // nested elements use unqualified names
         name = qualifyName(name);
 
@@ -118,7 +118,7 @@ public class StructType extends BeanType {
      * Writes a nested element with an unqualified name.
      */
     @Override
-    protected void writeElement(QName name, Object value, 
+    protected void writeElement(QName name, Object value,
                                 AegisType type, MessageWriter writer, Context context) {
         // Nested elements are unqualified
         name = new QName("", name.getLocalPart());
@@ -156,7 +156,7 @@ public class StructType extends BeanType {
 
         return name;
     }
-    
+
     private BeanType superBeanType(AegisType t) {
         if (t instanceof BeanType) {
             BeanType bt = (BeanType)t;

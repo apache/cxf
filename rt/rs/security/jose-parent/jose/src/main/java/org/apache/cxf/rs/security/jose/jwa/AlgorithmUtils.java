@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.jose.jwa;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.Set;
 
 public final class AlgorithmUtils {
     public static final String AES = "AES";
-    
+
     // Key Encryption
     // JWA
     public static final String RSA_OAEP_ALGO = "RSA-OAEP";
@@ -93,45 +94,66 @@ public final class AlgorithmUtils {
     public static final String ES_SHA_256_JAVA = "SHA256withECDSA";
     public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
     public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
-    
-    public static final Set<String> HMAC_SIGN_SET = new HashSet<String>(Arrays.asList(HMAC_SHA_256_ALGO,
-                                                                                      HMAC_SHA_384_ALGO,
-                                                                                      HMAC_SHA_512_ALGO));
-    public static final Set<String> RSA_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(RS_SHA_256_ALGO,
-                                                                      RS_SHA_384_ALGO,
-                                                                      RS_SHA_512_ALGO));
-    public static final Set<String> RSA_SHA_PS_SIGN_SET = new HashSet<String>(Arrays.asList(PS_SHA_256_ALGO,
-                                        PS_SHA_384_ALGO,
-                                        PS_SHA_512_ALGO));
-    public static final Set<String> EC_SHA_SIGN_SET = new HashSet<String>(Arrays.asList(ES_SHA_256_ALGO,
-                                                                       ES_SHA_384_ALGO,
-                                                                       ES_SHA_512_ALGO));
-    public static final Set<String> RSA_CEK_SET = new HashSet<String>(Arrays.asList(RSA_OAEP_ALGO,
-                                                                                  RSA_OAEP_256_ALGO,
-                                                                                  RSA1_5_ALGO));
-    public static final Set<String> AES_GCM_CEK_SET = new HashSet<String>(Arrays.asList(A128GCM_ALGO,
-                                                                                      A192GCM_ALGO,
-                                                                                      A256GCM_ALGO));
-    public static final Set<String> AES_GCM_KW_SET = new HashSet<String>(Arrays.asList(A128GCMKW_ALGO,
-                                                                                      A192GCMKW_ALGO,
-                                                                                      A256GCMKW_ALGO));
-    public static final Set<String> AES_KW_SET = new HashSet<String>(Arrays.asList(A128KW_ALGO,
-                                                                                   A192KW_ALGO,
-                                                                                   A256KW_ALGO));
-    public static final Set<String> ACBC_HS_SET = new HashSet<String>(Arrays.asList(A128CBC_HS256_ALGO,
-                                        A192CBC_HS384_ALGO,
-                                        A256CBC_HS512_ALGO));
-    public static final Set<String> PBES_HS_SET = new HashSet<String>(Arrays.asList(PBES2_HS256_A128KW_ALGO,
-                                          PBES2_HS384_A192KW_ALGO,
-                                          PBES2_HS512_A256KW_ALGO));
-    public static final Set<String> ECDH_ES_WRAP_SET = new HashSet<String>(Arrays.asList(ECDH_ES_A128KW_ALGO,
-                      ECDH_ES_A192KW_ALGO,
-                      ECDH_ES_A256KW_ALGO));
-    
+
+    public static final Set<String> HMAC_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(HMAC_SHA_256_ALGO,
+                                                                HMAC_SHA_384_ALGO,
+                                                                HMAC_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_SHA_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(RS_SHA_256_ALGO,
+                                                                RS_SHA_384_ALGO,
+                                                                RS_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_SHA_PS_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(PS_SHA_256_ALGO,
+                                                                PS_SHA_384_ALGO,
+                                                                PS_SHA_512_ALGO)));
+
+    public static final Set<String> EC_SHA_SIGN_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(ES_SHA_256_ALGO,
+                                                                ES_SHA_384_ALGO,
+                                                                ES_SHA_512_ALGO)));
+
+    public static final Set<String> RSA_CEK_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(RSA_OAEP_ALGO,
+                                                                RSA_OAEP_256_ALGO,
+                                                                RSA1_5_ALGO)));
+
+    public static final Set<String> AES_GCM_CEK_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128GCM_ALGO,
+                                                                A192GCM_ALGO,
+                                                                A256GCM_ALGO)));
+
+    public static final Set<String> AES_GCM_KW_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128GCMKW_ALGO,
+                                                                A192GCMKW_ALGO,
+                                                                A256GCMKW_ALGO)));
+
+    public static final Set<String> AES_KW_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128KW_ALGO,
+                                                                A192KW_ALGO,
+                                                                A256KW_ALGO)));
+
+    public static final Set<String> ACBC_HS_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(A128CBC_HS256_ALGO,
+                                                                A192CBC_HS384_ALGO,
+                                                                A256CBC_HS512_ALGO)));
+
+    public static final Set<String> PBES_HS_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(PBES2_HS256_A128KW_ALGO,
+                                                                PBES2_HS384_A192KW_ALGO,
+                                                                PBES2_HS512_A256KW_ALGO)));
+
+    public static final Set<String> ECDH_ES_WRAP_SET =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(ECDH_ES_A128KW_ALGO,
+                                                                ECDH_ES_A192KW_ALGO,
+                                                                ECDH_ES_A256KW_ALGO)));
+
     private static final Map<String, String> JAVA_TO_JWA_NAMES;
     private static final Map<String, String> JWA_TO_JAVA_NAMES;
     static {
-        JAVA_TO_JWA_NAMES = new HashMap<String, String>();
+        JAVA_TO_JWA_NAMES = new HashMap<>();
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_256_JAVA, HMAC_SHA_256_ALGO);
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_384_JAVA, HMAC_SHA_384_ALGO);
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_512_JAVA, HMAC_SHA_512_ALGO);
@@ -156,7 +178,7 @@ public final class AlgorithmUtils {
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A128CBC_HS256_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A192CBC_HS384_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A256CBC_HS512_ALGO);
-        JWA_TO_JAVA_NAMES = new HashMap<String, String>();
+        JWA_TO_JAVA_NAMES = new HashMap<>();
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_512_ALGO, HMAC_SHA_512_JAVA);
@@ -191,7 +213,7 @@ public final class AlgorithmUtils {
         JWA_TO_JAVA_NAMES.put(ECDH_ES_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(ECDH_ES_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
     }
-    
+
     private AlgorithmUtils() {
     }
     public static boolean isRsa(String algo) {
@@ -210,73 +232,73 @@ public final class AlgorithmUtils {
         return AES_GCM_KW_SET.contains(algo);
     }
     public static boolean isPbesHsWrap(String algo) {
-        return PBES_HS_SET.contains(algo); 
+        return PBES_HS_SET.contains(algo);
     }
     public static boolean isEcdhEsWrap(String algo) {
-        return ECDH_ES_WRAP_SET.contains(algo); 
+        return ECDH_ES_WRAP_SET.contains(algo);
     }
     public static boolean isEcdhEsDirect(String algo) {
-        return ECDH_ES_DIRECT_ALGO.equals(algo); 
+        return ECDH_ES_DIRECT_ALGO.equals(algo);
     }
     public static boolean isAesGcm(String algo) {
         return AES_GCM_CEK_SET.contains(algo);
     }
     public static boolean isAesCbcHmac(String algo) {
-        return ACBC_HS_SET.contains(algo); 
+        return ACBC_HS_SET.contains(algo);
     }
     public static boolean isOctet(String algo) {
         return isHmacSign(algo)
             || isAesCbcHmac(algo)
             || isAesGcm(algo)
             || isAesGcmKeyWrap(algo)
-            || isAesKeyWrap(algo); 
+            || isAesKeyWrap(algo);
     }
     public static boolean isHmacSign(String algo) {
-        return HMAC_SIGN_SET.contains(algo); 
+        return HMAC_SIGN_SET.contains(algo);
     }
     public static boolean isHmacSign(SignatureAlgorithm algo) {
-        return isHmacSign(algo.getJwaName()); 
+        return isHmacSign(algo.getJwaName());
     }
     public static boolean isRsaSign(String algo) {
-        return isRsaShaSign(algo) || isRsaShaPsSign(algo); 
+        return isRsaShaSign(algo) || isRsaShaPsSign(algo);
     }
     public static boolean isRsaSign(SignatureAlgorithm algo) {
-        return isRsaSign(algo.getJwaName()); 
+        return isRsaSign(algo.getJwaName());
     }
     public static boolean isRsaShaSign(String algo) {
-        return RSA_SHA_SIGN_SET.contains(algo); 
+        return RSA_SHA_SIGN_SET.contains(algo);
     }
     public static boolean isRsaShaSign(SignatureAlgorithm algo) {
-        return isRsaShaSign(algo.getJwaName()); 
+        return isRsaShaSign(algo.getJwaName());
     }
     public static boolean isRsaShaPsSign(String algo) {
-        return RSA_SHA_PS_SIGN_SET.contains(algo); 
+        return RSA_SHA_PS_SIGN_SET.contains(algo);
     }
     public static boolean isRsaShaPsSign(SignatureAlgorithm algo) {
-        return isRsaShaPsSign(algo.getJwaName()); 
+        return isRsaShaPsSign(algo.getJwaName());
     }
     public static boolean isEcDsaSign(String algo) {
-        return EC_SHA_SIGN_SET.contains(algo); 
+        return EC_SHA_SIGN_SET.contains(algo);
     }
     public static boolean isEcDsaSign(SignatureAlgorithm algo) {
-        return isEcDsaSign(algo.getJwaName()); 
+        return isEcDsaSign(algo.getJwaName());
     }
-    
+
     public static String toJwaName(String javaName, int keyBitSize) {
         //TODO: perhaps a key should be a name+keysize pair
         String name = JAVA_TO_JWA_NAMES.get(javaName);
         if (name == null && javaName.startsWith(AES)) {
             name = "A" + keyBitSize + "GCM";
-        } 
+        }
         return name;
     }
-    public static String toJavaName(String jwtName) {    
+    public static String toJavaName(String jwtName) {
         return JWA_TO_JAVA_NAMES.get(jwtName);
     }
-    public static String toJavaAlgoNameOnly(String jwtName) {    
+    public static String toJavaAlgoNameOnly(String jwtName) {
         return stripAlgoProperties(toJavaName(jwtName));
     }
-    public static String stripAlgoProperties(String javaName) {    
+    public static String stripAlgoProperties(String javaName) {
         if (javaName != null) {
             int index = javaName.indexOf('/');
             if (index != -1) {
@@ -285,5 +307,5 @@ public final class AlgorithmUtils {
         }
         return javaName;
     }
-    
+
 }

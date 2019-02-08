@@ -28,37 +28,37 @@ import org.apache.cxf.message.Message;
  * instance will be supplied with this class, which contains a reference to the current
  * Message. The CallbackHandler implementation is required to set the claims Object to be
  * sent in the request. This object can be either a DOM Element to be written out "as is", or else
- * a org.apache.cxf.rt.security.claims.ClaimCollection Object which will be serialized in the 
+ * a org.apache.cxf.rt.security.claims.ClaimCollection Object which will be serialized in the
  * request.
  */
 public class ClaimsCallback implements Callback {
-    
+
     private Object claims;
-    
+
     private Message currentMessage;
-    
+
     public ClaimsCallback() {
         //
     }
-    
+
     public ClaimsCallback(Message currentMessage) {
         this.currentMessage = currentMessage;
     }
-    
+
     public void setClaims(Object claims) {
         this.claims = claims;
     }
-    
+
     public Object getClaims() {
         return claims;
     }
-    
+
     public void setCurrentMessage(Message currentMessage) {
         this.currentMessage = currentMessage;
     }
-    
+
     public Message getCurrentMessage() {
         return currentMessage;
     }
-    
+
 }

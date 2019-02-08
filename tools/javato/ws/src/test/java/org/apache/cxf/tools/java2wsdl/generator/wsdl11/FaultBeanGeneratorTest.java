@@ -25,22 +25,33 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.java2wsdl.processor.JavaToWSDLProcessor;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class FaultBeanGeneratorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    
+
     String classPath = "";
     @Before
     public void setUp() throws Exception {
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+            String java9PlusFolder = output.getParent() + java.io.File.separator + "java9";
+            System.setProperty("java.class.path", System.getProperty("java.class.path") 
+                               + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
+        }
         processor.setEnvironment(env);
     }
 
@@ -97,7 +108,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
     public void testGetExceptionClasses() throws Exception {
         Class<?> seiClass = Class.forName("org.apache.hello_world.Greeter");
         FaultBeanGenerator generator = new FaultBeanGenerator();
-        Set<Class<?>> classes = new HashSet<Class<?>>();
+        Set<Class<?>> classes = new HashSet<>();
         for (Method method : seiClass.getMethods()) {
             classes.addAll(generator.getExceptionClasses(method));
         }

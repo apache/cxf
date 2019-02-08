@@ -24,11 +24,9 @@ import java.util.concurrent.Executors;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.naming.NamingException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.transport.jms.util.JMSSender;
-import org.apache.cxf.transport.jms.util.JndiHelper;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -44,34 +42,14 @@ public final class JMSFactory {
     static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
 
     //private static final Logger LOG = LogUtils.getL7dLogger(JMSFactory.class);
-    
+
     private JMSFactory() {
     }
 
     /**
-     * Retrieve connection factory from JNDI
-     * 
-     * @param jmsConfig
-     * @param jndiConfig
-     * @return
-     */
-    static ConnectionFactory getConnectionFactoryFromJndi(JMSConfiguration jmsConfig) {
-        if (jmsConfig.getJndiEnvironment() == null || jmsConfig.getConnectionFactoryName() == null) {
-            return null;
-        }
-        try {
-            ConnectionFactory cf = new JndiHelper(jmsConfig.getJndiEnvironment()).
-                lookup(jmsConfig.getConnectionFactoryName(), ConnectionFactory.class);
-            return cf;
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    /**
      * Create JmsSender from configuration information. Most settings are taken from jmsConfig. The QoS
      * settings in messageProperties override the settings from jmsConfig
-     * 
+     *
      * @param jmsConfig configuration information
      * @param messageProperties context headers override config settings
      * @return
@@ -99,10 +77,10 @@ public final class JMSFactory {
         return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
     }
 
-    public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
+    public static Connection createConnection(final JMSConfiguration jmsConfig) throws JMSException {
         String username = jmsConfig.getUserName();
         ConnectionFactory cf = jmsConfig.getConnectionFactory();
-        Connection connection = username != null 
+        Connection connection = username != null
             ? cf.createConnection(username, jmsConfig.getPassword())
             : cf.createConnection();
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
@@ -110,11 +88,11 @@ public final class JMSFactory {
         }
         return connection;
     }
-    
+
     /**
      * Get workqueue from workqueue manager. Return an executor that will never reject messages and
      * instead block when all threads are used.
-     * 
+     *
      * @param bus
      * @param name
      * @return
@@ -125,14 +103,13 @@ public final class JMSFactory {
             AutomaticWorkQueue workQueue1 = manager.getNamedWorkQueue(name);
             final WorkQueue workQueue = (workQueue1 == null) ? manager.getAutomaticWorkQueue() : workQueue1;
             return new Executor() {
-                
+
                 @Override
                 public void execute(Runnable command) {
                     workQueue.execute(command, 0);
                 }
             };
-        } else {
-            return Executors.newFixedThreadPool(20);
         }
+        return Executors.newFixedThreadPool(20);
     }
 }

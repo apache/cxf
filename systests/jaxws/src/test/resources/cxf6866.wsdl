@@ -1,0 +1,914 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="DocLitWrappedCodeFirstService" targetNamespace="http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService">
+<wsdl:documentation>DocLitWrappedCodeFirstService top level doc</wsdl:documentation>
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService">
+  <xs:element name="ServiceTestDetails" type="tns:serviceTestDetails"/>
+  <xs:element name="arrayInput" type="tns:arrayInput"/>
+  <xs:element name="arrayInputResponse" type="tns:arrayInputResponse"/>
+  <xs:element name="arrayOutput" type="tns:arrayOutput"/>
+  <xs:element name="arrayOutputResponse" type="tns:arrayOutputResponse"/>
+  <xs:element name="createBar" type="tns:createBar"/>
+  <xs:element name="createBarResponse" type="tns:createBarResponse"/>
+  <xs:element name="doBug2692" type="tns:doBug2692"/>
+  <xs:element name="doBug2692Response" type="tns:doBug2692Response"/>
+  <xs:element name="doCXF2411" type="tns:doCXF2411"/>
+  <xs:element name="doCXF2411Response" type="tns:doCXF2411Response"/>
+  <xs:element name="doFooListResponse" type="tns:doFooListResponse"/>
+  <xs:element name="doOneWay" type="tns:doOneWay"/>
+  <xs:element name="echoIntArray" type="tns:echoIntArray"/>
+  <xs:element name="echoIntArrayResponse" type="tns:echoIntArrayResponse"/>
+  <xs:element name="echoIntX" type="tns:echoIntX"/>
+  <xs:element name="echoIntXResponse" type="tns:echoIntXResponse"/>
+  <xs:element name="echoStringNotReallyAsync" type="tns:echoStringNotReallyAsync"/>
+  <xs:element name="echoStringNotReallyAsyncResponse" type="tns:echoStringNotReallyAsyncResponse"/>
+  <xs:element name="getFooSet" type="tns:getFooSet"/>
+  <xs:element name="getFooSetResponse" type="tns:getFooSetResponse"/>
+  <xs:element name="listInput" type="tns:listInput"/>
+  <xs:element name="listInputResponse" type="tns:listInputResponse"/>
+  <xs:element name="listObjectArrayOutput" type="tns:listObjectArrayOutput"/>
+  <xs:element name="listObjectArrayOutputResponse" type="tns:listObjectArrayOutputResponse"/>
+  <xs:element name="listObjectIn" type="tns:listObjectIn"/>
+  <xs:element name="listObjectInResponse" type="tns:listObjectInResponse"/>
+  <xs:element name="listObjectOutput" type="tns:listObjectOutput"/>
+  <xs:element name="listObjectOutputResponse" type="tns:listObjectOutputResponse"/>
+  <xs:element name="listOutput" type="tns:listOutput"/>
+  <xs:element name="listOutputResponse" type="tns:listOutputResponse"/>
+  <xs:element name="modifyFoo" type="tns:modifyFoo"/>
+  <xs:element name="modifyFooResponse" type="tns:modifyFooResponse"/>
+  <xs:element name="multiInOut" type="tns:multiInOut"/>
+  <xs:element name="multiInOutResponse" type="tns:multiInOutResponse"/>
+  <xs:element name="multiListInput" type="tns:multiListInput"/>
+  <xs:element name="multiListInputResponse" type="tns:multiListInputResponse"/>
+  <xs:element name="outOnly" type="tns:outOnly"/>
+  <xs:element name="outOnlyResponse" type="tns:outOnlyResponse"/>
+  <xs:element name="singleInOut" type="tns:singleInOut"/>
+  <xs:element name="singleInOutResponse" type="tns:singleInOutResponse"/>
+  <xs:element name="throwException" type="tns:throwException"/>
+  <xs:element name="throwExceptionResponse" type="tns:throwExceptionResponse"/>
+  <xs:complexType name="echoStringNotReallyAsync">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echoStringNotReallyAsyncResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="multiInOut">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="multiInOutResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+      <xs:element minOccurs="0" name="return1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element minOccurs="0" name="return3" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+      <xs:element minOccurs="0" name="return6" type="xs:string"/>
+      <xs:element minOccurs="0" name="return7" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="arrayInput">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="input" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="arrayInputResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="doCXF2411">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="doCXF2411Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:cxf2411Result"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="cxf2411Result">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="content" nillable="true" type="tns:cxf2411Base"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="cxf2411Base">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="cxf2411SubClass">
+    <xs:complexContent>
+      <xs:extension base="tns:cxf2411Base">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="listObjectOutput">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="listObjectOutputResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="foo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listObjectArrayOutput">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="listObjectArrayOutputResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:fooArray"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="arrayOutput">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="arrayOutputResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="multiListInput">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg1" type="xs:string"/>
+      <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+      <xs:element name="arg3" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="multiListInputResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="modifyFoo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="modifyFooResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="outOnly">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="outOnlyResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+      <xs:element minOccurs="0" name="return1" type="xs:string"/>
+      <xs:element minOccurs="0" name="return2" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echoIntX">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echoIntXResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="createBar">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="createBarResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:bar"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="bar">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listObjectIn">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="tns:fooArray"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listObjectInResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="tns:fooArray"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listInput">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listInputResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="listOutput">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="listOutputResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="doOneWay">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="echoIntArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echoIntArrayResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="getFooSet">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="getFooSetResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="doBug2692">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="doBug2692Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="doFooList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="dbRef" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="doFooListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echo">
+    <xs:sequence>
+      <xs:element form="qualified" name="String_1" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="echoResponse">
+    <xs:sequence>
+      <xs:element form="qualified" name="result" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="singleInOut">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="singleInOutResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="created" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="throwException">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="throwExceptionResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="myBean">
+    <xs:sequence>
+      <xs:element name="age" type="xs:int"/>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="serviceTestDetails">
+    <xs:sequence>
+      <xs:element name="id" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType final="#all" name="cxf2411BaseArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:cxf2411Base"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType final="#all" name="fooArray">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:foo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="doFooList" nillable="true" type="tns:doFooList"/>
+  <xs:element name="echo" nillable="true" type="tns:echo"/>
+  <xs:element name="echoResponse" nillable="true" type="tns:echoResponse"/>
+  <xs:element name="ComplexException" type="tns:ComplexException"/>
+  <xs:complexType name="ComplexException">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="beans" type="tns:myBean"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="ints" type="xs:int"/>
+      <xs:element minOccurs="0" name="reason" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CustomException" type="tns:CustomException"/>
+  <xs:complexType name="CustomException">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="b" type="xs:string"/>
+      <xs:element minOccurs="0" name="a" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceTestFault" nillable="true" type="tns:serviceTestDetails"/>
+  <xs:element name="name" nillable="true" type="xs:string"/>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="echoStringNotReallyAsync">
+    <wsdl:part element="tns:echoStringNotReallyAsync" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="createBarResponse">
+    <wsdl:part element="tns:createBarResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectInResponse">
+    <wsdl:part element="tns:listObjectInResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doCXF2411">
+    <wsdl:part element="tns:doCXF2411" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFooSetResponse">
+    <wsdl:part element="tns:getFooSetResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectArrayOutput">
+    <wsdl:part element="tns:listObjectArrayOutput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoIntDifferentWrapperNameResponse">
+    <wsdl:part element="tns:echoIntXResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="arrayOutput">
+    <wsdl:part element="tns:arrayOutput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="multiListInput">
+    <wsdl:part element="tns:multiListInput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="modifyFoo">
+    <wsdl:part element="tns:modifyFoo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="outOnly">
+    <wsdl:part element="tns:outOnly" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="throwExceptionResponse">
+    <wsdl:part element="tns:throwExceptionResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="createBar">
+    <wsdl:part element="tns:createBar" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doBug2692Response">
+    <wsdl:part element="tns:doBug2692Response" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listInputResponse">
+    <wsdl:part element="tns:listInputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoResponse">
+    <wsdl:part element="tns:echoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listInput">
+    <wsdl:part element="tns:listInput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listOutput">
+    <wsdl:part element="tns:listOutput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doOneWay">
+    <wsdl:part element="tns:doOneWay" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="multiInOutResponse">
+<wsdl:documentation>multiInOut OutputMessage doc</wsdl:documentation>
+    <wsdl:part element="tns:multiInOutResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="modifyFooResponse">
+    <wsdl:part element="tns:modifyFooResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoIntArray">
+    <wsdl:part element="tns:echoIntArray" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getFooSet">
+    <wsdl:part element="tns:getFooSet" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doFooList">
+    <wsdl:part element="tns:doFooList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echo">
+    <wsdl:part element="tns:echo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listOutputResponse">
+    <wsdl:part element="tns:listOutputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="singleInOut">
+    <wsdl:part element="tns:singleInOut" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="multiInOut">
+<wsdl:documentation>multiInOut InputMessage doc</wsdl:documentation>
+    <wsdl:part element="tns:multiInOut" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="arrayOutputResponse">
+    <wsdl:part element="tns:arrayOutputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ComplexException">
+    <wsdl:part element="tns:ComplexException" name="ComplexException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="arrayInput">
+    <wsdl:part element="tns:arrayInput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectOutput">
+    <wsdl:part element="tns:listObjectOutput" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoStringNotReallyAsyncResponse">
+    <wsdl:part element="tns:echoStringNotReallyAsyncResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doFooListResponse">
+    <wsdl:part element="tns:doFooListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoIntDifferentWrapperName">
+    <wsdl:part element="tns:echoIntX" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doCXF2411Response">
+    <wsdl:part element="tns:doCXF2411Response" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectIn">
+    <wsdl:part element="tns:listObjectIn" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="outOnlyResponse">
+    <wsdl:part element="tns:outOnlyResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectArrayOutputResponse">
+    <wsdl:part element="tns:listObjectArrayOutputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doBug2692">
+    <wsdl:part element="tns:doBug2692" name="parameters">
+    </wsdl:part>
+    <wsdl:part element="tns:name" name="name">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ServiceTestFault">
+    <wsdl:part element="tns:ServiceTestFault" name="ServiceTestFault">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="singleInOutResponse">
+    <wsdl:part element="tns:singleInOutResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="multiListInputResponse">
+    <wsdl:part element="tns:multiListInputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CustomException">
+<wsdl:documentation>fault message doc</wsdl:documentation>
+    <wsdl:part element="tns:CustomException" name="CustomException">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="arrayInputResponse">
+    <wsdl:part element="tns:arrayInputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="listObjectOutputResponse">
+    <wsdl:part element="tns:listObjectOutputResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="echoIntArrayResponse">
+    <wsdl:part element="tns:echoIntArrayResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="throwException">
+    <wsdl:part element="tns:throwException" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DocLitWrappedCodeFirstService">
+<wsdl:documentation>DocLitWrappedCodeFirstService interface</wsdl:documentation>
+    <wsdl:operation name="echoStringNotReallyAsync">
+      <wsdl:input message="tns:echoStringNotReallyAsync" name="echoStringNotReallyAsync">
+    </wsdl:input>
+      <wsdl:output message="tns:echoStringNotReallyAsyncResponse" name="echoStringNotReallyAsyncResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="multiInOut">
+<wsdl:documentation>multiInOut doc</wsdl:documentation>
+      <wsdl:input message="tns:multiInOut" name="multiInOut">
+<wsdl:documentation>multiInOut Input doc</wsdl:documentation>
+    </wsdl:input>
+      <wsdl:output message="tns:multiInOutResponse" name="multiInOutResponse">
+<wsdl:documentation>multiInOut Output doc</wsdl:documentation>
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="arrayInput">
+      <wsdl:input message="tns:arrayInput" name="arrayInput">
+    </wsdl:input>
+      <wsdl:output message="tns:arrayInputResponse" name="arrayInputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doCXF2411">
+      <wsdl:input message="tns:doCXF2411" name="doCXF2411">
+    </wsdl:input>
+      <wsdl:output message="tns:doCXF2411Response" name="doCXF2411Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectOutput">
+      <wsdl:input message="tns:listObjectOutput" name="listObjectOutput">
+    </wsdl:input>
+      <wsdl:output message="tns:listObjectOutputResponse" name="listObjectOutputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectArrayOutput">
+      <wsdl:input message="tns:listObjectArrayOutput" name="listObjectArrayOutput">
+    </wsdl:input>
+      <wsdl:output message="tns:listObjectArrayOutputResponse" name="listObjectArrayOutputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="arrayOutput">
+      <wsdl:input message="tns:arrayOutput" name="arrayOutput">
+    </wsdl:input>
+      <wsdl:output message="tns:arrayOutputResponse" name="arrayOutputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="multiListInput">
+      <wsdl:input message="tns:multiListInput" name="multiListInput">
+    </wsdl:input>
+      <wsdl:output message="tns:multiListInputResponse" name="multiListInputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="modifyFoo">
+      <wsdl:input message="tns:modifyFoo" name="modifyFoo">
+    </wsdl:input>
+      <wsdl:output message="tns:modifyFooResponse" name="modifyFooResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="outOnly">
+      <wsdl:input message="tns:outOnly" name="outOnly">
+    </wsdl:input>
+      <wsdl:output message="tns:outOnlyResponse" name="outOnlyResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echoIntDifferentWrapperName">
+      <wsdl:input message="tns:echoIntDifferentWrapperName" name="echoIntDifferentWrapperName">
+    </wsdl:input>
+      <wsdl:output message="tns:echoIntDifferentWrapperNameResponse" name="echoIntDifferentWrapperNameResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createBar">
+      <wsdl:input message="tns:createBar" name="createBar">
+    </wsdl:input>
+      <wsdl:output message="tns:createBarResponse" name="createBarResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectIn">
+      <wsdl:input message="tns:listObjectIn" name="listObjectIn">
+    </wsdl:input>
+      <wsdl:output message="tns:listObjectInResponse" name="listObjectInResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listInput">
+      <wsdl:input message="tns:listInput" name="listInput">
+    </wsdl:input>
+      <wsdl:output message="tns:listInputResponse" name="listInputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listOutput">
+      <wsdl:input message="tns:listOutput" name="listOutput">
+    </wsdl:input>
+      <wsdl:output message="tns:listOutputResponse" name="listOutputResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doOneWay">
+      <wsdl:input message="tns:doOneWay" name="doOneWay">
+    </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="echoIntArray">
+      <wsdl:input message="tns:echoIntArray" name="echoIntArray">
+    </wsdl:input>
+      <wsdl:output message="tns:echoIntArrayResponse" name="echoIntArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFooSet">
+      <wsdl:input message="tns:getFooSet" name="getFooSet">
+    </wsdl:input>
+      <wsdl:output message="tns:getFooSetResponse" name="getFooSetResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doBug2692">
+      <wsdl:input message="tns:doBug2692" name="doBug2692">
+    </wsdl:input>
+      <wsdl:output message="tns:doBug2692Response" name="doBug2692Response">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doFooList">
+      <wsdl:input message="tns:doFooList" name="doFooList">
+    </wsdl:input>
+      <wsdl:output message="tns:doFooListResponse" name="doFooListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo">
+      <wsdl:input message="tns:echo" name="echo">
+    </wsdl:input>
+      <wsdl:output message="tns:echoResponse" name="echoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="singleInOut">
+      <wsdl:input message="tns:singleInOut" name="singleInOut">
+    </wsdl:input>
+      <wsdl:output message="tns:singleInOutResponse" name="singleInOutResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="throwException">
+      <wsdl:input message="tns:throwException" name="throwException">
+    </wsdl:input>
+      <wsdl:output message="tns:throwExceptionResponse" name="throwExceptionResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:ComplexException" name="ComplexException">
+    </wsdl:fault>
+      <wsdl:fault message="tns:ServiceTestFault" name="ServiceTestFault">
+    </wsdl:fault>
+      <wsdl:fault message="tns:CustomException" name="CustomException">
+<wsdl:documentation>fault porttype doc</wsdl:documentation>
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DocLitWrappedCodeFirstServiceSoapBinding" type="tns:DocLitWrappedCodeFirstService">
+<wsdl:documentation>DocLitWrappedCodeFirstService binding doc</wsdl:documentation>
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="echoStringNotReallyAsync">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echoStringNotReallyAsync">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoStringNotReallyAsyncResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="multiInOut">
+<wsdl:documentation>multiInOut binding doc</wsdl:documentation>
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="multiInOut">
+<wsdl:documentation>multiInOut binding Input doc</wsdl:documentation>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="multiInOutResponse">
+<wsdl:documentation>multiInOut binding Output doc</wsdl:documentation>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="arrayInput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="arrayInput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="arrayInputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doCXF2411">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doCXF2411">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doCXF2411Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectOutput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="listObjectOutput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listObjectOutputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectArrayOutput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="listObjectArrayOutput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listObjectArrayOutputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="arrayOutput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="arrayOutput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="arrayOutputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="multiListInput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="multiListInput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="multiListInputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="modifyFoo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="modifyFoo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="modifyFooResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="outOnly">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="outOnly">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="outOnlyResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echoIntDifferentWrapperName">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echoIntDifferentWrapperName">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoIntDifferentWrapperNameResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createBar">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="createBar">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="createBarResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listObjectIn">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="listObjectIn">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listObjectInResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listInput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="listInput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listInputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listOutput">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="listOutput">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listOutputResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doOneWay">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doOneWay">
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="echoIntArray">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echoIntArray">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoIntArrayResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFooSet">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getFooSet">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getFooSetResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doBug2692">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doBug2692">
+        <soap:header message="tns:doBug2692" part="name" use="literal">
+        </soap:header>
+        <soap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doBug2692Response">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doFooList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doFooList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doFooListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="echo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="echo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="echoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="singleInOut">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="singleInOut">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="singleInOutResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="throwException">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="throwException">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="throwExceptionResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ComplexException">
+        <soap:fault name="ComplexException" use="literal"/>
+      </wsdl:fault>
+      <wsdl:fault name="ServiceTestFault">
+        <soap:fault name="ServiceTestFault" use="literal"/>
+      </wsdl:fault>
+      <wsdl:fault name="CustomException">
+<wsdl:documentation>fault binding doc</wsdl:documentation>
+        <soap:fault name="CustomException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DocLitWrappedCodeFirstService">
+<wsdl:documentation>DocLitWrappedCodeFirstService impl</wsdl:documentation>
+    <wsdl:port binding="tns:DocLitWrappedCodeFirstServiceSoapBinding" name="DocLitWrappedCodeFirstServicePort">
+<wsdl:documentation>DocLitWrappedCodeFirstService service/port doc</wsdl:documentation>
+      <soap:address location="http://localhost:36401/DocLitWrappedCodeFirstService/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

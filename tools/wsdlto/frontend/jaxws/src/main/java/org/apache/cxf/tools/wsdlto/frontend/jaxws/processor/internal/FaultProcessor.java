@@ -59,9 +59,8 @@ public class FaultProcessor extends AbstractProcessor {
         if (context.optionSet(ToolConstants.CFG_GEN_OVERWRITE)) {
             return false;
         }
-        boolean collision = collector.containTypesClass(packageName, className)
+        return collector.containTypesClass(packageName, className)
             || collector.containSeiClass(packageName, className);
-        return collision;
     }
 
     private void processFault(JavaMethod method, FaultInfo faultMessage) throws ToolException {
@@ -98,7 +97,7 @@ public class FaultProcessor extends AbstractProcessor {
         collector.addExceptionClassName(packageName, name, fullClassName);
 
         boolean samePackage = method.getInterface().getPackageName().equals(packageName);
-        method.addException(new JavaException(faultMessage.getName().getLocalPart(), 
+        method.addException(new JavaException(faultMessage.getName().getLocalPart(),
                                               samePackage ? name : fullClassName, namespace));
 
         List<MessagePartInfo> faultParts = faultMessage.getMessageParts();

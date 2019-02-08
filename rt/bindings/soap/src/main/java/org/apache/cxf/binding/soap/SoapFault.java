@@ -40,7 +40,7 @@ public class SoapFault extends Fault {
     /**
      * "The message was incorrectly formed or did not contain the appropriate
      * information in order to succeed." -- SOAP 1.2 Spec
-     */ 
+     */
 
     /**
      * A SOAP 1.2 only fault code. <p/> "The message could not be processed for
@@ -48,12 +48,12 @@ public class SoapFault extends Fault {
      * contents of the message itself." -- SOAP 1.2 Spec <p/> If this message is
      * used in a SOAP 1.1 Fault it will most likely (depending on the
      * FaultHandler) be mapped to "Sender" instead.
-     */ 
+     */
 
     private List<QName> subCodes;
     private String role;
     private String node;
-    private Map<String, String> namespaces = new HashMap<String, String>();
+    private Map<String, String> namespaces = new HashMap<>();
 
     public SoapFault(Message message, Throwable throwable, QName faultCode) {
         super(message, throwable, faultCode);
@@ -80,15 +80,15 @@ public class SoapFault extends Fault {
         super(new Message(message, (ResourceBundle)null), t, faultCode);
     }
 
-    
+
     public String getCodeString(String prefix, String defaultPrefix) {
         return getFaultCodeString(prefix, defaultPrefix, getFaultCode());
     }
-    
+
     public String getSubCodeString(String prefix, String defaultPrefix) {
         return getFaultCodeString(prefix, defaultPrefix, getRootSubCode());
     }
-    
+
     private String getFaultCodeString(String prefix, String defaultPrefix, QName fCode) {
         String codePrefix = null;
         if (StringUtils.isEmpty(prefix)) {
@@ -99,17 +99,17 @@ public class SoapFault extends Fault {
         } else {
             codePrefix = prefix;
         }
-        
-        return codePrefix + ":" + fCode.getLocalPart();        
+
+        return codePrefix + ":" + fCode.getLocalPart();
     }
-    
+
     private QName getRootSubCode() {
-        return subCodes != null && subCodes.size() > 0 ? subCodes.get(0) : null;
+        return subCodes != null && !subCodes.isEmpty() ? subCodes.get(0) : null;
     }
 
     private void setRootSubCode(QName subCode) {
         if (subCodes == null) {
-            subCodes = new LinkedList<QName>();
+            subCodes = new LinkedList<>();
         } else {
             subCodes.clear();
         }
@@ -122,7 +122,7 @@ public class SoapFault extends Fault {
 
     /**
      * Returns the fault actor.
-     * 
+     *
      * @return the fault actor.
      */
     public String getRole() {
@@ -131,25 +131,25 @@ public class SoapFault extends Fault {
 
     /**
      * Sets the fault actor.
-     * 
+     *
      * @param actor the actor.
      */
     public void setRole(String actor) {
         this.role = actor;
     }
-    
+
     public String getNode() {
         return node;
     }
 
     public void setNode(String n) {
         this.node = n;
-    }    
+    }
 
     /**
-     * Returns the SubCode for the Fault Code. If there are more than one Subcode entries 
+     * Returns the SubCode for the Fault Code. If there are more than one Subcode entries
      * in this fault, the first Subcode is returned.
-     * 
+     *
      * @return The SubCode element as detailed by the SOAP 1.2 spec.
      */
     public QName getSubCode() {
@@ -158,7 +158,7 @@ public class SoapFault extends Fault {
 
     /**
      * Returns the SubCode list for the Fault Code.
-     * 
+     *
      * @return The SubCode element list as detailed by the SOAP 1.2 spec.
      */
     public List<QName> getSubCodes() {
@@ -166,9 +166,9 @@ public class SoapFault extends Fault {
     }
 
     /**
-     * Sets the SubCode for the Fault Code. If there are more than one Subcode entries 
+     * Sets the SubCode for the Fault Code. If there are more than one Subcode entries
      * in this fault, the first Subcode is set while the other entries are removed.
-     * 
+     *
      * @param subCode The SubCode element as detailed by the SOAP 1.2 spec.
      */
     public void setSubCode(QName subCode) {
@@ -177,7 +177,7 @@ public class SoapFault extends Fault {
 
     /**
      * Sets the SubCode list for the Fault Code.
-     * 
+     *
      * @param subCode The SubCode element list as detailed by the SOAP 1.2 spec.
      */
     public void setSubCodes(List<QName> subCodes) {
@@ -186,12 +186,12 @@ public class SoapFault extends Fault {
 
     /**
      * Appends the SubCode to the SubCode list.
-     * 
-     * @param subCode The SubCode element as detailed by the SOAP 1.2 spec. 
+     *
+     * @param subCode The SubCode element as detailed by the SOAP 1.2 spec.
      */
     public void addSubCode(QName subCode) {
         if (subCodes == null) {
-            subCodes = new LinkedList<QName>();
+            subCodes = new LinkedList<>();
         }
         subCodes.add(subCode);
     }
@@ -222,7 +222,7 @@ public class SoapFault extends Fault {
             return;
         }
         f.setFaultCode(Soap12.getInstance().getReceiver());
-        
+
         if (f.getSubCodes() == null) {
             f.setRootSubCode(fc);
         } else if (!f.getSubCodes().contains(fc)) {
@@ -237,7 +237,7 @@ public class SoapFault extends Fault {
                 QName fc = f.getFaultCode();
                 if (Fault.FAULT_CODE_CLIENT.equals(fc)) {
                     fc = v.getSender();
-                } else if (Fault.FAULT_CODE_SERVER.equals(fc)) { 
+                } else if (Fault.FAULT_CODE_SERVER.equals(fc)) {
                     fc = v.getReceiver();
                 }
                 f.setFaultCode(fc);
@@ -251,7 +251,7 @@ public class SoapFault extends Fault {
         QName fc = f.getFaultCode();
         if (Fault.FAULT_CODE_CLIENT.equals(fc)) {
             fc = v.getSender();
-        } else if (Fault.FAULT_CODE_SERVER.equals(fc)) { 
+        } else if (Fault.FAULT_CODE_SERVER.equals(fc)) {
             fc = v.getReceiver();
         }
         SoapFault soapFault = new SoapFault(new Message(f.getMessage(), (ResourceBundle)null),

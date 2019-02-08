@@ -25,31 +25,31 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * 
+ *
  */
 public final class EndpointCreationLoop2 {
-    
+
     private GenericApplicationContext applicationContext;
-    
+
     private EndpointCreationLoop2() {
     }
-    
+
     private void readBeans(Resource beanResource) {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(
                         applicationContext);
         reader.loadBeanDefinitions(beanResource);
     }
-    
+
     private void init() {
         applicationContext = new GenericApplicationContext();
         readBeans(new ClassPathResource("extrajaxbclass.xml"));
         applicationContext.refresh();
     }
-    
+
     private void close() {
         applicationContext.close();
     }
-    
+
     private void iteration() {
         applicationContext.stop();
         applicationContext.start();

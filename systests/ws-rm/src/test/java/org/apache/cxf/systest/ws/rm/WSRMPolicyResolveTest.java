@@ -21,10 +21,12 @@ package org.apache.cxf.systest.ws.rm;
 
 import org.apache.cxf.test.AbstractCXFSpringTest;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.springframework.context.support.GenericApplicationContext;
 
 import org.junit.Test;
 
-import org.springframework.context.support.GenericApplicationContext;
+import static org.junit.Assert.assertEquals;
+
 
 
 

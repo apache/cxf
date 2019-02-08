@@ -20,6 +20,6 @@
 package org.apache.cxf.extension;
 
 public interface BusExtension {
-       
+
     Class<?> getRegistrationType();
 }

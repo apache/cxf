@@ -53,6 +53,7 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.binding.soap.saaj.SAAJUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.ServiceUtils;
@@ -63,7 +64,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -131,10 +131,9 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     }
 
                     public OutputStream getOutputStream() throws IOException {
-                        // TODO Auto-generated method stub
                         return null;
                     }
-                    
+
                 });
             } else if (!ct.toLowerCase().contains("xml")) {
                 //not XML based, need to stream out directly.  This is a bit tricky as
@@ -158,7 +157,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             }
         } else if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)
             && Source.class.isAssignableFrom(type)) {
-            //if schema validation is on, we'll end up converting to a DOMSource anyway, 
+            //if schema validation is on, we'll end up converting to a DOMSource anyway,
             //let's convert and check for a fault
             MessageContentsList list = (MessageContentsList)message.getContent(List.class);
             Source ds = (Source)list.get(0);
@@ -172,10 +171,10 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 validatePossibleFault(message, bop, ((DOMSource)ds).getNode());
             }
         }
-        
+
     }
-    
-    
+
+
     private void validatePossibleFault(Message message, BindingOperationInfo bop, Node ds) {
         Element el = DOMUtils.getFirstElement(ds);
         if (!"Fault".equals(el.getLocalName())) {
@@ -209,7 +208,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 for (BindingFaultInfo bfi : bop.getFaults()) {
                     if (bfi.getFaultInfo().getMessagePartByIndex(0).getConcreteName().equals(qn)) {
                         //Found a fault with the correct QName, we can validate it
-                        schema.newValidator().validate(new DOMSource(el));
+                        schema.newValidator().validate(new DOMSource(DOMUtils.getDomElement(el)));
                     }
                 }
                 el = DOMUtils.getNextElement(el);
@@ -227,13 +226,13 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             } catch (Exception e) {
                 throw new SoapFault(e.getMessage(), e, message.getVersion().getReceiver());
             }
-            
+
             //We validated what we can from a fault standpoint
             message.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
         }
     }
-    
-    
+
+
     private void doSoap(Message message) {
         MessageContentsList list = (MessageContentsList)message.getContent(List.class);
         if (list == null || list.isEmpty()) {
@@ -242,18 +241,18 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         Object o = list.get(0);
         if (o instanceof SOAPMessage) {
             SOAPMessage soapMessage = (SOAPMessage)o;
-            
+
             if (soapMessage.countAttachments() > 0) {
                 message.put("write.attachments", Boolean.TRUE);
             }
             try {
                 if (message instanceof org.apache.cxf.binding.soap.SoapMessage) {
-                    org.apache.cxf.binding.soap.SoapMessage cxfSoapMessage = 
+                    org.apache.cxf.binding.soap.SoapMessage cxfSoapMessage =
                             (org.apache.cxf.binding.soap.SoapMessage)message;
                     String cxfNamespace = cxfSoapMessage.getVersion().getNamespace();
                     SOAPHeader soapHeader = soapMessage.getSOAPHeader();
                     String namespace = soapHeader == null ? null : soapHeader.getNamespaceURI();
-                    if (namespace != null && cxfNamespace != null && !namespace.equals(cxfNamespace) 
+                    if (namespace != null && cxfNamespace != null && !namespace.equals(cxfNamespace)
                             && Soap12.SOAP_NAMESPACE.equals(namespace)) {
                         cxfSoapMessage.setVersion(Soap12.getInstance());
                         cxfSoapMessage.put(Message.CONTENT_TYPE, cxfSoapMessage.getVersion().getContentType());
@@ -273,7 +272,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             try {
                 Object xmlDec = soapMessage.getProperty(SOAPMessage.WRITE_XML_DECLARATION);
                 if (xmlDec != null) {
-                    boolean b = MessageUtils.isTrue(xmlDec);
+                    boolean b = PropertyUtils.isTrue(xmlDec);
                     message.put(StaxOutInterceptor.FORCE_START_DOCUMENT, b);
                 }
             } catch (SOAPException e) {
@@ -282,18 +281,18 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         message.getInterceptorChain().add(internal);
     }
-    
+
     private class MessageModeOutInterceptorInternal extends AbstractSoapInterceptor {
         MessageModeOutInterceptorInternal() {
             super(Phase.PRE_PROTOCOL);
             addBefore(SAAJOutInterceptor.class.getName());
         }
-        
+
         public void handleMessage(SoapMessage message) throws Fault {
             MessageContentsList list = (MessageContentsList)message.getContent(List.class);
             Object o = list.remove(0);
             SOAPMessage soapMessage = null;
-            
+
             if (o instanceof SOAPMessage) {
                 soapMessage = (SOAPMessage)o;
                 if (soapMessage.countAttachments() > 0) {
@@ -307,11 +306,8 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     if (o instanceof Source) {
                         StaxUtils.copy((Source)o, new SAAJStreamWriter(part));
                     }
-                } catch (SOAPException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e, 
-                                        message.getVersion().getSender());
-                } catch (XMLStreamException e) {
-                    throw new SoapFault("Error creating SOAPMessage", e, 
+                } catch (SOAPException | XMLStreamException e) {
+                    throw new SoapFault("Error creating SOAPMessage", e,
                                         message.getVersion().getSender());
                 }
             }
@@ -327,12 +323,13 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                         validateFault(message, (SOAPFault)nd, bop);
                     }
                     body.removeChild(nd);
+                    nd = DOMUtils.getDomElement(nd);
                     frag.appendChild(nd);
                     nd = SAAJUtils.getBody(soapMessage).getFirstChild();
                 }
 
                 message.setContent(SOAPMessage.class, soapMessage);
-                
+
                 if (!message.containsKey(SAAJOutInterceptor.ORIGINAL_XML_WRITER)) {
                     XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
                     message.put(SAAJOutInterceptor.ORIGINAL_XML_WRITER, origWriter);
@@ -341,33 +338,33 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 // Replace stax writer with DomStreamWriter
                 message.setContent(XMLStreamWriter.class, writer);
                 message.setContent(SOAPMessage.class, soapMessage);
-                
+
                 int index = 0;
 
                 boolean client = isRequestor(message);
-                BindingMessageInfo bmsg = null; 
+                BindingMessageInfo bmsg = null;
 
                 if (client && bop != null) {
                     bmsg = bop.getInput();
                 } else if (bop != null && bop.getOutput() != null) {
-                    bmsg = bop.getOutput();  
+                    bmsg = bop.getOutput();
                 }
-                if (bmsg != null && bmsg.getMessageParts() != null 
+                if (bmsg != null && bmsg.getMessageParts() != null
                     && bmsg.getMessageParts().size() > 0) {
-                    index = bmsg.getMessageParts().get(0).getIndex(); 
+                    index = bmsg.getMessageParts().get(0).getIndex();
                 }
 
                 list.set(index, frag);
-                
-                
-                //No need to buffer this as we're already a DOM, 
+
+
+                //No need to buffer this as we're already a DOM,
                 //but only do so if someone hasn't actually configured this
                 Object buffer = message
                     .getContextualProperty(AbstractOutDatabindingInterceptor.OUT_BUFFERING);
                 if (buffer == null) {
                     message.put(AbstractOutDatabindingInterceptor.OUT_BUFFERING, Boolean.FALSE);
                 }
-                
+
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
@@ -375,12 +372,12 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                 bop = bop.getWrappedOperation();
                 message.getExchange().put(BindingOperationInfo.class, bop);
             }
-            
+
             // Add a final interceptor to write the message
             message.getInterceptorChain().add(SAAJOutEndingInterceptor.INSTANCE);
         }
     }
-    
-    
-        
+
+
+
 }

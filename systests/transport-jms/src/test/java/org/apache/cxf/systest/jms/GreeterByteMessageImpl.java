@@ -23,11 +23,11 @@ import javax.jws.WebService;
 
 
 
-@WebService(serviceName = "HWByteMsgService", 
+@WebService(serviceName = "HWByteMsgService",
             portName = "HWSByteMsgPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterByteMessageImpl extends TwoWayJMSImplBase {    
-    
+public class GreeterByteMessageImpl extends TwoWayJMSImplBase {
+
 }

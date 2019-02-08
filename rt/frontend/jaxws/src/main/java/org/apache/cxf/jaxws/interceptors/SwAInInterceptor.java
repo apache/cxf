@@ -52,38 +52,38 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
         if (bop == null) {
             return;
         }
-        
+
         if (bop.isUnwrapped()) {
             bop = bop.getWrappedOperation();
         }
-        
+
         boolean client = isRequestor(message);
         BindingMessageInfo bmi = client ? bop.getOutput() : bop.getInput();
-        
+
         if (bmi == null) {
             return;
         }
-        
+
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
-        
-        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
+
+        if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().isEmpty()) {
             return;
         }
-        
-        Set<Integer> foundAtts = new HashSet<Integer>();
+
+        Set<Integer> foundAtts = new HashSet<>();
         MessageContentsList inObjects = MessageContentsList.getContentsList(message);
 
         for (MessagePartInfo mpi : sbi.getAttachments()) {
             String partName = mpi.getConcreteName().getLocalPart();
-            
+
             String start = partName + "=";
             boolean found = false;
-            
+
             if (foundAtts.contains(mpi.getIndex())) {
                 continue;
             }
             foundAtts.add(mpi.getIndex());
-            
+
             for (Attachment a : message.getAttachments()) {
                 if (a.getId().startsWith(start)) {
                     DataHandler dh = a.getDataHandler();
@@ -120,13 +120,13 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
                     } else {
                         o = dh;
                     }
-                    
+
                     inObjects.put(mpi, o);
                     found = true;
                     break;
                 }
             }
-            
+
             if (!found) {
                 inObjects.put(mpi, null);
             }

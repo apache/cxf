@@ -38,6 +38,9 @@
         <wsdl:port name="DoubleItTransportCustomBSTPort" binding="tns:DoubleItTransportBSTBinding">
             <soap:address location="https://localhost:8081/doubleit/services/doubleittransportcustombst"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItTransportCustomBSTLocalPort" binding="tns:DoubleItTransportBSTBinding">
+            <soap:address location="https://localhost:8081/doubleit/services/doubleittransportcustombstlocal"/>
+        </wsdl:port>
     </wsdl:service>
     <wsp:Policy wsu:Id="DoubleItBindingTransportBSTPolicy">
         <wsp:ExactlyOne>
@@ -72,7 +75,6 @@
                         <sp:IssuedToken sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
                             <sp:RequestSecurityTokenTemplate>
                                 <t:TokenType>http://custom.apache.org/token</t:TokenType>
-                                <t:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer</t:KeyType>
                             </sp:RequestSecurityTokenTemplate>
                             <wsp:Policy>
                                 <sp:RequireInternalReference/>

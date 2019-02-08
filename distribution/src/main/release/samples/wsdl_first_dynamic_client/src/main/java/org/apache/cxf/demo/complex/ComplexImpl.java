@@ -35,7 +35,7 @@ import agentwsresponse.agent.legacysystemservices.schemas.hitum.esb.company.Agen
     portName = "Company_ESB_Application_Biztalk_AgentDetails_4405_AgentDetails_PrtSoap",
     targetNamespace = "http://Company.com/Application",
     wsdlLocation = "/wsdl/complex.wsdl",
-    endpointInterface = 
+    endpointInterface =
         "com.company.application.CompanyESBApplicationBiztalkAgentDetails4405AgentDetailsPrtSoap")
 
 public class ComplexImpl implements CompanyESBApplicationBiztalkAgentDetails4405AgentDetailsPrtSoap {
@@ -44,11 +44,11 @@ public class ComplexImpl implements CompanyESBApplicationBiztalkAgentDetails4405
     public GetAgentDetailsResponse getAgentDetails(GetAgentDetails parameters) {
         GetAgentDetailsResponse r = new GetAgentDetailsResponse();
         AgentWSResponse awr = new AgentWSResponse();
-        
+
         int number = parameters.getPart().getAgentNumber();
         awr.setAgenceNumber(number);
         awr.setAgentName("Orange");
-        
+
         r.setAgentWSResponse(awr);
         return r;
     }

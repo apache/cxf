@@ -20,9 +20,11 @@ package org.apache.cxf.transport.http.netty.client.integration;
 
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -31,9 +33,13 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class NettyClientTest extends AbstractBusClientServerTestBase {
 
@@ -79,10 +85,10 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testInovationWithNettyAddress() throws Exception {
-        String address =  "netty://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "netty://http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -90,10 +96,10 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testInvocationWithTransportId() throws Exception {
-        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -110,9 +116,7 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
             public void handleResponse(Response<GreetMeResponse> res) {
                 try {
                     res.get().getResponseType();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -133,9 +137,7 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         public void handleResponse(Response<GreetMeLaterResponse> res) {
             try {
                 response = res.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }

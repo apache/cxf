@@ -32,7 +32,7 @@ public abstract class AbstractGenerator<T> {
     private File outputdir;
     private Bus bus;
     private ToolContext context;
-    
+
     public void setToolContext(ToolContext arg) {
         this.context = arg;
     }
@@ -55,14 +55,14 @@ public abstract class AbstractGenerator<T> {
     public ServiceInfo getServiceModel() {
         return this.service;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     public void setAllowImports(boolean b) {
         allowImports = b;
     }
@@ -83,7 +83,7 @@ public abstract class AbstractGenerator<T> {
         }
         return parentDir;
     }
-    
+
     protected OutputStreamCreator getOutputStreamCreator() {
         OutputStreamCreator osc = context.get(OutputStreamCreator.class);
         if (osc == null) {

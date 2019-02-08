@@ -20,6 +20,10 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
+
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
@@ -30,31 +34,58 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    
-    
-    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
+    private boolean generateCekOnce;
+
+    protected AbstractContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
+        super(algo);
+        this.generateCekOnce = generateCekOnce;
+    }
+    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) {
         super(algo);
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {
             providedIvUsageCount = new AtomicInteger();
-        }    
+        }
     }
-    
+
     public byte[] getContentEncryptionKey(JweHeaders headers) {
-        return cek;
+        byte[] theCek = null;
+        if (cek == null) {
+            String algoJava = getAlgorithm().getJavaName();
+            SecretKey secretKey = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
+                          getContentEncryptionKeySize(headers));
+            theCek = secretKey.getEncoded();
+            if (generateCekOnce) {
+                synchronized (this) {
+                    cek = theCek;
+                }
+            }
+            // Clean the key after we're done with it
+            try {
+                secretKey.destroy();
+            } catch (DestroyFailedException e) {
+                // ignore
+            }
+        } else {
+            theCek = cek;
+        }
+        return theCek;
     }
     public byte[] getInitVector() {
         if (iv == null) {
             return CryptoUtils.generateSecureRandomBytes(getIvSize() / 8);
         } else if (iv.length > 0 && providedIvUsageCount.addAndGet(1) > 1) {
-            LOG.warning("Custom IV is recommeded to be used once");
+            LOG.warning("Custom IV is recommended to be used once");
             throw new JweException(JweException.Error.CUSTOM_IV_REUSED);
         } else {
             return iv;
         }
     }
-    protected int getIvSize() { 
+    protected int getContentEncryptionKeySize(JweHeaders headers) {
+        return getAlgorithm().getKeySizeBits();
+    }
+    protected int getIvSize() {
         return DEFAULT_IV_SIZE;
     }
 }

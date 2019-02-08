@@ -27,26 +27,26 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  */
 public interface ProtocolHeaders {
-    
+
     /**
      * Get the value of a request header.
      * @param name the header name, case insensitive
      * @return the header value
      */
     String getRequestHeaderValue(String name);
-    
+
     /**
      * Get the values of a request header.
      * @param name the header name, case insensitive
      * @return a read-only list of header values.
      */
     List<String> getRequestHeader(String name);
-    
+
     /**
-     * Get the values of request headers. 
+     * Get the values of request headers.
      * @return a read-only map of header names and values.
      */
     MultivaluedMap<String, String> getRequestHeaders();
-    
-    
+
+
 }

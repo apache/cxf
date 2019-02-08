@@ -23,14 +23,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *
  */
 public class ThrottleResponse {
     protected long delay;
     protected Map<String, String> responseHeaders = new HashMap<>();
     protected int responseCode = -1;
     protected String errorMessage;
-    
+
+    public ThrottleResponse() {
+
+    }
+
+    public ThrottleResponse(int responceCode) {
+        this.responseCode = responceCode;
+    }
+
+    public ThrottleResponse(int responceCode, long delay) {
+        this(responceCode);
+        this.delay = delay;
+    }
 
     public Map<String, String> getResponseHeaders() {
         return responseHeaders;
@@ -61,7 +73,9 @@ public class ThrottleResponse {
     }
 
     /**
-     * Delay processing for specified milliseconds.  Should be "small" to prevent the client from timing out.
+     * Delay processing for specified milliseconds.
+     * Should be "small" to prevent the client from timing out unless the client request is
+     * aborted with the HTTP error code.
      * @return
      */
     public long getDelay() {
@@ -71,5 +85,5 @@ public class ThrottleResponse {
     public ThrottleResponse setDelay(long d) {
         this.delay = d;
         return this;
-    }    
+    }
 }

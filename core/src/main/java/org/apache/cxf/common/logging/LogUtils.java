@@ -43,7 +43,7 @@ import org.apache.cxf.common.util.StringUtils;
  * application must provide an object that extends {@link AbstractDelegatingLogger}, and advertise that class
  * via one of the following mechanisms:
  * <ul>
- * <li>Create a file, in the classpath, named META-INF/cxf/org.apache.cxf.Logger. 
+ * <li>Create a file, in the classpath, named META-INF/cxf/org.apache.cxf.Logger.
  * This file should contain the fully-qualified name
  * of the class, with no comments, on a single line.</li>
  * <li>Call {@link #setLoggerClass(Class)} with a Class<?> reference to the logger class.</li>
@@ -51,13 +51,13 @@ import org.apache.cxf.common.util.StringUtils;
  * CXF provides {@link Log4jLogger} to use log4j instead of java.util.logging.
  */
 public final class LogUtils {
-    public static final String KEY = "org.apache.cxf.Logger";
-    
+    private static final String KEY = "org.apache.cxf.Logger";
+
     private static final Object[] NO_PARAMETERS = new Object[0];
 
-    
+
     private static Class<?> loggerClass;
-    
+
     /**
      * Prevents instantiation.
      */
@@ -66,9 +66,9 @@ public final class LogUtils {
 
     static {
         JDKBugHacks.doHacks();
-        
+
         try {
-            
+
             String cname = null;
             try {
                 cname = AccessController.doPrivileged(new PrivilegedAction<String>() {
@@ -98,12 +98,12 @@ public final class LogUtils {
                     // as we'll just use j.u.l and pax-logging will pick it up fine
                     // If we don't call this and there isn't a slf4j impl avail,
                     // you get warnings printed to stderr about NOPLoggers and such
-                    Class.forName("org.slf4j.impl.StaticLoggerBinder");  
+                    Class.forName("org.slf4j.impl.StaticLoggerBinder");
                     Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
                     Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
                     String clsName = fcls.getName();
                     if (clsName.contains("NOPLogger")) {
-                        //no real slf4j implementation, use j.u.l 
+                        //no real slf4j implementation, use j.u.l
                         cname = null;
                     } else if (clsName.contains("Log4j")) {
                         cname = "org.apache.cxf.common.logging.Log4jLogger";
@@ -115,7 +115,7 @@ public final class LogUtils {
                         }
                     } else if (clsName.contains("JDK14")
                         || clsName.contains("pax.logging")) {
-                        //both of these we can use the appropriate j.u.l API's 
+                        //both of these we can use the appropriate j.u.l API's
                         //directly and have it work properly
                         cname = null;
                     } else {
@@ -142,8 +142,8 @@ public final class LogUtils {
             loggerClass = null;
         }
     }
-    
-    
+
+
     /**
      * Specify a logger class that inherits from {@link AbstractDelegatingLogger}.
      * Enable users to use their own logger implementation.
@@ -152,23 +152,23 @@ public final class LogUtils {
         loggerClass = cls;
     }
 
-    
+
     /**
      * Get a Logger with the associated default resource bundle for the class.
      *
      * @param cls the Class to contain the Logger
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getLogger(Class<?> cls) {
         return createLogger(cls, null, cls.getName());
     }
-    
+
     /**
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger
      * @param resourcename the resource name
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getLogger(Class<?> cls, String resourcename) {
         return createLogger(cls, resourcename, cls.getName());
@@ -180,7 +180,7 @@ public final class LogUtils {
      * @param cls the Class to contain the Logger (to find resources)
      * @param resourcename the resource name
      * @param loggerName the full name for the logger
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getLogger(Class<?> cls,
                                      String resourcename,
@@ -192,18 +192,18 @@ public final class LogUtils {
      * Get a Logger with the associated default resource bundle for the class.
      *
      * @param cls the Class to contain the Logger
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getL7dLogger(Class<?> cls) {
         return createLogger(cls, null, cls.getName());
     }
-    
+
     /**
      * Get a Logger with an associated resource bundle.
      *
      * @param cls the Class to contain the Logger
      * @param resourcename the resource name
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getL7dLogger(Class<?> cls, String resourcename) {
         return createLogger(cls, resourcename, cls.getName());
@@ -215,22 +215,22 @@ public final class LogUtils {
      * @param cls the Class to contain the Logger (to find resources)
      * @param resourcename the resource name
      * @param loggerName the full name for the logger
-     * @return an appropriate Logger 
+     * @return an appropriate Logger
      */
     public static Logger getL7dLogger(Class<?> cls,
                                       String resourcename,
                                       String loggerName) {
         return createLogger(cls, resourcename, loggerName);
     }
-    
+
     /**
      * Create a logger
      */
-    protected static Logger createLogger(Class<?> cls, 
-                                         String name, 
+    protected static Logger createLogger(Class<?> cls,
+                                         String name,
                                          String loggerName) {
-        ClassLoader orig = Thread.currentThread().getContextClassLoader();
-        ClassLoader n = cls.getClassLoader();
+        ClassLoader orig = getContextClassLoader();
+        ClassLoader n = getClassLoader(cls);
         if (n != null) {
             setContextClassLoader(n);
         }
@@ -239,7 +239,7 @@ public final class LogUtils {
             Logger logger = null;
             ResourceBundle b = null;
             if (bundleName == null) {
-                //grab the bundle prior to the call to Logger.getLogger(...) so the 
+                //grab the bundle prior to the call to Logger.getLogger(...) so the
                 //ResourceBundle can be loaded outside the big sync block that getLogger really is
                 bundleName = BundleUtils.getBundleName(cls);
                 try {
@@ -258,7 +258,7 @@ public final class LogUtils {
             if (b != null) {
                 b.getLocale();
             }
-            
+
             if (loggerClass != null) {
                 try {
                     Constructor<?> cns = loggerClass.getConstructor(String.class, String.class);
@@ -268,26 +268,23 @@ public final class LogUtils {
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof MissingResourceException) {
                                 return (Logger) cns.newInstance(loggerName, null);
-                            } else {
-                                throw ite;
                             }
-                        } 
-                    } else {
-                        try {
-                            return (Logger) cns.newInstance(loggerName, bundleName);
-                        } catch (InvocationTargetException ite) {
-                            if (ite.getTargetException() instanceof MissingResourceException) {
-                                throw (MissingResourceException)ite.getTargetException();
-                            } else {
-                                throw ite;
-                            }
-                        } 
+                            throw ite;
+                        }
+                    }
+                    try {
+                        return (Logger) cns.newInstance(loggerName, bundleName);
+                    } catch (InvocationTargetException ite) {
+                        if (ite.getTargetException() instanceof MissingResourceException) {
+                            throw (MissingResourceException)ite.getTargetException();
+                        }
+                        throw ite;
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
-                
+
             try {
                 logger = Logger.getLogger(loggerName, bundleName); //NOPMD
             } catch (IllegalArgumentException iae) {
@@ -305,14 +302,43 @@ public final class LogUtils {
             }
         }
     }
-    
+
     private static void setContextClassLoader(final ClassLoader classLoader) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                Thread.currentThread().setContextClassLoader(classLoader);
-                return null;
-            }
-        });
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    Thread.currentThread().setContextClassLoader(classLoader);
+                    return null;
+                }
+            });
+        } else {
+            Thread.currentThread().setContextClassLoader(classLoader);
+        }
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     /**
@@ -324,13 +350,13 @@ public final class LogUtils {
      * @param throwable the Throwable to log
      * @param parameter the parameter to substitute into message
      */
-    public static void log(Logger logger, 
-                           Level level, 
-                           String message, 
+    public static void log(Logger logger,
+                           Level level,
+                           String message,
                            Throwable throwable,
                            Object parameter) {
         if (logger.isLoggable(level)) {
-            final String formattedMessage = 
+            final String formattedMessage =
                 MessageFormat.format(localize(logger, message), parameter);
             doLog(logger, level, formattedMessage, throwable);
         }
@@ -345,31 +371,31 @@ public final class LogUtils {
      * @param throwable the Throwable to log
      * @param parameters the parameters to substitute into message
      */
-    public static void log(Logger logger, 
-                           Level level, 
-                           String message, 
+    public static void log(Logger logger,
+                           Level level,
+                           String message,
                            Throwable throwable,
                            Object... parameters) {
         if (logger.isLoggable(level)) {
-            final String formattedMessage = 
+            final String formattedMessage =
                 MessageFormat.format(localize(logger, message), parameters);
             doLog(logger, level, formattedMessage, throwable);
         }
     }
- 
+
     /**
      * Checks log level and logs
      *
      * @param logger the Logger the log to
      * @param level the severity level
      * @param message the log message
-     */    
-    public static void log(Logger logger, 
-                           Level level, 
+     */
+    public static void log(Logger logger,
+                           Level level,
                            String message) {
-        log(logger, level, message, NO_PARAMETERS);        
-    }  
-    
+        log(logger, level, message, NO_PARAMETERS);
+    }
+
     /**
      * Checks log level and logs
      *
@@ -377,14 +403,14 @@ public final class LogUtils {
      * @param level the severity level
      * @param message the log message
      * @param throwable the Throwable to log
-     */      
-    public static void log(Logger logger, 
-                           Level level, 
-                           String message, 
+     */
+    public static void log(Logger logger,
+                           Level level,
+                           String message,
                            Throwable throwable) {
         log(logger, level, message, throwable, NO_PARAMETERS);
     }
-  
+
     /**
      * Checks log level and logs
      *
@@ -392,14 +418,14 @@ public final class LogUtils {
      * @param level the severity level
      * @param message the log message
      * @param parameter the parameter to substitute into message
-     */      
-    public static void log(Logger logger, 
-                           Level level, 
-                           String message, 
+     */
+    public static void log(Logger logger,
+                           Level level,
+                           String message,
                            Object parameter) {
         log(logger, level, message, new Object[] {parameter});
     }
-    
+
     /**
      * Checks log level and logs
      *
@@ -407,10 +433,10 @@ public final class LogUtils {
      * @param level the severity level
      * @param message the log message
      * @param parameters the parameters to substitute into message
-     */      
-    public static void log(Logger logger, 
-                           Level level, 
-                           String message, 
+     */
+    public static void log(Logger logger,
+                           Level level,
+                           String message,
                            Object[] parameters) {
         if (logger.isLoggable(level)) {
             String msg = localize(logger, message);
@@ -420,23 +446,23 @@ public final class LogUtils {
                 //ignore, log as is
             }
             doLog(logger, level, msg, null);
-        }        
+        }
     }
 
     private static void doLog(Logger log, Level level, String msg, Throwable t) {
         LogRecord record = new LogRecord(level, msg);
-    
+
         record.setLoggerName(log.getName());
         record.setResourceBundleName(log.getResourceBundleName());
         record.setResourceBundle(log.getResourceBundle());
-            
+
         if (t != null) {
             record.setThrown(t);
         }
-        
+
         //try to get the right class name/method name - just trace
         //back the stack till we get out of this class
-        StackTraceElement stack[] = (new Throwable()).getStackTrace();
+        StackTraceElement[] stack = (new Throwable()).getStackTrace();
         String cname = LogUtils.class.getName();
         for (int x = 0; x < stack.length; x++) {
             StackTraceElement frame = stack[x];

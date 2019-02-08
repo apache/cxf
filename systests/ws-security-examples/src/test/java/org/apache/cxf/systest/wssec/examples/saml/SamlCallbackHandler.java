@@ -48,19 +48,19 @@ public class SamlCallbackHandler implements CallbackHandler {
     private String confirmationMethod;
     private boolean saml2;
     private boolean signed;
-    
+
     public SamlCallbackHandler() {
         //
     }
-    
+
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
     }
-    
+
     public void setSaml2(boolean isSaml2) {
         saml2 = isSaml2;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -71,15 +71,15 @@ public class SamlCallbackHandler implements CallbackHandler {
                 callback.setIssuer("sts");
                 String subjectName = "uid=sts-client,o=mock-sts.com";
                 String subjectQualifier = "www.mock-sts.com";
-                
+
                 String subjectConfMethod = confirmationMethod;
                 if (subjectConfMethod == null && !saml2) {
                     subjectConfMethod = SAML1Constants.CONF_BEARER;
                 } else if (subjectConfMethod == null && saml2) {
                     subjectConfMethod = SAML2Constants.CONF_BEARER;
                 }
-                
-                SubjectBean subjectBean = 
+
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, subjectConfMethod
                     );
@@ -92,12 +92,12 @@ public class SamlCallbackHandler implements CallbackHandler {
                         throw new IOException("Problem creating KeyInfo: " +  ex.getMessage());
                     }
                 }
-                
+
                 callback.setSubject(subjectBean);
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
-                
+
                 AttributeBean attributeBean = new AttributeBean();
                 if (saml2) {
                     attributeBean.setQualifiedName("subject-role");
@@ -108,7 +108,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("system-user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                
+
                 try {
                     String file = "alice.properties";
                     Crypto crypto = CryptoFactory.getInstance(file);
@@ -124,16 +124,16 @@ public class SamlCallbackHandler implements CallbackHandler {
     }
 
     protected KeyInfoBean createKeyInfo() throws Exception {
-        Crypto crypto = 
+        Crypto crypto =
             CryptoFactory.getInstance("alice.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("alice");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        
+
         KeyInfoBean keyInfo = new KeyInfoBean();
         keyInfo.setCertificate(certs[0]);
         keyInfo.setCertIdentifer(CERT_IDENTIFIER.X509_CERT);
-        
+
         return keyInfo;
     }
 
@@ -144,5 +144,5 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setSigned(boolean signed) {
         this.signed = signed;
     }
-    
+
 }

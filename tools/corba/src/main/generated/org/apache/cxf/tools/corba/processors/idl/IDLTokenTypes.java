@@ -2,7 +2,7 @@
 
   package org.apache.cxf.tools.corba.processors.idl;
 
- 
+
 public interface IDLTokenTypes {
 	int EOF = 1;
 	int NULL_TREE_LOOKAHEAD = 3;

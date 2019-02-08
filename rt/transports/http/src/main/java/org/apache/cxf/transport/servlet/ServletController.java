@@ -40,13 +40,13 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 
 public class ServletController {
-    
+
     public static final String AUTH_SERVICE_LIST = "auth.service.list";
     public static final String AUTH_SERVICE_LIST_REALM = "auth.service.list.realm";
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
     private static final String HTTP_PREFIX = "http";
-        
+
     protected boolean isHideServiceList;
     protected boolean isAuthServiceListPage;
     protected boolean disableAddressUpdates = true;
@@ -58,7 +58,7 @@ public class ServletController {
     protected HttpServlet serviceListGenerator;
 
     public ServletController(DestinationRegistry destinationRegistry,
-                                ServletConfig config, 
+                                ServletConfig config,
                                 HttpServlet serviceListGenerator) {
         this.servletConfig = config;
         this.destinationRegistry = destinationRegistry;
@@ -73,11 +73,11 @@ public class ServletController {
     protected String getBaseURL(HttpServletRequest request) {
         return forcedBaseAddress == null ? BaseUrlHelper.getBaseURL(request) : forcedBaseAddress;
     }
-    
+
     protected void setBaseURLAttribute(HttpServletRequest request) {
         request.setAttribute(Message.BASE_PATH, getBaseURL(request));
     }
-    
+
     protected void updateDestination(HttpServletRequest request,
                                      AbstractHTTPDestination d) {
         String base = getBaseURL(request);
@@ -88,14 +88,14 @@ public class ServletController {
                 updateDestination(request, base, d);
             }
         }
-        
+
     }
-    
+
     protected void updateDestination(HttpServletRequest request,
                                      String base,
                                      AbstractHTTPDestination d) {
         String ad = d.getEndpointInfo().getAddress();
-        if (ad == null 
+        if (ad == null
             && d.getAddress() != null
             && d.getAddress().getAddress() != null) {
             ad = d.getAddress().getAddress().getValue();
@@ -107,34 +107,34 @@ public class ServletController {
         // URI.create(ad).isRelative() can be used - a bit more expensive though
         if (ad != null && !ad.startsWith(HTTP_PREFIX)) {
             if (disableAddressUpdates) {
-                request.setAttribute("org.apache.cxf.transport.endpoint.address", 
+                request.setAttribute("org.apache.cxf.transport.endpoint.address",
                                      base + ad);
             } else {
                 BaseUrlHelper.setAddress(d, base + ad);
             }
         }
     }
-    
+
     private void init() {
         if (servletConfig == null) {
             return;
         }
-        
+
         String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
         if (!StringUtils.isEmpty(hideServiceList)) {
             this.isHideServiceList = Boolean.valueOf(hideServiceList);
         }
-        
+
         String authServiceListPage = servletConfig.getInitParameter("service-list-page-authenticate");
         if (!StringUtils.isEmpty(authServiceListPage)) {
             this.isAuthServiceListPage = Boolean.valueOf(authServiceListPage);
         }
-        
+
         String authServiceListRealm = servletConfig.getInitParameter("service-list-page-authenticate-realm");
         if (!StringUtils.isEmpty(authServiceListRealm)) {
             this.authServiceListPageRealm = authServiceListRealm;
         }
-        
+
         String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
         if (!StringUtils.isEmpty(isDisableAddressUpdates)) {
             this.disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
@@ -155,7 +155,7 @@ public class ServletController {
     }
     public boolean filter(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         return invoke(request, res, false);
-    }    
+    }
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         invoke(request, res, true);
     }
@@ -179,7 +179,7 @@ public class ServletController {
                     d = destinationRegistry.checkRestfulRequest(pathInfo);
                     if (d == null || d.getMessageObserver() == null) {
                         if (returnErrors) {
-                            LOG.warning("Can't find the the request for "
+                            LOG.warning("Can't find the request for "
                                 + request.getRequestURL() + "'s Observer ");
                             generateNotFound(request, res);
                         }
@@ -187,7 +187,7 @@ public class ServletController {
                     }
                 }
             }
-            if (d != null) {
+            if (d != null && d.getMessageObserver() != null) {
                 Bus bus = d.getBus();
                 ClassLoaderHolder orig = null;
                 try {
@@ -207,7 +207,7 @@ public class ServletController {
                     updateDestination(request, d);
                     invokeDestination(request, res, d);
                 } finally {
-                    if (orig != null) { 
+                    if (orig != null) {
                         orig.reset();
                     }
                 }
@@ -221,7 +221,7 @@ public class ServletController {
     private void setAuthServiceListPageAttribute(HttpServletRequest request) {
         request.setAttribute(ServletController.AUTH_SERVICE_LIST, this.isAuthServiceListPage);
         request.setAttribute(ServletController.AUTH_SERVICE_LIST_REALM, this.authServiceListPageRealm);
-        
+
     }
 
     public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
@@ -246,5 +246,5 @@ public class ServletController {
         res.setContentType("text/html");
         res.getWriter().write("<html><body>No service was found.</body></html>");
     }
-    
+
 }

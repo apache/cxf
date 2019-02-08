@@ -40,19 +40,19 @@ public class XMLServerImpl extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String args[]) {
-        try { 
+    public static void main(String[] args) {
+        try {
             XMLServerImpl s = new XMLServerImpl();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }
-    
-    @WebService(serviceName = "XMLService", 
+
+    @WebService(serviceName = "XMLService",
                 portName = "XMLPort",
                 endpointInterface = "org.apache.type_test.xml.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/xml",

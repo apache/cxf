@@ -25,7 +25,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
+import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.SP12Constants;
+import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.AbstractToken;
 import org.apache.wss4j.policy.model.AbstractToken.DerivedKeys;
 import org.apache.wss4j.policy.model.IssuedToken;
@@ -39,28 +42,36 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 
 /**
- * Validate a SignedEndorsingEncryptedSupportingToken policy. 
+ * Validate a SignedEndorsingEncryptedSupportingToken policy.
  */
 public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         QName suppTokens12 = SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && suppTokens12.equals(assertionInfo.getAssertion().getName());
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
+        // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
+        if (isTLSInUse(parameters.getMessage())) {
+            AssertionInfo transportAi =
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(),
+                                                         SPConstants.TRANSPORT_BINDING);
+            super.setEnforceEncryptedTokens(transportAi == null);
+        }
+
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
@@ -69,10 +80,11 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             List<AbstractToken> tokens = binding.getTokens();
             for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, parameters.getMessage())) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
                     assertSecurePartsIfTokenNotRequired(binding, parameters.getAssertionInfoMap());
                     continue;
                 }
-                
+
                 DerivedKeys derivedKeys = token.getDerivedKeys();
                 boolean derived = derivedKeys == DerivedKeys.RequireDerivedKeys;
                 boolean processingFailed = false;
@@ -81,7 +93,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                         processingFailed = true;
                     }
                 } else if (token instanceof SamlToken) {
-                    if (!processSAMLTokens(parameters)) {
+                    if (!processSAMLTokens(parameters, derived)) {
                         processingFailed = true;
                     }
                 } else if (token instanceof X509Token) {
@@ -101,10 +113,15 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                     if (!processSCTokens(parameters, derived)) {
                         processingFailed = true;
                     }
-                } else if (!(token instanceof IssuedToken)) {
+                } else if (token instanceof IssuedToken) {
+                    IssuedToken issuedToken = (IssuedToken)token;
+                    if (isSamlTokenRequiredForIssuedToken(issuedToken) && !processSAMLTokens(parameters, derived)) {
+                        processingFailed = true;
+                    }
+                } else {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the signed endorsing encrypted "
@@ -112,18 +129,22 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                     );
                     continue;
                 }
+
+                if (derived && parameters.getResults().getActionResults().containsKey(WSConstants.DKT)) {
+                    assertDerivedKeys(token, parameters.getAssertionInfoMap());
+                }
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return true;
     }
-    
+
     protected boolean isEncrypted() {
         return true;
     }
-    
+
     protected boolean isEndorsing() {
         return true;
     }

@@ -44,30 +44,30 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 
 public class SoapActionInInterceptor extends AbstractSoapInterceptor {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SoapActionInInterceptor.class);
     private static final String ALLOW_NON_MATCHING_TO_DEFAULT = "allowNonMatchingToDefaultSoapAction";
     private static final String CALCULATED_WSA_ACTION = SoapActionInInterceptor.class.getName() + ".ACTION";
-    
+
     public SoapActionInInterceptor() {
         super(Phase.READ);
         addAfter(ReadHeadersInterceptor.class.getName());
         addAfter(EndpointSelectionInterceptor.class.getName());
     }
-    
+
     public static String getSoapAction(Message m) {
         if (!(m instanceof SoapMessage)) {
             return null;
         }
         SoapMessage message = (SoapMessage)m;
         if (message.getVersion() instanceof Soap11) {
-            Map<String, List<String>> headers 
+            Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (headers != null) {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
-                if (sa != null && sa.size() > 0) {
+                if (sa != null && !sa.isEmpty()) {
                     String action = sa.get(0);
-                    if (action.startsWith("\"")) {
+                    if (action.startsWith("\"") || action.startsWith("\'")) {
                         action = action.substring(1, action.length() - 1);
                     }
                     return action;
@@ -75,18 +75,18 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             }
         } else if (message.getVersion() instanceof Soap12) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
-            
+
             if (ct == null) {
                 return null;
             }
-            
+
             int start = ct.indexOf("action=");
             if (start == -1 && ct.indexOf("multipart/related") == 0 && ct.indexOf("start-info") == -1) {
                 // the action property may not be found at the package's content-type for non-mtom multipart message
                 // but skip searching if the start-info property is set
                 List<String> cts = CastUtils.cast((List<?>)(((Map<?, ?>)
                     message.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS)).get(Message.CONTENT_TYPE)));
-                if (cts != null && cts.size() > 0) {
+                if (cts != null && !cts.isEmpty()) {
                     ct = cts.get(0);
                     start = ct.indexOf("action=");
                 }
@@ -113,19 +113,19 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
         return null;
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
         if (isRequestor(message)) {
             return;
         }
-        
+
         String action = getSoapAction(message);
         if (!StringUtils.isEmpty(action)) {
             getAndSetOperation(message, action);
             message.put(SoapBindingConstants.SOAP_ACTION, action);
         }
     }
-    
+
     public static void getAndSetOperation(SoapMessage message, String action) {
         getAndSetOperation(message, action, true);
     }
@@ -133,15 +133,15 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         if (StringUtils.isEmpty(action)) {
             return;
         }
-        
+
         Exchange ex = message.getExchange();
         Endpoint ep = ex.getEndpoint();
         if (ep == null) {
             return;
         }
-        
+
         BindingOperationInfo bindingOp = null;
-        
+
         Collection<BindingOperationInfo> bops = ep.getEndpointInfo()
             .getBinding().getOperations();
         if (bops != null) {
@@ -162,7 +162,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 }
             }
         }
-        
+
         if (bindingOp == null) {
             if (strict) {
                 //we didn't match the an operation, we'll try again later to make
@@ -173,7 +173,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
             }
             return;
         }
-        
+
         ex.put(BindingOperationInfo.class, bindingOp);
     }
     private static boolean matchWSAAction(BindingOperationInfo boi, String action) {
@@ -188,7 +188,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         }
         return false;
     }
-    
+
     private static String getWSAAction(BindingOperationInfo boi) {
         Object o = boi.getOperationInfo().getInput().getProperty(CALCULATED_WSA_ACTION);
         if (o == null) {
@@ -232,7 +232,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         return buffer.toString();
     }
 
-    
+
     public static class SoapActionInAttemptTwoInterceptor extends AbstractSoapInterceptor {
         final String action;
         public SoapActionInAttemptTwoInterceptor(String action) {

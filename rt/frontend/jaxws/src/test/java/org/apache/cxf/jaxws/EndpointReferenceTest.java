@@ -43,8 +43,12 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EndpointReferenceTest extends AbstractJaxWsTest {
 
@@ -71,7 +75,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         //1.2/HTTP, then a W3CEndpointReference MUST be returned.
         assertTrue(er instanceof W3CEndpointReference);
     }
-    
+
     @Test
     public void testBindingProviderSOAPBindingStaicService() throws Exception {
         org.apache.hello_world_soap_http.SOAPService s = new org.apache.hello_world_soap_http.SOAPService();
@@ -89,7 +93,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
 
     @Test
     public void testBindingProviderXMLBindingStaticService() throws Exception {
-        org.apache.hello_world_xml_http.bare.XMLService s = 
+        org.apache.hello_world_xml_http.bare.XMLService s =
             new org.apache.hello_world_xml_http.bare.XMLService();
 
         org.apache.hello_world_xml_http.bare.Greeter greeter = s.getXMLPort();
@@ -101,7 +105,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
             fail("Did not get expected UnsupportedOperationException");
         } catch (UnsupportedOperationException e) {
             //do nothing
-        } 
+        }
     }
 
     /*
@@ -123,21 +127,21 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         GreeterImpl greeter1 = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
             endpoint.publish("http://localhost:8080/test");
-            
+
             javax.xml.ws.Service s = javax.xml.ws.Service
                 .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
-    
+
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
             Document doc = StaxUtils.read(is);
             DOMSource erXML = new DOMSource(doc);
             EndpointReference endpointReference = EndpointReference.readFrom(erXML);
-    
+
             WebServiceFeature[] wfs = new WebServiceFeature[] {};
-    
+
             Greeter greeter = s.getPort(endpointReference, Greeter.class, wfs);
-    
+
             String response = greeter.greetMe("John");
-            
+
             assertEquals("Hello John", response);
         }
     }
@@ -148,27 +152,27 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         GreeterImpl greeter1 = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
             endpoint.publish("http://localhost:8080/test");
-            
+
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
             Document doc = StaxUtils.read(is);
             DOMSource erXML = new DOMSource(doc);
             EndpointReference endpointReference = EndpointReference.readFrom(erXML);
-    
+
             WebServiceFeature[] wfs = new WebServiceFeature[] {};
-    
+
             Greeter greeter = endpointReference.getPort(Greeter.class, wfs);
-    
+
             String response = greeter.greetMe("John");
             assertEquals("Hello John", response);
         }
-    }    
-    
+    }
+
     @Test
     public void testEndpointGetEndpointReferenceSOAPBinding() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
             endpoint.publish("http://localhost:8080/test");
-    
+
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
             Document doc = StaxUtils.read(is);
             Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
@@ -177,22 +181,21 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
             EndpointReference endpointReference = endpoint.getEndpointReference(referenceParameters);
             assertNotNull(endpointReference);
             assertTrue(endpointReference instanceof W3CEndpointReference);
-    
+
             //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
             //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
-            endpoint.stop();        
+            endpoint.stop();
         }
     }
-    
+
     @Test
-    @Ignore("Not implemented yet")
     public void testEndpointGetEndpointReferenceXMLBinding() throws Exception {
-        org.apache.hello_world_xml_http.bare.Greeter greeter = 
+        org.apache.hello_world_xml_http.bare.Greeter greeter =
             new org.apache.hello_world_xml_http.bare.GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
 
             endpoint.publish("http://localhost:8080/test");
-    
+
             try {
                 InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
                 Document doc = StaxUtils.read(is);
@@ -200,23 +203,23 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
                                                                           "wsa:ReferenceParameters",
                                                                           "");
                 endpoint.getEndpointReference(referenceParameters);
-    
+
                 fail("Did not get expected UnsupportedOperationException");
             } catch (UnsupportedOperationException e) {
                 //do nothing
             }
-    
+
             endpoint.stop();
         }
     }
-    
+
     @Test
     public void testEndpointGetEndpointReferenceW3C() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
 
             endpoint.publish("http://localhost:8080/test");
-    
+
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
             Document doc = StaxUtils.read(is);
             Element referenceParameters = fetchElementByNameAttribute(doc.getDocumentElement(),
@@ -225,24 +228,24 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
             EndpointReference endpointReference = endpoint.getEndpointReference(W3CEndpointReference.class,
                                                                                 referenceParameters);
             assertNotNull(endpointReference);
-    
+
             assertTrue(endpointReference instanceof W3CEndpointReference);
-    
+
             //A returned W3CEndpointReferenceMUST also contain the specified referenceParameters.
             //W3CEndpointReference wer = (W3CEndpointReference)endpointReference;
-    
+
             endpoint.stop();
         }
     }
-    
-    
+
+
     @Test
     public void testEndpointGetEndpointReferenceInvalid() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
-    
+
             endpoint.publish("http://localhost:8080/test");
-    
+
             try {
                 InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
                 Document doc = StaxUtils.read(is);
@@ -250,16 +253,16 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
                                                                           "wsa:ReferenceParameters",
                                                                           "");
                 endpoint.getEndpointReference(MyEndpointReference.class, referenceParameters);
-    
+
                 fail("Did not get expected WebServiceException");
             } catch (WebServiceException e) {
                 // do nothing
             }
-    
+
             endpoint.stop();
         }
     }
-    
+
     @Test
     public void testProviderReadEndpointReference() throws Exception {
         ProviderImpl provider = new ProviderImpl();
@@ -270,9 +273,9 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         EndpointReference endpointReference = provider.readEndpointReference(erXML);
         assertNotNull(endpointReference);
 
-        assertTrue(endpointReference instanceof W3CEndpointReference);        
+        assertTrue(endpointReference instanceof W3CEndpointReference);
     }
-    
+
     @Test
     public void testProviderCreateW3CEndpointReference() throws Exception {
         ProviderImpl provider = new ProviderImpl();
@@ -282,13 +285,13 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         Element referenceParameter = fetchElementByNameAttribute(doc.getDocumentElement(),
                                                                  "wsa:ReferenceParameters",
                                                                  "");
-        List<Element> referenceParameters = new ArrayList<Element>();
+        List<Element> referenceParameters = new ArrayList<>();
         if (referenceParameter != null) {
             referenceParameters.add(referenceParameter);
         }
 
         Element metadata = fetchElementByNameAttribute(doc.getDocumentElement(), "wsa:metadata", "");
-        List<Element> metadataList = new ArrayList<Element>();
+        List<Element> metadataList = new ArrayList<>();
         if (metadata != null) {
             metadataList.add(metadata);
         }
@@ -298,30 +301,30 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
                                         "wsdlDocumentLocation", referenceParameters);
         assertNotNull(endpointReference);
     }
-    
+
     @Test
     public void testProviderGetPort() throws Exception {
         BusFactory.setDefaultBus(getBus());
         GreeterImpl greeter1 = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter1, (String)null)) {
             endpoint.publish("http://localhost:8080/test");
-            
+
             ProviderImpl provider = new ProviderImpl();
-            
+
             InputStream is = getClass().getResourceAsStream("resources/hello_world_soap_http_infoset.xml");
             Document doc = StaxUtils.read(is);
             DOMSource erXML = new DOMSource(doc);
-            EndpointReference endpointReference = EndpointReference.readFrom(erXML);        
-    
+            EndpointReference endpointReference = EndpointReference.readFrom(erXML);
+
             WebServiceFeature[] wfs = new WebServiceFeature[] {};
-            
-            Greeter greeter = provider.getPort(endpointReference, Greeter.class, wfs);        
-    
+
+            Greeter greeter = provider.getPort(endpointReference, Greeter.class, wfs);
+
             String response = greeter.greetMe("John");
             assertEquals("Hello John", response);
         }
     }
-    
+
     final class MyEndpointReference extends EndpointReference {
         protected MyEndpointReference() {
         }
@@ -331,7 +334,7 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
         }
     }
 
-    
+
 
     public static Element fetchElementByNameAttribute(Element parent, String elementName, String nameValue) {
         if (elementName.equals(parent.getTagName())
@@ -347,5 +350,5 @@ public class EndpointReferenceTest extends AbstractJaxWsTest {
             elem = DOMUtils.getNextElement(elem);
         }
         return null;
-    }      
+    }
 }

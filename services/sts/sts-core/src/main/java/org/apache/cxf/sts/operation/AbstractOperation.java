@@ -19,25 +19,24 @@
 
 package org.apache.cxf.sts.operation;
 
-import java.net.URI;
 import java.security.Principal;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.IdentityMapper;
 import org.apache.cxf.sts.QNameConstants;
@@ -75,11 +74,12 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.ReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferenceType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -90,9 +90,9 @@ import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
  */
 public abstract class AbstractOperation {
 
-    public static final QName TOKEN_TYPE = 
+    public static final QName TOKEN_TYPE =
         new QName(WSConstants.WSSE11_NS, WSConstants.TOKEN_TYPE, WSConstants.WSSE11_PREFIX);
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractOperation.class);
 
     protected STSPropertiesMBean stsProperties;
@@ -105,7 +105,26 @@ public abstract class AbstractOperation {
     protected ClaimsManager claimsManager = new ClaimsManager();
     protected STSEventListener eventPublisher;
     protected List<TokenDelegationHandler> delegationHandlers = new ArrayList<>();
-    
+    protected TokenWrapper tokenWrapper = new DefaultTokenWrapper();
+    protected boolean allowCustomContent;
+    protected boolean includeLifetimeElement = true;
+
+    public boolean isAllowCustomContent() {
+        return allowCustomContent;
+    }
+
+    public void setAllowCustomContent(boolean allowCustomContent) {
+        this.allowCustomContent = allowCustomContent;
+    }
+
+    public TokenWrapper getTokenWrapper() {
+        return tokenWrapper;
+    }
+
+    public void setTokenWrapper(TokenWrapper tokenWrapper) {
+        this.tokenWrapper = tokenWrapper;
+    }
+
     public boolean isReturnReferences() {
         return returnReferences;
     }
@@ -113,7 +132,7 @@ public abstract class AbstractOperation {
     public void setReturnReferences(boolean returnReferences) {
         this.returnReferences = returnReferences;
     }
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -125,19 +144,19 @@ public abstract class AbstractOperation {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public void setEncryptIssuedToken(boolean encryptIssuedToken) {
         this.encryptIssuedToken = encryptIssuedToken;
     }
-    
+
     public void setServices(List<ServiceMBean> services) {
         this.services = services;
     }
-    
+
     public void setTokenProviders(List<TokenProvider> tokenProviders) {
         this.tokenProviders = tokenProviders;
     }
-    
+
     public List<TokenDelegationHandler> getDelegationHandlers() {
         return delegationHandlers;
     }
@@ -157,7 +176,7 @@ public abstract class AbstractOperation {
     public List<TokenValidator> getTokenValidators() {
         return tokenValidators;
     }
-    
+
     public ClaimsManager getClaimsManager() {
         return claimsManager;
     }
@@ -165,55 +184,72 @@ public abstract class AbstractOperation {
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
     }
-    
+
+    public void setIncludeLifetimeElement(boolean value) {
+        this.includeLifetimeElement = value;
+    }
+
+    public boolean isIncludeLifetimeElement() {
+        return includeLifetimeElement;
+    }
+
     /**
      * Check the arguments from the STSProvider and parse the request.
      */
     protected RequestRequirements parseRequest(
         RequestSecurityTokenType request,
-        WebServiceContext context
+        Map<String, Object> messageContext
     ) {
-        if (context == null || context.getMessageContext() == null) {
+        if (messageContext == null) {
             throw new STSException("No message context found");
         }
-        
+
         if (stsProperties == null) {
             throw new STSException("No STSProperties object found");
         }
         stsProperties.configureProperties();
-        
+
         RequestParser requestParser = new RequestParser();
-        return requestParser.parseRequest(request, context, stsProperties, claimsManager.getClaimParsers());
+        requestParser.setAllowCustomContent(allowCustomContent);
+        return requestParser.parseRequest(request, messageContext, stsProperties,
+                                          claimsManager.getClaimParsers());
     }
-    
+
+    protected void cleanRequest(RequestRequirements requestRequirements) {
+        if (requestRequirements.getKeyRequirements() != null
+            && requestRequirements.getKeyRequirements().getEntropy() != null) {
+            requestRequirements.getKeyRequirements().getEntropy().clean();
+        }
+    }
+
     /**
      * Create a RequestedReferenceType object using a TokenReference object
      */
     protected static RequestedReferenceType createRequestedReference(
         TokenReference tokenReference, boolean attached
     ) {
-        RequestedReferenceType requestedReferenceType = 
+        RequestedReferenceType requestedReferenceType =
             QNameConstants.WS_TRUST_FACTORY.createRequestedReferenceType();
-        SecurityTokenReferenceType securityTokenReferenceType = 
+        SecurityTokenReferenceType securityTokenReferenceType =
             QNameConstants.WSSE_FACTORY.createSecurityTokenReferenceType();
-        
+
         // TokenType
         String tokenType = tokenReference.getWsse11TokenType();
         if (tokenType != null) {
             securityTokenReferenceType.getOtherAttributes().put(TOKEN_TYPE, tokenType);
         }
-        
+
         if (tokenReference.isUseKeyIdentifier()) {
             String identifier = XMLUtils.getIDFromReference(tokenReference.getIdentifier());
-            
-            KeyIdentifierType keyIdentifierType = 
+
+            KeyIdentifierType keyIdentifierType =
                 QNameConstants.WSSE_FACTORY.createKeyIdentifierType();
             keyIdentifierType.setValue(identifier);
             String valueType = tokenReference.getWsseValueType();
             if (valueType != null) {
                 keyIdentifierType.setValueType(valueType);
             }
-            JAXBElement<KeyIdentifierType> keyIdentifier = 
+            JAXBElement<KeyIdentifierType> keyIdentifier =
                 QNameConstants.WSSE_FACTORY.createKeyIdentifier(keyIdentifierType);
             securityTokenReferenceType.getAny().add(keyIdentifier);
         } else if (tokenReference.isUseDirectReference()) {
@@ -223,24 +259,24 @@ public abstract class AbstractOperation {
             } else if (!attached && identifier.charAt(0) == '#') {
                 identifier = identifier.substring(1);
             }
-            
+
             ReferenceType referenceType = QNameConstants.WSSE_FACTORY.createReferenceType();
             referenceType.setURI(identifier);
-            
+
             String valueType = tokenReference.getWsseValueType();
             if (valueType != null) {
                 referenceType.setValueType(valueType);
             }
-            JAXBElement<ReferenceType> reference = 
+            JAXBElement<ReferenceType> reference =
                 QNameConstants.WSSE_FACTORY.createReference(referenceType);
             securityTokenReferenceType.getAny().add(reference);
         }
-        
+
         requestedReferenceType.setSecurityTokenReference(securityTokenReferenceType);
-        
+
         return requestedReferenceType;
     }
-    
+
     /**
      * Create a RequestedReferenceType object using a token id and tokenType
      */
@@ -249,64 +285,64 @@ public abstract class AbstractOperation {
     ) {
         TokenReference tokenReference = new TokenReference();
         tokenReference.setIdentifier(tokenId);
-        
-        if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) 
-            || WSConstants.SAML_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML_TOKEN_TYPE);
+
+        if (WSS4JConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML_KI_VALUE_TYPE);
-        } else if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
-            || WSConstants.SAML2_NS.equals(tokenType)) {
-            tokenReference.setWsse11TokenType(WSConstants.WSS_SAML2_TOKEN_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML_KI_VALUE_TYPE);
+        } else if (WSS4JConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
+            || WSS4JConstants.SAML2_NS.equals(tokenType)) {
+            tokenReference.setWsse11TokenType(WSS4JConstants.WSS_SAML2_TOKEN_TYPE);
             tokenReference.setUseKeyIdentifier(true);
-            tokenReference.setWsseValueType(WSConstants.WSS_SAML2_KI_VALUE_TYPE);
+            tokenReference.setWsseValueType(WSS4JConstants.WSS_SAML2_KI_VALUE_TYPE);
         } else {
             tokenReference.setUseDirectReference(true);
             tokenReference.setWsseValueType(tokenType);
         }
-        
+
         return createRequestedReference(tokenReference, attached);
     }
-    
+
     /**
      * Create a LifetimeType object given a created + expires Dates
      */
     protected static LifetimeType createLifetime(
-        Date tokenCreated, Date tokenExpires
+        Instant tokenCreated, Instant tokenExpires
     ) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
-        
-        Date creationTime = tokenCreated;
-        if (creationTime == null) {
-            creationTime = new Date();
-        }
-        Date expirationTime = tokenExpires;
-        if (expirationTime == null) {
-            expirationTime = new Date();
-            long lifeTimeOfToken = 300L;
-            expirationTime.setTime(creationTime.getTime() + (lifeTimeOfToken * 1000L));
+
+        Instant now = Instant.now();
+        Instant creationTime = tokenCreated;
+        if (tokenCreated == null) {
+            creationTime = now;
         }
 
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        created.setValue(fmt.format(creationTime));
-        expires.setValue(fmt.format(expirationTime));
+        Instant expirationTime = tokenExpires;
+        if (tokenExpires == null) {
+            long lifeTimeOfToken = 300L;
+            expirationTime = now.plusSeconds(lifeTimeOfToken);
+        }
+
+        created.setValue(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        expires.setValue(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Token lifetime creation: " + created.getValue());
             LOG.fine("Token lifetime expiration: " + expires.getValue());
         }
-        
+
         LifetimeType lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetimeType();
         lifetimeType.setCreated(created);
         lifetimeType.setExpires(expires);
         return lifetimeType;
     }
-    
+
     /**
      * Encrypt a secret using the given arguments producing a DOM EncryptedKey element
      */
     protected Element encryptSecret(
-        byte[] secret, 
+        byte[] secret,
         EncryptionProperties encryptionProperties,
         KeyRequirements keyRequirements
     ) throws WSSecurityException {
@@ -317,14 +353,14 @@ public abstract class AbstractOperation {
         if (name == null) {
             throw new STSException("No encryption alias is configured", STSException.REQUEST_FAILED);
         }
-        
+
         // Get the key-wrap algorithm to use
         String keyWrapAlgorithm = keyRequirements.getKeywrapAlgorithm();
         if (keyWrapAlgorithm == null) {
             // If none then default to what is configured
             keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
         } else {
-            List<String> supportedAlgorithms = 
+            List<String> supportedAlgorithms =
                 encryptionProperties.getAcceptedKeyWrapAlgorithms();
             if (!supportedAlgorithms.contains(keyWrapAlgorithm)) {
                 keyWrapAlgorithm = encryptionProperties.getKeyWrapAlgorithm();
@@ -333,17 +369,17 @@ public abstract class AbstractOperation {
                 }
             }
         }
-        
-        WSSecEncryptedKey builder = new WSSecEncryptedKey();
+
+        Document doc = DOMUtils.getEmptyDocument();
+
+        WSSecEncryptedKey builder = new WSSecEncryptedKey(doc);
         builder.setUserInfo(name);
         builder.setKeyIdentifierType(encryptionProperties.getKeyIdentifierType());
         builder.setEphemeralKey(secret);
         builder.setKeyEncAlgo(keyWrapAlgorithm);
-        
-        Document doc = DOMUtils.createDocument();
-                                 
-        builder.prepare(doc, stsProperties.getEncryptionCrypto());
-        
+
+        builder.prepare(stsProperties.getEncryptionCrypto());
+
         return builder.getEncryptedKeyElement();
     }
 
@@ -353,13 +389,13 @@ public abstract class AbstractOperation {
     protected String extractAddressFromAppliesTo(Element appliesTo) {
         LOG.fine("Parsing AppliesTo element");
         if (appliesTo != null) {
-            Element endpointRef = 
+            Element endpointRef =
                 DOMUtils.getFirstChildWithName(
                     appliesTo, STSConstants.WSA_NS_05, "EndpointReference"
                 );
             if (endpointRef != null) {
                 LOG.fine("Found EndpointReference element");
-                Element address = 
+                Element address =
                     DOMUtils.getFirstChildWithName(
                         endpointRef, STSConstants.WSA_NS_05, "Address");
                 if (address != null) {
@@ -367,7 +403,7 @@ public abstract class AbstractOperation {
                     return address.getTextContent();
                 }
             } else if (appliesTo.getNamespaceURI() != null) {
-                Element uri = 
+                Element uri =
                     DOMUtils.getFirstChildWithName(
                         appliesTo, appliesTo.getNamespaceURI(), "URI"
                     );
@@ -382,43 +418,44 @@ public abstract class AbstractOperation {
     }
 
     /**
-     * Create a TokenProviderParameters object given a RequestParser and WebServiceContext object
+     * Create a TokenProviderParameters object
      */
     protected TokenProviderParameters createTokenProviderParameters(
-        RequestRequirements requestRequirements, WebServiceContext context
+        RequestRequirements requestRequirements, Principal principal,
+        Map<String, Object> messageContext
     ) {
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         providerParameters.setStsProperties(stsProperties);
-        providerParameters.setPrincipal(context.getUserPrincipal());
-        providerParameters.setWebServiceContext(context);
+        providerParameters.setPrincipal(principal);
+        providerParameters.setMessageContext(messageContext);
         providerParameters.setTokenStore(getTokenStore());
         providerParameters.setEncryptToken(encryptIssuedToken);
-        
+
         KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
         TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
         providerParameters.setKeyRequirements(keyRequirements);
         providerParameters.setTokenRequirements(tokenRequirements);
-        
+
         // Extract AppliesTo
         String address = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("The AppliesTo address that has been received is: " + address);
         }
         providerParameters.setAppliesToAddress(address);
-        
+
         // Get the realm of the request
         if (stsProperties.getRealmParser() != null) {
             RealmParser realmParser = stsProperties.getRealmParser();
-            String realm = realmParser.parseRealm(context);
+            String realm = realmParser.parseRealm(messageContext);
             providerParameters.setRealm(realm);
         }
-        
+
         // Set the requested Claims
         ClaimCollection claims = tokenRequirements.getPrimaryClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
         claims = tokenRequirements.getSecondaryClaims();
         providerParameters.setRequestedSecondaryClaims(claims);
-        
+
         EncryptionProperties encryptionProperties = stsProperties.getEncryptionProperties();
         if (address != null) {
             boolean foundService = false;
@@ -426,7 +463,7 @@ public abstract class AbstractOperation {
             if (services != null) {
                 for (ServiceMBean service : services) {
                     if (service.isAddressInEndpoints(address)) {
-                        EncryptionProperties svcEncryptionProperties = 
+                        EncryptionProperties svcEncryptionProperties =
                             service.getEncryptionProperties();
                         if (svcEncryptionProperties != null) {
                             encryptionProperties = svcEncryptionProperties;
@@ -454,24 +491,25 @@ public abstract class AbstractOperation {
                 throw new STSException(msg, STSException.REQUEST_FAILED);
             }
         }
-        
+
         providerParameters.setEncryptionProperties(encryptionProperties);
-        
+
         return providerParameters;
     }
-    
+
     protected TokenValidatorResponse validateReceivedToken(
-            WebServiceContext context, String realm,
+            Principal principal,
+            Map<String, Object> messageContext, String realm,
             TokenRequirements tokenRequirements, ReceivedToken token) {
         token.setState(STATE.NONE);
-        
+
         TokenRequirements validateRequirements = new TokenRequirements();
         validateRequirements.setValidateTarget(token);
-        
+
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
         validatorParameters.setStsProperties(stsProperties);
-        validatorParameters.setPrincipal(context.getUserPrincipal());
-        validatorParameters.setWebServiceContext(context);
+        validatorParameters.setPrincipal(principal);
+        validatorParameters.setMessageContext(messageContext);
         validatorParameters.setTokenStore(getTokenStore());
         validatorParameters.setKeyRequirements(null);
         validatorParameters.setTokenRequirements(validateRequirements);
@@ -480,7 +518,7 @@ public abstract class AbstractOperation {
         if (tokenValidators.isEmpty()) {
             LOG.fine("No token validators have been configured to validate the received token");
         }
-        
+
         TokenValidatorResponse tokenResponse = null;
         for (TokenValidator tokenValidator : tokenValidators) {
             boolean canHandle = false;
@@ -493,7 +531,7 @@ public abstract class AbstractOperation {
                 try {
                     tokenResponse = tokenValidator.validateToken(validatorParameters);
                     token = tokenResponse.getToken();
-                    // The parsed principal/roles is set if available. It's up to other 
+                    // The parsed principal/roles is set if available. It's up to other
                     // components to deal with the STATE of the validation
                     token.setPrincipal(tokenResponse.getPrincipal());
                     token.setRoles(tokenResponse.getRoles());
@@ -504,34 +542,35 @@ public abstract class AbstractOperation {
                 break;
             }
         }
-        
+
         if (tokenResponse == null) {
             LOG.fine("No token validator has been configured to validate the received token");
         }
         return tokenResponse;
     }
-    
+
     protected void performDelegationHandling(
-        RequestRequirements requestRequirements, WebServiceContext context, ReceivedToken token,
+        RequestRequirements requestRequirements, Principal principal,
+        Map<String, Object> messageContext, ReceivedToken token,
         Principal tokenPrincipal, Set<Principal> tokenRoles
     ) {
         TokenDelegationParameters delegationParameters = new TokenDelegationParameters();
         delegationParameters.setStsProperties(stsProperties);
-        delegationParameters.setPrincipal(context.getUserPrincipal());
-        delegationParameters.setWebServiceContext(context);
+        delegationParameters.setPrincipal(principal);
+        delegationParameters.setMessageContext(messageContext);
         delegationParameters.setTokenStore(getTokenStore());
         delegationParameters.setTokenPrincipal(tokenPrincipal);
         delegationParameters.setTokenRoles(tokenRoles);
-        
+
         KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
         TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
         delegationParameters.setKeyRequirements(keyRequirements);
         delegationParameters.setTokenRequirements(tokenRequirements);
-        
+
         // Extract AppliesTo
         String address = extractAddressFromAppliesTo(tokenRequirements.getAppliesTo());
         delegationParameters.setAppliesToAddress(address);
-        
+
         delegationParameters.setToken(token);
 
         TokenDelegationResponse tokenResponse = null;
@@ -546,34 +585,13 @@ public abstract class AbstractOperation {
                 break;
             }
         }
-        
+
         if (tokenResponse == null || !tokenResponse.isDelegationAllowed()) {
             LOG.log(Level.WARNING, "No matching token delegation handler found");
             throw new STSException(
-                "No matching token delegation handler found", 
+                "No matching token delegation handler found",
                 STSException.REQUEST_FAILED
             );
-        }
-    }
-    
-    protected void checkClaimsSupport(ClaimCollection requestedClaims) {
-        if (requestedClaims != null) {
-            List<URI> unhandledClaimTypes = new ArrayList<>();
-            for (Claim requestedClaim : requestedClaims) {
-                if (!claimsManager.getSupportedClaimTypes().contains(requestedClaim.getClaimType()) 
-                        && !requestedClaim.isOptional()) {
-                    unhandledClaimTypes.add(requestedClaim.getClaimType());
-                }
-            }
-
-            if (unhandledClaimTypes.size() > 0) {
-                LOG.log(Level.WARNING, "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS.");
-                throw new STSException(
-                        "The requested claim " + unhandledClaimTypes.toString() 
-                        + " cannot be fulfilled by the STS."
-                );
-            }
         }
     }
 
@@ -584,8 +602,8 @@ public abstract class AbstractOperation {
         if (responsePrincipal != null) {
             String targetRealm = providerParameters.getRealm();
             String sourceRealm = tokenResponse.getTokenRealm();
-    
-            if (sourceRealm != null && !sourceRealm.equals(targetRealm)) {
+
+            if (sourceRealm != null && targetRealm != null && !sourceRealm.equals(targetRealm)) {
                 RelationshipResolver relRes = stsProperties.getRelationshipResolver();
                 Relationship relationship = null;
                 if (relRes != null) {
@@ -604,7 +622,7 @@ public abstract class AbstractOperation {
                         identityMapper = relationship.getIdentityMapper();
                     }
                     if (identityMapper != null) {
-                        Principal targetPrincipal = 
+                        Principal targetPrincipal =
                             identityMapper.mapPrincipal(sourceRealm, responsePrincipal, targetRealm);
                         validatedToken.setPrincipal(targetPrincipal);
                     } else {
@@ -616,39 +634,37 @@ public abstract class AbstractOperation {
                     // federate claims
                     // Claims are transformed at the time when the claims are required to create a token
                     // (ex. ClaimsAttributeStatementProvider)
-                    // principal remains unchanged                            
-    
+                    // principal remains unchanged
+
                 } else  {
-                    LOG.log(Level.SEVERE, "Unkown federation type: " + relationship.getType());
+                    LOG.log(Level.SEVERE, "Unknown federation type: " + relationship.getType());
                     throw new STSException("Error in providing a token", STSException.BAD_REQUEST);
                 }
             }
         }
     }
-    
+
     public void setEventListener(STSEventListener eventListener) {
         this.eventPublisher = eventListener;
     }
-    
-    
+
+
     protected void publishEvent(AbstractSTSEvent event) {
         if (eventPublisher != null) {
             eventPublisher.handleSTSEvent(event);
         }
     }
-    
-    protected static org.apache.xml.security.stax.securityToken.SecurityToken 
+
+    protected static org.apache.xml.security.stax.securityToken.SecurityToken
     findInboundSecurityToken(SecurityEventConstants.Event event,
-                             MessageContext messageContext) throws XMLSecurityException {
+                             Map<String, Object> messageContext) throws XMLSecurityException {
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingEventList = 
+        final List<SecurityEvent> incomingEventList =
             (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (event == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
-                        ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
-                    return token;
+                    return ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
                 }
             }
         }

@@ -41,7 +41,7 @@ import org.apache.cxf.ws.rm.RMContextUtils;
 import org.apache.cxf.ws.rm.RMMessageConstants;
 
 /**
- * 
+ *
  */
 public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getLogger(MessageLossSimulator.class);
@@ -53,7 +53,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         super(Phase.PREPARE_SEND);
         addBefore(MessageSenderInterceptor.class.getName());
     }
-    
+
     public boolean isThrowsException() {
         return throwsException;
     }
@@ -85,13 +85,13 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
         if (Boolean.TRUE.equals(message.get(RMMessageConstants.RM_RETRANSMISSION))) {
             return;
         }
-        
+
         if (mode == 1) {
             // never lose
             return;
         } else if (mode == -1) {
             // always lose
-        } else { 
+        } else {
             // alternatively lose
             synchronized (this) {
                 appMessageCount++;
@@ -111,20 +111,20 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
                 break;
             }
         }
-        
-        message.setContent(OutputStream.class, new WrappedOutputStream(message));     
-        
+
+        message.setContent(OutputStream.class, new WrappedOutputStream(message));
+
         message.getInterceptorChain().add(new MessageLossEndingInterceptor(throwsException));
     }
-    
+
     /**
      * Ending interceptor to discard message output. Note that the name is used as a String by RMCaptureOutInterceptor,
      * so if ever changed here also needs to be changed there.
      */
     public static final class MessageLossEndingInterceptor extends AbstractPhaseInterceptor<Message> {
-        
+
         private final boolean throwsException;
-        
+
         public MessageLossEndingInterceptor(boolean except) {
             super(Phase.PREPARE_SEND_ENDING);
             throwsException = except;
@@ -160,15 +160,14 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
             wrappedStream = new DummyOutputStream();
         }
     }
-    
+
     private class DummyOutputStream extends OutputStream {
 
         @Override
         public void write(int b) throws IOException {
-            // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
-    
+
 }

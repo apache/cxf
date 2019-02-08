@@ -33,24 +33,30 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class AssertionInfoMapTest extends Assert {
+public class AssertionInfoMapTest {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testAlternativeSupported() {
         PolicyAssertion a1 = control.createMock(PolicyAssertion.class);
@@ -64,11 +70,11 @@ public class AssertionInfoMapTest extends Assert {
         PolicyAssertion c = control.createMock(PolicyAssertion.class);
         QName cqn = new QName("http://x.y.z", "c");
         EasyMock.expect(c.getName()).andReturn(cqn).anyTimes();
-        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST, 
+        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         AssertionInfo ai1 = new AssertionInfo(a1);
         AssertionInfo ai2 = new AssertionInfo(a2);
-        Collection<AssertionInfo> ais = new ArrayList<AssertionInfo>();
+        Collection<AssertionInfo> ais = new ArrayList<>();
         AssertionInfo bi = new AssertionInfo(b);
         AssertionInfo ci = new AssertionInfo(c);
         ais.add(ai1);
@@ -83,28 +89,28 @@ public class AssertionInfoMapTest extends Assert {
         EasyMock.expect(a2.equal(a2)).andReturn(true).anyTimes();
         EasyMock.expect(b.equal(b)).andReturn(true).anyTimes();
         EasyMock.expect(c.equal(c)).andReturn(true).anyTimes();
-        
+
         EasyMock.expect(a2.isAsserted(aim)).andReturn(true).anyTimes();
         EasyMock.expect(b.isAsserted(aim)).andReturn(true).anyTimes();
         EasyMock.expect(c.isAsserted(aim)).andReturn(true).anyTimes();
-        
-        
-        List<Assertion> alt1 = new ArrayList<Assertion>();
+
+
+        List<Assertion> alt1 = new ArrayList<>();
         alt1.add(a1);
         alt1.add(b);
-        
-        List<Assertion> alt2 = new ArrayList<Assertion>();
+
+        List<Assertion> alt2 = new ArrayList<>();
         alt2.add(a2);
         alt2.add(c);
-                
+
         control.replay();
-        assertTrue(!aim.supportsAlternative(alt1, new ArrayList<QName>()));
-        assertTrue(aim.supportsAlternative(alt2, new ArrayList<QName>()));
-        control.verify();     
-    }  
-    
+        assertFalse(aim.supportsAlternative(alt1, new ArrayList<>()));
+        assertTrue(aim.supportsAlternative(alt2, new ArrayList<>()));
+        control.verify();
+    }
+
     @Test
-    public void testCheckEffectivePolicy() { 
+    public void testCheckEffectivePolicy() {
         Policy p = new Policy();
         QName aqn = new QName("http://x.y.z", "a");
         Assertion a = new PrimitiveAssertion(aqn);
@@ -120,8 +126,8 @@ public class AssertionInfoMapTest extends Assert {
         ExactlyOne ea = new ExactlyOne();
         ea.addPolicyComponent(alt1);
         ea.addPolicyComponent(alt2);
-        p.addPolicyComponent(ea);   
-        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST, 
+        p.addPolicyComponent(ea);
+        AssertionInfoMap aim = new AssertionInfoMap(CastUtils.cast(Collections.EMPTY_LIST,
                                                                    PolicyAssertion.class));
         AssertionInfo ai = new AssertionInfo(a);
         AssertionInfo bi = new AssertionInfo(b);
@@ -129,25 +135,25 @@ public class AssertionInfoMapTest extends Assert {
         aim.put(aqn, Collections.singleton(ai));
         aim.put(bqn, Collections.singleton(bi));
         aim.put(cqn, Collections.singleton(ci));
-        
+
         try {
             aim.checkEffectivePolicy(p);
             fail("Expected PolicyException not thrown.");
         } catch (PolicyException ex) {
             // expected
         }
-        
+
         ai.setAsserted(true);
         ci.setAsserted(true);
-        
+
         aim.checkEffectivePolicy(p);
-    } 
-    
+    }
+
     @Test
     public void testCheck() throws PolicyException {
         QName aqn = new QName("http://x.y.z", "a");
         Assertion a = new PrimitiveAssertion(aqn);
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         assertions.add(a);
         AssertionInfoMap aim = new AssertionInfoMap(assertions);
         try {
@@ -159,15 +165,15 @@ public class AssertionInfoMapTest extends Assert {
         aim.get(aqn).iterator().next().setAsserted(true);
         aim.check();
     }
-    
+
     @Test
-    public void testAllAssertionsIn() { 
-        
+    public void testAllAssertionsIn() {
+
         Policy nested = new Policy();
         Assertion nb = new PrimitiveAssertion(
             new QName("http://x.y.z", "b"));
         nested.addAssertion(nb);
-        
+
         Policy p = new Policy();
         Assertion a1 = new PrimitiveAssertion(
                                 new QName("http://x.y.z", "a"));
@@ -177,7 +183,7 @@ public class AssertionInfoMapTest extends Assert {
                                 new QName("http://x.y.z", "b"));
         Assertion c = new PolicyContainingPrimitiveAssertion(
                                new QName("http://x.y.z", "c"), false, false, nested);
-        
+
         All alt1 = new All();
         alt1.addAssertion(a1);
         alt1.addAssertion(b);
@@ -187,32 +193,32 @@ public class AssertionInfoMapTest extends Assert {
         ExactlyOne ea = new ExactlyOne();
         ea.addPolicyComponent(alt1);
         ea.addPolicyComponent(alt2);
-        p.addPolicyComponent(ea);  
-        
+        p.addPolicyComponent(ea);
+
         AssertionInfoMap aim = new AssertionInfoMap(p);
-        
-        Collection<AssertionInfo> listA = 
+
+        Collection<AssertionInfo> listA =
             aim.getAssertionInfo(new QName("http://x.y.z", "a"));
         assertEquals("2 A assertions should've been added", 2, listA.size());
         AssertionInfo[] ais = listA.toArray(new AssertionInfo[] {});
-        assertTrue("Two different A instances should be added", 
-                   ais[0].getAssertion() == a1 && ais[1].getAssertion() == a2 
+        assertTrue("Two different A instances should be added",
+                   ais[0].getAssertion() == a1 && ais[1].getAssertion() == a2
                    || ais[0].getAssertion() == a2 && ais[1].getAssertion() == a1);
-        
-        Collection<AssertionInfo> listB = 
+
+        Collection<AssertionInfo> listB =
             aim.getAssertionInfo(new QName("http://x.y.z", "b"));
         assertEquals("2 B assertions should've been added", 2, listB.size());
         ais = listB.toArray(new AssertionInfo[] {});
-        assertTrue("Two different B instances should be added", 
-                   ais[0].getAssertion() == nb && ais[1].getAssertion() == b 
+        assertTrue("Two different B instances should be added",
+                   ais[0].getAssertion() == nb && ais[1].getAssertion() == b
                    || ais[0].getAssertion() == b && ais[1].getAssertion() == nb);
-        
-        Collection<AssertionInfo> listC = 
+
+        Collection<AssertionInfo> listC =
             aim.getAssertionInfo(new QName("http://x.y.z", "c"));
         assertEquals("1 C assertion should've been added", 1, listC.size());
         ais = listC.toArray(new AssertionInfo[] {});
-        assertSame("One C instances should be added", 
+        assertSame("One C instances should be added",
                    ais[0].getAssertion(), c);
-        
+
     }
 }

@@ -28,8 +28,13 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.factory.HelloService;
-import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 
@@ -37,19 +42,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 // set up the client and server with spring bean configuration
 
 public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
-    
+
     @Test
     public void testClientServer() {
-        ctx = 
+        ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/frontend/spring/rountrip.xml"});
-        
+
         HelloService greeter = (HelloService) ctx.getBean("client");
         assertNotNull(greeter);
-        
+
         String result = greeter.sayHello();
         assertEquals("We get the wrong sayHello result", "hello", result);
-        
-        
+
+
         Client c = ClientProxy.getClient(greeter);
         TestInterceptor out = new TestInterceptor();
         TestInterceptor in = new TestInterceptor();
@@ -65,14 +70,14 @@ public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
         ctx.close();
         BusFactory.setDefaultBus(null);
     }
-    
+
     private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         boolean called;
-        
+
         TestInterceptor() {
             super(Phase.USER_LOGICAL);
         }
-        
+
         public void handleMessage(Message message) throws Fault {
             called = true;
         }
@@ -83,6 +88,6 @@ public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
             called = false;
         }
     }
-    
+
 
 }

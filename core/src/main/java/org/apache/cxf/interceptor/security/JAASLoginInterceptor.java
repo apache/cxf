@@ -48,7 +48,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String ROLE_CLASSIFIER_CLASS_NAME = "classname";
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAASLoginInterceptor.class);
-    
+
     private String contextName = "";
     private Configuration loginConfig;
     private String roleClassifier;
@@ -58,39 +58,39 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     private List<CallbackHandlerProvider> callbackHandlerProviders;
     private boolean allowAnonymous = true;
     private boolean allowNamedPrincipals;
-    
+
     public JAASLoginInterceptor() {
         this(Phase.UNMARSHAL);
     }
-    
+
     public JAASLoginInterceptor(String phase) {
         super(phase);
-        this.callbackHandlerProviders = new ArrayList<CallbackHandlerProvider>();
+        this.callbackHandlerProviders = new ArrayList<>();
         this.callbackHandlerProviders.add(new CallbackHandlerProviderAuthPol());
         this.callbackHandlerProviders.add(new CallbackHandlerProviderUsernameToken());
     }
-    
+
     public void setContextName(String name) {
         contextName = name;
     }
-    
+
     public String getContextName() {
         return contextName;
     }
-    
+
     @Deprecated
     public void setRolePrefix(String name) {
         setRoleClassifier(name);
     }
-    
+
     public void setRoleClassifier(String value) {
         roleClassifier = value;
     }
-    
+
     public String getRoleClassifier() {
         return roleClassifier;
     }
-    
+
     public void setRoleClassifierType(String value) {
         if (!ROLE_CLASSIFIER_PREFIX.equals(value)
             && !ROLE_CLASSIFIER_CLASS_NAME.equals(value)) {
@@ -98,19 +98,19 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         roleClassifierType = value;
     }
-    
+
     public String getRoleClassifierType() {
         return roleClassifierType;
     }
-    
+
     public void setReportFault(boolean reportFault) {
         this.reportFault = reportFault;
     }
-    
+
     public void setUseDoAs(boolean useDoAs) {
         this.useDoAs = useDoAs;
     }
-    
+
     private CallbackHandler getFirstCallbackHandler(Message message) {
         for (CallbackHandlerProvider cbp : callbackHandlerProviders) {
             CallbackHandler cbh = cbp.create(message);
@@ -124,12 +124,12 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(final Message message) throws Fault {
         if (allowNamedPrincipals) {
             SecurityContext sc = message.get(SecurityContext.class);
-            if (sc != null && sc.getUserPrincipal() != null 
+            if (sc != null && sc.getUserPrincipal() != null
                 && sc.getUserPrincipal().getName() != null) {
                 return;
             }
         }
-        
+
         CallbackHandler handler = getFirstCallbackHandler(message);
 
         if (handler == null && !allowAnonymous) {
@@ -137,12 +137,12 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         try {
-            LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);  
+            LoginContext ctx = new LoginContext(getContextName(), null, handler, loginConfig);
             ctx.login();
             Subject subject = ctx.getSubject();
             String name = getUsername(handler);
             message.put(SecurityContext.class, createSecurityContext(name, subject));
-            
+
             // Run the further chain in the context of this subject.
             // This allows other code to retrieve the subject using pure JAAS
             if (useDoAs) {
@@ -152,6 +152,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                     public Void run() {
                         InterceptorChain chain = message.getInterceptorChain();
                         if (chain != null) {
+                            message.put("suspend.chain.on.current.interceptor", Boolean.TRUE);
                             chain.doIntercept(message);
                         }
                         return null;
@@ -166,10 +167,9 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                 AuthenticationException aex = new AuthenticationException(errorMessage);
                 aex.initCause(ex);
                 throw aex;
-                
-            } else {
-                throw new AuthenticationException("Authentication failed (details can be found in server log)");
+
             }
+            throw new AuthenticationException("Authentication failed (details can be found in server log)");
         }
     }
 
@@ -189,14 +189,13 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
     protected CallbackHandler getCallbackHandler(String name, String password) {
         return new NamePasswordCallbackHandler(name, password);
     }
-    
+
     protected SecurityContext createSecurityContext(String name, Subject subject) {
         if (getRoleClassifier() != null) {
             return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
                                                      getRoleClassifierType());
-        } else {
-            return new DefaultSecurityContext(name, subject);
         }
+        return new DefaultSecurityContext(name, subject);
     }
 
     public Configuration getLoginConfig() {
@@ -215,7 +214,7 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         this.callbackHandlerProviders.clear();
         this.callbackHandlerProviders.addAll(callbackHandlerProviders);
     }
-    
+
     public void addCallbackHandlerProviders(List<CallbackHandlerProvider> callbackHandlerProviders2) {
         this.callbackHandlerProviders.addAll(callbackHandlerProviders2);
     }

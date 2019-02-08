@@ -27,15 +27,19 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            
-            @Override
-            public Object createNamespaceHandler() {
-                return new HttpNettyTransportNamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/transports/http-netty-server/configuration"); 
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+
+                @Override
+                public Object createNamespaceHandler() {
+                    return new HttpNettyTransportNamespaceHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, factory,
+                                                "http://cxf.apache.org/transports/http-netty-server/configuration");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
     }
 
     @Override

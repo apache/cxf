@@ -27,16 +27,17 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 /**
- * Logical Handler responsible for aggregating the Message Addressing 
+ * Logical Handler responsible for aggregating the Message Addressing
  * Properties for outgoing messages.
  */
 public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     public static final String USING_ADDRESSING = MAPAggregator.class.getName() + ".usingAddressing";
     public static final String ADDRESSING_DISABLED = MAPAggregator.class.getName() + ".addressingDisabled";
-    public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName() 
+    public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName()
         + ".decoupledDestination";
     public static final String ACTION_VERIFIED = MAPAggregator.class.getName() + ".actionVerified";
-    
+    public static final String ADDRESSING_NAMESPACE = MAPAggregator.class.getName() + ".addressingNamespace";
+
     public interface MAPAggregatorLoader {
         MAPAggregator createImplementation(MAPAggregator mag);
     }
@@ -45,7 +46,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     protected boolean usingAddressingAdvisory = true;
     protected boolean addressingRequired;
     protected boolean allowDuplicates = true;
-    protected WSAddressingFeature.AddressingResponses addressingResponses 
+    protected WSAddressingFeature.AddressingResponses addressingResponses
         = WSAddressingFeature.AddressingResponses.ALL;
 
     /**
@@ -60,7 +61,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         super(MAPAggregator.class.getName(), Phase.PRE_LOGICAL);
         addBefore("org.apache.cxf.interceptor.OneWayProcessorInterceptor");
     }
-    
+
     /**
      * Indicates if duplicate messageIDs are allowed.
      * @return true if duplicate messageIDs are allowed
@@ -73,7 +74,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     }
 
     /**
-     * Allows/disallows duplicate messageIdDs.  
+     * Allows/disallows duplicate messageIdDs.
      * @param ad whether duplicate messageIDs are allowed
      */
     public void setAllowDuplicates(boolean ad) {
@@ -88,7 +89,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * in the WSDL is purely advisory, i.e. its absence doesn't prevent
      * the encoding of WS-A headers.
      *
-     * @return true if the presence of the <wsaw:UsingAddressing> element is 
+     * @return true if the presence of the <wsaw:UsingAddressing> element is
      * advisory
      */
     public boolean isUsingAddressingAdvisory() {
@@ -112,7 +113,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         usingAddressingAdvisory = advisory;
     }
-    
+
     /**
      * Whether the use of addressing is completely required for this endpoint
      *
@@ -134,9 +135,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         addressingRequired = required;
     }
-    
+
     /**
-     * Sets Addresing Response 
+     * Sets Addresing Response
      *
      */
     public void setAddressingResponses(WSAddressingFeature.AddressingResponses responses) {
@@ -145,7 +146,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         addressingResponses = responses;
     }
-    
+
     /**
      * Returns the cache used to enforce duplicate message IDs when
      * {@link #allowDuplicates()} returns {@code false}.
@@ -176,9 +177,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         this.messageIdCache = messageIdCache;
     }
-    
+
     /**
-     * Sets Addressing Response 
+     * Sets Addressing Response
      *
      */
     public WSAddressingFeature.AddressingResponses getAddressingResponses() {
@@ -187,7 +188,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         return addressingResponses;
     }
-    
+
     /**
      * Invoked for normal processing of inbound and outbound messages.
      *
@@ -202,20 +203,20 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
         impl.handleMessage(message);
     }
-    
+
     public void handleFault(Message message) {
         if (impl != null) {
             impl.handleFault(message);
         }
     }
-    
-    
+
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         if (impl != null) {
             return impl.getAdditionalInterceptors();
         }
         return super.getAdditionalInterceptors();
     }
-    
+
 
 }

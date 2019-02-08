@@ -38,14 +38,17 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocMessageObserverTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ColocMessageObserverTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private ColocMessageObserver observer;
     private Message msg;
@@ -59,7 +62,7 @@ public class ColocMessageObserverTest extends Assert {
         ep = control.createMock(Endpoint.class);
         bus = control.createMock(Bus.class);
         srv = control.createMock(Service.class);
-        BusFactory.setDefaultBus(bus);        
+        BusFactory.setDefaultBus(bus);
         msg = new MessageImpl();
         ex = new ExchangeImpl();
         //msg.setExchange(ex);
@@ -73,7 +76,7 @@ public class ColocMessageObserverTest extends Assert {
     @Test
     public void testSetExchangeProperties() throws Exception {
         QName opName = new QName("A", "B");
-        msg.put(Message.WSDL_OPERATION, opName);    
+        msg.put(Message.WSDL_OPERATION, opName);
         EasyMock.expect(ep.getService()).andReturn(srv);
         Binding binding = control.createMock(Binding.class);
         EasyMock.expect(ep.getBinding()).andReturn(binding);
@@ -104,10 +107,10 @@ public class ColocMessageObserverTest extends Assert {
     @Test
     public void testObserverOnMessage() throws Exception {
         msg.setExchange(ex);
-        
+
         Binding binding = control.createMock(Binding.class);
         EasyMock.expect(ep.getBinding()).andReturn(binding);
-        
+
         Message inMsg = new MessageImpl();
         EasyMock.expect(binding.createMessage()).andReturn(inMsg);
 
@@ -136,18 +139,18 @@ public class ColocMessageObserverTest extends Assert {
         Exchange ex1 = msg.getExchange();
         assertNotNull("Exchange should be set", ex1);
     }
-    
+
     class TestColocMessageObserver extends ColocMessageObserver {
         TestColocMessageObserver(Endpoint endpoint, Bus bus) {
             super(endpoint, bus);
         }
-        
+
         public void setExchangeProperties(Exchange exchange, Message m) {
             exchange.put(Bus.class, bus);
             exchange.put(Endpoint.class, ep);
             exchange.put(Service.class, srv);
         }
-        
+
         protected List<Interceptor<? extends Message>> addColocInterceptors() {
             return new ArrayList<Interceptor<? extends Message>>();
         }

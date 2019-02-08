@@ -27,9 +27,9 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
+
 import org.easymock.EasyMockRule;
 import org.easymock.Mock;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +37,6 @@ import org.junit.Test;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-
 import static org.junit.Assert.fail;
 
 public class AbstractJwtHandlerTest {
@@ -58,7 +57,7 @@ public class AbstractJwtHandlerTest {
     public void setUp() {
         handler = new AbstractJwtHandler(Arrays.asList("someGrantType")) {
             @Override
-            public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
+            public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
                 throws OAuthServiceException {
                 throw new UnsupportedOperationException("not implemented");
             }

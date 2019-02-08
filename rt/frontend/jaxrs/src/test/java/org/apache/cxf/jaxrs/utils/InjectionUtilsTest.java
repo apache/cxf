@@ -20,10 +20,13 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +34,15 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -44,37 +52,42 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class InjectionUtilsTest extends Assert {
-    
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class InjectionUtilsTest {
+
+
     @Test
     public void testHandleParameterWithXmlAdapterOnInterface() throws Exception {
         // Arrange
         String value = "1.1";
 
         // Act
-        Object id = InjectionUtils.handleParameter(value, 
-                                                   true, 
-                                                   Id.class, 
+        Object id = InjectionUtils.handleParameter(value,
+                                                   true,
                                                    Id.class,
-                                                   new Annotation[] {}, 
-                                                   ParameterType.PATH,  
+                                                   Id.class,
+                                                   new Annotation[] {},
+                                                   ParameterType.PATH,
                                                    createMessage());
 
         // Assert
         assertTrue(id instanceof Id);
         assertEquals(value, ((Id)id).getId());
     }
-    
+
+    @Test
     public void testCollectionTypeFromArray() {
         assertNull(InjectionUtils.getCollectionType(String[].class));
     }
-    
+
     @Test
     public void testCollectionType() {
         assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class));
@@ -82,7 +95,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class));
         assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class));
     }
-    
+
     @Test
     public void testSupportedCollectionType() {
         assertFalse(InjectionUtils.isSupportedCollectionOrArray(Map.class));
@@ -92,32 +105,32 @@ public class InjectionUtilsTest extends Assert {
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(Set.class));
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(SortedSet.class));
     }
-    
-    
+
+
     @Test
     public void testExtractValuesFromBean() {
         CustomerBean1 bean1 = new CustomerBean1();
         bean1.setA("aValue");
         bean1.setB(1L);
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("lv1");
         values.add("lv2");
         bean1.setC(values);
         CustomerBean2 bean2 = new CustomerBean2();
         bean2.setA("aaValue");
         bean2.setB(2L);
-        values = new ArrayList<String>();
+        values = new ArrayList<>();
         values.add("lv11");
         values.add("lv22");
         bean2.setC(values);
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add("set1");
         set.add("set2");
         bean2.setS(set);
-        
+
         bean1.setD(bean2);
-        
-        
+
+
         MultivaluedMap<String, Object> map = InjectionUtils.extractValuesFromBean(bean1, "");
         assertEquals("Size is wrong", 7, map.size());
         assertEquals(1, map.get("a").size());
@@ -127,7 +140,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(2, map.get("c").size());
         assertEquals("lv1", map.get("c").get(0));
         assertEquals("lv2", map.get("c").get(1));
-        
+
         assertEquals(1, map.get("d.a").size());
         assertEquals("aaValue", map.getFirst("d.a"));
         assertEquals(1, map.get("d.b").size());
@@ -135,7 +148,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(2, map.get("d.c").size());
         assertEquals("lv11", map.get("d.c").get(0));
         assertEquals("lv22", map.get("d.c").get(1));
-        
+
         assertEquals(2, map.get("d.s").size());
         assertTrue(map.get("d.s").contains("set1"));
         assertTrue(map.get("d.s").contains("set2"));
@@ -143,10 +156,26 @@ public class InjectionUtilsTest extends Assert {
 
     @Test
     public void testInstantiateJAXBEnum() {
-        CarType carType = InjectionUtils.handleParameter("AUDI", false, CarType.class, 
+        CarType carType = InjectionUtils.handleParameter("AUDI", false, CarType.class,
                                                          CarType.class, null,
                                                          ParameterType.QUERY, null);
         assertEquals("Type is wrong", CarType.AUDI, carType);
+    }
+
+    @Test
+    public void testInstantiateIntegerInQuery() {
+        Integer integer = InjectionUtils.handleParameter("", false, Integer.class,
+                Integer.class, null,
+                ParameterType.QUERY, null);
+        assertNull("Integer is not null", integer);
+    }
+
+    @Test
+    public void testInstantiateFloatInQuery() {
+        Float f = InjectionUtils.handleParameter("", false, float.class,
+                float.class, null,
+                ParameterType.QUERY, null);
+        assertEquals("Float is not 0", Float.valueOf(0F), f);
     }
 
     @Test
@@ -156,17 +185,25 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(String.class, str);
         ParameterizedType list = (ParameterizedType) InjectionUtils.getGenericResponseType(
             GenericInterface.class.getMethod("list"), TestService.class,
-            new ArrayList<String>(), ArrayList.class, new ExchangeImpl());
+            new ArrayList<>(), ArrayList.class, new ExchangeImpl());
         assertEquals(String.class, list.getActualTypeArguments()[0]);
     }
-    
+
+    @Test(expected = InternalServerErrorException.class)
+    public void testJsr310DateExceptionHandling() {
+        Field field = CustomerDetailsWithAdapter.class.getDeclaredFields()[0];
+        Annotation[] paramAnns = field.getDeclaredAnnotations();
+        InjectionUtils.createParameterObject(Collections.singletonList("wrongDate"), LocalDate.class,
+                LocalDate.class, paramAnns, null, false, ParameterType.QUERY, createMessage());
+    }
+
     static class CustomerBean1 {
         private String a;
         private Long b;
         private List<String> c;
         private CustomerBean2 d;
-        private String e; 
-        
+        private String e;
+
         public void setA(String aString) {
             this.a = aString;
         }
@@ -191,22 +228,22 @@ public class InjectionUtilsTest extends Assert {
         public CustomerBean2 getD() {
             return d;
         }
-        
+
         public void setE(String ee) {
             this.e = ee;
         }
         public String getE() {
             return e;
         }
-        
+
     }
-    
+
     static class CustomerBean2 {
         private String a;
         private Long b;
         private List<String> c;
         private Set<String> s;
-        
+
         public void setA(String aString) {
             this.a = aString;
         }
@@ -225,16 +262,16 @@ public class InjectionUtilsTest extends Assert {
         public List<String> getC() {
             return c;
         }
-        
+
         public void setS(Set<String> set) {
             this.s = set;
         }
-        
+
         public Set<String> getS() {
             return this.s;
         }
     }
-    
+
     private Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
@@ -257,7 +294,7 @@ public class InjectionUtilsTest extends Assert {
         e.put(Endpoint.class, endpoint);
         return m;
     }
-    
+
     public static class Adapter extends XmlAdapter<String, Id> {
 
         @Override
@@ -272,28 +309,28 @@ public class InjectionUtilsTest extends Assert {
             return id;
         }
     }
-    
+
     @XmlJavaTypeAdapter(Adapter.class)
     public interface Id {
         String getId();
 
         void setId(String id);
     }
-    
+
     public static class DelegatingId implements Id {
-    
+
         private String id;
 
         public String getId() {
             return this.id;
         }
-    
+
         public void setId(String id) {
             this.id = id;
         }
-    
+
     }
-    
+
     public enum CarType {
 
         AUDI("Audi"),
@@ -334,6 +371,21 @@ public class InjectionUtilsTest extends Assert {
         @Override
         public List<String> list() {
             return new ArrayList<>();
+        }
+    }
+
+    public class CustomerDetailsWithAdapter {
+        @NotNull
+        @QueryParam("birthDate")
+        @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
+        private LocalDate birthDate;
+
+        public LocalDate getBirthDate() {
+            return birthDate;
+        }
+
+        public void setBirthDate(LocalDate birthDate) {
+            this.birthDate = birthDate;
         }
     }
 }

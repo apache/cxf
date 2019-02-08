@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -68,10 +68,10 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         public void onClose(CachedOutputStream cos) {
-            String id = (String)this.message.getExchange().get(LoggingMessage.ID_KEY);
+            String id = (String)this.message.getExchange().get("exchangeId");
             if (id == null) {
-                id = LoggingMessage.nextId();
-                this.message.getExchange().put(LoggingMessage.ID_KEY, id);
+                id = UUID.randomUUID().toString();
+                this.message.getExchange().put("exchangeId", id);
             }
             try {
                 StringBuilder buffer = new StringBuilder();
@@ -115,7 +115,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
         exchangeProperty.setValue(value);
 
         if (exchange.getProperties() == null) {
-            exchange.setProperties(new ArrayList<ExchangeDataProperty>());
+            exchange.setProperties(new ArrayList<>());
         }
         exchange.getProperties().add(exchangeProperty);
     }

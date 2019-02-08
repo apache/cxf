@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 
 /**
  * Can be applied to methods returning a JAX-RS {@link Response}
- * 
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD })

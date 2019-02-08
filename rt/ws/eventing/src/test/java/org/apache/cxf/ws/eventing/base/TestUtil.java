@@ -31,7 +31,7 @@ public final class TestUtil {
         Integer random = new Random().nextInt(Integer.MAX_VALUE);
         return "local://endpoint" + random;
     }
-    
+
     public static String generateRandomURLWithHttpTransport(String port) {
         Integer random = new Random().nextInt(Integer.MAX_VALUE);
         return "http://localhost:" + port + "/endpoint" + random;

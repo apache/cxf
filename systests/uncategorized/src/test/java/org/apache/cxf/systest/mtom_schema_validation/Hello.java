@@ -28,9 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for hello complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="hello">
  *   &lt;complexContent>
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "hello", propOrder = {
@@ -60,11 +60,11 @@ public class Hello {
 
     /**
      * Gets the value of the arg0 property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getArg0() {
         return arg0;
@@ -72,11 +72,11 @@ public class Hello {
 
     /**
      * Sets the value of the arg0 property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setArg0(String value) {
         this.arg0 = value;
@@ -84,11 +84,11 @@ public class Hello {
 
     /**
      * Gets the value of the file property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link DataHandler }
-     *     
+     *
      */
     public DataHandler getFile() {
         return file;
@@ -96,11 +96,11 @@ public class Hello {
 
     /**
      * Sets the value of the file property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link DataHandler }
-     *     
+     *
      */
     public void setFile(DataHandler value) {
         this.file = value;

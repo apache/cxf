@@ -21,18 +21,18 @@ package org.apache.cxf.sts.token.provider.jwt;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 
 /**
- * The parameters that are passed through to a JWTClaimsProvider implementation to create a 
+ * The parameters that are passed through to a JWTClaimsProvider implementation to create a
  * JWTClaims Object.
  */
 public class JWTClaimsProviderParameters {
 
     private TokenProviderParameters providerParameters;
     private String issuer;
-    
+
     public TokenProviderParameters getProviderParameters() {
         return providerParameters;
     }
-    
+
     public void setProviderParameters(TokenProviderParameters providerParameters) {
         this.providerParameters = providerParameters;
     }
@@ -44,5 +44,5 @@ public class JWTClaimsProviderParameters {
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
 }

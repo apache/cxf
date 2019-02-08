@@ -24,13 +24,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
-public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T> 
+public class ThreadLocalInvocationHandler<T> extends AbstractThreadLocalProxy<T>
     implements InvocationHandler {
 
     public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
         Object target = null;
         if (m.getDeclaringClass() == ThreadLocalProxy.class) {
-            target = this;    
+            target = this;
         } else {
             target = get();
             if (target == null) {

@@ -18,7 +18,7 @@
  */
 
 package org.apache.cxf.tools.fortest.jaxws.rpc;
- 
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;

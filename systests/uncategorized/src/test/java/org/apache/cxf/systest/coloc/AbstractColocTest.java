@@ -34,12 +34,13 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 
-public abstract class AbstractColocTest extends Assert {
+import static org.junit.Assert.assertNotNull;
+
+public abstract class AbstractColocTest {
     public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
-    
+
     /**
      * Cxf Bus
      */
@@ -62,7 +63,7 @@ public abstract class AbstractColocTest extends Assert {
             if (cxfConfig == null) {
                 throw new Exception("Make sure " + getCxfConfig() + " is in the CLASSPATH");
             }
-            assertTrue(cxfConfig.toExternalForm() != null);
+            assertNotNull(cxfConfig.toExternalForm());
         }
 
         //Bus is shared by client, router and server.

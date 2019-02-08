@@ -20,19 +20,19 @@
 package org.apache.cxf.sts.event;
 
 public abstract class AbstractSTSFailureEvent extends AbstractSTSEvent {
-    
+
     //private static final String OPERATION = "Issue";
     private Exception exception;
-    
+
     public AbstractSTSFailureEvent(Object source, long duration, Exception ex) {
         super(source, duration);
         exception = ex;
     }
-    
+
     public Exception getException() {
         return exception;
     }
-    
+
     /*@Override
     public String getOperation() {
         return OPERATION;

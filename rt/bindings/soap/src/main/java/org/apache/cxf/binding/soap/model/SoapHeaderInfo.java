@@ -22,12 +22,12 @@ package org.apache.cxf.binding.soap.model;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class SoapHeaderInfo {
-    
+
     private MessagePartInfo part;
     private String use;
-    
+
     public SoapHeaderInfo() {
-        
+
     }
 
     public MessagePartInfo getPart() {

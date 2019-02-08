@@ -20,33 +20,34 @@ package org.apache.cxf.binding.corba.types;
 
 import javax.xml.namespace.QName;
 
-
-
 import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.Sequence;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-public class CorbaSequenceHandlerTest extends Assert {
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class CorbaSequenceHandlerTest {
 
     private ORB orb;
     private CorbaSequenceHandler obj;
     private QName objName;
     private QName objIdlType;
     private TypeCode objTypeCode;
-    
-    
+
+
     @Before
     public void setUp() throws Exception {
-        
+
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
         obj = null;
@@ -54,7 +55,7 @@ public class CorbaSequenceHandlerTest extends Assert {
         objIdlType = null;
         objTypeCode = null;
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (orb != null) {
@@ -79,7 +80,7 @@ public class CorbaSequenceHandlerTest extends Assert {
         obj = new CorbaSequenceHandler(objName, objIdlType, objTypeCode, sequenceType);
         assertNotNull(obj);
 
-        int sequenceData[] = {2, 4, 6, 8, 10};
+        int[] sequenceData = {2, 4, 6, 8, 10};
         for (int i = 0; i < sequenceData.length; ++i) {
             QName elName = new QName("item");
             QName elIdlType = CorbaConstants.NT_CORBA_LONG;

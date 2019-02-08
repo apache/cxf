@@ -24,14 +24,14 @@ import javax.xml.namespace.QName;
 
 public class CorbaTypeImpl {
     protected QName qname;
-    
+
     /**
      * Gets the value of the qname property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link QName }
-     *     
+     *
      */
     public QName getQName() {
         return qname;
@@ -39,11 +39,11 @@ public class CorbaTypeImpl {
 
     /**
      * Sets the value of the name property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link QName }
-     *     
+     *
      */
     public void setQName(QName value) {
         this.qname = value;
@@ -52,7 +52,7 @@ public class CorbaTypeImpl {
     public boolean isSetQName() {
         return this.qname != null;
     }
-    
+
 }
 
 

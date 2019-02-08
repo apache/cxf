@@ -37,7 +37,7 @@ import org.apache.cxf.service.model.OperationInfo;
 public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final String CLIENT_HOLDERS = "client.holders";
-    
+
     public HolderInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
@@ -54,9 +54,9 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (op == null || !op.hasOutput() || op.getOutput().size() == 0) {
             return;
         }
-        
+
         List<MessagePartInfo> parts = op.getOutput().getMessageParts();
-        
+
         boolean client = Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE));
         if (client) {
             List<Holder<?>> outHolders = CastUtils.cast((List<?>)message.getExchange()

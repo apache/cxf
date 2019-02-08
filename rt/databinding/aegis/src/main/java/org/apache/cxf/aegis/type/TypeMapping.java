@@ -23,7 +23,7 @@ import java.lang.reflect.Type;
 import javax.xml.namespace.QName;
 
 /**
- * Abstraction for the map between Java types (represented as 
+ * Abstraction for the map between Java types (represented as
  * {@link java.lang.reflect.Type} and Aegis types.
  */
 public interface TypeMapping {
@@ -54,7 +54,7 @@ public interface TypeMapping {
 
     /**
      * Register a type that self-describes the schema type and the Java class.
-     * @param type Aegis type object that 
+     * @param type Aegis type object that
      */
     void register(AegisType type);
 
@@ -67,7 +67,7 @@ public interface TypeMapping {
     QName getTypeQName(Type clazz);
 
     TypeCreator getTypeCreator();
-    
+
     /**
      * Each mapping has a URI that identifies it.
      * The mapping for a service uses the service URI.

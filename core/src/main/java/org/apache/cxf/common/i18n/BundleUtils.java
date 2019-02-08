@@ -19,6 +19,8 @@
 
 package org.apache.cxf.common.i18n;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -45,7 +47,7 @@ public final class BundleUtils {
 
     /**
      * Encapsulates the logic related to naming the default resource bundle
-     * for a class. 
+     * for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle name
@@ -53,12 +55,12 @@ public final class BundleUtils {
     public static String getBundleName(Class<?> cls) {
         // Class.getPackage() can return null, so change to another way to get Package Name
         return PackageUtils.getPackageName(cls) + MESSAGE_BUNDLE;
-        
+
     }
-    
+
     /**
      * Encapsulates the logic related to naming the resource bundle
-     * with the given relative name for a class. 
+     * with the given relative name for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle name
@@ -69,27 +71,35 @@ public final class BundleUtils {
 
     /**
      * Encapsulates the logic related to locating the default resource bundle
-     * for a class. 
+     * for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle
      */
     public static ResourceBundle getBundle(Class<?> cls) {
-        
+
         try {
+            ClassLoader loader = getClassLoader(cls);
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls),
                                         Locale.getDefault(),
-                                        cls.getClassLoader());
+                                        loader);
         } catch (MissingResourceException ex) {
+            ClassLoader loader = getContextClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls),
                                             Locale.getDefault(),
-                                            Thread.currentThread().getContextClassLoader());
-            
+                                            loader);
+
         }
     }
-    
+
     /**
-     * Encapsulates the logic related to locating the resource bundle with the given 
+     * Encapsulates the logic related to locating the resource bundle with the given
      * relative name for a class.
      *
      * @param cls the Class requiring the bundle
@@ -98,20 +108,28 @@ public final class BundleUtils {
      */
     public static ResourceBundle getBundle(Class<?> cls, String name) {
         try {
+            ClassLoader loader = getClassLoader(cls);
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls, name),
                                             Locale.getDefault(),
-                                            cls.getClassLoader());
+                                            loader);
         } catch (MissingResourceException ex) {
+            ClassLoader loader = getContextClassLoader();
+            if (loader == null) {
+                return ResourceBundle.getBundle(getBundleName(cls, name), Locale.getDefault());
+            }
             return ResourceBundle.getBundle(getBundleName(cls, name),
                                             Locale.getDefault(),
-                                            Thread.currentThread().getContextClassLoader());
-            
+                                            loader);
+
         }
     }
-    
+
     /**
      * Encapsulates the logic to format a string based on the key in the resource bundle
-     * 
+     *
      * @param b Resource bundle to use
      * @param key The key in the bundle to lookup
      * @param params the params to expand into the string
@@ -120,4 +138,29 @@ public final class BundleUtils {
     public static String getFormattedString(ResourceBundle b, String key, Object ... params) {
         return MessageFormat.format(b.getString(key), params);
     }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+
 }

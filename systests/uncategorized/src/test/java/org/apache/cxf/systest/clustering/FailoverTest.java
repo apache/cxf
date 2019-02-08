@@ -56,6 +56,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests failover within a static cluster.
@@ -67,14 +72,14 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public static final String PORT_C = allocatePort(Server.class, 3);
     public static final String PORT_D = allocatePort(Server.class, 4);
     public static final String PORT_E = allocatePort(Server.class, 5);
-    
-    
+
+
     protected static final String REPLICA_A =
         "http://localhost:" + PORT_A + "/SoapContext/ReplicatedPortA";
     protected static final String REPLICA_B =
-        "http://localhost:" + PORT_B + "/SoapContext/ReplicatedPortB"; 
+        "http://localhost:" + PORT_B + "/SoapContext/ReplicatedPortB";
     protected static final String REPLICA_C =
-        "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC"; 
+        "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC";
     protected static final String REPLICA_D =
         "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD";
     protected static final String REPLICA_E =
@@ -98,24 +103,24 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
     }
-            
+
     protected String getConfig() {
         return FAILOVER_CONFIG;
     }
-    
+
     @Before
     public void setUp() {
-        targets = new ArrayList<String>();
-        SpringBusFactory bf = new SpringBusFactory();    
+        targets = new ArrayList<>();
+        SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
-        
+
         updateWsdlExtensors("9051", PORT_A);
         updateWsdlExtensors("9052", PORT_B);
         updateWsdlExtensors("9053", PORT_C);
         updateWsdlExtensors("9055", PORT_E);
     }
-    
+
     @After
     public void tearDown() {
         if (null != control) {
@@ -130,9 +135,9 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             bus = null;
         }
     }
-    
+
     @Test
-    public void testNoFailoverAcrossBindings() throws Exception {        
+    public void testNoFailoverAcrossBindings() throws Exception {
         startTarget(REPLICA_D);
         setupGreeter();
 
@@ -143,15 +148,15 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             verifyCurrentEndpoint(REPLICA_A);
         }
     }
-    
+
     @Test
-    public void testRevertExceptionOnUnsucessfulFailover() throws Exception {        
+    public void testRevertExceptionOnUnsucessfulFailover() throws Exception {
         startTarget(REPLICA_B);
         startTarget(REPLICA_C);
         setupGreeter();
         stopTarget(REPLICA_C);
         stopTarget(REPLICA_B);
-        
+
         try {
             greeter.greetMe("fred");
             fail("expected exception");
@@ -160,30 +165,30 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             while (cause.getCause() != null) {
                 cause = cause.getCause();
             }
-            // failover attempt bails after retried invocations on 
-            // started & stopped replicas B & C fail with HTTP 404  
+            // failover attempt bails after retried invocations on
+            // started & stopped replicas B & C fail with HTTP 404
             // indicated by a thrown IOException("Not found"),
-            // in which case we should revert back to the original 
-            // java.net.ConnectionException on the unavailable 
+            // in which case we should revert back to the original
+            // java.net.ConnectionException on the unavailable
             // replica A
 
             boolean isOrig = cause instanceof ConnectException;
             if (!isOrig) {
-                //depending on the order of the tests, 
+                //depending on the order of the tests,
                 //the port COULD have been created, but no service deployed
                 isOrig = cause instanceof HTTPException
                     && cause.getMessage().contains("SoapContext/ReplicatedPortA")
                     && cause.getMessage().contains("404:");
             }
-            
+
             if (!isOrig) {
                 cause.printStackTrace();
             }
-            assertTrue("should revert to original exception when no failover: " 
+            assertTrue("should revert to original exception when no failover: "
                        + cause,
                        isOrig);
-            
-            // similarly the current endpoint referenced by the client 
+
+            // similarly the current endpoint referenced by the client
             // should also revert back to the original replica A
             //
             verifyCurrentEndpoint(REPLICA_A);
@@ -200,21 +205,21 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         response = greeter.greetMe("joe");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
-                   response.endsWith(REPLICA_C));        
+                   response.endsWith(REPLICA_C));
     }
-        
+
     @Test
     public void testNoFailoverOnApplicationFault() throws Exception {
         startTarget(REPLICA_C);
         setupGreeter();
-        
+
         greeter.pingMe();
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         startTarget(REPLICA_B);
 
         try {
@@ -229,29 +234,29 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         startTarget(REPLICA_C);
         setupGreeter();
         String response = null;
-        
+
         response = greeter.greetMe("fred");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         startTarget(REPLICA_B);
         stopTarget(REPLICA_C);
-        
+
         response = greeter.greetMe("joe");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_B));
         verifyCurrentEndpoint(REPLICA_B);
     }
-    
+
     @Test
     public void testNoFailbackWhileCurrentReplicaLive() throws Exception {
         startTarget(REPLICA_C);
         setupGreeter();
         String response = null;
-        
+
         response = greeter.greetMe("fred");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
@@ -264,21 +269,21 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         startTarget(REPLICA_B);
         response = greeter.greetMe("bob");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         stopTarget(REPLICA_B);
         response = greeter.greetMe("john");
         assertNotNull("expected non-null response", response);
         assertTrue("response from unexpected target: " + response,
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
-        
+
         stopTarget(REPLICA_A);
         response = greeter.greetMe("mike");
         assertNotNull("expected non-null response", response);
@@ -286,7 +291,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                    response.endsWith(REPLICA_C));
         verifyCurrentEndpoint(REPLICA_C);
     }
-    
+
     @Test
     public void testEndpointSpecificInterceptorsDoNotPersistAcrossFailover()
         throws Exception {
@@ -302,10 +307,10 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                    response.endsWith(REPLICA_A));
         assertTrue("response expected to include WS-A messageID",
                    response.indexOf("message: urn:uuid") != -1);
-        verifyCurrentEndpoint(REPLICA_A); 
+        verifyCurrentEndpoint(REPLICA_A);
         assertTrue("expected WSA enabled for current endpoint",
                    isWSAEnabledForCurrentEndpoint());
-        
+
         stopTarget(REPLICA_A);
         startTarget(REPLICA_C);
 
@@ -320,7 +325,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                     isWSAEnabledForCurrentEndpoint());
     }
 
-    @Test    
+    @Test
     public void testDefaultSequentialStrategy() throws Exception {
         strategyTest(REPLICA_B, REPLICA_C, REPLICA_A, false);
     }
@@ -329,12 +334,12 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     public void testExplicitSequentialStrategy() throws Exception {
         strategyTest(REPLICA_A, REPLICA_C, REPLICA_B, false);
     }
-    
+
     @Test
     public void testRandomStrategy() throws Exception {
         strategyTest(REPLICA_A, REPLICA_B, REPLICA_C, true);
     }
-    
+
     protected Greeter getGreeter(String type) throws Exception {
         if (REPLICA_A.equals(type)) {
             Greeter g = new ClusteredGreeterService().getReplicatedPortA();
@@ -352,7 +357,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
             updateWsdlExtensors("9053", PORT_C);
             return g;
         }
-        
+
         Greeter g = new ClusteredGreeterService().getReplicatedPortE();
         updateAddressPort(g, PORT_E);
         updateWsdlExtensors("9055", PORT_E);
@@ -368,7 +373,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         String prevEndpoint = null;
         for (int i = 0; i < 20; i++) {
             Greeter g = getGreeter(inactiveReplica);
-            verifyStrategy(g, expectRandom 
+            verifyStrategy(g, expectRandom
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
             String response = g.greetMe("fred");
@@ -395,7 +400,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         assertTrue("Failed to start greeter", control.startGreeter(address));
         targets.add(address);
     }
-    
+
     protected void stopTarget(String address) {
         if (control != null
             && targets.contains(address)) {
@@ -410,28 +415,28 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                      replica,
                      getCurrentEndpoint(greeter));
     }
-    
+
     protected String getCurrentEndpoint(Object proxy) {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
-    
+
     protected void setupGreeter() throws Exception {
         ClusteredGreeterService cs = new ClusteredGreeterService();
         // REVISIT: why doesn't the generic (i.e. non-Port-specific)
         // Service.getPort() load the <jaxws:client> configuration?
         greeter = cs.getReplicatedPortA();
         updateAddressPort(greeter, PORT_A);
-        assertTrue("unexpected conduit selector: " 
+        assertTrue("unexpected conduit selector: "
                    + ClientProxy.getClient(greeter).getConduitSelector().getClass().getName(),
                    ClientProxy.getClient(greeter).getConduitSelector()
                    instanceof FailoverTargetSelector);
-        
+
         updateWsdlExtensors("9051", PORT_A);
         updateWsdlExtensors("9052", PORT_B);
         updateWsdlExtensors("9053", PORT_C);
         updateWsdlExtensors("9055", PORT_E);
     }
-        
+
     protected void verifyStrategy(Object proxy, Class<?> clz) {
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
@@ -447,38 +452,38 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     protected void enableWSAForCurrentEndpoint() {
         Endpoint provider = ClientProxy.getClient(greeter).getEndpoint();
         mapAggregator = new MAPAggregator();
-        mapCodec = new MAPCodec();
+        mapCodec = MAPCodec.getInstance(ClientProxy.getClient(greeter).getBus());
         provider.getInInterceptors().add(mapAggregator);
         provider.getInInterceptors().add(mapCodec);
-        
+
         provider.getOutInterceptors().add(mapAggregator);
         provider.getOutInterceptors().add(mapCodec);
-        
+
         provider.getInFaultInterceptors().add(mapAggregator);
         provider.getInFaultInterceptors().add(mapCodec);
-        
+
         provider.getOutFaultInterceptors().add(mapAggregator);
         provider.getOutFaultInterceptors().add(mapCodec);
     }
-    
+
     protected boolean isWSAEnabledForCurrentEndpoint() {
         Endpoint provider = ClientProxy.getClient(greeter).getEndpoint();
-        boolean enabledIn = 
+        boolean enabledIn =
             provider.getInInterceptors().contains(mapAggregator)
             && provider.getInInterceptors().contains(mapCodec)
             && provider.getInFaultInterceptors().contains(mapAggregator)
             && provider.getInFaultInterceptors().contains(mapCodec);
-        boolean enabledOut = 
+        boolean enabledOut =
             provider.getOutInterceptors().contains(mapAggregator)
             && provider.getOutInterceptors().contains(mapCodec)
             && provider.getOutFaultInterceptors().contains(mapAggregator)
             && provider.getOutFaultInterceptors().contains(mapCodec);
         return enabledIn && enabledOut;
     }
-    
-    
+
+
     /**
-     * Exchange the port number in all service addresses on the bus.  
+     * Exchange the port number in all service addresses on the bus.
      * @param port1 current port
      * @param port2 new port
      */
@@ -498,12 +503,12 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
                             String add = ((SOAPAddress)e).getLocationURI();
                             int idx = add.indexOf(":" + port1);
                             if (idx != -1) {
-                                add = add.substring(0, idx) + ":" + port2 
+                                add = add.substring(0, idx) + ":" + port2
                                     + add.substring(idx + port1.length() + 1);
                                 ((SOAPAddress)e).setLocationURI(add);
                             }
                         }
-                    }                    
+                    }
                 }
             }
         } catch (Exception e) {
@@ -511,5 +516,5 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    
+
 }

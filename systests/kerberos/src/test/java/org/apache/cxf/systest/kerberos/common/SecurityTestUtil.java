@@ -33,7 +33,7 @@ import org.example.contract.doubleit.DoubleItPortType;
  * A utility class for security tests
  */
 public final class SecurityTestUtil {
-    
+
     private static final boolean UNRESTRICTED_POLICIES_INSTALLED;
     static {
         boolean ok = false;
@@ -54,11 +54,11 @@ public final class SecurityTestUtil {
         }
         UNRESTRICTED_POLICIES_INSTALLED = ok;
     }
-    
+
     private SecurityTestUtil() {
         // complete
     }
-    
+
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
@@ -75,11 +75,11 @@ public final class SecurityTestUtil {
             }
         }
     }
-    
+
     public static boolean checkUnrestrictedPoliciesInstalled() {
         return UNRESTRICTED_POLICIES_INSTALLED;
     }
-    
+
     public static void enableStreaming(DoubleItPortType port) {
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -88,9 +88,10 @@ public final class SecurityTestUtil {
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
     }
-    
+
     public static void updateSTSPort(BindingProvider p, String port) {
-        STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
+        STSClient stsClient = (STSClient)p.getRequestContext()
+            .get(org.apache.cxf.rt.security.SecurityConstants.STS_CLIENT);
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
             if (location != null && location.contains("8080")) {
@@ -99,7 +100,8 @@ public final class SecurityTestUtil {
                 stsClient.setWsdlLocation(location.replace("8443", port));
             }
         }
-        stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT + ".sct");
+        stsClient = (STSClient)p.getRequestContext()
+            .get(org.apache.cxf.rt.security.SecurityConstants.STS_CLIENT + ".sct");
         if (stsClient != null) {
             String location = stsClient.getWsdlLocation();
             if (location.contains("8080")) {
@@ -109,5 +111,5 @@ public final class SecurityTestUtil {
             }
         }
     }
-    
+
 }

@@ -23,7 +23,7 @@ package org.apache.cxf.javascript.fortest;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 //@XmlRootElement(name = "InheritanceTestDerived")
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")

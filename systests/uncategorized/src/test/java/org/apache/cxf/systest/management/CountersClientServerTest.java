@@ -39,19 +39,23 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CountersClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(CountersClientServerTest.class);
     public static final String JMX_PORT = allocatePort(CountersClientServerTest.class, 1);
 
-    private final QName portName = 
+    private final QName portName =
         new QName("http://apache.org/hello_world_soap_http",
-                  "SoapPort"); 
-         
-    public static class Server extends AbstractBusTestServerBase {        
+                  "SoapPort");
+
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run() {
             Object implementor = new GreeterImpl();
@@ -61,73 +65,73 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
             ep.stop();
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus("org/apache/cxf/systest/management/counter-spring.xml");
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCountersWithInstrumentationManager() throws Exception {
         // create Client with other bus
         Bus bus = getStaticBus();
         BusFactory.setDefaultBus(bus);
         bus.getExtension(WorkQueueManager.class);
-                                
+
         CounterRepository cr = bus.getExtension(CounterRepository.class);
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull(im);
         InstrumentationManagerImpl impl = (InstrumentationManagerImpl)im;
         assertTrue(impl.isEnabled());
         assertNotNull(impl.getMBeanServer());
-        
+
         MBeanServer mbs = im.getMBeanServer();
-        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
-            + ":" + ManagementConstants.BUS_ID_PROP + "=cxf" + bus.hashCode() + ",*");        
-        
+        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
+            + ":" + ManagementConstants.BUS_ID_PROP + "=cxf" + bus.hashCode() + ",*");
+
         SOAPService service = new SOAPService();
-        assertNotNull(service);        
-        
+        assertNotNull(service);
+
         Greeter greeter = service.getPort(portName, Greeter.class);
         updateAddressPort(greeter, PORT);
-        
+
         String response = new String("Bonjour");
         String reply = greeter.sayHi();
-        
+
         //assertNotNull("no response received from service", reply);
-        //assertEquals(response, reply);  
-        
+        //assertEquals(response, reply);
+
         assertEquals("The Counters are not create yet", 4, cr.getCounters().size());
         Set<?> counterNames = mbs.queryNames(name, null);
-        assertEquals("The Counters are not export to JMX: " + counterNames, 
+        assertEquals("The Counters are not export to JMX: " + counterNames,
                      4 + 3, counterNames.size());
-       
-        ObjectName sayHiCounter =  new ObjectName(
-            ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"sayHi\",*"); 
-        
-        Set<?> s = mbs.queryNames(sayHiCounter, null);        
+
+        ObjectName sayHiCounter = new ObjectName(
+            ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"sayHi\",*");
+
+        Set<?> s = mbs.queryNames(sayHiCounter, null);
         Iterator<?> it = s.iterator();
-        
+
         while (it.hasNext()) {
             ObjectName counterName = (ObjectName)it.next();
-            Object val = mbs.getAttribute(counterName, "NumInvocations");    
+            Object val = mbs.getAttribute(counterName, "NumInvocations");
             assertEquals("Wrong Counters Number of Invocations", val, 1);
         }
-                
+
         reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);
-        assertEquals(response, reply); 
-        
-        s = mbs.queryNames(sayHiCounter, null);        
+        assertEquals(response, reply);
+
+        s = mbs.queryNames(sayHiCounter, null);
         it = s.iterator();
-        
+
         while (it.hasNext()) {
             ObjectName counterName = (ObjectName)it.next();
-            Object val = mbs.getAttribute(counterName, "NumInvocations");    
+            Object val = mbs.getAttribute(counterName, "NumInvocations");
             assertEquals("Wrong Counters Number of Invocations", val, 2);
         }
-        
+
         greeter.greetMeOneWay("hello");
         for (int count = 0; count < 10; count++) {
             if (6 != cr.getCounters().size()) {
@@ -146,16 +150,16 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         }
         counterNames = mbs.queryNames(name, null);
         assertEquals("The Counters are not export to JMX " + counterNames, 6 + 4, counterNames.size());
-        
-        ObjectName greetMeOneWayCounter =  new ObjectName(
+
+        ObjectName greetMeOneWayCounter = new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"greetMeOneWay\",*");
-        
-        s = mbs.queryNames(greetMeOneWayCounter, null);        
+
+        s = mbs.queryNames(greetMeOneWayCounter, null);
         it = s.iterator();
-        
+
         while (it.hasNext()) {
             ObjectName counterName = (ObjectName)it.next();
-            Object val = mbs.getAttribute(counterName, "NumInvocations");    
+            Object val = mbs.getAttribute(counterName, "NumInvocations");
             assertEquals("Wrong Counters Number of Invocations", val, 1);
         }
     }

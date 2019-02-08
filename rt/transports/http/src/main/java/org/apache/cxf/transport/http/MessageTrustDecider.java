@@ -16,22 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.transport.http;
 
 import org.apache.cxf.message.Message;
 
 /**
- * 
- * The HTTPConduit calls upon this object to establish trust just before a 
+ *
+ * The HTTPConduit calls upon this object to establish trust just before a
  * message within the HTTP Conduit is sent out. This object is based on
  * the implementation of HTTP Conduit using java.net.URL and
- * java.net.URLConnection implementations. 
- * 
+ * java.net.URLConnection implementations.
+ *
  * The HttpURLConnection will be set up and connected, but no data
- * yet sent (at least according to the JDK 1.5 default implemenation), 
+ * yet sent (at least according to the JDK 1.5 default implementation),
  * and in the case of an HttpsURLConnection (again with caveat on
- * particular java.net.HttpsURLConnection implemenation), the TLS handshake 
+ * particular java.net.HttpsURLConnection implementation), the TLS handshake
  * will be completed and certain TLS artifacts will be available.
  * <p>
  * Each MessageTrustDecider has a "logical" name that may be used in logging
@@ -39,7 +39,7 @@ import org.apache.cxf.message.Message;
  * conduits.
  */
 public abstract class MessageTrustDecider {
-    
+
     /**
      * This field contains the "logical" name of this Message Trust Decider.
      * This field is not assigned to be final, since an extension may be
@@ -47,7 +47,7 @@ public abstract class MessageTrustDecider {
      * method, and set this field.
      */
     protected String logicalName;
-    
+
     /**
      * This default constructor sets the "logical" name of the trust
      * decider to be its class name.
@@ -57,13 +57,13 @@ public abstract class MessageTrustDecider {
     }
 
     /**
-     * This constructor is used to set the logical name of the 
+     * This constructor is used to set the logical name of the
      * trust decider.
      */
     protected MessageTrustDecider(String name) {
         logicalName = name;
     }
-    
+
     /**
      * This method returns the logical name of this trust decider.
      * The name of the trust decider may be used in logging or auditing
@@ -72,15 +72,15 @@ public abstract class MessageTrustDecider {
     public String getLogicalName() {
         return logicalName;
     }
-    
+
     /**
      * This method is called when a Message is about to be sent out
      * over an HTTPConduit. Its implementation must throw the specified
-     * exception if the URL connection cannot be trusted for the 
+     * exception if the URL connection cannot be trusted for the
      * message.
      * <p>
      * It is important to note that the Message structure at this point
-     * may not have any content, so any analysis of message content 
+     * may not have any content, so any analysis of message content
      * may be impossible.
      * <p>
      * This method gets invoked after URL.setRequestProperties() is called
@@ -88,28 +88,28 @@ public abstract class MessageTrustDecider {
      * <P>
      * The HTTPConduit calls this message on every redirect, however, it is
      * impossible to tell where it has been redirected from.
-     * 
-     * TODO: What are the exising Message Properties at the point of this call?
-     * 
-     * @param conduitName    This parameter contains the logical name 
+     *
+     * TODO: What are the existing Message Properties at the point of this call?
+     *
+     * @param conduitName    This parameter contains the logical name
      *                       for the conduit that this trust decider
      *                       is being called from.
-     *                       
+     *
      * @param connectionInfo This parameter contains information about
      *                       the URL Connection. It may be subclassed depending
      *                       on the protocol used for the URL. For "https",
-     *                       this argument will be a HttpsURLConnectionInfo. 
-     *                       For "http", this argument will be 
+     *                       this argument will be a HttpsURLConnectionInfo.
+     *                       For "http", this argument will be
      *                       HttpURLConnectionInfo.
-     *                       
+     *
      * @param message        This parameter contains the Message structure
      *                       that governs where the message may be going.
-     * 
+     *
      * @throws UntrustedURLConnectionIOException
-     *                     The trust decider throws this exception if 
+     *                     The trust decider throws this exception if
      *                     trust in the URLConnection cannot be established
      *                     for the particular Message.
-     *                     
+     *
      * @see HttpURLConnectionInfo
      * @see HttpsURLConnectionInfo
      */
@@ -118,6 +118,6 @@ public abstract class MessageTrustDecider {
         String             conduitName,
         URLConnectionInfo  connectionInfo,
         Message            message
-    ) throws 
+    ) throws
         UntrustedURLConnectionIOException;
 }

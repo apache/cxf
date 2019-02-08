@@ -19,26 +19,18 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
-import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
-import org.apache.cxf.jaxrs.provider.json.DataBindingJSONProvider;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.sdo.SDODataBinding;
-import org.apache.cxf.systest.jaxrs.sdo.SDOResource;
-import org.apache.cxf.systest.jaxrs.sdo.Structure;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookDataBindingServer.PORT;
@@ -71,48 +63,6 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF in Action", book.getName());
     }
 
-    @Test
-    public void testSDOStructure() throws Exception {
-        doTestSDOStructure("http://localhost:" + PORT + "/databinding/sdo");
-    }
 
-    @Test
-    public void testSDOStructureWithAnnotation() throws Exception {
-        doTestSDOStructure("http://localhost:" + PORT + "/databinding/sdo2");
-    }
-
-    private void doTestSDOStructure(String address) throws Exception {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setDataBinding(new SDODataBinding());
-        bean.setAddress(address);
-        bean.setResourceClass(SDOResource.class);
-        SDOResource client = bean.create(SDOResource.class);
-        Structure struct = client.getStructure();
-        assertEquals("sdo", struct.getText());
-        assertEquals(123.5, struct.getDbl(), 0.01);
-        assertEquals(3, struct.getInt());
-    }
-
-    @Test
-    public void testSDOStructureJSON() throws Exception {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        DataBinding db = new SDODataBinding();
-        bean.setDataBinding(db);
-        DataBindingJSONProvider<Structure> provider = new DataBindingJSONProvider<Structure>();
-        provider.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
-        provider.setDataBinding(db);
-        bean.setProvider(provider);
-        bean.setAddress("http://localhost:" + PORT + "/databinding/sdo");
-        bean.setResourceClass(SDOResource.class);
-        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
-        list.add(new LoggingInInterceptor());
-        bean.setInInterceptors(list);
-        SDOResource client = bean.create(SDOResource.class);
-        WebClient.client(client).accept("application/json");
-        Structure struct = client.getStructure();
-        assertEquals("sdo", struct.getText());
-        assertEquals(123.5, struct.getDbl(), 0.01);
-        assertEquals(3, struct.getInt());
-    }
 
 }

@@ -28,11 +28,11 @@ public final class IdlAttribute extends IdlField {
         super(parent, name, type);
         this.readonly = readonlyValue;
     }
-    
+
     public void setReadonly(boolean readonlyValue) {
         this.readonly = readonlyValue;
     }
-    
+
     public static IdlAttribute create(IdlScopeBase parent, String name, IdlType type, boolean readonly) {
         return new IdlAttribute(parent, name, type, readonly);
     }
@@ -41,7 +41,7 @@ public final class IdlAttribute extends IdlField {
     public boolean readonly() {
         return this.readonly;
     }
-    
+
     public void write(PrintWriter pw) {
         pw.print(indent());
 
@@ -51,5 +51,5 @@ public final class IdlAttribute extends IdlField {
 
         pw.println("attribute " + type().fullName(scopeName()) + " " + localName() + ";");
     }
-    
+
 }

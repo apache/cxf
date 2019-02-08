@@ -25,19 +25,19 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 
 /**
- * Strategy for null Conduit retrieval. 
+ * Strategy for null Conduit retrieval.
  * An instance of this class is set on the Exchange to clear
- * the current ConduitSelector, as a work-around for broken 
+ * the current ConduitSelector, as a work-around for broken
  * Exchange.remove(ConduitSelector.class) semantics.
  */
 @NoJSR250Annotations
 public class NullConduitSelector implements ConduitSelector {
 
     private Endpoint endpoint;
-    
+
     /**
      * Called prior to the interceptor chain being traversed.
-     * 
+     *
      * @param message the current Message
      */
     public void prepare(Message message) {
@@ -46,7 +46,7 @@ public class NullConduitSelector implements ConduitSelector {
 
     /**
      * Called when a Conduit is actually required.
-     * 
+     *
      * @param message
      * @return the Conduit to use for mediation of the message
      */
@@ -56,13 +56,13 @@ public class NullConduitSelector implements ConduitSelector {
 
     /**
      * Called on completion of the MEP for which the Conduit was required.
-     * 
+     *
      * @param exchange represents the completed MEP
      */
     public void complete(Exchange exchange) {
         // nothing to do
     }
-    
+
     /**
      * @return the encapsulated Endpoint
      */

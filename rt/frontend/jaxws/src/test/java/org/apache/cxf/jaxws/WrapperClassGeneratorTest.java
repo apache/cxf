@@ -36,86 +36,88 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.junit.After;
-import org.junit.Assert;
 
-public class WrapperClassGeneratorTest extends Assert {
-    
+import org.junit.After;
+
+import static org.junit.Assert.assertTrue;
+
+public class WrapperClassGeneratorTest {
+
     @After
     public void tearDown() {
         BusFactory.setDefaultBus(null);
     }
-    
+
     @org.junit.Test
     public void testForXmlList() throws Exception {
-        JaxWsImplementorInfo implInfo = 
+        JaxWsImplementorInfo implInfo =
             new JaxWsImplementorInfo(AddNumbersImpl.class);
         JaxWsServiceFactoryBean jaxwsFac = new JaxWsServiceFactoryBean(implInfo);
         jaxwsFac.setBus(BusFactory.getDefaultBus());
         Service service = jaxwsFac.create();
-        
-        
-        ServiceInfo serviceInfo =  service.getServiceInfos().get(0);
-        
+
+
+        ServiceInfo serviceInfo = service.getServiceInfos().get(0);
+
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         OperationInfo inf = interfaceInfo.getOperations().iterator().next();
         Class<?> requestClass = inf.getInput().getMessagePart(0).getTypeClass();
         Class<?> responseClass = inf.getOutput().getMessagePart(0).getTypeClass();
-                        
+
         // Create request wrapper Object
         List<String> partNames = Arrays.asList(new String[] {"arg0"});
         List<String> elTypeNames = Arrays.asList(new String[] {"list"});
         List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
-           
+
         String className = requestClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
-        
+
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
-                                                             partNames, elTypeNames, partClasses);        
-        
-        List<Object> paraList = new ArrayList<Object>();
-        List<String> valueList = new ArrayList<String>();
+                                                             partNames, elTypeNames, partClasses);
+
+        List<Object> paraList = new ArrayList<>();
+        List<String> valueList = new ArrayList<>();
         valueList.add("str1");
         valueList.add("str2");
         valueList.add("str3");
         paraList.add(valueList);
         Object requestObj = wh.createWrapperObject(paraList);
         // Create response wrapper Object
-        
+
         partNames = Arrays.asList(new String[] {"return"});
         elTypeNames = Arrays.asList(new String[] {"list"});
         partClasses = Arrays.asList(new Class<?>[] {List.class});
-           
+
         className = responseClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
-        
+
         wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
-                                                             partNames, elTypeNames, partClasses);        
-        List<Object> resPara = new ArrayList<Object>();
-        List<Integer> intValueList = new ArrayList<Integer>();
+                                                             partNames, elTypeNames, partClasses);
+        List<Object> resPara = new ArrayList<>();
+        List<Integer> intValueList = new ArrayList<>();
         intValueList.add(1);
         intValueList.add(2);
         intValueList.add(3);
         resPara.add(intValueList);
         Object responseObj = wh.createWrapperObject(resPara);
-              
+
         JAXBContext jaxbContext = JAXBContext.newInstance(requestClass, responseClass);
         java.io.ByteArrayOutputStream bout = new java.io.ByteArrayOutputStream();
         Marshaller marshaller = jaxbContext.createMarshaller();
-        
+
         //check marshall wrapper
-        marshaller.marshal(requestObj, bout);      
+        marshaller.marshal(requestObj, bout);
         String expected = "<arg0>str1 str2 str3</arg0>";
 
-        assertTrue("The generated request wrapper class does not contain the correct annotations", 
+        assertTrue("The generated request wrapper class does not contain the correct annotations",
                    bout.toString().contains(expected));
-       
-        
+
+
         bout.reset();
-        marshaller.marshal(responseObj, bout);       
+        marshaller.marshal(responseObj, bout);
         expected = "<return>1</return><return>2</return><return>3</return>";
         assertTrue("The generated response wrapper class is not correct", bout.toString().contains(expected));
-     
+
     }
-  
+
 }

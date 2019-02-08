@@ -43,23 +43,23 @@ public class Book2 {
     private String name;
     @XmlElement(name = "id", namespace = "http://www.example.org/books")
     private long id;
-    
+
     @Context
     @XmlTransient
-    private UriInfo uriInfo; 
-    
+    private UriInfo uriInfo;
+
     @BeanParam
     @XmlTransient
     private QueryBean2 queryBean;
-    
+
     public Book2() {
     }
-    
+
     public Book2(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -67,14 +67,14 @@ public class Book2 {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
     @GET
     @Path("rc")
     @Produces("application/xml")
@@ -84,11 +84,11 @@ public class Book2 {
         name = params.getFirst("bookname");
         return this;
     }
-    
+
     public void checkContext() {
         uriInfo.getQueryParameters();
     }
-    
+
     @GET
     @Path("rc/bean")
     @Produces("application/xml")
@@ -97,7 +97,7 @@ public class Book2 {
         name = bean.getBookname();
         return this;
     }
-    
+
     @GET
     @Path("rc/bean2")
     @Produces("application/xml")
@@ -119,7 +119,7 @@ public class Book2 {
         public void setBookid(long i) {
             this.id = i;
         }
-        
+
         public String getBookname() {
             return name;
         }
@@ -128,10 +128,10 @@ public class Book2 {
         public void setBookname(String bookname) {
             this.name = bookname;
         }
-        
+
     }
-    
+
     public static class QueryBean2 extends QueryBean {
-        
+
     }
 }

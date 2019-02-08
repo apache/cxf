@@ -37,7 +37,7 @@ public final class AttachmentUtil {
     private AttachmentUtil() {
         //utility class
     }
-    
+
     public static String createContentID(String ns) {
         String uid = UID.generate();
         try {

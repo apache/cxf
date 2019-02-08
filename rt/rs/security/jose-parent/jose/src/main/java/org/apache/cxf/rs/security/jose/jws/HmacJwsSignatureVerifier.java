@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.rs.security.jose.jws;
 
+import java.security.MessageDigest;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 import java.util.logging.Logger;
+
+import javax.crypto.Mac;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
@@ -33,7 +35,7 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     private byte[] key;
     private AlgorithmParameterSpec hmacSpec;
     private SignatureAlgorithm supportedAlgo;
-    
+
     public HmacJwsSignatureVerifier(String encodedKey) {
         this(JoseUtils.decode(encodedKey), SignatureAlgorithm.HS256);
     }
@@ -48,24 +50,24 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
         this.hmacSpec = spec;
         this.supportedAlgo = supportedAlgo;
     }
-    
-    
+
+
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         byte[] expected = computeMac(headers, unsignedText);
-        return Arrays.equals(expected, signature);
+        return MessageDigest.isEqual(expected, signature);
     }
-    
+
     private byte[] computeMac(JwsHeaders headers, String text) {
         final String sigAlgo = checkAlgorithm(headers.getSignatureAlgorithm());
-        return HmacUtils.computeHmac(key, 
+        return HmacUtils.computeHmac(key,
                                      AlgorithmUtils.toJavaName(sigAlgo),
                                      hmacSpec,
                                      text);
     }
-    
+
     protected String checkAlgorithm(SignatureAlgorithm sigAlgo) {
-        
+
         if (sigAlgo == null) {
             LOG.warning("Signature algorithm is not set");
             throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
@@ -81,5 +83,34 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     @Override
     public SignatureAlgorithm getAlgorithm() {
         return supportedAlgo;
+    }
+    @Override
+    public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
+        final String sigAlgo = checkAlgorithm(headers.getSignatureAlgorithm());
+        Mac mac = HmacUtils.getInitializedMac(key,
+                                     AlgorithmUtils.toJavaName(sigAlgo),
+                                     hmacSpec);
+        return new HmacJwsVerificationSignature(mac);
+    }
+    
+    private static class HmacJwsVerificationSignature implements JwsVerificationSignature {
+
+        private Mac mac;
+        
+        HmacJwsVerificationSignature(Mac mac) {
+            this.mac = mac;
+        }
+
+        @Override
+        public void update(byte[] src, int off, int len) {
+            mac.update(src, off, len);
+        }
+
+        @Override
+        public boolean verify(byte[] signature) {
+            byte[] macBytes = mac.doFinal();
+            return MessageDigest.isEqual(macBytes, signature);
+        }
+        
     }
 }

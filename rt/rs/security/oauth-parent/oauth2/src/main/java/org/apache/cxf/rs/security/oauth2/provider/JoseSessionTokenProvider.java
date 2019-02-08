@@ -64,10 +64,10 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
     @Override
     public OAuthRedirectionState getSessionState(MessageContext messageContext, String sessionToken,
                                                  UserSubject subject) {
-        
+
         String stateString = decryptStateString(sessionToken);
         return convertStateStringToState(stateString);
-        
+
     }
 
     public void setJwsProvider(JwsSignatureProvider jwsProvider) {
@@ -88,13 +88,13 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
 
     protected JwsSignatureProvider getInitializedSigProvider() {
         if (jwsProvider != null) {
-            return jwsProvider;    
-        } 
+            return jwsProvider;
+        }
         return JwsUtils.loadSignatureProvider(jwsRequired);
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider() {
         if (jweEncryptor != null) {
-            return jweEncryptor;    
+            return jweEncryptor;
         }
         return JweUtils.loadEncryptionProvider(jweRequired);
     }
@@ -108,14 +108,14 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
 
     protected JweDecryptionProvider getInitializedDecryptionProvider() {
         if (jweDecryptor != null) {
-            return jweDecryptor;    
-        } 
+            return jweDecryptor;
+        }
         return JweUtils.loadDecryptionProvider(jweRequired);
     }
     protected JwsSignatureVerifier getInitializedSigVerifier() {
         if (jwsVerifier != null) {
-            return jwsVerifier;    
-        } 
+            return jwsVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(jwsRequired);
     }
 
@@ -124,7 +124,7 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         String stateString = jwe.decrypt(sessionToken).getContentText();
         JwsSignatureVerifier jws = getInitializedSigVerifier();
         if (jws != null) {
-            stateString = JwsUtils.verify(jws, stateString).getUnsignedEncodedSequence();
+            stateString = JwsUtils.verify(jws, stateString).getDecodedJwsPayload();
         }
         return stateString;
     }
@@ -137,17 +137,19 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         }
         if (jws != null) {
             stateString = JwsUtils.sign(jws, stateString, null);
-        } 
+        }
         if (jwe != null) {
             stateString = jwe.encrypt(StringUtils.toBytesUTF8(stateString), null);
         }
         return stateString;
     }
-    
+
     private OAuthRedirectionState convertStateStringToState(String stateString) {
         String[] parts = ModelEncryptionSupport.getParts(stateString);
         OAuthRedirectionState state = new OAuthRedirectionState();
-        state.setClientId(parts[0]);
+        if (!StringUtils.isEmpty(parts[0])) {
+            state.setClientId(parts[0]);
+        }
         if (!StringUtils.isEmpty(parts[1])) {
             state.setAudience(parts[1]);
         }
@@ -166,9 +168,16 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         if (!StringUtils.isEmpty(parts[6])) {
             state.setNonce(parts[6]);
         }
+        if (!StringUtils.isEmpty(parts[7])) {
+            state.setResponseType(parts[7]);
+        }
+        if (!StringUtils.isEmpty(parts[8])) {
+            state.setExtraProperties(ModelEncryptionSupport.parseSimpleMap(parts[8]));
+        }
         return state;
     }
     protected String convertStateToString(OAuthRedirectionState secData) {
+        //TODO: make it simpler, convert it to JwtClaims -> JSON
         StringBuilder state = new StringBuilder();
         // 0: client id
         state.append(ModelEncryptionSupport.tokenizeString(secData.getClientId()));
@@ -190,7 +199,13 @@ public class JoseSessionTokenProvider implements SessionAuthenticityTokenProvide
         state.append(ModelEncryptionSupport.SEP);
         // 6: nonce
         state.append(ModelEncryptionSupport.tokenizeString(secData.getNonce()));
-        
+        state.append(ModelEncryptionSupport.SEP);
+        // 7: response_type
+        state.append(ModelEncryptionSupport.tokenizeString(secData.getResponseType()));
+        state.append(ModelEncryptionSupport.SEP);
+        // 8: extra props
+        state.append(secData.getExtraProperties().toString());
+
         return state.toString();
     }
 

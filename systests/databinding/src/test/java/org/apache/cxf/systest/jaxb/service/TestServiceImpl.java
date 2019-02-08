@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxb.service;
 
+import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.jaxb.model.ExtendedWidget;
@@ -35,6 +36,22 @@ public class TestServiceImpl implements TestService {
         throw new TestServiceException("Your hovercraft is full of eels.");
     }
 
-    
+    @WebMethod
+    public String echo(String test) throws PropertyOrderException {
+        if ("Exception".equalsIgnoreCase(test)) {
+            PropertyOrderException exception = new PropertyOrderException();
+            ErrorData ed = new ErrorData();
+            ed.setCode(500);
+            ed.setDescription("Error happened");
+            ed.setTitle("Error title");
+            exception.setData(ed);
+            exception.setMessage("Exception message");
+            throw exception;
+
+        }
+        return test;
+    }
+
+
 
 }

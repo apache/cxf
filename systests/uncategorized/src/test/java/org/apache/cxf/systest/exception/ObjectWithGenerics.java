@@ -22,11 +22,11 @@ public class ObjectWithGenerics<A, B> {
 
     private A a;
     private B b;
-    
+
     public ObjectWithGenerics() {
-        
+
     }
-    
+
     public ObjectWithGenerics(A aa, B bb) {
         this.a = aa;
         this.b = bb;
@@ -35,15 +35,15 @@ public class ObjectWithGenerics<A, B> {
     public A getA() {
         return a;
     }
-    
+
     public void setA(A aa) {
         this.a = aa;
     }
-    
+
     public B getB() {
         return b;
     }
-    
+
     public void setB(B bb) {
         this.b = bb;
     }

@@ -37,8 +37,8 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 public class PrimitiveTypesVisitor implements Visitor {
 
     private static XmlSchemaPrimitiveMap xmlSchemaPrimitiveMap = new XmlSchemaPrimitiveMap();
-    
-    private static final List<Integer> PRIMITIVE_TYPES = new ArrayList<Integer>();
+
+    private static final List<Integer> PRIMITIVE_TYPES = new ArrayList<>();
 
     static {
         PRIMITIVE_TYPES.add(Integer.valueOf(IDLTokenTypes.LITERAL_float));
@@ -58,7 +58,7 @@ public class PrimitiveTypesVisitor implements Visitor {
     private CorbaType corbaType;
     private Scope scope;
     private XmlSchemaCollection schemas;
-    
+
     public PrimitiveTypesVisitor(Scope scopeRef,
                                  Definition defn,
                                  XmlSchema schemaRef,
@@ -70,7 +70,7 @@ public class PrimitiveTypesVisitor implements Visitor {
     public static boolean accept(AST node) {
         return PRIMITIVE_TYPES.contains(node.getType());
     }
-    
+
     public void visit(AST node) {
         // <base_type_spec> ::= <floating_pt_type>
         //                    | <integer_type>
@@ -103,9 +103,9 @@ public class PrimitiveTypesVisitor implements Visitor {
         // <boolean_type> ::= "boolean"
         // <octet_type> ::= "octet"
         // <any_type> ::= "any"
- 
-        
-        XmlSchemaType stype = null; 
+
+
+        XmlSchemaType stype = null;
         CorbaType ctype = null;
         QName corbaTypeQName = PrimitiveTypesVisitor.getPrimitiveType(node);
         if (corbaTypeQName != null) {
@@ -122,27 +122,27 @@ public class PrimitiveTypesVisitor implements Visitor {
             }
         }
 
-        
+
         schemaType = stype;
-        corbaType = ctype;        
+        corbaType = ctype;
     }
-    
+
     public XmlSchemaType getSchemaType() {
         return schemaType;
     }
-    
+
     public CorbaType getCorbaType() {
         return corbaType;
     }
-    
+
     public Scope getScope() {
         return scope;
     }
-    
+
     public Scope getFullyQualifiedName() {
         return scope;
     }
-    
+
     public static QName getPrimitiveType(AST node) {
         QName result = null;
         switch (node.getType()) {
@@ -184,10 +184,10 @@ public class PrimitiveTypesVisitor implements Visitor {
             break;
         case IDLTokenTypes.LITERAL_float:
             result = CorbaConstants.NT_CORBA_FLOAT;
-            break;            
+            break;
         case IDLTokenTypes.LITERAL_double:
             result = CorbaConstants.NT_CORBA_DOUBLE;
-            break;            
+            break;
         case IDLTokenTypes.LITERAL_char:
             result = CorbaConstants.NT_CORBA_CHAR;
             break;
@@ -210,7 +210,7 @@ public class PrimitiveTypesVisitor implements Visitor {
             result = CorbaConstants.NT_CORBA_ANY;
             break;
         default:
-            // TBD 
+            // TBD
             break;
         }
         return result;

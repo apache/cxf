@@ -36,11 +36,11 @@ public class Echo {
 
     /**
      * Gets the value of the string1 property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getString1() {
         return string1;
@@ -48,11 +48,11 @@ public class Echo {
 
     /**
      * Sets the value of the string1 property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setString1(String value) {
         this.string1 = value;

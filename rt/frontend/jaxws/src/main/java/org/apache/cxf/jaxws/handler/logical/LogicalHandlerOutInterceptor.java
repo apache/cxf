@@ -35,30 +35,30 @@ import org.w3c.dom.Node;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.MessageObserver;
 
 
-public class LogicalHandlerOutInterceptor 
+public class LogicalHandlerOutInterceptor
     extends AbstractJAXWSHandlerInterceptor<Message> {
-    
-    public static final String ORIGINAL_WRITER 
+
+    public static final String ORIGINAL_WRITER
         = LogicalHandlerOutInterceptor.class.getName() + ".original_writer";
     private LogicalHandlerOutEndingInterceptor ending;
-    
+
     public LogicalHandlerOutInterceptor(Binding binding) {
         super(binding, Phase.PRE_MARSHAL);
         ending = new LogicalHandlerOutEndingInterceptor(binding);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         if (binding.getHandlerChain().isEmpty()) {
             return;
@@ -67,13 +67,13 @@ public class LogicalHandlerOutInterceptor
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
         }
-        
+
         XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
-        
+
         Node nd = message.getContent(Node.class);
         SOAPMessage m = message.getContent(SOAPMessage.class);
         Document document = null;
-        
+
         if (m != null) {
             document = m.getSOAPPart();
         } else if (nd != null) {
@@ -82,13 +82,13 @@ public class LogicalHandlerOutInterceptor
             document = DOMUtils.newDocument();
             message.setContent(Node.class, document);
         }
-        
+
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());
-    
+
         // Replace stax writer with DomStreamWriter
-        message.setContent(XMLStreamWriter.class, writer);        
+        message.setContent(XMLStreamWriter.class, writer);
         message.put(ORIGINAL_WRITER, origWriter);
-        
+
         message.getInterceptorChain().add(ending);
     }
     @Override
@@ -99,26 +99,26 @@ public class LogicalHandlerOutInterceptor
             message.setContent(XMLStreamWriter.class, os);
         }
     }
-    
-    private class LogicalHandlerOutEndingInterceptor 
+
+    private static class LogicalHandlerOutEndingInterceptor
         extends AbstractJAXWSHandlerInterceptor<Message> {
-    
+
         LogicalHandlerOutEndingInterceptor(Binding binding) {
             super(binding, Phase.POST_MARSHAL);
         }
-    
+
         public void handleMessage(Message message) throws Fault {
             W3CDOMStreamWriter domWriter = (W3CDOMStreamWriter)message.getContent(XMLStreamWriter.class);
             XMLStreamWriter origWriter = (XMLStreamWriter)message
-                .get(LogicalHandlerOutInterceptor.ORIGINAL_WRITER);  
-            
-            
+                .get(LogicalHandlerOutInterceptor.ORIGINAL_WRITER);
+
+
             HandlerChainInvoker invoker = getInvoker(message);
             LogicalMessageContextImpl lctx = new LogicalMessageContextImpl(message);
             invoker.setLogicalMessageContext(lctx);
             boolean requestor = isRequestor(message);
-            
-            
+
+
             XMLStreamReader reader = (XMLStreamReader)message.get("LogicalHandlerInterceptor.INREADER");
             SOAPMessage origMessage = null;
             if (reader != null) {
@@ -138,10 +138,10 @@ public class LogicalHandlerOutInterceptor
             } else if (domWriter.getDocument().getDocumentElement() != null) {
                 Source source = new DOMSource(domWriter.getDocument());
                 message.setContent(Source.class, source);
-                message.setContent(XMLStreamReader.class, 
+                message.setContent(XMLStreamReader.class,
                                    StaxUtils.createXMLStreamReader(domWriter.getDocument()));
-            }            
-            
+            }
+
             if (!invoker.invokeLogicalHandlers(requestor, lctx)) {
                 if (requestor) {
                     // client side - abort
@@ -150,17 +150,17 @@ public class LogicalHandlerOutInterceptor
                         Endpoint e = message.getExchange().getEndpoint();
                         Message responseMsg = new MessageImpl();
                         responseMsg.setExchange(message.getExchange());
-                        responseMsg = e.getBinding().createMessage(responseMsg);            
-    
+                        responseMsg = e.getBinding().createMessage(responseMsg);
+
                         MessageObserver observer = message.getExchange()
                                     .get(MessageObserver.class);
                         if (observer != null) {
                             //client side outbound, the request message becomes the response message
                             responseMsg.setContent(XMLStreamReader.class, message
-                                .getContent(XMLStreamReader.class));                        
-                            
+                                .getContent(XMLStreamReader.class));
+
                             message.getExchange().setInMessage(responseMsg);
-                            responseMsg.put(PhaseInterceptorChain.STARTING_AT_INTERCEPTOR_ID,
+                            responseMsg.put(InterceptorChain.STARTING_AT_INTERCEPTOR_ID,
                                             LogicalHandlerInInterceptor.class.getName());
                             observer.onMessage(responseMsg);
                         }
@@ -175,7 +175,7 @@ public class LogicalHandlerOutInterceptor
             if (origMessage != null) {
                 message.setContent(SOAPMessage.class, origMessage);
             }
-            
+
             try {
                 reader = message.getContent(XMLStreamReader.class);
                 message.removeContent(XMLStreamReader.class);
@@ -190,5 +190,5 @@ public class LogicalHandlerOutInterceptor
             }
         }
     }
-    
+
 }

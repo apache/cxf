@@ -22,12 +22,16 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+import org.junit.After;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+
+public class JAXRSClientFactoryBeanTest {
 
     @After
     public void tearDown() throws Exception {
@@ -35,15 +39,15 @@ public class JAXRSClientFactoryBeanTest extends Assert {
             BusFactory.getDefaultBus(false).shutdown(true);
         }
     }
-    
+
     @Test
     public void testClients() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"});
-        
+
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
-        
+
         bean = ctx.getBean("setHeaderClient.proxyFactory");
         assertNotNull(bean);
         JAXRSClientFactoryBean cfb = (JAXRSClientFactoryBean) bean;
@@ -54,7 +58,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         QName serviceQName = new QName("http://books.com", "BookService");
         assertEquals(serviceQName, cfb.getServiceName());
         assertEquals(serviceQName, cfb.getServiceFactory().getServiceName());
-        
+
         bean = ctx.getBean("ModelClient.proxyFactory");
         assertNotNull(bean);
         cfb = (JAXRSClientFactoryBean) bean;

@@ -41,7 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Actually it breaks streaming (can be fixed in further versions when XSLT engine supports XML stream)
  */
 public class XSLTInInterceptor extends AbstractXSLTInterceptor {
-    private static final Logger LOG = LogUtils.getL7dLogger(XSLTInInterceptor.class);    
+    private static final Logger LOG = LogUtils.getL7dLogger(XSLTInInterceptor.class);
 
     public XSLTInInterceptor(String xsltPath) {
         super(Phase.POST_STREAM, StaxInInterceptor.class, null, xsltPath);
@@ -100,7 +100,7 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
             }
         }
     }
-    
+
     protected void transformIS(Message message, InputStream is) {
         try {
             InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is);

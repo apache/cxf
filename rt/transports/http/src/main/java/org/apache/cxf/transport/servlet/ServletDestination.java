@@ -30,19 +30,19 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 
 
-public class ServletDestination extends AbstractHTTPDestination {
-    
+public class ServletDestination extends AbstractHTTPDestination implements ServletConfigAware {
+
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
-        
+
     /**
      * Constructor, allowing subsititution of configuration.
-     * 
+     *
      * @param b the associated Bus
      * @param ci the associated conduit initiator
-     * @param ei the endpoint info of the destination 
+     * @param ei the endpoint info of the destination
      * @param cfg the configuration
      * @throws IOException
-     */    
+     */
     public ServletDestination(Bus b,
                               DestinationRegistry registry,
                               EndpointInfo ei,
@@ -60,13 +60,13 @@ public class ServletDestination extends AbstractHTTPDestination {
         // would add the default port to the address
         super(b, registry, ei, path, dp);
     }
-        
+
     protected Logger getLogger() {
         return LOG;
     }
-    
+
     protected String getBasePath(String contextPath) throws IOException {
-        
+
         String address = getAddress().getAddress().getValue();
         if (address == null) {
             return contextPath;
@@ -74,8 +74,8 @@ public class ServletDestination extends AbstractHTTPDestination {
         if (address.startsWith("http")) {
             return URI.create(address).getPath();
         }
-        
+
         return contextPath + address;
     }
-  
+
 }

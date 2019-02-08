@@ -27,7 +27,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 
 public class CXFBlueprintServlet extends CXFNonSpringServlet {
     private static final String CONTAINER_ATTRIBUTE = "org.apache.aries.blueprint.container";
-    
+
     private static final long serialVersionUID = -5922443981969455305L;
     private boolean busCreated;
     public CXFBlueprintServlet() {
@@ -35,9 +35,9 @@ public class CXFBlueprintServlet extends CXFNonSpringServlet {
 
     @Override
     protected void loadBus(ServletConfig servletConfig) {
-        BlueprintContainer container = 
+        BlueprintContainer container =
             (BlueprintContainer)servletConfig.getServletContext().getAttribute(CONTAINER_ATTRIBUTE);
-        
+
         if (container != null) {
             Object busComponent = container.getComponentInstance("cxf");
             setBus((Bus)busComponent);

@@ -46,13 +46,13 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
 
     private static final Logger LOG =
             LogUtils.getL7dLogger(NettyHttpDestination.class);
-    
+
     protected NettyHttpServerEngine engine;
     protected NettyHttpServerEngineFactory serverEngineFactory;
     protected ServletContext servletContext;
     protected ClassLoader loader;
     protected URL nurl;
-    
+
     private boolean configFinalized;
 
     /**
@@ -64,7 +64,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
      * @param serverEngineFactory the serverEngineFactory which could be used to create ServerEngine
      * @throws java.io.IOException
      */
-    public NettyHttpDestination(Bus b, DestinationRegistry registry, 
+    public NettyHttpDestination(Bus b, DestinationRegistry registry,
                                 EndpointInfo ei, NettyHttpServerEngineFactory serverEngineFactory) throws IOException {
         //Add the default port if the address is missing it
         super(b, registry, ei, getAddressValue(ei, true).getAddress(), true);
@@ -84,7 +84,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
 
         engine = serverEngineFactory.retrieveNettyHttpServerEngine(nurl.getPort());
         if (engine == null) {
-            engine = 
+            engine =
                 serverEngineFactory.createNettyHttpServerEngine(nurl.getHost(), nurl.getPort(), nurl.getProtocol());
         }
 
@@ -101,7 +101,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         }
         configFinalized = true;
     }
-    
+
     private String getAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("netty://")) {
@@ -109,7 +109,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         }
         return address;
     }
-    
+
     protected String getBasePath(String contextPath) throws IOException {
         if (StringUtils.isEmpty(endpointInfo.getAddress())) {
             return "";
@@ -124,7 +124,7 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
         super.activate();
         LOG.log(Level.FINE, "Activating receipt of incoming messages");
         URL url = null;
-        
+
         try {
             url = new URL(getAddress(endpointInfo));
         } catch (Exception e) {
@@ -181,9 +181,9 @@ public class NettyHttpDestination extends AbstractHTTPDestination {
             }
         }
     }
-    
-    protected void invokeComplete(final ServletContext context, 
-                                  final HttpServletRequest req, 
+
+    protected void invokeComplete(final ServletContext context,
+                                  final HttpServletRequest req,
                                   final HttpServletResponse resp,
                                   Message m) throws IOException {
         resp.flushBuffer();

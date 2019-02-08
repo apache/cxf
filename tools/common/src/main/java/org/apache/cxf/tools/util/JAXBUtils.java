@@ -20,7 +20,8 @@
 package org.apache.cxf.tools.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -43,16 +44,16 @@ public final class JAXBUtils {
         String schemaNamespace = schema.getNamespaceURI();
         List<Element> annoList = DOMUtils.findAllElementsByTagNameNS(schema, schemaNamespace, "annotation");
         Element annotation = null;
-        if (annoList.size() > 0) {
+        if (!annoList.isEmpty()) {
             annotation = annoList.get(0);
         } else {
             annotation = schema.getOwnerDocument().createElementNS(schemaNamespace, "annotation");
         }
-        List<Element> appList = DOMUtils.findAllElementsByTagNameNS(annotation, 
-                                                                    schemaNamespace, 
+        List<Element> appList = DOMUtils.findAllElementsByTagNameNS(annotation,
+                                                                    schemaNamespace,
                                                                     "appinfo");
         Element appInfo = null;
-        if (appList.size() > 0) {
+        if (!appList.isEmpty()) {
             appInfo = appList.get(0);
         } else {
             appInfo = schema.getOwnerDocument().createElementNS(schemaNamespace, "appinfo");
@@ -60,13 +61,13 @@ public final class JAXBUtils {
         }
 
         Element jaxbBindings = null;
-        List<Element> jaxbList = DOMUtils.findAllElementsByTagNameNS(schema, 
-                                                                     ToolConstants.NS_JAXB_BINDINGS, 
+        List<Element> jaxbList = DOMUtils.findAllElementsByTagNameNS(schema,
+                                                                     ToolConstants.NS_JAXB_BINDINGS,
                                                                      "schemaBindings");
-        if (jaxbList.size() > 0) {
+        if (!jaxbList.isEmpty()) {
             jaxbBindings = jaxbList.get(0);
         } else {
-            jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS, 
+            jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS,
                                                                      "schemaBindings");
             appInfo.appendChild(jaxbBindings);
         }
@@ -78,8 +79,8 @@ public final class JAXBUtils {
         Document doc = schema.getOwnerDocument();
 
         if (!DOMUtils.hasAttribute(schema, ToolConstants.NS_JAXB_BINDINGS)) {
-            Attr attr = 
-                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS, 
+            Attr attr =
+                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS,
                                                             "version");
             attr.setValue("2.0");
             schema.setAttributeNodeNS(attr);
@@ -87,11 +88,11 @@ public final class JAXBUtils {
 
         Node schemaBindings = innerJaxbBinding(schema);
 
-        List<Element> pkgList = DOMUtils.findAllElementsByTagNameNS(schema, 
-                                                                    ToolConstants.NS_JAXB_BINDINGS, 
+        List<Element> pkgList = DOMUtils.findAllElementsByTagNameNS(schema,
+                                                                    ToolConstants.NS_JAXB_BINDINGS,
                                                                     "package");
         Element packagename = null;
-        if (pkgList.size() > 0) {
+        if (!pkgList.isEmpty()) {
             packagename = pkgList.get(0);
         } else {
             packagename = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "package");
@@ -105,13 +106,13 @@ public final class JAXBUtils {
 
     /**
      * Create the jaxb binding file to customize namespace to package mapping
-     * 
+     *
      * @param namespace
      * @param pkgName
      * @return file
      */
     public static File getPackageMappingSchemaBindingFile(String namespace, String pkgName) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element rootElement = doc.createElementNS(ToolConstants.SCHEMA_URI, "schema");
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns", ToolConstants.SCHEMA_URI);
         rootElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:jaxb", ToolConstants.NS_JAXB_BINDINGS);
@@ -127,17 +128,17 @@ public final class JAXBUtils {
         schemaBindings.appendChild(pkgElement);
         rootElement.appendChild(annoElement);
         File tmpFile = null;
-        FileOutputStream fout = null;
+        OutputStream out = null;
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
-            fout = new FileOutputStream(tmpFile);
-            StaxUtils.writeTo(rootElement, fout);
+            out = Files.newOutputStream(tmpFile.toPath());
+            StaxUtils.writeTo(rootElement, out);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (fout != null) {
+            if (out != null) {
                 try {
-                    fout.close();
+                    out.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

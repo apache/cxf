@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.endpoint;
 
 import java.util.logging.Logger;
@@ -28,24 +28,24 @@ import org.apache.cxf.transport.Conduit;
 
 
 /**
- * Strategy for eager upfront retreival of a Conduit to mediate an 
+ * Strategy for eager upfront retreival of a Conduit to mediate an
  * outbound message.
  */
 public class UpfrontConduitSelector extends AbstractConduitSelector {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(UpfrontConduitSelector.class);
-    
+
     /**
      * Normal constructor.
      */
     public UpfrontConduitSelector() {
         super();
     }
-    
+
     /**
      * Constructor, allowing a specific conduit to override normal selection.
-     * 
+     *
      * @param c specific conduit
      */
     public UpfrontConduitSelector(Conduit c) {
@@ -54,7 +54,7 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
 
     /**
      * Called prior to the interceptor chain being traversed.
-     * 
+     *
      * @param message the current Message
      */
     public void prepare(Message message) {
@@ -64,10 +64,10 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
             message.put(Conduit.class, c);
         }
     }
-    
+
     /**
      * Called when a Conduit is actually required.
-     * 
+     *
      * @param message
      * @return the Conduit to use for mediation of the message
      */
@@ -79,7 +79,7 @@ public class UpfrontConduitSelector extends AbstractConduitSelector {
         }
         return c;
     }
-    
+
     /**
      * @return the logger to use
      */

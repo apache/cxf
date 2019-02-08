@@ -36,12 +36,13 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.After;
 import org.junit.AfterClass;
 
 /**
  * Base class for JMS tests that use the an in VM ConnectionFactory.
- * 
+ *
  *  The idea is to start the bus and services in the @BeforeClass of the test.
  *  In each test method clients are created and marked for removal.
  *  The base class then makes sure that all clients are closed after each test method
@@ -52,14 +53,14 @@ public abstract class AbstractVmJMSTest {
     protected static ConnectionFactoryFeature cff;
     protected static ConnectionFactory cf;
     protected static BrokerService broker;
-    private List<Object> closeableResources = new ArrayList<Object>();
+    private List<Object> closeableResources = new ArrayList<>();
 
     public static void startBusAndJMS(Class<?> testClass) {
         String brokerURI = "vm://" + testClass.getName() + "?broker.persistent=false&broker.useJmx=false";
         startBusAndJMS(brokerURI);
         startBroker(brokerURI);
     }
-    
+
     public static void startBusAndJMS(String brokerURI) {
         bus = BusFactory.getDefaultBus();
         ActiveMQConnectionFactory cf1 = new ActiveMQConnectionFactory(brokerURI);
@@ -70,7 +71,7 @@ public abstract class AbstractVmJMSTest {
         cf = new PooledConnectionFactory(cf1);
         cff = new ConnectionFactoryFeature(cf);
     }
-    
+
     protected static RedeliveryPolicy redeliveryPolicy() {
         RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
         redeliveryPolicy.setMaximumRedeliveries(1);
@@ -91,12 +92,12 @@ public abstract class AbstractVmJMSTest {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     public <T> T markForClose(T resource) {
         closeableResources.add(resource);
         return resource;
     }
-    
+
     @After
     public void stopClosables() {
         for (Object proxy : closeableResources) {
@@ -110,7 +111,7 @@ public abstract class AbstractVmJMSTest {
         }
         closeableResources.clear();
     }
-    
+
     @AfterClass
     public static void stopBus() throws Exception {
         bus.shutdown(false);
@@ -122,7 +123,7 @@ public abstract class AbstractVmJMSTest {
             broker = null;
         }
     }
-    
+
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
         if (u == null) {
@@ -130,14 +131,14 @@ public abstract class AbstractVmJMSTest {
         }
         return u;
     }
-    
+
     public static void publish(String address, Object impl) {
         EndpointImpl ep = (EndpointImpl)Endpoint.create(impl);
         ep.setBus(bus);
         ep.getFeatures().add(cff);
         ep.publish(address);
     }
-    
+
     public static void publish(Object impl) {
         publish(null, impl);
     }

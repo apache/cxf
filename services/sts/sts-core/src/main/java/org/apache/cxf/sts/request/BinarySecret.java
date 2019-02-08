@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.sts.request;
 
+import java.util.Arrays;
+
 /**
  * This class contains values that have been extracted from a BinarySecret structure.
  */
@@ -28,17 +30,24 @@ public class BinarySecret {
     public byte[] getBinarySecretValue() {
         return binarySecretValue;
     }
-    
+
     public void setBinarySecretValue(byte[] binarySecretValue) {
         this.binarySecretValue = binarySecretValue;
     }
-    
+
     public String getBinarySecretType() {
         return binarySecretType;
     }
-    
+
     public void setBinarySecretType(String binarySecretType) {
         this.binarySecretType = binarySecretType;
     }
-    
+
+    public void clean() {
+        if (binarySecretValue != null) {
+            Arrays.fill(binarySecretValue, (byte) 0);
+        }
+        binarySecretType = null;
+    }
+
 }

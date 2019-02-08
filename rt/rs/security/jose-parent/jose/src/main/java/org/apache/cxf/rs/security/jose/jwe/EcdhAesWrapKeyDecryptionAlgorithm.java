@@ -26,29 +26,29 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 public class EcdhAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private ECPrivateKey key;
     private KeyAlgorithm algo;
-    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key) {    
+    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key) {
         this(key, KeyAlgorithm.ECDH_ES_A128KW);
     }
-    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key, KeyAlgorithm algo) {    
+    public EcdhAesWrapKeyDecryptionAlgorithm(ECPrivateKey key, KeyAlgorithm algo) {
         this.key = key;
         this.algo = algo;
     }
     @Override
     public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
-        byte[] derivedKey = 
+        byte[] derivedKey =
             EcdhDirectKeyJweDecryption.getDecryptedContentEncryptionKeyFromHeaders(
                 jweDecryptionInput.getJweHeaders(), key);
         KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
                 return AlgorithmUtils.isEcdhEsWrap(wrapAlgo);
-            }    
+            }
         };
         return aesWrap.getDecryptedContentEncryptionKey(jweDecryptionInput);
-    }    
-    
+    }
+
     @Override
     public KeyAlgorithm getAlgorithm() {
         return algo;
     }
-    
+
 }

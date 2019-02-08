@@ -37,7 +37,7 @@ import org.apache.cxf.tools.common.model.JavaType.Style;
 public class JavaMethod implements JavaAnnotatable {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaMethod.class);
     private static final Map<String, String> PRIMITIVE_MAP;
-    
+
     private String name;
     private String operationName;
     private String javaDoc;
@@ -49,16 +49,16 @@ public class JavaMethod implements JavaAnnotatable {
     private boolean wrapperStyle;
     private boolean enableMime;
     private JavaInterface javaInterface;
-    private final List<JavaParameter> parameters = new ArrayList<JavaParameter>();
-    private final List<JavaException> exceptions = new ArrayList<JavaException>();
-    private final Map<String, JAnnotation> annotations = new HashMap<String, JAnnotation>();
+    private final List<JavaParameter> parameters = new ArrayList<>();
+    private final List<JavaException> exceptions = new ArrayList<>();
+    private final Map<String, JAnnotation> annotations = new HashMap<>();
 
     private JavaCodeBlock block;
 
     private boolean async;
-    
-    static { 
-        PRIMITIVE_MAP = new HashMap<String, String>();
+
+    static {
+        PRIMITIVE_MAP = new HashMap<>();
         PRIMITIVE_MAP.put("java.lang.Character", "char");
         PRIMITIVE_MAP.put("java.lang.Boolean", "boolean");
         PRIMITIVE_MAP.put("java.lang.Integer", "int");
@@ -146,7 +146,7 @@ public class JavaMethod implements JavaAnnotatable {
         }
         return false;
     }
-    
+
     private void replaceParameter(JavaParameter p1, JavaParameter p2) {
         int index = ((ArrayList<?>)parameters).indexOf(p1);
         parameters.remove(index);
@@ -157,11 +157,11 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     private boolean isEquiv(String c1, String c2) {
-        //for the "in/out" params, we need to check if the 
+        //for the "in/out" params, we need to check if the
         //primitive in is being changed to an in/out
         //which would no longer be primitive
         String s = PRIMITIVE_MAP.get(c2);
-        if (s != null && c1.equals(s)) {
+        if (s != null && s.equals(c1)) {
             return true;
         }
         return c1.equals(c2);
@@ -174,13 +174,12 @@ public class JavaMethod implements JavaAnnotatable {
                 //removeParameter(paramInList);
                 replaceParameter(paramInList, param);
                 return;
-            } else {
-                Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(), 
-                                              getName(), paramInList.getType(), param.getType());
-                throw new ToolException(message);
             }
+            Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(),
+                                          getName(), paramInList.getType(), param.getType());
+            throw new ToolException(message);
         }
-        
+
         if (param.getType() == null && param.getClassName() == null) {
             Message msg = new Message("FAIL_TO_CREATE_JAVA_PARAMETER", LOG, param.name, this.getName());
             throw new ToolException(msg);
@@ -242,12 +241,12 @@ public class JavaMethod implements JavaAnnotatable {
     public void setWrapperStyle(boolean w) {
         this.wrapperStyle = w;
     }
-    
-    
+
+
     public boolean enableMime() {
         return this.enableMime;
     }
-    
+
     public void setMimeEnable(boolean arg) {
         enableMime = arg;
     }
@@ -281,7 +280,7 @@ public class JavaMethod implements JavaAnnotatable {
             return;
         }
         this.annotations.put(tag, annotation);
-        
+
         for (String importClz : annotation.getImports()) {
             getInterface().addImport(importClz);
         }
@@ -314,7 +313,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public List<String> getParameterList(boolean includeAnnotation) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < parameters.size(); i++) {
             JavaParameter parameter = parameters.get(i);
@@ -383,11 +382,11 @@ public class JavaMethod implements JavaAnnotatable {
     public final void setAsync(final boolean newAsync) {
         this.async = newAsync;
     }
-    
+
     public void setJavaDoc(String doc) {
         javaDoc = JavaInterface.formatJavaDoc(doc, "     ");
     }
-    
+
     public String getJavaDoc() {
         return (javaDoc != null) ? javaDoc : "";
     }

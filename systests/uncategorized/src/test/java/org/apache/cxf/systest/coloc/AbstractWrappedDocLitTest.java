@@ -25,9 +25,13 @@ import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.NoSuchCodeLitFault;
+
 import org.junit.Before;
-//import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This class invokes the service described in /wsdl/greeter_control.wsdl.
@@ -64,7 +68,7 @@ public abstract class AbstractWrappedDocLitTest extends AbstractColocTest {
             verifyGreetMe(port);
         }
     }
-    
+
     @Test
     public void testOneWayOperation() {
         for (int idx = 0; idx < 2; idx++) {
@@ -95,7 +99,7 @@ public abstract class AbstractWrappedDocLitTest extends AbstractColocTest {
         proxy.greetMeOneWay("oneWay");
         assertTrue("Count Should not be same", count != impl.getInvocationCount());
     }
-    
+
     protected void verifySayHi(Greeter greeterPort) {
         String resp = greeterPort.sayHi();
         assertEquals("Bonjour", resp);

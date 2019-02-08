@@ -43,7 +43,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Reads and writes <code>javax.xml.transform.Source</code> types.
  * <p>
  * The XML stream is converted DOMSource and sent off.
- * 
+ *
  * @see javanet.staxutils.StAXSource
  * @see javax.xml.stream.XMLInputFactory
  * @see org.apache.cxf.aegis.util.STAXUtils

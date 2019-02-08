@@ -50,14 +50,14 @@ public class IdGenerator {
 
     /**
      * Construct an IdGenerator
-     * 
+     *
      */
     public IdGenerator(String prefix) {
         synchronized (UNIQUE_STUB) {
             this.seed = prefix + UNIQUE_STUB + (instanceCount++) + ":";
         }
     }
-    
+
     static {
         String stub = "";
         boolean canAccessSystemProps = true;
@@ -74,8 +74,8 @@ public class IdGenerator {
             try {
                 hostName = InetAddress.getLocalHost().getHostAddress();
                 ServerSocket ss = new ServerSocket(0);
-                stub = hostName + "-" 
-                    + Long.toHexString(ss.getLocalPort() ^ System.currentTimeMillis()) 
+                stub = hostName + "-"
+                    + Long.toHexString(ss.getLocalPort() ^ System.currentTimeMillis())
                     + "-";
                 Thread.sleep(100);
                 ss.close();
@@ -92,7 +92,7 @@ public class IdGenerator {
     /**
      * As we have to find the hostname as a side-affect of generating a unique
      * stub, we allow it's easy retrevial here
-     * 
+     *
      * @return the local host name
      */
 
@@ -102,7 +102,7 @@ public class IdGenerator {
 
     /**
      * Generate a unqiue id
-     * 
+     *
      * @return a unique id
      */
 
@@ -112,7 +112,7 @@ public class IdGenerator {
 
     /**
      * Generate a unique ID - that is friendly for a URL or file system
-     * 
+     *
      * @return a unique id
      */
     public String generateSanitizedId() {

@@ -34,8 +34,8 @@ import javax.ws.rs.core.Response;
 @Produces("text/xml")
 public class CustomerService {
     long currentId = 123;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    Map<Long, Order> orders = new HashMap<Long, Order>();
+    Map<Long, Customer> customers = new HashMap<>();
+    Map<Long, Order> orders = new HashMap<>();
 
     public CustomerService() {
         init();
@@ -46,8 +46,7 @@ public class CustomerService {
     public Customer getCustomer(@PathParam("id") String id) {
         System.out.println("----invoking getCustomer, Customer id is: " + id);
         long idNumber = Long.parseLong(id);
-        Customer c = customers.get(idNumber);
-        return c;
+        return customers.get(idNumber);
     }
 
     @PUT
@@ -99,8 +98,7 @@ public class CustomerService {
     public Order getOrder(@PathParam("orderId") String orderId) {
         System.out.println("----invoking getOrder, Order id is: " + orderId);
         long idNumber = Long.parseLong(orderId);
-        Order c = orders.get(idNumber);
-        return c;
+        return orders.get(idNumber);
     }
 
     final void init() {

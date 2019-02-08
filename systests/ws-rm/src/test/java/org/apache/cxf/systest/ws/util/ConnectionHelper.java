@@ -26,13 +26,13 @@ import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 /**
- * 
+ *
  */
 public final class ConnectionHelper {
 
     private ConnectionHelper() {
     }
-    
+
     public static void setKeepAliveConnection(Object proxy, boolean keepAlive) {
         setKeepAliveConnection(proxy, keepAlive, true);
     }

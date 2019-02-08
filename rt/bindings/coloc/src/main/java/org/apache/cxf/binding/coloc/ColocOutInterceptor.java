@@ -41,12 +41,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-//import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-//import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -54,8 +52,8 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(ClientImpl.class);
     private static final String COLOCATED = Message.class.getName() + ".COLOCATED";
     private MessageObserver colocObserver;
-    private Bus bus; 
-    
+    private Bus bus;
+
     public ColocOutInterceptor() {
         super(Phase.POST_LOGICAL);
     }
@@ -65,9 +63,9 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void setBus(Bus bus) {
-        this.bus = bus; 
+        this.bus = bus;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         if (bus == null) {
             bus = message.getExchange().getBus();
@@ -78,30 +76,30 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("BUS_NOT_FOUND", BUNDLE));
             }
         }
-        
+
         ServerRegistry registry = bus.getExtension(ServerRegistry.class);
-        
+
         if (registry == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("SERVER_REGISTRY_NOT_FOUND", BUNDLE));
         }
-        
+
         Exchange exchange = message.getExchange();
         Endpoint senderEndpoint = exchange.getEndpoint();
 
         if (senderEndpoint == null) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("ENDPOINT_NOT_FOUND", 
+            throw new Fault(new org.apache.cxf.common.i18n.Message("ENDPOINT_NOT_FOUND",
                                                                    BUNDLE));
         }
 
         BindingOperationInfo boi = exchange.getBindingOperationInfo();
-        
+
         if (boi == null) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("OPERATIONINFO_NOT_FOUND", 
+            throw new Fault(new org.apache.cxf.common.i18n.Message("OPERATIONINFO_NOT_FOUND",
                                                                    BUNDLE));
         }
 
         Server srv = isColocated(registry.getServers(), senderEndpoint, boi);
-        
+
         if (srv != null) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Operation:" + boi.getName() + " dispatched as colocated call.");
@@ -121,11 +119,11 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Operation:" + boi.getName() + " dispatched as remote call.");
             }
-            
+
             message.put(COLOCATED, Boolean.FALSE);
         }
     }
-    
+
     protected void invokeColocObserver(Message outMsg, Endpoint inboundEndpoint) {
         if (colocObserver == null) {
             colocObserver = new ColocMessageObserver(inboundEndpoint, bus);
@@ -141,40 +139,40 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
         Message m = getInBoundMessage(ex);
         Message inMsg = ep.getBinding().createMessage();
         MessageImpl.copyContent(m, inMsg);
-        
+
         //Copy Response Context to Client inBound Message
-        //TODO a Context Filter Strategy required. 
+        //TODO a Context Filter Strategy required.
         inMsg.putAll(m);
-        
+
         inMsg.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         inMsg.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         inMsg.setExchange(ex);
-        
+
         Exception exc = inMsg.getContent(Exception.class);
         if (exc != null) {
             ex.setInFaultMessage(inMsg);
             ColocInFaultObserver observer = new ColocInFaultObserver(bus);
-            observer.onMessage(inMsg);            
+            observer.onMessage(inMsg);
         } else {
             //Handle Response
             ex.setInMessage(inMsg);
             PhaseManager pm = bus.getExtension(PhaseManager.class);
-            SortedSet<Phase> phases = new TreeSet<Phase>(pm.getInPhases());
+            SortedSet<Phase> phases = new TreeSet<>(pm.getInPhases());
             ColocUtil.setPhases(phases, Phase.USER_LOGICAL, Phase.PRE_INVOKE);
-            
-            InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);        
-            inMsg.setInterceptorChain(chain);        
+
+            InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);
+            inMsg.setInterceptorChain(chain);
             chain.doIntercept(inMsg);
         }
         ex.put(ClientImpl.FINISHED, Boolean.TRUE);
     }
-    
+
     protected Message getInBoundMessage(Exchange ex) {
         return  (ex.getInFaultMessage() != null)
                    ? ex.getInFaultMessage()
                    : ex.getInMessage();
     }
-    
+
     protected void setMessageObserver(MessageObserver observer) {
         colocObserver = observer;
     }
@@ -191,26 +189,26 @@ public class ColocOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     && receiverEI.getName().equals(senderEI.getName())) {
                     //Check For Operation Match.
                     BindingOperationInfo receiverOI = receiverEI.getBinding().getOperation(boi.getName());
-                    if (receiverOI != null 
+                    if (receiverOI != null
                         && isCompatibleOperationInfo(boi, receiverOI)) {
                         return s;
                     }
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     protected boolean isSameOperationInfo(BindingOperationInfo sender,
                                           BindingOperationInfo receiver) {
-        return ColocUtil.isSameOperationInfo(sender.getOperationInfo(), 
+        return ColocUtil.isSameOperationInfo(sender.getOperationInfo(),
                                              receiver.getOperationInfo());
     }
 
     protected boolean isCompatibleOperationInfo(BindingOperationInfo sender,
                                                 BindingOperationInfo receiver) {
-        return ColocUtil.isCompatibleOperationInfo(sender.getOperationInfo(), 
+        return ColocUtil.isCompatibleOperationInfo(sender.getOperationInfo(),
                                                    receiver.getOperationInfo());
     }
 

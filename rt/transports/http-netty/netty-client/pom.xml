@@ -27,11 +27,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.transport.http.netty.client</cxf.module.name>
         <cxf.osgi.import>
+            javax.servlet*;version="[2,4)",
             io.netty.*;version="${cxf.netty.version.range}",
             javax.annotation;version="${cxf.osgi.javax.annotation.version}",
         </cxf.osgi.import>
@@ -78,6 +80,13 @@
             <artifactId>cxf-testutils</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-testutils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>keys</classifier>
         </dependency>
         <!-- Need to run some integration with jaxws frond end -->
         <dependency>

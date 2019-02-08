@@ -23,7 +23,7 @@ public enum KeyType {
     RSA(JsonWebKey.KEY_TYPE_RSA),
     EC(JsonWebKey.KEY_TYPE_ELLIPTIC),
     OCTET(JsonWebKey.KEY_TYPE_OCTET);
-    
+
     private final String type;
     KeyType(String type) {
         this.type = type;
@@ -32,7 +32,7 @@ public enum KeyType {
         if (type == null) {
             return null;
         } else if (JsonWebKey.KEY_TYPE_OCTET.equals(type)) {
-            return OCTET;    
+            return OCTET;
         } else {
             return valueOf(type);
         }
@@ -40,5 +40,5 @@ public enum KeyType {
     public String toString() {
         return type;
     }
-    
+
 }

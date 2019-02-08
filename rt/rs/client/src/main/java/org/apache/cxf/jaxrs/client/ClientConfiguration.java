@@ -47,29 +47,29 @@ import org.apache.cxf.transport.http.HTTPConduit;
  */
 public class ClientConfiguration implements InterceptorProvider, ConduitSelectorHolder {
     private static final Logger LOG = LogUtils.getL7dLogger(ClientConfiguration.class);
-    
-    private List<Interceptor<? extends Message>> inInterceptors 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outInterceptors 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outFault 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> inFault 
-        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+
+    private List<Interceptor<? extends Message>> inInterceptors
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> outInterceptors
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> outFault
+        = new ModCountCopyOnWriteArrayList<>();
+    private List<Interceptor<? extends Message>> inFault
+        = new ModCountCopyOnWriteArrayList<>();
     private ConduitSelector conduitSelector;
     private Bus bus;
-    private Map<String, Object> requestContext = new HashMap<String, Object>();
-    private Map<String, Object> responseContext = new HashMap<String, Object>();
+    private Map<String, Object> requestContext = new HashMap<>();
+    private Map<String, Object> responseContext = new HashMap<>();
     private long synchronousTimeout = 60000;
     private boolean shutdownBusOnClose;
-    
+    private boolean resetThreadLocalStateImmediately;
+
     public long getSynchronousTimeout() {
         Conduit conduit = getConduit();
         if (conduit instanceof HTTPConduit) {
             return ((HTTPConduit)conduit).getClient().getReceiveTimeout();
-        } else {
-            return synchronousTimeout;
         }
+        return synchronousTimeout;
     }
 
     /**
@@ -79,7 +79,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     public void setSynchronousTimeout(long synchronousTimeout) {
         this.synchronousTimeout = synchronousTimeout;
     }
-    
+
     /**
      * Indicates if Response may still be expected for oneway requests.
      * For example, 202 in case of HTTP
@@ -88,22 +88,22 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     public boolean isResponseExpectedForOneway() {
         return getConduit() instanceof HTTPConduit ? true : false;
     }
-    
+
     /**
-     * Sets the conduit selector 
+     * Sets the conduit selector
      * @param cs the selector
      */
     public void setConduitSelector(ConduitSelector cs) {
         this.conduitSelector = cs;
     }
     /**
-     * Gets the conduit selector 
+     * Gets the conduit selector
      * @return the conduit the selector
      */
     public ConduitSelector getConduitSelector() {
         return conduitSelector;
     }
-    
+
     void prepareConduitSelector(Message message) {
         try {
             getConduitSelector().prepare(message);
@@ -111,7 +111,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
             LOG.fine("Failure to prepare a message from conduit selector");
         }
     }
-    
+
     /**
      * Sets the bus
      * @param bus the bus
@@ -119,7 +119,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     public void setBus(Bus bus) {
         this.bus = bus;
     }
-    
+
     /**
      * Gets the bus
      * @return the bus
@@ -127,7 +127,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     public Bus getBus() {
         return bus;
     }
-    
+
     public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return inFault;
     }
@@ -145,9 +145,9 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     }
 
     /**
-     * Sets the list of in interceptors which pre-process 
+     * Sets the list of in interceptors which pre-process
      * the responses from remote services.
-     *  
+     *
      * @param interceptors in interceptors
      */
     public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
@@ -155,20 +155,20 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     }
 
     /**
-     * Sets the list of out interceptors which post-process 
+     * Sets the list of out interceptors which post-process
      * the requests to the remote services.
-     *  
+     *
      * @param interceptors out interceptors
      */
     public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outInterceptors = interceptors;
     }
-    
+
     /**
      * Sets the list of in fault interceptors which will deal with the HTTP
      * faults; the client code may choose to catch {@link WebApplicationException}
      * exceptions instead.
-     *  
+     *
      * @param interceptors in fault interceptors
      */
     public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
@@ -179,16 +179,16 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
      * Sets the list of out fault interceptors which will deal with the client-side
      * faults; the client code may choose to catch {@link ClientException}
      * exceptions instead.
-     *  
+     *
      * @param interceptors out fault interceptors
      */
     public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outFault = interceptors;
     }
-    
+
     /**
      * Gets the conduit responsible for a transport-level
-     * communication with the remote service. 
+     * communication with the remote service.
      * @return the conduit
      */
     public Conduit getConduit() {
@@ -203,37 +203,37 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
         prepareConduitSelector(message);
         return getConduitSelector().selectConduit(message);
     }
-    
+
     /**
      * Gets the HTTP conduit responsible for a transport-level
-     * communication with the remote service. 
+     * communication with the remote service.
      * @return the HTTP conduit
      */
     public HTTPConduit getHttpConduit() {
         Conduit conduit = getConduit();
         return conduit instanceof HTTPConduit ? (HTTPConduit)conduit : null;
     }
- 
+
     /**
-     * Get the map of properties which affect the responses only. 
-     * These additional properties may be optionally set after a 
+     * Get the map of properties which affect the responses only.
+     * These additional properties may be optionally set after a
      * proxy or WebClient has been created.
      * @return the response context properties
      */
     public Map<String, Object> getResponseContext() {
         return responseContext;
     }
-    
+
     /**
-     * Get the map of properties which affect the requests only. 
-     * These additional properties may be optionally set after a 
+     * Get the map of properties which affect the requests only.
+     * These additional properties may be optionally set after a
      * proxy or WebClient has been created.
      * @return the request context properties
      */
     public Map<String, Object> getRequestContext() {
         return requestContext;
     }
-    
+
     public Endpoint getEndpoint() {
         return conduitSelector == null ? null : conduitSelector.getEndpoint();
     }
@@ -244,5 +244,12 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
 
     public void setShutdownBusOnClose(boolean shutdownBusOnClose) {
         this.shutdownBusOnClose = shutdownBusOnClose;
+    }
+
+    public boolean isResetThreadLocalStateImmediately() {
+        return resetThreadLocalStateImmediately;
+    }
+    public void setResetThreadLocalStateImmediately(boolean reset) {
+        resetThreadLocalStateImmediately = reset;
     }
 }

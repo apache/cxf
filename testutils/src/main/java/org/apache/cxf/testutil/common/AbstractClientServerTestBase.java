@@ -26,26 +26,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public abstract class AbstractClientServerTestBase extends Assert {
-    private static List<ServerLauncher> launchers = new ArrayList<ServerLauncher>();  
+public abstract class AbstractClientServerTestBase {
+    private static List<ServerLauncher> launchers = new ArrayList<>();
 
 
     @AfterClass
     public static void stopAllServers() throws Exception {
         boolean passed = true;
         for (ServerLauncher sl : launchers) {
-            try { 
+            try {
                 sl.signalStop();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
         for (ServerLauncher sl : launchers) {
-            try { 
-                passed = passed && sl.stopServer(); 
+            try {
+                passed = passed && sl.stopServer();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -54,13 +55,13 @@ public abstract class AbstractClientServerTestBase extends Assert {
         System.gc();
         assertTrue("server failed", passed);
     }
-    
+
     /**
      * Starts the server inProcess
      */
     public static boolean launchServer(AbstractTestServerBase base) {
         boolean ok = false;
-        try { 
+        try {
             ServerLauncher sl = new ServerLauncher(base);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -69,10 +70,10 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ex.printStackTrace();
             fail("failed to launch server " + base);
         }
-        
+
         return ok;
     }
-    
+
     /**
      * Starts the server inProcess
      */
@@ -85,7 +86,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
      */
     public static boolean launchServer(Class<?> clz, boolean inProcess) {
         boolean ok = false;
-        try { 
+        try {
             ServerLauncher sl = new ServerLauncher(clz.getName(), inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -94,7 +95,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ex.printStackTrace();
             fail("failed to launch server " + clz);
         }
-        
+
         return ok;
     }
 
@@ -111,7 +112,7 @@ public abstract class AbstractClientServerTestBase extends Assert {
     public static boolean launchServer(Class<?> clz, Map<String, String> props, String[] args,
                                 boolean inProcess) {
         boolean ok = false;
-        try { 
+        try {
             ServerLauncher sl = new ServerLauncher(clz.getName(), props, args, inProcess);
             ok = sl.launchServer();
             assertTrue("server failed to launch", ok);
@@ -120,19 +121,19 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ex.printStackTrace();
             fail("failed to launch server " + clz);
         }
-        
+
         return ok;
     }
-    
+
     protected void setAddress(Object o, String address) {
         TestUtil.setAddress(o, address);
     }
-    
-    protected void updateAddressPort(Object o, String port) 
+
+    protected void updateAddressPort(Object o, String port)
         throws NumberFormatException, MalformedURLException {
         TestUtil.updateAddressPort(o, port);
     }
-    
+
     protected static String allocatePort(String s) {
         return TestUtil.getPortNumber(s);
     }
@@ -142,6 +143,6 @@ public abstract class AbstractClientServerTestBase extends Assert {
     protected static String allocatePort(Class<?> cls, int count) {
         return TestUtil.getPortNumber(cls, count);
     }
-    
-    
+
+
 }

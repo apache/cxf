@@ -78,7 +78,7 @@ public class ArrayType extends AegisType {
     }
 
     protected Collection<Object> createCollection() {
-        return new ArrayList<Object>();
+        return new ArrayList<>();
     }
 
     /**
@@ -406,7 +406,7 @@ public class ArrayType extends AegisType {
      */
     @Override
     public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         deps.add(getComponentType());
 

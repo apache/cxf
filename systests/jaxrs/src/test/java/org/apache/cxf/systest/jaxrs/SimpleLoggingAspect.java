@@ -24,13 +24,13 @@ import java.io.StringWriter;
 
 public class SimpleLoggingAspect {
     PrintWriter writer = new PrintWriter(new StringWriter());
-    
+
     public void logBefore() {
         writer.println("AOP in before action");
     }
-    
+
     public void logAfter() {
         writer.println("AOP in after action");
     }
-    
+
 }

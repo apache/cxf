@@ -1,0 +1,18 @@
+version: "3"
+services:
+  eureka:
+    image: $USER/apachecxf:spring-boot-sample-rs-scan-eureka
+    ports:
+      - "8761:8761"
+  jaxrs:
+    image: $USER/apachecxf:spring-boot-sample-rs-scan-app
+    environment:
+      - EUREKA_SERVER_URI
+    ports:
+      - "8080:8080"
+#   Use this mode only if you'd like Eureka client to use 127.0.0.1
+#   instead of exporting EUREKA_SERVER_URI env variable   
+# 
+#    network_mode: "host"
+
+

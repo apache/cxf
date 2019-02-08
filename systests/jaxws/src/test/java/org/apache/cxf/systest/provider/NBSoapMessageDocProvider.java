@@ -34,22 +34,22 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 
 @WebServiceProvider(portName = "SoapProviderPort", serviceName = "SOAPProviderService",
                     targetNamespace = "http://apache.org/hello_world_soap_http")
-@ServiceMode(value = Service.Mode.MESSAGE)            
+@ServiceMode(value = Service.Mode.MESSAGE)
 public class NBSoapMessageDocProvider implements Provider<SOAPMessage> {
     private SOAPMessage sayHiResponse;
-    
+
     public NBSoapMessageDocProvider() {
-       
+
         try {
-            MessageFactory factory = MessageFactory.newInstance();            
+            MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiDocLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is);
+            sayHiResponse = factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     public SOAPMessage invoke(SOAPMessage request) {
         SOAPBody body = null;
         try {

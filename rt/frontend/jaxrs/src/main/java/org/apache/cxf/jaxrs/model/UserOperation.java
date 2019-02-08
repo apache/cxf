@@ -30,81 +30,81 @@ public class UserOperation {
     private String pathValue;
     private String consumesTypes;
     private String producesTypes;
-    private List<Parameter> params; 
+    private List<Parameter> params;
     private boolean oneway;
-    
+
     public UserOperation() {
-        
+
     }
-    
+
     public UserOperation(String methodName) {
         this(methodName, null);
     }
-    
+
     public UserOperation(String methodName, String pathValue) {
         this(methodName, pathValue, null);
     }
-    
+
     public UserOperation(String methodName, String pathValue, List<Parameter> ps) {
         this.methodName = methodName;
         this.pathValue = pathValue;
         this.params = ps;
     }
-    
+
     public String getName() {
         return methodName;
     }
-    
+
     public void setName(String name) {
         if (!"".equals(name)) {
             methodName = name;
         }
     }
-    
+
     public String getVerb() {
         return httpMethodName;
     }
-    
+
     public void setVerb(String name) {
         if (!"".equals(name)) {
             httpMethodName = name;
         }
     }
-    
+
     public String getConsumes() {
         return consumesTypes;
     }
-    
+
     public String getProduces() {
         return producesTypes;
     }
-    
+
     public void setConsumes(String types) {
         if (!"".equals(types)) {
             consumesTypes = types;
         }
     }
-    
+
     public void setProduces(String types) {
         if (!"".equals(types)) {
             producesTypes = types;
         }
     }
-    
+
     public String getPath() {
         return pathValue == null ? "/" : pathValue;
     }
-    
+
     public void setPath(String path) {
         if (!"".equals(path)) {
             pathValue = path;
         }
     }
-    
+
     public void setParameters(List<Parameter> ps) {
         params = ps;
     }
-    
+
     public List<Parameter> getParameters() {
         return params == null ? CastUtils.cast(Collections.emptyList(), Parameter.class)
             : Collections.unmodifiableList(params);

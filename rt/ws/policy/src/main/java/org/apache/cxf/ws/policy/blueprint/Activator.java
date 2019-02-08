@@ -27,20 +27,24 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
 
-            @Override
-            public Object createNamespaceHandler() {
-                return new PolicyBPHandler();
-            }
-        };
-        NamespaceHandlerRegisterer
-            .register(context, factory, "http://cxf.apache.org/policy", "http://www.w3.org/ns/ws-policy",
-                      "http://www.w3.org/2006/07/ws-policy", "http://schemas.xmlsoap.org/ws/2004/09/policy",
-                      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-                      "http://www.w3.org/2000/09/xmldsig#",
-                      "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702");
+                @Override
+                public Object createNamespaceHandler() {
+                    return new PolicyBPHandler();
+                }
+            };
+            NamespaceHandlerRegisterer
+                .register(context, factory, "http://cxf.apache.org/policy", "http://www.w3.org/ns/ws-policy",
+                          "http://www.w3.org/2006/07/ws-policy", "http://schemas.xmlsoap.org/ws/2004/09/policy",
+                          "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
+                          "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
+                          "http://www.w3.org/2000/09/xmldsig#",
+                          "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
     }
 
     @Override

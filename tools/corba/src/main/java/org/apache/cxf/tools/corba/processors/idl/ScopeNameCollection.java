@@ -23,23 +23,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class ScopeNameCollection  {
-    
-    Map<String, Scope> scopedNames = new HashMap<String, Scope>();
-    
+
+    Map<String, Scope> scopedNames = new HashMap<>();
+
     public void add(Scope scope) {
         scopedNames.put(scope.toString(), scope);
     }
-    
+
     public void remove(Scope scope) {
         scopedNames.remove(scope.toString());
     }
-    
+
     public Scope getScope(Scope scope) {
         return scopedNames.get(scope.toString());
     }
-    
+
     public Scope getScope(String scopename) {
         return scopedNames.get(scopename);
     }
-    
+
 }

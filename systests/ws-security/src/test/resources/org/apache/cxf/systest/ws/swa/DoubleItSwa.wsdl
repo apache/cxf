@@ -205,6 +205,9 @@
         <wsdl:port name="DoubleItSWAEncryptionCompleteActionPort" binding="tns:DoubleItNoSecurityBinding">
             <soap:address location="http://localhost:9001/DoubleItSWAEncryptionCompleteAction"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSWASignatureEncryptionContentActionPort" binding="tns:DoubleItNoSecurityBinding">
+            <soap:address location="http://localhost:9001/DoubleItSWASignatureEncryptionContentAction"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItSWASignatureContentPolicyPort" binding="tns:DoubleItSignatureContentBinding">
             <soap:address location="http://localhost:9001/DoubleItSWASignatureContentPolicy"/>
         </wsdl:port>

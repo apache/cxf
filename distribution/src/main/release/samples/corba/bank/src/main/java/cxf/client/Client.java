@@ -29,21 +29,21 @@ import bank.common.BankCORBAService;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://cxf.apache.org/schemas/cxf/idl/bank", "BankCORBAService");
 
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         URL wsdlUrl = Client.class.getResource("/wsdl/bank.wsdl");
-    
+
         BankCORBAService ss = new BankCORBAService(wsdlUrl, SERVICE_NAME);
-        Bank port = ss.getBankCORBAPort();  
-        
+        Bank port = ss.getBankCORBAPort();
+
 
         System.out.print("Invoking createAccount for Mr. John... ");
-        javax.xml.ws.Holder<Account> account = new javax.xml.ws.Holder<Account>(new Account());
+        javax.xml.ws.Holder<Account> account = new javax.xml.ws.Holder<>(new Account());
         try {
             if (port.createAccount("John", account)) {
                 System.out.println("success");
@@ -56,7 +56,7 @@ public final class Client {
 
         Account bankAccount = account.value;
         if (bankAccount != null) {
-            System.out.println("Created Account : " 
+            System.out.println("Created Account : "
                                + bankAccount.getName() + ": " + bankAccount.getBalance());
         }
 
@@ -71,16 +71,16 @@ public final class Client {
             }
         } catch (AccountNotFoundException ex) {
             System.out.println("failure (" + ex.getMessage() + " : " + ex.getFaultInfo().getName() + ")");
-        }       
+        }
 
         System.out.println("Getting an non-existent account (Ms. Helen)...");
         try {
             bankAccount = port.getAccount("Helen");
         } catch (AccountNotFoundException ex) {
-            System.out.println("Caught the expected AccountNotFoundException(" 
+            System.out.println("Caught the expected AccountNotFoundException("
                                + ex.getFaultInfo().getName() + ")");
         }
-                
+
         System.exit(0);
     }
 

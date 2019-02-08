@@ -87,7 +87,7 @@ abstract class CXFInvocationHandlerBase implements CXFInvocationHandler {
     private boolean isCheckedException(Method method, Throwable t) {
         boolean isCheckedException = false;
 
-        Class<?> checkExceptionTypes[] = method.getExceptionTypes();
+        Class<?>[] checkExceptionTypes = method.getExceptionTypes();
 
         for (int i = 0; i < checkExceptionTypes.length; i++) {
             if (checkExceptionTypes[i].isAssignableFrom(t.getClass())) {
@@ -107,7 +107,7 @@ class CXFInvocationHandlerDataImpl implements CXFInvocationHandlerData {
     private CXFManagedConnection managedConnection;
     private Subject subject;
     private Object target;
-    
+
     public final void setSubject(Subject sub) {
         this.subject = sub;
     }
@@ -133,11 +133,11 @@ class CXFInvocationHandlerDataImpl implements CXFInvocationHandlerData {
     }
 
     public void setTarget(Object t) {
-        this.target = t; 
-        
+        this.target = t;
+
     }
 
-    public Object getTarget() {        
+    public Object getTarget() {
         return target;
     }
 

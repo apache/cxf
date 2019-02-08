@@ -24,21 +24,21 @@ package org.apache.cxf.continuations;
  * a given invocation was suspended
  */
 public class SuspendedInvocationException extends RuntimeException {
-    
+
     private static final long serialVersionUID = 6889545463301144757L;
 
 
     public SuspendedInvocationException(Throwable cause) {
         super(cause);
     }
-    
+
     public SuspendedInvocationException() {
     }
-    
-   
+
+
     /**
      * Returns a transport-specific runtime exception
-     * @return RuntimeException the transport-specific runtime exception, 
+     * @return RuntimeException the transport-specific runtime exception,
      *         can be null for asynchronous transports
      */
     public RuntimeException getRuntimeException() {

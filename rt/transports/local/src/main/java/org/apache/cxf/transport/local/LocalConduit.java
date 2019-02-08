@@ -67,7 +67,7 @@ public class LocalConduit extends AbstractConduit {
         protected void dispatchToService(boolean empty) throws IOException {
             final MessageImpl inMsg = new MessageImpl();
             transportFactory.copy(message, inMsg);
-            
+
             if (!empty) {
                 final PipedInputStream stream = new PipedInputStream();
                 wrappedStream = new PipedOutputStream(stream);
@@ -78,7 +78,7 @@ public class LocalConduit extends AbstractConduit {
             inMsg.put(IN_CONDUIT, conduit);
 
             final Runnable receiver = new Runnable() {
-                public void run() {                            
+                public void run() {
                     ExchangeImpl ex = new ExchangeImpl();
                     ex.put(Bus.class, destination.getBus());
                     ex.setInMessage(inMsg);
@@ -126,7 +126,7 @@ public class LocalConduit extends AbstractConduit {
     public static final String MESSAGE_FILTER_PROPERTIES = LocalTransportFactory.MESSAGE_FILTER_PROPERTIES;
 
     private static final Logger LOG = LogUtils.getL7dLogger(LocalConduit.class);
-    
+
     private LocalDestination destination;
     private LocalTransportFactory transportFactory;
 
@@ -135,9 +135,9 @@ public class LocalConduit extends AbstractConduit {
         this.destination = destination;
         this.transportFactory = transportFactory;
     }
-    
+
     public void prepare(final Message message) throws IOException {
-        if (!MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))) {
+        if (!MessageUtils.getContextualBoolean(message, DIRECT_DISPATCH)) {
             dispatchViaPipe(message);
         } else {
             // prepare the stream here
@@ -151,43 +151,43 @@ public class LocalConduit extends AbstractConduit {
 
     @Override
     public void close(Message message) throws IOException {
-        if (MessageUtils.isTrue(message.getContextualProperty(DIRECT_DISPATCH))
+        if (MessageUtils.getContextualBoolean(message, DIRECT_DISPATCH)
             && !Boolean.TRUE.equals(message.get(Message.INBOUND_MESSAGE))) {
             dispatchDirect(message);
-        } 
-        
+        }
+
         super.close(message);
     }
 
     private void dispatchDirect(Message message) throws IOException {
         if (destination.getMessageObserver() == null) {
-            throw new IllegalStateException("Local destination does not have a MessageObserver on address " 
+            throw new IllegalStateException("Local destination does not have a MessageObserver on address "
                                             + destination.getAddress().getAddress().getValue());
         }
 
         MessageImpl copy = new MessageImpl();
         copy.put(IN_CONDUIT, this);
         copy.setDestination(destination);
-        
+
         transportFactory.copy(message, copy);
         MessageImpl.copyContent(message, copy);
-        
+
         OutputStream out = message.getContent(OutputStream.class);
         out.flush();
         out.close();
-        
+
         CachedOutputStream stream = message.get(CachedOutputStream.class);
         copy.setContent(InputStream.class, stream.getInputStream());
         copy.removeContent(CachedOutputStream.class);
         stream.releaseTempFileHold();
-        
+
         // Create a new incoming exchange and store the original exchange for the response
         ExchangeImpl ex = new ExchangeImpl();
         ex.setInMessage(copy);
         ex.put(IN_EXCHANGE, message.getExchange());
         ex.put(LocalConduit.DIRECT_DISPATCH, true);
         ex.setDestination(destination);
-        
+
         destination.getMessageObserver().onMessage(copy);
     }
 
@@ -197,15 +197,15 @@ public class LocalConduit extends AbstractConduit {
         final Exchange exchange = message.getExchange();
 
         if (destination.getMessageObserver() == null) {
-            throw new IllegalStateException("Local destination does not have a MessageObserver on address " 
+            throw new IllegalStateException("Local destination does not have a MessageObserver on address "
                                             + destination.getAddress().getAddress().getValue());
         }
-        
-        AbstractWrappedOutputStream cout 
+
+        AbstractWrappedOutputStream cout
             = new LocalConduitOutputStream(conduit, exchange, message);
         message.setContent(OutputStream.class, cout);
     }
-    
+
     protected Logger getLogger() {
         return LOG;
     }

@@ -19,7 +19,6 @@
 package org.apache.cxf.endpoint.dynamic;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +48,7 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
@@ -73,6 +74,7 @@ import com.sun.tools.xjc.reader.internalizer.InternalizationLogic;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.catalog.OASISCatalogManagerHelper;
@@ -97,6 +99,7 @@ import org.apache.cxf.endpoint.EndpointImplFactory;
 import org.apache.cxf.endpoint.SimpleEndpointImplFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
@@ -111,12 +114,12 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer;
 import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
 /**
  * This class reads a WSDL and creates a dynamic client from it.
- * 
+ *
  * Use {@link #newInstance} to obtain an instance, and then
  * {@link #createClient(String)} (or other overloads) to create a client.
- * 
- * It uses the JAXB data binding. It does not set up complex interceptors for 
- * features such as attachments. 
+ *
+ * It uses the JAXB data binding. It does not set up complex interceptors for
+ * features such as attachments.
  * See {@link org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory}
  * for an alternative that sets up JAX-WS endpoints.
  *
@@ -132,14 +135,14 @@ public class DynamicClientFactory {
 
     private boolean simpleBindingEnabled = true;
     private boolean allowRefs;
-    
+
     private Map<String, Object> jaxbContextProperties;
     private String[] schemaCompilerOptions;
-    
+
     protected DynamicClientFactory(Bus bus) {
         this.bus = bus;
     }
-    
+
     protected EndpointImplFactory getEndpointImplFactory() {
         return SimpleEndpointImplFactory.getSingleton();
     }
@@ -147,7 +150,7 @@ public class DynamicClientFactory {
     public void setTemporaryDirectory(String dir) {
         tmpdir = dir;
     }
-    
+
     public void setAllowElementReferences(boolean b) {
         allowRefs = b;
     }
@@ -155,10 +158,10 @@ public class DynamicClientFactory {
     public void setSchemaCompilerOptions(String[] options) {
         this.schemaCompilerOptions = options;
     }
-    
+
     /**
      * Create a new instance using a specific <tt>Bus</tt>.
-     * 
+     *
      * @param b the <tt>Bus</tt> to use in subsequent operations with the
      *            instance
      * @return the new instance
@@ -169,19 +172,19 @@ public class DynamicClientFactory {
 
     /**
      * Create a new instance using a default <tt>Bus</tt>.
-     * 
+     *
      * @return the new instance
      * @see CXFBusFactory#getDefaultBus()
      */
     public static DynamicClientFactory newInstance() {
-        Bus bus = CXFBusFactory.getThreadDefaultBus();
+        Bus bus = BusFactory.getThreadDefaultBus();
         return new DynamicClientFactory(bus);
     }
 
     /**
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and using the current classloading context.
-     * 
+     *
      * @param wsdlURL the URL to load
      * @return
      */
@@ -191,12 +194,12 @@ public class DynamicClientFactory {
     public Client createClient(String wsdlUrl, List<String> bindingFiles) {
         return createClient(wsdlUrl, (QName)null, (QName)null, bindingFiles);
     }
-    
-    
+
+
     /**
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and using the current classloading context.
-     * 
+     *
      * @param wsdlURL the URL to load
      * @return
      */
@@ -211,7 +214,7 @@ public class DynamicClientFactory {
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and with the specified <code>ClassLoader</code>
      * as parent.
-     * 
+     *
      * @param wsdlUrl
      * @param classLoader
      * @return
@@ -241,12 +244,12 @@ public class DynamicClientFactory {
         return createClient(wsdlUrl, service, classLoader, port, null);
     }
 
-    
+
     /**
      * Create a new <code>Client</code> instance using the WSDL to be loaded
      * from the specified URL and with the specified <code>ClassLoader</code>
      * as parent.
-     * 
+     *
      * @param wsdlUrl
      * @param classLoader
      * @return
@@ -275,19 +278,38 @@ public class DynamicClientFactory {
     public Client createClient(URL wsdlUrl, QName service, ClassLoader classLoader, QName port) {
         return createClient(wsdlUrl.toString(), service, classLoader, port, null);
     }
-    
-    public Client createClient(URL wsdlUrl, 
-                               QName service, 
-                               ClassLoader classLoader, 
-                               QName port, 
+
+    public Client createClient(URL wsdlUrl,
+                               QName service,
+                               ClassLoader classLoader,
+                               QName port,
                                List<String> bindingFiles) {
         return createClient(wsdlUrl.toString(), service, classLoader, port, bindingFiles);
     }
-    
+
+    static class DynamicClientImpl extends ClientImpl implements AutoCloseable {
+        final ClassLoader cl;
+        final ClassLoader orig;
+        DynamicClientImpl(Bus bus, Service svc, QName port,
+                          EndpointImplFactory endpointImplFactory,
+                          ClassLoader l) {
+            super(bus, svc, port, endpointImplFactory);
+            cl = l;
+            orig = Thread.currentThread().getContextClassLoader();
+        }
+        @Override
+        public void close() throws Exception {
+            destroy();
+            if (Thread.currentThread().getContextClassLoader() == cl) {
+                Thread.currentThread().setContextClassLoader(orig);
+            }
+        }
+    }
+
     public Client createClient(String wsdlUrl, QName service,
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
-            
+
         if (classLoader == null) {
             classLoader = Thread.currentThread().getContextClassLoader();
         }
@@ -298,30 +320,27 @@ public class DynamicClientFactory {
         sf.setAllowElementRefs(allowRefs);
         Service svc = sf.create();
 
-        ClientImpl client = new ClientImpl(bus, svc, port,
-                                           getEndpointImplFactory());
-
         //all SI's should have the same schemas
         SchemaCollection schemas = svc.getServiceInfos().get(0).getXmlSchemaCollection();
 
         SchemaCompiler compiler = createSchemaCompiler();
-        
+
         InnerErrorListener listener = new InnerErrorListener(wsdlUrl);
         Object elForRun = ReflectionInvokationHandler
             .createProxyWrapper(listener,
                                 JAXBUtils.getParamClass(compiler, "setErrorListener"));
-        
+
         compiler.setErrorListener(elForRun);
-        
+
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         hackInNewInternalizationLogic(compiler, catalog);
 
         addSchemas(compiler.getOptions(), compiler, svc.getServiceInfos(), schemas);
         addBindingFiles(bindingFiles, compiler);
         S2JJAXBModel intermediateModel = compiler.bind();
-        
+
         listener.throwException();
-        
+
         JCodeModel codeModel = intermediateModel.generateCode(null, elForRun);
         StringBuilder sb = new StringBuilder();
         boolean firstnt = false;
@@ -339,7 +358,7 @@ public class DynamicClientFactory {
             sb.append(jpackage.name());
         }
         JAXBUtils.logGeneratedClassNames(LOG, codeModel);
-        
+
         String packageList = sb.toString();
 
         // our hashcode + timestamp ought to be enough.
@@ -365,9 +384,9 @@ public class DynamicClientFactory {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        
-        List<File> srcFiles = FileUtils.getFilesRecurse(src, ".+\\.java$"); 
-        if (srcFiles.size() > 0 && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
+
+        List<File> srcFiles = FileUtils.getFilesRecurseUsingSuffix(src, ".java");
+        if (!srcFiles.isEmpty() && !compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
             LOG.log(Level.SEVERE, new Message("COULD_NOT_COMPILE_SRC", LOG, wsdlUrl).toString());
         }
         FileUtils.removeDir(src);
@@ -378,15 +397,15 @@ public class DynamicClientFactory {
             throw new IllegalStateException("Internal error; a directory returns a malformed URL: "
                                             + mue.getMessage(), mue);
         }
-        ClassLoader cl = ClassLoaderUtils.getURLClassLoader(urls, classLoader);
+        final ClassLoader cl = ClassLoaderUtils.getURLClassLoader(urls, classLoader);
 
         JAXBContext context;
         Map<String, Object> contextProperties = jaxbContextProperties;
-        
+
         if (contextProperties == null) {
             contextProperties = Collections.emptyMap();
         }
-        
+
         try {
             if (StringUtils.isEmpty(packageList)) {
                 context = JAXBContext.newInstance(new Class[0], contextProperties);
@@ -397,17 +416,20 @@ public class DynamicClientFactory {
             throw new IllegalStateException("Unable to create JAXBContext for generated packages: "
                                             + jbe.getMessage(), jbe);
         }
-         
+
         JAXBDataBinding databinding = new JAXBDataBinding();
         databinding.setContext(context);
         svc.setDataBinding(databinding);
+
+        ClientImpl client = new DynamicClientImpl(bus, svc, port,
+                                                  getEndpointImplFactory(), cl);
 
         ServiceInfo svcfo = client.getEndpoint().getEndpointInfo().getService();
 
         // Setup the new classloader!
         ClassLoaderUtils.setThreadContextClassloader(cl);
 
-        TypeClassInitializer visitor = new TypeClassInitializer(svcfo, 
+        TypeClassInitializer visitor = new TypeClassInitializer(svcfo,
                                                                 intermediateModel,
                                                                 allowWrapperOps());
         visitor.walk();
@@ -418,16 +440,16 @@ public class DynamicClientFactory {
     protected boolean allowWrapperOps() {
         return false;
     }
-    
+
     protected SchemaCompiler createSchemaCompiler() {
-        SchemaCompiler compiler = 
-            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
+        SchemaCompiler compiler =
+            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());
         if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
             compiler.getOptions().parseArguments(schemaCompilerOptions);
         }
         return compiler;
     }
-    
+
     private void addBindingFiles(List<String> bindingFiles, SchemaCompiler compiler) {
         if (bindingFiles != null) {
             for (String s : bindingFiles) {
@@ -459,21 +481,21 @@ public class DynamicClientFactory {
         Iterator<JDefinedClass> i = jpackage.classes();
         while (i.hasNext()) {
             JDefinedClass current = i.next();
-            if ("ObjectFactory".equals(current.name())) { 
+            if ("ObjectFactory".equals(current.name())) {
                 return true;
             }
         }
         return false;
     }
 
-    
+
     private void addSchemas(Options opts,
                             SchemaCompiler schemaCompiler,
                             List<ServiceInfo> serviceList,
                             SchemaCollection schemaCollection) {
 
-        Map<String, Element> done = new HashMap<String, Element>();
-        Map<String, Element> notDone = new HashMap<String, Element>();
+        Map<String, Element> done = new HashMap<>();
+        Map<String, Element> notDone = new HashMap<>();
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
@@ -528,13 +550,13 @@ public class DynamicClientFactory {
                                 }
                             }
                         }
-                       
+
                     }
                     if (key == null) {
                         continue;
                     }
                     if (key.startsWith("file:")) {
-                        in = new FileInputStream(new File(new URI(key)));
+                        in = Files.newInputStream(new File(new URI(key)).toPath());
                     } else {
                         in = new URL(key).openStream();
                     }
@@ -591,7 +613,7 @@ public class DynamicClientFactory {
         }
 
     }
-    
+
     public boolean isSimpleBindingEnabled() {
         return simpleBindingEnabled;
     }
@@ -601,19 +623,25 @@ public class DynamicClientFactory {
     }
 
     protected boolean compileJavaSrc(String classPath, List<File> srcList, String dest) {
-        org.apache.cxf.common.util.Compiler javaCompiler 
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
+        org.apache.cxf.common.util.Compiler javaCompiler
             = new org.apache.cxf.common.util.Compiler();
-        
+
         javaCompiler.setClassPath(classPath);
         javaCompiler.setOutputDir(dest);
-        javaCompiler.setTarget("1.6");
-        
-        return javaCompiler.compileFiles(srcList); 
+        if (JavaUtils.isJava9Compatible()) {
+            javaCompiler.setTarget("9");
+        } else {
+            javaCompiler.setTarget("1.8");
+        }
+        return javaCompiler.compileFiles(srcList);
     }
-    
-    static void addClasspathFromManifest(StringBuilder classPath, File file) 
+
+    static void addClasspathFromManifest(StringBuilder classPath, File file)
         throws URISyntaxException, IOException {
-        
+
         try (JarFile jar = new JarFile(file)) {
             Attributes attr = null;
             if (jar.getManifest() != null) {
@@ -626,7 +654,7 @@ public class DynamicClientFactory {
                     int idx = fileName.indexOf(' ');
                     if (idx != -1) {
                         fileName = fileName.substring(0, idx);
-                        cp =  cp.substring(idx + 1).trim();
+                        cp = cp.substring(idx + 1).trim();
                     } else {
                         cp = null;
                     }
@@ -648,8 +676,8 @@ public class DynamicClientFactory {
 
     static void setupClasspath(StringBuilder classPath, ClassLoader classLoader)
         throws URISyntaxException, IOException {
-        
-        ClassLoader scl = ClassLoader.getSystemClassLoader();        
+
+        ClassLoader scl = ClassLoader.getSystemClassLoader();
         ClassLoader tcl = classLoader;
         do {
             if (tcl instanceof URLClassLoader) {
@@ -665,20 +693,20 @@ public class DynamicClientFactory {
                             if (url.getPath() == null) {
                                 continue;
                             }
-                            file = new File(URLDecoder.decode(url.getPath(), "utf-8")); 
+                            file = new File(URLDecoder.decode(url.getPath(), "utf-8"));
                         } catch (UnsupportedEncodingException uee) {
                             // ignored as utf-8 is supported
-                        } 
+                        }
 
-                        if (null != file && file.exists()) { 
-                            classPath.append(file.getAbsolutePath()) 
-                                .append(System 
-                                        .getProperty("path.separator")); 
+                        if (null != file && file.exists()) {
+                            classPath.append(file.getAbsolutePath())
+                                .append(System
+                                        .getProperty("path.separator"));
 
-                            if (file.getName().endsWith(".jar")) { 
-                                addClasspathFromManifest(classPath, file); 
-                            }                         
-                        }     
+                            if (file.getName().endsWith(".jar")) {
+                                addClasspathFromManifest(classPath, file);
+                            }
+                        }
                     }
                 }
             } else if (tcl.getClass().getName().contains("weblogic")) {
@@ -687,7 +715,7 @@ public class DynamicClientFactory {
                     Method method = tcl.getClass().getMethod("getClassPath");
                     Object weblogicClassPath = method.invoke(tcl);
                     classPath.append(weblogicClassPath)
-                        .append(File.pathSeparator); 
+                        .append(File.pathSeparator);
                 } catch (Exception e) {
                     LOG.log(Level.FINE, "unsuccessfully tried getClassPath method", e);
                 }
@@ -705,15 +733,14 @@ public class DynamicClientFactory {
 
             if (resolver.isResolved()) {
                 return resolver.getURI().toURL();
-            } else {
-                throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
             }
+            throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s));
         } catch (IOException e) {
             throw new ServiceConstructionException(new Message("COULD_NOT_RESOLVE_URL", LOG, s), e);
         }
     }
 
-    class InnerErrorListener {
+    static class InnerErrorListener {
 
         private String url;
         private StringBuilder errors = new StringBuilder();
@@ -777,10 +804,9 @@ public class DynamicClientFactory {
             if (systemId != null) {
                 File file = new File(baseURI, systemId);
                 if (file.exists()) {
-                    return new InputSource(new FileInputStream(file));
-                } else {
-                    return new InputSource(systemId);
+                    return new InputSource(Files.newInputStream(file.toPath()));
                 }
+                return new InputSource(systemId);
             }
             return null;
         }
@@ -886,7 +912,7 @@ public class DynamicClientFactory {
     }
     static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
         try {
-            String resolvedLocation = new OASISCatalogManagerHelper().resolve(catalog, 
+            String resolvedLocation = new OASISCatalogManagerHelper().resolve(catalog,
                                                                               target, base);
             if (resolvedLocation != null) {
                 return resolvedLocation;
@@ -895,7 +921,7 @@ public class DynamicClientFactory {
         } catch (Exception ex) {
             //ignore
         }
-        
+
 
         try {
             URIResolver resolver = new URIResolver(base, target);
@@ -918,11 +944,11 @@ public class DynamicClientFactory {
         List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                         "http://www.w3.org/2001/XMLSchema",
                                                                      "include");
-        if (impElemList.size() == 0 && incElemList.size() == 0) {
+        if (impElemList.isEmpty() && incElemList.isEmpty()) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        List<Node> ns = new ArrayList<Node>();
+        List<Node> ns = new ArrayList<>();
 
         impElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                           "http://www.w3.org/2001/XMLSchema",
@@ -939,7 +965,7 @@ public class DynamicClientFactory {
         incElemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                           "http://www.w3.org/2001/XMLSchema",
                                                           "include");
-        
+
         boolean addedToNotDone = false;
         for (Element elem : incElemList) {
             Attr val = elem.getAttributeNode("schemaLocation");
@@ -998,7 +1024,7 @@ public class DynamicClientFactory {
         }
         return clone;
     }
-    public class LocationFilterReader extends StreamReaderDelegate {
+    public static class LocationFilterReader extends StreamReaderDelegate {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;
@@ -1011,7 +1037,7 @@ public class DynamicClientFactory {
 
         public int next() throws XMLStreamException {
             int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
@@ -1029,7 +1055,7 @@ public class DynamicClientFactory {
 
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
+            if (i == XMLStreamConstants.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);

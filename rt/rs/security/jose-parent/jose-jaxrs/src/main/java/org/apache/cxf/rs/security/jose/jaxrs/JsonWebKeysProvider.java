@@ -34,7 +34,7 @@ import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
 import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class JsonWebKeysProvider implements MessageBodyReader<JsonWebKeys>, MessageBodyWriter<JsonWebKeys> {
-    
+
     @Override
     public boolean isReadable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
         return cls == JsonWebKeys.class;
@@ -64,7 +64,7 @@ public class JsonWebKeysProvider implements MessageBodyReader<JsonWebKeys>, Mess
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException, WebApplicationException {
         JwkUtils.jwkSetToJson(t, entityStream);
-        
+
     }
-    
+
 }

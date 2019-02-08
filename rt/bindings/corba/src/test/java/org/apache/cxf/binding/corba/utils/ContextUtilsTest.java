@@ -24,20 +24,22 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.junit.Assert;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Holder for utility methods relating to contexts.
  */
-public final class ContextUtilsTest extends Assert {
-    
+public final class ContextUtilsTest {
+
 
     @Test
     public void testIsRequestor() throws Exception {
         Message message = new MessageImpl();
         message.put("org.apache.cxf.client", "org.apache.cxf.client");
-        assertEquals(ContextUtils.isRequestor(message), true);               
+        assertEquals(ContextUtils.isRequestor(message), true);
     }
 
     @Test
@@ -46,9 +48,8 @@ public final class ContextUtilsTest extends Assert {
         Exchange exchange = new ExchangeImpl();
         exchange.setOutMessage(message);
         message.setExchange(exchange);
-        
+
         assertEquals(ContextUtils.isOutbound(message), true);
     }
 
 }
-    

@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -115,7 +116,7 @@ public class ElementReader extends AbstractMessageReader {
                     return null;
                 }
                 value = root.getElementText();
-                
+
                 hasCheckedChildren = true;
                 hasChildren = false;
                 if (root.hasNext()) {
@@ -124,7 +125,7 @@ public class ElementReader extends AbstractMessageReader {
             } catch (XMLStreamException e) {
                 throw new DatabindingException("Could not read XML stream.", e);
             }
-            
+
             if (value == null) {
                 value = "";
             }
@@ -151,7 +152,7 @@ public class ElementReader extends AbstractMessageReader {
             int event = root.getEventType();
             while (root.hasNext()) {
                 switch (event) {
-                case XMLStreamReader.START_ELEMENT:
+                case XMLStreamConstants.START_ELEMENT:
                     if (root.getDepth() > depth) {
                         hasCheckedChildren = true;
                         hasChildren = true;
@@ -159,7 +160,7 @@ public class ElementReader extends AbstractMessageReader {
                         return true;
                     }
                     break;
-                case XMLStreamReader.END_ELEMENT:
+                case XMLStreamConstants.END_ELEMENT:
                     if (root.getDepth() < depth) {
                         hasCheckedChildren = true;
                         hasChildren = false;
@@ -170,7 +171,7 @@ public class ElementReader extends AbstractMessageReader {
                         return false;
                     }
                     break;
-                case XMLStreamReader.END_DOCUMENT:
+                case XMLStreamConstants.END_DOCUMENT:
                     // We should never get here...
                     hasCheckedChildren = true;
                     hasChildren = false;

@@ -28,25 +28,25 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * 
+ *
  */
 public class RMTxStorePooledConnectionTest extends RMTxStoreTestBase {
-    @BeforeClass 
+    @BeforeClass
     public static void setUpOnce() {
         RMTxStoreTestBase.setUpOnce();
-        
+
         RMTxStore.deleteDatabaseFiles("rmdbpc", true);
 
         EmbeddedConnectionPoolDataSource ds = new EmbeddedConnectionPoolDataSource();
         ds.setDatabaseName("rmdbpc");
         ds.setCreateDatabase("create");
-        
+
         store = new RMTxStore();
         store.setDataSource(ds);
         store.setKeepConnection(false);
         store.init();
     }
-    
+
     @AfterClass
     public static void tearDownOnce() {
         /*

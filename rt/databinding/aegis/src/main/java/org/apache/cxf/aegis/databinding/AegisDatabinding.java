@@ -97,7 +97,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     public AegisDatabinding() {
         super();
-        part2Type = new HashMap<MessagePartInfo, AegisType>();
+        part2Type = new HashMap<>();
     }
     public AegisDatabinding(AegisContext ctx) {
         this();
@@ -197,7 +197,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 aegisContext.setMtomUseXmime(true);
             }
 
-            Map<Class<?>, String> implMap = new HashMap<Class<?>, String>();
+            Map<Class<?>, String> implMap = new HashMap<>();
             // now for a really annoying case, the .implementation objects.
             for (String key : s.keySet()) {
                 if (key.endsWith(".implementation")) {
@@ -223,7 +223,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 aegisContext.setTypeCreationOptions(configuration);
             }
 
-            if (implMap.size() > 0) {
+            if (!implMap.isEmpty()) {
                 aegisContext.setBeanImplementationMap(implMap);
             }
         }
@@ -235,7 +235,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         s.getInInterceptors()
             .add(new StaxSchemaValidationInInterceptor());
 
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         for (ServiceInfo info : s.getServiceInfos()) {
             for (OperationInfo opInfo : info.getInterface().getOperations()) {
@@ -405,12 +405,12 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     private void createSchemas(Service s, Set<AegisType> deps) {
 
-        Map<String, Set<AegisType>> tns2Type = new HashMap<String, Set<AegisType>>();
+        Map<String, Set<AegisType>> tns2Type = new HashMap<>();
         for (AegisType t : deps) {
             String ns = t.getSchemaType().getNamespaceURI();
             Set<AegisType> types = tns2Type.get(ns);
             if (types == null) {
-                types = new HashSet<AegisType>();
+                types = new HashSet<>();
                 tns2Type.put(ns, types);
             }
             types.add(t);
@@ -486,9 +486,8 @@ public class AegisDatabinding extends AbstractDataBinding {
                         String message = ex.getMessage();
                         if (expected.equals(message)) {
                             continue;
-                        } else {
-                            throw ex;
                         }
+                        throw ex;
                     }
                 }
 

@@ -28,80 +28,78 @@ import org.apache.cxf.helpers.CastUtils;
 
 public class UserResource {
 
-    private String className; 
+    private String className;
     private String pathValue;
     private String consumesTypes;
     private String producesTypes;
-    private List<UserOperation> opers; 
-    
+    private List<UserOperation> opers;
+
     public UserResource() {
     }
-    
+
     public UserResource(String className) {
         this(className, null);
     }
-    
+
     public UserResource(String className, String pathValue) {
         this(className, pathValue, null);
     }
-    
+
     public UserResource(String className, String pathValue, List<UserOperation> ops) {
         this.className = className;
         this.pathValue = pathValue;
         this.opers = ops;
     }
-    
+
     public String getConsumes() {
         return consumesTypes;
     }
-    
+
     public String getProduces() {
         return producesTypes;
     }
-    
+
     public void setConsumes(String types) {
         if (!StringUtils.isEmpty(types)) {
             consumesTypes = types;
         }
     }
-    
+
     public void setProduces(String types) {
         if (!StringUtils.isEmpty(types)) {
             producesTypes = types;
         }
     }
-    
+
     public String getName() {
         return className;
     }
-    
+
     public void setName(String name) {
-        if (!StringUtils.isEmpty(name)) {
-            className = name;
-        }
+        className = name;
     }
-    
+
     public String getPath() {
         return pathValue;
     }
-    
+
     public void setPath(String path) {
         if (!StringUtils.isEmpty(path)) {
             pathValue = path;
         }
     }
-    
+
     public void setOperations(List<UserOperation> ops) {
         opers = ops;
     }
-    
+
     public List<UserOperation> getOperations() {
         return opers == null ? CastUtils.cast(Collections.emptyList(), UserOperation.class)
             : Collections.unmodifiableList(opers);
     }
-    
+
     public Map<String, UserOperation> getOperationsAsMap() {
-        Map<String, UserOperation> map = new HashMap<String, UserOperation>();
+        Map<String, UserOperation> map = new HashMap<>();
         for (UserOperation op : opers) {
             map.put(op.getName(), op);
         }

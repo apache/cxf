@@ -24,18 +24,18 @@ import org.apache.cxf.sts.request.ReceivedToken;
  * This TokenDelegationHandler implementation allows UsernameTokens for OnBehalfOf/ActAs.
  */
 public class UsernameTokenDelegationHandler implements TokenDelegationHandler {
-    
+
     public boolean canHandleToken(ReceivedToken delegateTarget) {
         return delegateTarget.isUsernameToken();
     }
-    
+
     public TokenDelegationResponse isDelegationAllowed(TokenDelegationParameters tokenParameters) {
         TokenDelegationResponse response = new TokenDelegationResponse();
         ReceivedToken delegateTarget = tokenParameters.getToken();
         response.setToken(delegateTarget);
-        
+
         response.setDelegationAllowed(true);
-        
+
         return response;
     }
 }

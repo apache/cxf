@@ -20,22 +20,25 @@ package org.apache.cxf.jaxrs.client.cache;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 public class Entry implements Serializable {
     private static final long serialVersionUID = -3551501551331222546L;
     private Map<String, String> cacheHeaders = Collections.emptyMap();
     private Serializable data;
-    private MultivaluedMap<String, String> headers;
+    private Map<String, List<String>> headers;
     private long expiresValue;
     private long initialTimestamp = now();
 
     public Entry(final Serializable data, final MultivaluedMap<String, String> headers,
                  final Map<String, String> cacheHeaders, final long expiresHeaderValue) {
         this.data = data;
-        this.headers = headers;
+        initHeaders(headers);
         this.cacheHeaders = cacheHeaders;
         this.expiresValue = expiresHeaderValue;
     }
@@ -45,7 +48,7 @@ public class Entry implements Serializable {
     }
 
     public boolean isOutDated() {
-        return now() - initialTimestamp > expiresValue * 1000;
+        return now() - initialTimestamp > expiresValue * 1000L;
     }
 
     public Map<String, String> getCacheHeaders() {
@@ -65,11 +68,18 @@ public class Entry implements Serializable {
     }
 
     public MultivaluedMap<String, String> getHeaders() {
-        return headers;
+        final MultivaluedHashMap<String, String> toReturn = new MultivaluedHashMap<String, String>();
+        toReturn.putAll(headers);
+        return toReturn;
+    }
+
+    private void initHeaders(final  MultivaluedMap<String, String> mHeaders) {
+        this.headers = new HashMap<String, List<String>>();
+        headers.putAll(mHeaders);
     }
 
     public void setHeaders(final MultivaluedMap<String, String> headers) {
-        this.headers = headers;
+        initHeaders(headers);
     }
 
     public long getExpiresValue() {

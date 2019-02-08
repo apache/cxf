@@ -33,13 +33,16 @@ import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CXFBusImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+public class CXFBusImplTest {
 
     @Test
     public void testThreadBus() throws BusException {
@@ -52,40 +55,40 @@ public class CXFBusImplTest extends Assert {
     }
     @Test
     public void testConstructionWithoutExtensions() throws BusException {
-        
+
         Bus bus = new ExtensionManagerBus();
         assertNotNull(bus.getExtension(BindingFactoryManager.class));
-        assertNotNull(bus.getExtension(ConduitInitiatorManager.class));   
+        assertNotNull(bus.getExtension(ConduitInitiatorManager.class));
         assertNotNull(bus.getExtension(DestinationFactoryManager.class));
         assertNotNull(bus.getExtension(PhaseManager.class));
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testConstructionWithExtensions() throws BusException {
-        
+
         IMocksControl control;
         BindingFactoryManager bindingFactoryManager;
         InstrumentationManager instrumentationManager;
         PhaseManager phaseManager;
-        
+
         control = EasyMock.createNiceControl();
-        
-        Map<Class<?>, Object> extensions = new HashMap<Class<?>, Object>();
+
+        Map<Class<?>, Object> extensions = new HashMap<>();
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         instrumentationManager = control.createMock(InstrumentationManager.class);
         phaseManager = control.createMock(PhaseManager.class);
-        
+
         extensions.put(BindingFactoryManager.class, bindingFactoryManager);
         extensions.put(InstrumentationManager.class, instrumentationManager);
         extensions.put(PhaseManager.class, phaseManager);
-        
+
         Bus bus = new ExtensionManagerBus(extensions);
-        
+
         assertSame(bindingFactoryManager, bus.getExtension(BindingFactoryManager.class));
         assertSame(instrumentationManager, bus.getExtension(InstrumentationManager.class));
         assertSame(phaseManager, bus.getExtension(PhaseManager.class));
-  
+
     }
 
     @Test
@@ -96,7 +99,7 @@ public class CXFBusImplTest extends Assert {
         assertSame(extension, bus.getExtension(String.class));
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testBusID() {
         Bus bus = new ExtensionManagerBus();
@@ -106,7 +109,7 @@ public class CXFBusImplTest extends Assert {
         assertEquals("The bus id should be changed", "test", bus.getId());
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testShutdownWithBusLifecycle() {
         final Bus bus = new ExtensionManagerBus();
@@ -116,12 +119,12 @@ public class CXFBusImplTest extends Assert {
         listener.preShutdown();
         EasyMock.expectLastCall();
         listener.postShutdown();
-        EasyMock.expectLastCall();        
-        EasyMock.replay(listener);        
+        EasyMock.expectLastCall();
+        EasyMock.replay(listener);
         lifeCycleManager.registerLifeCycleListener(listener);
         bus.shutdown(true);
         EasyMock.verify(listener);
-        bus.shutdown(true);        
+        bus.shutdown(true);
     }
 
 }

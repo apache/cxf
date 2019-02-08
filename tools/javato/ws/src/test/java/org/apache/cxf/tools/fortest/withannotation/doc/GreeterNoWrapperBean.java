@@ -30,7 +30,7 @@ public interface GreeterNoWrapperBean {
     @RequestWrapper(className = "org.apache.cxf.SayHi")
     @ResponseWrapper(className = "org.apache.cxf.SayHiResponse")
     String sayHi();
-    
+
     @WebMethod
     @RequestWrapper(className = "org.apache.cxf.EchoDataBean")
     @ResponseWrapper(className = "org.apache.cxf.EchoDataBeanResponse")

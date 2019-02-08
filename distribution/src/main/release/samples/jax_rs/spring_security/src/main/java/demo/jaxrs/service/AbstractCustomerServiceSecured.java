@@ -31,14 +31,14 @@ import javax.ws.rs.core.Response;
 
 @Path("/customerservice/")
 public abstract class AbstractCustomerServiceSecured implements CustomerServiceSecured {
-    
+
     protected long currentId = 123;
-    protected Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    protected Map<Long, Order> orders = new HashMap<Long, Order>();
+    protected Map<Long, Customer> customers = new HashMap<>();
+    protected Map<Long, Order> orders = new HashMap<>();
 
     protected AbstractCustomerServiceSecured() {
         init();
-    } 
+    }
 
     @GET
     @Path("/customers/{id}/")
@@ -47,7 +47,7 @@ public abstract class AbstractCustomerServiceSecured implements CustomerServiceS
     @PUT
     @Path("/customers/{id}")
     public abstract Response updateCustomer(@PathParam("id") Long id, Customer customer);
-    
+
     @POST
     @Path("/customers/")
     public abstract Response addCustomer(Customer customer);

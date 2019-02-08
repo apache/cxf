@@ -18,15 +18,20 @@
  */
 package org.apache.cxf.sts.request;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.w3c.dom.Element;
+
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 
 /**
- * This class contains values that have been extracted from a RequestSecurityToken corresponding to 
+ * This class contains values that have been extracted from a RequestSecurityToken corresponding to
  * various token requirements.
  */
 public class TokenRequirements {
-    
+
     private String tokenType;
     private Element appliesTo;
     private String context;
@@ -40,7 +45,8 @@ public class TokenRequirements {
     private ClaimCollection secondaryClaims;
     private Renewing renewing;
     private Participants participants;
-    
+    private final List<Object> customContent = new ArrayList<>();
+
     public Renewing getRenewing() {
         return renewing;
     }
@@ -52,11 +58,11 @@ public class TokenRequirements {
     public String getTokenType() {
         return tokenType;
     }
-    
+
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
     }
-    
+
     public ReceivedToken getCancelTarget() {
         return cancelTarget;
     }
@@ -64,7 +70,7 @@ public class TokenRequirements {
     public void setCancelTarget(ReceivedToken cancelTarget) {
         this.cancelTarget = cancelTarget;
     }
-    
+
     public ReceivedToken getRenewTarget() {
         return renewTarget;
     }
@@ -76,51 +82,51 @@ public class TokenRequirements {
     public Element getAppliesTo() {
         return appliesTo;
     }
-    
+
     public void setAppliesTo(Element appliesTo) {
         this.appliesTo = appliesTo;
     }
-    
+
     public String getContext() {
         return context;
     }
-    
+
     public void setContext(String context) {
         this.context = context;
     }
-    
+
     public ReceivedToken getValidateTarget() {
         return validateTarget;
     }
-    
+
     public void setValidateTarget(ReceivedToken validateTarget) {
         this.validateTarget = validateTarget;
     }
-    
+
     public ReceivedToken getOnBehalfOf() {
         return onBehalfOf;
     }
-    
+
     public void setOnBehalfOf(ReceivedToken onBehalfOf) {
         this.onBehalfOf = onBehalfOf;
     }
-    
+
     public ReceivedToken getActAs() {
         return actAs;
     }
-    
+
     public void setActAs(ReceivedToken actAs) {
         this.actAs = actAs;
     }
-    
+
     public Lifetime getLifetime() {
         return lifetime;
     }
-    
+
     public void setLifetime(Lifetime lifetime) {
         this.lifetime = lifetime;
     }
-    
+
     public ClaimCollection getPrimaryClaims() {
         return primaryClaims;
     }
@@ -143,6 +149,16 @@ public class TokenRequirements {
 
     public void setParticipants(Participants participants) {
         this.participants = participants;
+    }
+
+    public List<Object> getCustomContent() {
+        return Collections.unmodifiableList(customContent);
+    }
+
+    public void addCustomContent(Object customElement) {
+        if (customElement != null) {
+            this.customContent.add(customElement);
+        }
     }
 
 }

@@ -20,35 +20,31 @@ package org.apache.cxf.osgi.itests.soap;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.osgi.itests.AbstractServerActivator;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
-public class HttpTestActivator implements BundleActivator {
+public class HttpTestActivator extends AbstractServerActivator {
     public static final String PORT = TestUtil.getPortNumber(HttpTestActivator.class);
-    private Server server;
     private Server serverJetty;
 
     @Override
-    public void start(BundleContext arg0) throws Exception {
+    protected Server createServer() {
+        serverJetty = createTestServer("http://localhost:" + PORT + "/cxf/greeter");
+        return createTestServer("/greeter");
+    }
+
+    private Server createTestServer(String url) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Greeter.class);
-        factory.setAddress("/greeter");
+        factory.setAddress(url);
         factory.setServiceBean(new GreeterImpl());
-        server = factory.create();
-        
-        factory = new JaxWsServerFactoryBean();
-        factory.setServiceClass(Greeter.class);
-        factory.setAddress("http://localhost:" + PORT + "/cxf/greeter");
-        factory.setServiceBean(new GreeterImpl());
-        serverJetty = factory.create();
+        return factory.create();
     }
 
     @Override
-    public void stop(BundleContext arg0) throws Exception {
-        server.stop();
-        server.destroy();
-        serverJetty.stop();
+    public void stop(BundleContext bundleContext) throws Exception {
+        super.stop(bundleContext);
         serverJetty.destroy();
     }
 

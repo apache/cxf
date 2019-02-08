@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 public interface TypeCreator {
     /**
      * Get the mapped name of a method parameter.
-     * 
+     *
      * @param m
      * @param index
      * @return
@@ -38,24 +38,24 @@ public interface TypeCreator {
     AegisType createType(Method m, int index);
 
     AegisType createType(PropertyDescriptor pd);
-    
+
     AegisType createType(Type type);
 
     AegisType createType(Field f);
 
     TypeCreator getParent();
-    
+
     void setParent(TypeCreator creator);
-        
+
     void setTypeMapping(TypeMapping typeMapping);
 
-    /** Retrieve the classInfo for a method. Needed to get parameters right. 
-     * 
+    /** Retrieve the classInfo for a method. Needed to get parameters right.
+     *
      * @param m Method object
      * @param index index in the parameter list
      * @return info
      */
-    TypeClassInfo createClassInfo(Method m, int index); 
+    TypeClassInfo createClassInfo(Method m, int index);
 
     /**
      * Create class info for a Type.
@@ -63,7 +63,7 @@ public interface TypeCreator {
      * @return info
      */
     TypeClassInfo createBasicClassInfo(Type itemType);
-    
+
     /**
      * Turn a TypeClassInfo into a type.
      * @param info

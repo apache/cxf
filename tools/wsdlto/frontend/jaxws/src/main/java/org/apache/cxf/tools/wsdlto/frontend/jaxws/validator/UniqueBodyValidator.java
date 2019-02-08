@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -68,8 +69,8 @@ public class UniqueBodyValidator extends ServiceValidator {
 
     private boolean isValidEndpoint(EndpointInfo endpoint) {
         BindingInfo binding = endpoint.getBinding();
-        Map<QName, QName> uniqueNames = new HashMap<QName, QName>();
-        Map<QName, Set<String>> actions = new HashMap<QName, Set<String>>();
+        Map<QName, QName> uniqueNames = new HashMap<>();
+        Map<QName, Set<String>> actions = new HashMap<>();
 
         Collection<BindingOperationInfo> bos = binding.getOperations();
         for (BindingOperationInfo bo : bos) {
@@ -88,25 +89,24 @@ public class UniqueBodyValidator extends ServiceValidator {
                     opName = null;
                 }
                 if (opName != null) {
-                    Message msg = new Message("NON_UNIQUE_BODY", LOG, 
+                    Message msg = new Message("NON_UNIQUE_BODY", LOG,
                                               endpoint.getName(), op.getName(), opName, mName);
                     addErrorMessage(msg.toString());
                     return false;
-                } else {
-                    uniqueNames.put(mName, op.getName());
-                    if (action != null) {
-                        if (opActions == null) {
-                            opActions = new HashSet<String>();
-                            actions.put(mName, opActions);
-                        }
-                        opActions.add(action);
+                }
+                uniqueNames.put(mName, op.getName());
+                if (action != null) {
+                    if (opActions == null) {
+                        opActions = new HashSet<>();
+                        actions.put(mName, opActions);
                     }
+                    opActions.add(action);
                 }
             }
-            
+
             for (BindingFaultInfo fault : bo.getFaults()) {
                 if (fault.getFaultInfo().getMessagePartsNumber() > 1) {
-                    Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG, 
+                    Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG,
                                               fault.getFaultInfo().getName()
                                                   .getLocalPart());
                     addErrorMessage(msg.toString());

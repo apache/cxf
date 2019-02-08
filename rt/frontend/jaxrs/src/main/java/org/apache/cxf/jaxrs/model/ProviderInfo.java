@@ -29,32 +29,51 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     private T provider;
     private boolean custom;
     private boolean busGlobal;
-    
+
     public ProviderInfo(T provider, Bus bus, boolean custom) {
         this(provider, bus, true, custom);
     }
-    
+
     public ProviderInfo(T provider, Bus bus, boolean checkContexts, boolean custom) {
-        this(provider, null, bus, checkContexts, custom);
+        this(provider.getClass(), provider.getClass(), provider, bus, checkContexts, custom);
     }
-    
-    public ProviderInfo(T provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+
+    public ProviderInfo(Class<?> resourceClass, Class<?> serviceClass, T provider, Bus bus, boolean custom) {
+        this(resourceClass, serviceClass, provider, bus, true, custom);
+    }
+
+    public ProviderInfo(Class<?> resourceClass, Class<?> serviceClass, T provider, Bus bus, 
+            boolean checkContexts, boolean custom) {
+        this(resourceClass, serviceClass, provider, null, bus, checkContexts, custom);
+    }
+
+    public ProviderInfo(T provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus,
                         boolean custom) {
         this(provider, constructorProxies, bus, true, custom);
     }
-    
-    public ProviderInfo(T provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
-                        Bus bus,
-                        boolean checkContexts,
-                        boolean custom) {
-        super(provider.getClass(), provider.getClass(), true, checkContexts, constructorProxies, bus, provider);
+
+    public ProviderInfo(Class<?> resourceClass, 
+            Class<?> serviceClass,
+            T provider,
+            Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
+            Bus bus,
+            boolean checkContexts,
+            boolean custom) {
+        super(resourceClass, serviceClass, true, checkContexts, constructorProxies, bus, provider);
         this.provider = provider;
         this.custom = custom;
     }
-    
+
+    public ProviderInfo(T provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
+                        Bus bus,
+                        boolean checkContexts,
+                        boolean custom) {
+        this(provider.getClass(), provider.getClass(), provider, constructorProxies, bus, checkContexts, custom);
+    }
+
     @Override
     public boolean isSingleton() {
         return true;
@@ -63,7 +82,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     public T getProvider() {
         return provider;
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof ProviderInfo)) {
             return false;

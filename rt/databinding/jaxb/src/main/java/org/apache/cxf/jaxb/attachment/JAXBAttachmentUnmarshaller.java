@@ -38,7 +38,7 @@ public class JAXBAttachmentUnmarshaller extends AttachmentUnmarshaller {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBAttachmentUnmarshaller.class);
 
     private Collection<Attachment> attachments;
-    
+
     public JAXBAttachmentUnmarshaller(Collection<Attachment> attachments) {
         super();
         this.attachments = attachments;

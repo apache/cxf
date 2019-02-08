@@ -29,18 +29,18 @@ import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItMtomPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItMtomPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleIt4Impl implements DoubleItMtomPortType {
-    
+
     @Override
     public int doubleIt4(int numberToDouble, DataHandler imageData) throws DoubleItFault {
         if (numberToDouble == 0) {
             throw new DoubleItFault("0 can't be doubled!");
         }
-        
+
         try {
             BufferedImage image = ImageIO.read(imageData.getInputStream());
             if (image == null) {
@@ -49,8 +49,8 @@ public class DoubleIt4Impl implements DoubleItMtomPortType {
         } catch (IOException e) {
             throw new DoubleItFault("Error processing image data: " + e.getMessage());
         }
-        
+
         return numberToDouble * 2;
     }
-    
+
 }

@@ -18,10 +18,24 @@
  */
 package org.apache.cxf.rs.security.jose.jwk;
 
-import org.junit.Assert;
+import java.math.BigInteger;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+
+import org.apache.cxf.rs.security.jose.common.JoseException;
+import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+
 import org.junit.Test;
 
-public class JwkUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class JwkUtilsTest {
     private static final String RSA_KEY = "{"
       + "\"kty\": \"RSA\","
       + "\"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAt"
@@ -61,6 +75,91 @@ public class JwkUtilsTest extends Assert {
         + "\"k\": \"NGbwp1rC4n85A1SaNxoHow\""
         + "}";
     @Test
+    public void testRsaKeyModulus() throws Exception {
+        JsonWebKey jwk = JwkUtils.readJwkKey(RSA_KEY);
+        String modulus = jwk.getStringProperty(JsonWebKey.RSA_MODULUS);
+        assertEquals(256, JoseUtils.decode(modulus).length);
+
+        RSAPublicKey pk = JwkUtils.toRSAPublicKey(jwk);
+        JsonWebKey jwk2 = JwkUtils.fromRSAPublicKey(pk, jwk.getAlgorithm());
+        String modulus2 = jwk2.getStringProperty(JsonWebKey.RSA_MODULUS);
+        assertEquals(256, JoseUtils.decode(modulus2).length);
+        assertEquals(modulus2, modulus);
+    }
+    @Test
+    public void testFromToPrivateRsaKey() throws Exception {
+        RSAPrivateKey privateKey1 =
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks",
+                                              "password",
+                                              "alice",
+                                              "password",
+                                              null);
+        JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PRIVATE_EXP));
+        RSAPrivateKey privateKey2 = JwkUtils.toRSAPrivateKey(jwk1);
+        assertEquals(privateKey2, privateKey1);
+
+    }
+    @Test
+    public void testFromToPublicRsaKey() throws Exception {
+        RSAPublicKey publicKey1 =
+            (RSAPublicKey)KeyManagementUtils.loadPublicKey("org/apache/cxf/rs/security/jose/jws/alice.jks",
+                                              "password",
+                                              "alice",
+                                              null);
+        JsonWebKey jwk1 = JwkUtils.fromRSAPublicKey(publicKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        assertNull(jwk1.getProperty(JsonWebKey.RSA_PRIVATE_EXP));
+        RSAPublicKey publicKey2 = JwkUtils.toRSAPublicKey(jwk1);
+        assertEquals(publicKey2, publicKey1);
+
+    }
+    @Test
+    public void testFromToPublicRsaKey2() throws Exception {
+        BigInteger n = new BigInteger(
+            "525569531153621228164069013206963023039121751335221395180741421479892725873020691336158448746650762107595"
+            + "8352148531548486906896903886764928450353366890712125983926472500064566992690642117517954169974907061547"
+            + "3353190040609042090075291281955112293781438730376121249764205272939686534594208819023639183157456093565"
+            + "4148815673814517535941780340023556224072529306118783149589148262622268860151306096159642808944513667279"
+            + "4704664637866917427597486905443676772669967766269923280637049233876979061993814679654208850149406432368"
+            + "2161337544093644200063709176660451323844399667162451308704624790051211834667782115390754507376506824717"
+            + "9938484919159962066058375588059543574624283546151162925649987580839763809787286157381728046746195701379"
+            + "0902293850442561995774628930418082115864728330723111110174368232384797709242627319756376556142528218939"
+            + "7783875183123336240582938265783686836202210705597100765098627429017295706176890505466946207401105614189"
+            + "2784165813507235148683348014201150784998715061575093867666453332433607035581378251824779499939486011300"
+            + "7245546797308586043310145338620953330797301627631794650975659295961069452157705404946866414340860434286"
+            + "65874725802069389719375237126155948350679342167596471110676954951640992376889874630989205394080379", 
+            10);
+        BigInteger e = new BigInteger("65537", 10);
+        RSAPublicKey publicKey = CryptoUtils.getRSAPublicKey(n, e);
+        
+        JsonWebKey jwk1 = JwkUtils.fromRSAPublicKey(publicKey, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        assertNull(jwk1.getProperty(JsonWebKey.RSA_PRIVATE_EXP));
+        RSAPublicKey privateKey2 = JwkUtils.toRSAPublicKey(jwk1);
+        assertEquals(privateKey2, publicKey);
+
+    }
+    @Test
+    public void testToPrivateRsaKeyWithoutE() throws Exception {
+        RSAPrivateKey privateKey1 =
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks",
+                                              "password",
+                                              "alice",
+                                              "password",
+                                              null);
+        JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
+        assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
+        jwk1.asMap().remove(JsonWebKey.RSA_PUBLIC_EXP);
+        try {
+            JwkUtils.toRSAPrivateKey(jwk1);
+            fail("JWK without the public exponent can not be converted to RSAPrivateKey");
+        } catch (JoseException ex) {
+            // expected
+        }
+    }
+    @Test
     public void testRsaKeyThumbprint() throws Exception {
         String thumbprint = JwkUtils.getThumbprint(RSA_KEY);
         assertEquals("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs", thumbprint);
@@ -90,5 +189,5 @@ public class JwkUtilsTest extends Assert {
         String thumbprint = JwkUtils.getThumbprint(EC_521_KEY);
         assertEquals("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg", thumbprint);
     }
-    
+
 }

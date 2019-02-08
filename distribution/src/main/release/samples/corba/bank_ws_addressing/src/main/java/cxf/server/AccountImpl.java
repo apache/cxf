@@ -28,9 +28,9 @@ import cxf.common.Account;
                       endpointInterface = "cxf.common.Account")
 
 public class AccountImpl implements Account {
-    
+
     private float balance;
-    
+
     public float getBalance() {
         System.out.println("[Account] Called AccountImpl.getBalance()...");
         System.out.println();

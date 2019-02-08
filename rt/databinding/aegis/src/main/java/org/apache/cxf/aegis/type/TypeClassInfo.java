@@ -25,27 +25,27 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 /**
- * Object to carry information for an Aegis type, 
+ * Object to carry information for an Aegis type,
  * such as that from an XML mapping file.
- * 
- * Note that this class has a misleading name. It is used both for 
- * type information that corresponds to a type, and also for parameters 
+ *
+ * Note that this class has a misleading name. It is used both for
+ * type information that corresponds to a type, and also for parameters
  * of methods and elements of beans. When describing a top-level type,
  * minOccurs and maxOccurs are not meaningful. Aegis does not have a
  * very clear model of a 'type', in the sense of an AegisType object
  * corresponding to some particular XML Schema type, in isolation
- * from the mapping system. 
- * 
- * Historically, Aegis talked about Java types as Class. However, 
+ * from the mapping system.
+ *
+ * Historically, Aegis talked about Java types as Class. However,
  * we want to be able to keep track, distinctly, of un-erased
  * generics. That requires java.lang.reflect.Type.
- * 
+ *
  *  Nillable is only used for parameters.
- * 
+ *
  *  It might be that the code could be deconfused by
  * using the nillable property in here for the non-parameters cases
  * that look at minOccurs and maxOccurs.
- * 
+ *
  * Historically, the code for dealing with nillable was very confused,
  * and so the support here is a bit ginger, until someone figures out how
  * to sort things out. Thus the three-valued support instead
@@ -65,7 +65,7 @@ public class TypeClassInfo {
     private QName mappedName;
     // XML schema name for the type.
     private QName typeName;
-    
+
     // a Class reference to the aegis aegisTypeClass, if the app has specified it
     // via XML or via an annotation.
     private Class<? extends AegisType> aegisTypeClass;
@@ -76,7 +76,7 @@ public class TypeClassInfo {
     // Flat array.
     private boolean flat;
     private Boolean nillable;
-    
+
     public boolean nonDefaultAttributes() {
         return minOccurs != -1 || maxOccurs != -1 || flat;
     }
@@ -112,7 +112,7 @@ public class TypeClassInfo {
     public void setType(Type type) {
         this.type = type;
     }
-    
+
     public void setType(Type tp, Map<String, Type> vars) {
         this.type = tp;
         this.typeVars = vars;

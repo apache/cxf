@@ -36,13 +36,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Java class for param-valueType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="param-valueType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="description" type="{http://java.sun.com/xml/ns/javaee}descriptionType" 
+ *         &lt;element name="description" type="{http://java.sun.com/xml/ns/javaee}descriptionType"
  *                     maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element name="param-name" type="{http://java.sun.com/xml/ns/javaee}string"/>
  *         &lt;element name="param-value" type="{http://java.sun.com/xml/ns/javaee}xsdStringType"/>
@@ -76,7 +76,7 @@ public class ParamValueType {
      * <CODE>set</CODE> method for the description property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getDescription().add(newItem);
      * </pre>
@@ -85,14 +85,14 @@ public class ParamValueType {
      */
     public List<DescriptionType> getDescription() {
         if (description == null) {
-            description = new ArrayList<DescriptionType>();
+            description = new ArrayList<>();
         }
         return this.description;
     }
 
     /**
      * Gets the value of the paramName property.
-     * 
+     *
      * @return possible object is {@link CString }
      */
     public CString getParamName() {
@@ -101,7 +101,7 @@ public class ParamValueType {
 
     /**
      * Sets the value of the paramName property.
-     * 
+     *
      * @param value allowed object is {@link CString }
      */
     public void setParamName(CString value) {
@@ -110,7 +110,7 @@ public class ParamValueType {
 
     /**
      * Gets the value of the paramValue property.
-     * 
+     *
      * @return possible object is {@link XsdStringType }
      */
     public XsdStringType getParamValue() {
@@ -119,7 +119,7 @@ public class ParamValueType {
 
     /**
      * Sets the value of the paramValue property.
-     * 
+     *
      * @param value allowed object is {@link XsdStringType }
      */
     public void setParamValue(XsdStringType value) {
@@ -128,7 +128,7 @@ public class ParamValueType {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -137,7 +137,7 @@ public class ParamValueType {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String value) {

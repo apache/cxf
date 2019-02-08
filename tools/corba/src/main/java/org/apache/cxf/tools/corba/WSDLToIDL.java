@@ -44,16 +44,16 @@ import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaProcessor;
 public class WSDLToIDL extends AbstractCXFToolContainer {
 
     static final String TOOL_NAME = "wsdltoidl";
-    private static String[] args;    
+    private static String[] args;
     String idlOutput;
     String wsdlOutput;
- 
+
     public WSDLToIDL(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
 
     private Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     public void execute(boolean exitOnFinish) {
@@ -69,7 +69,7 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
                     env.put(ToolConstants.CFG_VERBOSE, Boolean.TRUE);
                 }
                 env.put(ToolConstants.CFG_CMD_ARG, args);
-                    
+
                 CommandDocument doc = super.getCommandDocument();
                 if (doc.hasParameter("corba")) {
                     env.put(ToolCorbaConstants.CFG_CORBA, Boolean.TRUE);
@@ -121,11 +121,11 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
         }
         if (env.optionSet(ToolCorbaConstants.CFG_WSDLOUTPUTFILE)) {
             env.put(ToolCorbaConstants.CFG_WSDLOUTPUTFILE, doc.getParameter("wsdloutputfile"));
-        }        
+        }
         if (env.optionSet(ToolCorbaConstants.CFG_IDLOUTPUTFILE)) {
             env.put(ToolCorbaConstants.CFG_IDLOUTPUTFILE, doc.getParameter("idloutputfile"));
         }
-        
+
         if (env.optionSet(ToolConstants.CFG_OUTPUTDIR)) {
             env.put(ToolConstants.CFG_OUTPUTDIR, doc.getParameter("outputdir"));
         }

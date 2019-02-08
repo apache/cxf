@@ -34,8 +34,8 @@ public class CreatePullPoint implements Referencable {
     }
 
     public CreatePullPoint(W3CEndpointReference epr) {
-        this.createPullPoint 
-            = WSNHelper.getInstance().getPort(epr, 
+        this.createPullPoint
+            = WSNHelper.getInstance().getPort(epr,
                                               org.oasis_open.docs.wsn.bw_2.CreatePullPoint.class);
         this.epr = epr;
     }
@@ -49,8 +49,16 @@ public class CreatePullPoint implements Referencable {
     }
 
     public PullPoint create() throws UnableToCreatePullPointFault {
-        org.oasis_open.docs.wsn.b_2.CreatePullPoint request 
+        org.oasis_open.docs.wsn.b_2.CreatePullPoint request
             = new org.oasis_open.docs.wsn.b_2.CreatePullPoint();
+        CreatePullPointResponse response = createPullPoint.createPullPoint(request);
+        return new PullPoint(response.getPullPoint());
+    }
+
+    public PullPoint create(String queueName) throws UnableToCreatePullPointFault {
+        org.oasis_open.docs.wsn.b_2.CreatePullPoint request
+            = new org.oasis_open.docs.wsn.b_2.CreatePullPoint();
+        request.getOtherAttributes().put(NotificationBroker.QNAME_PULLPOINT_QUEUE_NAME, queueName);
         CreatePullPointResponse response = createPullPoint.createPullPoint(request);
         return new PullPoint(response.getPullPoint());
     }

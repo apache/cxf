@@ -37,14 +37,14 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public final class ServiceUtils {
-    
+
     private ServiceUtils() {
     }
-    
+
     /**
      * A short cut method to be able to test for if Schema Validation should be enabled
      * for IN or OUT without having to check BOTH and IN or OUT.
-     * 
+     *
      * @param message
      * @param type
      */
@@ -65,82 +65,88 @@ public final class ServiceUtils {
                 validationType = SchemaValidationType.OUT;
             }
         }
-        
-        return validationType.equals(type) 
+
+        return validationType.equals(type)
             || ((SchemaValidationType.IN.equals(type) || SchemaValidationType.OUT.equals(type))
                 && SchemaValidationType.BOTH.equals(validationType));
     }
     /**
      * A convenience method to check for schema validation config in the message context, and then in the service model.
      * Does not modify the Message context (other than what is done in the getContextualProperty itself)
-     * 
+     *
      * @param message
      */
     public static SchemaValidationType getSchemaValidationType(Message message) {
         SchemaValidationType validationType = getOverrideSchemaValidationType(message);
         if (validationType == null) {
             validationType = getSchemaValidationTypeFromModel(message);
-        } 
-        
+        }
+        if (validationType == null) {
+            Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+            if (obj != null) {
+                validationType = getSchemaValidationType(obj);
+            }
+        }
         if (validationType == null) {
             validationType = SchemaValidationType.NONE;
         }
-     
+
         return validationType;
     }
-    
+
     private static SchemaValidationType getOverrideSchemaValidationType(Message message) {
-        Object obj = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        Object obj = message.get(Message.SCHEMA_VALIDATION_ENABLED);
+        if (obj == null && message.getExchange() != null) {
+            obj = message.getExchange().get(Message.SCHEMA_VALIDATION_ENABLED);
+        }
         if (obj != null) {
             // this method will transform the legacy enabled as well
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
-    }
-    
-    private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
-        Exchange exchange = message.getExchange();
-        
-        if (exchange != null) {
-            BindingOperationInfo boi = exchange.getBindingOperationInfo();
-            Endpoint endpoint = exchange.getEndpoint();
-            
-            if (boi != null && endpoint != null) {
-                SchemaValidationType validationType = null;
-                OperationInfo opInfo = boi.getOperationInfo();
-                EndpointInfo ep = endpoint.getEndpointInfo();
-                
-                if (validationType == null && opInfo != null) {
-                    validationType = getSchemaValidationTypeFromModel(message, opInfo);
-                    
-                    if (validationType == null && ep != null) {
-                        validationType = getSchemaValidationTypeFromModel(message, ep);
-                    }
-                }
-                
-                return validationType;
-            }
-        }
-        
-        // else
         return null;
     }
-    
+
+    private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
+        Exchange exchange = message.getExchange();
+        SchemaValidationType validationType = null;
+
+        if (exchange != null) {
+
+            BindingOperationInfo boi = exchange.getBindingOperationInfo();
+            if (boi != null) {
+                OperationInfo opInfo = boi.getOperationInfo();
+                if (opInfo != null) {
+                    validationType = getSchemaValidationTypeFromModel(opInfo);
+                }
+            }
+
+            if (validationType == null) {
+                Endpoint endpoint = exchange.getEndpoint();
+                if (endpoint != null) {
+                    EndpointInfo ep = endpoint.getEndpointInfo();
+                    if (ep != null) {
+                        validationType = getSchemaValidationTypeFromModel(ep);
+                    }
+                }
+            }
+        }
+
+        return validationType;
+    }
+
     private static SchemaValidationType getSchemaValidationTypeFromModel(
-            Message message, AbstractPropertiesHolder properties) {
+        AbstractPropertiesHolder properties) {
         Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
         if (obj != null) {
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
+        return null;
     }
-    
+
     public static SchemaValidationType getSchemaValidationType(Object obj) {
         if (obj instanceof SchemaValidationType) {
             return (SchemaValidationType)obj;
-        } else if (obj != null) { 
+        } else if (obj != null) {
             String value = obj.toString().toUpperCase(); // handle boolean values as well
             if ("TRUE".equals(value)) {
                 return SchemaValidationType.BOTH;
@@ -150,15 +156,15 @@ public final class ServiceUtils {
                 return SchemaValidationType.valueOf(value);
             }
         }
-        
+
         // fall through default value
         return SchemaValidationType.NONE;
     }
-    
+
     /**
      * Generates a suitable service name from a given class. The returned name
      * is the simple name of the class, i.e. without the package name.
-     * 
+     *
      * @param clazz the class.
      * @return the name.
      */
@@ -210,7 +216,7 @@ public final class ServiceUtils {
      * <code>org.codehaus.xfire.services.Echo</code>, and the protocol is
      * <code>http</code>, the resulting namespace would be
      * <code>http://services.xfire.codehaus.org</code>.
-     * 
+     *
      * @param className the class name
      * @param protocol the protocol (eg. <code>http</code>)
      * @return the namespace
@@ -249,7 +255,7 @@ public final class ServiceUtils {
 
     /**
      * Method makePackageName
-     * 
+     *
      * @param namespace
      */
     public static String makePackageName(String namespace) {
@@ -317,7 +323,7 @@ public final class ServiceUtils {
      * Massage <tt>word</tt> into a form suitable for use in a Java package
      * name. Append it to the target string buffer with a <tt>.</tt> delimiter
      * iff <tt>word</tt> is not the first word in the package name.
-     * 
+     *
      * @param sb the buffer to append to
      * @param word the word to append
      * @param firstWord a flag indicating whether this is the first word

@@ -31,18 +31,18 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
-public class ClientResponseContextImpl extends AbstractResponseContextImpl 
+public class ClientResponseContextImpl extends AbstractResponseContextImpl
     implements ClientResponseContext {
 
-    public ClientResponseContextImpl(ResponseImpl r, 
+    public ClientResponseContextImpl(ResponseImpl r,
                                      Message m) {
         super(r, m);
     }
-    
+
     public InputStream getEntityStream() {
         InputStream is = m.getContent(InputStream.class);
         if (is == null) {
-            is = ((ResponseImpl)r).convertEntityToStreamIfPossible();
+            is = r.convertEntityToStreamIfPossible();
         }
         return is;
     }
@@ -52,16 +52,20 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
         return HttpUtils.getModifiableStringHeaders(m);
     }
 
-    
+
     @Override
     public void setEntityStream(InputStream is) {
         m.setContent(InputStream.class, is);
         r.setEntity(is, r.getEntityAnnotations());
 
     }
-    
+
     @Override
-    public boolean hasEntity() { 
+    public boolean hasEntity() {
+        // Is Content-Length is explicitly set to 0 ?
+        if (HttpUtils.isPayloadEmpty(getHeaders())) {
+            return false;
+        }
         try {
             return !IOUtils.isEmpty(getEntityStream());
         } catch (IOException ex) {

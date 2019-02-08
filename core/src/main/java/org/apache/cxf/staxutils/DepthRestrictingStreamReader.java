@@ -29,39 +29,39 @@ import javax.xml.stream.XMLStreamReader;
  * - total number of elements in the document
  * - the maximum depth of the given element; the root element will be checked by default
  * - the maximum number of immediate child nodes for individual elements
- * 
- * More sophisticated policies can be supported in the future.      
+ *
+ * More sophisticated policies can be supported in the future.
  */
 public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
-    
+
     private DocumentDepthProperties props;
     private int totalElementCount;
-    private Stack<Integer> stack = new Stack<Integer>();
-    
+    private Stack<Integer> stack = new Stack<>();
+
     public DepthRestrictingStreamReader(XMLStreamReader reader,
                                         int elementCountThreshold,
                                         int innerElementLevelThreshold,
                                         int innerElementCountThreshold) {
-        this(reader, new DocumentDepthProperties(elementCountThreshold, 
+        this(reader, new DocumentDepthProperties(elementCountThreshold,
                                                  innerElementLevelThreshold,
                                                  innerElementCountThreshold));
     }
-    
+
     public DepthRestrictingStreamReader(XMLStreamReader reader,
                                         DocumentDepthProperties props) {
         super(reader);
         this.props = props;
     }
-    
+
     @Override
     public int next() throws XMLStreamException {
         int next = super.next();
         if (next == START_ELEMENT) {
-            if (props.getInnerElementLevelThreshold() != -1 
+            if (props.getInnerElementLevelThreshold() != -1
                 && getDepth() >= props.getInnerElementLevelThreshold()) {
                 throw new DepthExceededStaxException();
             }
-            if (props.getElementCountThreshold() != -1 
+            if (props.getElementCountThreshold() != -1
                 && ++totalElementCount >= props.getElementCountThreshold()) {
                 throw new DepthExceededStaxException();
             }
@@ -70,13 +70,12 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                     int currentCount = stack.pop();
                     if (++currentCount >= props.getInnerElementCountThreshold()) {
                         throw new DepthExceededStaxException();
-                    } else {
-                        stack.push(currentCount);
                     }
-                } 
+                    stack.push(currentCount);
+                }
                 stack.push(0);
             }
-            
+
         } else if (next == END_ELEMENT && props.getInnerElementCountThreshold() != -1) {
             stack.pop();
         }

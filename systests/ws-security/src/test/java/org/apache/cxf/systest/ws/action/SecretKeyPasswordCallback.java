@@ -27,7 +27,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 public class SecretKeyPasswordCallback implements CallbackHandler {
-    
+
     private static final byte[] KEY = {
         (byte)0x31, (byte)0xfd,
         (byte)0xcb, (byte)0xda,
@@ -42,7 +42,7 @@ public class SecretKeyPasswordCallback implements CallbackHandler {
         (byte)0xc8, (byte)0x51,
         (byte)0x34, (byte)0x04,
     };
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
@@ -51,5 +51,5 @@ public class SecretKeyPasswordCallback implements CallbackHandler {
             }
         }
     }
-    
+
 }

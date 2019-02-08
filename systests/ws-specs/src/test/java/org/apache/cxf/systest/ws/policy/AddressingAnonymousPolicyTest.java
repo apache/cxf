@@ -28,18 +28,22 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests the use of the WS-Policy Framework to automatically engage WS-Addressing and
@@ -47,8 +51,8 @@ import org.junit.Test;
  */
 public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString(); 
-    
+    public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
+
     private static final Logger LOG = LogUtils.getLogger(AddressingAnonymousPolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
@@ -59,11 +63,11 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         public Server(String dir) {
             tmpDir = dir;
         }
-        public Server(String args[]) {
+        public Server(String[] args) {
             tmpDir = args[0];
         }
         protected void run()  {
-            
+
             System.setProperty("server.temp.location", tmpDir);
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-anon-server.xml");
@@ -75,30 +79,30 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
             LoggingOutInterceptor out = new LoggingOutInterceptor();
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             ep = Endpoint.publish(address, implementor);
-            LOG.info("Published greeter endpoint.");            
+            LOG.info("Published greeter endpoint.");
         }
         public void tearDown() {
             ep.stop();
             ep = null;
         }
-        
+
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(args[0]); 
+            try {
+                Server s = new Server(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -108,7 +112,7 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         assertTrue("server did not launch correctly", launchServer(Server.class, null,
                                                                    new String[] {TEMPDIR}));
     }
-         
+
     @Test
     public void testUsingAddressing() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -120,11 +124,11 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-        
+
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        LOG.fine("Created greeter client.");     
+        LOG.fine("Created greeter client.");
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
         // oneway
@@ -133,16 +137,16 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
 
         // two-way
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
-     
+        assertEquals("CXF", greeter.greetMe("cxf"));
+
         // exception
 
         try {
             greeter.pingMe();
         } catch (PingMeFault ex) {
             fail("First invocation should have succeeded.");
-        } 
-       
+        }
+
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
@@ -151,6 +155,6 @@ public class AddressingAnonymousPolicyTest extends AbstractBusClientServerTestBa
             assertEquals(1, ex.getFaultInfo().getMinor());
         }
         ((Closeable)greeter).close();
-        
+
     }
 }

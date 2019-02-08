@@ -19,7 +19,9 @@
 package org.apache.cxf.binding.corba;
 
 import java.net.URL;
+
 import javax.xml.namespace.QName;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
@@ -29,13 +31,13 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
-public class TestUtils { 
-    
+public class TestUtils {
+
     protected static Bus bus;
     protected CorbaBindingFactory factory;
     protected EndpointInfo endpointInfo;
-    
-    public TestUtils() {     
+
+    public TestUtils() {
         bus = BusFactory.getDefaultBus();
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         try {
@@ -43,35 +45,35 @@ public class TestUtils {
                        "http://cxf.apache.org/bindings/corba");
             bfm.registerBindingFactory(CorbaConstants.NU_WSDL_CORBA, factory);
         } catch (BusException ex) {
-            ex.printStackTrace();            
+            ex.printStackTrace();
         }
-    }        
-    
+    }
+
     public EndpointInfo setupServiceInfo(String ns, String wsdl,
-                                         String serviceName, String portName) throws Exception {      
+                                         String serviceName, String portName) throws Exception {
         URL wsdlUrl = getClass().getResource(wsdl);
         WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl.toString(),
                                                       new QName(ns, serviceName));
 
         Service service = f.create();
         return service.getEndpointInfo(new QName(ns, portName));
-    }                  
+    }
 
     public CorbaDestination getExceptionTypesTestDestination() throws Exception {
         endpointInfo = setupServiceInfo("http://schemas.apache.org/idl/except",
-                                                     "/wsdl_corbabinding/exceptions.wsdl", 
+                                                     "/wsdl_corbabinding/exceptions.wsdl",
                                                      "ExceptionTestCORBAService",
                                                      "ExceptionTestCORBAPort");
         CorbaBindingFactory corbaBF = factory;
-        return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);        
+        return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);
     }
-    
+
     public CorbaDestination getComplexTypesTestDestination() throws Exception {
         endpointInfo = setupServiceInfo("http://cxf.apache.org/bindings/corba/ComplexTypes",
                                                      "/wsdl_corbabinding/ComplexTypes.wsdl",
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
-        CorbaBindingFactory corbaBF = factory;        
+        CorbaBindingFactory corbaBF = factory;
         return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);
     }
     public CorbaDestination getComplexTypesTestDestinationYoko() throws Exception {
@@ -79,7 +81,7 @@ public class TestUtils {
                                                      "/wsdl_corbabinding/ComplexTypesYoko.wsdl",
                                                      "ComplexTypesCORBAService",
                                                      "ComplexTypesCORBAPort");
-        CorbaBindingFactory corbaBF = factory;        
+        CorbaBindingFactory corbaBF = factory;
         return (CorbaDestination)corbaBF.getDestination(endpointInfo, bus);
     }
 

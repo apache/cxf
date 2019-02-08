@@ -20,6 +20,7 @@
 package org.apache.cxf.security.transport;
 
 import java.security.cert.Certificate;
+
 import javax.net.ssl.SSLSession;
 
 /**
@@ -32,7 +33,7 @@ public class TLSSessionInfo {
     private final SSLSession sslSession;
     private final Certificate[] peerCertificates;
     private final String cipherSuite;
-    
+
     /**
      * This constructor has the effect of calling
      * TLSSessionInfo(null, suite)
@@ -42,7 +43,7 @@ public class TLSSessionInfo {
     ) {
         this(suite, null, null);
     }
-    
+
     /**
      * @param       suite
      *              The negotiated cipher suite
@@ -75,7 +76,7 @@ public class TLSSessionInfo {
     public final String getChipherSuite() {
         return cipherSuite;
     }
-    
+
     /**
      * @return      the negotiated cipher suite.  This attribute is
      *              guaranteed to be non-null.

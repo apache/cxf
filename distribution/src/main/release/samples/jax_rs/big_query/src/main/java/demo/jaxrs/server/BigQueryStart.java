@@ -24,7 +24,7 @@ public class BigQueryStart {
     public BigQueryStart(String userName) {
         this.userName = userName;
     }
-    
+
     public String getUserName() {
         return userName;
     }

@@ -26,7 +26,7 @@ import org.apache.cxf.hello_world.discovery.Greeter;
 import org.apache.cxf.hello_world.discovery.PingMeFault;
 
 /**
- * 
+ *
  */
 @WebService(endpointInterface = "org.apache.cxf.hello_world.discovery.Greeter",
     wsdlLocation = "classpath:/org/apache/cxf/hello_world/discovery/hello_world.wsdl",

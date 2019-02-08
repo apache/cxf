@@ -35,12 +35,12 @@ public class Service {
     String activeMqUrl = "vm:(broker:(tcp://localhost:6000)?persistent=false)";
     String userName;
     String password;
-    
+
     boolean jmxEnable = true;
 
     AbstractCreatePullPoint createPullPointServer;
     AbstractNotificationBroker notificationBrokerServer;
-    
+
     public Service(String[] args) {
         for (int x = 0; x < args.length; x++) {
             if ("-brokerUrl".equals(args[x])) {
@@ -55,7 +55,7 @@ public class Service {
                 jmxEnable = Boolean.valueOf(args[++x]);
             }
         }
-        
+
     }
 
     /**
@@ -63,7 +63,7 @@ public class Service {
      */
     public static void main(String[] args) throws Exception {
         new Service(args).start();
-        
+
     }
 
     public void start() throws Exception {
@@ -76,15 +76,15 @@ public class Service {
         createPullPointServer = new JaxwsCreatePullPoint("CreatePullPoint", activemq);
         createPullPointServer.setAddress(rootURL + "/CreatePullPoint");
         createPullPointServer.init();
-        
+
         if (jmxEnable) {
-            
+
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            
+
             mbs.registerMBean(notificationBrokerServer, notificationBrokerServer.getMBeanName());
-            
+
             mbs.registerMBean(createPullPointServer, createPullPointServer.getMBeanName());
-       
+
         }
     }
 

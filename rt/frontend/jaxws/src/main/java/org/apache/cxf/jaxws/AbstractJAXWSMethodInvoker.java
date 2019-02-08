@@ -65,11 +65,11 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     public AbstractJAXWSMethodInvoker(final Object bean) {
         super(new SingletonFactory(bean));
     }
-    
+
     public AbstractJAXWSMethodInvoker(Factory factory) {
         super(factory);
     }
-    
+
     protected SOAPFaultException findSoapFaultException(Throwable ex) {
         if (ex instanceof SOAPFaultException) {
             return (SOAPFaultException)ex;
@@ -86,13 +86,13 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         // If class implements Provider<T> interface, use overriden method from service object class
         // to check UseAsyncMethod annotation
         Method mso = getProviderServiceObjectMethod(mOriginal, serviceObjectClass);
-        
+
         UseAsyncMethod uam = mso.getAnnotation(UseAsyncMethod.class);
         if (uam != null) {
             BindingOperationInfo bop = ex.getBindingOperationInfo();
             Method ret = bop.getProperty(ASYNC_METHOD, Method.class);
             if (ret == null) {
-                Class<?> ptypes[] = new Class<?>[mso.getParameterTypes().length + 1];
+                Class<?>[] ptypes = new Class<?>[mso.getParameterTypes().length + 1];
                 System.arraycopy(mso.getParameterTypes(), 0, ptypes, 0, mso.getParameterTypes().length);
                 ptypes[mso.getParameterTypes().length] = AsyncHandler.class;
                 try {
@@ -105,7 +105,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             if (ret != null) {
                 JaxwsServerHandler h = ex.get(JaxwsServerHandler.class);
                 if (h != null) {
-                    return ret; 
+                    return ret;
                 }
                 ContinuationProvider cp = ex.getInMessage().get(ContinuationProvider.class);
                 // Check for decoupled endpoints: if partial response already was sent, ignore continuation
@@ -128,7 +128,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         }
         return mOriginal;
     }
-    
+
     private Method getProviderServiceObjectMethod(Method m, Class<?> serviceObjectClass) {
         if (!Provider.class.isAssignableFrom(serviceObjectClass)) {
             return m;
@@ -176,11 +176,11 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         Response<Object> r;
         Continuation continuation;
         boolean done;
-        
+
         JaxwsServerHandler(Continuation c) {
             continuation = c;
         }
-        
+
         public synchronized void handleResponse(Response<Object> res) {
             r = res;
             done = true;
@@ -208,9 +208,9 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             return r.get();
         }
     }
-    
+
     @Override
-    protected Object invoke(Exchange exchange, 
+    protected Object invoke(Exchange exchange,
                             final Object serviceObject, Method m,
                             List<Object> params) {
         JaxwsServerHandler h = exchange.get(JaxwsServerHandler.class);
@@ -222,8 +222,8 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             try {
                 return new MessageContentsList(h.getObject());
             } catch (ExecutionException ex) {
-                exchange.getInMessage().put(FaultMode.class, 
-                                            FaultMode.CHECKED_APPLICATION_FAULT);                    
+                exchange.getInMessage().put(FaultMode.class,
+                                            FaultMode.CHECKED_APPLICATION_FAULT);
                 throw createFault(ex.getCause(), m, params, true);
             } catch (Exception ex) {
                 throw createFault(ex.getCause(), m, params, false);
@@ -239,8 +239,8 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             try {
                 return new MessageContentsList(h.getObject());
             } catch (ExecutionException ex) {
-                exchange.getInMessage().put(FaultMode.class, 
-                                            FaultMode.CHECKED_APPLICATION_FAULT);                    
+                exchange.getInMessage().put(FaultMode.class,
+                                            FaultMode.CHECKED_APPLICATION_FAULT);
                 throw createFault(ex.getCause(), m, params, true);
             } catch (Exception ex) {
                 throw createFault(ex.getCause(), m, params, false);
@@ -248,7 +248,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         }
         return o;
     }
-    
+
     @Override
     protected Fault createFault(Throwable ex, Method m, List<Object> params, boolean checked) {
         //map the JAX-WS faults
@@ -261,15 +261,15 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
             if (sfe.getFault().hasDetail()) {
                 fault.setDetail(sfe.getFault().getDetail());
             }
-            
+
             return fault;
         }
         return super.createFault(ex, m, params, checked);
     }
-    
+
     protected Map<String, Object> removeHandlerProperties(WrappedMessageContext ctx) {
         Map<String, Scope> scopes = CastUtils.cast((Map<?, ?>)ctx.get(WrappedMessageContext.SCOPES));
-        Map<String, Object> handlerScopedStuff = new HashMap<String, Object>();
+        Map<String, Object> handlerScopedStuff = new HashMap<>();
         if (scopes != null) {
             for (Map.Entry<String, Scope> scope : scopes.entrySet()) {
                 if (scope.getValue() == Scope.HANDLER) {
@@ -282,14 +282,14 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         }
         return handlerScopedStuff;
     }
-    
+
     protected void addHandlerProperties(WrappedMessageContext ctx,
                                         Map<String, Object> handlerScopedStuff) {
         for (Map.Entry<String, Object> key : handlerScopedStuff.entrySet()) {
             ctx.put(key.getKey(), key.getValue(), Scope.HANDLER);
         }
     }
-   
+
     private Message createResponseMessage(Exchange exchange) {
         if (exchange == null) {
             return null;
@@ -308,7 +308,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     protected void updateWebServiceContext(Exchange exchange, MessageContext ctx) {
         // Guard against wrong type associated with header list.
         // Need to copy header only if the message is going out.
-        if (ctx.containsKey(Header.HEADER_LIST) 
+        if (ctx.containsKey(Header.HEADER_LIST)
                 && ctx.get(Header.HEADER_LIST) instanceof List<?>) {
             List<?> list = (List<?>) ctx.get(Header.HEADER_LIST);
             if (list != null && !list.isEmpty()) {
@@ -336,7 +336,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
     }
 
     protected void updateHeader(Exchange exchange, MessageContext ctx) {
-        if (ctx.containsKey(Header.HEADER_LIST) 
+        if (ctx.containsKey(Header.HEADER_LIST)
                 && ctx.get(Header.HEADER_LIST) instanceof List<?>) {
             List<?> list = (List<?>) ctx.get(Header.HEADER_LIST);
             if (list != null && !list.isEmpty()) {
@@ -347,10 +347,10 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
                         Header header = (Header) iter.next();
                         if (header.getDirection() != Header.Direction.DIRECTION_IN
                             && !header.getName().getNamespaceURI().
-                                equals("http://docs.oasis-open.org/wss/2004/01/" 
+                                equals("http://docs.oasis-open.org/wss/2004/01/"
                                         + "oasis-200401-wss-wssecurity-secext-1.0.xsd")
                                    && !header.getName().getNamespaceURI().
-                                       equals("http://docs.oasis-open.org/" 
+                                       equals("http://docs.oasis-open.org/"
                                               + "wss/oasis-wss-wssecurity-secext-1.1.xsd")) {
                             //don't copy over security header, out interceptor chain will take care of it.
                             sm.getHeaders().add(header);

@@ -27,14 +27,14 @@ import demo.hw.server.Server;
 
 
 /**
- * 
+ *
  */
 public class TestAegisSample {
     @BeforeClass
     public static void startServer() throws Exception {
         Server.startServer();
     }
-    
+
     @Test
     public void testClient() throws Exception {
         Client.main(null);

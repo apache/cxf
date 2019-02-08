@@ -22,9 +22,14 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * 
+ *
  */
 public class ProxyHelper {
     static final ProxyHelper HELPER;
@@ -37,11 +42,16 @@ public class ProxyHelper {
         }
         HELPER = theHelper;
     }
+   
+    private static final Logger LOG = LogUtils.getL7dLogger(ProxyHelper.class);
     
+    protected ProxyClassLoaderCache proxyClassLoaderCache = 
+        new ProxyClassLoaderCache();
+      
     
     protected ProxyHelper() {
     }
-    
+
     protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
         ClassLoader combinedLoader = getClassLoaderForInterfaces(loader, interfaces);
         return Proxy.newProxyInstance(combinedLoader, interfaces, handler);
@@ -50,21 +60,49 @@ public class ProxyHelper {
     /**
      * Return a classloader that can see all the given interfaces If the given loader can see all interfaces
      * then it is used. If not then a combined classloader of all interface classloaders is returned.
-     * 
+     *
      * @param loader use supplied class loader
      * @param interfaces
      * @return classloader that sees all interfaces
      */
-    private ClassLoader getClassLoaderForInterfaces(ClassLoader loader, Class<?>[] interfaces) {
+    private ClassLoader getClassLoaderForInterfaces(final ClassLoader loader, final Class<?>[] interfaces) {
         if (canSeeAllInterfaces(loader, interfaces)) {
+            LOG.log(Level.FINE, "current classloader " + loader + " can see all interface");
             return loader;
         }
-        ProxyClassLoader combined = new ProxyClassLoader(loader, interfaces);
-        for (Class<?> currentInterface : interfaces) {
-            combined.addLoader(currentInterface.getClassLoader());
+        String sortedNameFromInterfaceArray = getSortedNameFromInterfaceArray(interfaces);
+        ClassLoader cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+        if (canSeeAllInterfaces(cachedLoader, interfaces)) {
+            LOG.log(Level.FINE, "find required loader from ProxyClassLoader cache with key" 
+                 + sortedNameFromInterfaceArray);
+            return cachedLoader;
+        } else {
+            LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache with interfaces " 
+                + sortedNameFromInterfaceArray
+                + " but can't see all interfaces");
+            for (Class<?> currentInterface : interfaces) {
+                String ifName = currentInterface.getName();
+                
+                if (!ifName.startsWith("org.apache.cxf") && !ifName.startsWith("java")) {
+                    // remove the stale ProxyClassLoader and recreate one
+                    proxyClassLoaderCache.removeStaleProxyClassLoader(currentInterface);
+                    cachedLoader = proxyClassLoaderCache.getProxyClassLoader(loader, interfaces);
+                    
+                }
+            }
         }
-        return combined;
+               
+        return cachedLoader;
     }
+    
+    private String getSortedNameFromInterfaceArray(Class<?>[] interfaces) {
+        SortedArraySet<String> arraySet = new SortedArraySet<String>();
+        for (Class<?> currentInterface : interfaces) {
+            arraySet.add(currentInterface.getName() + ClassLoaderUtils.getClassLoaderName(currentInterface));
+        }
+        return arraySet.toString();
+    }
+
 
     private boolean canSeeAllInterfaces(ClassLoader loader, Class<?>[] interfaces) {
         for (Class<?> currentInterface : interfaces) {
@@ -74,7 +112,7 @@ public class ProxyHelper {
                 if (ifClass != currentInterface) {
                     return false;
                 }
-                //we need to check all the params/returns as well as the Proxy creation 
+                //we need to check all the params/returns as well as the Proxy creation
                 //will try to create methods for all of this even if they aren't used
                 //by the client and not available in the clients classloader
                 for (Method m : ifClass.getMethods()) {
@@ -88,9 +126,7 @@ public class ProxyHelper {
                         }
                     }
                 }
-            } catch (NoClassDefFoundError e) {
-                return false;
-            } catch (ClassNotFoundException e) {
+            } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return false;
             }
         }
@@ -100,4 +136,5 @@ public class ProxyHelper {
     public static Object getProxy(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
         return HELPER.getProxyInternal(loader, interfaces, handler);
     }
+    
 }

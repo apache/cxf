@@ -28,14 +28,14 @@ public class CustomXmlStreamWriter extends DelegatingXMLStreamWriter {
     public CustomXmlStreamWriter(XMLStreamWriter writer) {
         super(writer);
     }
-    
+
     @Override
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-        
+
         super.writeStartElement("b", local, "");
         if ("Book".equals(local)) {
             super.writeNamespace("b", "http://www.w3.org/1999/xhtml");
         }
     }
-    
+
 }

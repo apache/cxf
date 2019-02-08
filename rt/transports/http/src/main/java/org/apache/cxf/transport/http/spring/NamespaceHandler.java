@@ -22,13 +22,13 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("conduit", 
-                new HttpConduitBeanDefinitionParser());        
-        registerBeanDefinitionParser("trustDecider", 
-                new MessageTrustDeciderBeanDefinitionParser());        
-        registerBeanDefinitionParser("authSupplier", 
+        registerBeanDefinitionParser("conduit",
+                new HttpConduitBeanDefinitionParser());
+        registerBeanDefinitionParser("trustDecider",
+                new MessageTrustDeciderBeanDefinitionParser());
+        registerBeanDefinitionParser("authSupplier",
                 new HttpAuthSupplierBeanDefinitionParser());
-        registerBeanDefinitionParser("destination", 
-                new HttpDestinationBeanDefinitionParser());        
+        registerBeanDefinitionParser("destination",
+                new HttpDestinationBeanDefinitionParser());
     }
 }

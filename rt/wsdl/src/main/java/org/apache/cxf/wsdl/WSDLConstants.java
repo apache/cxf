@@ -25,7 +25,7 @@ public final class WSDLConstants {
 
     public static final String WSDL_PREFIX = "wsdl";
     public static final String NS_WSDL11 = "http://schemas.xmlsoap.org/wsdl/";
-    
+
 
     public static final String NP_XMLNS = "xmlns";
     public static final String NS_XMLNS = "http://www.w3.org/2000/xmlns/";
@@ -41,10 +41,10 @@ public final class WSDLConstants {
     // XML Schema instance
     public static final String NP_SCHEMA_XSI = "xsi";
     public static final String NS_SCHEMA_XSI = "http://www.w3.org/2001/XMLSchema-instance";
-    
+
     public static final String A_XSI_TYPE = "type";
     public static final String A_XSI_NIL = "nil";
-    
+
     // XML Schema attribute names
     public static final QName NA_XSI_TYPE = new QName(NP_SCHEMA_XSI, A_XSI_TYPE, NS_SCHEMA_XSI);
     public static final QName NA_XSI_NIL = new QName(NP_SCHEMA_XSI, A_XSI_NIL, NS_SCHEMA_XSI);
@@ -56,10 +56,10 @@ public final class WSDLConstants {
     public static final String NS_SOAP12 = "http://schemas.xmlsoap.org/wsdl/soap12/";
     public static final String SOAP11_PREFIX = "soap";
     public static final String SOAP12_PREFIX = "soap12";
-    
+
     public static final String NS_SOAP_HTTP_TRANSPORT = "http://schemas.xmlsoap.org/soap/http";
     public static final String NS_SOAP11_HTTP_TRANSPORT = "http://schemas.xmlsoap.org/soap/http";
-    
+
     public static final QName QNAME_SOAP_BINDING = new QName(NS_SOAP, "binding");
     public static final QName QNAME_SOAP_OPERATION = new QName(NS_SOAP, "operation");
     public static final QName QNAME_SOAP_BODY = new QName(NS_SOAP, "body");
@@ -68,10 +68,10 @@ public final class WSDLConstants {
 
 
     public static final String NS_SOAP12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
-    
+
     public static final QName QNAME_SOAP12_BINDING = new QName(NS_SOAP12, "binding");
     public static final QName QNAME_SOAP12_BINDING_ADDRESS = new QName(NS_SOAP12, "address");
-    
+
 
     public static final String DOCUMENT = "document";
     public static final String RPC = "rpc";
@@ -110,9 +110,9 @@ public final class WSDLConstants {
     public static final int ERORR_STYLE_USE = -1;
 
     public static final String NS_BINDING_XML = "http://cxf.apache.org/bindings/xformat";
-    public static final QName QNAME_XMLHTTP_BINDING_ADDRESS = 
+    public static final QName QNAME_XMLHTTP_BINDING_ADDRESS =
         new QName("http://schemas.xmlsoap.org/wsdl/http/", "address");
-    
+
     public static final String ATTR_TRANSPORT = "transport";
     public static final String ATTR_LOCATION = "location";
     public static final String ATTR_NAME = "name";
@@ -120,7 +120,7 @@ public final class WSDLConstants {
     public static final String ATTR_TNS = "targetNamespace";
     // usual prefix for the targetNamespace.
     public static final String CONVENTIONAL_TNS_PREFIX = "tns";
-    
+
     public static final String WSDL11 = "1.1";
     public static final String WSDL20 = "2.0";
 
@@ -132,7 +132,7 @@ public final class WSDLConstants {
 
     private WSDLConstants() {
     }
-    
+
     public static WSDLVersion getVersion(String version) {
         if (WSDL11.equals(version)) {
             return WSDLVersion.WSDL11;
@@ -142,5 +142,5 @@ public final class WSDLConstants {
         }
         return WSDLVersion.UNKNOWN;
     }
-    
+
 }

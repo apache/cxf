@@ -49,7 +49,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceFactory.class);
 
     protected final String wsdlUrl;
-    
+
     private QName serviceName;
     private QName endpointName;
     private Definition definition;
@@ -89,7 +89,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
         serviceName = sn;
     }
-    
+
     public void setAllowElementRefs(boolean b) {
         allowRefs = b;
     }
@@ -97,11 +97,11 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
-    
+
     public Definition getDefinition() {
         return definition;
     }
-    
+
     public Service create() {
 
         List<ServiceInfo> services;
@@ -113,17 +113,16 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }
-            if (services.size() == 0) {
+            if (services.isEmpty()) {
                 throw new ServiceConstructionException(new Message("NO_SERVICE_EXC", LOG));
-            } else {
-                //@@TODO  - this isn't good, need to return all the services
-                serviceName = services.get(0).getName();
-                //get all the service info's that match that first one.
-                Iterator<ServiceInfo> it = services.iterator();
-                while (it.hasNext()) {
-                    if (!it.next().getName().equals(serviceName)) {
-                        it.remove();
-                    }
+            }
+            //@@TODO  - this isn't good, need to return all the services
+            serviceName = services.get(0).getName();
+            //get all the service info's that match that first one.
+            Iterator<ServiceInfo> it = services.iterator();
+            while (it.hasNext()) {
+                if (!it.next().getName().equals(serviceName)) {
+                    it.remove();
                 }
             }
         } else {
@@ -133,7 +132,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                     && (!PartialWSDLProcessor.isBindingExisted(definition, serviceName))
                     && (PartialWSDLProcessor.isPortTypeExisted(definition, serviceName))) {
                     try {
-                        Map<QName, PortType> portTypes = CastUtils.cast(definition.getPortTypes());
+                        Map<QName, PortType> portTypes = CastUtils.cast(definition.getAllPortTypes());
                         String existPortName = null;
                         PortType portType = null;
                         for (Map.Entry<QName, PortType> entry : portTypes.entrySet()) {
@@ -145,10 +144,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                         }
                         WSDLFactory factory = WSDLFactory.newInstance();
                         ExtensionRegistry extReg = factory.newPopulatedExtensionRegistry();
-                        Binding binding = PartialWSDLProcessor.doAppendBinding(definition, 
+                        Binding binding = PartialWSDLProcessor.doAppendBinding(definition,
                                                                                existPortName, portType, extReg);
                         definition.addBinding(binding);
-                        wsdlService = PartialWSDLProcessor.doAppendService(definition, 
+                        wsdlService = PartialWSDLProcessor.doAppendService(definition,
                                                                            existPortName, extReg, binding);
                         definition.addService(wsdlService);
                     } catch (Exception e) {
@@ -159,10 +158,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 }
             }
             try {
-                services = new WSDLServiceBuilder(getBus()).buildServices(definition, 
+                services = new WSDLServiceBuilder(getBus()).buildServices(definition,
                                                                           wsdlService,
                                                                           endpointName);
-                if (services.size() == 0) {
+                if (services.isEmpty()) {
                     throw new ServiceConstructionException(
                         new Message("NO_SUCH_ENDPOINT_EXC", LOG, endpointName));
                 }

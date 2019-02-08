@@ -27,34 +27,38 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.PolicyException;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 /**
- * 
+ *
  */
-public class DomainExpressionBuilderRegistryTest extends Assert {
+public class DomainExpressionBuilderRegistryTest {
 
     private IMocksControl control;
-    
-    
+
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testNoBuilder() {
         DomainExpressionBuilderRegistry reg = new DomainExpressionBuilderRegistry();
         assertEquals(DomainExpressionBuilderRegistry.class, reg.getRegistrationType());
-        
-        Element e = control.createMock(Element.class); 
+
+        Element e = control.createMock(Element.class);
         EasyMock.expect(e.getNamespaceURI()).andReturn("http://a.b.c");
         EasyMock.expect(e.getLocalName()).andReturn("x");
-        
+
         control.replay();
         try {
             reg.build(e);
@@ -63,25 +67,25 @@ public class DomainExpressionBuilderRegistryTest extends Assert {
             // expected
         }
         control.verify();
-        
+
     }
-    
+
     @Test
     public void testBuild() {
         DomainExpressionBuilder builder = control.createMock(DomainExpressionBuilder.class);
-        Map<QName, DomainExpressionBuilder> builders = new HashMap<QName, DomainExpressionBuilder>();
+        Map<QName, DomainExpressionBuilder> builders = new HashMap<>();
         QName qn = new QName("http://a.b.c", "x");
         builders.put(qn, builder);
         DomainExpressionBuilderRegistry reg = new DomainExpressionBuilderRegistry(builders);
-        
-        Element e = control.createMock(Element.class); 
+
+        Element e = control.createMock(Element.class);
         EasyMock.expect(e.getNamespaceURI()).andReturn("http://a.b.c");
         EasyMock.expect(e.getLocalName()).andReturn("x");
-        DomainExpression de = control.createMock(DomainExpression.class); 
+        DomainExpression de = control.createMock(DomainExpression.class);
         EasyMock.expect(builder.build(e)).andReturn(de);
-        
+
         control.replay();
         assertSame(de, reg.build(e));
-        control.verify();     
+        control.verify();
     }
 }

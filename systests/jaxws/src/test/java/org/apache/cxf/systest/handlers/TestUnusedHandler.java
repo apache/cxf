@@ -23,25 +23,25 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
 
-public class TestUnusedHandler<T extends LogicalMessageContext> 
+public class TestUnusedHandler<T extends LogicalMessageContext>
     extends TestHandlerBase implements LogicalHandler<T> {
-    
+
     public TestUnusedHandler() {
-        this(true); 
-    } 
-    
+        this(true);
+    }
+
     public TestUnusedHandler(boolean serverSide) {
         super(serverSide);
     }
-    
-    public String getHandlerId() { 
+
+    public String getHandlerId() {
         return "handler" + getId();
-    } 
+    }
 
     public boolean handleMessage(T ctx) {
         throw new RuntimeException("should not be called");
     }
-    
+
     public boolean handleFault(LogicalMessageContext ctx) {
         return true;
     }
@@ -54,7 +54,7 @@ public class TestUnusedHandler<T extends LogicalMessageContext>
         methodCalled("destroy");
     }
 
-    public String toString() { 
-        return getHandlerId(); 
-    } 
-}    
+    public String toString() {
+        return getHandlerId();
+    }
+}

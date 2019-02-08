@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.ws;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,38 +28,57 @@ import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
 
-    protected ByteArrayOutputStream setupInLogging() {
+    static class PayloadLogEventSender implements LogEventSender {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(bos, true);
-        LoggingInInterceptor in = new LoggingInInterceptor(writer);
+
+        @Override
+        public void send(LogEvent event) {
+            try {
+                bos.write(("Address: " + event.getAddress()).getBytes("utf8"));
+                bos.write(("Headers: " + event.getHeaders().toString()).getBytes("utf8"));
+                bos.write(("Payload: " + event.getPayload()).getBytes("utf8"));
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    protected ByteArrayOutputStream setupInLogging() {
+        PayloadLogEventSender sender = new PayloadLogEventSender();
+        LoggingInInterceptor in = new LoggingInInterceptor(sender);
         this.bus.getInInterceptors().add(in);
-        return bos;
+        this.bus.getInFaultInterceptors().add(in);
+        return sender.bos;
     }
 
     protected ByteArrayOutputStream setupOutLogging() {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(bos, true);
-
-        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        PayloadLogEventSender sender = new PayloadLogEventSender();
+        LoggingOutInterceptor out = new LoggingOutInterceptor(sender);
         this.bus.getOutInterceptors().add(out);
-
-        return bos;
+        this.bus.getOutFaultInterceptors().add(out);
+        return sender.bos;
     }
-    
-    
+
+
     protected String getLogValue(String log, String xpath) throws XMLStreamException {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
-        
-        Map<String, String> ns = new HashMap<String, String>();
+
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         XPathUtils xpathu = new XPathUtils(ns);
@@ -69,8 +87,8 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
     protected void assertLogNotContains(String log, String xpath) throws XMLStreamException {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
-        
-        Map<String, String> ns = new HashMap<String, String>();
+
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         XPathUtils xpathu = new XPathUtils(ns);

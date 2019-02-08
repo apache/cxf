@@ -33,375 +33,377 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class InTransformReaderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class InTransformReaderTest {
 
     @Test
     public void testReadWithDefaultNamespace() throws Exception {
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                         Collections.singletonMap("{http://bar}test", "test2"),
                                         null, null, null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
-        assertTrue("<test2 xmlns=\"\"/>".equals(value));        
+        assertTrue("<test2 xmlns=\"\"/>".equals(value));
     }
-    
+
     @Test
     public void testReplaceSimpleElement() throws Exception {
         InputStream is = new ByteArrayInputStream(
                 "<ns:test xmlns:ns=\"http://bar\"><ns:a>1</ns:a></ns:test>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                         null,
                                         Collections.singletonMap("{http://bar}a", "{http://bar}a=1 2 3"),
-                                        null, 
+                                        null,
                                         null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
-        assertEquals("<ns:test xmlns:ns=\"http://bar\"><ns:a>1 2 3</ns:a></ns:test>", value);        
+        assertEquals("<ns:test xmlns:ns=\"http://bar\"><ns:a>1 2 3</ns:a></ns:test>", value);
     }
-    
+
     @Test
     public void testTransformAndReplaceSimpleElement() throws Exception {
         InputStream is = new ByteArrayInputStream(
                 "<ns:test xmlns:ns=\"http://bar\"><ns:a>1</ns:a></ns:test>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                        Collections.singletonMap("{http://bar}*", "{http://foo}*"),
                                        Collections.singletonMap("{http://bar}a", "{http://bar}a=1 2 3"),
-                                       null, 
+                                       null,
                                        null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
         assertEquals(
-                "<ns:test xmlns:ns=\"http://foo\"><ns:a>1 2 3</ns:a></ns:test>", value);        
+                "<ns:test xmlns:ns=\"http://foo\"><ns:a>1 2 3</ns:a></ns:test>", value);
     }
-    
+
     @Test
     public void testReadWithParentDefaultNamespace() throws Exception {
         InputStream is = new ByteArrayInputStream(
             "<test xmlns=\"http://bar\"><ns:subtest xmlns:ns=\"http://bar1\"/></test>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
-                                        Collections.singletonMap("{http://bar1}subtest", "subtest"), 
+        reader = new InTransformReader(reader,
+                                        Collections.singletonMap("{http://bar1}subtest", "subtest"),
                                         null, null, null, false);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
         assertEquals("<test xmlns=\"http://bar\"><subtest xmlns=\"\"/></test>",
-                     value);        
+                     value);
     }
-    
+
     // additional test cases
     @Test
     public void testReadWithComplexRequestSameNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/element}*");
-        
-        reader = new InTransformReader(reader, 
+
+        reader = new InTransformReader(reader,
                                        inMap, null, null,
                                        null, false);
-        
-        XMLStreamReader reader2 = 
+
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
                 InTransformReader.class.getResourceAsStream("../resources/complexReq1.xml"));
         TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
-    
+
     @Test
     public void testReadWithComplexRequestMultipleNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));        
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));
+
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
+        inMap.put("{http://cxf.apache.org/transform/test}*",
                 "{http://cxf.apache.org/transform/othertest}*");
-        
-        reader = new InTransformReader(reader, 
+
+        reader = new InTransformReader(reader,
                                         inMap, null, null,
                                         null, false);
-        
-        XMLStreamReader reader2 = 
+
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));        
+                InTransformReader.class.getResourceAsStream("../resources/complexReq2.xml"));
         TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
-    
+
     @Test
     public void testReadWithComplexTransformationNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));        
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));
+
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
+        inMap.put("{http://cxf.apache.org/transform/test}*",
                 "{http://cxf.apache.org/transform/othertest}*");
-        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope", 
+        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope",
                 "{http://schemas.xmlsoap.org/soap/envelope/}TheEnvelope");
-        
+
         // set the block original reader flag to true
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                        inMap, null, null,
                                        null, true);
-        XMLStreamReader reader2 = 
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));        
+                InTransformReader.class.getResourceAsStream("../resources/complexReq3.xml"));
         TransformTestUtils.verifyReaders(reader2, reader, true, true);
     }
 
     @Test
     public void testReadPartialWithComplexRequestSameNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/element}*");
-        
-        reader = new InTransformReader(reader, 
+
+        reader = new InTransformReader(reader,
                                        inMap, null, null,
                                        null, false);
-        
+
         QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
         PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        XMLStreamReader reader2 = 
+
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq1partial.xml"));        
+                InTransformReader.class.getResourceAsStream("../resources/complexReq1partial.xml"));
         TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
-    
+
     @Test
     public void testPartialReadWithComplexRequestMultipleNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));        
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));
+
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
+        inMap.put("{http://cxf.apache.org/transform/test}*",
                 "{http://cxf.apache.org/transform/othertest}*");
-        
-        reader = new InTransformReader(reader, 
+
+        reader = new InTransformReader(reader,
                                         inMap, null, null,
                                         null, false);
-        
+
         QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
         PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        XMLStreamReader reader2 = 
+
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
-                InTransformReader.class.getResourceAsStream("../resources/complexReq2partial.xml"));        
+                InTransformReader.class.getResourceAsStream("../resources/complexReq2partial.xml"));
         TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
-    
+
     @Test
     public void testPartialReadWithComplexTransformationNamespace() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
-                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));        
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("{http://cxf.apache.org/transform/header/element}*", 
+                      InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));
+
+        Map<String, String> inMap = new HashMap<>();
+        inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
-        inMap.put("{http://cxf.apache.org/transform/test}*", 
+        inMap.put("{http://cxf.apache.org/transform/test}*",
                 "{http://cxf.apache.org/transform/othertest}*");
-        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope", 
+        inMap.put("{http://schemas.xmlsoap.org/soap/envelope/}Envelope",
                 "{http://schemas.xmlsoap.org/soap/envelope/}TheEnvelope");
-        
+
         // set the block original reader flag to true
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                        inMap, null, null,
                                        null, true);
-        
+
         QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
         PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
-        XMLStreamReader reader2 = 
+
+        XMLStreamReader reader2 =
             StaxUtils.createXMLStreamReader(
-                  InTransformReader.class.getResourceAsStream("../resources/complexReq3partial.xml"));        
+                  InTransformReader.class.getResourceAsStream("../resources/complexReq3partial.xml"));
         TransformTestUtils.verifyReaders(reader2, filteredReader, false, true);
     }
-    
-    
+
+
     @Test
     public void testReadWithReplaceAppend() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("requestValue",
                               "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
-        
-        Map<String, String> appendElements = new HashMap<String, String>();
+
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn1.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn1.xml",
                                                      "../resources/greetMeReq.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
     @Test
     public void testReadWithReplaceAppendDelete() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("requestValue",
                               "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
         transformElements.put("{http://cxf.apache.org/hello_world_soap_http/types}requestDate",
                               "");
-        
-        Map<String, String> appendElements = new HashMap<String, String>();
+
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
-        
-        List<String> dropElements = new ArrayList<String>();
+
+        List<String> dropElements = new ArrayList<>();
         dropElements.add("value");
-        
-        Map<String, String> transformAttributes = new HashMap<String, String>();
+
+        Map<String, String> transformAttributes = new HashMap<>();
         transformAttributes.put("num", "");
         transformAttributes.put("nombre", "{http://cxf.apache.org/hello_world_soap_http/types}name");
-        
-        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn2.xml", 
+
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn2.xml",
                                                      "../resources/greetMeReq.xml",
-                                  transformElements, appendElements, dropElements, 
+                                  transformElements, appendElements, dropElements,
                                   transformAttributes, null);
     }
 
     @Test
     public void testReadWithChangeNamespaces() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("*",
                               "{http://cxf.apache.org/hello_world_soap_http/types}*");
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn3.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn3.xml",
                                                      "../resources/greetMeReq.xml",
                                   transformElements, null, null, null, null);
     }
 
     @Test
     public void testReadWithDeleteAttributes() throws Exception {
-        Map<String, String> transformAttributes = new HashMap<String, String>();
+        Map<String, String> transformAttributes = new HashMap<>();
         transformAttributes.put("{http://www.w3.org/2001/XMLSchema-instance}type",
                                 "");
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn4.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn4.xml",
                                                      "../resources/greetMeReq.xml",
                                   null, null, null, transformAttributes, null);
     }
-    
+
     @Test
     public void testReadWithAppendPreInclude1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1.xml",
                                                      "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPreInclude2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
-        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1nospace.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1nospace.xml",
                                                      "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPreWrap1() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml",
                                                      "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
     @Test
     public void testReadWithAppendPreWrap2() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml",
                                                      "../resources/AddRequest2.xml",
                                   transformElements, appendElements, null, null, null);
     }
 
     @Test
     public void testReadWithAppendPostInclude1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
-        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2.xml",
                                                      "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPostInclude2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
-        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2nospace.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2nospace.xml",
                                                      "../resources/amazon.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPostWrap1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
-        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1.xml",
                                                      "../resources/AddRequest.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPostWrap2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
-        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1nospace.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1nospace.xml",
                                                      "../resources/AddRequest.xml",
                                   null, appendElements, null, null, null);
-        
+
     }
 
     @Test
     public void testReadWithAppendPostWrapReplaceDrop() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
         transformElements.put("params",
@@ -412,52 +414,52 @@ public class InTransformReaderTest extends Assert {
                               "{http://apache.org/cxf/calculator/types}arg1");
         transformElements.put("i3",
                               "");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("payload/",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
-        List<String> dropElements = new ArrayList<String>();
+        List<String> dropElements = new ArrayList<>();
         dropElements.add("param");
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml",
                                                      "../resources/AddRequest3.xml",
                                   transformElements, appendElements, dropElements, null, null);
-        
+
     }
 
     @Test
     public void testOldSTSTransform() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
 
         transformElements.put("{http://docs.oasis-open.org/ws-sx/ws-trust/200512}*",
                               "{http://schemas.xmlsoap.org/ws/2005/02/trust}*");
-        
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/wstrustReqSTRCIn1.xml", 
+
+        TransformTestUtils.transformInStreamAndCompare("../resources/wstrustReqSTRCIn1.xml",
                                                      "../resources/wstrustReqSTRC.xml",
                                   transformElements, null, null, null, null);
-        
+
     }
 
     @Test
     public void testPreservePrefixBindings() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("{urn:abc}*",
                               "{urn:a}*");
 
-        TransformTestUtils.transformInStreamAndCompare("../resources/multiNSIn1.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/multiNSIn1.xml",
                                                      "../resources/multiNS.xml",
                                   transformElements, null, null, null, null);
     }
 
     @Test
     public void testReadNamespaceWithDuplicatePrefixes() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("{http://bar.com/foo}*",
                               "{http://bar.com/foobar}*");
-        TransformTestUtils.transformInStreamAndCompare("../resources/multiNS2In1.xml", 
+        TransformTestUtils.transformInStreamAndCompare("../resources/multiNS2In1.xml",
                                                      "../resources/multiNS2.xml",
                                   transformElements, null, null, null, null);
-        
+
     }
 
 }

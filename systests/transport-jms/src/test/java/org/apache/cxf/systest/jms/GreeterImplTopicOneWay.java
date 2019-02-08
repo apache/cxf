@@ -22,8 +22,8 @@ import javax.jws.WebService;
 
 import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 
-@WebService(serviceName = "HelloWorldPubSubService", 
-            portName = "HelloWorldPubSubPort", 
+@WebService(serviceName = "HelloWorldPubSubService",
+            portName = "HelloWorldPubSubPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPubSubPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")

@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
+import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(namespace = "urn:xfire:foo")
+@XmlType(namespace = "urn:xfire:foo", name = "bar")
 public enum JaxbTestEnum {
-    VALUE1, VALUE2
+    @XmlEnumValue("Value1")
+    VALUE1,
+    VALUE2
 }

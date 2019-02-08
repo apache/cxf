@@ -41,7 +41,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class ClientProxyFactoryBeanDefinitionParser 
+public class ClientProxyFactoryBeanDefinitionParser
     extends AbstractFactoryBeanDefinitionParser {
 
     public ClientProxyFactoryBeanDefinitionParser() {
@@ -65,7 +65,7 @@ public class ClientProxyFactoryBeanDefinitionParser
     protected String getSuffix() {
         return ".simple-client";
     }
-    
+
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
         if ("endpointName".equals(name) || "serviceName".equals(name)) {
@@ -92,20 +92,20 @@ public class ClientProxyFactoryBeanDefinitionParser
             setFirstChildAsProperty(e, ctx, bean, name);
         }
     }
-    
+
     @NoJSR250Annotations
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
         implements ApplicationContextAware, FactoryBean<Object>, DisposableBean {
 
         private Object obj;
-        
+
         public SpringClientProxyFactoryBean() {
             super();
         }
         public SpringClientProxyFactoryBean(ClientFactoryBean fact) {
             super(fact);
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));
@@ -127,7 +127,7 @@ public class ClientProxyFactoryBeanDefinitionParser
         public boolean isSingleton() {
             return true;
         }
-        
+
         public void destroy() throws Exception {
             if (obj != null) {
                 if (obj instanceof Closeable) {

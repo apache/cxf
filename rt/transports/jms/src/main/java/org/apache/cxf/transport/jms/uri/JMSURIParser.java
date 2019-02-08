@@ -27,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 
 /**
  * Unfortunately soap/jms URIs are not recognized correctly in URI.
@@ -35,14 +34,14 @@ import org.apache.cxf.common.util.StringUtils;
  */
 final class JMSURIParser {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSURIParser.class);
-    
+
     String uri;
     int pos;
     private String scheme;
     private String variant;
     private String destination;
     private String query;
-    
+
     JMSURIParser(String uri) {
         this.uri = UnsafeUriCharactersEncoder.encode(uri);
         this.scheme = parseUntil(":");
@@ -58,7 +57,7 @@ final class JMSURIParser {
         LOG.log(Level.FINE, "Creating endpoint uri=[" + uri + "], destination=[" + destination
                 + "], query=[" + query + "]");
     }
-    
+
     private String parseToEnd() {
         return uri.substring(pos, uri.length());
     }
@@ -69,15 +68,14 @@ final class JMSURIParser {
             String found = uri.substring(pos, separatorPos);
             pos = separatorPos + 1;
             return found;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Map<String, Object> parseQuery() {
-        Map<String, Object> rc = new HashMap<String, Object>();
+        Map<String, Object> rc = new HashMap<>();
         if (query != null) {
-            String[] parameters = StringUtils.split(query, "&");
+            String[] parameters = query.split("&");
             for (String parameter : parameters) {
                 int p = parameter.indexOf("=");
                 if (p >= 0) {
@@ -92,7 +90,7 @@ final class JMSURIParser {
         return rc;
 
     }
-    
+
     private static String urldecode(String s) {
         try {
             return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
@@ -113,5 +111,5 @@ final class JMSURIParser {
         return destination;
     }
 
-    
+
 }

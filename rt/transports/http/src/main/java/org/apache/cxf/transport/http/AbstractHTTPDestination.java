@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,16 +84,16 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 /**
  * Common base for HTTP Destination implementations.
  */
-public abstract class AbstractHTTPDestination 
-    extends AbstractMultiplexDestination 
+public abstract class AbstractHTTPDestination
+    extends AbstractMultiplexDestination
     implements Configurable, Assertor {
-    
+
     public static final String HTTP_REQUEST = "HTTP.REQUEST";
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String HTTP_CONTEXT_MATCH_STRATEGY = "HTTP_CONTEXT_MATCH_STRATEGY";
-        
+
     public static final String RESPONSE_HEADERS_COPIED = "http.headers.copied";
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
@@ -105,9 +106,10 @@ public abstract class AbstractHTTPDestination
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
+    private static final String DECODE_BASIC_AUTH_WITH_ISO8859 = "decode.basicauth.with.iso8859";
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
-    private static final String CACHE_HTTP_REQUEST_PARAMETERS = "cache.http.request.parameters"; 
-    
+
     protected final Bus bus;
     protected DestinationRegistry registry;
     protected final String path;
@@ -119,27 +121,29 @@ public abstract class AbstractHTTPDestination
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
     protected boolean isServlet3;
+    protected boolean decodeBasicAuthWithIso8859;
     protected ContinuationProviderFactory cproviderFactory;
     protected boolean enableWebSocket;
 
-    private volatile boolean serverPolicyCalced; 
+    private volatile boolean serverPolicyCalced;
 
     /**
      * Constructor
-     * 
+     *
      * @param b the associated Bus
-     * @param ci the associated conduit initiator
-     * @param ei the endpoint info of the destination 
+     * @param registry the destination registry
+     * @param ei the endpoint info of the destination
+     * @param path the path
      * @param dp true for adding the default port if it is missing
      * @throws IOException
-     */    
+     */
     public AbstractHTTPDestination(Bus b,
                                    DestinationRegistry registry,
                                    EndpointInfo ei,
                                    String path,
                                    boolean dp)
         throws IOException {
-        super(b, getTargetReference(getAddressValue(ei, dp), b), ei);  
+        super(b, getTargetReference(getAddressValue(ei, dp), b), ei);
         this.bus = b;
         this.registry = registry;
         this.path = path;
@@ -149,10 +153,11 @@ public abstract class AbstractHTTPDestination
         } catch (Throwable t) {
             //servlet 2.5 or earlier, no async support
         }
-        
+        decodeBasicAuthWithIso8859 = PropertyUtils.isTrue(bus.getProperty(DECODE_BASIC_AUTH_WITH_ISO8859));
+
         initConfig();
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -161,12 +166,21 @@ public abstract class AbstractHTTPDestination
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
         }
-        String creds[] = StringUtils.split(credentials, " ");
+
+        final String[] creds = credentials.split(" ");
         String authType = creds[0];
-        if ("Basic".equals(authType)) {
+        if ("Basic".equals(authType) && creds.length == 2) {
             String authEncoded = creds[1];
             try {
-                String authDecoded = new String(Base64Utility.decode(authEncoded));
+                byte[] authBytes = Base64Utility.decode(authEncoded);
+
+                if (authBytes == null) {
+                    throw new Base64Exception(new Throwable("Invalid Base64 data."));
+                }
+                
+                String authDecoded = decodeBasicAuthWithIso8859
+                    ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
+
                 int idx = authDecoded.indexOf(':');
                 String username = null;
                 String password = null;
@@ -178,8 +192,8 @@ public abstract class AbstractHTTPDestination
                         password = authDecoded.substring(idx + 1);
                     }
                 }
-                
-                AuthorizationPolicy policy = sc.getUserPrincipal() == null 
+
+                AuthorizationPolicy policy = sc.getUserPrincipal() == null
                     ? new AuthorizationPolicy() : new PrincipalAuthorizationPolicy(sc);
                 policy.setUserName(username);
                 policy.setPassword(password);
@@ -188,7 +202,7 @@ public abstract class AbstractHTTPDestination
             } catch (Base64Exception ex) {
                 // Invalid authentication => treat as not authenticated or use the Principal
             }
-        } 
+        }
         if (sc.getUserPrincipal() != null) {
             AuthorizationPolicy policy = new PrincipalAuthorizationPolicy(sc);
             policy.setAuthorization(credentials);
@@ -215,19 +229,19 @@ public abstract class AbstractHTTPDestination
             return pp != null ? pp.getName() : null;
         }
     }
-    
-    /** 
+
+    /**
      * @param message the message under consideration
      * @return true iff the message has been marked as oneway
-     */    
+     */
     protected final boolean isOneWay(Message message) {
         Exchange ex = message.getExchange();
         return ex == null ? false : ex.isOneWay();
     }
-    
-    public void invoke(final ServletConfig config, 
-                       final ServletContext context, 
-                       final HttpServletRequest req, 
+
+    public void invoke(final ServletConfig config,
+                       final ServletContext context,
+                       final HttpServletRequest req,
                        final HttpServletResponse resp) throws IOException {
         Message inMessage = retrieveFromContinuation(req);
         if (inMessage == null) {
@@ -248,8 +262,8 @@ public abstract class AbstractHTTPDestination
         }
 
         copyKnownRequestAttributes(req, inMessage);
-        
-        try {    
+
+        try {
             incomingObserver.onMessage(inMessage);
             invokeComplete(context, req, resp, inMessage);
         } catch (SuspendedInvocationException ex) {
@@ -261,9 +275,8 @@ public abstract class AbstractHTTPDestination
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException) {
                 throw (RuntimeException)cause;
-            } else {
-                throw ex;
             }
+            throw ex;
         } catch (RuntimeException ex) {
             throw ex;
         } finally {
@@ -272,9 +285,9 @@ public abstract class AbstractHTTPDestination
             }
         }
     }
-    
-    protected void invokeComplete(final ServletContext context, 
-                                  final HttpServletRequest req, 
+
+    protected void invokeComplete(final ServletContext context,
+                                  final HttpServletRequest req,
                                   final HttpServletResponse resp,
                                   Message m) throws IOException {
         ContinuationProvider p = m.get(ContinuationProvider.class);
@@ -286,28 +299,24 @@ public abstract class AbstractHTTPDestination
     private void copyKnownRequestAttributes(HttpServletRequest request, Message message) {
         message.put(SERVICE_REDIRECTION, request.getAttribute(SERVICE_REDIRECTION));
     }
-        
+
     protected void setupMessage(final Message inMessage,
                                 final ServletConfig config,
-                                final ServletContext context, 
-                                final HttpServletRequest req, 
+                                final ServletContext context,
+                                final HttpServletRequest req,
                                 final HttpServletResponse resp) throws IOException {
         setupContinuation(inMessage,
-                          req, 
+                          req,
                           resp);
-        
+
         final Exchange exchange = inMessage.getExchange();
-        if (bus != null && PropertyUtils.isTrue(
-            bus.getProperty(CACHE_HTTP_REQUEST_PARAMETERS))) {
-            req.getParameterNames();
-        }
         DelegatingInputStream in = new DelegatingInputStream(req.getInputStream()) {
             public void cacheInput() {
                 if (!cached && (exchange.isOneWay() || isWSAddressingReplyToSpecified(exchange))) {
                     //For one-ways and WS-Addressing invocations with ReplyTo address,
                     //we need to cache the values of the HttpServletRequest
-                    //so they can be queried later for things like paths and schemes 
-                    //and such like that.                   
+                    //so they can be queried later for things like paths and schemes
+                    //and such like that.
                     //Please note, exchange used to always get the "current" message
                     exchange.getInMessage().put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
                 }
@@ -318,7 +327,7 @@ public abstract class AbstractHTTPDestination
                 return map != null && !ContextUtils.isGenericAddress(map.getReplyTo());
             }
         };
-        
+
         inMessage.setContent(DelegatingInputStream.class, in);
         inMessage.setContent(InputStream.class, in);
         inMessage.put(HTTP_REQUEST, req);
@@ -326,7 +335,7 @@ public abstract class AbstractHTTPDestination
         inMessage.put(HTTP_CONTEXT, context);
         inMessage.put(HTTP_CONFIG, config);
         inMessage.put(HTTP_CONTEXT_MATCH_STRATEGY, contextMatchStrategy);
-        
+
         inMessage.put(Message.HTTP_REQUEST_METHOD, req.getMethod());
         String requestURI = req.getRequestURI();
         inMessage.put(Message.REQUEST_URI, requestURI);
@@ -341,13 +350,18 @@ public abstract class AbstractHTTPDestination
             servletPath = "";
         }
         String contextServletPath = contextPath + servletPath;
-        inMessage.put(Message.PATH_INFO, contextServletPath + req.getPathInfo());
+        String pathInfo = req.getPathInfo();
+        if (pathInfo != null) {
+            inMessage.put(Message.PATH_INFO, contextServletPath + pathInfo);
+        } else {
+            inMessage.put(Message.PATH_INFO, requestURI);
+        }
         if (!StringUtils.isEmpty(requestURI)) {
             int index = requestURL.indexOf(requestURI);
             if (index > 0) {
                 // Can be useful for referencing resources with URIs not covered by CXFServlet.
-                // For example, if we a have web application name 'app' and CXFServlet listening 
-                // on "/services/*" then having HTTP_BASE_PATH pointing to say 
+                // For example, if we a have web application name 'app' and CXFServlet listening
+                // on "/services/*" then having HTTP_BASE_PATH pointing to say
                 // http://localhost:8080/app will make it easy to refer to non CXF resources
                 String schemaInfo = requestURL.substring(0, index);
                 String basePathWithContextOnly = schemaInfo + contextPath;
@@ -372,7 +386,7 @@ public abstract class AbstractHTTPDestination
         }
         inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
         inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
-        
+
         SecurityContext httpSecurityContext = new SecurityContext() {
             public Principal getUserPrincipal() {
                 return req.getUserPrincipal();
@@ -381,17 +395,17 @@ public abstract class AbstractHTTPDestination
                 return req.isUserInRole(role);
             }
         };
-        
+
         inMessage.put(SecurityContext.class, httpSecurityContext);
-        
-        
+
+
         Headers headers = new Headers(inMessage);
         headers.copyFromRequest(req);
         String credentials = headers.getAuthorization();
-        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials, 
+        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials,
                                                                            httpSecurityContext);
         inMessage.put(AuthorizationPolicy.class, authPolicy);
-        
+
         propogateSecureSession(req, inMessage);
 
         inMessage.put(CertConstraints.class.getName(), certConstraints);
@@ -400,18 +414,18 @@ public abstract class AbstractHTTPDestination
 
     }
     /**
-     * Propogate in the message a TLSSessionInfo instance representative  
+     * Propogate in the message a TLSSessionInfo instance representative
      * of the TLS-specific information in the HTTP request.
-     * 
-     * @param req the Jetty request
+     *
+     * @param request the Jetty request
      * @param message the Message
      */
     private static void propogateSecureSession(HttpServletRequest request,
-                                              Message message) {    
-        final String cipherSuite = 
+                                              Message message) {
+        final String cipherSuite =
             (String) request.getAttribute(SSL_CIPHER_SUITE_ATTRIBUTE);
         if (cipherSuite != null) {
-            final java.security.cert.Certificate[] certs = 
+            final java.security.cert.Certificate[] certs =
                 (java.security.cert.Certificate[]) request.getAttribute(SSL_PEER_CERT_CHAIN_ATTRIBUTE);
             message.put(TLSSessionInfo.class,
                         new TLSSessionInfo(cipherSuite,
@@ -419,10 +433,10 @@ public abstract class AbstractHTTPDestination
                                            certs));
         }
     }
-    private String setEncoding(final Message inMessage, 
-                               final HttpServletRequest req, 
+    private String setEncoding(final Message inMessage,
+                               final HttpServletRequest req,
                                final String contentType) throws IOException {
-        
+
         String enc = HttpHeaderHelper.findCharset(contentType);
         if (enc == null) {
             enc = req.getCharacterEncoding();
@@ -439,7 +453,7 @@ public abstract class AbstractHTTPDestination
                 String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
                                                                   LOG, enc).toString();
                 LOG.log(Level.WARNING, m);
-                throw new IOException(m);   
+                throw new IOException(m);
             }
             inMessage.put(Message.ENCODING, normalizedEncoding);
         }
@@ -454,7 +468,7 @@ public abstract class AbstractHTTPDestination
         }
         return retrieveFromServlet3Async(req);
     }
-    
+
     protected Message retrieveFromServlet3Async(HttpServletRequest req) {
         try {
             return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
@@ -487,14 +501,14 @@ public abstract class AbstractHTTPDestination
         }
         return new URL(endpointInfo.getAddress()).getPath();
     }
-    
-    protected static EndpointInfo getAddressValue(EndpointInfo ei) {       
+
+    protected static EndpointInfo getAddressValue(EndpointInfo ei) {
         return getAddressValue(ei, true);
-    } 
-    
-    protected static EndpointInfo getAddressValue(EndpointInfo ei, boolean dp) {       
+    }
+
+    protected static EndpointInfo getAddressValue(EndpointInfo ei, boolean dp) {
         if (dp) {
-            
+
             String eiAddress = ei.getAddress();
             if (eiAddress == null) {
                 try {
@@ -507,15 +521,15 @@ public abstract class AbstractHTTPDestination
                     ei.setAddress("http://localhost");
                 }
             }
-            
+
             String addr = StringUtils.addDefaultPortIfMissing(ei.getAddress());
             if (addr != null) {
                 ei.setAddress(addr);
             }
-        } 
+        }
         return ei;
     }
-    
+
     /**
      * @param inMessage the incoming message
      * @return the inbuilt backchannel
@@ -526,7 +540,7 @@ public abstract class AbstractHTTPDestination
     }
 
     private void initConfig() {
-        
+
         cproviderFactory = bus.getExtension(ContinuationProviderFactory.class);
     }
 
@@ -553,12 +567,12 @@ public abstract class AbstractHTTPDestination
         }
         return sp;
     }
-    
+
     /**
-     * On first write, we need to make sure any attachments and such that are still on the incoming stream 
-     * are read in.  Otherwise we can get into a deadlock where the client is still trying to send the 
-     * request, but the server is trying to send the response.   Neither side is reading and both blocked 
-     * on full buffers.  Not a good situation.    
+     * On first write, we need to make sure any attachments and such that are still on the incoming stream
+     * are read in.  Otherwise we can get into a deadlock where the client is still trying to send the
+     * request, but the server is trying to send the response.   Neither side is reading and both blocked
+     * on full buffers.  Not a good situation.
      * @param outMessage
      */
     private void cacheInput(Message outMessage) {
@@ -571,7 +585,7 @@ public abstract class AbstractHTTPDestination
         }
         Object o = inMessage.get("cxf.io.cacheinput");
         DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
-        if (MessageUtils.isTrue(o)) {
+        if (PropertyUtils.isTrue(o)) {
             Collection<Attachment> atts = inMessage.getAttachments();
             if (atts != null) {
                 for (Attachment a : atts) {
@@ -588,17 +602,17 @@ public abstract class AbstractHTTPDestination
                 in.cacheInput();
             }
         } else if (in != null) {
-            //We don't need to cache it, but we may need to consume it in order for the client 
+            //We don't need to cache it, but we may need to consume it in order for the client
             // to be able to receive a response. (could be blocked sending)
             //However, also don't want to consume indefinitely.   We'll limit to 16M.
             try {
                 IOUtils.consume(in, 16 * 1024 * 1024);
-            } catch (IOException ioe) {
+            } catch (Exception ioe) {
                 //ignore
             }
         }
     }
-    
+
     protected OutputStream flushHeaders(Message outMessage) throws IOException {
         return flushHeaders(outMessage, true);
     }
@@ -630,15 +644,15 @@ public abstract class AbstractHTTPDestination
         new Headers(outMessage).copyToResponse(response);
 
         outMessage.put(RESPONSE_HEADERS_COPIED, "true");
-        
+
         if (hasNoResponseContent(outMessage)) {
             response.setContentLength(0);
             response.flushBuffer();
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else if (!getStream) {
-            response.getOutputStream().close();
+            closeResponseOutputStream(response);
         } else {
-            responseStream = response.getOutputStream();                
+            responseStream = response.getOutputStream();
         }
 
         if (oneWay) {
@@ -647,25 +661,32 @@ public abstract class AbstractHTTPDestination
         return responseStream;
     }
 
+    private void closeResponseOutputStream(HttpServletResponse response) throws IOException {
+        try {
+            response.getOutputStream().close();
+        } catch (IllegalStateException ex) {
+            // response.getWriter() has already been called
+        }
+    }
+
     private int getReponseCodeFromMessage(Message message) {
         Integer i = (Integer)message.get(Message.RESPONSE_CODE);
         if (i != null) {
             return i.intValue();
-        } else {
-            int code = hasNoResponseContent(message) ? HttpURLConnection.HTTP_ACCEPTED : HttpURLConnection.HTTP_OK;
-            // put the code in the message so that others can get it
-            message.put(Message.RESPONSE_CODE, code);
-            return code;
         }
+        int code = hasNoResponseContent(message) ? HttpURLConnection.HTTP_ACCEPTED : HttpURLConnection.HTTP_OK;
+        // put the code in the message so that others can get it
+        message.put(Message.RESPONSE_CODE, code);
+        return code;
     }
 
     /**
      * Determines if the current message has no response content.
      * The message has no response content if either:
-     *  - the request is oneway and the current message is no partial 
+     *  - the request is oneway and the current message is no partial
      *    response or an empty partial response.
-     *  - the request is not oneway but the current message is an empty partial 
-     *    response. 
+     *  - the request is not oneway but the current message is an empty partial
+     *    response.
      * @param message
      * @return
      */
@@ -680,7 +701,7 @@ public abstract class AbstractHTTPDestination
         // suppress additionally empty responses for decoupled twoway calls =>
         return (ow && !pr) || epr;
     }
-    
+
     private HttpServletResponse getHttpResponseFromMessage(Message message) throws IOException {
         Object responseObj = message.get(HTTP_RESPONSE);
         if (responseObj instanceof HttpServletResponse) {
@@ -689,7 +710,7 @@ public abstract class AbstractHTTPDestination
             String m = (new org.apache.cxf.common.i18n.Message("UNEXPECTED_RESPONSE_TYPE_MSG",
                     LOG, responseObj.getClass())).toString();
             LOG.log(Level.WARNING, m);
-            throw new IOException(m);   
+            throw new IOException(m);
         } else {
             String m = (new org.apache.cxf.common.i18n.Message("NULL_RESPONSE_MSG", LOG)).toString();
             LOG.log(Level.WARNING, m);
@@ -699,7 +720,7 @@ public abstract class AbstractHTTPDestination
 
     private boolean isResponseRedirected(Message outMessage) {
         Exchange exchange = outMessage.getExchange();
-        return exchange != null 
+        return exchange != null
                && Boolean.TRUE.equals(exchange.get(REQUEST_REDIRECTED));
     }
 
@@ -717,19 +738,19 @@ public abstract class AbstractHTTPDestination
 
         /**
          * Send an outbound message, assumed to contain all the name-value
-         * mappings of the corresponding input message (if any). 
-         * 
+         * mappings of the corresponding input message (if any).
+         *
          * @param message the message to be sent.
          */
         public void prepare(Message message) throws IOException {
             message.put(HTTP_RESPONSE, response);
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {
-                message.setContent(OutputStream.class, 
-                               new WrappedOutputStream(message, response));
+                message.setContent(OutputStream.class,
+                               new WrappedOutputStream(message));
             }
         }
-        
+
         @Override
         public void close(Message msg) throws IOException {
             super.close(msg);
@@ -758,16 +779,14 @@ public abstract class AbstractHTTPDestination
      */
     private class WrappedOutputStream extends AbstractWrappedOutputStream implements CopyingOutputStream {
 
-        protected HttpServletResponse response;
         private Message outMessage;
-        
-        WrappedOutputStream(Message m, HttpServletResponse resp) {
+
+        WrappedOutputStream(Message m) {
             super();
             this.outMessage = m;
-            response = resp;
         }
 
-        
+
         @Override
         public int copyFrom(InputStream in) throws IOException {
             if (!written) {
@@ -779,7 +798,7 @@ public abstract class AbstractHTTPDestination
             }
             return IOUtils.copy(in, this, IOUtils.DEFAULT_BUFFER_SIZE);
         }
-        
+
         /**
          * Perform any actions required on stream flush (freeze headers,
          * reset output stream ... etc.)
@@ -802,12 +821,12 @@ public abstract class AbstractHTTPDestination
                 }
             }
             if (wrappedStream != null) {
+                // closing the stream should indirectly call the servlet response's flushBuffer
                 wrappedStream.close();
-                response.flushBuffer();
             }
             /*
             try {
-                //make sure the input stream is also closed in this 
+                //make sure the input stream is also closed in this
                 //case so that any resources it may have is cleaned up
                 Message m = outMessage.getExchange().getInMessage();
                 if (m != null) {
@@ -826,8 +845,8 @@ public abstract class AbstractHTTPDestination
 
     protected boolean contextMatchOnExact() {
         return "exact".equals(contextMatchStrategy);
-    }    
-    
+    }
+
     public void finalizeConfig() {
     }
 
@@ -842,7 +861,7 @@ public abstract class AbstractHTTPDestination
     /*
      * Implement multiplex via the address URL to avoid the need for ws-a.
      * Requires contextMatchStrategy of stem.
-     * 
+     *
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getAddressWithId(java.lang.String)
      */
     public EndpointReferenceType getAddressWithId(String id) {
@@ -864,7 +883,7 @@ public abstract class AbstractHTTPDestination
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getId(java.util.Map)
      */
     @Override
@@ -875,7 +894,7 @@ public abstract class AbstractHTTPDestination
             String address = (String)context.get(Message.PATH_INFO);
             if (null != address) {
                 int afterLastSlashIndex = address.lastIndexOf("/") + 1;
-                if (afterLastSlashIndex > 0 
+                if (afterLastSlashIndex > 0
                         && afterLastSlashIndex < address.length()) {
                     id = address.substring(afterLastSlashIndex);
                 }
@@ -886,7 +905,7 @@ public abstract class AbstractHTTPDestination
             }
         } else {
             return super.getId(context);
-        }   
+        }
         return id;
     }
 
@@ -924,20 +943,20 @@ public abstract class AbstractHTTPDestination
             serverPolicyCalced = true;
         }
     }
-    
+
     public void assertMessage(Message message) {
         PolicyDataEngine pde = bus.getExtension(PolicyDataEngine.class);
         pde.assertMessage(message, calcServerPolicy(message), new ServerPolicyCalculator());
     }
 
     public boolean canAssert(QName type) {
-        return new ServerPolicyCalculator().getDataClassName().equals(type); 
+        return new ServerPolicyCalculator().getDataClassName().equals(type);
     }
-    
+
     public void releaseRegistry() {
         registry = null;
     }
-    
+
     public String getPath() {
         return path;
     }
@@ -958,7 +977,7 @@ public abstract class AbstractHTTPDestination
             }
         }
     }
-    
+
     @Override
     public void shutdown() {
         synchronized (this) {

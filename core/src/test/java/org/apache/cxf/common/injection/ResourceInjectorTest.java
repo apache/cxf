@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,26 +35,28 @@ import javax.annotation.Resources;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ResourceInjectorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ResourceInjectorTest {
     private static final String RESOURCE_ONE = "resource one";
     private static final String RESOURCE_TWO = "resource two";
     private static final String RESOURCE_THREE = "resource three";
-    
-    private ResourceInjector injector; 
-        
-    public void setUpResourceManager(String pfx) { 
+
+    private ResourceInjector injector;
+
+    public void setUpResourceManager(String pfx) {
 
         ResourceManager resMgr = EasyMock.createMock(ResourceManager.class);
-        List<ResourceResolver> resolvers = new ArrayList<ResourceResolver>();
-        
+        List<ResourceResolver> resolvers = new ArrayList<>();
+
         resMgr.getResourceResolvers();
         EasyMock.expectLastCall().andReturn(resolvers);
         resMgr.resolveResource(pfx + "resource1", String.class, resolvers);
@@ -65,44 +66,44 @@ public class ResourceInjectorTest extends Assert {
         resMgr.resolveResource("resource3", CharSequence.class, resolvers);
         EasyMock.expectLastCall().andReturn(RESOURCE_THREE);
         EasyMock.replay(resMgr);
-        
-        injector = new ResourceInjector(resMgr); 
-    } 
+
+        injector = new ResourceInjector(resMgr);
+    }
 
     @Test
-    public void testFieldInjection() { 
+    public void testFieldInjection() {
         setUpResourceManager(FieldTarget.class.getCanonicalName() + "/");
-        doInjectTest(new FieldTarget()); 
+        doInjectTest(new FieldTarget());
     }
-    
-        
+
+
     @Test
-    public void testFieldInSuperClassInjection() { 
+    public void testFieldInSuperClassInjection() {
         setUpResourceManager("org.apache.cxf.common.injection.FieldTarget/");
-        doInjectTest(new SubFieldTarget()); 
+        doInjectTest(new SubFieldTarget());
     }
-    
+
     @Test
     public void testSetterInSuperClassInjection() {
         setUpResourceManager("org.apache.cxf.common.injection.SetterTarget/");
-        doInjectTest(new SubSetterTarget()); 
+        doInjectTest(new SubSetterTarget());
     }
 
     @Test
     public void testSetterInjection() {
         setUpResourceManager(SetterTarget.class.getCanonicalName() + "/");
-        doInjectTest(new SetterTarget()); 
+        doInjectTest(new SetterTarget());
     }
-    
+
     @Test
     public void testProxyInjection() {
         setUpResourceManager(SetterTarget.class.getCanonicalName() + "/");
         doInjectTest(getProxyObject(), SetterTarget.class);
     }
-    
+
     @Test
     public void testEnhancedInjection() {
-        setUpResourceManager(FieldTarget.class.getCanonicalName() + "/");               
+        setUpResourceManager(FieldTarget.class.getCanonicalName() + "/");
         doInjectTest(getEnhancedObject());
     }
 
@@ -115,75 +116,74 @@ public class ResourceInjectorTest extends Assert {
     @Test
     public void testResourcesContainer() {
         setUpResourceManager("");
-        doInjectTest(new ResourcesContainerTarget()); 
+        doInjectTest(new ResourcesContainerTarget());
     }
 
     @Test
-    public void testPostConstruct() { 
+    public void testPostConstruct() {
         setUpResourceManager(SetterTarget.class.getCanonicalName() + "/");
 
-        SetterTarget target = new SetterTarget(); 
-        doInjectTest(target); 
-        assertTrue(target.injectionCompleteCalled()); 
+        SetterTarget target = new SetterTarget();
+        doInjectTest(target);
+        assertTrue(target.injectionCompleteCalled());
     }
 
     @Test
-    public void testPreDestroy() { 
+    public void testPreDestroy() {
         injector = new ResourceInjector(null, null);
-        SetterTarget target = new SetterTarget(); 
-        injector.destroy(target); 
-        assertTrue(target.preDestroyCalled()); 
+        SetterTarget target = new SetterTarget();
+        injector.destroy(target);
+        assertTrue(target.preDestroyCalled());
     }
 
     private void doInjectTest(Target target) {
         doInjectTest(target, target.getClass());
     }
-    
+
     private void doInjectTest(Target target, Class<?> clazz) {
 
         injector.inject(target, clazz);
         injector.construct(target);
-        assertNotNull(target.getResource1()); 
-        assertEquals(RESOURCE_ONE, target.getResource1()); 
+        assertNotNull(target.getResource1());
+        assertEquals(RESOURCE_ONE, target.getResource1());
 
-        assertNotNull(target.getResource2()); 
+        assertNotNull(target.getResource2());
         assertEquals(RESOURCE_TWO, target.getResource2());
-        
+
         assertNotNull(target.getResource3());
         assertEquals(RESOURCE_THREE, target.getResource3());
     }
-    
+
     private Target getProxyObject() {
-        Target t = (Target)Proxy.newProxyInstance(ISetterTarget.class.getClassLoader(),
-                                                  new Class[] {ISetterTarget.class},
-                                                  new ProxyClass(new SetterTarget()));
-        return t;
+        return (Target)Proxy.newProxyInstance(ISetterTarget.class.getClassLoader(),
+                                              new Class[] {ISetterTarget.class},
+                                              new ProxyClass(new SetterTarget()));
     }
-        
+
     private FieldTarget getEnhancedObject() {
         Enhancer e = new Enhancer();
-        e.setSuperclass(FieldTarget.class);        
+        e.setSuperclass(FieldTarget.class);
         e.setCallback(new CallInterceptor());
-        return (FieldTarget)e.create();        
+        return (FieldTarget)e.create();
     }
 
 }
 
 
 interface Target {
-    String getResource1(); 
-    String getResource2(); 
+    String getResource1();
+    String getResource2();
     CharSequence getResource3();
 }
 
 class CallInterceptor implements MethodInterceptor {
-    
+
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         Object retValFromSuper = null;
         if (!Modifier.isAbstract(method.getModifiers())) {
             retValFromSuper = proxy.invokeSuper(obj, args);
-        }        
-        return retValFromSuper;            
+        }
+        return retValFromSuper;
     }
 }
 
@@ -191,27 +191,27 @@ class CallInterceptor implements MethodInterceptor {
 class FieldTarget implements Target {
 
     @Resource
-    private String resource1; 
+    private String resource1;
 
     @Resource(name = "resource2")
     private String resource2foo;
-    
+
     @Resource(name = "resource3")
     private CharSequence resource3foo;
 
-    public String getResource1() { 
-        return resource1; 
-    } 
+    public String getResource1() {
+        return resource1;
+    }
 
-    public String getResource2() { 
+    public String getResource2() {
         return resource2foo;
-    } 
-    
+    }
+
     public CharSequence getResource3() {
         return resource3foo;
     }
 
-    public String toString() { 
+    public String toString() {
         return "[" + resource1 + ":" + resource2foo + ":" + resource3foo + "]";
     }
 
@@ -221,13 +221,13 @@ class SubFieldTarget extends FieldTarget {
 }
 
 class SubSetterTarget extends SetterTarget {
-    
+
 }
 
-interface ISetterTarget extends Target {    
-    void setResource1(final String argResource1);    
-    void setResource2(final String argResource2);
-    void setResource3(final CharSequence argResource3);
+interface ISetterTarget extends Target {
+    void setResource1(String argResource1);
+    void setResource2(String argResource2);
+    void setResource3(CharSequence argResource3);
 }
 
 class ProxyClass implements InvocationHandler {
@@ -249,28 +249,26 @@ class ProxyClass implements InvocationHandler {
                         types[i] = CharSequence.class;
                     }
                 }
-            }    
+            }
             Method target = obj.getClass().getMethod(m.getName(), types);
             result = target.invoke(obj, args);
         } catch (InvocationTargetException e) {
             // Do nothing here
         } catch (Exception eBj) {
             eBj.printStackTrace();
-        } finally {
-            // Do something after the method is called ...
         }
         return result;
     }
 }
-class SetterTarget implements Target { 
+class SetterTarget implements Target {
 
     private String resource1;
     private String resource2;
     private CharSequence resource3;
-    private boolean injectionCompletePublic; 
-    private boolean injectionCompletePrivate; 
-    private boolean preDestroy; 
-    private boolean preDestroyPrivate; 
+    private boolean injectionCompletePublic;
+    private boolean injectionCompletePrivate;
+    private boolean preDestroy;
+    private boolean preDestroyPrivate;
 
     public final String getResource1() {
         return this.resource1;
@@ -280,56 +278,56 @@ class SetterTarget implements Target {
     public final void setResource1(final String argResource1) {
         this.resource1 = argResource1;
     }
-    
+
     public final String getResource2() {
         return this.resource2;
     }
-    
+
     @Resource(name = "resource2")
     public void setResource2(final String argResource2) {
         this.resource2 = argResource2;
     }
-    
+
     public final CharSequence getResource3() {
         return this.resource3;
     }
-    
+
     @Resource(name = "resource3")
     public void setResource3(final CharSequence argResource3) {
         this.resource3 = argResource3;
     }
 
     @PostConstruct
-    public void injectionIsAllFinishedNowThankYouVeryMuch() { 
+    public void injectionIsAllFinishedNowThankYouVeryMuch() {
         injectionCompletePublic = true;
 
         // stick this here to keep PMD happy...
         injectionIsAllFinishedNowThankYouVeryMuchPrivate();
-    } 
-    
+    }
+
     @PostConstruct
-    private void injectionIsAllFinishedNowThankYouVeryMuchPrivate() { 
+    private void injectionIsAllFinishedNowThankYouVeryMuchPrivate() {
         injectionCompletePrivate = true;
-    } 
-    
+    }
+
     @PreDestroy
-    public void preDestroyMethod() { 
+    public void preDestroyMethod() {
         preDestroy = true;
-    } 
-    
+    }
+
     @PreDestroy
-    private void preDestroyMethodPrivate() { 
+    private void preDestroyMethodPrivate() {
         preDestroyPrivate = true;
-    } 
-    
-    public boolean injectionCompleteCalled() { 
+    }
+
+    public boolean injectionCompleteCalled() {
         return injectionCompletePrivate && injectionCompletePublic;
     }
 
-    public boolean preDestroyCalled() { 
+    public boolean preDestroyCalled() {
         return preDestroy && preDestroyPrivate;
     }
-    
+
     // dummy method to access the private methods to avoid compile warnings
     public void dummyMethod() {
         preDestroyMethodPrivate();
@@ -341,15 +339,15 @@ class SetterTarget implements Target {
 @Resource(name = "resource1")
 class ClassTarget implements Target {
 
-    @Resource(name = "resource3") 
+    @Resource(name = "resource3")
     public CharSequence resource3foo;
-    @Resource(name = "resource2") 
-    public String resource2foo; 
-    private String res1; 
+    @Resource(name = "resource2")
+    public String resource2foo;
+    private String res1;
 
-    public final void setResource1(String res) { 
-        res1 = res; 
-    } 
+    public final void setResource1(String res) {
+        res1 = res;
+    }
 
     public final String getResource1() {
         return res1;
@@ -358,7 +356,7 @@ class ClassTarget implements Target {
     public final String getResource2() {
         return resource2foo;
     }
-    
+
     public final CharSequence getResource3() {
         return resource3foo;
     }
@@ -366,18 +364,18 @@ class ClassTarget implements Target {
 
 
 
-@Resources({@Resource(name = "resource1"), 
+@Resources({@Resource(name = "resource1"),
             @Resource(name = "resource2"),
             @Resource(name = "resource3") })
 class ResourcesContainerTarget implements Target {
 
-    private String res1; 
-    private String resource2; 
+    private String res1;
+    private String resource2;
     private CharSequence resource3;
 
-    public final void setResource1(String res) { 
-        res1 = res; 
-    } 
+    public final void setResource1(String res) {
+        res1 = res;
+    }
 
     public final String getResource1() {
         return res1;
@@ -386,7 +384,7 @@ class ResourcesContainerTarget implements Target {
     public final String getResource2() {
         return resource2;
     }
-    
+
     public final CharSequence getResource3() {
         return resource3;
     }

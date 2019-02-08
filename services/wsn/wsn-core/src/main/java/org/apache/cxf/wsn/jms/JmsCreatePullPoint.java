@@ -23,6 +23,7 @@ import javax.jms.ConnectionFactory;
 
 import org.apache.cxf.wsn.AbstractCreatePullPoint;
 import org.apache.cxf.wsn.AbstractPullPoint;
+import org.apache.cxf.wsn.client.NotificationBroker;
 import org.oasis_open.docs.wsn.b_2.CreatePullPoint;
 
 public class JmsCreatePullPoint extends AbstractCreatePullPoint {
@@ -57,9 +58,20 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
 
     @Override
     protected String createPullPointName(CreatePullPoint createPullPointRequest) {
+        String name = null;
+        if (createPullPointRequest.getOtherAttributes().get(
+            NotificationBroker.QNAME_PULLPOINT_QUEUE_NAME) != null) {
+            //try use the sepcified pullpoint queue instead a generated one
+            //so that we can reuse this durable pullpoint queue between the
+            //broker restarts
+            name = createPullPointRequest.getOtherAttributes().get(
+                              NotificationBroker.QNAME_PULLPOINT_QUEUE_NAME);
+        } else {
+            name = super.createPullPointName(createPullPointRequest);
+        }
         // For JMS, avoid using dashes in the pullpoint name (which is also the queue name,
         // as it will lead to problems with some JMS providers
-        String name = super.createPullPointName(createPullPointRequest);
+
         name = name.replace("-", "");
         return name;
     }
@@ -79,5 +91,5 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
-   
+
 }

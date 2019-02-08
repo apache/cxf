@@ -19,10 +19,12 @@
 
 package org.apache.cxf.version;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class VersionTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class VersionTest {
 
     @Test
     public void testLoadProperties() {
@@ -33,7 +35,7 @@ public class VersionTest extends Assert {
 
     @Test
     public void testGetVersion() {
-        String completeVersion =  Version.getCompleteVersionString();
+        String completeVersion = Version.getCompleteVersionString();
         String currentVersion = Version.getCurrentVersion();
         assertTrue(completeVersion.contains(currentVersion));
     }

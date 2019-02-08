@@ -21,12 +21,12 @@ package org.apache.cxf.jaxws.service;
 
 
 /**
- * 
+ *
  */
 public class QueryResult<Q, T> {
     Q q;
     T t;
-    
+
     public Q getQ() {
         return q;
     }
@@ -39,5 +39,5 @@ public class QueryResult<Q, T> {
     public void setT(T pt) {
         this.t = pt;
     }
-    
+
 }

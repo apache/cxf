@@ -34,28 +34,28 @@ public class Option {
 
     /**
      * As maven will set null for an empty parameter we need
-     * this horrid initial value to tell if it has been 
+     * this horrid initial value to tell if it has been
      * configured or not yet.
      */
     private static final String DEFAULT_WSDL_LOCATION = "DEFAULTWSDLLOCATION - WORKAROUND";
 
     /**
-     * 
+     *
      */
-    protected List<String> packagenames = new ArrayList<String>();
+    protected List<String> packagenames = new ArrayList<>();
 
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to
      * specify any extra flags not addressed by other parameters
      */
-    protected List<String> extraargs = new ArrayList<String>();
+    protected List<String> extraargs = new ArrayList<>();
 
     /**
      * Extra arguments to pass to the XJC compiler command-line code generator.
      * For compatibility as well as to specify any extra flags not addressed by other parameters
      */
-    protected List<String> xjcargs = new ArrayList<String>();
-    
+    protected List<String> xjcargs = new ArrayList<>();
+
     protected String[] asyncMethods;
     protected String[] bareMethods;
     protected String[] mimeMethods;
@@ -67,10 +67,10 @@ public class Option {
 
     /**
      * Ignore the specified WSDL schema namespace when generating code.
-     * Also, optionally specifies the Java package name used by types described in the excluded 
+     * Also, optionally specifies the Java package name used by types described in the excluded
      * namespace(s) using schema-namespace[=java-packagename]
      */
-    List<String> namespaceExcludes = new ArrayList<String>();
+    List<String> namespaceExcludes = new ArrayList<>();
 
     /**
      * Enables or disables the loading of the default excludes namespace mapping. Default is true.
@@ -78,31 +78,31 @@ public class Option {
     Boolean defaultExcludesNamespace;
 
     /**
-     * Enables or disables the loading of the default namespace package name mapping. Default is true and 
+     * Enables or disables the loading of the default namespace package name mapping. Default is true and
      * <a href=""http://www.w3.org/2005/08/addressing">
-     * http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a> 
+     * http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a>
      * package mapping will be enabled.
      */
     Boolean defaultNamespacePackageMapping;
 
     /**
-     * A set of dependent files used to detect that the generator must process WSDL, even 
+     * A set of dependent files used to detect that the generator must process WSDL, even
      * if generator marker files are up to date.
      */
-    String dependencies[];
+    String[] dependencies;
 
     /**
      * Redundant directories to be deleted after code generation
      */
-    File redundantDirs[];
+    File[] redundantDirs;
 
     /**
      * Specifies JAXWS or JAXB binding files. Use spaces to separate multiple entries.
      */
-    Set<String> bindingFiles = new HashSet<String>();
+    Set<String> bindingFiles = new HashSet<>();
 
     /**
-     * Specifies the value of the @WebServiceClient annotation's wsdlLocation property. 
+     * Specifies the value of the @WebServiceClient annotation's wsdlLocation property.
      */
     String wsdlLocation = DEFAULT_WSDL_LOCATION;
 
@@ -113,12 +113,12 @@ public class Option {
     Boolean wsdlList;
 
     /**
-     * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
+     * Specifies the frontend. Default is JAXWS. Currently supports "JAXWS" and "CXF" frontends.
      */
     String frontEnd;
 
     /**
-     * Specifies the databinding. Default is JAXB. Currently supports only JAXB databinding.
+     * Specifies the databinding. Default is JAXB.
      */
     String dataBinding;
 
@@ -133,17 +133,17 @@ public class Option {
     String catalog;
 
     /**
-     * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the 
+     * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the
      * wsdl:binding but not wsdl:portType section.) Default is false.
      */
     Boolean extendedSoapHeaders;
 
     /**
-     * Enables validating the WSDL before generating the code. 
+     * Enables validating the WSDL before generating the code.
      */
     String validateWsdl;
-    
-    
+
+
     /**
      * Enables or disables generation of the type classes. Default value is false.
      */
@@ -162,12 +162,18 @@ public class Option {
     /**
      * The superinterfaces to use for generated SEIs
      */
-    List<String> seiSuper = new ArrayList<String>();
+    List<String> seiSuper = new ArrayList<>();
 
     /**
      * Uses @Generated annotation in all generated java classes if the flag is set to true.
      */
     Boolean markGenerated;
+
+    /**
+     * Prevents dumping current date as part of @Generated annotation as well as part of
+     * the javadocs of the Java files generated.
+     */
+    Boolean suppressGeneratedDate;
 
     /**
      * The WSDL service name to use for the generated code
@@ -183,9 +189,9 @@ public class Option {
      * Disable generation of service address binding in the generated Java classes
      */
     Boolean noAddressBinding;
-    
+
     /**
-     * Allow element references when determining if an operation can be unwrapped or not 
+     * Allow element references when determining if an operation can be unwrapped or not
      */
     Boolean allowElementRefs;
 
@@ -229,7 +235,7 @@ public class Option {
     public String[] getBareMethods() {
         return bareMethods;
     }
-    
+
 
     public List<String> getPackagenames() {
         return packagenames;
@@ -246,7 +252,7 @@ public class Option {
     public void setNamespaceExcludes(List<String> namespaceExcludes) {
         this.namespaceExcludes = namespaceExcludes;
     }
-    public void setDependencies(String dependencies[]) {
+    public void setDependencies(String[] dependencies) {
         this.dependencies = dependencies;
     }
 
@@ -267,7 +273,7 @@ public class Option {
         return uris;
     }
 
-    public void setDeleteDirs(File files[]) {
+    public void setDeleteDirs(File[] files) {
         redundantDirs = files;
     }
 
@@ -282,7 +288,7 @@ public class Option {
     public void setOutputDir(File f) {
         outputDir = f;
     }
-    
+
     public void setBindingFiles(Set<String> files) {
         bindingFiles = files;
     }
@@ -292,7 +298,7 @@ public class Option {
     public void addBindingFile(File file) {
         bindingFiles.add(file.getAbsolutePath());
     }
-    
+
     public void addDefaultBindingFileIfExists(File baseDir) {
         File defaultBindingFile = new File(baseDir, DEFAULT_BINDING_FILE_PATH);
         if (defaultBindingFile.exists()) {
@@ -370,11 +376,11 @@ public class Option {
     public void setValidate(String v) {
         this.validateWsdl = v;
     }
-    
+
     public boolean isNoTypes() {
         return noTypes == null ? false : noTypes;
     }
-    
+
     public void setNoTypes(boolean noTypes) {
         this.noTypes = noTypes;
     }
@@ -386,18 +392,18 @@ public class Option {
     public void setFaultSerialVersionUID(String faultSerialVersionUID) {
         this.faultSerialVersionUID = faultSerialVersionUID;
     }
-    
+
     public String getExceptionSuper() {
         return exceptionSuper;
     }
-    
+
     public void setExceptionSuper(String exceptionSuper) {
         this.exceptionSuper = exceptionSuper;
     }
     public List<String> getSeiSuper() {
         return seiSuper;
     }
-    
+
     public void setSeiSuper(List<String> seiSuper) {
         this.seiSuper.clear();
         this.seiSuper.addAll(seiSuper);
@@ -409,6 +415,14 @@ public class Option {
 
     public void setMarkGenerated(Boolean markGenerated) {
         this.markGenerated = markGenerated;
+    }
+
+    public Boolean isSuppressGeneratedDate() {
+        return suppressGeneratedDate;
+    }
+
+    public void setSuppressGeneratedDate(Boolean suppressGeneratedDate) {
+        this.suppressGeneratedDate = suppressGeneratedDate;
     }
 
     public Boolean getDefaultExcludesNamespace() {
@@ -481,6 +495,7 @@ public class Option {
         destination.setNoTypes(isNoTypes());
         destination.setFaultSerialVersionUID(getFaultSerialVersionUID());
         destination.setMarkGenerated(isMarkGenerated());
+        destination.setSuppressGeneratedDate(isSuppressGeneratedDate());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -491,14 +506,14 @@ public class Option {
         destination.setBareMethods(getBareMethods());
         destination.setExceptionSuper(getExceptionSuper());
     }
-    
+
     private <T> T setIfNull(T dest, T source) {
         if (dest == null) {
             dest = source;
         }
         return dest;
     }
-    
+
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         exceptionSuper = setIfNull(exceptionSuper, defaultOptions.exceptionSuper);
@@ -509,10 +524,11 @@ public class Option {
         faultSerialVersionUID = setIfNull(faultSerialVersionUID,
             defaultOptions.faultSerialVersionUID);
         markGenerated = setIfNull(markGenerated, defaultOptions.markGenerated);
+        suppressGeneratedDate = setIfNull(suppressGeneratedDate, defaultOptions.suppressGeneratedDate);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
-        defaultExcludesNamespace = setIfNull(defaultExcludesNamespace, 
+        defaultExcludesNamespace = setIfNull(defaultExcludesNamespace,
                                              defaultOptions.defaultExcludesNamespace);
         defaultNamespacePackageMapping = setIfNull(defaultNamespacePackageMapping,
                                                    defaultOptions.defaultNamespacePackageMapping);
@@ -536,7 +552,7 @@ public class Option {
             wsdlLocation = defaultOptions.getWsdlLocation();
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T[] mergeList(T[] l1, T[] l2, Class<T> cls) {
         if (l1 == null) {
@@ -545,7 +561,7 @@ public class Option {
             return l1;
         }
         int len = l1.length + l2.length;
-        T ret[] = (T[])java.lang.reflect.Array.newInstance(cls, len);
+        T[] ret = (T[])java.lang.reflect.Array.newInstance(cls, len);
         System.arraycopy(l1, 0, ret, 0, l1.length);
         System.arraycopy(l2, 0, ret, l1.length, l2.length);
         return ret;

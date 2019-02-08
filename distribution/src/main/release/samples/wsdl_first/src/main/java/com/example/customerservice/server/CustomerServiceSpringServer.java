@@ -21,11 +21,11 @@ package com.example.customerservice.server;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CustomerServiceSpringServer {
-    
+
     protected CustomerServiceSpringServer() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new ClassPathXmlApplicationContext("server-applicationContext.xml");
         System.in.read();
     }

@@ -30,17 +30,20 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
+import org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
- * 
+ *
  */
-public class JettyWebSocketDestinationTest extends Assert {
+public class JettyWebSocketDestinationTest {
     private static final String ENDPOINT_ADDRESS = "ws://localhost:9001/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
 
@@ -53,7 +56,7 @@ public class JettyWebSocketDestinationTest extends Assert {
 
     @Test
     public void testRegisteration() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
+        Bus bus = new ExtensionManagerBus();
         DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
@@ -61,21 +64,21 @@ public class JettyWebSocketDestinationTest extends Assert {
         JettyHTTPServerEngine engine = EasyMock.createMock(JettyHTTPServerEngine.class);
 
         control.replay();
-        
+
         TestJettyWebSocketDestination dest = new TestJettyWebSocketDestination(bus, registry, endpoint, null, engine);
 
         dest.activate();
-        
+
         assertNotNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
-        
+
         dest.deactivate();
 
         assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
     }
-    
-    private static class TestJettyWebSocketDestination extends JettyWebSocketDestination {
+
+    private static class TestJettyWebSocketDestination extends Jetty9WebSocketDestination {
         TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                      JettyHTTPServerEngineFactory serverEngineFactory, 
+                                      JettyHTTPServerEngineFactory serverEngineFactory,
                                       JettyHTTPServerEngine engine) throws IOException {
             super(bus, registry, ei, serverEngineFactory);
             this.engine = engine;

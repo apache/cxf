@@ -25,7 +25,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 
 /**
  * This interface defines an object that can create EndpointImpl
- * objects. 
+ * objects.
  */
 public interface EndpointImplFactory {
     /**
@@ -34,6 +34,6 @@ public interface EndpointImplFactory {
      * @param service
      * @param endpointInfo
      */
-    EndpointImpl newEndpointImpl(Bus bus, Service service, 
+    EndpointImpl newEndpointImpl(Bus bus, Service service,
                                  EndpointInfo endpointInfo) throws EndpointException;
 }

@@ -34,19 +34,19 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public class SchemaValidationFeature extends AbstractFeature {
     private final SchemaValidationTypeProvider provider;
-    
+
     public SchemaValidationFeature(final SchemaValidationTypeProvider provider) {
         this.provider = provider;
     }
-    
+
     public void initialize(Server server, Bus bus) {
         initialise(server.getEndpoint());
     }
-    
+
     public void initialize(Client client, Bus bus) {
         initialise(client.getEndpoint());
     }
-    
+
     private void initialise(Endpoint endpoint) {
         for (BindingOperationInfo bop : endpoint.getEndpointInfo().getBinding().getOperations()) {
             SchemaValidationType type = provider.getSchemaValidationType(bop.getOperationInfo());

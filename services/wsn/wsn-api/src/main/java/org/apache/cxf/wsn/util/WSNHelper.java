@@ -45,7 +45,7 @@ public class WSNHelper {
     private static volatile WSNHelper instance;
     protected boolean setClassLoader = true;
 
-    
+
     public static WSNHelper getInstance() {
         if (instance == null) {
             createInstance();
@@ -55,7 +55,7 @@ public class WSNHelper {
     public static void clearInstance() {
         instance = null;
     }
-    
+
     private static synchronized void createInstance() {
         if (instance != null) {
             return;
@@ -67,18 +67,18 @@ public class WSNHelper {
             instance = new WSNHelper();
         }
     }
-    
+
     public boolean setClassLoader() {
         return setClassLoader;
     }
     public void setClassLoader(boolean cl) {
         setClassLoader = cl;
     }
-    
+
     public boolean supportsExtraClasses() {
         return false;
     }
-    
+
     public Endpoint publish(String address, Object o, Class<?> ... extraClasses) {
         if (extraClasses != null && extraClasses.length > 0) {
             throw new UnsupportedOperationException("Pure JAX-WS does not support the extraClasses");
@@ -91,7 +91,7 @@ public class WSNHelper {
                     endpoint.setProperties(new HashMap<String, Object>());
                 }
                 endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
-                List<Source> mt = new ArrayList<Source>();
+                List<Source> mt = new ArrayList<>();
                 StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                 mt.add(src);
                 endpoint.setMetadata(mt);
@@ -99,16 +99,16 @@ public class WSNHelper {
                 //ignore, no wsdl really needed
             }
         }
-        
+
         endpoint.publish(address);
         return endpoint;
     }
-    
-    public <T> T getPort(EndpointReference ref, 
+
+    public <T> T getPort(EndpointReference ref,
                          Class<T> serviceInterface,
                          Class<?> ... extraClasses) {
         if (!(ref instanceof W3CEndpointReference)) {
-            throw new IllegalArgumentException("Unsupported endpoint reference: " 
+            throw new IllegalArgumentException("Unsupported endpoint reference: "
                 + (ref != null ? ref.toString() : "null"));
         }
         W3CEndpointReference w3cEpr = (W3CEndpointReference) ref;
@@ -116,21 +116,21 @@ public class WSNHelper {
         return getPort(address, serviceInterface, extraClasses);
     }
 
-    public <T> T getPort(String address, 
+    public <T> T getPort(String address,
                          Class<T> serviceInterface,
                          Class<?> ... extraClasses) {
         if (extraClasses != null && extraClasses.length > 0) {
             throw new UnsupportedOperationException("Pure JAX-WS does not support the extraClasses");
         }
-        
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (setClassLoader) {
                 Thread.currentThread().setContextClassLoader(WSNHelper.class.getClassLoader());
             }
-            
+
             Service service = Service.create(WSNWSDLLocator.getWSDLUrl(),
-                                             new QName("http://cxf.apache.org/wsn/jaxws", 
+                                             new QName("http://cxf.apache.org/wsn/jaxws",
                                                        serviceInterface.getSimpleName() + "Service"));
             return service.getPort(createWSA(address), serviceInterface);
         } finally {
@@ -144,7 +144,7 @@ public class WSNHelper {
             if (setClassLoader) {
                 Thread.currentThread().setContextClassLoader(WSNHelper.class.getClassLoader());
             }
-            
+
             return new W3CEndpointReferenceBuilder().address(address).build();
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
@@ -152,7 +152,7 @@ public class WSNHelper {
     }
 
     public String getWSAAddress(W3CEndpointReference ref) {
-        Element element = DOMUtils.createDocument().createElement("elem");
+        Element element = DOMUtils.getEmptyDocument().createElement("elem");
         ref.writeTo(new DOMResult(element));
         NodeList nl = element.getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address");
         if (nl != null && nl.getLength() > 0) {

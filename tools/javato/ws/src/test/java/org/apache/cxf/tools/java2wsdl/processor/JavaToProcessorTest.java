@@ -42,6 +42,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
 import org.apache.cxf.service.model.FaultInfo;
@@ -64,6 +65,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class JavaToProcessorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
     String classPath = "";
@@ -75,6 +83,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
+
     }
     @After
     public void tearDown() {
@@ -141,7 +153,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
 
     @Test
-    // TODO the generated wsdl has two faultDetail elements
     public void testSOAP12() throws Exception {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.hello_world_soap12_http.Greeter");
         env.put(ToolConstants.CFG_SOAP12, "soap12");
@@ -159,8 +170,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
         classFile.mkdir();
 
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                           + File.separatorChar);
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+            String java9PlusFolder = output.getParent() + java.io.File.separator + "java9";
+            System.setProperty("java.class.path", System.getProperty("java.class.path")
+                               + java.io.File.pathSeparator + java9PlusFolder + java.io.File.separator + "*");
+        }
 
         env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
         env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
@@ -377,7 +392,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
     private String findImport(Document doc) {
         List<Element> lst = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
-                                                         WSDLConstants.NS_SCHEMA_XSD, 
+                                                         WSDLConstants.NS_SCHEMA_XSD,
                                                          "import");
         for (Element el : lst) {
             return el.getAttribute("schemaLocation");
@@ -451,12 +466,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     //Test for cxf774
     public void testList() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/list_test.wsdl");
-        env.put(ToolConstants.CFG_CLASSNAME, 
+        env.put(ToolConstants.CFG_CLASSNAME,
                 org.apache.cxf.tools.fortest.cxf774.ListTestImpl.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         try {
             processor.setEnvironment(env);
-            processor.process();                  
+            processor.process();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -469,20 +484,19 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
 
     @Test
-    //  TODO: should suppor the XmlMimeType annotation in the SEI
     public void testMimeTypeInSEI() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/send_image.wsdl");
         env.put(ToolConstants.CFG_CLASSNAME, org.apache.cxf.tools.fortest.ImageSender.class.getName());
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         try {
             processor.setEnvironment(env);
-            processor.process();                  
+            processor.process();
         } catch (Exception e) {
             e.printStackTrace();
         }
         File wsdlFile = new File(output, "send_image.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        
+
         URI expectedFile = getClass().getResource("expected/expected_send_image.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
@@ -500,7 +514,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "send_image2.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
-        
+
         URI expectedFile = getClass().getResource("expected/expected_send_image2.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
@@ -521,7 +535,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         // To test there is wsam:action generated for the
         String wsdlString = getStringFromFile(wsdlFile);
         assertTrue("The wsam and wsaw action are not both generated", wsdlString
-            .indexOf("wsam:Action=\"http://cxf.apache.org/fault3\"") > -1 
+            .indexOf("wsam:Action=\"http://cxf.apache.org/fault3\"") > -1
             && wsdlString.indexOf("wsaw:Action=\"http://cxf.apache.org/fault3\"") > -1);
         assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
             .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request") > -1);
@@ -639,10 +653,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
         String xsd = getStringFromFile(wsdlFile);
         assertTrue(xsd, xsd.indexOf("ref=") == -1);
-        
+
     }
-    
-    
+
+
     @Test
     public void testException() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception.wsdl");
@@ -658,25 +672,25 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "exception.wsdl");
         assertTrue(wsdlFile.exists());
         // schema element
-        
+
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
         XPathUtils util = new XPathUtils(map);
-        
+
         assertNotNull(util.getValueNode("//xsd:complexType[@name='Exception']", doc));
 
         Element nd = (Element)util.getValueNode("//xsd:element[@name='Exception']", doc);
         assertNotNull(nd);
         assertTrue(nd.getAttribute("type").contains("Exception"));
-        
+
         nd = (Element)util.getValueNode("//xsd:element[@name='message']", doc);
         assertNotNull(nd);
         assertTrue(nd.getAttribute("type").contains("string"));
         assertTrue(nd.getAttribute("minOccurs").contains("0"));
-        
+
         nd = (Element)util.getValueNode("//wsdl:part[@name='Exception']", doc);
         assertNotNull(nd);
         assertTrue(nd.getAttribute("element").contains(":Exception"));
@@ -689,7 +703,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertNotNull(nd);
         assertTrue(nd.getAttribute("use").contains("literal"));
     }
-    
+
     //CXF-1509
     @Test
     public void testWebFaultWithXmlType() throws Exception {
@@ -711,9 +725,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlContent.indexOf("xmlns:tns=\"http://cxf.apache.org/cxf1519/faults\"") != -1);
         assertTrue(wsdlContent.indexOf("<xsd:complexType name=\"UserException\">") != -1);
         assertTrue(wsdlContent.indexOf("<xsd:element name=\"UserExceptionFault\"") != -1);
-        
+
     }
-    
+
     //CXF-4147
     @Test
     public void testBareWithoutWebParam() throws Exception {
@@ -730,13 +744,13 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
         String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
         assertTrue(wsdlContent.indexOf("xsd:element name=\"add\" nillable=\"true\" type=\"xsd:int\"") != -1);
-        assertTrue(wsdlContent.indexOf("xsd:element name=\"add1\" nillable=\"true\" type=\"xsd:string\"") 
+        assertTrue(wsdlContent.indexOf("xsd:element name=\"add1\" nillable=\"true\" type=\"xsd:string\"")
                    != -1);
         assertTrue(wsdlContent.indexOf("wsdl:part name=\"add1\" element=\"tns:add1\"") != -1);
     }
-    
-    
-    
+
+
+
     @Test
     public void testPropOrderInException() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_prop_order.wsdl");
@@ -751,9 +765,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "exception_prop_order.wsdl");
         assertTrue(wsdlFile.exists());
-        
+
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -765,7 +779,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertNotNull(summary);
         assertNotNull(from);
         assertNotNull(id);
-        
+
         Node nd = summary.getNextSibling();
         while (nd != null) {
             if (nd == from) {
@@ -781,7 +795,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertNull(id);
         assertNull(from);
     }
-    
+
     @Test
     public void testPropOrderInException2() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_prop_order2.wsdl");
@@ -798,7 +812,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -840,9 +854,9 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "exception_order.wsdl");
         assertTrue(wsdlFile.exists());
-        
+
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -854,7 +868,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertNotNull(summary);
         assertNotNull(from);
         assertNotNull(id);
-        
+
         Node nd = from.getNextSibling();
         while (nd != null) {
             if (nd == id) {
@@ -870,7 +884,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertNull(id);
         assertNull(from);
     }
-    
+
     @Test
     public void testExceptionList() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception_list.wsdl");
@@ -882,12 +896,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         File wsdlFile = new File(output, "exception_list.wsdl");
         assertTrue(wsdlFile.exists());
-        
+
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -898,8 +912,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertEquals("0", nd.getAttribute("minOccurs"));
         assertEquals("unbounded", nd.getAttribute("maxOccurs"));
         assertTrue(nd.getAttribute("type").endsWith(":myData"));
-        
-        
+
+
         nd = (Element)util.getValueNode("//xsd:complexType[@name='ListException2']"
                                         + "/xsd:sequence/xsd:element[@name='address']", doc);
         assertNotNull(nd);
@@ -907,7 +921,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertEquals("unbounded", nd.getAttribute("maxOccurs"));
         assertTrue(nd.getAttribute("type").endsWith(":myData"));
     }
-    
+
     @Test
     public void testExceptionRefNillable() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-ref-nillable.wsdl");
@@ -919,23 +933,23 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         File wsdlFile = new File(output, "exception-ref-nillable.wsdl");
         assertTrue(wsdlFile.exists());
-        
+
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
         map.put("tns", "http://cxf.apache.org/test/HelloService");
         XPathUtils util = new XPathUtils(map);
-        
+
         Element el = (Element)util.getValueNode("//xsd:element[@ref]", doc);
         assertNotNull(el);
         assertTrue(el.getAttribute("ref").contains("item"));
     }
-    
+
     @Test
     public void testExceptionTypeAdapter() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/exception-type-adapter.wsdl");
@@ -947,25 +961,25 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         File wsdlFile = new File(output, "exception-type-adapter.wsdl");
         assertTrue(wsdlFile.exists());
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         XPathUtils util = new XPathUtils(map);
         Node nd = util.getValueNode("//xsd:complexType[@name='myClass2']", doc);
         assertNotNull(nd);
-        
+
         nd = util.getValueNode("//xsd:element[@name='adapted']", doc);
-        assertNotNull(nd); 
-        
+        assertNotNull(nd);
+
         String at = ((Element)nd).getAttribute("type");
         assertTrue(at.contains("myClass2"));
         assertEquals("0", ((Element)nd).getAttribute("minOccurs"));
     }
-    
-    
+
+
     @Test
     public void testCXF4877() throws Exception {
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/testwsdl.wsdl");
@@ -974,13 +988,13 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         processor.setEnvironment(env);
         processor.process();
-        
+
         File wsdlFile = new File(output, "HelloWorld.wsdl");
         assertTrue(wsdlFile.exists());
         //if the test works, this won't throw an exception.  CXF-4877 generated bad XML at this point
         StaxUtils.read(new FileInputStream(wsdlFile));
     }
-    
+
     @Test
     public void testTransientMessage() throws Exception {
         //CXF-5744
@@ -993,13 +1007,13 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         File wsdlFile = new File(output, "transient_message.wsdl");
         assertTrue(wsdlFile.exists());
-        
+
         Document doc = StaxUtils.read(wsdlFile);
         //StaxUtils.print(doc);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -1009,7 +1023,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         String path = "//xsd:complexType[@name='TransientMessageException']//xsd:sequence/xsd:element[@name='message']";
         Element nd = (Element)util.getValueNode(path, doc);
         assertNull(nd);
-        
+
         //ok, we didn't map it into the schema.  Make sure the runtime won't write it out.
         List<ServiceInfo> sl = CastUtils.cast((List<?>)env.get("serviceList"));
         FaultInfo mi = sl.get(0).getInterface().getOperation(new QName("http://cxf.apache.org/test/HelloService",
@@ -1028,5 +1042,5 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         writer.close();
         assertEquals(-1, sw.getBuffer().indexOf("Exception Message"));
     }
-    
+
 }

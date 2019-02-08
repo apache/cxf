@@ -31,11 +31,11 @@ public class UnwrappedOperationInfo extends OperationInfo {
         wrappedOp = op;
         setDelegate(wrappedOp, true);
     }
-    
+
     public OperationInfo getWrappedOperation() {
         return wrappedOp;
     }
-    
+
     public boolean isUnwrapped() {
         return true;
     }
@@ -43,20 +43,20 @@ public class UnwrappedOperationInfo extends OperationInfo {
     public FaultInfo addFault(QName name, QName message) {
         return wrappedOp.addFault(name, message);
     }
-    
+
     public FaultInfo getFault(QName name) {
         return wrappedOp.getFault(name);
     }
-    
+
     public Collection<FaultInfo> getFaults() {
         return wrappedOp.getFaults();
     }
-    
-    
+
+
     public void setOutput(String nm, MessageInfo out) {
         super.setOutput(nm, out);
         out.setDelegate(wrappedOp.getOutput(), false);
-    }    
+    }
 
     public void setInput(String nm, MessageInfo in) {
         super.setInput(nm, in);

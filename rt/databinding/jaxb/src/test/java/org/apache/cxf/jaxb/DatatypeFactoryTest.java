@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class DatatypeFactoryTest {
-    
+
     @Test
     public void testNewFactory() throws Exception {
         Class.forName("org.apache.cxf.jaxb.DatatypeFactory");

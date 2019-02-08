@@ -56,13 +56,12 @@ public class BundleDelegatingClassLoader extends ClassLoader {
             });
         } catch (PrivilegedActionException e) {
             Exception cause = e.getException();
-          
+
             if (cause instanceof ClassNotFoundException) {
                 throw (ClassNotFoundException)cause;
-            } else {
-                throw (RuntimeException)cause;
             }
-        }    
+            throw (RuntimeException)cause;
+        }
     }
 
     protected URL findResource(final String name) {
@@ -70,7 +69,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
             public URL run() {
                 return bundle.getResource(name);
             }
-        });        
+        });
         if (classLoader != null && resource == null) {
             resource = classLoader.getResource(name);
         }
@@ -80,28 +79,26 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     protected Enumeration<URL> findResources(final String name) throws IOException {
         Enumeration<URL> urls;
         try {
-            urls =  AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
-                @SuppressWarnings("unchecked")
+            urls = AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
                 public Enumeration<URL> run() throws IOException {
                     return bundle.getResources(name);
                 }
-          
+
             });
         } catch (PrivilegedActionException e) {
             Exception cause = e.getException();
-        
+
             if (cause instanceof IOException) {
                 throw (IOException)cause;
-            } else {
-                throw (RuntimeException)cause;
             }
+            throw (RuntimeException)cause;
         }
-      
+
         if (urls == null) {
-            urls = Collections.enumeration(new ArrayList<URL>());
+            urls = Collections.enumeration(new ArrayList<>());
         }
-      
-        return urls;    
+
+        return urls;
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -113,11 +110,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
                 try {
                     clazz = classLoader.loadClass(name);
                 } catch (ClassNotFoundException e) {
-                    throw new ClassNotFoundException(name + " from bundle " + bundle.getBundleId() 
+                    throw new ClassNotFoundException(name + " from bundle " + bundle.getBundleId()
                                                      + " (" + bundle.getSymbolicName() + ")", cnfe);
                 }
             } else {
-                throw new ClassNotFoundException(name + " from bundle " + bundle.getBundleId() 
+                throw new ClassNotFoundException(name + " from bundle " + bundle.getBundleId()
                                                  + " (" + bundle.getSymbolicName() + ")", cnfe);
             }
         }

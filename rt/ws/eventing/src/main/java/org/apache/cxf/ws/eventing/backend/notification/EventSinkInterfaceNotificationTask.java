@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.eventing.EventType;
 import org.apache.cxf.ws.eventing.backend.database.SubscriptionTicket;
@@ -92,13 +92,13 @@ class EventSinkInterfaceNotificationTask implements Runnable {
                 }
                 param = event;
             }
-            
+
             method.invoke(proxy, param);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
-    
+
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
@@ -113,7 +113,7 @@ class EventSinkInterfaceNotificationTask implements Runnable {
         ReferenceParametersAddingHandler handler = new
                 ReferenceParametersAddingHandler(
                 target.getNotificationReferenceParams());
-        
+
         JaxWsProxyFactoryBean service = new JaxWsProxyFactoryBean();
         service.getOutInterceptors().add(new LoggingOutInterceptor());
         service.setServiceClass(sinkInterface);
@@ -124,9 +124,9 @@ class EventSinkInterfaceNotificationTask implements Runnable {
         if (target.getFilter() != null && target.getFilter().getContent().size() > 0) {
             service.getOutInterceptors().add(new FilteringInterceptor(target.getFilter()));
         }
-        
+
         if (extraClasses != null && extraClasses.length > 0) {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             props.put("jaxb.additionalContextClasses", extraClasses);
             service.getClientFactoryBean().getServiceFactory().setProperties(props);
         }

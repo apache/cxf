@@ -57,7 +57,7 @@ import org.apache.neethi.PolicyReference;
 /**
  * PolicyAttachmentManager provides methods to retrieve element policies and
  * calculate effective policies based on the policy subject's scope.
- * 
+ *
  */
 @NoJSR250Annotations
 public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
@@ -66,15 +66,15 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
     public Wsdl11AttachmentPolicyProvider() {
         this(null);
     }
-    
+
     public Wsdl11AttachmentPolicyProvider(Bus bus) {
         super(bus);
-    }  
-    
+    }
+
     public Policy getEffectivePolicy(ServiceInfo si, Message m) {
         return getElementPolicy(si);
     }
-    
+
     private Policy mergePolicies(Policy p1, Policy p2) {
         if (p1 == null) {
             return p2;
@@ -83,13 +83,13 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         }
         return p1.merge(p2);
     }
-    
+
     /**
-     * The effective policy for a WSDL endpoint policy subject includes the element policy of the 
+     * The effective policy for a WSDL endpoint policy subject includes the element policy of the
      * wsdl11:port element that defines the endpoint merged with the element policy of the
      * referenced wsdl11:binding element and the element policy of the referenced wsdl11:portType
-     * element that defines the interface of the endpoint. 
-     * 
+     * element that defines the interface of the endpoint.
+     *
      * @param ei the EndpointInfo object identifying the endpoint
      * @return the effective policy
      */
@@ -97,16 +97,16 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         Policy p = getElementPolicy(ei);
         p = mergePolicies(p, getElementPolicy(ei.getBinding()));
         p = mergePolicies(p, getElementPolicy(ei.getInterface(), true));
-        
+
         return p;
     }
 
     /**
-     * The effective policy for a WSDL operation policy subject is calculated in relation to a 
-     * specific port, and includes the element policy of the wsdl11:portType/wsdl11:operation 
-     * element that defines the operation merged with that of the corresponding 
+     * The effective policy for a WSDL operation policy subject is calculated in relation to a
+     * specific port, and includes the element policy of the wsdl11:portType/wsdl11:operation
+     * element that defines the operation merged with that of the corresponding
      * wsdl11:binding/wsdl11:operation element.
-     * 
+     *
      * @param bi the BindingOperationInfo identifying the operation in relation to a port
      * @return the effective policy
      */
@@ -116,17 +116,17 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         p = mergePolicies(p, getElementPolicy(bi.getOperationInfo(), false, di));
         return p;
     }
-    
+
     /**
      * The effective policy for a specific WSDL message (input or output) is calculated
      * in relation to a specific port, and includes the element policy of the wsdl:message
-     * element that defines the message's type merged with the element policy of the 
+     * element that defines the message's type merged with the element policy of the
      * wsdl11:binding and wsdl11:portType message definitions that describe the message.
      * For example, the effective policy of a specific input message for a specific port
      * would be the (element policies of the) wsdl11:message element defining the message type,
      * the wsdl11:portType/wsdl11:operation/wsdl11:input element and the corresponding
      * wsdl11:binding/wsdl11:operation/wsdl11:input element for that message.
-     * 
+     *
      * @param bmi the BindingMessageInfo identifiying the message
      * @return the effective policy
      */
@@ -141,9 +141,9 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
 
         return p;
     }
-    
 
-    
+
+
     public Policy getEffectivePolicy(BindingFaultInfo bfi, Message m) {
         ServiceInfo si = bfi.getBindingOperation().getBinding().getService();
         DescriptionInfo di = si.getDescription();
@@ -156,35 +156,35 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
 
         return p;
     }
-    
+
     Policy getElementPolicy(AbstractDescriptionElement adh) {
         return getElementPolicy(adh, false);
     }
-    
+
     Policy getElementPolicy(AbstractDescriptionElement adh, boolean includeAttributes) {
         if (adh == null) {
             return null;
         }
         return getElementPolicy(adh, includeAttributes, adh.getDescription());
     }
-  
+
     Policy getElementPolicy(Extensible ex, boolean includeAttributes, DescriptionInfo di) {
         if (null == ex || null == di) {
             return null;
         }
-        
+
         if (di.getProperty("registeredPolicy") == null) {
-            List<UnknownExtensibilityElement> diext = 
+            List<UnknownExtensibilityElement> diext =
                 di.getExtensors(UnknownExtensibilityElement.class);
             if (diext != null) {
                 for (UnknownExtensibilityElement e : diext) {
                     String uri = e.getElement().getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                   PolicyConstants.WSU_ID_ATTR_NAME);
-                    
+
                     if (Constants.isPolicyElement(e.getElementType())
                         && !StringUtils.isEmpty(uri)) {
-                        
-                        String id = (di.getBaseURI() == null ? Integer.toString(di.hashCode()) : di.getBaseURI()) 
+
+                        String id = (di.getBaseURI() == null ? Integer.toString(di.hashCode()) : di.getBaseURI())
                                 + "#" + uri;
                         Policy policy = registry.lookup(id);
                         if (policy == null) {
@@ -203,11 +203,11 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             }
             di.setProperty("registeredPolicy", true);
         }
-        
+
         Policy elementPolicy = null;
-        List<UnknownExtensibilityElement> extensions = 
+        List<UnknownExtensibilityElement> extensions =
             ex.getExtensors(UnknownExtensibilityElement.class);
-        
+
         if (null != extensions) {
             for (UnknownExtensibilityElement e : extensions) {
                 Policy p = null;
@@ -228,7 +228,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
                 }
             }
         }
-        
+
         if (includeAttributes && ex.getExtensionAttributes() != null) {
             for (Map.Entry<QName, Object> ent : ex.getExtensionAttributes().entrySet()) {
                 if (Constants.isPolicyURIsAttr(ent.getKey())) {
@@ -248,7 +248,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
                             ref.setURI(uri);
                             Policy p = resolveReference(ref, di);
                             if (null != p) {
-                                elementPolicy = elementPolicy == null 
+                                elementPolicy = elementPolicy == null
                                     ? new Policy().merge(p) : elementPolicy.merge(p);
                             }
                         }
@@ -259,7 +259,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
 
         return elementPolicy;
     }
-    
+
     Policy resolveReference(PolicyReference ref, DescriptionInfo di) {
         Policy p = null;
         if (isExternal(ref)) {
@@ -274,7 +274,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         checkResolved(ref, p);
         return p;
     }
-    
+
     Policy resolveLocal(PolicyReference ref, DescriptionInfo di) {
         String uri = ref.getURI().substring(1);
         String absoluteURI = di.getBaseURI();
@@ -287,7 +287,7 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         if (null != resolved) {
             return resolved;
         }
-        
+
         ReferenceResolver resolver = new LocalServiceModelReferenceResolver(di, builder);
         resolved = resolver.resolveReference(uri);
         if (null != resolved) {
@@ -296,8 +296,8 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         }
         return resolved;
     }
-    
-     
+
+
     private Extensible getMessageTypeInfo(QName name, DescriptionInfo di) {
         if (null == di) {
             return null;
@@ -306,10 +306,10 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         if (null == def) {
             return null;
         }
-        
+
         javax.wsdl.Message m = def.getMessage(name);
         if (null != m) {
-            List<ExtensibilityElement> extensors = 
+            List<ExtensibilityElement> extensors =
                 CastUtils.cast(m.getExtensibilityElements(), ExtensibilityElement.class);
             if (null != extensors) {
                 return new ExtensibleInfo(extensors);
@@ -317,13 +317,13 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
         }
         return null;
     }
-     
-    private class ExtensibleInfo implements Extensible {
+
+    private static class ExtensibleInfo implements Extensible {
         private List<ExtensibilityElement> extensors;
         ExtensibleInfo(List<ExtensibilityElement> e) {
             extensors = e;
         }
-        
+
         public <T> T getExtensor(Class<T> cls) {
             for (ExtensibilityElement e : extensors) {
                 if (cls.isInstance(e)) {
@@ -336,8 +336,8 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             if (null == extensors) {
                 return null;
             }
-            
-            List<T> list = new ArrayList<T>(extensors.size());
+
+            List<T> list = new ArrayList<>(extensors.size());
             for (ExtensibilityElement e : extensors) {
                 if (cls.isInstance(e)) {
                     list.add(cls.cast(e));
@@ -346,10 +346,10 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             return list;
         }
 
-        public void addExtensionAttribute(QName arg0, Object arg1) {    
+        public void addExtensionAttribute(QName arg0, Object arg1) {
         }
 
-        public void addExtensor(Object arg0) {   
+        public void addExtensor(Object arg0) {
         }
 
         public Object getExtensionAttribute(QName arg0) {
@@ -360,12 +360,12 @@ public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider {
             return null;
         }
 
-        public void setExtensionAttributes(Map<QName, Object> arg0) {  
+        public void setExtensionAttributes(Map<QName, Object> arg0) {
         }
-        
-        
-        
-    } 
-   
+
+
+
+    }
+
 
 }

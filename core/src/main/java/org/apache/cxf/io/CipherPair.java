@@ -20,12 +20,14 @@
 package org.apache.cxf.io;
 
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.security.auth.DestroyFailedException;
 
 /**
  * A class to hold a pair of encryption and decryption ciphers.
@@ -33,12 +35,12 @@ import javax.crypto.spec.IvParameterSpec;
 public class CipherPair {
     private String transformation;
     private Cipher enccipher;
-    private Key key;
+    private SecretKey key;
     private byte[] ivp;
-    
+
     public CipherPair(String transformation) throws GeneralSecurityException {
         this.transformation = transformation;
-        
+
         int d = transformation.indexOf('/');
         String a;
         if (d > 0) {
@@ -58,15 +60,15 @@ public class CipherPair {
             throw e;
         }
     }
-    
+
     public String getTransformation() {
         return transformation;
     }
-    
+
     public Cipher getEncryptor() {
         return enccipher;
     }
-    
+
     public Cipher getDecryptor() {
         Cipher deccipher = null;
         try {
@@ -76,5 +78,17 @@ public class CipherPair {
             // ignore
         }
         return deccipher;
+    }
+
+    public void clean() {
+        if (ivp != null) {
+            Arrays.fill(ivp, (byte) 0);
+        }
+        // Clean the key after we're done with it
+        try {
+            key.destroy();
+        } catch (DestroyFailedException e) {
+            // ignore
+        }
     }
 }

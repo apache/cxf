@@ -29,11 +29,11 @@ import org.example.contract.doubleit.DoubleItPortType;
  * A utility class for security tests
  */
 public final class SecurityTestUtil {
-    
+
     private SecurityTestUtil() {
         // complete
     }
-    
+
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");
         if (tmpDir != null) {
@@ -50,7 +50,7 @@ public final class SecurityTestUtil {
             }
         }
     }
-    
+
     public static void enableStreaming(DoubleItPortType port) {
         ((BindingProvider)port).getRequestContext().put(
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -59,5 +59,5 @@ public final class SecurityTestUtil {
             SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
         );
     }
-    
+
 }

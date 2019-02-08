@@ -34,13 +34,13 @@ import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 
 
 
-@WebService(serviceName = "HelloWorldQueueDecoupledOneWaysService", 
-            portName = "HelloWorldQueueDecoupledOneWaysPort", 
+@WebService(serviceName = "HelloWorldQueueDecoupledOneWaysService",
+            portName = "HelloWorldQueueDecoupledOneWaysPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldOneWayPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
 public class GreeterImplQueueDecoupledOneWays implements HelloWorldOneWayPort {
-    
+
     @Resource
     private WebServiceContext context;
     private Throwable asyncEx;
@@ -55,7 +55,7 @@ public class GreeterImplQueueDecoupledOneWays implements HelloWorldOneWayPort {
     public GreeterImplQueueDecoupledOneWays(boolean specCompliant) {
         this.specCompliant = specCompliant;
     }
-    
+
     public void greetMeOneWay(String value) {
         synchronized (this) {
             request = value;
@@ -78,9 +78,9 @@ public class GreeterImplQueueDecoupledOneWays implements HelloWorldOneWayPort {
         }
         sendReply();
     }
-    
+
     protected void sendReply() {
-        JMSMessageHeadersType headers = 
+        JMSMessageHeadersType headers =
             (JMSMessageHeadersType)context.getMessageContext().get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
         if (headers == null || headers.getJMSReplyTo() == null) {
             synchronized (this) {
@@ -97,16 +97,16 @@ public class GreeterImplQueueDecoupledOneWays implements HelloWorldOneWayPort {
             }
             return;
         }
-        
+
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms",
                                       "HelloWorldQueueDecoupledOneWaysService");
         QName portName = new QName("http://cxf.apache.org/hello_world_jms",
                                    "HelloWorldQueueDecoupledOneWaysReplyPort");
         Throwable e = null;
-        
+
         try {
             URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
-            HelloWorldQueueDecoupledOneWaysService service = 
+            HelloWorldQueueDecoupledOneWaysService service =
                 new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
             HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
             reply = "Re:" + request;
@@ -124,7 +124,7 @@ public class GreeterImplQueueDecoupledOneWays implements HelloWorldOneWayPort {
     public void proceedWithReply() {
         latch.countDown();
     }
-        
+
     public String ackRequestReceived(long timeout) {
         synchronized (this) {
             if (request != null) {

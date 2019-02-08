@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
  * Java class for xsdQNameType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="xsdQNameType">
  *   &lt;simpleContent>
@@ -58,7 +58,7 @@ public class XsdQNameType {
 
     /**
      * Gets the value of the value property.
-     * 
+     *
      * @return possible object is {@link QName }
      */
     public QName getValue() {
@@ -67,7 +67,7 @@ public class XsdQNameType {
 
     /**
      * Sets the value of the value property.
-     * 
+     *
      * @param value allowed object is {@link QName }
      */
     public void setValue(QName value) {
@@ -76,7 +76,7 @@ public class XsdQNameType {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -85,7 +85,7 @@ public class XsdQNameType {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String v) {

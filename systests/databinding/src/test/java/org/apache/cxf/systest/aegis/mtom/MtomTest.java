@@ -44,12 +44,12 @@ import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.ws.commons.schema.constants.Constants;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
  *
@@ -78,7 +78,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         jaxwsFac.setDataBinding(new AegisDatabinding());
         jaxwsFac.setAddress("http://localhost:" + PORT + "/jaxWsMtom");
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         if (enableClientMTOM) {
             props.put("mtom-enabled", Boolean.TRUE);
         }
@@ -145,7 +145,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Assert.assertNotNull(accepted);
         InputStream data = accepted.getDataHandler().getInputStream();
         Assert.assertNotNull(data);
-        String dataString = org.apache.commons.io.IOUtils.toString(data, "utf-8");
+        String dataString = IOUtils.toString(data, "utf-8");
         Assert.assertEquals("This is the cereal shot from guns.", dataString);
     }
 

@@ -82,7 +82,7 @@ final class InternalContextUtils {
             //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
             //we don't wait for a response.
             inMessage.getExchange().setOneWay(true);
-            ConduitInitiator conduitInitiator 
+            ConduitInitiator conduitInitiator
                 = bus.getExtension(ConduitInitiatorManager.class)
                     .getConduitInitiatorForUri(reference.getAddress().getValue());
             if (conduitInitiator != null) {
@@ -124,19 +124,19 @@ final class InternalContextUtils {
     private InternalContextUtils() {
     }
 
-    
+
     /**
      * Rebase response on replyTo
-     * 
+     *
      * @param reference the replyTo reference
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
-    //CHECKSTYLE:OFF  Max executable statement count limitation
+    //CHECKSTYLE:OFF Max executable statement count limitation
     public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
-        
+
         String namespaceURI = inMAPs.getNamespaceURI();
         if (!ContextUtils.retrievePartialResponseSent(inMessage)) {
             ContextUtils.storePartialResponseSent(inMessage);
@@ -144,7 +144,7 @@ final class InternalContextUtils {
             Message fullResponse = exchange.getOutMessage();
             Message partialResponse = ContextUtils.createMessage(exchange);
             ensurePartialResponseMAPs(partialResponse, namespaceURI);
-            
+
             // ensure the inbound MAPs are available in the partial response
             // message (used to determine relatesTo etc.)
             ContextUtils.propogateReceivedMAPs(inMAPs, partialResponse);
@@ -152,7 +152,7 @@ final class InternalContextUtils {
             if (target == null) {
                 return;
             }
-            
+
             try {
                 if (reference == null) {
                     reference = ContextUtils.getNoneEndpointReference();
@@ -161,9 +161,8 @@ final class InternalContextUtils {
                 if (backChannel != null) {
                     partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
-                    boolean robust =
-                        MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
-                    
+                    boolean robust = MessageUtils.getContextualBoolean(inMessage, Message.ROBUST_ONEWAY, false);
+
                     if (robust) {
                         BindingOperationInfo boi = exchange.getBindingOperationInfo();
                         // insert the executor in the exchange to fool the OneWayProcessorInterceptor
@@ -174,8 +173,8 @@ final class InternalContextUtils {
                         // restore the BOI for the partial response handling
                         exchange.put(BindingOperationInfo.class, boi);
                     }
-                    
-                    
+
+
                     // set up interceptor chains and send message
                     InterceptorChain chain =
                         fullResponse != null
@@ -187,30 +186,29 @@ final class InternalContextUtils {
                                  new PreexistingConduitSelector(backChannel,
                                                                 exchange.getEndpoint()));
 
-                    if (chain != null && !chain.doIntercept(partialResponse) 
+                    if (chain != null && !chain.doIntercept(partialResponse)
                         && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
                             throw (Fault)partialResponse.getContent(Exception.class);
-                        } else {
-                            throw new Fault(partialResponse.getContent(Exception.class));
                         }
+                        throw new Fault(partialResponse.getContent(Exception.class));
                     }
                     if (chain != null) {
-                        chain.reset();                        
+                        chain.reset();
                     }
                     exchange.put(ConduitSelector.class, new NullConduitSelector());
-                    
+
                     if (fullResponse == null) {
                         fullResponse = ContextUtils.createMessage(exchange);
                     }
                     exchange.setOutMessage(fullResponse);
-                    
+
                     Destination destination = createDecoupledDestination(
-                        exchange, 
+                        exchange,
                         reference);
                     exchange.setDestination(destination);
 
-                } 
+                }
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "SERVER_TRANSPORT_REBASE_FAILURE_MSG", e);
             }
@@ -223,10 +221,10 @@ final class InternalContextUtils {
         final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new DecoupledDestination(ei, reference);
     }
-    
+
     /**
      * Construct and store MAPs for partial response.
-     * 
+     *
      * @param partialResponse the partial response message
      * @param namespaceURI the current namespace URI
      */
@@ -252,7 +250,7 @@ final class InternalContextUtils {
     private static Executor getExecutor(final Message message) {
         Endpoint endpoint = message.getExchange().getEndpoint();
         Executor executor = endpoint.getService().getExecutor();
-        
+
         if (executor == null || SynchronousExecutor.isA(executor)) {
             // need true asynchrony
             Bus bus = message.getExchange().getBus();
@@ -271,5 +269,5 @@ final class InternalContextUtils {
         message.getExchange().put(Executor.class, executor);
         return executor;
     }
- 
+
 }

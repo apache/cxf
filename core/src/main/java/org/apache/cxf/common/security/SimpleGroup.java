@@ -19,7 +19,6 @@
 package org.apache.cxf.common.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,20 +28,20 @@ import java.util.Set;
  * Simple Group implementation
  *
  */
-public class SimpleGroup extends SimplePrincipal implements Group {
-    
+public class SimpleGroup extends SimplePrincipal implements GroupPrincipal {
+
     private static final long serialVersionUID = 1L;
-    private Set<Principal> members = new HashSet<Principal>();
-    
+    private Set<Principal> members = new HashSet<>();
+
     public SimpleGroup(String groupName) {
         super(groupName);
     }
-    
+
     public SimpleGroup(String groupName, String memberName) {
         super(groupName);
         members.add(new SimplePrincipal(memberName));
     }
-    
+
     public SimpleGroup(String groupName, Principal member) {
         super(groupName);
         members.add(member);
@@ -55,11 +54,11 @@ public class SimpleGroup extends SimplePrincipal implements Group {
     public boolean addMember(Principal p) {
         return members.add(p);
     }
-    
+
     public Enumeration<? extends Principal> members() {
-        
+
         final Iterator<Principal> it = members.iterator();
-        
+
         return new Enumeration<Principal>() {
 
             public boolean hasMoreElements() {
@@ -69,22 +68,22 @@ public class SimpleGroup extends SimplePrincipal implements Group {
             public Principal nextElement() {
                 return it.next();
             }
-            
+
         };
     }
 
     public boolean removeMember(Principal p) {
         return members.remove(p);
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof SimpleGroup)) {
             return false;
         }
         SimpleGroup other = (SimpleGroup)obj;
-        return getName().equals(other.getName()) && members.equals(other.members);
+        return members.equals(other.members) && super.equals(obj);
     }
-    
+
     public int hashCode() {
         return getName().hashCode() + 37 * members.hashCode();
     }

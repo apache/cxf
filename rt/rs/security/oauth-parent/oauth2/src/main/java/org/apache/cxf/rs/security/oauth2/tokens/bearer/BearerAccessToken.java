@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.tokens.bearer;
 
+import javax.persistence.Entity;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -26,20 +28,21 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 /**
  * Simple Bearer Access Token implementations
  */
+@Entity
 public class BearerAccessToken extends ServerAccessToken {
     private static final long serialVersionUID = -3614732043728799245L;
-    
-    public BearerAccessToken(Client client, 
+
+    public BearerAccessToken(Client client,
                              long lifetime) {
-        super(client, 
-              OAuthConstants.BEARER_TOKEN_TYPE, 
-              OAuthUtils.generateRandomTokenKey(), 
-              lifetime, 
+        super(client,
+              OAuthConstants.BEARER_TOKEN_TYPE,
+              OAuthUtils.generateRandomTokenKey(),
+              lifetime,
               OAuthUtils.getIssuedAt());
     }
-    public BearerAccessToken(Client client, 
+    public BearerAccessToken(Client client,
                              String tokenKey,
-                             long lifetime, 
+                             long lifetime,
                              long issuedAt) {
         super(client, OAuthConstants.BEARER_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
     }
@@ -50,6 +53,6 @@ public class BearerAccessToken extends ServerAccessToken {
         super(validateTokenType(token, OAuthConstants.BEARER_TOKEN_TYPE), newKey);
     }
     public BearerAccessToken() {
-        
+
     }
 }

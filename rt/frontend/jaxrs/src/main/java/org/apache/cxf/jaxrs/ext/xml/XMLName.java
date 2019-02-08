@@ -26,8 +26,8 @@ import java.lang.annotation.Target;
 
 /**
  * Can be used to assign qualified XML names to arbitrary classes
- * for the purpose of matching them with external schema definitions 
- * 
+ * for the purpose of matching them with external schema definitions
+ *
  */
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
@@ -37,7 +37,7 @@ public @interface XMLName {
      */
     String value() default "";
     /**
-     * Optional prefix 
+     * Optional prefix
      **/
     String prefix() default "";
 }

@@ -27,4 +27,4 @@ public interface BookStoreJaxrs {
 
     @GET
     int getId();
-} 
+}

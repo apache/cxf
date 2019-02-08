@@ -28,13 +28,13 @@ public class OwnerAddress {
 
 
     public OwnerAddress() {
-        
+
     }
-    
+
     public OwnerAddress(String street) {
         this.street = street;
     }
-    
+
     public String getStreet() {
         return street;
     }

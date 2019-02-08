@@ -32,11 +32,11 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -56,17 +56,21 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
  */
 public abstract class AbstractClientPersistenceTest extends AbstractBusClientServerTestBase {
-    public static final String GREETMEONEWAY_ACTION 
+    public static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     public static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
     private static final Logger LOG = LogUtils.getLogger(ClientPersistenceTest.class);
-    
+
     private Greeter greeter;
     private OutMessageRecorder out;
     private InMessageRecorder in;
@@ -75,12 +79,12 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         Endpoint ep;
         String port;
         String pfx;
-        
-        public Server(String args[]) {
+
+        public Server(String[] args) {
             port = args[0];
             pfx = args[1];
         }
-        
+
         protected void run() {
             SpringBusFactory bf = new SpringBusFactory();
             System.setProperty("db.name", pfx + "-server");
@@ -88,20 +92,20 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             BusFactory.setDefaultBus(bus);
             setBus(bus);
             System.clearProperty("db.name");
-            
+
             LoggingInInterceptor logIn = new LoggingInInterceptor();
             bus.getInInterceptors().add(logIn);
             LoggingOutInterceptor logOut = new LoggingOutInterceptor();
             bus.getOutFaultInterceptors().add(logOut);
             bus.getOutFaultInterceptors().add(logOut);
-            
+
             bus.getExtension(RMManager.class).getConfiguration()
-                .setBaseRetransmissionInterval(new Long(60000));
-            
+                .setBaseRetransmissionInterval(Long.valueOf(60000));
+
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + port + "/SoapContext/GreeterPort";
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);
@@ -111,8 +115,8 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             ep.stop();
             ep = null;
         }
-        
-        public static void main(String args[]) {
+
+        public static void main(String[] args) {
             new Server(args).start();
         }
 
@@ -120,7 +124,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
 
     public abstract String getPort();
     public abstract String getPrefix();
-    
+
     public static void startServers(String port, String pfx) throws Exception {
         RMTxStore.deleteDatabaseFiles(pfx + "-server", true);
         RMTxStore.deleteDatabaseFiles(pfx + "-client", true);
@@ -128,7 +132,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
                    launchServer(Server.class, null, new String[] {port, pfx}, true));
     }
 
-    @Test 
+    @Test
     public void testRecovery() throws Exception {
         startClient();
         populateStore();
@@ -139,7 +143,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         recover();
         verifyRecovery();
     }
-    
+
     void startClient() throws Exception {
         LOG.fine("Creating greeter client");
         System.setProperty("db.name", getPrefix() + "-client");
@@ -160,20 +164,20 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
     }
 
     void populateStore() throws Exception {
-        
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
+
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
         bus.getOutInterceptors().add(new MessageLossSimulator());
-                
+
         greeter.greetMeOneWay("one");
         greeter.greetMeOneWay("two");
         greeter.greetMeOneWay("three");
         greeter.greetMeOneWay("four");
 
         awaitMessages(5, 3);
-        
+
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        
+
         // sent create seq + 4 app messages and losing 2 app messages
         mf.verifyMessages(5, true);
         String[] expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_ACTION,
@@ -185,59 +189,59 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3", "4"}, true);
         mf.verifyAcknowledgements(new boolean[5], true);
 
-        // as 2 messages being lost, received seq ack and 2 ack messages 
+        // as 2 messages being lost, received seq ack and 2 ack messages
         mf.verifyMessages(3, false);
         expectedActions = new String[] {RM10Constants.CREATE_SEQUENCE_RESPONSE_ACTION,
             RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION,
             RM10Constants.SEQUENCE_ACKNOWLEDGMENT_ACTION};
         mf.verifyActions(expectedActions, false);
-        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);        
+        mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
-    
+
     void verifyStorePopulation() {
-        
+
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMStore store = manager.getStore();
         assertNotNull(store);
-        
+
         Client client = ClientProxy.getClient(greeter);
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
-        
+
         Collection<DestinationSequence> dss =
             store.getDestinationSequences(id);
         assertEquals(1, dss.size());
-        
+
         Collection<SourceSequence> sss =
             store.getSourceSequences(id);
         assertEquals(1, sss.size());
-        
-        Collection<RMMessage> msgs = 
+
+        Collection<RMMessage> msgs =
             store.getMessages(sss.iterator().next().getIdentifier(), true);
-        assertEquals(2, msgs.size());  
-        
-        msgs = 
+        assertEquals(2, msgs.size());
+
+        msgs =
             store.getMessages(sss.iterator().next().getIdentifier(), false);
-        assertEquals(0, msgs.size());  
+        assertEquals(0, msgs.size());
     }
-    
+
     void stopClient() {
         // ClientProxy.getClient(greeter).destroy();
         bus.shutdown(true);
     }
-      
+
     void populateStoreAfterRestart() throws Exception {
-        
-        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(60000));
+
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
 
         greeter.greetMeOneWay("five");
 
         // force at least two outbound messages, since can't always count on three
         awaitMessages(1, 2);
-        
+
         MessageFlow mf = new MessageFlow(out.getOutboundMessages(), in.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        
+
         // sent 1 app message and no create seq messag this time
         mf.verifyMessages(1, true);
         String[] expectedActions = new String[] {GREETMEONEWAY_ACTION};
@@ -257,12 +261,12 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
 //            null};
 //        mf.verifyActions(expectedActions, false);
 //        mf.verifyAcknowledgements(new boolean[]{true, true, false}, false);
-        
+
         // verify the final ack range to be complete
         try {
             mf.verifyAcknowledgementRange(1, 5);
         } catch (AssertionError er) {
-            //possibly only got the first 2 ranges when split in 3, lets 
+            //possibly only got the first 2 ranges when split in 3, lets
             //wait for the third and then recheck
             awaitMessages(1, 3);
             mf.reset(out.getOutboundMessages(), in.getInboundMessages());
@@ -271,47 +275,47 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
     }
 
     void recover() throws Exception {
-        
-        // do nothing - resends should happen in the background  
-       
+
+        // do nothing - resends should happen in the background
+
         Thread.sleep(5000);
         LOG.info("Recovered messages should have been resent by now.");
- 
+
     }
-    
+
     void verifyRecovery() throws Exception {
-        
+
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
-        
+
         RMStore store = manager.getStore();
         assertNotNull(store);
-        
+
         Client client = ClientProxy.getClient(greeter);
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint());
-        
+
         Collection<DestinationSequence> dss =
             store.getDestinationSequences(id);
         assertEquals(1, dss.size());
-        
+
         Collection<SourceSequence> sss =
             store.getSourceSequences(id);
         assertEquals(1, sss.size());
-        
+
         int i = 0;
         while (store.getMessages(sss.iterator().next().getIdentifier(), true).size() > 0 && i < 10) {
             Thread.sleep(200);
             i++;
         }
-       
+
         assertEquals(0, store.getMessages(sss.iterator().next().getIdentifier(), true).size());
-        assertEquals(0, store.getMessages(sss.iterator().next().getIdentifier(), false).size());        
+        assertEquals(0, store.getMessages(sss.iterator().next().getIdentifier(), false).size());
     }
-    
+
     private void awaitMessages(int nExpectedOut, int nExpectedIn) {
         awaitMessages(nExpectedOut, nExpectedIn, 20000);
     }
-    
+
     private void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
         MessageRecorder mr = new MessageRecorder(out, in);
         mr.awaitMessages(nExpectedOut, nExpectedIn, timeout);

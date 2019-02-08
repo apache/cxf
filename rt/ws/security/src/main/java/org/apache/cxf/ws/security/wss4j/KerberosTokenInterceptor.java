@@ -27,8 +27,8 @@ import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An interceptor to add a Kerberos token to the security header of an outbound request, and to
- * process a Kerberos Token on an inbound request. It takes the Kerberos Token from the message 
- * context on the outbound side, where it was previously placed by the 
+ * process a Kerberos Token on an inbound request. It takes the Kerberos Token from the message
+ * context on the outbound side, where it was previously placed by the
  * KerberosTokenInterceptorProvider.
  */
 public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
@@ -36,7 +36,7 @@ public class KerberosTokenInterceptor extends BinarySecurityTokenInterceptor {
     public KerberosTokenInterceptor() {
         super();
     }
-    
+
     protected AbstractToken assertTokens(SoapMessage message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         PolicyUtils.assertPolicy(aim, "WssKerberosV5ApReqToken11");

@@ -29,16 +29,16 @@ import org.apache.wss4j.dom.validate.Credential;
  * checks that we get back a SAML2 Assertion from the STS.
  */
 public class CustomBSTTokenValidator extends STSTokenValidator {
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        
+
         SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"DoubleItSTSIssuer".equals(transformedToken.getIssuerString())) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE);
         }
-        
+
         return validatedCredential;
     }
 

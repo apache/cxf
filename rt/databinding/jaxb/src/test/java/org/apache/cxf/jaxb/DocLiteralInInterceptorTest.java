@@ -53,16 +53,18 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-import org.easymock.IMocksControl;
 
-import org.junit.Assert;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class DocLiteralInInterceptorTest extends Assert {
+public class DocLiteralInInterceptorTest {
     PhaseInterceptorChain chain;
     MessageImpl message;
     Bus bus;
@@ -169,7 +171,6 @@ public class DocLiteralInInterceptorTest extends Assert {
         assertNull(parameters);
     }
 
-     //TODO: remove duplicate code in setUpUsingHelloWorld and setUpUsingDocLit
     private void setUpUsingHelloWorld() throws Exception {
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()

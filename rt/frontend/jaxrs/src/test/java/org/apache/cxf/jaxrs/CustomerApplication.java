@@ -25,7 +25,7 @@ import javax.ws.rs.core.UriInfo;
 public class CustomerApplication extends Application {
     @Context
     private UriInfo uriInfo;
-    
+
     public UriInfo getUriInfo() {
         return uriInfo;
     }

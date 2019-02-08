@@ -30,19 +30,19 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public class ServletOutputStreamFilter extends ServletOutputStream {
 
     private Message m;
-    private ServletOutputStream os; 
-    
+    private ServletOutputStream os;
+
     public ServletOutputStreamFilter(ServletOutputStream os, Message m) {
         this.os = os;
         this.m = m;
     }
-    
+
     @Override
     public void write(int b) throws IOException {
         setComittedStatus();
         os.write(b);
     }
-    
+
     @Override
     public void write(byte[] b) throws IOException {
         setComittedStatus();

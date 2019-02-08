@@ -59,7 +59,7 @@ sun_tool_path=""
 if [ $darwin = false ]; then
     sun_tool_path=${JAVA_HOME}/lib/tools.jar
     if [ ! -f $sun_tool_path ]; then
-	echo "ERROR: Set JAVA_HOME to the path where the J2SE 6.0 (JDK6.0) is installed"
+	echo "ERROR: Set JAVA_HOME to the path where the Java Development Kit (JDK) is installed"
 	exit 1
     fi
 fi 
@@ -83,7 +83,13 @@ if $cygwin; then
 else
    cxf_classpath=${cxf_jar}:${CLASSPATH}:${sun_tool_path}
 fi
-$JAVA_HOME/bin/java -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.XSDToWSDL "$@"
+
+if [ "x${JAVA_MAX_MEM}" = "x" ]; then
+    JAVA_MAX_MEM=512M
+    export JAVA_MAX_MEM
+fi
+
+$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.XSDToWSDL "$@"
 
 
 

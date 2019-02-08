@@ -26,9 +26,10 @@ import java.util.Properties;
 import javax.security.auth.callback.CallbackHandler;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.sts.STSConstants;
@@ -41,17 +42,21 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.systest.sts.common.CommonCallbackHandler;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
-import org.apache.cxf.systest.sts.issueunit.IssueUnitTest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.WSConstants;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Some tests for sending a SAML Token OnBehalfOf/ActAs to the STS. The STS is set up with
@@ -60,18 +65,18 @@ import org.junit.BeforeClass;
  * SAML DelegationHandler.
  */
 public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
-    
+
     private static final String STSPORT = allocatePort(STSServer.class);
-    
-    private static final String SAML2_TOKEN_TYPE = 
+
+    private static final String SAML2_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
-    private static final String PUBLIC_KEY_KEYTYPE = 
+    private static final String PUBLIC_KEY_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
-    private static final String BEARER_KEYTYPE = 
+    private static final String BEARER_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
-    private static final String DEFAULT_ADDRESS = 
+    private static final String DEFAULT_ADDRESS =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -81,7 +86,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -91,178 +96,158 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testSAMLOnBehalfOf() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token from the UT endpoint first
         SecurityToken token =
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
-        assertTrue(token.getToken() != null);
-        
+        assertNotNull(token.getToken());
+
         // Use the first token as OnBehalfOf to get another token
-        
+
         // First try with the UT endpoint. This should fail as there is no Delegation Handler.
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                      DEFAULT_ADDRESS, true, "Transport_UT_Port");
             fail("Failure expected on no delegation handler");
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Now send to the Transport endpoint.
         SecurityToken token2 =
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, true, "Transport_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
-        assertTrue(token2.getToken() != null);
-        
+        assertNotNull(token2.getToken());
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAMLActAs() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         // Get a token from the UT endpoint first
         SecurityToken token =
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
-        assertTrue(token.getToken() != null);
-        
+        assertNotNull(token.getToken());
+
         // Use the first token as ActAs to get another token
-        
+
         // First try with the UT endpoint. This should fail as there is no Delegation Handler.
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                      DEFAULT_ADDRESS, false, "Transport_UT_Port");
             fail("Failure expected on no delegation handler");
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Now send to the Transport endpoint.
         SecurityToken token2 =
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, false, "Transport_Port");
         assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
-        assertTrue(token2.getToken() != null);
-        
+        assertNotNull(token2.getToken());
+
         bus.shutdown(true);
     }
-    
-    @org.junit.Test
-    public void testTransportNoDelegationToken() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
 
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, 
-                                 DEFAULT_ADDRESS, "Transport_Port");
-            fail("Failure expected on no delegation token");
-        } catch (Exception ex) {
-            // expected
-        }
-        
-        bus.shutdown(true);
-    }
-    
     @org.junit.Test
     public void testTransportForgedDelegationToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new CommonCallbackHandler();
-        
+
         // Create SAML token
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
+        Element samlToken =
+            createSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
                                 crypto, "eve", callbackHandler, "alice", "a-issuer");
 
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus,
                                  DEFAULT_ADDRESS, true, "Transport_Port");
             fail("Failure expected on a forged delegation token");
         } catch (Exception ex) {
             // expected
         }
-        
+
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus,
                                  DEFAULT_ADDRESS, false, "Transport_Port");
             fail("Failure expected on a forged delegation token");
         } catch (Exception ex) {
             // expected
         }
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testTransportUnsignedDelegationToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = IssueUnitTest.class.getResource("cxf-client.xml");
+        URL busFile = SAMLDelegationTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
         // Create SAML token
-        Element samlToken = 
-            createUnsignedSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
+        Element samlToken =
+            createUnsignedSAMLAssertion(WSS4JConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE,
                                 "alice", "a-issuer");
 
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus,
                                  DEFAULT_ADDRESS, true, "Transport_Port");
             fail("Failure expected on a unsigned delegation token");
         } catch (Exception ex) {
             // expected
         }
-        
+
         try {
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus, 
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, samlToken, bus,
                                  DEFAULT_ADDRESS, false, "Transport_Port");
             fail("Failure expected on a unsigned delegation token");
         } catch (Exception ex) {
             // expected
         }
-        
+
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
-        String tokenType, 
-        String keyType, 
+        String tokenType,
+        String keyType,
         Bus bus,
         String endpointAddress,
         String wsdlPort
     ) throws Exception {
         return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, true, wsdlPort);
     }
-    
+
     private SecurityToken requestSecurityToken(
-        String tokenType, 
+        String tokenType,
         String keyType,
         Element supportingToken,
         Bus bus,
@@ -274,7 +259,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         String port = STSPORT;
 
         stsClient.setWsdlLocation("https://localhost:" + port + "/SecurityTokenService/Transport?wsdl");
-        
+
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         if (wsdlPort != null) {
             stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}" + wsdlPort);
@@ -282,12 +267,12 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
             stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         }
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
-        properties.put(SecurityConstants.CALLBACK_HANDLER, 
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put(SecurityConstants.IS_BSP_COMPLIANT, "false");
-        
+
         if (PUBLIC_KEY_KEYTYPE.equals(keyType)) {
             properties.put(SecurityConstants.STS_TOKEN_USERNAME, "myclientkey");
             properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "clientKeystore.properties");
@@ -300,55 +285,55 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
                 stsClient.setActAs(supportingToken);
             }
         }
-        
+
         stsClient.setProperties(properties);
         stsClient.setTokenType(tokenType);
         stsClient.setKeyType(keyType);
-        
+
         return stsClient.requestSecurityToken(endpointAddress);
     }
-    
+
     /*
      * Mock up an SAML assertion element
      */
     private Element createSAMLAssertion(
-        String tokenType, String keyType, Crypto crypto, String signatureUsername, 
+        String tokenType, String keyType, Crypto crypto, String signatureUsername,
         CallbackHandler callbackHandler, String user, String issuer
     ) throws WSSecurityException {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
 
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 tokenType, keyType, crypto, signatureUsername, callbackHandler, user, issuer
             );
-        
+
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
     }
-    
+
     private Element createUnsignedSAMLAssertion(
         String tokenType, String keyType, String user, String issuer
     ) throws WSSecurityException {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setSignToken(false);
 
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 tokenType, keyType, null, null, null, user, issuer
             );
 
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
     }
-    
+
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler,
         String username, String issuer
     ) throws WSSecurityException {
@@ -366,8 +351,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
+        parameters.setMessageContext(msgCtx);
 
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
 
@@ -383,7 +367,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
 
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(

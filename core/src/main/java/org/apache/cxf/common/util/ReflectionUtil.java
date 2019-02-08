@@ -37,14 +37,14 @@ import java.util.List;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 
 public final class ReflectionUtil {
-    
-    private static Method springBeanUtilsDescriptorFetcher; 
+
+    private static Method springBeanUtilsDescriptorFetcher;
     private static boolean springChecked;
-    
+
     private ReflectionUtil() {
         // intentionally empty
     }
-    
+
     public static <T> T accessDeclaredField(final Field f, final Object o, final Class<T> responseClass) {
         return AccessController.doPrivileged(new PrivilegedAction<T>() {
             public T run() {
@@ -52,9 +52,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -64,7 +62,7 @@ public final class ReflectionUtil {
     }
     public static <T> T accessDeclaredField(final String fieldName,
                                             final Class<?> cls,
-                                            final Object o, 
+                                            final Object o,
                                             final Class<T> responseClass) {
         return AccessController.doPrivileged(new PrivilegedAction<T>() {
             public T run() {
@@ -73,9 +71,7 @@ public final class ReflectionUtil {
                 try {
                     f.setAccessible(true);
                     return responseClass.cast(f.get(o));
-                } catch (SecurityException e) {
-                    return null;
-                } catch (IllegalAccessException e) {
+                } catch (SecurityException | IllegalAccessException e) {
                     return null;
                 } finally {
                     f.setAccessible(b);
@@ -83,15 +79,13 @@ public final class ReflectionUtil {
             }
         });
     }
-    
+
     public static Field getDeclaredField(final Class<?> cls, final String name) {
         return AccessController.doPrivileged(new PrivilegedAction<Field>() {
             public Field run() {
                 try {
                     return cls.getDeclaredField(name);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchFieldException e) {
+                } catch (SecurityException | NoSuchFieldException e) {
                     return null;
                 }
             }
@@ -103,29 +97,25 @@ public final class ReflectionUtil {
             public Constructor<T> run() {
                 try {
                     return cls.getDeclaredConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
         });
-        
+
     }
     public static <T> Constructor<T> getConstructor(final Class<T> cls, final Class<?> ... args) {
         return AccessController.doPrivileged(new PrivilegedAction<Constructor<T>>() {
             public Constructor<T> run() {
                 try {
                     return cls.getConstructor(args);
-                } catch (SecurityException e) {
-                    return null;
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     return null;
                 }
             }
-        });      
+        });
     }
-    
+
     public static <T> Constructor<T>[] getDeclaredConstructors(final Class<T> cls) {
         return AccessController.doPrivileged(new PrivilegedAction<Constructor<T>[]>() {
             @SuppressWarnings("unchecked")
@@ -134,11 +124,11 @@ public final class ReflectionUtil {
                     return (Constructor<T>[])cls.getDeclaredConstructors();
                 } catch (SecurityException e) {
                     return null;
-                } 
+                }
             }
-        });      
+        });
     }
-    
+
     public static Method[] getDeclaredMethods(final Class<?> cls) {
         return AccessController.doPrivileged(new PrivilegedAction<Method[]>() {
             public Method[] run() {
@@ -159,9 +149,24 @@ public final class ReflectionUtil {
             Exception e = pae.getException();
             if (e instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException)e;
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
+        }
+    }
+    public static Method getMethod(final Class<?> clazz, final String name,
+                                   final Class<?>... parameterTypes) throws NoSuchMethodException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                public Method run() throws Exception {
+                    return clazz.getMethod(name, parameterTypes);
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException)e;
+            }
+            throw new SecurityException(e);
         }
     }
 
@@ -189,7 +194,7 @@ public final class ReflectionUtil {
             }
         });
     }
-    
+
     /**
      *  create own array of property descriptors to:
      *  <pre>
@@ -204,7 +209,7 @@ public final class ReflectionUtil {
      * @param beanClass class for bean in question
      * @param propertyDescriptors raw descriptors
      */
-    public static PropertyDescriptor[] getPropertyDescriptorsAvoidSunBug(Class<?> refClass, 
+    public static PropertyDescriptor[] getPropertyDescriptorsAvoidSunBug(Class<?> refClass,
                                                                   BeanInfo beanInfo,
                                                                   Class<?> beanClass,
                                                                   PropertyDescriptor[] propertyDescriptors) {
@@ -213,45 +218,42 @@ public final class ReflectionUtil {
                 springChecked = true;
                 Class<?> cls = ClassLoaderUtils
                     .loadClass("org.springframework.beans.BeanUtils", refClass);
-                springBeanUtilsDescriptorFetcher 
-                    = cls.getMethod("getPropertyDescriptor", new Class[] {Class.class, String.class});
+                springBeanUtilsDescriptorFetcher
+                    = cls.getMethod("getPropertyDescriptor", Class.class, String.class);
             } catch (Exception e) {
                 //ignore - just assume it's an unsupported/unknown annotation
             }
         }
-        
+
         if (springBeanUtilsDescriptorFetcher != null) {
             if (propertyDescriptors != null) {
-                List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>(propertyDescriptors.length);
+                List<PropertyDescriptor> descriptors = new ArrayList<>(propertyDescriptors.length);
                 for (int i = 0; i < propertyDescriptors.length; i++) {
                     PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
                     try {
                         propertyDescriptor = (PropertyDescriptor)springBeanUtilsDescriptorFetcher.invoke(null,
-                                                                                     beanClass, 
+                                                                                     beanClass,
                                                                                      propertyDescriptor.getName());
                         if (propertyDescriptor != null) {
                             descriptors.add(propertyDescriptor);
                         }
-                    } catch (IllegalArgumentException e) {
-                        throw new RuntimeException(e);
-                    } catch (IllegalAccessException e) {
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
                         throw new RuntimeException(e);
                     } catch (InvocationTargetException e) {
                         throw new RuntimeException(e.getCause());
-                    } 
+                    }
                 }
-                return descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
+                return descriptors.toArray(new PropertyDescriptor[0]);
             }
             return null;
-        } else {
-            return beanInfo.getPropertyDescriptors();
         }
+        return beanInfo.getPropertyDescriptors();
     }
 
     /**
      * Look for a specified annotation on a method. If there, return it. If not, search it's containing class.
      * Assume that the annotation is marked @Inherited.
-     * 
+     *
      * @param m method to examine
      * @param annotationType the annotation type to look for.
      */
@@ -261,6 +263,27 @@ public final class ReflectionUtil {
         if (annotation != null) {
             return annotation;
         }
-        return m.getDeclaringClass().getAnnotation(annotationType);
+        annotation = m.getDeclaringClass().getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf : m.getDeclaringClass().getInterfaces()) {
+            annotation = getAnnotationForInterface(intf, annotationType);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+    
+    private static <T extends Annotation> T getAnnotationForInterface(Class<?> intf, Class<T> annotationType) {
+        T annotation = intf.getAnnotation(annotationType);
+        if (annotation != null) {
+            return annotation;
+        }
+        for (Class<?> intf2 : intf.getInterfaces()) {
+            return getAnnotationForInterface(intf2, annotationType);
+        }
+        return null;
     }
 }

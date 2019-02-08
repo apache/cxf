@@ -29,6 +29,6 @@ public interface TokenReplayCache<T> extends Closeable {
     void putId(T id);
 
     void putId(T id, long timeToLive);
-    
+
     void close() throws IOException;
 }

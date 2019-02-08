@@ -62,7 +62,7 @@ public class SchemaCollection {
 
     private XmlSchemaCollection schemaCollection;
     private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
-        = new HashMap<XmlSchema, Set<XmlSchemaType>>();
+        = new HashMap<>();
 
     public SchemaCollection() {
         this(new XmlSchemaCollection());
@@ -161,7 +161,8 @@ public class SchemaCollection {
      */
     public XmlSchema getSchemaByTargetNamespace(String namespaceURI) {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (namespaceURI.equals(schema.getTargetNamespace())) {
+            if (namespaceURI != null && namespaceURI.equals(schema.getTargetNamespace())
+                || namespaceURI == null && schema.getTargetNamespace() == null) {
                 return schema;
             }
         }
@@ -276,7 +277,7 @@ public class SchemaCollection {
         if (schemaType != null) {
             Set<XmlSchemaType> xmlTypesCheckedForCrossImports;
             if (!xmlTypesCheckedForCrossImportsPerSchema.containsKey(schema)) {
-                xmlTypesCheckedForCrossImports = new HashSet<XmlSchemaType>();
+                xmlTypesCheckedForCrossImports = new HashSet<>();
                 xmlTypesCheckedForCrossImportsPerSchema.put(schema, xmlTypesCheckedForCrossImports);
             } else {
                 xmlTypesCheckedForCrossImports = xmlTypesCheckedForCrossImportsPerSchema.get(schema);
@@ -298,7 +299,7 @@ public class SchemaCollection {
             addCrossImports(schema, complexType.getContentModel());
             addCrossImportsAttributeList(schema, complexType.getAttributes());
             // could it be a choice or something else?
-            
+
             if (complexType.getParticle() instanceof XmlSchemaChoice) {
                 XmlSchemaChoice choice = (XmlSchemaChoice)complexType.getParticle();
                 addCrossImports(schema, choice);

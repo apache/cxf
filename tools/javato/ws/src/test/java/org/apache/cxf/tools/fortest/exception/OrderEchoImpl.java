@@ -20,9 +20,9 @@ package org.apache.cxf.tools.fortest.exception;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "HelloService", 
-            portName = "HelloPort", 
-            endpointInterface = "org.apache.cxf.tools.fortest.exception.OrderEcho", 
+@WebService(serviceName = "HelloService",
+            portName = "HelloPort",
+            endpointInterface = "org.apache.cxf.tools.fortest.exception.OrderEcho",
             targetNamespace = "http://cxf.apache.org/test/HelloService")
 public class OrderEchoImpl {
     public String echo(String request) throws OrderException {

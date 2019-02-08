@@ -32,7 +32,7 @@ public class BookContinuationFilter implements ContainerResponseFilter {
         if (requestContext.getUriInfo().getPath().endsWith("unmappedFromFilter")) {
             throw new RuntimeException("Async exception from response filter");
         }
-        
+
     }
 
 }

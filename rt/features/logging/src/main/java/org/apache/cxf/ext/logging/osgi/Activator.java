@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -47,10 +48,11 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext context) throws Exception {
 
     }
-    
-    private final class ConfigUpdater implements ManagedService {
+
+    private static final class ConfigUpdater implements ManagedService {
         private BundleContext bundleContext;
-        private ServiceRegistration serviceReg;
+        private ServiceRegistration<?> serviceReg;
+        private ServiceRegistration<?> intentReg;
         private LoggingFeature logging;
 
         ConfigUpdater(BundleContext bundleContext) {
@@ -63,24 +65,36 @@ public class Activator implements BundleActivator {
         public void updated(Dictionary config) throws ConfigurationException {
             boolean enabled = Boolean.valueOf(getValue(config, "enabled", "false"));
             LOG.info("CXF message logging feature " + (enabled ? "enabled" : "disabled"));
-            if (enabled) {
-                Integer limit = Integer.valueOf(getValue(config, "limit", "65536"));
-                Boolean pretty = Boolean.valueOf(getValue(config, "pretty", "false"));
-                Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
+            Integer limit = Integer.valueOf(getValue(config, "limit", "65536"));
+            Boolean pretty = Boolean.valueOf(getValue(config, "pretty", "false"));
+            Boolean verbose = Boolean.valueOf(getValue(config, "verbose", "true"));
+            Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
 
-                if (limit != null) {
-                    logging.setLimit(limit);
-                }
-                if (inMemThreshold != null) {
-                    logging.setInMemThreshold(inMemThreshold);
-                }
-                if (pretty != null) {
-                    logging.setPrettyLogging(pretty);
-                }
+            if (limit != null) {
+                logging.setLimit(limit);
+            }
+            if (inMemThreshold != null) {
+                logging.setInMemThreshold(inMemThreshold);
+            }
+            if (pretty != null) {
+                logging.setPrettyLogging(pretty);
+            }
+            
+            if (verbose != null) {
+                logging.setVerbose(verbose);
+            }
+
+            if (intentReg == null) {
                 Dictionary<String, Object> properties = new Hashtable<>();
-                properties.put("name", "logging");
+                properties.put("org.apache.cxf.dosgi.IntentName", "logging");
+                bundleContext.registerService(AbstractFeature.class.getName(), logging, properties);
+            }
+
+            if (enabled) {
                 if (serviceReg == null) {
-                    serviceReg =  bundleContext.registerService(Feature.class.getName(), logging, properties);
+                    Dictionary<String, Object> properties = new Hashtable<>();
+                    properties.put("name", "logging");
+                    serviceReg = bundleContext.registerService(Feature.class.getName(), logging, properties);
                 }
             } else {
                 if (serviceReg != null) {
@@ -89,7 +103,7 @@ public class Activator implements BundleActivator {
                 }
             }
         }
-        
+
         @SuppressWarnings("rawtypes")
         private String getValue(Dictionary config, String key, String defaultValue) {
             if (config == null) {

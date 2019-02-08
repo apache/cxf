@@ -21,12 +21,14 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.core.Cookie;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CookieHeaderProviderTest extends Assert {
-    
-        
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CookieHeaderProviderTest {
+
+
     @Test
     public void testFromSimpleString() {
         Cookie c = Cookie.valueOf("foo=bar");
@@ -34,14 +36,14 @@ public class CookieHeaderProviderTest extends Assert {
                    && "foo".equals(c.getName())
                    && 0 == c.getVersion());
     }
-    
+
     @Test
     public void testNoValue() {
         Cookie c = Cookie.valueOf("foo=");
         assertTrue("".equals(c.getValue())
                    && "foo".equals(c.getName()));
     }
-    
+
     @Test
     public void testFromComplexString() {
         Cookie c = Cookie.valueOf("$Version=2;foo=bar;$Path=path;$Domain=domain");
@@ -51,15 +53,23 @@ public class CookieHeaderProviderTest extends Assert {
                    && "path".equals(c.getPath())
                    && "domain".equals(c.getDomain()));
     }
-    
+
     @Test
     public void testToString() {
         Cookie c = new Cookie("foo", "bar", "path", "domain", 2);
-        assertEquals("$Version=2;foo=bar;$Path=path;$Domain=domain", 
+        assertEquals("$Version=2;foo=bar;$Path=path;$Domain=domain",
                      c.toString());
-               
+
     }
-    
+
+    @Test
+    public void testToStringWithQuotes() {
+        Cookie c = new Cookie("foo", "bar z", "path", "domain", 2);
+        assertEquals("$Version=2;foo=\"bar z\";$Path=path;$Domain=domain",
+                     c.toString());
+
+    }
+
     @Test
     public void testCookieWithQuotes() {
         Cookie c = Cookie.valueOf("$Version=\"1\"; foo=\"bar\"; $Path=\"/path\"");
@@ -69,10 +79,10 @@ public class CookieHeaderProviderTest extends Assert {
                    && "/path".equals(c.getPath())
                    && null == c.getDomain());
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {
         Cookie.valueOf(null);
     }
-    
+
 }

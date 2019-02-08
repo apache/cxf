@@ -32,6 +32,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.principal.WSDerivedKeyTokenPrincipal;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDataRef;
@@ -48,17 +49,17 @@ import org.apache.xml.security.transforms.Transforms;
  * EncryptedData structure against an AlgorithmSuite policy.
  */
 public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.ALGORITHM_SUITE.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -66,35 +67,35 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
         for (AssertionInfo ai : ais) {
             AlgorithmSuite algorithmSuite = (AlgorithmSuite)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             boolean valid = validatePolicy(ai, algorithmSuite, parameters.getResults().getResults());
             if (valid) {
                 String namespace = algorithmSuite.getAlgorithmSuiteType().getNamespace();
                 String name = algorithmSuite.getAlgorithmSuiteType().getName();
-                Collection<AssertionInfo> algSuiteAis = 
+                Collection<AssertionInfo> algSuiteAis =
                     parameters.getAssertionInfoMap().get(new QName(namespace, name));
                 if (algSuiteAis != null) {
                     for (AssertionInfo algSuiteAi : algSuiteAis) {
                         algSuiteAi.setAsserted(true);
                     }
                 }
-                
-                PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), 
-                                         new QName(algorithmSuite.getName().getNamespaceURI(), 
+
+                PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(),
+                                         new QName(algorithmSuite.getName().getNamespaceURI(),
                                                    algorithmSuite.getC14n().name()));
             } else if (!valid && ai.isAsserted()) {
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
         }
     }
-    
+
     private boolean validatePolicy(
         AssertionInfo ai, AlgorithmSuite algorithmPolicy, List<WSSecurityEngineResult> results
     ) {
-        
+
         for (WSSecurityEngineResult result : results) {
             Integer action = (Integer)result.get(WSSecurityEngineResult.TAG_ACTION);
-            if (WSConstants.SIGN == action 
+            if (WSConstants.SIGN == action
                 && !checkSignatureAlgorithms(result, algorithmPolicy, ai)) {
                 return false;
             } else if (WSConstants.ENCR == action
@@ -102,19 +103,19 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Check the Signature Algorithms
      */
     private boolean checkSignatureAlgorithms(
-        WSSecurityEngineResult result, 
+        WSSecurityEngineResult result,
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
-        String signatureMethod = 
+        String signatureMethod =
             (String)result.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
         if (!algorithmPolicy.getAsymmetricSignature().equals(signatureMethod)
             && !algorithmPolicy.getSymmetricSignature().equals(signatureMethod)) {
@@ -123,7 +124,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             );
             return false;
         }
-        String c14nMethod = 
+        String c14nMethod =
             (String)result.get(WSSecurityEngineResult.TAG_CANONICALIZATION_METHOD);
         if (!algorithmPolicy.getC14n().getValue().equals(c14nMethod)) {
             ai.setNotAsserted(
@@ -132,15 +133,15 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             return false;
         }
 
-        List<WSDataRef> dataRefs = 
+        List<WSDataRef> dataRefs =
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         if (!checkDataRefs(dataRefs, algorithmPolicy, ai)) {
             return false;
         }
-        
+
         return checkKeyLengths(result, algorithmPolicy, ai, true);
     }
-    
+
     /**
      * Check the individual signature references
      */
@@ -158,7 +159,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 );
                 return false;
             }
-            
+
             List<String> transformAlgorithms = dataRef.getTransformAlgorithms();
             // Only a max of 2 transforms per reference is allowed
             if (transformAlgorithms == null || transformAlgorithms.size() > 2) {
@@ -167,11 +168,11 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             }
             for (String transformAlgorithm : transformAlgorithms) {
                 if (!(algorithmPolicy.getC14n().getValue().equals(transformAlgorithm)
-                    || WSConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
+                    || WSS4JConstants.C14N_EXCL_OMIT_COMMENTS.equals(transformAlgorithm)
                     || STRTransform.TRANSFORM_URI.equals(transformAlgorithm)
                     || Transforms.TRANSFORM_ENVELOPED_SIGNATURE.equals(transformAlgorithm)
-                    || WSConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
-                    || WSConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
+                    || WSS4JConstants.SWA_ATTACHMENT_CONTENT_SIG_TRANS.equals(transformAlgorithm)
+                    || WSS4JConstants.SWA_ATTACHMENT_COMPLETE_SIG_TRANS.equals(transformAlgorithm))) {
                     ai.setNotAsserted("The transform algorithms do not match the requirement");
                     return false;
                 }
@@ -179,19 +180,19 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
         }
         return true;
     }
-    
+
     /**
      * Check the Encryption Algorithms
      */
     private boolean checkEncryptionAlgorithms(
-        WSSecurityEngineResult result, 
+        WSSecurityEngineResult result,
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
         AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
-        String transportMethod = 
+        String transportMethod =
             (String)result.get(WSSecurityEngineResult.TAG_ENCRYPTED_KEY_TRANSPORT_METHOD);
-        if (transportMethod != null 
+        if (transportMethod != null
             && !algorithmSuiteType.getSymmetricKeyWrap().equals(transportMethod)
             && !algorithmSuiteType.getAsymmetricKeyWrap().equals(transportMethod)) {
             ai.setNotAsserted(
@@ -199,8 +200,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             );
             return false;
         }
-        
-        List<WSDataRef> dataRefs = 
+
+        List<WSDataRef> dataRefs =
             CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
         if (dataRefs != null) {
             for (WSDataRef dataRef : dataRefs) {
@@ -213,15 +214,15 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 }
             }
         }
-        
+
         return checkKeyLengths(result, algorithmPolicy, ai, false);
     }
-    
+
     /**
      * Check the key lengths of the secret and public keys.
      */
     private boolean checkKeyLengths(
-        WSSecurityEngineResult result, 
+        WSSecurityEngineResult result,
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai,
         boolean signature
@@ -230,13 +231,13 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
         if (publicKey != null && !checkPublicKeyLength(publicKey, algorithmPolicy, ai)) {
             return false;
         }
-        
-        X509Certificate x509Cert = 
+
+        X509Certificate x509Cert =
             (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         if (x509Cert != null && !checkPublicKeyLength(x509Cert.getPublicKey(), algorithmPolicy, ai)) {
             return false;
         }
-        
+
         AlgorithmSuiteType algorithmSuiteType = algorithmPolicy.getAlgorithmSuiteType();
         byte[] secret = (byte[])result.get(WSSecurityEngineResult.TAG_SECRET);
         if (signature) {
@@ -249,7 +250,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                     );
                     return false;
                 }
-            } else if (secret != null 
+            } else if (secret != null
                 && (secret.length < (algorithmSuiteType.getMinimumSymmetricKeyLength() / 8)
                     || secret.length > (algorithmSuiteType.getMaximumSymmetricKeyLength() / 8))) {
                 ai.setNotAsserted(
@@ -257,7 +258,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 );
                 return false;
             }
-        } else if (secret != null 
+        } else if (secret != null
             && (secret.length < (algorithmSuiteType.getMinimumSymmetricKeyLength() / 8)
                 || secret.length > (algorithmSuiteType.getMaximumSymmetricKeyLength() / 8))) {
             ai.setNotAsserted(
@@ -265,15 +266,15 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             );
             return false;
         }
-        
+
         return true;
     }
-        
+
     /**
      * Check the public key lengths
      */
     private boolean checkPublicKeyLength(
-        PublicKey publicKey, 
+        PublicKey publicKey,
         AlgorithmSuite algorithmPolicy,
         AssertionInfo ai
     ) {
@@ -302,8 +303,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
             );
             return false;
         }
-        
+
         return true;
     }
-    
+
 }

@@ -18,26 +18,26 @@
  */
 package org.apache.cxf.jca.cxf;
 
-//import java.lang.reflect.Method;
 import java.util.Properties;
 
 import javax.resource.ResourceException;
-
-//import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ResourceAdapter;
 
-
 import org.apache.cxf.Bus;
-//import org.apache.cxf.jca.cxf.test.DummyBus;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectionFactoryImplTest {
-    
-    
+
+
     @Test
     public void testSetResourceAdapter() throws Exception {
-        TestableAssociatedManagedConnectionFactoryImpl mci = 
+        TestableAssociatedManagedConnectionFactoryImpl mci =
             new TestableAssociatedManagedConnectionFactoryImpl();
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
         mci.setResourceAdapter(rai);
@@ -70,7 +70,7 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
     }
     /*
     public void testBusInitializedAndRegisteredToResourceAdapter() throws ResourceException, Exception {
-        DummyBus.reset();     
+        DummyBus.reset();
         System.setProperty("test.bus.class", DummyBus.class.getName());
         TestableAssociatedManagedConnectionFactoryImpl mci =
             new TestableAssociatedManagedConnectionFactoryImpl();
@@ -82,14 +82,14 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
             Thread.currentThread().setContextClassLoader(mci.getClass().getClassLoader());
 
             Class dummyBusClass = Class.forName(DummyBus.class.getName(), true, mci.getClass()
-                .getClassLoader());           
+                .getClassLoader());
             Method initializeCount = dummyBusClass.getMethod("getInitializeCount", new Class[]{});
-            ConnectionManager cm = 
+            ConnectionManager cm =
                 (ConnectionManager)EasyMock.createMock(
                     Class.forName(ConnectionManager.class.getName(), true, mci.getClass().getClassLoader()));
 
             mci.createConnectionFactory(cm);
-            assertEquals("bus should be initialized once", 1, 
+            assertEquals("bus should be initialized once", 1,
                          initializeCount.invoke(null, new Object[]{}));
             assertEquals("bus registered once after first call", 1, rai.registeredCount);
         } finally {
@@ -105,7 +105,7 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
 
         TestableAssociatedManagedConnectionFactoryImpl mci =
             new TestableAssociatedManagedConnectionFactoryImpl();
-       
+
 
         assertEquals("before associate, one props", 0, mci.getPluginProps().size());
         assertTrue("before associate, key1 not set", !mci.getPluginProps().containsKey("key1"));
@@ -115,7 +115,7 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
         assertTrue("after associate, key1 is set", mci.getPluginProps().containsKey("key1"));
     }
 
-    
+
     protected ManagedConnectionFactoryImpl createManagedConnectionFactoryImpl() {
         TestableAssociatedManagedConnectionFactoryImpl mci =
             new TestableAssociatedManagedConnectionFactoryImpl();
@@ -146,5 +146,5 @@ class DummyResourceAdapterImpl extends ResourceAdapterImpl {
 class TestableAssociatedManagedConnectionFactoryImpl extends AssociatedManagedConnectionFactoryImpl {
 
     private static final long serialVersionUID = -1077391534536084071L;
-   
+
 }

@@ -45,25 +45,25 @@ import javax.ws.rs.core.Context;
 
 public class BookStoreWithInterface2 extends BookStoreStorage implements BookInterface {
 
-    private ServletContext servletContext; 
-    
+    private ServletContext servletContext;
+
     public BookStoreWithInterface2() {
         Book book = new Book();
         book.setId(bookId);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     public BookStoreWithInterface2(@Context ServletContext scontext) {
         this();
         this.servletContext = scontext;
     }
-    
+
     @PreDestroy
     public void preDestroy() {
         System.out.println("PreDestroy called");
     }
-    
+
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {
         if (servletContext == null) {
             throw new RuntimeException();
@@ -73,24 +73,23 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
         }
         return doGetBook(id);
     }
-    
+
     public Book getThatBook(Long id) throws BookNotFoundFault {
         if (servletContext == null) {
             throw new RuntimeException();
         }
         return doGetBook(id);
     }
-    
+
     private Book doGetBook(Long id) throws BookNotFoundFault {
         //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(id);
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     public Book getThatBook() throws BookNotFoundFault {
@@ -101,7 +100,7 @@ public class BookStoreWithInterface2 extends BookStoreStorage implements BookInt
     }
 
     public Book echoBook(Book b) {
-        
+
         return b;
     }
 

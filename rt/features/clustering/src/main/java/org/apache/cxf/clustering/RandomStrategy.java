@@ -24,13 +24,13 @@ import java.util.Random;
 
 /**
  * Failover strategy based on a randomized walk through the
- * static cluster represented by multiple endpoints associated 
+ * static cluster represented by multiple endpoints associated
  * with the same service instance.
  */
 public class RandomStrategy extends AbstractStaticFailoverStrategy {
-    
+
     private Random random;
-    
+
     /**
      * Constructor.
      */
@@ -40,8 +40,8 @@ public class RandomStrategy extends AbstractStaticFailoverStrategy {
 
     /**
      * Get next alternate endpoint.
-     * 
-     * @param alternates non-empty List of alternate endpoints 
+     *
+     * @param alternates non-empty List of alternate endpoints
      * @return
      */
     protected <T> T getNextAlternate(List<T> alternates) {

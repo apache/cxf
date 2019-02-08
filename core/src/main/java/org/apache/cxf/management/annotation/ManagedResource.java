@@ -47,6 +47,6 @@ public @interface ManagedResource {
 
     String persistName() default "";
 
-    String persistLocation() default "";        
+    String persistLocation() default "";
 
 }

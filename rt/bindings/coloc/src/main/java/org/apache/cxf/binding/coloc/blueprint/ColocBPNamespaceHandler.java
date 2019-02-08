@@ -20,6 +20,7 @@ package org.apache.cxf.binding.coloc.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -33,7 +34,11 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class ColocBPNamespaceHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("schemas/coloc-feature.xsd");
+        if ("http://cxf.apache.org/binding/coloc".equals(s)) {
+            return getClass().getClassLoader().getResource("schemas/coloc-feature.xsd");
+        }
+        // no imported XSDs, so we don't have to delegate to cxf-core namespace handler
+        return null;
     }
 
     @SuppressWarnings("rawtypes")

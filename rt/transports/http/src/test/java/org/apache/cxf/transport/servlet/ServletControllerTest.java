@@ -30,19 +30,21 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.easymock.EasyMock;
 
-import org.junit.Assert;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServletControllerTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServletControllerTest {
 
     private HttpServletRequest req;
     private HttpServletResponse res;
     private DestinationRegistry registry;
     private HttpServlet serviceListGenerator;
-    
+
     @Before
     public void setUp() {
         req = EasyMock.createMock(HttpServletRequest.class);
@@ -50,14 +52,14 @@ public class ServletControllerTest extends Assert {
         registry = EasyMock.createMock(DestinationRegistry.class);
         serviceListGenerator = EasyMock.createMock(HttpServlet.class);
     }
-    
+
     private void setReq(String pathInfo, String requestUri, String styleSheet, String formatted) {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(pathInfo).anyTimes();
         req.getContextPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getServletPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.setAttribute(Message.BASE_PATH, "http://localhost:8080");
         EasyMock.expectLastCall().anyTimes();
         req.getRequestURI();
@@ -73,16 +75,16 @@ public class ServletControllerTest extends Assert {
         registry.getDestinationForPath("", true);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
     }
-    
+
     private void expectServiceListGeneratorCalled() throws ServletException, IOException {
-        serviceListGenerator.service(EasyMock.isA(HttpServletRequest.class), 
+        serviceListGenerator.service(EasyMock.isA(HttpServletRequest.class),
                                      EasyMock.isA(HttpServletResponse.class));
         EasyMock.expectLastCall();
     }
-    
+
     private void expectServiceListGeneratorNotCalled() throws ServletException, IOException {
     }
-    
+
     @Test
     public void testGenerateServiceListing() throws Exception {
         setReq(null, "/services", null, "true");
@@ -92,18 +94,18 @@ public class ServletControllerTest extends Assert {
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
     }
-    
+
     @Test
     public void testGenerateUnformattedServiceListing() throws Exception {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         req.getContextPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getServletPath();
-        EasyMock.expectLastCall().andReturn("");
+        EasyMock.expectLastCall().andReturn("").anyTimes();
         req.getRequestURI();
         EasyMock.expectLastCall().andReturn("/services").times(2);
-        
+
         req.getParameter("stylesheet");
         EasyMock.expectLastCall().andReturn(null);
         req.getParameter("formatted");
@@ -116,20 +118,20 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
         registry.getDestinationForPath("", true);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
-        
+
         expectServiceListGeneratorCalled();
         EasyMock.replay(req, registry, serviceListGenerator);
-        
+
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
     }
-    
+
     @Test
     public void testHideServiceListing() throws Exception {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(null);
-        
+
         registry.getDestinationForPath("", true);
         EasyMock.expectLastCall().andReturn(null).atLeastOnce();
         AbstractHTTPDestination dest = EasyMock.createMock(AbstractHTTPDestination.class);
@@ -139,16 +141,16 @@ public class ServletControllerTest extends Assert {
         EasyMock.expectLastCall().andReturn(null).anyTimes();
         dest.getMessageObserver();
         EasyMock.expectLastCall().andReturn(EasyMock.createMock(MessageObserver.class)).atLeastOnce();
-        
+
         expectServiceListGeneratorNotCalled();
-        
+
         EasyMock.replay(req, registry, serviceListGenerator, dest);
         TestServletController sc = new TestServletController(registry, serviceListGenerator);
         sc.setHideServiceList(true);
         sc.invoke(req, res);
         assertTrue(sc.invokeDestinationCalled());
     }
-    
+
     @Test
     public void testDifferentServiceListPath() throws Exception {
         setReq(null, "/listing", null, "true");
@@ -159,29 +161,29 @@ public class ServletControllerTest extends Assert {
         sc.invoke(req, res);
         assertFalse(sc.invokeDestinationCalled());
     }
- 
+
     public static class TestServletController extends ServletController {
         private boolean invokeDestinationCalled;
 
-        public TestServletController(DestinationRegistry destinationRegistry, 
+        public TestServletController(DestinationRegistry destinationRegistry,
                                      HttpServlet serviceListGenerator) {
             super(destinationRegistry, null, serviceListGenerator);
         }
-        
+
         public void setHideServiceList(boolean b) {
             this.isHideServiceList = b;
         }
 
         @Override
-        protected void updateDestination(HttpServletRequest request, AbstractHTTPDestination d) { 
+        protected void updateDestination(HttpServletRequest request, AbstractHTTPDestination d) {
         }
-        
+
         @Override
         public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
                                       AbstractHTTPDestination d) throws ServletException {
             invokeDestinationCalled = true;
         }
-        
+
         public boolean invokeDestinationCalled() {
             return invokeDestinationCalled;
         }

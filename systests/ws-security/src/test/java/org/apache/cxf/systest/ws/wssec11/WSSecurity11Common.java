@@ -32,23 +32,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
-
 import wssec.wssec11.IPingService;
 import wssec.wssec11.PingService11;
 
+import static org.junit.Assert.assertEquals;
 
 /**
  *
  */
 public class WSSecurity11Common extends AbstractBusClientServerTestBase {
-       
+
     private static final String INPUT = "foo";
 
     public void runClientServer(
         String portPrefix, String portNumber, boolean unrestrictedPoliciesInstalled,
         boolean streaming
     ) throws IOException {
-        
+
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
             bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client.xml");
@@ -60,15 +60,15 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         URL wsdlLocation = null;
-        PingService11 svc = null; 
-        wsdlLocation = getWsdlLocation(portPrefix, portNumber); 
+        PingService11 svc = null;
+        wsdlLocation = getWsdlLocation(portPrefix, portNumber);
         svc = new PingService11(wsdlLocation);
-        final IPingService port = 
+        final IPingService port =
             svc.getPort(
                 new QName("http://WSSec/wssec11", portPrefix + "_IPingService"),
                 IPingService.class
             );
-        
+
         if (streaming) {
             ((BindingProvider)port).getRequestContext().put(
                 SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -82,10 +82,10 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         assertEquals(INPUT, output);
 
         ((java.io.Closeable)port).close();
-        
+
         bus.shutdown(true);
     }
-    
+
     private static URL getWsdlLocation(String portPrefix, String portNumber) {
         try {
             return new URL("http://localhost:" + portNumber + "/" + portPrefix + "PingService?wsdl");
@@ -109,9 +109,9 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         String javaVersion = System.getProperty("java.version");
         double javaVersionNum = 0.0;
         if (javaVersion.length() > 3) {
-            javaVersionNum = new Double(javaVersion.substring(0, 3)).doubleValue();
+            javaVersionNum = Double.valueOf(javaVersion.substring(0, 3)).doubleValue();
         } else {
-            javaVersionNum = new Double(javaVersion).doubleValue();
+            javaVersionNum = Double.valueOf(javaVersion).doubleValue();
         }
         return !(javaVersionNum < 1.6);
     }

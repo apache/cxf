@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
 
 public class SecurityContextImpl implements SecurityContext {
     private Message m;
-    
+
     public SecurityContextImpl(Message m) {
         this.m = m;
     }
@@ -43,7 +43,7 @@ public class SecurityContextImpl implements SecurityContext {
             return SecurityContext.BASIC_AUTH;
         }
         @SuppressWarnings("unchecked")
-        Map<String, List<String>> headers = 
+        Map<String, List<String>> headers =
             (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
         if (headers != null) {
             List<String> values = headers.get(HttpHeaders.AUTHORIZATION);
@@ -65,7 +65,7 @@ public class SecurityContextImpl implements SecurityContext {
         return sc == null ? null : sc.getUserPrincipal();
     }
 
-    
+
     public boolean isSecure() {
         String value = HttpUtils.getEndpointAddress(m);
         return value.startsWith("https://");

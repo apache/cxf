@@ -27,7 +27,7 @@ import org.apache.cxf.aegis.type.AegisType;
 public interface AegisReader<ReaderT> extends AegisIo {
 
     /**
-     * Read an object. 
+     * Read an object.
      * @param reader the source.
      * @return
      * @throws Exception

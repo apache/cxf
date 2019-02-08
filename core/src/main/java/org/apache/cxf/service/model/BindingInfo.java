@@ -31,21 +31,21 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class BindingInfo extends AbstractDescriptionElement implements NamedItem {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(BindingInfo.class);
-    
+
     QName name;
     ServiceInfo service;
     final String bindingId;
-    
-    Map<QName, BindingOperationInfo> operations 
-        = new ConcurrentHashMap<QName, BindingOperationInfo>(4, 0.75f, 2);
-    
+
+    Map<QName, BindingOperationInfo> operations
+        = new ConcurrentHashMap<>(4, 0.75f, 2);
+
     public BindingInfo(ServiceInfo service, String bindingId) {
         this.service = service;
         this.bindingId = bindingId;
     }
-    
+
     public DescriptionInfo getDescription() {
         if (service == null) {
             return null;
@@ -64,31 +64,30 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
     public String getBindingId() {
         return bindingId;
     }
-    
+
     public void setName(QName n) {
         name = n;
     }
     public QName getName() {
         return name;
     }
-    
+
     private boolean nameEquals(String a, String b, String def) {
         if (a == null) {
             // in case of input/output itself is empty
             return true;
-        } else {
-            if (b == null) {
-                b = def;
-            }
-            return "".equals(a) ? "".equals(b) : a.equals(b);
         }
+        if (b == null) {
+            b = def;
+        }
+        return "".equals(a) ? "".equals(b) : a.equals(b);
     }
     public BindingOperationInfo buildOperation(QName opName, String inName, String outName) {
         for (OperationInfo op : getInterface().getOperations()) {
             if (opName.equals(op.getName())
                 && nameEquals(inName, op.getInputName(), op.getName().getLocalPart() + "Request")
                 && nameEquals(outName, op.getOutputName(), op.getName().getLocalPart() + "Response")) {
-                
+
                 return new BindingOperationInfo(this, op);
             }
         }
@@ -104,15 +103,15 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         if (operation.getName() == null) {
             throw new NullPointerException(
                 new Message("BINDING.OPERATION.NAME.NOT.NULL", LOG).toString());
-        } 
+        }
         if (operations.containsKey(operation.getName())) {
             throw new IllegalArgumentException(
                 new Message("DUPLICATED.OPERATION.NAME", LOG, new Object[]{operation.getName()}).toString());
         }
-        
+
         operations.put(operation.getName(), operation);
     }
-    
+
     /**
      * Removes an operation from this service.
      *
@@ -122,8 +121,8 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         if (operation.getName() == null) {
             throw new NullPointerException(
                 new Message("BINDING.OPERATION.NAME.NOT.NULL", LOG).toString());
-        } 
-        
+        }
+
         operations.remove(operation.getName());
     }
 
@@ -154,10 +153,10 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
                 return b.getUnwrappedOperation();
             }
         }
-        
+
         return null;
     }
-    
+
     @Override
     public String toString() {
         return "[BindingInfo " + getBindingId() + "]";

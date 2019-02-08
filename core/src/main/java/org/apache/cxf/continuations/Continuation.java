@@ -20,60 +20,67 @@
 package org.apache.cxf.continuations;
 
 /**
- * Represents transport-neutral suspended invocation instances 
+ * Represents transport-neutral suspended invocation instances
  * or continuations
  */
 public interface Continuation {
-    
-    /** 
+
+    /**
      * This method will suspend the request for the timeout or until resume is
      * called
-     * 
-     * @param timeout A timeout of < 0 will cause an immediate return.
-     * A timeout of 0 will wait indefinitely.
-     * @return True if resume called or false if timeout.
+     *
+     * @param timeout the suspend timeout, timeout of 0 will suspend the request indefinitely.
+     * @return true if suspend was successful.
      */
     boolean suspend(long timeout);
-    
-    /** 
-     * Resume a suspended request  
+
+    /**
+     * Resume a suspended request
      */
     void resume();
-    
-    /** 
+
+    /**
      * Reset the continuation
      */
     void reset();
-    
-    /** 
+
+    /**
      * Is this a newly created Continuation.
-     * @return True if the continuation has just been created and has not yet suspended the request.
+     * @return true if the continuation has just been created and has not yet suspended the request.
      */
     boolean isNew();
-    
-    /** 
+
+    /**
      * Get the pending status
-     * @return True if the continuation has been suspended.
+     * @return true if the continuation has been suspended.
      */
     boolean isPending();
-    
-    /** 
+
+    /**
      * Get the resumed status
-     * @return True if the continuation is has been resumed.
+     * @return true if the continuation is has been resumed.
      */
     boolean isResumed();
     
-    /** 
+    /**
+     * Get the timeout status
+     * @return true if the continuation is has been timeout.
+     */
+    boolean isTimeout();
+
+    /**
      * Get arbitrary object associated with the continuation for context
-     * 
+     *
      * @return An arbitrary object associated with the continuation
      */
     Object getObject();
-    
-    /** 
+
+    /**
      * Sets arbitrary object associated with the continuation for context
-     * 
+     *
      * @param o An arbitrary object to associate with the continuation
      */
     void setObject(Object o);
+
+    boolean isReadyForWrite();
 }

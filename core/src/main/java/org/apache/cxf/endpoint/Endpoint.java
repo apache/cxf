@@ -32,36 +32,36 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 /**
- * Represents an endpoint that receives messages. 
+ * Represents an endpoint that receives messages.
  *
  */
 public interface Endpoint extends Map<String, Object>, InterceptorProvider {
 
     EndpointInfo getEndpointInfo();
-    
+
     Binding getBinding();
-    
+
     Service getService();
 
     void setExecutor(Executor executor);
-    
+
     Executor getExecutor();
-    
+
     MessageObserver getInFaultObserver();
-    
+
     MessageObserver getOutFaultObserver();
-    
+
     void setInFaultObserver(MessageObserver observer);
-    
+
     void setOutFaultObserver(MessageObserver observer);
 
     List<Feature> getActiveFeatures();
-    
+
     /**
      * Add a hook that will be called when this end point being terminated.
      * This will be called prior to the Server/ClientLifecycleListener.*Destroyed()
      * method is called.  This provides an opportunity to cleanup any resources
-     * that are specific to this Endpoint. 
+     * that are specific to this Endpoint.
      * @param c
      */
     void addCleanupHook(Closeable c);

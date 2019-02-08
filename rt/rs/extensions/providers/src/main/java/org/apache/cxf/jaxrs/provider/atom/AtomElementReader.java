@@ -22,16 +22,16 @@ import org.apache.abdera.model.Element;
 
 /**
  * A callback-style interface which can be used to deserialize an Atom Feed or Entry into a custom object
- * without having to introduce direct dependencies on Abdera API in the 'main' service code  
- * 
+ * without having to introduce direct dependencies on Abdera API in the 'main' service code
+ *
  * @param <T> Type of Atom element, Feed or Entry
  * @param <E> Type of objects which will be deseriaized from feed or entry
- *  
+ *
  */
 public interface AtomElementReader<T extends Element, E> {
     /**
-     * @param element Feed or Entry instance 
-     * @return pojoElement 
+     * @param element Feed or Entry instance
+     * @return pojoElement
      */
     E readFrom(T element);
 }

@@ -116,7 +116,7 @@ public class CorbaObjectReader {
         case TCKind._tk_any:
             ((CorbaAnyHandler)obj).setValue(this.readAny());
             break;
-        
+
         // Now for the complex types
         case TCKind._tk_array:
             this.readArray((CorbaArrayHandler)obj);
@@ -141,9 +141,10 @@ public class CorbaObjectReader {
             break;
         case TCKind._tk_objref:
             this.readObjectReference((CorbaObjectReferenceHandler)obj);
-            break;            
+            break;
         default:
-        // TODO: Provide Implementation. Do we throw an exception.
+            throw new CorbaBindingException("CorbaObjectReader: unhandled TypeCode.Kind: "
+                                            + obj.getTypeCode().kind().value());
         }
     }
 
@@ -364,7 +365,7 @@ public class CorbaObjectReader {
         Union unionType = (Union)unionHandler.getType();
         List<Unionbranch> branches = unionType.getUnionbranch();
         CorbaObjectHandler discriminator = unionHandler.getDiscriminator();
-        if (branches.size() > 0) {
+        if (!branches.isEmpty()) {
             String discLabel = null;
             if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
                 CorbaEnumHandler disc = (CorbaEnumHandler) discriminator;
@@ -372,7 +373,7 @@ public class CorbaObjectReader {
                 discLabel = disc.getValue();
             } else {
                 read(discriminator);
-                discLabel = ((CorbaPrimitiveHandler)discriminator).getDataFromValue(); 
+                discLabel = ((CorbaPrimitiveHandler)discriminator).getDataFromValue();
             }
             // Now find the label in the union to get the right case
             Unionbranch defaultBranch = null;
@@ -397,7 +398,7 @@ public class CorbaObjectReader {
                     break;
                 }
             }
-            
+
             // If we never find a case that matches the value of the discriminiator, then we must have
             // found the default case.
             if (!caseFound && defaultBranch != null) {
@@ -418,7 +419,7 @@ public class CorbaObjectReader {
             switch(arrayElements.get(0).getTypeCodeKind().value()) {
             case TCKind._tk_boolean: {
                 boolean[] values = new boolean[arraySize];
-                stream.read_boolean_array(values, 0, arraySize); 
+                stream.read_boolean_array(values, 0, arraySize);
                 val = values;
                 break;
             }
@@ -522,8 +523,8 @@ public class CorbaObjectReader {
             CorbaSequenceHandler sequenceObj = (CorbaSequenceHandler)obj;
             List<CorbaObjectHandler> seqElements = sequenceObj.getElements();
             int length = stream.read_ulong();
-            List<CorbaObjectHandler> elements = new ArrayList<CorbaObjectHandler>(length);
-            
+            List<CorbaObjectHandler> elements = new ArrayList<>(length);
+
             // Simply checking the bound won't handle our recursive types.  We need to check for the
             // existance of template, which will be present for all unbounded sequences and for bound
             // sequences with recursive type elements.  Use the template element to construct each
@@ -560,7 +561,7 @@ public class CorbaObjectReader {
     private CorbaObjectHandler initializeCorbaObjectHandler(CorbaObjectHandler template) {
         Constructor<?> templateConstructor = template.getClass().getDeclaredConstructors()[0];
         Object[] params = new Object[4];
-        
+
         // Check to see if the template type is a recursive type.  If so, it means that it is part
         // of a sequence and needs to have the name "item" in order
         if (template.isRecursive()) {
@@ -572,7 +573,7 @@ public class CorbaObjectReader {
         params[1] = template.getIdlType();
         params[2] = template.getTypeCode();
         params[3] = template.getType();
-        
+
         CorbaObjectHandler handler = null;
         try {
             handler = (CorbaObjectHandler) templateConstructor.newInstance(params);
@@ -598,7 +599,7 @@ public class CorbaObjectReader {
             for (int i = 0; i < members.size(); i++) {
                 CorbaObjectHandler member = initializeCorbaObjectHandler(members.get(i));
                 struct.addMember(member);
-            }           
+            }
         } else if (template instanceof CorbaArrayHandler) {
             CorbaArrayHandler templateArray = (CorbaArrayHandler) template;
             CorbaArrayHandler array = (CorbaArrayHandler) handler;

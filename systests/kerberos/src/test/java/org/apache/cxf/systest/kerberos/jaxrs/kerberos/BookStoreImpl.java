@@ -28,26 +28,26 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriInfo;
 
 public class BookStoreImpl implements BookStore {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private long bookId = 123;
-    
+
     private String defaultName;
     private long defaultId;
-    
+
     private String currentBookId;
-    
+
     public BookStoreImpl() {
         init();
     }
     public BookStoreImpl(UriInfo ui) {
         init();
     }
-    
+
     @Override
     public Book getBookRoot() {
         return new Book("root", 124L);
     }
-    
+
     @Override
     public Book getDefaultBook() {
         return new Book(defaultName, defaultId);
@@ -72,7 +72,7 @@ public class BookStoreImpl implements BookStore {
     public void setBookId(String id) {
         currentBookId = id;
     }
-    
+
     public void setDefaultNameAndId(String name, long id) {
         defaultName = name;
         defaultId = id;
@@ -82,22 +82,21 @@ public class BookStoreImpl implements BookStore {
     public Book getBookAsJSON() throws BookNotFoundFault {
         return doGetBook(currentBookId);
     }
-    
+
     private Book doGetBook(String id) throws BookNotFoundFault {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(Long.parseLong(id));
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(Long.parseLong(id));
+        throw new BookNotFoundFault(details);
     }
 
     public final String init() {
         books.clear();
         bookId = 123;
-        
+
         Book book = new Book();
         book.setId(bookId);
         book.setName("CXF in Action");
@@ -105,7 +104,7 @@ public class BookStoreImpl implements BookStore {
 
         return "OK";
     }
-    
+
 }
 
 

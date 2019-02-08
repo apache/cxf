@@ -22,10 +22,10 @@ package org.apache.cxf.resource;
 import java.io.InputStream;
 
 public class SinglePropertyResolver implements ResourceResolver {
-   
+
     private final String key;
     private final Object value;
- 
+
     public SinglePropertyResolver(String k, Object v) {
         key = k;
         value = v;
@@ -40,5 +40,5 @@ public class SinglePropertyResolver implements ResourceResolver {
             return resourceType.cast(value);
         }
         return null;
-    }    
+    }
 }

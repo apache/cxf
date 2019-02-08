@@ -21,19 +21,19 @@ package org.apache.cxf.aegis.exception;
 import org.apache.cxf.frontend.FaultInfoException;
 
 public class HelloException extends FaultInfoException {
-    
+
     private static final long serialVersionUID = 6037321444071981393L;
     String faultInfo;
-    
+
     public HelloException() {
         super();
     }
-    
+
     public HelloException(String message, String faultInfo) {
         super(message);
         this.faultInfo = faultInfo;
     }
-    
+
     public void setFaultInfo(String faultInfo) {
         this.faultInfo = faultInfo;
     }

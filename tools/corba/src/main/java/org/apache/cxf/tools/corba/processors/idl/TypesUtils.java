@@ -37,9 +37,9 @@ public final class TypesUtils {
     private TypesUtils() {
         //complete
     }
-    
+
     /** Returns node corresponding to the name of the CORBA primitive type node.
-     * 
+     *
      * @param node
      * @return
      */
@@ -55,12 +55,12 @@ public final class TypesUtils {
         }
         return currentNode.getNextSibling();
     }
-    
+
     public static boolean isValidIdentifier(String id) {
         boolean result = true;
         // From the CORBA IDL spec (section 3.2.3):
         //   An identifier is an arbitrarily long sequence of ASCII alphabetic, digit,
-        //   and underscore ("_") characters. The first character must be an ASCII 
+        //   and underscore ("_") characters. The first character must be an ASCII
         //   alphabetic character. All characters are significant.
         //
         // See section 3.2.3.1 for escaped identifiers (that start with a "_")
@@ -82,7 +82,7 @@ public final class TypesUtils {
         }
         return result;
     }
-    
+
     public static Scope generateAnonymousScopedName(Scope scope, XmlSchema schema) {
         Scope scopedName = null;
         XmlSchemaType anonSchemaType = null;
@@ -98,10 +98,10 @@ public final class TypesUtils {
             QName scopedQName = new QName(schema.getTargetNamespace(), scopedName.toString());
             anonSchemaType = schema.getTypeByName(scopedQName);
         } while (anonSchemaType != null);
-        
+
         return scopedName;
     }
-    
+
     public static String getConstValueByName(AST node, TypeMappingType typeMap) {
         List<CorbaType> types = typeMap.getStructOrExceptionOrUnion();
         for (Iterator<CorbaType> it = types.iterator(); it.hasNext();) {
@@ -112,7 +112,7 @@ public final class TypesUtils {
                 if (name.endsWith(node.getText())) {
                     return corbaConst.getValue();
                 }
-            }             
+            }
         }
         return null;
     }

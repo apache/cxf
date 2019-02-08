@@ -50,7 +50,7 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceResponseType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
- * 
+ *
  */
 public class Servant implements Invoker {
 
@@ -58,21 +58,21 @@ public class Servant implements Invoker {
     private RMEndpoint reliableEndpoint;
     // REVISIT assumption there is only a single outstanding unattached Identifier
     private Identifier unattachedIdentifier;
- 
+
     Servant(RMEndpoint rme) {
         reliableEndpoint = rme;
     }
-    
-    
+
+
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(exchange.getInMessage());
         OperationInfo oi = exchange.getBindingOperationInfo().getOperationInfo();
         if (null == oi) {
-            LOG.fine("No operation info."); 
+            LOG.fine("No operation info.");
             return null;
         }
-        
+
         if (RM10Constants.INSTANCE.getCreateSequenceOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getCreateSequenceOperationName().equals(oi.getName())
             || RM10Constants.INSTANCE.getCreateSequenceOnewayOperationName().equals(oi.getName())
@@ -81,7 +81,7 @@ public class Servant implements Invoker {
                 return Collections.singletonList(createSequence(exchange.getInMessage()));
             } catch (RuntimeException ex) {
                 LOG.log(Level.WARNING, "Sequence creation rejected", ex);
-                SequenceFault sf = 
+                SequenceFault sf =
                     new SequenceFaultFactory(protocol.getConstants()).createCreateSequenceRefusedFault();
                 Endpoint e = exchange.getEndpoint();
                 Binding b = null == e ? null : e.getBinding();
@@ -99,7 +99,7 @@ public class Servant implements Invoker {
         } else if (RM10Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())
             || RM11Constants.INSTANCE.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
             EncoderDecoder codec = protocol.getCodec();
-            CreateSequenceResponseType createResponse = 
+            CreateSequenceResponseType createResponse =
                 codec.convertReceivedCreateSequenceResponse(getParameter(exchange.getInMessage()));
             createSequenceResponse(createResponse, protocol);
         } else if (RM10Constants.INSTANCE.getTerminateSequenceOperationName().equals(oi.getName())
@@ -111,7 +111,7 @@ public class Servant implements Invoker {
         } else if (RM11Constants.INSTANCE.getCloseSequenceOperationName().equals(oi.getName())) {
             return Collections.singletonList(closeSequence(exchange.getInMessage()));
         }
-        
+
         return null;
     }
 
@@ -119,22 +119,22 @@ public class Servant implements Invoker {
     Object createSequence(Message message) {
         LOG.fine("Creating sequence");
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
-        
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
-        Message outMessage = message.getExchange().getOutMessage();  
+
+        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
+        Message outMessage = message.getExchange().getOutMessage();
         if (null != outMessage) {
             RMContextUtils.storeMAPs(maps, outMessage, false, false);
         }
-        
+
         EncoderDecoder codec = protocol.getCodec();
         CreateSequenceType create = codec.convertReceivedCreateSequence(getParameter(message));
         Destination destination = reliableEndpoint.getDestination();
-        
-        CreateSequenceResponseType createResponse = new CreateSequenceResponseType();        
+
+        CreateSequenceResponseType createResponse = new CreateSequenceResponseType();
         createResponse.setIdentifier(destination.generateSequenceIdentifier());
-        
+
         DestinationPolicyType dp = reliableEndpoint.getManager().getDestinationPolicy();
-        if (dp.getMaxSequences() > 0 
+        if (dp.getMaxSequences() > 0
             && destination.getProcessingSequenceCount() >= dp.getMaxSequences()) {
             throw new RuntimeException("Sequence creation refused");
         }
@@ -143,12 +143,12 @@ public class Servant implements Invoker {
             supportedDuration = DatatypeFactory.PT0S;
         }
         Expires ex = create.getExpires();
-        
+
         if (null != ex) {
             Duration effectiveDuration = ex.getValue();
-            // PT0S represents 0 second and the shortest duration but in ws-rm, considered the longest 
-            if (DatatypeFactory.PT0S.equals(effectiveDuration) 
-                || (!DatatypeFactory.PT0S.equals(supportedDuration) 
+            // PT0S represents 0 second and the shortest duration but in ws-rm, considered the longest
+            if (DatatypeFactory.PT0S.equals(effectiveDuration)
+                || (!DatatypeFactory.PT0S.equals(supportedDuration)
                     &&  supportedDuration.isShorterThan(effectiveDuration)))  {
                 effectiveDuration = supportedDuration;
             }
@@ -156,7 +156,7 @@ public class Servant implements Invoker {
             ex.setValue(effectiveDuration);
             createResponse.setExpires(ex);
         }
-        
+
         OfferType offer = create.getOffer();
         if (null != offer) {
             AcceptType accept = new AcceptType();
@@ -170,20 +170,20 @@ public class Servant implements Invoker {
                 seq.setExpires(offer.getExpires());
                 seq.setTarget(create.getAcksTo());
                 source.addSequence(seq);
-                source.setCurrent(createResponse.getIdentifier(), seq);  
+                source.setCurrent(createResponse.getIdentifier(), seq);
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Making offered sequence the current sequence for responses to "
                              + createResponse.getIdentifier().getValue());
                 }
             } else {
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Refusing inbound sequence offer"); 
+                    LOG.fine("Refusing inbound sequence offer");
                 }
                 accept.setAcksTo(RMUtils.createNoneReference());
             }
             createResponse.setAccept(accept);
         }
-        
+
         DestinationSequence seq = new DestinationSequence(createResponse.getIdentifier(),
             create.getAcksTo(), destination, protocol);
         seq.setCorrelationID(maps.getMessageID().getValue());
@@ -192,25 +192,25 @@ public class Servant implements Invoker {
         return codec.convertToSend(createResponse);
     }
 
-    public void createSequenceResponse(CreateSequenceResponseType createResponse, 
+    public void createSequenceResponse(CreateSequenceResponseType createResponse,
                                        ProtocolVariation protocol) {
         LOG.fine("Creating sequence response");
-        
+
         SourceSequence seq = new SourceSequence(createResponse.getIdentifier(),
             protocol);
         seq.setExpires(createResponse.getExpires());
-        Source source  = reliableEndpoint.getSource();
+        Source source = reliableEndpoint.getSource();
         source.addSequence(seq);
-        
+
         // the incoming sequence ID is either used as the requestor sequence
-        // (signalled by null) or associated with a corresponding sequence 
+        // (signalled by null) or associated with a corresponding sequence
         // identifier
         source.setCurrent(clearUnattachedIdentifier(), seq);
 
         // if a sequence was offered and accepted, then we can add this to
         // to the local destination sequence list, otherwise we have to wait for
         // and incoming CreateSequence request
-        
+
         Identifier offeredId = reliableEndpoint.getProxy().getOfferedIdentifier();
         if (null != offeredId) {
             AcceptType accept = createResponse.getAccept();
@@ -218,7 +218,7 @@ public class Servant implements Invoker {
                 Destination dest = reliableEndpoint.getDestination();
                 String address = accept.getAcksTo().getAddress().getValue();
                 if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
-                    DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
+                    DestinationSequence ds = new DestinationSequence(offeredId, accept.getAcksTo(), dest,
                                                                       protocol);
                     dest.addSequence(ds);
                 }
@@ -229,41 +229,38 @@ public class Servant implements Invoker {
     public Object terminateSequence(Message message) {
         LOG.fine("Terminating sequence");
         final ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
-        
+
         EncoderDecoder codec = protocol.getCodec();
         TerminateSequenceType terminate = codec.convertReceivedTerminateSequence(getParameter(message));
-        
+
         // check if the terminated sequence was created in response to a a createSequence
         // request
-        
+
         Destination destination = reliableEndpoint.getDestination();
         Identifier sid = terminate.getIdentifier();
         DestinationSequence terminatedSeq = destination.getSequence(sid);
-        if (null == terminatedSeq) {
-            //  TODO
-            LOG.severe("No such sequence.");
-            return null;
-        } 
+        if (null != terminatedSeq) {
+            destination.terminateSequence(terminatedSeq);
+        }
 
-        destination.removeSequence(terminatedSeq);
-        
+
         // the following may be necessary if the last message for this sequence was a oneway
         // request and hence there was no response to which a last message could have been added
-        
+
         // REVISIT: A last message for the correlated sequence should have been sent by the time
         // the last message for the underlying sequence was received.
-        
+
         Source source = reliableEndpoint.getSource();
-        
+
         for (SourceSequence outboundSeq : source.getAllSequences()) {
             if (outboundSeq.offeredBy(sid) && !outboundSeq.isLastMessage()) {
-                
+
                 if (outboundSeq.getCurrentMessageNr() == 0) {
                     source.removeSequence(outboundSeq);
                 }
-                // send an out of band message with an empty body and a 
+                // send an out of band message with an empty body and a
                 // sequence header containing a lastMessage element.
-               
+
                 /*
                 Proxy proxy = new Proxy(reliableEndpoint);
                 try {
@@ -272,24 +269,24 @@ public class Servant implements Invoker {
                     LogUtils.log(LOG, Level.SEVERE, "CORRELATED_SEQ_TERMINATION_EXC", ex);
                 }
                 */
-                
+
                 break;
             }
         }
         TerminateSequenceResponseType terminateResponse = null;
         if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
-            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
+            AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
             Message outMessage = message.getExchange().getOutMessage();
 
             if (null == outMessage) {
-                // outMessage may be null e.g. if ReplyTo is not set for TS 
+                // outMessage may be null e.g. if ReplyTo is not set for TS
                 outMessage = ContextUtils.createMessage(message.getExchange());
                 message.getExchange().setOutMessage(outMessage);
             }
             if (null != outMessage) {
                 RMContextUtils.storeMAPs(maps, outMessage, false, false);
             }
-            terminateResponse = new TerminateSequenceResponseType();        
+            terminateResponse = new TerminateSequenceResponseType();
             terminateResponse.setIdentifier(sid);
         }
         return terminateResponse;
@@ -297,12 +294,12 @@ public class Servant implements Invoker {
 
     public Object closeSequence(Message message) {
         LOG.fine("Closing sequence");
-        
+
         CloseSequenceType close = (CloseSequenceType)getParameter(message);
-        
+
         // check if the terminated sequence was created in response to a a createSequence
         // request
-        
+
         Destination destination = reliableEndpoint.getDestination();
         Identifier sid = close.getIdentifier();
         DestinationSequence closedSeq = destination.getSequence(sid);
@@ -310,16 +307,16 @@ public class Servant implements Invoker {
             //  TODO
             LOG.severe("No such sequence.");
             return null;
-        } 
+        }
         closedSeq.scheduleImmediateAcknowledgement();
         closedSeq.setLastMessageNumber(close.getLastMsgNumber());
         CloseSequenceResponseType closeResponse = new CloseSequenceResponseType();
         closeResponse.setIdentifier(close.getIdentifier());
-        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);        
+        AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, false);
         Message outMessage = message.getExchange().getOutMessage();
 
         if (null == outMessage) {
-            // outMessage may be null e.g. if ReplyTo is not set for TS 
+            // outMessage may be null e.g. if ReplyTo is not set for TS
             outMessage = ContextUtils.createMessage(message.getExchange());
             message.getExchange().setOutMessage(outMessage);
         }
@@ -332,7 +329,7 @@ public class Servant implements Invoker {
     Object getParameter(Message message) {
         List<?> resList = null;
         // assert message == message.getExchange().getInMessage();
-        
+
         if (message != null) {
             resList = message.getContent(List.class);
         }
@@ -342,14 +339,14 @@ public class Servant implements Invoker {
         }
         return null;
     }
-    
+
     Identifier clearUnattachedIdentifier() {
         Identifier ret = unattachedIdentifier;
         unattachedIdentifier = null;
         return ret;
     }
-    
-    void setUnattachedIdentifier(Identifier i) { 
+
+    void setUnattachedIdentifier(Identifier i) {
         unattachedIdentifier = i;
     }
 }

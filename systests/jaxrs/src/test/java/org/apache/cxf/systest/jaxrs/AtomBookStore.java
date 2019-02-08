@@ -52,44 +52,44 @@ public class AtomBookStore {
 
     @Context protected UriInfo uField;
     private HttpHeaders headers;
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    private Map<Long, CD> cds = new HashMap<Long, CD>();
+    private Map<Long, Book> books = new HashMap<>();
+    private Map<Long, CD> cds = new HashMap<>();
     private long bookId = 123;
     private long cdId = 123;
-    
+
     public AtomBookStore() {
         init();
         //System.out.println("----books: " + books.size());
     }
-    
+
     @Context
     public void setHttpHeaders(HttpHeaders theHeaders) {
         headers = theHeaders;
     }
-    
+
     @GET
     @Path("/books/jsonfeed")
     @Produces({"application/xml", "application/json", "text/html", "application/atom+xml" })
     public Feed getBooksAsJsonFeed(@Context UriInfo uParam) {
-        return getBooksAsFeed(uParam);    
+        return getBooksAsFeed(uParam);
     }
-    
-    
+
+
     @GET
     @Path("/books/feed")
     @Produces({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
-        
+
         MediaType mt = headers.getMediaType();
         if (!mt.equals(MediaType.valueOf(MediaType.MEDIA_TYPE_WILDCARD))
-            && !mt.equals(MediaType.APPLICATION_JSON_TYPE) 
+            && !mt.equals(MediaType.APPLICATION_JSON_TYPE)
             && !mt.equals(MediaType.APPLICATION_ATOM_XML_TYPE)) {
             throw new WebApplicationException();
         }
-        
+
         return doGetBookAsFeed(uParam);
     }
-    
+
     private Feed doGetBookAsFeed(@Context UriInfo uParam) {
         Factory factory = Abdera.getNewFactory();
         Feed f = factory.newFeed();
@@ -99,9 +99,9 @@ public class AtomBookStore {
         f.addAuthor("BookStore Management Company");
         try {
             for (Book b : books.values()) {
-                
+
                 Entry e = AtomUtils.createBookEntry(factory, b);
-                
+
                 f.addEntry(e);
             }
         } catch (Exception ex) {
@@ -109,7 +109,7 @@ public class AtomBookStore {
         }
         return f;
     }
-    
+
     @POST
     @Path("/books/feed")
     @Consumes("application/atom+xml")
@@ -120,16 +120,16 @@ public class AtomBookStore {
             JAXBContext jc = JAXBContext.newInstance(Book.class);
             Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
             books.put(b.getId(), b);
-            
-            URI uri = 
-                uField.getBaseUriBuilder().path("books").path("entries") 
+
+            URI uri =
+                uField.getBaseUriBuilder().path("books").path("entries")
                                                 .path(Long.toString(b.getId())).build();
             return Response.created(uri).entity(e).build();
         } catch (Exception ex) {
             return Response.serverError().build();
         }
     }
-    
+
     @POST
     @Path("/books/feed/relative")
     @Consumes("application/atom+xml")
@@ -140,15 +140,15 @@ public class AtomBookStore {
             JAXBContext jc = JAXBContext.newInstance(Book.class);
             Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
             books.put(b.getId(), b);
-            
+
             URI uri = URI.create("books/entries/" + Long.toString(b.getId()));
             return Response.created(uri).entity(e).build();
         } catch (Exception ex) {
             return Response.serverError().build();
         }
     }
-    
-    
+
+
     @GET
     @Path("/books/entries/{bookId}/")
     @Produces({"application/atom+xml", "application/json" })
@@ -168,7 +168,7 @@ public class AtomBookStore {
         }
         return null;
     }
-    
+
     @Path("/books/subresources/{bookId}/")
     public AtomBook getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         //System.out.println("----invoking getBook with id: " + id);
@@ -186,10 +186,10 @@ public class AtomBookStore {
         }
         return null;
     }
-    
-    
-    
-    
+
+
+
+
     final void init() {
         Book book = new Book();
         book.setId(bookId);

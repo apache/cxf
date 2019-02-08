@@ -25,13 +25,13 @@ import org.w3c.dom.Document;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.test.TestUtilities;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = { "classpath:crossSchemaBeans.xml" })
 public class CrossSchemaImportsTests extends AbstractJUnit4SpringContextTests {
@@ -46,19 +46,19 @@ public class CrossSchemaImportsTests extends AbstractJUnit4SpringContextTests {
     public void testJaxbCrossSchemaImport() throws Exception {
         testUtilities.setBus((Bus)applicationContext.getBean("cxf"));
         testUtilities.addDefaultNamespaces();
-        Server s = testUtilities.getServerForService(new QName("http://apache.org/type_test/doc", 
+        Server s = testUtilities.getServerForService(new QName("http://apache.org/type_test/doc",
                                                                "TypeTestPortTypeService"));
         Document wsdl = testUtilities.getWSDLDocument(s);
         testUtilities.
              assertValid("//xsd:schema[@targetNamespace='http://apache.org/type_test/doc']/"
                          + "xsd:import[@namespace='http://apache.org/type_test/types1']", wsdl);
-        
+
         Assert.assertEquals(1, LifeCycleListenerTester.getInitCount());
-        
+
         Assert.assertEquals(0, LifeCycleListenerTester.getShutdownCount());
-        
+
         ((ConfigurableApplicationContext)applicationContext).close();
-        Assert.assertEquals(1, LifeCycleListenerTester.getShutdownCount());        
+        Assert.assertEquals(1, LifeCycleListenerTester.getShutdownCount());
     }
 
 }

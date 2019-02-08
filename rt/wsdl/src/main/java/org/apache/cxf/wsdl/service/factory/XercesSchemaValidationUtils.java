@@ -45,18 +45,18 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaSerializer;
 
 /**
- * 
+ *
  */
 class XercesSchemaValidationUtils {
 
-   
-    class DOMLSInput implements LSInput {
+
+    static class DOMLSInput implements LSInput {
         private String systemId;
         private String data;
-        
+
         DOMLSInput(Document doc, String systemId) throws TransformerException {
             this.systemId = systemId;
-            data = StaxUtils.toString(doc);           
+            data = StaxUtils.toString(doc);
         }
 
         /** {@inheritDoc}*/
@@ -131,21 +131,21 @@ class XercesSchemaValidationUtils {
         public void setSystemId(String systemId) {
         }
     }
-    
-    
+
+
     private DOMImplementation impl;
 
     XercesSchemaValidationUtils() throws ClassNotFoundException, InstantiationException,
         IllegalAccessException, ClassCastException {
-        
+
         DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
         impl = registry.getDOMImplementation("XS-Loader");
     }
 
-    
+
     Method findMethod(Object o, String name) {
-        for (Method m: o.getClass().getMethods()) {
-            if (m.getName() == name) {
+        for (Method m : o.getClass().getMethods()) {
+            if (m.getName() != null && m.getName().equals(name)) {
                 m.setAccessible(true);
                 return m;
             }
@@ -155,8 +155,8 @@ class XercesSchemaValidationUtils {
     void tryToParseSchemas(XmlSchemaCollection collection, DOMErrorHandler handler)
         throws Exception {
 
-        final List<DOMLSInput> inputs = new ArrayList<DOMLSInput>();
-        final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
+        final List<DOMLSInput> inputs = new ArrayList<>();
+        final Map<String, LSInput> resolverMap = new HashMap<>();
 
         for (XmlSchema schema : collection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
@@ -169,10 +169,10 @@ class XercesSchemaValidationUtils {
         }
 
         try {
-        
+
             Object schemaLoader = findMethod(impl, "createXSLoader").invoke(impl, new Object[1]);
             DOMConfiguration config = (DOMConfiguration)findMethod(schemaLoader, "getConfig").invoke(schemaLoader);
-    
+
             config.setParameter("validate", Boolean.TRUE);
             config.setParameter("error-handler", handler);
             config.setParameter("resource-resolver", new LSResourceResolver() {
@@ -181,17 +181,17 @@ class XercesSchemaValidationUtils {
                     return resolverMap.get(namespaceURI);
                 }
             });
-    
-            
+
+
             Method m = findMethod(schemaLoader, "loadInputList");
             String name = m.getParameterTypes()[0].getName() + "Impl";
             name = name.replace("xs.LS", "impl.xs.util.LS");
             Class<?> c = Class.forName(name);
             Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
-                .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
+                .newInstance(inputs.toArray(new LSInput[0]), inputs.size());
             m.invoke(schemaLoader, inputList);
         } catch (InvocationTargetException e) {
-            throw (Exception)e.getTargetException(); 
+            throw (Exception)e.getTargetException();
         }
     }
 }

@@ -28,8 +28,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WSSecTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -38,7 +42,7 @@ public class WSSecTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("Server failed to launch", launchServer(Server.class));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -60,7 +64,7 @@ public class WSSecTest extends AbstractBusClientServerTestBase {
         HelloWorld port = service.getPort(portName, HelloWorld.class);
         updateAddressPort(port, PORT);
         assertEquals("Hello CXF", port.sayHello("CXF"));
-        
+
         bus.shutdown(true);
     }
 

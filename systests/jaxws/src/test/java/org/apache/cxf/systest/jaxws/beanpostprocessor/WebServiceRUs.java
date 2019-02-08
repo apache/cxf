@@ -31,27 +31,27 @@ import org.apache.cxf.service.Service;
 /**
  * a web service that can be launched and spoken to by the test.
  */
-@WebService(name = "Horatio", serviceName = "Alger", 
+@WebService(name = "Horatio", serviceName = "Alger",
             endpointInterface = "org.apache.cxf.systest.jaxws.beanpostprocessor.IWebServiceRUs")
 public class WebServiceRUs implements IWebServiceRUs {
-    
+
     private static org.apache.cxf.service.Service service;
-    
+
     @Resource
     WebServiceContext injectedContext;
-    
+
     private void noteService() {
         MessageContext ctx = injectedContext.getMessageContext();
         WrappedMessageContext wmc = (WrappedMessageContext) ctx;
         org.apache.cxf.message.Message msg = wmc.getWrappedMessage();
         service = msg.getExchange().getService();
     }
-    
+
     @WebMethod(exclude = true)
     public static Service getService() {
         return service;
     }
-    
+
     /** {@inheritDoc}*/
     @WebMethod
     public String consultTheOracle() {

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.maven_plugin.common.ClassLoaderSwitcher;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -43,18 +44,18 @@ import org.sonatype.plexus.build.incremental.BuildContext;
       requiresDependencyResolution = ResolutionScope.TEST)
 public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     @Parameter
-    WadlOption wadlOptions[];
+    WadlOption[] wadlOptions;
 
-    @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wad")
+    @Parameter(property = "cxf.wadlRoot", defaultValue = "${basedir}/src/main/resources/wadl")
     File wadlRoot;
 
     @Parameter(property = "cxf.testWadlRoot", defaultValue = "${basedir}/src/test/resources/wadl")
     File testWadlRoot;
-    
-    
+
+
     @Component
     BuildContext buildContext;
-    
+
     private void mergeOptions(List<WadlOption> effectiveOptions) {
         if (wadlOptions == null) {
             return;
@@ -73,10 +74,24 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        if (JavaUtils.isJava9Compatible()) {
+            fork = "true";
+            additionalJvmArgs =  "--add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED "
+                    + "--add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED "
+                    + "--add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED "
+                    + "--add-opens java.base/java.security=ALL-UNNAMED "
+                    + "--add-opens java.base/java.net=ALL-UNNAMED "
+                    + "--add-opens java.base/java.lang=ALL-UNNAMED "
+                    + "--add-opens java.base/java.util=ALL-UNNAMED "
+                    + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED " 
+                    + (additionalJvmArgs == null ? "" : additionalJvmArgs); 
+        }
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
-        
+
         // add the generated source into compile source
         // do this step first to ensure the source folder will be added to the Eclipse classpath
         if (project != null && sourceRoot != null) {
@@ -85,7 +100,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
         if (project != null && testSourceRoot != null) {
             project.addTestCompileSourceRoot(testSourceRoot.getAbsolutePath());
         }
-        
+
         // if this is an m2e configuration build then return immediately without doing any work
         if (project != null && buildContext.isIncremental() && !buildContext.hasDelta(project.getBasedir())) {
             return;
@@ -93,7 +108,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
 
         List<WadlOption> effectiveWsdlOptions = createWadlOptionsFromScansAndExplicitWadlOptions(classesDir);
 
-        if (effectiveWsdlOptions.size() == 0) {
+        if (effectiveWsdlOptions.isEmpty()) {
             getLog().info("Nothing to generate");
             return;
         }
@@ -110,8 +125,8 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             } else {
                 for (WadlOption o : effectiveWsdlOptions) {
                     bus = callCodeGenerator(o, bus, cp);
-    
-                    File dirs[] = o.getDeleteDirs();
+
+                    File[] dirs = o.getDeleteDirs();
                     if (dirs != null) {
                         for (int idx = 0; idx < dirs.length; ++idx) {
                             result = result && deleteDir(dirs[idx]);
@@ -129,14 +144,14 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
 
         System.gc();
     }
-    
+
     /**
      * @return effective WsdlOptions
      * @throws MojoExecutionException
      */
-    private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir) 
+    private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir)
         throws MojoExecutionException {
-        List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
+        List<WadlOption> effectiveOptions = new ArrayList<>();
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
         if (effectiveOptions.isEmpty()) {
@@ -147,13 +162,13 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             }
             File defaultRoot = wadlRoot != null && wadlRoot.exists() ? wadlRoot : testWadlRoot;
             effectiveOptions.addAll(
-                OptionLoader.loadWadlOptionsFromFile(defaultRoot, 
-                                                     includes, 
-                                                     excludes, 
-                                                     defaultOptions, 
+                OptionLoader.loadWadlOptionsFromFile(defaultRoot,
+                                                     includes,
+                                                     excludes,
+                                                     defaultOptions,
                                                      classesDir));
         }
         return effectiveOptions;
     }
-    
+
 }

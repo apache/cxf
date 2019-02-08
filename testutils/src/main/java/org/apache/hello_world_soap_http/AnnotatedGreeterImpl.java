@@ -23,6 +23,7 @@ package org.apache.hello_world_soap_http;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
@@ -32,20 +33,20 @@ import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebServiceContext;
 
-@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService", 
+@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http")
 @HandlerChain(name = "TestHandlerChain", file = "handlers.xml")
 public class AnnotatedGreeterImpl {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(AnnotatedGreeterImpl.class.getName());
 
     @Resource
-    private int foo; 
+    private int foo;
 
     private WebServiceContext context;
 
-    private final Map<String, Integer> invocationCount = new HashMap<String, Integer>();
+    private final Map<String, Integer> invocationCount = new HashMap<>();
 
     public AnnotatedGreeterImpl() {
         invocationCount.put("sayHi", 0);
@@ -56,10 +57,9 @@ public class AnnotatedGreeterImpl {
     public int getInvocationCount(String method) {
         if (invocationCount.containsKey(method)) {
             return invocationCount.get(method).intValue();
-        } else {
-            System.out.println("No invocation count for method: " + method);
-            return 0;
         }
+        System.out.println("No invocation count for method: " + method);
+        return 0;
     }
 
     /**
@@ -105,7 +105,7 @@ public class AnnotatedGreeterImpl {
         incrementInvocationCount("greetMe");
         return "Bonjour " + me + "!";
     }
-    
+
     @WebMethod
     @RequestWrapper(className = "org.apache.hello_world_soap_http.types.GreetMeOneWay",
                     localName = "greetMeOneWay",
@@ -116,11 +116,11 @@ public class AnnotatedGreeterImpl {
         System.out.println("That was OneWay to say hello");
     }
 
-    public void testDocLitFault(String faultType)  throws BadRecordLitFault, NoSuchCodeLitFault {        
+    public void testDocLitFault(String faultType)  throws BadRecordLitFault, NoSuchCodeLitFault {
     }
 
     @Resource
-    public void setContext(WebServiceContext ctx) { 
+    public void setContext(WebServiceContext ctx) {
         context = ctx;
     }
 
@@ -134,21 +134,21 @@ public class AnnotatedGreeterImpl {
         String body) {
         //Complete
     }
-    
+
     @WebMethod(operationName = "PutLastTradedPrice")
     public void putLastTradedPrice(
         @WebParam(name = "body", partName = "body")
         String body) {
         //Complete
     }
-    
+
     /**
-     * stop eclipse from whinging 
+     * stop eclipse from whinging
      */
-    public int getFoo() {         
+    public int getFoo() {
         return foo;
     }
-    
+
     private void incrementInvocationCount(String method) {
         LOG.info("Executing " + method);
         int n = invocationCount.get(method);

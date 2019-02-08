@@ -33,68 +33,68 @@ public class Option {
     protected File outputDir;
 
     /**
-     * A set of dependent files used to detect the generator must process WSDL, even 
+     * A set of dependent files used to detect the generator must process WSDL, even
      * if generator marker files are up to date.
      */
-    File dependencies[];
+    File[] dependencies;
 
     /**
      * Redundant directories to be deleted after code generation
      */
-    File redundantDirs[];
-    
+    File[] redundantDirs;
+
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to
      * specify any extra flags not addressed by other parameters
      */
-    List<String> extraargs = new ArrayList<String>();
+    List<String> extraargs = new ArrayList<>();
 
     /**
      * Specifies JAXB binding files. Use spaces to separate multiple entries.
      */
-    String bindingFiles[] = new String[0];
+    String[] bindingFiles = new String[0];
 
     /**
      * Specifies catalog file to map the imported wadl/schema
      */
     String catalog;
-    
+
     /**
      * Specifies resource id
      */
     private String resourcename;
-    
+
     /**
-     * Specifies package name of WADL resource elements 
+     * Specifies package name of WADL resource elements
      */
     private String packagename;
-    
+
     /**
      * Enables or disables generation of the impl classes. Default value is false.
      * If set then only implementation classes will be generated
      */
     private Boolean generateImpl;
-    
+
     /**
      * Enables or disables generation of the interface classes. Setting this property
      * only makes sense when generateImpl is also set. In other cases it is ignored and
      * interfaces are always generated.
-     *  
-     * 
-     * 
+     *
+     *
+     *
      */
     private Boolean generateInterface;
-    
+
     /**
-     * 
+     *
      */
-    private List<String> schemaPackagenames = new ArrayList<String>();
+    private List<String> schemaPackagenames = new ArrayList<>();
 
     public Option() {
         super();
     }
 
-    public void setDependencies(File files[]) {
+    public void setDependencies(File[] files) {
         dependencies = files;
     }
 
@@ -102,7 +102,7 @@ public class Option {
         return dependencies;
     }
 
-    public void setDeleteDirs(File files[]) {
+    public void setDeleteDirs(File[] files) {
         redundantDirs = files;
     }
 
@@ -117,20 +117,20 @@ public class Option {
     public void setOutputDir(File f) {
         outputDir = f;
     }
-    
-    public void setBindingFiles(String files[]) {
+
+    public void setBindingFiles(String[] files) {
         bindingFiles = files;
     }
     public String[] getBindingFiles() {
         return bindingFiles;
     }
     public void addBindingFile(File file) {
-        String tmp[] = new String[bindingFiles.length + 1];
+        String[] tmp = new String[bindingFiles.length + 1];
         System.arraycopy(bindingFiles, 0, tmp, 0, bindingFiles.length);
         bindingFiles = tmp;
         bindingFiles[bindingFiles.length - 1] = file.getAbsolutePath();
     }
-    
+
     public List<String> getSchemaPackagenames() {
         return schemaPackagenames;
     }
@@ -138,7 +138,7 @@ public class Option {
     public void setSchemaPackagenames(List<String> pn) {
         this.schemaPackagenames = pn;
     }
-    
+
     public String getCatalog() {
         return catalog;
     }
@@ -146,7 +146,7 @@ public class Option {
     public void setCatalog(String catalog) {
         this.catalog = catalog;
     }
-    
+
     public String getPackagename() {
         return packagename;
     }
@@ -166,15 +166,15 @@ public class Option {
     public boolean isImpl() {
         return generateImpl == null ? false : generateImpl;
     }
-    
+
     public void setImpl(boolean impl) {
         this.generateImpl = impl;
     }
-    
+
     public boolean isInterface() {
         return generateInterface == null ? false : generateInterface;
     }
-    
+
     public void setInterface(boolean interf) {
         this.generateInterface = interf;
     }
@@ -187,7 +187,7 @@ public class Option {
         this.extraargs.clear();
         this.extraargs.addAll(ea);
     }
-    
+
     public void copyOptions(Option destination) {
         destination.setBindingFiles(getBindingFiles());
         destination.setCatalog(getCatalog());
@@ -198,16 +198,16 @@ public class Option {
         destination.setOutputDir(getOutputDir());
         destination.setExtraargs(getExtraargs());
     }
-    
-    
-    
+
+
+
     private <T> T setIfNull(T dest, T source) {
         if (dest == null) {
             dest = source;
         }
         return dest;
     }
-    
+
     public void merge(Option defaultOptions) {
         catalog = setIfNull(catalog, defaultOptions.catalog);
         generateImpl = setIfNull(generateImpl, defaultOptions.generateImpl);
@@ -220,7 +220,7 @@ public class Option {
         schemaPackagenames.addAll(defaultOptions.schemaPackagenames);
         extraargs.addAll(defaultOptions.extraargs);
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T[] mergeList(T[] l1, T[] l2, Class<T> cls) {
         if (l1 == null) {
@@ -229,7 +229,7 @@ public class Option {
             return l1;
         }
         int len = l1.length + l2.length;
-        T ret[] = (T[])java.lang.reflect.Array.newInstance(cls, len);
+        T[] ret = (T[])java.lang.reflect.Array.newInstance(cls, len);
         System.arraycopy(l1, 0, ret, 0, l1.length);
         System.arraycopy(l2, 0, ret, l1.length, l2.length);
         return ret;

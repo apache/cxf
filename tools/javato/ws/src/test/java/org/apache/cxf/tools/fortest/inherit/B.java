@@ -34,7 +34,7 @@ import javax.jws.soap.SOAPBinding;
 interface B extends C {
     // An overloaded method helloWorld
     String helloWorld();
-    
+
     // Annotation to disambiguate name of overloaded method helloWorld
     // and to disambiguate name of Wrappers from HelloWorld - > HelloWorld2
     @javax.jws.WebMethod(operationName = "helloWorld2")
@@ -53,10 +53,10 @@ interface B extends C {
     @javax.jws.WebMethod
     @javax.jws.Oneway
     void oneWayOperation();
-    
+
     @javax.jws.WebMethod
     String bye(String bye);
-    
+
     @javax.jws.WebMethod
     String hello(String hello);
 }

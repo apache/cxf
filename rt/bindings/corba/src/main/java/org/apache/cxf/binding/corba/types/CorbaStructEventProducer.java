@@ -33,14 +33,14 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
         iterator = handler.members.iterator();
         serviceInfo = service;
         orb = orbRef;
-        if (handler.members.isEmpty() 
+        if (handler.members.isEmpty()
             && handler.getSimpleName().equals(handler.getIdlType().getLocalPart() + "_f")) {
             state = states.length;
         }
 
     }
 
-    public int next() { 
+    public int next() {
         int event = states[state];
         if (event != 0) {
             state++;
@@ -73,12 +73,12 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
                         currentEventProducer = new CorbaPrimitiveArrayEventProducer(obj, serviceInfo, orb);
                     }
                 }
-            } else if (obj.getSimpleName().equals(obj.getIdlType().getLocalPart() + "_f")) { 
+            } else if (obj.getSimpleName().equals(obj.getIdlType().getLocalPart() + "_f")) {
                 //some "special cases" we need to make sure are mapped correctly
 
                 currentEventProducer =
                     CorbaHandlerUtils.getTypeEventProducer(obj, serviceInfo, orb);
-                
+
             } else {
                 currentEventProducer =
                     CorbaHandlerUtils.getTypeEventProducer(obj, serviceInfo, orb);

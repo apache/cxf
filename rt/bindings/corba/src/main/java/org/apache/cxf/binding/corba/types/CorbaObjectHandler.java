@@ -22,12 +22,11 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.corba.CorbaStreamable;
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
-
 import org.omg.CORBA.Any;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
 
-// This class serves as a base for all other specific object type handlers and 
+// This class serves as a base for all other specific object type handlers and
 // provides basic functionality that is common for all objects.
 public class CorbaObjectHandler {
 
@@ -40,34 +39,34 @@ public class CorbaObjectHandler {
 
     public CorbaObjectHandler() {
     }
-    
+
     public CorbaObjectHandler(QName objName, QName objIdlType, TypeCode objTC, Object objType) {
         name = objName;
         idlType = objIdlType;
         typeCode = objTC;
         type = (CorbaType)objType;
     }
-    
+
     public QName getName() {
         return name;
     }
-    
+
     public String getSimpleName() {
         return name.getLocalPart();
     }
-    
+
     public QName getIdlType() {
         return idlType;
     }
-    
+
     public TypeCode getTypeCode() {
         return typeCode;
     }
-    
+
     public TCKind getTypeCodeKind() {
         return typeCode.kind();
     }
-    
+
     public CorbaType getType() {
         return type;
     }
@@ -88,9 +87,9 @@ public class CorbaObjectHandler {
         return isRecursive;
     }
 
-    public void clear() {        
+    public void clear() {
     }
-    
+
     public void setIntoAny(Any value, CorbaStreamable stream, boolean output) {
         value.insert_Streamable(stream);
     }

@@ -30,7 +30,7 @@ public interface Connection {
 
     /**
      * close the connection handle. A caller should not use a closed connection.
-     * 
+     *
      * @throws ResourceException if an error occurs during close.
      */
     void close() throws ResourceException;

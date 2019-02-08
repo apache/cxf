@@ -29,7 +29,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  */
 public interface Retryable {
     Object[] invoke(BindingOperationInfo oi,
-                    Object[] params, 
+                    Object[] params,
                     Map<String, Object> context,
                     Exchange exchange) throws Exception;
 }

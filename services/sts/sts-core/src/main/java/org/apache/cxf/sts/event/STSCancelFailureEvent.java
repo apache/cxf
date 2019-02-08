@@ -24,11 +24,11 @@ import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 public class STSCancelFailureEvent extends AbstractSTSFailureEvent implements TokenCancellerParametersSupport {
 
     private static final String OPERATION = "Cancel";
-    
+
     public STSCancelFailureEvent(TokenCancellerParameters parameters, long duration, Exception exception) {
         super(parameters, duration, exception);
     }
-    
+
     @Override
     public String getOperation() {
         return OPERATION;

@@ -20,11 +20,12 @@
 package org.apache.cxf.tools.misc.processor.address;
 
 import java.util.Map;
+
 import org.apache.cxf.tools.common.ToolContext;
 
 public interface Address {
     String HTTP_PREFIX = "http://localhost:9000";
 
-    Map<String, Object> buildAddressArguments(final ToolContext context);
-    Map<String, String> getNamespaces(final ToolContext context);
+    Map<String, Object> buildAddressArguments(ToolContext context);
+    Map<String, String> getNamespaces(ToolContext context);
 }

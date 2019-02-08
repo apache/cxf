@@ -47,11 +47,11 @@ public final class EHCacheUtil {
             }
         }
     }
-    
+
     private EHCacheUtil() {
-        // 
+        //
     }
-    
+
     public static CacheConfiguration getCacheConfiguration(String key, CacheManager cacheManager) {
         CacheConfiguration cc = cacheManager.getConfiguration().getCacheConfigurations().get(key);
         if (cc == null && key.contains("-")) {
@@ -64,12 +64,12 @@ public final class EHCacheUtil {
         if (cc == null) {
             cc = new CacheConfiguration();
         } else {
-            cc = (CacheConfiguration)cc.clone();
+            cc = cc.clone();
         }
         cc.setName(key);
         return cc;
     }
-    
+
     public static CacheManager createCacheManager() throws CacheException {
         try {
             return (CacheManager)cacheManagerCreateMethodNoArg.invoke(null, (Object[])null);

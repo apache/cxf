@@ -29,74 +29,80 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.calculator.CalculatorPortType;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SOAPBindingTest extends AbstractJaxWsTest {
 
-    private static final QName SERVICE_1 = 
+    private static final QName SERVICE_1 =
         new QName("http://apache.org/cxf/calculator", "CalculatorService");
 
-    private static final QName PORT_1 = 
+    private static final QName PORT_1 =
         new QName("http://apache.org/cxf/calculator", "CalculatorPort");
 
     @Test
     public void testRoles() throws Exception {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
-        
+
         BindingProvider bindingProvider = (BindingProvider)cal;
-        
+
         assertTrue(bindingProvider.getBinding() instanceof SOAPBinding);
         SOAPBinding binding = (SOAPBinding)bindingProvider.getBinding();
-        
+
         assertNotNull(binding.getRoles());
         assertEquals(2, binding.getRoles().size());
         assertTrue(binding.getRoles().contains(Soap12.getInstance().getNextRole()));
         assertTrue(binding.getRoles().contains(Soap12.getInstance().getUltimateReceiverRole()));
-        
+
         String myrole = "http://myrole";
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         roles.add(myrole);
-        
+
         binding.setRoles(roles);
-        
+
         assertNotNull(binding.getRoles());
         assertEquals(3, binding.getRoles().size());
         assertTrue(binding.getRoles().contains(myrole));
         assertTrue(binding.getRoles().contains(Soap12.getInstance().getNextRole()));
         assertTrue(binding.getRoles().contains(Soap12.getInstance().getUltimateReceiverRole()));
-                
+
         roles.add(Soap12.getInstance().getNoneRole());
-        
-        try {        
+
+        try {
             binding.setRoles(roles);
             fail("did not throw exception");
         } catch (WebServiceException e) {
             // that's expected with none role
-        }                   
+        }
     }
 
     @Test
     public void testSAAJ() throws Exception {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
-        
+
         BindingProvider bindingProvider = (BindingProvider)cal;
-        
+
         assertTrue(bindingProvider.getBinding() instanceof SOAPBinding);
         SOAPBinding binding = (SOAPBinding)bindingProvider.getBinding();
-        
+
         assertNotNull(binding.getMessageFactory());
-        
+
         assertNotNull(binding.getSOAPFactory());
     }
-        
+
 }

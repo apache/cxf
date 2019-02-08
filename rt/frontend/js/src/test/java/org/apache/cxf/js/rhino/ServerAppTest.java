@@ -25,11 +25,15 @@ import java.io.PrintStream;
 
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServerAppTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ServerAppTest {
 
     private String epAddr = "http://cxf.apache.org/";
 
@@ -180,7 +184,7 @@ public class ServerAppTest extends Assert {
             pout.flush();
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
-            System.setOut(orig);            
+            System.setOut(orig);
         }
     }
 
@@ -201,7 +205,7 @@ public class ServerAppTest extends Assert {
         PrintStream orig = System.out;
         try {
             System.setOut(pout);
-            
+
             phMock.createAndPublish(new File(emptyFile), epAddr, true);
             EasyMock.replay(phMock);
             ServerApp app = createServerApp();
@@ -210,7 +214,7 @@ public class ServerAppTest extends Assert {
             EasyMock.verify(phMock);
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
-            System.setOut(orig);            
+            System.setOut(orig);
         }
     }
 
@@ -218,7 +222,7 @@ public class ServerAppTest extends Assert {
     public void testDirectory() throws Exception {
         File f = new File(emptyFile);
         String dir = f.getParent();
-        assertTrue(dir != null);
+        assertNotNull(dir);
         EasyMock.checkOrder(phMock, false);
         phMock.createAndPublish(new File(emptyFile), epAddr, true);
         String file = getClass().getResource("empty/empty2.jsx").toURI().getPath();

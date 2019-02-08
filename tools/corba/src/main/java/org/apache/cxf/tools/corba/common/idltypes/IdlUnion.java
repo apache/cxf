@@ -30,7 +30,7 @@ public final class IdlUnion extends IdlScopeBase implements IdlType {
         super(parent, name);
         discriminator = disc;
     }
-    
+
     public static IdlUnion create(IdlScopeBase parent, String name, IdlType discriminator) {
         return new IdlUnion(parent, name, discriminator);
     }
@@ -50,13 +50,13 @@ public final class IdlUnion extends IdlScopeBase implements IdlType {
         pw.println(indent() + "};");
     }
 
-    
+
     public void writeFwd(PrintWriter pw) {
         if (isCircular()) {
             pw.println(indent() + "union " + localName() + ";");
         }
-    }    
-    
+    }
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         if (startScope == null) {
             startScope = this;

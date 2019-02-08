@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "SuperBook")
 public class SuperBook2 extends BookType {
     private boolean superBook;
-    
+
     public SuperBook2() {
-        
+
     }
-    
+
     public SuperBook2(String name, long id, boolean superStatus) {
         super(name, id);
         this.superBook = superStatus;

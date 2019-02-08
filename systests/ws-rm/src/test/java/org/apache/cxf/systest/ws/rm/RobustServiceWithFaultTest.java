@@ -40,20 +40,24 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests the addition of WS-RM properties to application messages and the
  * exchange of WS-RM protocol messages.
  */
 public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class); 
-    public static final String GREETMEONEWAY_ACTION 
+    public static final String PORT = allocatePort(Server.class);
+    public static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final Logger LOG = LogUtils.getLogger(RobustServiceWithFaultTest.class);
-    
+
     private static RobustOneWayPropertySetter robustSetter;
     private static GreeterCounterImpl serverGreeter;
     private Greeter greeter;
-    
+
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
@@ -63,18 +67,18 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/atmostonce.xml");
             BusFactory.setDefaultBus(bus);
             setBus(bus);
-            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(new Long(0));
+            bus.getExtension(RMManager.class).getConfiguration().setAcknowledgementInterval(Long.valueOf(0));
 
             serverGreeter = new GreeterCounterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             robustSetter = new RobustOneWayPropertySetter();
             bus.getInInterceptors().add(robustSetter);
-            
+
             // publish this robust oneway endpoint
             ep = Endpoint.create(serverGreeter);
             // leave the robust prop untouched, as it will be set per call later
-            
+
             ep.publish(address);
             LOG.info("Published greeter endpoint.");
         }
@@ -89,48 +93,48 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-    @Test 
+
+    @Test
     public void testRobustWithSomeFaults() throws Exception {
         LOG.fine("Creating greeter client");
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/seqlength1.xml");
         // set the client retry interval much shorter than the slow processing delay
-        RMManager manager = bus.getExtension(RMManager.class); 
-        manager.getConfiguration().setBaseRetransmissionInterval(new Long(5000));
+        RMManager manager = bus.getExtension(RMManager.class);
+        manager.getConfiguration().setBaseRetransmissionInterval(Long.valueOf(5000));
 
         BusFactory.setDefaultBus(bus);
         GreeterService gs = new GreeterService();
         greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        
+
         LOG.fine("Invoking greeter");
         greeter.greetMeOneWay("one");
         Thread.sleep(3000);
-        
+
         // invoked once
         assertEquals("not invoked once", 1, serverGreeter.getCount());
         assertTrue("still in retransmission", manager.getRetransmissionQueue().isEmpty());
-        
+
         LOG.fine("Invoking greeter and raising a fault");
         serverGreeter.setThrowAlways(true);
-        
+
         greeter.greetMeOneWay("two");
         Thread.sleep(3000);
-        
+
         // still invoked once
         assertEquals("not invoked once", 1, serverGreeter.getCount());
         assertTrue("still in retransmission", manager.getRetransmissionQueue().isEmpty());
-        
+
         LOG.fine("Invoking robust greeter and raising a fault");
         robustSetter.setRobust(true);
         greeter.greetMeOneWay("three");
         Thread.sleep(3000);
-        
+
         // still invoked once
         assertEquals("not invoked once", 1, serverGreeter.getCount());
         assertFalse("no message in retransmission", manager.getRetransmissionQueue().isEmpty());
-        
+
         LOG.fine("Stop raising a fault and let the retransmission succeeds");
         serverGreeter.setThrowAlways(false);
         Thread.sleep(8000);
@@ -143,7 +147,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
     private static class GreeterCounterImpl extends GreeterImpl {
         private int count;
         private boolean throwAlways;
-        
+
         public void greetMeOneWay(String arg0) {
             if (throwAlways) {
                 throw new RuntimeException("invocation exception");
@@ -151,7 +155,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             super.greetMeOneWay(arg0);
             count++;
         }
-        
+
         public int getCount() {
             return count;
         }
@@ -162,7 +166,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
             super.setThrowAlways(t);
         }
     }
-    
+
     static class RobustOneWayPropertySetter extends AbstractPhaseInterceptor<Message> {
         private boolean robust;
 
@@ -173,7 +177,7 @@ public class RobustServiceWithFaultTest extends AbstractBusClientServerTestBase 
         public void setRobust(boolean robust) {
             this.robust = robust;
         }
-        
+
         @Override
         public void handleMessage(Message message) throws Fault {
             message.put(Message.ROBUST_ONEWAY, robust);

@@ -46,23 +46,23 @@ import org.apache.http.HttpStatus;
 @SchemaValidation
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private boolean ignoreJaxrsClient;
     @Context
     private MessageContext jaxrsContext;
-    
+
     @Resource(name = "restClient")
     private BookStoreJaxrsJaxws webClient;
     private boolean invocationInProcess;
-    
+
     public BookStoreSoapRestImpl() {
         init();
     }
-    
+
     public void setIgnoreJaxrsClient(boolean ignore) {
         this.ignoreJaxrsClient = ignore;
     }
-    
+
     @PostConstruct
     public void verifyWebClient() {
         if (!ignoreJaxrsClient) {
@@ -72,9 +72,9 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
             WebClient.client(webClient).accept("application/xml");
         }
     }
-    
+
     public Book getBook(Long id) throws BookNotFoundFault {
-        
+
         if (books.get(id) == null) {
             if (id == 0) {
                 try {
@@ -99,13 +99,13 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
             }
             String msg = "No Book with id " + id + " is available";
             ResponseBuilder builder = Response.status(returnCode).header("BOOK-HEADER", msg);
-            
+
             if (returnCode == 404) {
                 builder.type("text/plain").entity(msg);
             }
             throw new WebApplicationException(builder.build());
         }
-     
+
         if (!ignoreJaxrsClient) {
             if (!invocationInProcess) {
                 invocationInProcess = true;
@@ -113,24 +113,24 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
             }
             invocationInProcess = false;
         }
-        
-        
+
+
         return books.get(id);
     }
-    
+
     public Book addBook(Book book) {
         book.setId(124);
         books.put(book.getId(), book);
         return books.get(book.getId());
     }
-    
+
     private void init() {
         Book book = new Book();
-        book.setId(new Long(123));
+        book.setId(Long.valueOf(123));
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
- 
+
 
     @WebMethod(exclude = true)
     public BookSubresource getBookSubresource(String id) {
@@ -148,7 +148,7 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public Book addFastinfoBook(Book book) {
         return book;
     }
-    
+
     public Book getFastinfoBook() {
         return new Book("CXF2", 2L);
     }
@@ -157,9 +157,8 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     public Response checkBook(Long id) {
         if (id.longValue() != 0L) {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
         }
+        return Response.ok().build();
     }
-    
+
 }

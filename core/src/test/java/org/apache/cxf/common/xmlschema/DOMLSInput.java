@@ -32,18 +32,18 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 
 /**
- * 
+ *
  */
 class DOMLSInput implements LSInput {
     private static final Logger LOG = LogUtils.getL7dLogger(DOMLSInput.class);
     private String systemId;
     private String data;
-    
+
     DOMLSInput(Document doc, String systemId) throws TransformerException {
         this.systemId = systemId;
         data = StaxUtils.toString(doc);
         LOG.fine(systemId + ": " + data);
-        
+
     }
 
     /** {@inheritDoc}*/

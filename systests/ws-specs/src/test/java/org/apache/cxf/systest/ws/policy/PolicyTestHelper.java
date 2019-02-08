@@ -28,14 +28,14 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 
 /**
- * 
+ *
  */
 public final class PolicyTestHelper {
     private PolicyTestHelper() {
-        
+
     }
-    
-    
+
+
     public static void updatePolicyRef(String file, String oldData,
                                        String newData) throws IOException {
         File f = FileUtils.getDefaultTempDir();

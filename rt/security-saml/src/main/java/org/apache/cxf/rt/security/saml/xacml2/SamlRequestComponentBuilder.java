@@ -38,16 +38,16 @@ import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
  */
 public final class SamlRequestComponentBuilder {
     private static volatile XACMLObjectBuilder<XACMLAuthzDecisionQueryType> xacmlAuthzDecisionQueryTypeBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
-    
-    private static volatile XMLObjectBuilderFactory builderFactory = 
+
+    private static volatile XMLObjectBuilderFactory builderFactory =
         XMLObjectProviderRegistrySupport.getBuilderFactory();
-    
+
     private SamlRequestComponentBuilder() {
         // complete
     }
-    
+
     /**
      * Create an AuthzDecisionQuery using the defaults
      */
@@ -58,7 +58,7 @@ public final class SamlRequestComponentBuilder {
     ) {
         return createAuthzDecisionQuery(false, false, issuerValue, request, namespace);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static XACMLAuthzDecisionQueryType createAuthzDecisionQuery(
         boolean inputContextOnly,
@@ -71,7 +71,7 @@ public final class SamlRequestComponentBuilder {
             xacmlAuthzDecisionQueryTypeBuilder = (XACMLObjectBuilder<XACMLAuthzDecisionQueryType>)
                 builderFactory.getBuilder(XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_NAME_XACML20);
         }
-        XACMLAuthzDecisionQueryType authzQuery = 
+        XACMLAuthzDecisionQueryType authzQuery =
             xacmlAuthzDecisionQueryTypeBuilder.buildObject(
                 namespace,
                 XACMLAuthzDecisionQueryType.DEFAULT_ELEMENT_LOCAL_NAME,
@@ -82,18 +82,18 @@ public final class SamlRequestComponentBuilder {
         authzQuery.setIssueInstant(new DateTime());
         authzQuery.setInputContextOnly(Boolean.valueOf(inputContextOnly));
         authzQuery.setReturnContext(Boolean.valueOf(returnContext));
-        
+
         if (issuerValue != null) {
             Issuer issuer = createIssuer(issuerValue);
             authzQuery.setIssuer(issuer);
         }
-        
+
         authzQuery.setRequest(request);
-        
+
         return authzQuery;
     }
-    
-    
+
+
     /**
      * Create an Issuer object
      *
@@ -103,13 +103,13 @@ public final class SamlRequestComponentBuilder {
     @SuppressWarnings("unchecked")
     public static Issuer createIssuer(String issuerValue) {
         if (issuerBuilder == null) {
-            issuerBuilder = (SAMLObjectBuilder<Issuer>) 
+            issuerBuilder = (SAMLObjectBuilder<Issuer>)
                 builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
-            
+
         }
         Issuer issuer = issuerBuilder.buildObject();
         //
-        // The SAML authority that is making the claim(s) in the assertion. The issuer SHOULD 
+        // The SAML authority that is making the claim(s) in the assertion. The issuer SHOULD
         // be unambiguous to the intended relying parties.
         issuer.setValue(issuerValue);
         return issuer;

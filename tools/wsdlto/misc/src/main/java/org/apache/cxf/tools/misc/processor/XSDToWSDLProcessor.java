@@ -19,11 +19,12 @@
 
 package org.apache.cxf.tools.misc.processor;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
@@ -50,7 +51,6 @@ import org.apache.cxf.tools.util.FileWriterUtil;
 import org.apache.cxf.tools.util.OutputStreamCreator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingDeserializer;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBindingSerializer;
 import org.apache.cxf.wsdl.WSDLConstants;
 
 public class XSDToWSDLProcessor implements Processor {
@@ -102,7 +102,7 @@ public class XSDToWSDLProcessor implements Processor {
             in = new URL(xsdUrl).openStream();
         } catch (Exception m) {
             try {
-                in = new FileInputStream(xsdUrl);
+                in = Files.newInputStream(Paths.get(xsdUrl));
             } catch (IOException ioe) {
                 Message msg = new Message("FAIL_TO_OPEN_XSD_FILE", LOG, xsdUrl);
                 throw new ToolException(msg, ioe);
@@ -164,8 +164,6 @@ public class XSDToWSDLProcessor implements Processor {
     }
 
     private void registerJAXWSBinding(Class<?> clz) {
-        registry.registerSerializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingSerializer());
-
         registry.registerDeserializer(clz, ToolConstants.JAXWS_BINDINGS, new JAXWSBindingDeserializer());
         registry.mapExtensionTypes(clz, ToolConstants.JAXWS_BINDINGS, JAXWSBinding.class);
     }

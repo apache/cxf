@@ -28,7 +28,7 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
     int count;
     CorbaObjectHandler next;
     boolean isServer;
-    
+
     public HandlerIterator(CorbaMessage msg, boolean server) {
         params = msg.getStreamableArguments();
         isServer = server;
@@ -36,7 +36,7 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
             next = msg.getStreamableReturn().getObject();
         }
     }
-    
+
     public boolean hasNext() {
         while (next == null && count < params.length) {
             int mode = params[count].getMode();
@@ -48,7 +48,7 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
                 || mode == org.omg.CORBA.ARG_INOUT.value) {
                 next = params[count].getObject();
             }
-            if (!isServer 
+            if (!isServer
                 && mode == org.omg.CORBA.ARG_INOUT.value
                 && next instanceof CorbaPrimitiveHandler) {
                 CorbaPrimitiveHandler prim = (CorbaPrimitiveHandler)next;
@@ -58,13 +58,13 @@ public class HandlerIterator implements Iterator<CorbaObjectHandler> {
         }
         return next != null;
     }
-    
+
     public CorbaObjectHandler next() {
         CorbaObjectHandler current = next;
         next = null;
         return current;
     }
-    
+
     public void remove() {
     }
 }

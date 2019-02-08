@@ -19,41 +19,42 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ws.rm.RMManager;
-import org.junit.Assert;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class RMTxStoreConfigurationTest extends Assert {
-    
-    @Test     
+public class RMTxStoreConfigurationTest {
+
+    @Test
     public void testTxStoreBean() {
-        // connect exception only results in a log message 
+        // connect exception only results in a log message
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-bean.xml");
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
         assertNotNull(store);
-        assertNull("Connection should be null", store.getConnection());
-        assertEquals("org.apache.derby.jdbc.NoDriver", store.getDriverClassName());
+        assertNotNull("Connection should be null", store.getConnection());
+        assertEquals("org.apache.derby.jdbc.EmbeddedDriver", store.getDriverClassName());
         assertEquals("scott", store.getUserName());
         assertEquals("tiger", store.getPassword());
-        assertEquals("jdbc:derby://localhost:1527/rmdb;create=true", store.getUrl());
+        assertEquals("jdbc:derby:target/wsrmdb3;create=true", store.getUrl());
         assertNull("schema should be unset", store.getSchemaName());
     }
-   
+
     @Test
     public void testSetCustomTableExistsState() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -61,22 +62,23 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
-        
+
         assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
     }
 
     @Test
     public void testSetCustomTableExistsState2() {
+        RMTxStore.deleteDatabaseFiles("target/wsrmdb5", true);
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-custom-error-bean2.xml");
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
-        
+
         assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
     }
 
@@ -87,12 +89,12 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertNotNull(store.getDataSource());
-        
-        assertNull(store.getConnection());
+
+        assertNotNull(store.getConnection());
     }
-    
+
     @Test
     public void testTxStoreWithDataSource2() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -100,47 +102,10 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertNotNull(store.getDataSource());
-        
-        assertNull(store.getConnection());
+
+        assertNotNull(store.getConnection());
     }
-    
-    static class TestDataSource implements DataSource {
-        public PrintWriter getLogWriter() throws SQLException {
-            return null;
-        }
 
-        public void setLogWriter(PrintWriter out) throws SQLException {
-        }
-
-        public void setLoginTimeout(int seconds) throws SQLException {
-        }
-
-        public int getLoginTimeout() throws SQLException {
-            return 0;
-        }
-
-        public <T> T unwrap(Class<T> iface) throws SQLException {
-            return null;
-        }
-
-        public boolean isWrapperFor(Class<?> iface) throws SQLException {
-            return false;
-        }
-
-        public Connection getConnection() throws SQLException {
-            // avoid creating a connection and tables at RMTxStore.init()
-            throw new SQLException("test");
-        }
-
-        public Connection getConnection(String username, String password) throws SQLException {
-            // avoid creating a connection and tables at RMTxStore.init()
-            throw new SQLException("test");
-        }
-
-        public Logger getParentLogger() {
-            return null;
-        }
-    }
 }

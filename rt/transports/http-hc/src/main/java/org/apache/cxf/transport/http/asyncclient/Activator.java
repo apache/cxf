@@ -25,64 +25,59 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
-
-    private ServiceTracker tracker;
+    private ConduitConfigurer conduitConfigurer;
 
     @Override
     public void start(BundleContext context) throws Exception {
-        tracker = new ServiceTracker(context, Bus.class.getName(), null);
-        tracker.open();
-        ConduitConfigurer conduitConfigurer = new ConduitConfigurer(context, tracker);
-        registerManagedService(context, conduitConfigurer, "org.apache.cxf.transport.http.async");
-    }
-
-    private void registerManagedService(BundleContext context, ConduitConfigurer conduitConfigurer, String servicePid) {
-        Dictionary<String, Object> properties = new Hashtable<String, Object>();
-        properties.put(Constants.SERVICE_PID, servicePid);
+        conduitConfigurer = new ConduitConfigurer(context);
+        conduitConfigurer.open();
+        Dictionary<String, Object> properties = new Hashtable<>();
+        properties.put(Constants.SERVICE_PID, "org.apache.cxf.transport.http.async");
         context.registerService(ManagedService.class.getName(), conduitConfigurer, properties);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        tracker.close();
+        conduitConfigurer.close();
     }
 
-    class ConduitConfigurer implements ManagedService {
-        private AsyncHTTPConduitFactory conduitFactory;
-        private ServiceTracker busTracker;
-        private BundleContext context;
-        private ServiceRegistration reg;
-        
-        ConduitConfigurer(BundleContext context, ServiceTracker busTracker) {
-            this.context = context;
-            this.busTracker = busTracker;
+    public class ConduitConfigurer extends ServiceTracker<Bus, Bus> implements ManagedService {
+        private Map<String, Object> currentConfig;
+
+        public ConduitConfigurer(BundleContext context) {
+            super(context, Bus.class, null);
         }
 
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
         @Override
-        public void updated(Dictionary properties) throws ConfigurationException {
-            if (reg != null) {
-                reg.unregister();
+        public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+            this.currentConfig = toMap(properties);
+            Bus[] buses = (Bus[])getServices();
+            if (buses == null) {
+                return;
             }
-            conduitFactory = new AsyncHTTPConduitFactory((Bus)this.busTracker.getService());
-            conduitFactory.update(toMap(properties));
-            reg = context.registerService(HTTPConduitFactory.class.getName(), conduitFactory, null);
+            for (Bus bus : buses) {
+                configureConduitFactory(bus);
+            }
         }
-        
+
+        @Override
+        public Bus addingService(ServiceReference<Bus> reference) {
+            Bus bus = super.addingService(reference);
+            configureConduitFactory(bus);
+            return bus;
+        }
+
         private Map<String, Object> toMap(Dictionary<String, ?> properties) {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             if (properties == null) {
                 return props;
             }
@@ -93,6 +88,12 @@ public class Activator implements BundleActivator {
             }
             return props;
         }
-        
+
+        private void configureConduitFactory(Bus bus) {
+            AsyncHTTPConduitFactory conduitFactory = bus.getExtension(AsyncHTTPConduitFactory.class);
+            conduitFactory.update(this.currentConfig);
+        }
+
+
     }
 }

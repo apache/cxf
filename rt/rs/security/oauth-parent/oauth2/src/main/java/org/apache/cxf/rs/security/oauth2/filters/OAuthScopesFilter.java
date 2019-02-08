@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
@@ -42,24 +44,24 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthContextUtils;
 
-
+@Priority(Priorities.AUTHENTICATION + 1)
 public class OAuthScopesFilter implements ContainerRequestFilter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthScopesFilter.class);
     private static final Set<String> SKIP_METHODS;
     static {
-        SKIP_METHODS = new HashSet<String>();
+        SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll", 
+            new String[] {"wait", "notify", "notifyAll",
                           "equals", "toString", "hashCode"}));
     }
 
     @Context
     private MessageContext mc;
-    private Map<String, List<String>> scopesMap = new HashMap<String, List<String>>();
-    private Map<String, Boolean> scopesMatchAllMap = new HashMap<String, Boolean>();
-    private Set<String> confidentialClientMethods = new HashSet<String>();
-   
+    private Map<String, List<String>> scopesMap = new HashMap<>();
+    private Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
+    private Set<String> confidentialClientMethods = new HashSet<>();
+
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         checkSecureClass(cls);
@@ -88,7 +90,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
                 scopesMap.put(m.getName(), Arrays.asList(theScopes.value()));
                 scopesMatchAllMap.put(m.getName(), theScopes.matchAll());
             }
-            
+
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
             if (classConfClient != null || mConfClient != null) {
                 confidentialClientMethods.add(m.getName());
@@ -123,7 +125,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
         boolean matchAll = scopesMatchAllMap.get(m.getName());
         OAuthContext context = OAuthContextUtils.getContext(mc);
-        List<String> requestScopes = new LinkedList<String>();
+        List<String> requestScopes = new LinkedList<>();
         for (OAuthPermission perm : context.getPermissions()) {
             if (matchAll) {
                 requestScopes.add(perm.getPermission());
@@ -131,12 +133,12 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
                 return;
             }
         }
-        
+
         if (!requestScopes.containsAll(methodScopes)) {
             LOG.warning("Scopes do not match");
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-        
+
     }
     protected Method getTargetMethod() {
         Method method = (Method)mc.get("org.apache.cxf.resource.method");
@@ -145,6 +147,24 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
         }
         throw ExceptionUtils.toForbiddenException(null, null);
     }
-    
-    
+
+    public void setScopesMap(Map<String, List<String>> scopesMap) {
+        this.scopesMap = scopesMap;
+    }
+
+    public void setScopesStringMap(Map<String, String> scopesStringMap) {
+        for (Map.Entry<String, String> entry : scopesStringMap.entrySet()) {
+            scopesMap.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
+        }
+    }
+
+    public void setScopesMatchAllMap(Map<String, Boolean> scopesMatchAllMap) {
+        this.scopesMatchAllMap = scopesMatchAllMap;
+    }
+
+    public void setConfidentialClientMethods(Set<String> confidentialClientMethods) {
+        this.confidentialClientMethods = confidentialClientMethods;
+    }
+
+
 }

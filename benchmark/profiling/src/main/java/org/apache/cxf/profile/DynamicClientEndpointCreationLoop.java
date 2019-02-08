@@ -28,18 +28,18 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
 
 /**
- * 
+ *
  */
 public final class DynamicClientEndpointCreationLoop {
-    
+
     private Bus bus;
-    
+
     private DynamicClientEndpointCreationLoop() {
-        CXFBusFactory busFactory = new CXFBusFactory(); 
+        CXFBusFactory busFactory = new CXFBusFactory();
         bus = busFactory.createBus();
     }
-    
-    private void iteration() throws URISyntaxException {    
+
+    private void iteration() throws URISyntaxException {
         URL wsdl = getClass().getResource("/wsdl/others/dynamic_client_base64.wsdl");
         String wsdlUrl = null;
         wsdlUrl = wsdl.toURI().toString();
@@ -49,7 +49,7 @@ public final class DynamicClientEndpointCreationLoop {
     }
     /**
      * @param args
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     public static void main(String[] args) throws URISyntaxException {
         DynamicClientEndpointCreationLoop ecl = new DynamicClientEndpointCreationLoop();

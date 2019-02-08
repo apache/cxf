@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
+import javax.jms.InvalidClientIDException;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
@@ -59,9 +60,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     private JMSConfiguration jmsConfig;
     private Bus bus;
-    
-    @SuppressWarnings("unused")
-    private EndpointInfo ei;
+
     private JMSListenerContainer jmsListener;
     private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
@@ -71,7 +70,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
         this.bus = b;
-        this.ei = info;
         this.jmsConfig = jmsConfig;
         info.setProperty(OneWayProcessorInterceptor.USE_ORIGINAL_THREAD, Boolean.TRUE);
         loader = bus.getExtension(ClassLoader.class);
@@ -87,13 +85,18 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      */
     protected Conduit getInbuiltBackChannel(Message inMessage) {
         //with JMS, non-robust OneWays will never need to send back a response, even a "202" response.
-        boolean robust =
-            MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
+        boolean robust = MessageUtils.getContextualBoolean(inMessage, Message.ROBUST_ONEWAY);
         if (inMessage.getExchange().isOneWay()
             && !robust) {
             return null;
         }
-        return new BackChannelConduit(inMessage, jmsConfig, connection);
+
+        if (jmsConfig.isOneSessionPerConnection()) {
+            return new BackChannelConduit(inMessage, jmsConfig);
+        } else {
+            return new BackChannelConduit(inMessage, jmsConfig, connection);
+        }
+
     }
 
     /**
@@ -105,50 +108,66 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         try {
             this.jmsListener = createTargetDestinationListener();
         } catch (Exception e) {
-            // If first connect fails we will try to establish the connection in the background 
-            new Thread(new Runnable() {
-                
-                @Override
-                public void run() {
-                    restartConnection();
-                }
-            }).start();
+            if (e.getCause() != null && InvalidClientIDException.class.isInstance(e.getCause())) {
+                throw e;
+            }
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                // If first connect fails we will try to establish the connection in the background
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartConnection();
+                    }
+                }).start();
+            }
         }
     }
-    
-    
+
+
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
         try {
-            connection = JMSFactory.createConnection(jmsConfig);
-            connection.setExceptionListener(new ExceptionListener() {
+            ExceptionListener exListener = new ExceptionListener() {
                 public void onException(JMSException exception) {
                     if (!shutdown) {
                         LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
                         restartConnection();
                     }
                 }
-            });
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = jmsConfig.getTargetDestination(session);
+            };
+            
+            PollingMessageListenerContainer container;
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                connection = JMSFactory.createConnection(jmsConfig);
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Destination destination = jmsConfig.getTargetDestination(session);
+                container = new PollingMessageListenerContainer(connection, destination, this, exListener);
+            } else {
+                container = new PollingMessageListenerContainer(jmsConfig, false, this);
+            }
 
-            PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, 
-                                                                                            destination, this);
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
             container.setTransactionManager(jmsConfig.getTransactionManager());
             container.setMessageSelector(jmsConfig.getMessageSelector());
             container.setTransacted(jmsConfig.isSessionTransacted());
             container.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
+            container.setPubSubNoLocal(jmsConfig.isPubSubNoLocal());
 
             Object executor = bus.getProperty(JMSFactory.JMS_DESTINATION_EXECUTOR);
             if (executor instanceof Executor) {
                 container.setExecutor((Executor) executor);
             }
+            container.setJndiEnvironment(jmsConfig.getJndiEnvironment());
             container.start();
             suspendedContinuations.setListenerContainer(container);
-            connection.start();
+
+            if (!jmsConfig.isOneSessionPerConnection()) {
+                connection.start();
+            }
             return container;
         } catch (JMSException e) {
+            ResourceCloser.close(connection);
+            this.connection = null;
             throw JMSUtil.convertJmsException(e);
         } finally {
             ResourceCloser.close(session);
@@ -172,9 +191,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                     LOG.log(Level.WARNING, message);
                 }
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(jmsConfig.getRetryInterval());
                 } catch (InterruptedException e2) {
-                    // Ignore
+                    shutdown = true;
                 }
             }
         } while (jmsListener == null && !shutdown);
@@ -194,14 +213,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         getLogger().log(Level.FINE, "JMSDestination shutdown()");
         this.deactivate();
     }
-    
-    
+
+
 
     /**
      * Convert JMS message received by ListenerThread to CXF message and inform incomingObserver that a
      * message was received. The observer will call the service and then send the response CXF message by
      * using the BackChannelConduit
-     * 
+     *
      * @param message
      * @throws IOException
      */
@@ -217,7 +236,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                                 + jmsConfig.getTargetDestination());
             Message inMessage = JMSMessageUtils.asCXFMessage(message, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
             if (jmsConfig.isCreateSecurityContext()) {
-                SecurityContext securityContext = JMSMessageUtils.buildSecurityContext(message, jmsConfig);
+                SecurityContext securityContext = SecurityContextFactory.buildSecurityContext(message, jmsConfig);
                 inMessage.put(SecurityContext.class, securityContext);
             }
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
@@ -271,9 +290,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         if (ex != null) {
             if (ex.getCause() instanceof RuntimeException) {
                 throw (RuntimeException)ex.getCause();
-            } else {
-                throw new RuntimeException(ex);
             }
+            throw new RuntimeException(ex);
         }
     }
 

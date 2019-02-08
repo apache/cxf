@@ -52,9 +52,9 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(MustUnderstandInterceptor.class);
 
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-    
+
     private MustUnderstandEndingInterceptor ending = new MustUnderstandEndingInterceptor();
-        
+
     public MustUnderstandInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
@@ -68,20 +68,20 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
             return;
         }
-        
-        SoapVersion soapVersion = soapMessage.getVersion();              
-        Set<Header> mustUnderstandHeaders = new HashSet<Header>();
-        Set<URI> serviceRoles = new HashSet<URI>();
-        Set<QName> notUnderstandHeaders = new HashSet<QName>();
-        Set<Header> ultimateReceiverHeaders = new HashSet<Header>();
-        Set<QName> mustUnderstandQNames = new HashSet<QName>();
+
+        SoapVersion soapVersion = soapMessage.getVersion();
+        Set<Header> mustUnderstandHeaders = new HashSet<>();
+        Set<URI> serviceRoles = new HashSet<>();
+        Set<QName> notUnderstandHeaders = new HashSet<>();
+        Set<Header> ultimateReceiverHeaders = new HashSet<>();
+        Set<QName> mustUnderstandQNames = new HashSet<>();
 
         initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles, paramHeaders);
         buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage,
                                    serviceRoles, ultimateReceiverHeaders);
-        
+
         checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames, notUnderstandHeaders);
-        
+
         if (!notUnderstandHeaders.isEmpty()) {
             if (!isRequestor(soapMessage)) {
                 soapMessage.put(MustUnderstandInterceptor.UNKNOWNS, notUnderstandHeaders);
@@ -98,7 +98,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
     @Override
     public void handleFault(SoapMessage msg) {
         Set<QName> unknowns = CastUtils.cast((Set<?>)msg.get(MustUnderstandInterceptor.UNKNOWNS));
-        if (msg.getExchange().getBindingOperationInfo() == null 
+        if (msg.getExchange().getBindingOperationInfo() == null
             && unknowns != null && !unknowns.isEmpty()) {
             //per jaxws spec, if there are must understands that we didn't understand, but couldn't map
             //to an operation either, we need to throw the mustunderstand fault, not the one related to
@@ -109,7 +109,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
     }
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
-                                              Set<QName> mustUnderstandQNames, 
+                                              Set<QName> mustUnderstandQNames,
                                               SoapMessage soapMessage) {
         soapMessage.getInterceptorChain()
             .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
@@ -140,7 +140,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             }
         }
         if (!ultimateReceiverHeaders.isEmpty()) {
-            Set<QName> notFound = new HashSet<QName>();
+            Set<QName> notFound = new HashSet<>();
             for (Header h : ultimateReceiverHeaders) {
                 if (!mustUnderstandQNames.contains(h.getName())) {
                     notFound.add(h.getName());
@@ -160,7 +160,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         if (paramHeaders != null) {
             mustUnderstandQNames.addAll(paramHeaders);
         }
-        for (Interceptor<? extends org.apache.cxf.message.Message> interceptorInstance 
+        for (Interceptor<? extends org.apache.cxf.message.Message> interceptorInstance
             : soapMessage.getInterceptorChain()) {
             if (interceptorInstance instanceof SoapInterceptor) {
                 SoapInterceptor si = (SoapInterceptor) interceptorInstance;
@@ -188,7 +188,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                     if (role.equals(soapMessage.getVersion().getNextRole())) {
                         mustUnderstandHeaders.add(header);
                     } else if (role.equals(soapMessage.getVersion().getUltimateReceiverRole())) {
-                        ultimateReceiverHeaders.add(header);                        
+                        ultimateReceiverHeaders.add(header);
                     } else {
                         for (URI roleFromBinding : serviceRoles) {
                             if (role.equals(roleFromBinding.toString())) {
@@ -216,13 +216,13 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             }
         }
     }
-    
-    
-    
+
+
+
     /**
-     * 
+     *
      */
-    private class UltimateReceiverMustUnderstandInterceptor extends AbstractSoapInterceptor {
+    private static class UltimateReceiverMustUnderstandInterceptor extends AbstractSoapInterceptor {
         Set<QName> knownHeaders;
         UltimateReceiverMustUnderstandInterceptor(Set<QName> knownHeaders) {
             super(Phase.INVOKE);
@@ -230,9 +230,9 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         }
         public void handleMessage(SoapMessage soapMessage) throws Fault {
             SoapVersion soapVersion = soapMessage.getVersion();
-            Set<QName> notFound = new HashSet<QName>();
+            Set<QName> notFound = new HashSet<>();
             List<Header> heads = soapMessage.getHeaders();
-            
+
             for (Header header : heads) {
                 if (header instanceof SoapHeader
                     && ((SoapHeader)header).isMustUnderstand()
@@ -241,22 +241,22 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                     && (StringUtils.isEmpty(((SoapHeader)header).getActor())
                         || soapVersion.getUltimateReceiverRole()
                             .equals(((SoapHeader)header).getActor()))) {
-                    
+
                     notFound.add(header.getName());
                 }
             }
-            
-            
+
+
             if (!notFound.isEmpty()) {
                 soapMessage.remove(UNKNOWNS);
                 throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
                                 soapVersion.getMustUnderstand());
-            }            
+            }
         }
 
     }
-    
-    public class MustUnderstandEndingInterceptor extends AbstractSoapInterceptor {
+
+    public static class MustUnderstandEndingInterceptor extends AbstractSoapInterceptor {
         public MustUnderstandEndingInterceptor() {
             super(Phase.PRE_LOGICAL);
             addAfter(OneWayProcessorInterceptor.class.getName());
@@ -265,17 +265,17 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         public MustUnderstandEndingInterceptor(String phase) {
             super(phase);
         }
-        
+
         public void handleMessage(SoapMessage message) throws Fault {
             // throws soapFault after the response code 202 is set in OneWayProcessorInterceptor
             if (message.get(MustUnderstandInterceptor.UNKNOWNS) != null) {
-                //we may not have known the Operation in the main interceptor and thus may not 
+                //we may not have known the Operation in the main interceptor and thus may not
                 //have been able to get the parameter based headers.   We now know the
                 //operation and thus can remove those.
                 Set<QName> unknowns = CastUtils.cast((Set<?>)message.get(MustUnderstandInterceptor.UNKNOWNS));
                 Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(message);
                 unknowns.removeAll(paramHeaders);
-                
+
                 message.remove(MustUnderstandInterceptor.UNKNOWNS);
                 if (!unknowns.isEmpty()) {
                     throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, unknowns),

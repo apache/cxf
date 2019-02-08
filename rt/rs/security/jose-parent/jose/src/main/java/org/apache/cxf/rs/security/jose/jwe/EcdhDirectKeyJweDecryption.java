@@ -28,30 +28,30 @@ import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 
 public class EcdhDirectKeyJweDecryption extends JweDecryption {
     public EcdhDirectKeyJweDecryption(ECPrivateKey privateKey, ContentAlgorithm supportedCtAlgo) {
-        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey), 
+        super(new EcdhDirectKeyDecryptionAlgorithm(privateKey),
               new AesGcmContentDecryptionAlgorithm(supportedCtAlgo));
     }
     protected static byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers,
                                                                         ECPrivateKey privateKey) {
         ContentAlgorithm jwtAlgo = headers.getContentEncryptionAlgorithm();
-        JsonWebKey publicJwk = headers.getJsonWebKey("epv");
+        JsonWebKey publicJwk = headers.getJsonWebKey("epk");
         String apuHeader = (String)headers.getHeader("apu");
         byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
         String apvHeader = (String)headers.getHeader("apv");
         byte[] apvBytes = apvHeader == null ? null : JoseUtils.decode(apvHeader);
-        return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk), 
+        return JweUtils.getECDHKey(privateKey, JwkUtils.toECPublicKey(publicJwk),
                                    apuBytes, apvBytes, jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
     }
     protected static class EcdhDirectKeyDecryptionAlgorithm extends DirectKeyDecryptionAlgorithm {
         private ECPrivateKey privateKey;
-        public EcdhDirectKeyDecryptionAlgorithm(ECPrivateKey privateKey) {    
+        public EcdhDirectKeyDecryptionAlgorithm(ECPrivateKey privateKey) {
             super((byte[])null);
             this.privateKey = privateKey;
         }
         @Override
         public byte[] getDecryptedContentEncryptionKey(JweDecryptionInput jweDecryptionInput) {
             super.validateKeyEncryptionKey(jweDecryptionInput);
-            
+
             return getDecryptedContentEncryptionKeyFromHeaders(jweDecryptionInput.getJweHeaders(), privateKey);
         }
     }

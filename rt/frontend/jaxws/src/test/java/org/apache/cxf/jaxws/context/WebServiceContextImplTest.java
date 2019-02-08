@@ -30,62 +30,66 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
-public class WebServiceContextImplTest extends Assert {
+
+public class WebServiceContextImplTest {
 
     @After
-    public void tearDown() { 
+    public void tearDown() {
         WebServiceContextImpl.clear();
-    }    
+    }
 
     @Test
-    public void testGetSetMessageContext() { 
-        WebServiceContextImpl wsci = new WebServiceContextImpl(); 
+    public void testGetSetMessageContext() {
+        WebServiceContextImpl wsci = new WebServiceContextImpl();
         assertNull(wsci.getMessageContext());
-        
+
         MessageImpl msg = new MessageImpl();
         final MessageContext ctx = new WrappedMessageContext(msg);
         WebServiceContextImpl.setMessageContext(ctx);
 
         assertSame(ctx, wsci.getMessageContext());
 
-        Thread t = new Thread() { 
+        Thread t = new Thread() {
                 public void run() {
-                    WebServiceContextImpl threadLocalWSCI = new WebServiceContextImpl(); 
+                    WebServiceContextImpl threadLocalWSCI = new WebServiceContextImpl();
 
                     assertNull(threadLocalWSCI.getMessageContext());
 
                     MessageImpl msg1 = new MessageImpl();
-                    MessageContext threadLocalCtx = new WrappedMessageContext(msg1); 
+                    MessageContext threadLocalCtx = new WrappedMessageContext(msg1);
                     WebServiceContextImpl.setMessageContext(threadLocalCtx);
 
 
                     assertSame(threadLocalCtx, threadLocalWSCI.getMessageContext());
                     assertTrue(ctx !=  threadLocalWSCI.getMessageContext());
-                    
+
                 }
             };
 
-        t.start(); 
-        
+        t.start();
+
         try {
             t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-    
+
     // CXF-3989
     @Test
     public void testSetHttpRequestHeadersScope() {
         MessageImpl msg = new MessageImpl();
         MessageContext context = new WrappedMessageContext(msg);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
-        List<String> values = new ArrayList<String>();
+        Map<String, List<String>> headers = new HashMap<>();
+        List<String> values = new ArrayList<>();
         values.add("Value1");
         headers.put("Header1", values);
         context.put(MessageContext.HTTP_REQUEST_HEADERS, headers);

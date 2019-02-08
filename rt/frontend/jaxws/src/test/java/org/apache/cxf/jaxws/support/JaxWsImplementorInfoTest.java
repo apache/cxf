@@ -24,23 +24,26 @@ import javax.xml.ws.WebServiceProvider;
 
 import org.apache.cxf.calculator.CalculatorImpl;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JaxWsImplementorInfoTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class JaxWsImplementorInfoTest {
+
     @Test
     public void testGetWSDLLocation() throws Exception {
         JaxWsImplementorInfo info = new JaxWsImplementorInfo(CalculatorImpl.class);
         assertEquals("testutils/calculator.wsdl", info.getWsdlLocation());
     }
-    
+
     @Test
     public void testWebServiceAnnotation() throws Exception {
         assertTrue(JaxWsImplementorInfo.
                    ifAnnotationLoadedByOtherClassLoader(CalculatorImpl.class, WebService.class));
         assertFalse(JaxWsImplementorInfo.
                     ifAnnotationLoadedByOtherClassLoader(CalculatorImpl.class, WebServiceProvider.class));
-        
+
     }
 }

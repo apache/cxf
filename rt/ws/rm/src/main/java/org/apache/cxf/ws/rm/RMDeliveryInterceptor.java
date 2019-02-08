@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -35,16 +37,16 @@ import org.apache.cxf.ws.addressing.ContextUtils;
  * destination (since otherwise there is no way to enforce in-order delivery).
  */
 public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RMDeliveryInterceptor.class);
-  
+
     public RMDeliveryInterceptor() {
         super(Phase.POST_INVOKE);
         addBefore(OutgoingChainInterceptor.class.getName());
     }
-    
-    // Interceptor interface 
-    
+
+    // Interceptor interface
+
     public void handle(Message message) throws SequenceFault, RMException {
         final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         //if wsrmp:RMAssertion and addressing is optional
@@ -54,11 +56,21 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
         LOG.entering(getClass().getName(), "handleMessage");
         Destination dest = getManager().getDestination(message);
         final boolean robust =
-            MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
         if (robust) {
             message.remove(RMMessageConstants.DELIVERING_ROBUST_ONEWAY);
             dest.acknowledge(message);
         }
         dest.processingComplete(message);
+
+        // close InputStream of RMCaptureInInterceptor, to delete tmp files in filesystem
+        Closeable closable = (Closeable)message.get("org.apache.cxf.ws.rm.content.closeable");
+        if (null != closable) {
+            try {
+                closable.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
     }
 }

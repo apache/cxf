@@ -74,6 +74,7 @@ import org.apache.cxf.wsdl11.WSDLManagerImpl;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+
 import org.junit.Before;
 
 public abstract class AbstractAegisTest extends AbstractCXFTest {
@@ -83,7 +84,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     @Before
     public void setUp() throws Exception {
         super.setUpBus();
-        
+
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
         bindingFactory.setBus(bus);
 
@@ -111,8 +112,8 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
 
         bus.setExtension(new WSDLManagerImpl(), WSDLManager.class);
         //WoodstoxValidationImpl wstxVal = new WoodstoxValidationImpl();
-        
-        
+
+
 
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
@@ -160,7 +161,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         return sf.create();
     }
 
-    protected Server createJaxwsService(Class<?> serviceClass, 
+    protected Server createJaxwsService(Class<?> serviceClass,
                                         Object serviceBean, String address, QName name) {
         if (address == null) {
             address = serviceClass.getSimpleName();
@@ -169,13 +170,13 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         sf.setDataBinding(new AegisDatabinding());
         JaxWsServerFactoryBean serverFactoryBean = new JaxWsServerFactoryBean();
         serverFactoryBean.setServiceClass(serviceClass);
-        
+
         if (serviceBean != null) {
             serverFactoryBean.setServiceBean(serviceBean);
         }
 
         serverFactoryBean.setAddress("local://" + address);
-            
+
         serverFactoryBean.setServiceFactory(sf);
         if (name != null) {
             serverFactoryBean.setEndpointName(name);
@@ -194,7 +195,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         return sf.create();
     }
 
-    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass, 
+    protected ServerFactoryBean createServiceFactory(Class<?> serviceClass,
                                                      Object serviceBean, String address,
                                                      QName name, AegisDatabinding binding) {
         ServerFactoryBean sf = new ServerFactoryBean();
@@ -233,7 +234,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     protected Collection<Document> getWSDLDocuments(String string) throws WSDLException {
         WSDLWriter writer = WSDLFactory.newInstance().newWSDLWriter();
 
-        Collection<Document> docs = new ArrayList<Document>();
+        Collection<Document> docs = new ArrayList<>();
         Definition definition = getWSDLDefinition(string);
         if (definition == null) {
             return null;
@@ -245,9 +246,9 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         }
         return docs;
     }
-    
+
     private Collection<Import> getImports(final Definition wsdlDef) {
-        Collection<Import> importList = new ArrayList<Import>();
+        Collection<Import> importList = new ArrayList<>();
         Map<?, ?> imports = wsdlDef.getImports();
         for (Iterator<?> iter = imports.keySet().iterator(); iter.hasNext();) {
             String uri = (String)iter.next();
@@ -256,7 +257,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         }
         return importList;
     }
-    
+
 
     protected Definition getWSDLDefinition(String string) throws WSDLException {
         ServerRegistry svrMan = getBus().getExtension(ServerRegistry.class);
@@ -285,7 +286,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         globalContext.initialize();
         return new Context(globalContext);
     }
-    
+
     protected XmlSchema newXmlSchema(String targetNamespace) {
         XmlSchema s = new XmlSchema();
         s.setTargetNamespace(targetNamespace);
@@ -294,29 +295,28 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
 
         // tns: is conventional, and besides we have unit tests that are hardcoded to it.
         xmlsNamespaceMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, targetNamespace);
-        
+
         // ditto for xsd: instead of just namespace= for the schema schema.
         xmlsNamespaceMap.add("xsd", Constants.URI_2001_SCHEMA_XSD);
         return s;
     }
-    
+
     protected Element createElement(String namespace, String name) {
         return createElement(namespace, name, null);
     }
 
     protected Element createElement(String namespace, String name, String namespacePrefix) {
+        //The Aegis tests use xpaths that require the created element be the root of a doc
         Document doc = DOMUtils.createDocument();
-
         Element element = doc.createElementNS(namespace, name);
         if (namespacePrefix != null) {
             element.setPrefix(namespacePrefix);
             DOMUtils.addNamespacePrefix(element, namespace, namespacePrefix);
         }
-
         doc.appendChild(element);
         return element;
     }
-    
+
     protected ElementWriter getElementWriter(Element element) {
         return getElementWriter(element, new MapNamespaceContext());
     }
@@ -350,7 +350,7 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
     protected void setEnableJDOM(boolean enableJDOM) {
         this.enableJDOM = enableJDOM;
     }
-    
+
     protected String renderWsdl(Document wsdlDoc) throws XMLStreamException {
         StringWriter out = new StringWriter();
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
@@ -358,5 +358,5 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         writer.flush();
         return out.toString();
     }
-    
+
 }

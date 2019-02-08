@@ -24,23 +24,23 @@ import org.apache.hello_world_soap12_http.Greeter;
 import org.apache.hello_world_soap12_http.PingMeFault;
 import org.apache.hello_world_soap12_http.types.FaultDetail;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap12_http", 
+@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/hello_world_soap12_http",
                       endpointInterface = "org.apache.hello_world_soap12_http.Greeter")
-@javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")     
+@javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
 @org.apache.cxf.annotations.SchemaValidation
 public class GreeterImpl implements Greeter {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
-    
+
     public String greetMe(String me) {
         LOG.info("Executing operation greetMe");
         System.out.println("Executing operation greetMe");
         System.out.println("Message received: " + me + "\n");
         return "Hello " + me;
     }
-    
+
     public void greetMeOneWay(String me) {
         LOG.info("Executing operation greetMeOneWay");
         System.out.println("Executing operation greetMeOneWay\n");
@@ -52,7 +52,7 @@ public class GreeterImpl implements Greeter {
         System.out.println("Executing operation sayHi\n");
         return "Bonjour";
     }
-    
+
     public void pingMe() throws PingMeFault {
         FaultDetail faultDetail = new FaultDetail();
         faultDetail.setMajor((short)2);
@@ -62,5 +62,5 @@ public class GreeterImpl implements Greeter {
         throw new PingMeFault("PingMeFault raised by server", faultDetail);
     }
 
-    
+
 }

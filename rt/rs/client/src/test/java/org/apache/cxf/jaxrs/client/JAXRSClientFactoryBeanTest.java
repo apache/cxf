@@ -27,6 +27,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.ProxyClassLoader;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
@@ -35,6 +36,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookInterface;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
 import org.apache.cxf.message.Message;
@@ -42,10 +44,15 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class JAXRSClientFactoryBeanTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class JAXRSClientFactoryBeanTest {
 
     @Test
     public void testCreateClient() throws Exception {
@@ -54,12 +61,12 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStore.class);
         assertTrue(bean.create() instanceof BookStore);
     }
-    
+
     @Test
     public void testCreateClientCustomLoader() throws Exception {
         ProxyClassLoader loader = new ProxyClassLoader(BookStore.class.getClassLoader());
         loader.addLoader(BookStore.class.getClassLoader());
-        
+
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStore.class);
@@ -67,11 +74,11 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         BookStore client = (BookStore)bean.createWithValues(BookStore.class);
         assertNotNull(client);
         assertSame(client.getClass().getClassLoader(), loader);
-        // tricky to test the loader has been used correctly with Maven 
-        // given that the system loader loads all the test classes  
-        
+        // tricky to test the loader has been used correctly with Maven
+        // given that the system loader loads all the test classes
+
     }
-    
+
     @Test
     public void testCreateClientWithUserResource() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -86,7 +93,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setModelBeans(r);
         assertTrue(bean.create() instanceof BookStore);
     }
-    
+
     @Test
     public void testCreateClientWithTwoUserResources() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -98,7 +105,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         op.setName("getDescription");
         op.setVerb("GET");
         r1.setOperations(Collections.singletonList(op));
-        
+
         UserResource r2 = new UserResource();
         r2.setName(Book.class.getName());
         r2.setPath("/book");
@@ -106,12 +113,12 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         op2.setName("getName");
         op2.setVerb("GET");
         r2.setOperations(Collections.singletonList(op2));
-        
+
         bean.setModelBeans(r1, r2);
         bean.setServiceClass(Book.class);
         assertTrue(bean.create() instanceof Book);
     }
-    
+
     @Test
     public void testGetConduit() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -121,7 +128,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         Conduit conduit = WebClient.getConfig(store).getConduit();
         assertTrue(conduit instanceof HTTPConduit);
     }
-    
+
     @Test
     public void testTemplateInRootPathInherit() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -129,10 +136,10 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
         BookStoreSubresourcesOnly store2 = store.getItself();
-        assertEquals("http://bar/bookstore/1/2/3/sub1", 
+        assertEquals("http://bar/bookstore/1/2/3/sub1",
                      WebClient.client(store2).getCurrentURI().toString());
     }
-    
+
     @Test
     public void testTemplateInRootReplace() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -140,10 +147,10 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
         BookStoreSubresourcesOnly store2 = store.getItself2("4", "11", "33");
-        assertEquals("http://bar/bookstore/11/2/33/sub2/4", 
+        assertEquals("http://bar/bookstore/11/2/33/sub2/4",
                      WebClient.client(store2).getCurrentURI().toString());
     }
-    
+
     @Test
     public void testTemplateInRootReplaceEmpty() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -151,10 +158,10 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store2 = store.getItself4("4", "11", "22", "33");
-        assertEquals("http://bar/bookstore/11/22/33/sub2/4", 
+        assertEquals("http://bar/bookstore/11/22/33/sub2/4",
                      WebClient.client(store2).getCurrentURI().toString());
     }
-    
+
     @Test
     public void testTemplateInRootAppend() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -162,30 +169,30 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
         BookStoreSubresourcesOnly store2 = store.getItself3("id4");
-        assertEquals("http://bar/bookstore/1/2/3/id4/sub3", 
+        assertEquals("http://bar/bookstore/1/2/3/id4/sub3",
                      WebClient.client(store2).getCurrentURI().toString());
     }
-    
+
     @Test
     public void testAddLoggingToClient() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress("http://bar");
         bean.setResourceClass(BookStoreSubresourcesOnly.class);
         TestFeature testFeature = new TestFeature();
-        List<Feature> features = new ArrayList<Feature>();
+        List<Feature> features = new ArrayList<>();
         features.add(testFeature);
         bean.setFeatures(features);
-        
+
         BookStoreSubresourcesOnly store = bean.create(BookStoreSubresourcesOnly.class, 1, 2, 3);
         assertTrue("TestFeature wasn't initialized", testFeature.isInitialized());
         BookStoreSubresourcesOnly store2 = store.getItself3("id4");
-        assertEquals("http://bar/bookstore/1/2/3/id4/sub3", 
+        assertEquals("http://bar/bookstore/1/2/3/id4/sub3",
                      WebClient.client(store2).getCurrentURI().toString());
     }
-    
-    @Test 
+
+    @Test
     public void testComplexProxy() throws Exception {
-        IProductResource productResource = JAXRSClientFactory.create("http://localhost:9000", 
+        IProductResource productResource = JAXRSClientFactory.create("http://localhost:9000",
                                                                      IProductResource.class);
         assertNotNull(productResource);
         IPartsResource parts = productResource.getParts();
@@ -194,6 +201,37 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertNotNull(productResourceElement);
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathNull() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvokePathEmpty() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        store.getBook("");
+    }
+    
+    @Test
+    public void testInvokePathEmptyAllowed() throws Exception {
+        Bus bus = BusFactory.newInstance().createBus();
+        bus.setProperty("allow.empty.path.template.value", true);
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setBus(bus);
+        bean.setAddress("http://bar");
+        bean.setResourceClass(BookInterface.class);
+        BookInterface store = bean.create(BookInterface.class);
+        assertNotNull(store.getBook(""));
+    }
+
+
     private class TestFeature extends AbstractFeature {
         private TestInterceptor testInterceptor;
 
@@ -207,7 +245,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
             return testInterceptor.isInitialized();
         }
     }
- 
+
     private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean isInitialized;
 
@@ -218,7 +256,7 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         TestInterceptor(String s) {
             super(Phase.PRE_STREAM);
             isInitialized = true;
-        } 
+        }
 
         public void handleMessage(Message message) throws Fault {
         }
@@ -228,18 +266,18 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         }
 
     }
-    
 
-    
+
+
     public interface IProductResource {
         @Path("/parts")
         IPartsResource getParts();
     }
-    
+
     public interface IPartsResource {
         @Path("/{i}/")
         IProductResource elementAt(@PathParam("i") String i);
         String get();
     }
-    
+
 }

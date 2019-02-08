@@ -27,7 +27,7 @@ import javax.xml.ws.ServiceMode;
 import org.mozilla.javascript.Scriptable;
 
 
-@ServiceMode(value = Service.Mode.MESSAGE)            
+@ServiceMode(value = Service.Mode.MESSAGE)
 public class DOMMessageProvider extends AbstractDOMProvider implements Provider<DOMSource> {
     public DOMMessageProvider(Scriptable scope, Scriptable wspVar,
                               String epAddr, boolean isBaseAddr, boolean e4x) {

@@ -25,9 +25,9 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 
 public class CollectionCheckCondition<T> extends PrimitiveSearchCondition<T> {
-    
+
     private CollectionCheckInfo checkInfo;
-    public CollectionCheckCondition(String propertyName, 
+    public CollectionCheckCondition(String propertyName,
                                     Object propertyValue,
                                     Type propertyType,
                                     ConditionType ct,
@@ -40,11 +40,11 @@ public class CollectionCheckCondition<T> extends PrimitiveSearchCondition<T> {
         return checkInfo;
     }
     public PrimitiveStatement getStatement() {
-        return new CollectionCheckStatement(getPropertyName(), 
-                                            getPropertyValue(), 
-                                            getPropertyType(), 
+        return new CollectionCheckStatement(getPropertyName(),
+                                            getPropertyValue(),
+                                            getPropertyType(),
                                             getConditionType(),
                                             checkInfo);
     }
-    
+
 }

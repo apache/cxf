@@ -29,30 +29,31 @@ import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
+import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinitionParser {
-    
+
     private static final String HTTP_NS =
         "http://cxf.apache.org/transports/http/configuration";
 
     public Metadata parse(Element element, ParserContext context) {
         MutableBeanMetadata bean = context.createMetadata(MutableBeanMetadata.class);
-        
+
         bean.setRuntimeClass(AbstractHTTPDestination.class);
 
-        mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "server"), "server", 
+        mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "server"), "server",
                                  HTTPServerPolicy.class);
         mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "fixedParameterOrder"),
                                  "fixedParameterOrder", Boolean.class);
         mapElementToJaxbProperty(context, bean, element, new QName(HTTP_NS, "contextMatchStrategy"),
                                  "contextMatchStrategy", String.class);
-        
+
         parseAttributes(element, context, bean);
         parseChildElements(element, context, bean);
 
-        bean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
-        
+        bean.setScope(BeanMetadata.SCOPE_PROTOTYPE);
+
         return bean;
     }
 
@@ -61,6 +62,6 @@ public class HttpDestinationBPBeanDefinitionParser extends AbstractBPBeanDefinit
                                         String val) {
         bean.setId(val);
     }
-        
-    
+
+
 }

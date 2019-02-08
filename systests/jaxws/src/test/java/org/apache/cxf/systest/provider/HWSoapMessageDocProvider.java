@@ -51,44 +51,44 @@ import org.apache.cxf.helpers.DOMUtils;
 @WebServiceProvider(portName = "SoapProviderPort", serviceName = "SOAPProviderService",
                     targetNamespace = "http://apache.org/hello_world_soap_http",
                     wsdlLocation = "/org/apache/cxf/systest/provider/hello_world_with_restriction.wsdl")
-@ServiceMode(value = Service.Mode.MESSAGE)            
+@ServiceMode(value = Service.Mode.MESSAGE)
 public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_soap_http", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_soap_http", "greetMe");
-    
-    @Resource 
+
+    @Resource
     WebServiceContext ctx;
-    
+
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
     private SOAPMessage greetMeResponseExceedMaxLengthRestriction;
-    
+
     public HWSoapMessageDocProvider() {
-       
+
         try {
-            MessageFactory factory = MessageFactory.newInstance();            
+            MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiDocLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is);
+            sayHiResponse = factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeDocLiteralResp.xml");
-            greetMeResponse =  factory.createMessage(null, is);
+            greetMeResponse = factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeDocLiteralRespExceedLength.xml");
-            greetMeResponseExceedMaxLengthRestriction =  factory.createMessage(null, is);
+            greetMeResponseExceedMaxLengthRestriction = factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     public SOAPMessage invoke(SOAPMessage request) {
         QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
-        SOAPMessage response = null;        
+
+        SOAPMessage response = null;
         SOAPBody body = null;
         try {
             body = SAAJUtils.getBody(request);
@@ -111,25 +111,25 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
                 response = greetMeResponseExceedMaxLengthRestriction;
             } else if (v.contains("throwFault")) {
                 try {
-                    SOAPFactory f = SOAPFactory.newInstance(); 
-                    SOAPFault soapFault = f.createFault(); 
-                    
-                    soapFault.setFaultString("Test Fault String ****"); 
-       
-                    Detail detail = soapFault.addDetail(); 
-                    detail = soapFault.getDetail(); 
-       
-                    QName qName = new QName("http://www.Hello.org/greeter", "TestFault", "ns"); 
-                    DetailEntry de = detail.addDetailEntry(qName); 
-       
-                    qName = new QName("http://www.Hello.org/greeter", "ErrorCode", "ns"); 
-                    SOAPElement errorElement = de.addChildElement(qName); 
+                    SOAPFactory f = SOAPFactory.newInstance();
+                    SOAPFault soapFault = f.createFault();
+
+                    soapFault.setFaultString("Test Fault String ****");
+
+                    Detail detail = soapFault.addDetail();
+                    detail = soapFault.getDetail();
+
+                    QName qName = new QName("http://www.Hello.org/greeter", "TestFault", "ns");
+                    DetailEntry de = detail.addDetailEntry(qName);
+
+                    qName = new QName("http://www.Hello.org/greeter", "ErrorCode", "ns");
+                    SOAPElement errorElement = de.addChildElement(qName);
                     errorElement.setTextContent("errorcode");
                     throw new SOAPFaultException(soapFault);
                 } catch (SOAPException ex) {
                     //ignore
                 }
-                           
+
             } else {
                 response = greetMeResponse;
             }

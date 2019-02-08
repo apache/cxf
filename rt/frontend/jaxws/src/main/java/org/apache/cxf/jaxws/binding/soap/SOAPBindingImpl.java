@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
@@ -41,22 +42,22 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SOAPBindingImpl.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-    
+
     private BindingInfo soapBinding;
     private Set<String> roles;
 
     public SOAPBindingImpl(BindingInfo sb, JaxWsEndpointImpl endpoint) {
         super(endpoint);
-        soapBinding = sb;  
+        soapBinding = sb;
         addRequiredRoles();
     }
-    
+
     private void addRequiredRoles() {
         if (this.roles == null) {
-            this.roles = new HashSet<String>();
+            this.roles = new HashSet<>();
         }
         if (this.soapBinding instanceof SoapBindingInfo) {
             SoapBindingInfo bindingInfo = (SoapBindingInfo) this.soapBinding;
@@ -74,8 +75,8 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
     }
 
     public void setRoles(Set<String> set) {
-        if (set != null 
-            && (set.contains(Soap11.getInstance().getNoneRole()) 
+        if (set != null
+            && (set.contains(Soap11.getInstance().getNoneRole())
                 || set.contains(Soap12.getInstance().getNoneRole()))) {
             throw new WebServiceException(BUNDLE.getString("NONE_ROLE_ERR"));
         }
@@ -87,7 +88,7 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
         return Boolean.TRUE.equals(soapBinding.getProperty(Message.MTOM_ENABLED));
     }
 
-    public void setMTOMEnabled(boolean flag) {        
+    public void setMTOMEnabled(boolean flag) {
         soapBinding.setProperty(Message.MTOM_ENABLED, flag);
     }
 
@@ -128,7 +129,7 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
         if (this.soapBinding instanceof SoapBindingInfo) {
             SoapBindingInfo bindingInfo = (SoapBindingInfo) this.soapBinding;
             if (bindingInfo.getSoapVersion() instanceof Soap12) {
-                return SOAP12HTTP_BINDING;             
+                return SOAP12HTTP_BINDING;
             }
         }
         return SOAP11HTTP_BINDING;

@@ -31,7 +31,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -53,32 +52,36 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
-import org.apache.wss4j.dom.WSConstants;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some unit tests for the issue operation to issue SecurityContextTokens.
  */
-public class IssueSCTUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+public class IssueSCTUnitTest {
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    public static final QName ATTACHED_REFERENCE = 
+    public static final QName ATTACHED_REFERENCE =
         QNameConstants.WS_TRUST_FACTORY.createRequestedAttachedReference(null).getName();
-    public static final QName UNATTACHED_REFERENCE = 
+    public static final QName UNATTACHED_REFERENCE =
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
-    
+
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     private static boolean unrestrictedPoliciesInstalled;
-    
+
     static {
         unrestrictedPoliciesInstalled = TestUtils.checkUnrestrictedPoliciesInstalled();
     };
-    
+
     /**
      * Test to successfully issue a SecurityContextToken
      */
@@ -86,17 +89,17 @@ public class IssueSCTUnitTest extends org.junit.Assert {
     public void testIssueSCT() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         issueOperation.setTokenStore(tokenStore);
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -107,50 +110,50 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSUtils.TOKEN_TYPE_SCT_05_12
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        RequestSecurityTokenResponseCollectionType response =
+            issueOperation.issue(request, principal, msgCtx);
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
-        
+        assertFalse(securityTokenResponse.isEmpty());
+
         // Test the generated token.
         Element securityContextToken = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 securityContextToken = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(securityContextToken);
         String tokenString = DOM2Writer.nodeToString(securityContextToken);
         assertTrue(tokenString.contains("SecurityContextToken"));
         assertTrue(tokenString.contains("Identifier"));
     }
-    
+
     /**
      * Test to successfully issue an encrypted SecurityContextToken
      */
@@ -159,22 +162,22 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         issueOperation.setTokenStore(tokenStore);
         issueOperation.setEncryptIssuedToken(true);
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         EncryptionProperties encryptionProperties = new EncryptionProperties();
         if (!unrestrictedPoliciesInstalled) {
-            encryptionProperties.setEncryptionAlgorithm(WSConstants.AES_128);
+            encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.AES_128);
         }
         service.setEncryptionProperties(encryptionProperties);
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -185,51 +188,51 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSUtils.TOKEN_TYPE_SCT_05_12
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        RequestSecurityTokenResponseCollectionType response =
+            issueOperation.issue(request, principal, msgCtx);
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
-        
+        assertFalse(securityTokenResponse.isEmpty());
+
         // Test the generated token.
         Element securityContextToken = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 securityContextToken = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(securityContextToken);
         String tokenString = DOM2Writer.nodeToString(securityContextToken);
         assertFalse(tokenString.contains("SecurityContextToken"));
         assertFalse(tokenString.contains("Identifier"));
-        assertTrue(tokenString.contains("EncryptedData"));
+        assertTrue(tokenString, tokenString.contains("EncryptedData"));
     }
-    
+
     /**
      * Test to successfully issue a SecurityContextToken with no references
      */
@@ -238,17 +241,17 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
         issueOperation.setTokenStore(tokenStore);
         issueOperation.setReturnReferences(false);
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SCTProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -259,32 +262,32 @@ public class IssueSCTUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSUtils.TOKEN_TYPE_SCT_05_12
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
-            issueOperation.issue(request, webServiceContext);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        RequestSecurityTokenResponseCollectionType response =
+            issueOperation.issue(request, principal, msgCtx);
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
-        
+        assertFalse(securityTokenResponse.isEmpty());
+
         // Test that no references were returned
         boolean foundReference = false;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
@@ -295,10 +298,10 @@ public class IssueSCTUnitTest extends org.junit.Assert {
                 break;
             }
         }
-        
+
         assertFalse(foundReference);
     }
-    
+
     /*
      * Create a security context object
      */
@@ -312,34 +315,34 @@ public class IssueSCTUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /*
      * Mock up an AppliesTo element using the supplied address
      */
     private Element createAppliesToElement(String addressUrl) {
-        Document doc = DOMUtils.createDocument();
+        Document doc = DOMUtils.getEmptyDocument();
         Element appliesTo = doc.createElementNS(STSConstants.WSP_NS, "wsp:AppliesTo");
-        appliesTo.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
+        appliesTo.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsp", STSConstants.WSP_NS);
         Element endpointRef = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:EndpointReference");
-        endpointRef.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        endpointRef.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         Element address = doc.createElementNS(STSConstants.WSA_NS_05, "wsa:Address");
-        address.setAttributeNS(WSConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
+        address.setAttributeNS(WSS4JConstants.XMLNS_NS, "xmlns:wsa", STSConstants.WSA_NS_05);
         address.setTextContent(addressUrl);
         endpointRef.appendChild(address);
         appliesTo.appendChild(endpointRef);
         return appliesTo;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
-    
+
+
 }

@@ -50,35 +50,35 @@ public class FastInfosetFeature extends AbstractFeature {
     public FastInfosetFeature() {
         //
     }
-    
-    
+
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
+
         FIStaxInInterceptor in = new FIStaxInInterceptor();
 
         FIStaxOutInterceptor out = new FIStaxOutInterceptor(force);
         if (serializerAttributeValueMapMemoryLimit != null && serializerAttributeValueMapMemoryLimit.intValue() > 0) {
-            out.setSerializerAttributeValueMapMemoryLimit(serializerAttributeValueMapMemoryLimit.intValue());
+            out.setSerializerAttributeValueMapMemoryLimit(serializerAttributeValueMapMemoryLimit);
         }
         if (serializerMinAttributeValueSize != null && serializerMinAttributeValueSize.intValue() > 0) {
-            out.setSerializerMinAttributeValueSize(serializerMinAttributeValueSize.intValue());
+            out.setSerializerMinAttributeValueSize(serializerMinAttributeValueSize);
         }
         if (serializerMaxAttributeValueSize != null && serializerMaxAttributeValueSize.intValue() > 0) {
-            out.setSerializerMaxAttributeValueSize(serializerMaxAttributeValueSize.intValue());
+            out.setSerializerMaxAttributeValueSize(serializerMaxAttributeValueSize);
         }
         if (serializerCharacterContentChunkMapMemoryLimit != null
                 && serializerCharacterContentChunkMapMemoryLimit.intValue() > 0) {
             out.setSerializerCharacterContentChunkMapMemoryLimit(
-                    serializerCharacterContentChunkMapMemoryLimit.intValue());
+                    serializerCharacterContentChunkMapMemoryLimit);
         }
         if (serializerMinCharacterContentChunkSize != null && serializerMinCharacterContentChunkSize.intValue() > 0) {
-            out.setSerializerMinCharacterContentChunkSize(serializerMinCharacterContentChunkSize.intValue());
+            out.setSerializerMinCharacterContentChunkSize(serializerMinCharacterContentChunkSize);
         }
         if (serializerMaxCharacterContentChunkSize != null && serializerMaxCharacterContentChunkSize.intValue() > 0) {
-            out.setSerializerMaxCharacterContentChunkSize(serializerMaxCharacterContentChunkSize.intValue());
+            out.setSerializerMaxCharacterContentChunkSize(serializerMaxCharacterContentChunkSize);
         }
-        
+
         provider.getInInterceptors().add(in);
         provider.getInFaultInterceptors().add(in);
         provider.getOutInterceptors().add(out);
@@ -86,17 +86,17 @@ public class FastInfosetFeature extends AbstractFeature {
     }
 
     /**
-     * Set if FastInfoset is always used without negotiation 
+     * Set if FastInfoset is always used without negotiation
      * @param b
      */
     public void setForce(boolean b) {
         force = b;
     }
-    
+
     /**
      * Retrieve the value set with {@link #setForce(boolean)}.
      */
     public boolean getForce() {
         return force;
-    }    
+    }
 }

@@ -47,20 +47,20 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
     protected static final Logger LOG = LogUtils.getL7dLogger(DataSourceProvider.class);
     private boolean useDataSourceContentType;
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, mt);
     }
 
-    public T readFrom(Class<T> cls, Type genericType, Annotation[] annotations, 
-                               MediaType type, 
+    public T readFrom(Class<T> cls, Type genericType, Annotation[] annotations,
+                               MediaType type,
                                MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        
+
         DataSource ds = null;
-        if (cls == FileDataSource.class) { 
+        if (cls == FileDataSource.class) {
             File file = new BinaryDataProvider<File>().readFrom(File.class, File.class, annotations, type, headers, is);
-            ds = new FileDataSource(file);    
+            ds = new FileDataSource(file);
         } else if (cls == DataSource.class || cls == DataHandler.class) {
             ds = new InputStreamDataSource(is, type.toString());
         } else {
@@ -70,7 +70,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
         return cls.cast(DataSource.class.isAssignableFrom(cls) ? ds : new DataHandler(ds));
     }
 
-    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mt) {
         return -1;
     }
@@ -80,24 +80,24 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
     }
 
     private boolean isSupported(Class<?> type, MediaType mt) {
-        return  DataSource.class.isAssignableFrom(type) || DataHandler.class.isAssignableFrom(type);
+        return DataSource.class.isAssignableFrom(type) || DataHandler.class.isAssignableFrom(type);
     }
-    
-    public void writeTo(T src, Class<?> cls, Type genericType, Annotation[] annotations, 
+
+    public void writeTo(T src, Class<?> cls, Type genericType, Annotation[] annotations,
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        DataSource ds = DataSource.class.isAssignableFrom(cls) 
+        DataSource ds = DataSource.class.isAssignableFrom(cls)
             ? (DataSource)src : ((DataHandler)src).getDataSource();
-        if (useDataSourceContentType) {    
+        if (useDataSourceContentType) {
             setContentTypeIfNeeded(type, headers, ds.getContentType());
         }
         IOUtils.copyAndCloseInput(ds.getInputStream(), os);
     }
-    
-    private void setContentTypeIfNeeded(MediaType type, 
+
+    private void setContentTypeIfNeeded(MediaType type,
         MultivaluedMap<String, Object> headers, String ct) {
 
-        if (!StringUtils.isEmpty(ct) && !type.equals(JAXRSUtils.toMediaType(ct))) { 
+        if (!StringUtils.isEmpty(ct) && !type.equals(JAXRSUtils.toMediaType(ct))) {
             headers.putSingle("Content-Type", ct);
         }
     }
@@ -105,6 +105,6 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
     public void setUseDataSourceContentType(boolean useDataSourceContentType) {
         this.useDataSourceContentType = useDataSourceContentType;
     }
-    
+
 
 }

@@ -68,14 +68,14 @@ public class MIMEBindingValidator
         boolean gotRootPart = false;
         List<MIMEPart> parts = CastUtils.cast(mimeExt.getMIMEParts());
         for (MIMEPart mPart : parts) {
-            List<MIMEContent> mimeContents = new ArrayList<MIMEContent>();
+            List<MIMEContent> mimeContents = new ArrayList<>();
             List<ExtensibilityElement> extns = CastUtils.cast(mPart.getExtensibilityElements());
             for (ExtensibilityElement extElement : extns) {
                 if (SOAPBindingUtil.isSOAPBody(extElement)) {
                     if (gotRootPart) {
                         addErrorMessage("Operation("
                                         + operationName
-                                        + "): There's more than one soap body mime part" 
+                                        + "): There's more than one soap body mime part"
                                         + " in its binding input");
                         return false;
                     }
@@ -91,9 +91,9 @@ public class MIMEBindingValidator
         if (!gotRootPart) {
             addErrorMessage("Operation("
                             + operationName
-                            + "): There's no soap body in mime part" 
+                            + "): There's no soap body in mime part"
                             + " in its binding input");
-            return false;            
+            return false;
         }
         return true;
     }
@@ -109,17 +109,16 @@ public class MIMEBindingValidator
                                 + operationName
                                 + "): Must provide part attribute value for meme:content elements");
                 return false;
+            }
+            if (partName == null) {
+                partName = mimeContnetPart;
             } else {
-                if (partName == null) {
-                    partName = mimeContnetPart;
-                } else {
-                    if (!partName.equals(mimeContnetPart)) {
-                        addErrorMessage("Operation("
-                                        + operationName
-                                        + "): Part attribute value for meme:content " 
-                                        + "elements are different");
-                        return false;
-                    }
+                if (!partName.equals(mimeContnetPart)) {
+                    addErrorMessage("Operation("
+                                    + operationName
+                                    + "): Part attribute value for meme:content "
+                                    + "elements are different");
+                    return false;
                 }
             }
         }

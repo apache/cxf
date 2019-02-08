@@ -37,7 +37,7 @@ public interface MessageWriter {
     void writeValueAsFloat(Float f);
 
     void writeValueAsShort(Short short1);
-    
+
     void writeValueAsByte(Byte b);
 
     void writeValueAsBoolean(boolean b);
@@ -62,7 +62,7 @@ public interface MessageWriter {
      * use the hint prefix if possible. If the namespace is already registered
      * or the hint is already registered with a different namespace then the
      * behavior will be the same as the non-hint version.
-     * 
+     *
      * @param namespace the namespace to retrieve the prefix for
      * @param hint the hint for the prefix.
      * @return the prefix associated with the namespace
@@ -80,7 +80,7 @@ public interface MessageWriter {
      * XML Schema Part 1: "An element information item in an instance may,
      * however, explicitly assert its type using the attribute
      * <code>xsi:type</code>."
-     * 
+     *
      * @param type the QName of the type being referenced.
      */
     void writeXsiType(QName qn);

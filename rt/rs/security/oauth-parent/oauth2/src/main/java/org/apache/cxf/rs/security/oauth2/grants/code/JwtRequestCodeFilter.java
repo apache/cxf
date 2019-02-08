@@ -22,66 +22,68 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.SecretKey;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
-import org.apache.cxf.rs.security.jose.jwe.JweUtils;
-import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
-import org.apache.cxf.rs.security.oauth2.provider.AuthorizationCodeRequestFilter;
+import org.apache.cxf.rs.security.oauth2.provider.AuthorizationRequestFilter;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
-public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
+public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements AuthorizationRequestFilter {
     private static final String REQUEST_PARAM = "request";
     private static final String REQUEST_URI_PARAM = "request_uri";
-    private JweDecryptionProvider jweDecryptor;
-    private JwsSignatureVerifier jwsVerifier;
     private boolean verifyWithClientCertificates;
-    private boolean verifyWithClientSecret;
-    private boolean decryptWithClientSecret;
     private String issuer;
     private JsonMapObjectReaderWriter jsonHandler = new JsonMapObjectReaderWriter();
     @Override
-    public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
+    public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params,
                                                   UserSubject endUser,
                                                   Client client) {
         String requestToken = params.getFirst(REQUEST_PARAM);
         if (requestToken == null) {
             String requestUri = params.getFirst(REQUEST_URI_PARAM);
-            if (requestUri != null && requestUri.startsWith(getPrefix(client))) {
+            if (isRequestUriValid(client, requestUri)) {
                 requestToken = WebClient.create(requestUri).get(String.class);
             }
         }
         if (requestToken != null) {
-            JweDecryptionProvider theJweDecryptor = getInitializedDecryptionProvider(client);
-            if (theJweDecryptor != null) {
-                requestToken = theJweDecryptor.decrypt(requestToken).getContentText();
-            }
+            JweDecryptionProvider theDecryptor = super.getInitializedDecryptionProvider(client.getClientSecret());
             JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(client);
-            JwsJwtCompactConsumer consumer = new JwsJwtCompactConsumer(requestToken);
-            if (!consumer.verifySignatureWith(theSigVerifier)) {
-                throw new SecurityException("Invalid Signature");
-            }
-            JwtClaims claims = consumer.getJwtClaims();
-            String iss = issuer != null ? issuer : client.getClientId();  
-            if (!iss.equals(claims.getIssuer())
-                || claims.getClaim(OAuthConstants.CLIENT_ID) != null 
-                && claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
+            JwtToken jwt = getJwtToken(requestToken, theDecryptor, theSigVerifier);
+            JwtClaims claims = jwt.getClaims();
+
+            // Check issuer
+            String iss = issuer != null ? issuer : client.getClientId();
+            if (!iss.equals(claims.getIssuer())) {
                 throw new SecurityException();
             }
-            MultivaluedMap<String, String> newParams = new MetadataMap<String, String>();
+
+            // Check client_id - if present it must match the client_id specified in the request
+            if (claims.getClaim(OAuthConstants.CLIENT_ID) != null
+                && !claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
+                throw new SecurityException();
+            }
+
+            // Check response_type - if present it must match the response_type specified in the request
+            String tokenResponseType = (String)claims.getClaim(OAuthConstants.RESPONSE_TYPE);
+            if (tokenResponseType != null
+                && !tokenResponseType.equals(params.getFirst(OAuthConstants.RESPONSE_TYPE))) {
+                throw new SecurityException();
+            }
+
+            MultivaluedMap<String, String> newParams = new MetadataMap<>(params);
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
                 String key = entry.getKey();
@@ -92,69 +94,30 @@ public class JwtRequestCodeFilter implements AuthorizationCodeRequestFilter {
                 } else if (value instanceof List) {
                     List<Object> list = CastUtils.cast((List<?>)value);
                     value = jsonHandler.toJson(list);
-                } 
+                }
                 newParams.putSingle(key, value.toString());
             }
             return newParams;
-        } else {
-            return params;
         }
+        return params;
     }
-    private String getPrefix(Client client) {
+    private boolean isRequestUriValid(Client client, String requestUri) {
         //TODO: consider restricting to specific hosts
-        return "https://";
-    }
-    public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
-        this.jweDecryptor = jweDecryptor;
-    }
-
-    public void setJweVerifier(JwsSignatureVerifier theJwsVerifier) {
-        this.jwsVerifier = theJwsVerifier;
-    }
-    
-    protected JweDecryptionProvider getInitializedDecryptionProvider(Client c) {
-        if (jweDecryptor != null) {
-            return jweDecryptor;    
-        } 
-        if (decryptWithClientSecret) {
-            SecretKey key = CryptoUtils.decodeSecretKey(c.getClientSecret());
-            return JweUtils.getDirectKeyJweDecryption(key, ContentAlgorithm.A128GCM);
-        }
-        return JweUtils.loadDecryptionProvider(false);
+        return requestUri != null && requestUri.startsWith("https://");
     }
     protected JwsSignatureVerifier getInitializedSigVerifier(Client c) {
-        if (jwsVerifier != null) {
-            return jwsVerifier;    
-        } 
-        if (verifyWithClientSecret) {
-            byte[] hmac = CryptoUtils.decodeSequence(c.getClientSecret());
-            return JwsUtils.getHmacSignatureVerifier(hmac, SignatureAlgorithm.HS256);
-        } else if (verifyWithClientCertificates) {
-            X509Certificate cert = 
+        if (verifyWithClientCertificates) {
+            X509Certificate cert =
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             return JwsUtils.getPublicKeySignatureVerifier(cert, SignatureAlgorithm.RS256);
-        } 
-        return JwsUtils.loadSignatureVerifier(true);
+        }
+        return super.getInitializedSignatureVerifier(c.getClientSecret());
     }
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
     public void setVerifyWithClientCertificates(boolean verifyWithClientCertificates) {
-        if (verifyWithClientSecret) {
-            throw new SecurityException();          
-        }
         this.verifyWithClientCertificates = verifyWithClientCertificates;
     }
-    public void setVerifyWithClientSecret(boolean verifyWithClientSecret) {
-        if (decryptWithClientSecret || verifyWithClientCertificates) {
-            throw new SecurityException();          
-        }
-        this.verifyWithClientSecret = verifyWithClientSecret;
-    }
-    public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
-        if (verifyWithClientSecret) {
-            throw new SecurityException();          
-        }
-        this.decryptWithClientSecret = decryptWithClientSecret;
-    }
+
 }

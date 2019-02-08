@@ -28,12 +28,11 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <!-- bug in jaxb is causing an assertion error if -ea is turned on -->
-        <cxf.surefire.fork.vmargs />
+        <cxf.module.name>org.apache.cxf.wsn.core</cxf.module.name>
         <cxf.server.launcher.vmargs />
         <cxf.surefire.enable.assertions>false</cxf.surefire.enable.assertions>
     </properties>
@@ -41,7 +40,6 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -74,12 +72,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -100,19 +94,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
-            <version>2.1.7</version>
+            <version>2.2.10</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -120,8 +109,16 @@
                     <artifactId>jaxws-api</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
@@ -157,7 +154,7 @@
                             org.apache.cxf.services.wsn.cxf-services-wsn-api
                         </Require-Bundle>
                         <Import-Package>
-                            org.apache.cxf.wsn.util.*;version=${project.version},
+                            org.apache.cxf.wsn.util.*;version=${cxf.osgi.version.clean},
                             !org.apache.cxf.wsn*,
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
@@ -166,7 +163,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.wsn.services;version=${project.version}
+                            org.apache.cxf.wsn.services;version=${cxf.osgi.version.clean}
                         </Export-Package>
                         <_nouses>true</_nouses>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
@@ -175,4 +172,32 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>java9plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.java</include>
+                                <include>**/*TestCase.java</include>
+                                <include>**/*TestCases.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*$*</exclude>
+                                <!--ignore the test caused by CXF-7270-->
+                                <exclude>/org/apache/cxf/wsn/RiTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

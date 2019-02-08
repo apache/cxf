@@ -28,7 +28,7 @@ import org.apache.cxf.helpers.IOUtils;
 
 public class DelegatingInputStream extends FilterInputStream {
     protected boolean cached;
-    
+
     public DelegatingInputStream(InputStream is) {
         super(is);
     }
@@ -40,7 +40,7 @@ public class DelegatingInputStream extends FilterInputStream {
     public InputStream getInputStream() {
         return in;
     }
-    
+
     /**
      * Read the entire original input stream and cache it.  Useful
      * if switching threads or doing something where the original
@@ -65,5 +65,5 @@ public class DelegatingInputStream extends FilterInputStream {
             cached = true;
         }
     }
-    
+
 }

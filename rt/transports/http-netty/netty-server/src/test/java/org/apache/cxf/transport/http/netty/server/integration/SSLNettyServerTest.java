@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http.netty.server.integration;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -52,18 +51,21 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String PORT = allocatePort(SSLNettyServerTest.class);
-    
+
     static {
         System.setProperty("SSLNettyServerTest.port", PORT);
     }
-    
+
     static Endpoint ep;
 
     static Greeter g;
-    
+
     static String address;
 
     @BeforeClass
@@ -73,11 +75,11 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         MySSLInterceptor myInterceptor = new MySSLInterceptor();
         b.getInInterceptors().add(myInterceptor);
         BusFactory.setThreadDefaultBus(b);
-        
+
         address = "https://localhost:" + PORT + "/SoapContext/SoapPort";
         ep = Endpoint.publish(address,
                 new org.apache.hello_world_soap_http.GreeterImpl());
-        
+
         URL wsdl = NettyServerTest.class.getResource("/wsdl/hello_world.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -98,7 +100,7 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         }
         ep = null;
     }
-    
+
     @Test
     public void testInvocation() throws Exception {
         setupTLS(g);
@@ -106,37 +108,38 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     private static void setupTLS(Greeter port)
         throws FileNotFoundException, IOException, GeneralSecurityException {
-        String keyStoreLoc = 
-            "src/test/resources/org/apache/cxf/transport/http/netty/server/integration/clientKeystore.jks";
+        String keyStoreLoc =
+            "/keys/clientstore.jks";
         HTTPConduit httpConduit = (HTTPConduit) ClientProxy.getClient(port).getConduit();
 
         TLSClientParameters tlsCP = new TLSClientParameters();
         String keyPassword = "ckpass";
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+        keyStore.load(SSLNettyServerTest.class.getResourceAsStream(keyStoreLoc), "cspass".toCharArray());
         KeyManager[] myKeyManagers = getKeyManagers(keyStore, keyPassword);
         tlsCP.setKeyManagers(myKeyManagers);
 
 
         KeyStore trustStore = KeyStore.getInstance("JKS");
-        trustStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
+        trustStore.load(SSLNettyServerTest.class.getResourceAsStream(keyStoreLoc), "cspass".toCharArray());
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
 
+        tlsCP.setDisableCNCheck(true);
         httpConduit.setTlsClientParameters(tlsCP);
     }
 
     private static TrustManager[] getTrustManagers(KeyStore trustStore)
         throws NoSuchAlgorithmException, KeyStoreException {
-        String alg = KeyManagerFactory.getDefaultAlgorithm();
+        String alg = TrustManagerFactory.getDefaultAlgorithm();
         TrustManagerFactory fac = TrustManagerFactory.getInstance(alg);
         fac.init(trustStore);
         return fac.getTrustManagers();
     }
-    
+
     private static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword)
         throws GeneralSecurityException, IOException {
         String alg = KeyManagerFactory.getDefaultAlgorithm();
@@ -147,7 +150,7 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
         fac.init(keyStore, keyPass);
         return fac.getKeyManagers();
     }
-    
+
     public static class MySSLInterceptor extends AbstractPhaseInterceptor<Message> {
 
         public MySSLInterceptor() {
@@ -162,8 +165,8 @@ public class SSLNettyServerTest extends AbstractBusClientServerTestBase {
                 assertNotNull(info);
             }
         }
-        
+
     }
-    
+
 
 }

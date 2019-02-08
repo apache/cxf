@@ -27,12 +27,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -41,14 +42,14 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class Destination extends AbstractEndpoint {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(Destination.class);
 
     private Map<String, DestinationSequence> map;
 
     Destination(RMEndpoint reliableEndpoint) {
         super(reliableEndpoint);
-        map = new ConcurrentHashMap<String, DestinationSequence>();
+        map = new ConcurrentHashMap<>();
     }
 
     public DestinationSequence getSequence(Identifier id) {
@@ -75,6 +76,17 @@ public class Destination extends AbstractEndpoint {
         processingSequenceCount.incrementAndGet();
     }
 
+    // this method ensures to keep the sequence until all the messages are delivered
+    public void terminateSequence(DestinationSequence seq) {
+        terminateSequence(seq, false);
+    }
+    public void terminateSequence(DestinationSequence seq, boolean forceRemove) {
+        seq.terminate();
+        if (forceRemove || seq.allAcknowledgedMessagesDelivered()) {
+            removeSequence(seq);
+        }
+    }
+
     public void removeSequence(DestinationSequence seq) {
         DestinationSequence o;
         o = map.remove(seq.getIdentifier().getValue());
@@ -93,7 +105,7 @@ public class Destination extends AbstractEndpoint {
      * sequence, sends an out-of-band SequenceAcknowledgement unless there a
      * response will be sent to the acksTo address onto which the acknowldegment
      * can be piggybacked.
-     * 
+     *
      * @param sequenceType the sequenceType object that includes identifier and
      *            message number (and possibly a lastMessage element) for the
      *            message to be acknowledged)
@@ -108,15 +120,15 @@ public class Destination extends AbstractEndpoint {
         if (null == sequenceType) {
             return;
         }
-        
+
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
             if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
-                if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
+                if (PropertyUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
                     return;
                 }
-    
+
                 seq.acknowledge(message);
 
                 if (null != rmps.getCloseSequence()) {
@@ -158,7 +170,7 @@ public class Destination extends AbstractEndpoint {
         }
 
     }
-    
+
     void ackRequested(Message message) throws SequenceFault, RMException {
         // TODO
         Collection<AckRequestedType> ars = RMContextUtils.retrieveRMProperties(message, false)
@@ -175,9 +187,9 @@ public class Destination extends AbstractEndpoint {
             ackImmediately(seq, message);
         }
     }
-    
+
     void ackImmediately(DestinationSequence seq, Message message) throws RMException {
-        
+
         seq.scheduleImmediateAcknowledgement();
 
         // if we cannot expect an outgoing message to which the
@@ -191,26 +203,40 @@ public class Destination extends AbstractEndpoint {
             replyToAddress = maps.getReplyTo().getAddress().getValue();
         }
         if (!(seq.getAcksTo().getAddress().getValue().equals(replyToAddress) || seq
-            .canPiggybackAckOnPartialResponse())) { 
-            getReliableEndpoint().getProxy().acknowledge(seq);                    
+            .canPiggybackAckOnPartialResponse())) {
+            getReliableEndpoint().getProxy().acknowledge(seq);
         }
     }
-    
+
     void processingComplete(Message message) {
         SequenceType sequenceType = RMContextUtils.retrieveRMProperties(message, false).getSequence();
         if (null == sequenceType) {
             return;
         }
-        
+
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
             long mn = sequenceType.getMessageNumber().longValue();
             seq.processingComplete(mn);
             seq.purgeAcknowledged(mn);
+            // remove acknowledged undelivered message
+            seq.removeDeliveringMessageNumber(mn);
+            if (seq.isTerminated() && seq.allAcknowledgedMessagesDelivered()) {
+                removeSequence(seq);
+            }
+        }
+        CachedOutputStream saved = (CachedOutputStream)message.remove(RMMessageConstants.SAVED_CONTENT);
+        if (saved != null) {
+            saved.releaseTempFileHold();
+            try {
+                saved.close();
+            } catch (IOException e) {
+                // ignore
+            }
         }
     }
-    
+
     void releaseDeliveringStatus(Message message) {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         SequenceType sequenceType = rmps.getSequence();
@@ -221,7 +247,7 @@ public class Destination extends AbstractEndpoint {
             }
         }
     }
-    
+
     private static Message createMessage(Exchange exchange) {
         Endpoint ep = exchange.getEndpoint();
         Message msg = null;

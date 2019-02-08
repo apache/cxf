@@ -19,11 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.websocket;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * JAXRSClientServerWebSocketSpringTest without atmosphere
@@ -35,7 +36,7 @@ public class JAXRSClientServerWebSocketSpringNoAtmosphereTest extends JAXRSClien
     public static void startServers() throws Exception {
         System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
         @SuppressWarnings({ "unused", "resource" })
-        ApplicationContext appctxt = 
+        ApplicationContext appctxt =
             new ClassPathXmlApplicationContext(
                 JAXRSClientServerWebSocketSpringTest.class.getResource(
                     "/jaxrs_websocket/beans-embedded2.xml").toString());
@@ -43,7 +44,7 @@ public class JAXRSClientServerWebSocketSpringNoAtmosphereTest extends JAXRSClien
 
     @AfterClass
     public static void cleanup() {
-        System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
+        //System.clearProperty("org.apache.cxf.transport.websocket.atmosphere.disabled");
     }
 
     protected String getPort() {

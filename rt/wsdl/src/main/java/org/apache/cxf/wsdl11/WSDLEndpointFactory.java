@@ -31,6 +31,6 @@ import org.apache.cxf.service.model.ServiceInfo;
  */
 public interface WSDLEndpointFactory {
     EndpointInfo createEndpointInfo(Bus bus, ServiceInfo serviceInfo, BindingInfo b, List<?> extensions);
-    
+
     void createPortExtensors(Bus bus, EndpointInfo ei, Service service);
 }

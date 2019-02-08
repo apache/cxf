@@ -33,7 +33,7 @@ public class StaxEventFilter implements EventFilter {
     }
 
     public boolean accept(XMLEvent event) {
-        if (event.isStartDocument() 
+        if (event.isStartDocument()
             || event.isEndDocument()) {
             return false;
         }

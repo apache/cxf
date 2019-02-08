@@ -27,14 +27,17 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.addr</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ws.addressing.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
+            javax.xml.ws*;version="${cxf.osgi.javax.xml.ws.version}",
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>

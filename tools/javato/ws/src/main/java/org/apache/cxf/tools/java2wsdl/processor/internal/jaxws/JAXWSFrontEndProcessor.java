@@ -61,9 +61,9 @@ public class JAXWSFrontEndProcessor implements Processor {
     private static final String SEI_SUFFIX = "_PortType";
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSFrontEndProcessor.class);
     private ToolContext context;
-    private List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
-    private List<String> infList = new ArrayList<String>();
-    
+    private List<AbstractGenerator> generators = new ArrayList<>();
+    private List<String> infList = new ArrayList<>();
+
     @SuppressWarnings("unchecked")
     public void process() throws ToolException {
         checkJaxwsClass();
@@ -79,7 +79,7 @@ public class JAXWSFrontEndProcessor implements Processor {
         jinf.setJavaModel(jm);
         context.put(JavaModel.class, jm);
         context.put(ToolConstants.SERVICE_NAME, serviceInfo.getName());
-        EndpointInfo endpointInfo = serviceInfo.getEndpoints().iterator().next();        
+        EndpointInfo endpointInfo = serviceInfo.getEndpoints().iterator().next();
         context.put(ToolConstants.PORT_NAME, endpointInfo.getName());
         generators.add(new JaxwsSEIGenerator());
         generators.add(new JaxwsImplGenerator());
@@ -142,9 +142,8 @@ public class JAXWSFrontEndProcessor implements Processor {
             Class<?> clz = (Class<?>)type;
             if (clz.isArray()) {
                 return clz.getComponentType().getName() + "[]";
-            } else {
-                return clz.getName();
             }
+            return clz.getName();
         } else if (type instanceof ParameterizedType) {
             return type.toString();
         } else if (type instanceof GenericArrayType) {
@@ -168,12 +167,12 @@ public class JAXWSFrontEndProcessor implements Processor {
             throw new ToolException(msg);
         }
     }
-    
-    
+
+
     private boolean isImplRmiRemote(Class<?> claz) {
         for (Method method : claz.getMethods()) {
             if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())
-                && !method.getDeclaringClass().getName().equals("java.lang.Object")) {
+                && !"java.lang.Object".equals(method.getDeclaringClass().getName())) {
                 Class<?>[] paraClasses = method.getParameterTypes();
                 for (Class<?> clz : paraClasses) {
                     getInfClass(clz);
@@ -184,8 +183,8 @@ public class JAXWSFrontEndProcessor implements Processor {
         }
         return infList.contains("java.rmi.Remote");
     }
-    
-    
+
+
     private void getInfClass(Class<?> claz) {
         for (Class<?> inf : claz.getInterfaces()) {
             getInfClass(inf);
@@ -197,5 +196,5 @@ public class JAXWSFrontEndProcessor implements Processor {
             infList.add(claz.getName());
         }
     }
-    
+
 }

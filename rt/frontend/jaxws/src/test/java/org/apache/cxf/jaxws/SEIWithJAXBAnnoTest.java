@@ -25,26 +25,29 @@ import java.util.List;
 
 import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.service.AddNumbers;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
     String address = "local://localhost:9000/Hello";
 
-    
+
     @Test
     public void testXMLList() throws Exception {
-        
+
         AddNumbersImpl serviceImpl = new AddNumbersImpl();
         Endpoint.publish("local://localhost:9000/Hello", serviceImpl);
-     
+
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setBus(SpringBusFactory.getDefaultBus());
+        factory.setBus(BusFactory.getDefaultBus());
         factory.setServiceClass(AddNumbers.class);
 
         factory.setAddress(address);
@@ -52,8 +55,8 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         StringWriter strWriter = new StringWriter();
         LoggingOutInterceptor log = new LoggingOutInterceptor(new PrintWriter(strWriter));
         ClientProxy.getClient(proxy).getOutInterceptors().add(log);
-        
-        List<String> args = new ArrayList<String>();
+
+        List<String> args = new ArrayList<>();
         args.add("str1");
         args.add("str2");
         args.add("str3");
@@ -62,7 +65,7 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         assertTrue("Client does not use the generated wrapper class to marshal request parameters",
                      strWriter.toString().indexOf(expected) > -1);
         assertEquals("Get the wrong result", 100, (int)result.get(0));
-        
-    }    
+
+    }
 }
 

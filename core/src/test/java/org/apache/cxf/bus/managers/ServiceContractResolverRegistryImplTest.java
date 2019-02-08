@@ -25,14 +25,21 @@ import java.net.URISyntaxException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.ServiceContractResolver;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ServiceContractResolverRegistryImplTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ServiceContractResolverRegistryImplTest {
     private ServiceContractResolverRegistryImpl registry;
     private ServiceContractResolver resolver1;
     private ServiceContractResolver resolver2;
@@ -58,32 +65,32 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
         resolver2 = null;
         serviceName = null;
     }
-    
+
     @Test
     public void testRegister() {
         assertEquals("unexpected resolver count",
                      0,
                      registry.getResolvers().size());
-        
+
         registry.register(resolver1);
-        
+
         assertEquals("unexpected resolver count",
                      1,
                      registry.getResolvers().size());
         assertTrue("expected resolver to be registered",
                    registry.getResolvers().contains(resolver1));
-        
+
         registry.unregister(resolver1);
-        
+
         assertEquals("unexpected resolver count",
                      0,
                      registry.getResolvers().size());
         assertFalse("expected resolver to be registered",
                     registry.getResolvers().contains(resolver1));
-        
+
         registry.register(resolver2);
         registry.register(resolver1);
-        
+
         assertEquals("unexpected resolver count",
                      2,
                      registry.getResolvers().size());
@@ -91,9 +98,9 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
                    registry.getResolvers().contains(resolver1));
         assertTrue("expected resolver to be registered",
                    registry.getResolvers().contains(resolver2));
-        
+
         registry.unregister(resolver2);
-        
+
         assertEquals("unexpected resolver count",
                      1,
                      registry.getResolvers().size());
@@ -102,7 +109,7 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
         assertFalse("expected resolver to be registered",
                     registry.getResolvers().contains(resolver2));
     }
-    
+
     @Test
     public void testGetContactLocation() {
         registry.register(resolver1);
@@ -110,21 +117,21 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
         resolver1.getContractLocation(serviceName);
         EasyMock.expectLastCall().andReturn(uri1);
         control.replay();
-     
+
         URI resolved = registry.getContractLocation(serviceName);
-        
+
         control.verify();
         assertSame("unexpected physical EPR", uri1, resolved);
-        
+
         control.reset();
         resolver1.getContractLocation(serviceName);
         EasyMock.expectLastCall().andReturn(null);
         resolver2.getContractLocation(serviceName);
         EasyMock.expectLastCall().andReturn(uri2);
         control.replay();
-        
+
         resolved = registry.getContractLocation(serviceName);
-        
+
         control.verify();
         assertSame("unexpected physical EPR", uri2, resolved);
         assertNotSame("unexpected physical EPR", uri1, resolved);

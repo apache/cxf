@@ -24,66 +24,83 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
+
+
 /**
  * Represents a registered third-party Client application
  */
+@Entity
 public class Client implements Serializable {
-    
+
     private static final long serialVersionUID = -5550840247125850922L;
-    
+
     private String clientId;
     private String clientSecret;
     private String clientIpAddress;
-    
+
     private String applicationName;
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
-    private List<String> applicationCertificates = new LinkedList<String>();
-    private List<String> redirectUris = new LinkedList<String>();
-    
+    private String applicationLogoutUri;
+    private List<String> applicationCertificates = new LinkedList<>();
+    private List<String> redirectUris = new LinkedList<>();
+
     private boolean isConfidential;
-    private List<String> allowedGrantTypes = new LinkedList<String>();
-    private List<String> registeredScopes = new LinkedList<String>();
-    private List<String> registeredAudiences = new LinkedList<String>();
-    
-    private Map<String, String> properties = new HashMap<String, String>();
+    private List<String> allowedGrantTypes = new LinkedList<>();
+    private List<String> registeredScopes = new LinkedList<>();
+    private List<String> registeredAudiences = new LinkedList<>();
+
+    private Map<String, String> properties = new HashMap<>();
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
-    private long registeredAt;    
-    
+    private long registeredAt;
+    private String homeRealm;
+    private boolean registeredDynamically;
+    private String tokenEndpointAuthMethod;
+
     public Client() {
-        
+
     }
-    
+
     public Client(String clientId, String clientSecret, boolean isConfidential) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.isConfidential = isConfidential;
     }
 
-    public Client(String clientId, 
+    public Client(String clientId,
                   String clientSecret,
                   boolean isConfidential,
                   String applicationName) {
         this(clientId, clientSecret, isConfidential);
         this.applicationName = applicationName;
     }
-    
-    public Client(String clientId, 
+
+    public Client(String clientId,
                   String clientSecret,
                   boolean isConfidential,
                   String applicationName,
                   String applicationWebUri) {
         this(clientId, clientSecret, isConfidential, applicationName);
         this.applicationWebUri = applicationWebUri;
-        
+
     }
-    
+
     /**
      * Get the client registration id
      * @return the consumer key
      */
+    @Id
     public String getClientId() {
         return clientId;
     }
@@ -91,7 +108,7 @@ public class Client implements Serializable {
     public void setClientId(String id) {
         clientId = id;
     }
-    
+
     /**
      * Get the client secret
      * @return the consumer key
@@ -103,7 +120,7 @@ public class Client implements Serializable {
     public void setClientSecret(String id) {
         clientSecret = id;
     }
-        
+
     /**
      * Get the name of the third-party application
      * this client represents
@@ -139,27 +156,19 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the description of the third-party application.
-     * @param applicationDescription the description
-     */
-    public void setApplicationDescription(String applicationDescription) {
-        this.applicationDescription = applicationDescription;
-    }
-
-    /**
      * Get the description of the third-party application.
      * @return the application description
      */
     public String getApplicationDescription() {
         return applicationDescription;
     }
-    
+
     /**
-     * Set the URI pointing to a logo image of the client application
-     * @param logoPath the logo URI
+     * Set the description of the third-party application.
+     * @param applicationDescription the description
      */
-    public void setApplicationLogoUri(String logoPath) {
-        this.applicationLogoUri = logoPath;
+    public void setApplicationDescription(String applicationDescription) {
+        this.applicationDescription = applicationDescription;
     }
 
     /**
@@ -171,14 +180,11 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the confidentiality status of this client application.
-     * This can be used to restrict which OAuth2 flows this client
-     * can participate in.
-     * 
-     * @param isConf true if the client is confidential
+     * Set the URI pointing to a logo image of the client application
+     * @param logoPath the logo URI
      */
-    public void setConfidential(boolean isConf) {
-        this.isConfidential = isConf;
+    public void setApplicationLogoUri(String logoPath) {
+        this.applicationLogoUri = logoPath;
     }
 
     /**
@@ -187,6 +193,28 @@ public class Client implements Serializable {
      */
     public boolean isConfidential() {
         return isConfidential;
+    }
+
+    /**
+     * Set the confidentiality status of this client application.
+     * This can be used to restrict which OAuth2 flows this client
+     * can participate in.
+     *
+     * @param isConf true if the client is confidential
+     */
+    public void setConfidential(boolean isConf) {
+        this.isConfidential = isConf;
+    }
+
+    /**
+     * Get a list of URIs the AuthorizationService
+     * may return the authorization code to
+     * @return the redirect uris
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getRedirectUris() {
+        return redirectUris;
     }
 
     /**
@@ -199,12 +227,14 @@ public class Client implements Serializable {
     }
 
     /**
-     * Get a list of URIs the AuthorizationService
-     * may return the authorization code to
-     * @return the redirect uris
+     * Get the list of access token grant types this client
+     * can use to obtain the access tokens.
+     * @return the list of grant types
      */
-    public List<String> getRedirectUris() {
-        return redirectUris;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    public List<String> getAllowedGrantTypes() {
+        return allowedGrantTypes;
     }
 
     /**
@@ -217,20 +247,21 @@ public class Client implements Serializable {
     }
 
     /**
-     * Get the list of access token grant types this client
-     * can use to obtain the access tokens.
-     * @return the list of grant types
+     * Get the {@link UserSubject} representing this Client
+     * authentication
+     * @return the user subject
      */
-    public List<String> getAllowedGrantTypes() {
-        return allowedGrantTypes;
+    @OneToOne
+    public UserSubject getSubject() {
+        return subject;
     }
 
     /**
-     * Set the {@link UserSubject} representing this Client 
+     * Set the {@link UserSubject} representing this Client
      * authentication. This property may be set during the registration
      * in cases where a 3rd party client needs to authenticate first before
      * registering as OAuth2 client. This property may also wrap a clientId
-     * in cases where a client credentials flow is used   
+     * in cases where a client credentials flow is used
      *
      * @param subject the user subject
      */
@@ -239,40 +270,32 @@ public class Client implements Serializable {
     }
 
     /**
-     * Get the {@link UserSubject} representing this Client 
-     * authentication
-     * @return the user subject
+     * Get the {@link UserSubject} representing the resource owner
+     * who has registered this client
+     * @return the resource owner user subject
      */
-    public UserSubject getSubject() {
-        return subject;
+    @ManyToOne
+    public UserSubject getResourceOwnerSubject() {
+        return resourceOwnerSubject;
     }
 
     /**
-     * Set the {@link UserSubject} representing the resource owner 
+     * Set the {@link UserSubject} representing the resource owner
      * who has registered this client. This property may be set in cases where
      * each account (resource) owner registers account specific Clients
      *
-     * @param subject the resource owner user subject
+     * @param resourceOwnerSubject the resource owner user subject
      */
-
     public void setResourceOwnerSubject(UserSubject resourceOwnerSubject) {
         this.resourceOwnerSubject = resourceOwnerSubject;
     }
 
-
-    /**
-     * Get the {@link UserSubject} representing the resource owner 
-     * who has registered this client
-     * @return the resource owner user subject
-     */
-    public UserSubject getResourceOwnerSubject() {
-        return resourceOwnerSubject;
-    }
-    
     /**
      * Get the list of additional client properties
      * @return the list of properties
      */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "name")
     public Map<String, String> getProperties() {
         return properties;
     }
@@ -289,23 +312,27 @@ public class Client implements Serializable {
      * Get the list of registered scopes
      * @return scopes
      */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getRegisteredScopes() {
         return registeredScopes;
     }
 
     /**
-     * Set the list of registered scopes. 
+     * Set the list of registered scopes.
      * Registering the scopes will allow the clients not to include the scopes
      * and delegate to the runtime to enforce that the current request scopes are
      * a subset of the pre-registered scopes.
-     * 
-     * Client Registration service is expected to reject unknown scopes. 
+     *
+     * Client Registration service is expected to reject unknown scopes.
      * @param registeredScopes the scopes
      */
     public void setRegisteredScopes(List<String> registeredScopes) {
         this.registeredScopes = registeredScopes;
     }
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
     public List<String> getRegisteredAudiences() {
         return registeredAudiences;
     }
@@ -318,13 +345,16 @@ public class Client implements Serializable {
         this.registeredAudiences = registeredAudiences;
     }
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @OrderColumn
+    @Lob
     public List<String> getApplicationCertificates() {
         return applicationCertificates;
     }
 
     /*
      * Set the Base64 encoded Application Public X509 Certificate
-     * It can be used in combination with the clientSecret property to support 
+     * It can be used in combination with the clientSecret property to support
      * Basic or other password-aware authentication on top of 2-way TLS.
      */
     public void setApplicationCertificates(List<String> applicationCertificates) {
@@ -345,5 +375,42 @@ public class Client implements Serializable {
 
     public void setRegisteredAt(long registeredAt) {
         this.registeredAt = registeredAt;
+    }
+
+    public String getHomeRealm() {
+        return homeRealm;
+    }
+
+    /**
+     * Hint to the authentication system how the users
+     * redirected by this client need to be authenticated
+     * @param homeRealm user home realm
+     */
+    public void setHomeRealm(String homeRealm) {
+        this.homeRealm = homeRealm;
+    }
+
+    public boolean isRegisteredDynamically() {
+        return registeredDynamically;
+    }
+
+    public void setRegisteredDynamically(boolean registeredDynamically) {
+        this.registeredDynamically = registeredDynamically;
+    }
+
+    public String getApplicationLogoutUri() {
+        return applicationLogoutUri;
+    }
+
+    public void setApplicationLogoutUri(String applicationLogoutUri) {
+        this.applicationLogoutUri = applicationLogoutUri;
+    }
+
+    public String getTokenEndpointAuthMethod() {
+        return tokenEndpointAuthMethod;
+    }
+
+    public void setTokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+        this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
     }
 }

@@ -31,17 +31,12 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
     }
 
     private static class QueryContextImpl implements QueryContext {
-        
+
         private SearchContext searchContext;
         private Message message;
         QueryContextImpl(Message message) {
             this.searchContext = new SearchContextImpl(message);
             this.message = message;
-        }
-
-        @Override
-        public String getConvertedExpression() {
-            return getConvertedExpression((String)null);
         }
 
         @Override
@@ -53,16 +48,14 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
         public <T, E> E getConvertedExpression(Class<T> beanClass, Class<E> queryClass) {
             return getConvertedExpression((String)null, beanClass, queryClass);
         }
-        
-        public String getConvertedExpression(String originalExpression) {
-            return getConvertedExpression(originalExpression, SearchBean.class);
-        }
 
+        @Override
         public <T> String getConvertedExpression(String originalExpression, Class<T> beanClass) {
             return getConvertedExpression(originalExpression, beanClass, String.class);
-            
+
         }
-        
+
+        @Override
         public <T, E> E getConvertedExpression(String originalExpression,
                                                Class<T> beanClass,
                                                Class<E> queryClass) {
@@ -70,28 +63,27 @@ public class QueryContextProvider implements ContextProvider<QueryContext> {
             if (visitor == null) {
                 return null;
             }
-            
+
             SearchCondition<T> cond = searchContext.getCondition(originalExpression, beanClass);
             if (cond == null) {
                 return null;
             }
             cond.accept(visitor);
             return queryClass.cast(visitor.getQuery());
-            
+
         }
-        
+
         @SuppressWarnings("unchecked")
         private <T, Y> SearchConditionVisitor<T, Y> getVisitor() {
             Object visitor = message.getContextualProperty(SearchUtils.SEARCH_VISITOR_PROPERTY);
             if (visitor == null) {
                 return null;
-            } else {
-                //TODO: consider introducing SearchConditionVisitor.getBeanClass && 
-                //      SearchConditionVisitor.getQueryClass to avoid such casts
-                return (SearchConditionVisitor<T, Y>)visitor;
             }
+            //TODO: consider introducing SearchConditionVisitor.getBeanClass &&
+            //      SearchConditionVisitor.getQueryClass to avoid such casts
+            return (SearchConditionVisitor<T, Y>)visitor;
         }
 
-        
+
     }
 }

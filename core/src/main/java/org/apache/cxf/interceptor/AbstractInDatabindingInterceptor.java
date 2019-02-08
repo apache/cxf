@@ -54,22 +54,22 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 
 public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
-    public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName() 
+    public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName()
                                                     + ".novalidate-parts";
     private static final ResourceBundle BUNDLE = BundleUtils
         .getBundle(AbstractInDatabindingInterceptor.class);
 
-    
+
     public AbstractInDatabindingInterceptor(String phase) {
         super(phase);
     }
     public AbstractInDatabindingInterceptor(String i, String phase) {
         super(i, phase);
     }
-    
+
     protected boolean supportsDataReader(Message message, Class<?> input) {
         Service service = ServiceModelUtil.getService(message.getExchange());
-        Class<?> cls[] = service.getDataBinding().getSupportedReaderFormats();
+        Class<?>[] cls = service.getDataBinding().getSupportedReaderFormats();
         for (Class<?> c : cls) {
             if (c.equals(input)) {
                 return true;
@@ -81,7 +81,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         Service service = ServiceModelUtil.getService(message.getExchange());
         DataReader<T> dataReader = service.getDataBinding().createReader(input);
         if (dataReader == null) {
-            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_DATAREADER", 
+            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_DATAREADER",
                                                                    BUNDLE, service.getName()));
         }
         dataReader.setAttachments(message.getAttachments());
@@ -90,7 +90,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         setDataReaderValidation(service, message, dataReader);
         return dataReader;
     }
-    
+
     protected DataReader<XMLStreamReader> getDataReader(Message message) {
         return getDataReader(message, XMLStreamReader.class);
     }
@@ -102,11 +102,11 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     protected boolean shouldValidate(Message message) {
         return ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.IN, message);
     }
-    
+
     /**
      * Based on the Schema Validation configuration, will initialise the
      * DataReader with or without the schema set.
-     * 
+     *
      * Can also be called to override schema validation at operation level, thus the reader.setSchema(null)
      * to remove schema validation
      */
@@ -120,12 +120,12 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             reader.setSchema(null); // if this is being called for an operation, then override the service level
         }
     }
-    
+
     protected void setOperationSchemaValidation(Message message) {
         SchemaValidationType validationType = ServiceUtils.getSchemaValidationType(message);
         message.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
-    
+
     protected DepthXMLStreamReader getXMLStreamReader(Message message) {
         XMLStreamReader xr = message.getContent(XMLStreamReader.class);
         if (xr == null) {
@@ -143,7 +143,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
      * Find the next possible message part in the message. If an operation in
      * the list of operations is no longer a viable match, it will be removed
      * from the Collection.
-     * 
+     *
      * @param exchange
      * @param operations
      * @param name
@@ -176,15 +176,15 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                 itr.remove();
                 continue;
             }
-            
+
             Collection<MessagePartInfo> bodyParts = msgInfo.getMessageParts();
-            if (bodyParts.size() == 0 || bodyParts.size() <= index) {
+            if (bodyParts.isEmpty() || bodyParts.size() <= index) {
                 itr.remove();
                 continue;
             }
 
             MessagePartInfo p = msgInfo.getMessageParts().get(index);
-            if (name.getNamespaceURI() == null || name.getNamespaceURI().length() == 0) {
+            if (name.getNamespaceURI() == null || name.getNamespaceURI().isEmpty()) {
                 // message part has same namespace with the message
                 name = new QName(p.getMessageInfo().getName().getNamespaceURI(), name.getLocalPart());
             }
@@ -203,19 +203,19 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             }
         }
         if (lastChoice != null) {
-            setMessage(message, lastBoi, client, lastBoi.getBinding().getService(), 
+            setMessage(message, lastBoi, client, lastBoi.getBinding().getService(),
                        lastMsgInfo.getMessageInfo());
         }
         return lastChoice;
     }
-    
+
     protected MessageInfo setMessage(Message message, BindingOperationInfo operation,
                                    boolean requestor, ServiceInfo si,
                                    MessageInfo msgInfo) {
         message.put(MessageInfo.class, msgInfo);
 
         Exchange ex = message.getExchange();
-        
+
         ex.put(BindingOperationInfo.class, operation);
         ex.setOneWay(operation.getOperationInfo().isOneWay());
 
@@ -227,7 +227,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
 
         // configure endpoint and operation level schema validation
         setOperationSchemaValidation(message);
-        
+
         QName serviceQName = si.getName();
         message.put(Message.WSDL_SERVICE, serviceQName);
 
@@ -238,7 +238,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         QName portQName = endpointInfo.getName();
         message.put(Message.WSDL_PORT, portQName);
 
-        
+
         URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
         if (wsdlDescription == null) {
             String address = endpointInfo.getAddress();
@@ -253,14 +253,14 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
 
         return msgInfo;
     }
-    
-    
-    
+
+
+
     /**
-     * Returns a BindingOperationInfo if the operation is indentified as 
-     * a wrapped method,  return null if it is not a wrapped method 
+     * Returns a BindingOperationInfo if the operation is indentified as
+     * a wrapped method,  return null if it is not a wrapped method
      * (i.e., it is a bare method)
-     * 
+     *
      * @param exchange
      * @param name
      * @param client
@@ -272,15 +272,14 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
             local = local.substring(0, local.length() - 8);
         }
 
-        // TODO: Allow overridden methods.
         BindingOperationInfo bop = ServiceModelUtil.getOperation(exchange, local);
-        
+
         if (bop != null) {
             exchange.put(BindingOperationInfo.class, bop);
         }
         return bop;
     }
-    
+
     protected MessageInfo getMessageInfo(Message message, BindingOperationInfo operation) {
         return getMessageInfo(message, operation, isRequestor(message));
     }

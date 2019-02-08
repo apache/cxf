@@ -21,16 +21,17 @@ package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.Message;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageResponseTestBase {
 
-    private ResponseTimeMessageInvokerInterceptor invokerInterceptor = 
+    private ResponseTimeMessageInvokerInterceptor invokerInterceptor =
         new ResponseTimeMessageInvokerInterceptor();
-    private ResponseTimeMessageInvokerInterceptor.ResponseTimeMessageInvokerEndingInteceptor rtmii = 
+    private ResponseTimeMessageInvokerInterceptor.ResponseTimeMessageInvokerEndingInteceptor rtmii =
         invokerInterceptor.new ResponseTimeMessageInvokerEndingInteceptor();
-    
+
     @Test
     public void testServerOneWayMessageIn() {
         // need to increase the counter and is not a client
@@ -45,13 +46,13 @@ public class ResponseTimeMessageInvokerInterceptorTest extends AbstractMessageRe
         EasyMock.expectLastCall();
         mhtr.endHandling();
         EasyMock.expectLastCall();
-         
+
         EasyMock.replay(mhtr);
         EasyMock.expect(exchange.isOneWay()).andReturn(true);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);        
+        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr);
         EasyMock.replay(exchange);
         EasyMock.replay(message);
-        
+
         rtmii.handleMessage(message);
         EasyMock.verify(message);
         EasyMock.verify(bus);

@@ -82,7 +82,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
 public class RMEndpoint {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMEndpoint.class);
-    
+
     private static final String SERVICE_NAME = "SequenceAbstractService";
     private static final String INTERFACE_NAME = "SequenceAbstractPortType";
     private static final String BINDING_NAME = "SequenceAbstractSoapBinding";
@@ -93,7 +93,7 @@ public class RMEndpoint {
     private static final String TERMINATE_RESPONSE_PART_NAME = "terminateResponse";
     private static final String CLOSE_PART_NAME = "close";
     private static final String CLOSE_RESPONSE_PART_NAME = "closeResponse";
-    
+
     private static Schema rmSchema;
 
     private RMManager manager;
@@ -116,10 +116,10 @@ public class RMEndpoint {
     private ManagedRMEndpoint managedEndpoint;
     private RequiredModelMBean modelMBean;
     private AtomicInteger acknowledgementSequence;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param m
      * @param ae
      * @param pv
@@ -131,8 +131,8 @@ public class RMEndpoint {
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
-        services = new HashMap<ProtocolVariation, WrappedService>();
-        endpoints = new HashMap<ProtocolVariation, Endpoint>();
+        services = new HashMap<>();
+        endpoints = new HashMap<>();
         applicationMessageCount = new AtomicInteger();
         controlMessageCount = new AtomicInteger();
         acknowledgementSequence = new AtomicInteger();
@@ -267,10 +267,10 @@ public class RMEndpoint {
     public Conduit getConduit() {
         return conduit;
     }
-    
+
     /**
      * Get the RM configuration applied to this endpoint.
-     * 
+     *
      * @return configuration
      */
     public RMConfiguration getConfiguration() {
@@ -281,13 +281,13 @@ public class RMEndpoint {
      * Returns the replyTo address of the first application request, i.e. the
      * target address to which to send CreateSequence, CreateSequenceResponse
      * and TerminateSequence messages originating from the from the server.
-     * 
+     *
      * @return the replyTo address
      */
     EndpointReferenceType getReplyTo() {
         return replyTo;
     }
-    
+
     /**
      * Handle message accepted for source sequence. This generates a callback if a receiver is set on the message.
      * @param ssid
@@ -300,11 +300,11 @@ public class RMEndpoint {
             ((MessageCallback)value).messageAccepted(ssid, number);
         }
     }
-    
+
     /**
      * Handle message acknowledgment for source sequence. This generates a notification of the acknowledgment if JMX
      * is being used, and also generates a callback if a receiver is set on the message.
-     * 
+     *
      * @param ssid
      * @param number
      * @param msg
@@ -314,9 +314,7 @@ public class RMEndpoint {
             int seq = acknowledgementSequence.incrementAndGet();
             try {
                 modelMBean.sendNotification(new AcknowledgementNotification(this, seq, ssid, number));
-            } catch (RuntimeOperationsException e) {
-                LOG.log(Level.WARNING, "Error handling JMX notification", e);
-            } catch (MBeanException e) {
+            } catch (RuntimeOperationsException | MBeanException e) {
                 LOG.log(Level.WARNING, "Error handling JMX notification", e);
             }
         }
@@ -337,8 +335,8 @@ public class RMEndpoint {
         setPolicies(message);
         if (manager != null && manager.getBus() != null) {
             managedEndpoint = new ManagedRMEndpoint(this);
-            instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);        
-            if (instrumentationManager != null) {   
+            instrumentationManager = manager.getBus().getExtension(InstrumentationManager.class);
+            if (instrumentationManager != null) {
                 ModelMBeanAssembler assembler = new ModelMBeanAssembler();
                 ModelMBeanInfo mbi = assembler.getModelMbeanInfo(managedEndpoint.getClass());
                 MBeanServer mbs = instrumentationManager.getMBeanServer();
@@ -346,7 +344,7 @@ public class RMEndpoint {
                     LOG.log(Level.WARNING, "MBeanServer not available.");
                 } else {
                     try {
-                        RequiredModelMBean rtMBean = 
+                        RequiredModelMBean rtMBean =
                             (RequiredModelMBean)mbs.instantiate("javax.management.modelmbean.RequiredModelMBean");
                         rtMBean.setModelMBeanInfo(mbi);
                         try {
@@ -366,20 +364,20 @@ public class RMEndpoint {
     }
 
     // internally we keep three services and three endpoints to support three protocol variations
-    // using the specifically generated jaxb classes and operation names etc but this could probably 
+    // using the specifically generated jaxb classes and operation names etc but this could probably
     // be simplified/unified.
     void createServices() {
         for (ProtocolVariation protocol : ProtocolVariation.values()) {
             createService(protocol);
         }
     }
-    
+
     void createService(ProtocolVariation protocol) {
         ServiceInfo si = new ServiceInfo();
         si.setProperty(Schema.class.getName(), getSchema());
         QName serviceQName = new QName(protocol.getWSRMNamespace(), SERVICE_NAME);
         si.setName(serviceQName);
-        
+
         buildInterfaceInfo(si, protocol);
 
         WrappedService service = new WrappedService(applicationEndpoint.getService(), serviceQName, si);
@@ -409,8 +407,8 @@ public class RMEndpoint {
                 javax.xml.transform.Source rm = new StreamSource(RMEndpoint.class
                                                                  .getResource("/schemas/wsdl/wsrm.xsd")
                                                                  .openStream());
-                
-                javax.xml.transform.Source schemas[] = new javax.xml.transform.Source[] {ad, rm};
+
+                javax.xml.transform.Source[] schemas = new javax.xml.transform.Source[] {ad, rm};
                 rmSchema = factory.newSchema(schemas);
             } catch (Exception ex) {
                 //ignore
@@ -418,13 +416,13 @@ public class RMEndpoint {
         }
         return rmSchema;
     }
-    
+
     void createEndpoints(org.apache.cxf.transport.Destination d) {
         for (ProtocolVariation protocol : ProtocolVariation.values()) {
             createEndpoint(d, protocol);
         }
     }
-    
+
     void createEndpoint(org.apache.cxf.transport.Destination d, ProtocolVariation protocol) {
         final QName bindingQName = new QName(protocol.getWSRMNamespace(), BINDING_NAME);
         WrappedService service = services.get(protocol);
@@ -438,7 +436,7 @@ public class RMEndpoint {
         }
 
         ei.setAddress(aei.getAddress());
-        
+
         ei.setName(RMUtils.getConstants(protocol.getWSRMNamespace()).getPortName());
         ei.setBinding(si.getBinding(bindingQName));
 
@@ -452,7 +450,7 @@ public class RMEndpoint {
         }
         si.addEndpoint(ei);
         ei.setProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE, tokenStore);
-        
+
         Endpoint endpoint = new WrappedEndpoint(applicationEndpoint, ei, service);
         if (applicationEndpoint.getEndpointInfo() != null
             && applicationEndpoint.getEndpointInfo().getProperties() != null) {
@@ -477,7 +475,7 @@ public class RMEndpoint {
             EndpointPolicy epi = null == conduit
                 ? engine.getServerEndpointPolicy(applicationEndpoint.getEndpointInfo(), null, message)
                     : engine.getClientEndpointPolicy(applicationEndpoint.getEndpointInfo(), conduit, message);
-            
+
             if (conduit != null) {
                 engine.setClientEndpointPolicy(ei, epi);
             } else {
@@ -487,14 +485,14 @@ public class RMEndpoint {
             effectiveOutbound.initialise(epi, engine, false, false, message);
             EffectivePolicyImpl effectiveInbound = new EffectivePolicyImpl();
             effectiveInbound.initialise(epi, engine, true, false, message);
-            
+
             BindingInfo bi = ei.getBinding();
             Collection<BindingOperationInfo> bois = bi.getOperations();
-            
+
             for (BindingOperationInfo boi : bois) {
                 engine.setEffectiveServerRequestPolicy(ei, boi, effectiveInbound);
                 engine.setEffectiveServerResponsePolicy(ei, boi, effectiveOutbound);
-                
+
                 engine.setEffectiveClientRequestPolicy(ei, boi, effectiveOutbound);
                 engine.setEffectiveClientResponsePolicy(ei, boi, effectiveInbound);
             }
@@ -589,7 +587,7 @@ public class RMEndpoint {
             partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceResponseType());
             partInfo.setIndex(0);
         }
-        
+
         // for the TerminateSequence operation to an anonymous endpoint
         operationInfo = ii.addOperation(consts.getTerminateSequenceAnonymousOperationName());
         messageInfo = operationInfo.createMessage(consts.getTerminateSequenceAnonymousOperationName(),
@@ -599,7 +597,7 @@ public class RMEndpoint {
         partInfo.setElementQName(consts.getTerminateSequenceOperationName());
         partInfo.setElement(true);
         partInfo.setTypeClass(protocol.getCodec().getTerminateSequenceType());
-        
+
     }
 
     void buildSequenceAckOperationInfo(InterfaceInfo ii, ProtocolVariation protocol) {
@@ -668,7 +666,7 @@ public class RMEndpoint {
             BindingOperationInfo boi = null;
 
             RMConstants consts = protocol.getConstants();
-            
+
             boi = bi.buildOperation(consts.getCreateSequenceOperationName(),
                                     consts.getCreateSequenceOperationName().getLocalPart(), null);
             addAction(boi, consts.getCreateSequenceAction(), consts.getCreateSequenceResponseAction());
@@ -678,7 +676,7 @@ public class RMEndpoint {
                                     consts.getTerminateSequenceOperationName().getLocalPart(), null);
 
             if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
-                addAction(boi, consts.getTerminateSequenceAction(), 
+                addAction(boi, consts.getTerminateSequenceAction(),
                           RM11Constants.INSTANCE.getTerminateSequenceResponseAction());
             } else {
                 addAction(boi, consts.getTerminateSequenceAction());
@@ -696,7 +694,7 @@ public class RMEndpoint {
 
             boi = bi.buildOperation(consts.getCloseSequenceOperationName(), null, null);
             if (RM11Constants.NAMESPACE_URI.equals(protocol.getWSRMNamespace())) {
-                addAction(boi, consts.getCloseSequenceAction(), 
+                addAction(boi, consts.getCloseSequenceAction(),
                           RM11Constants.INSTANCE.getCloseSequenceResponseAction());
             } else {
                 addAction(boi, consts.getCloseSequenceAction());
@@ -736,7 +734,7 @@ public class RMEndpoint {
         if (info != null) {
             info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action);
         }
-        
+
         info = boi.getOperationInfo().getOutput();
         if (info != null) {
             info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, outputAction);
@@ -829,6 +827,9 @@ public class RMEndpoint {
 
         for (SourceSequence ss : getSource().getAllSequences()) {
             manager.getRetransmissionQueue().stop(ss);
+        }
+        for (DestinationSequence ds : getDestination().getAllSequences()) {
+            manager.getRedeliveryQueue().stop(ds);
         }
 
         // unregistering of this managed bean from the server is done by the bus itself

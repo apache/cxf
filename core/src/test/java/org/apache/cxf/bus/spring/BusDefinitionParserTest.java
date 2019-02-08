@@ -31,30 +31,32 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class BusDefinitionParserTest extends Assert {
-    
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+
+
+public class BusDefinitionParserTest {
+
     @Test
     public void testFeatures() {
         String cfgFile = "org/apache/cxf/bus/spring/bus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
-        
+
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i instanceof LoggingInInterceptor) {
+            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
                 found = true;
             }
         }
         assertTrue("could not find logging interceptor.", found);
-   
+
         Collection<Feature> features = bus.getFeatures();
         TestFeature tf = null;
         for (Feature f : features) {
@@ -63,26 +65,26 @@ public class BusDefinitionParserTest extends Assert {
                 break;
             }
         }
-        
+
         assertNotNull(tf);
         assertTrue("test feature  has not been initialised", tf.initialised);
         assertNotNull("test feature has not been injected", tf.testBean);
         assertTrue("bean injected into test feature has not been initialised", tf.testBean.initialised);
     }
-    
+
     @Test
     public void testBusConfigure() {
         ClassPathXmlApplicationContext context = null;
         try {
             context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus.xml");
             Bus cxf1 = (Bus)context.getBean("cxf1");
-            
+
             assertTrue(cxf1.getOutInterceptors().size() == 1);
-            assertTrue(cxf1.getInInterceptors().size() == 0);
-            
+            assertTrue(cxf1.getInInterceptors().isEmpty());
+
             Bus cxf2 = (Bus)context.getBean("cxf2");
             assertTrue(cxf2.getInInterceptors().size() == 1);
-            assertTrue(cxf2.getOutInterceptors().size() == 0);
+            assertTrue(cxf2.getOutInterceptors().isEmpty());
         } finally {
             if (context != null) {
                 context.close();
@@ -96,15 +98,15 @@ public class BusDefinitionParserTest extends Assert {
         try {
             context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus2.xml");
             Bus cxf1 = (Bus)context.getBean("cxf1");
-            
+
             assertTrue(cxf1.getOutInterceptors().size() == 1);
-            assertTrue(cxf1.getInInterceptors().size() == 0);
-            
+            assertTrue(cxf1.getInInterceptors().isEmpty());
+
             Bus cxf2 = (Bus)context.getBean("cxf2");
-            
+
             assertTrue(cxf2.getInInterceptors().size() == 1);
-            assertTrue(cxf2.getOutInterceptors().size() == 0);
-            
+            assertTrue(cxf2.getOutInterceptors().isEmpty());
+
             cxf2.getExtension(BusLifeCycleManager.class)
                 .registerLifeCycleListener(new BusLifeCycleListener() {
                     public void initComplete() {
@@ -116,7 +118,7 @@ public class BusDefinitionParserTest extends Assert {
                     public void postShutdown() {
                         b.set(true);
                     }
-                    
+
                 });
         } finally {
             if (context != null) {
@@ -133,7 +135,7 @@ public class BusDefinitionParserTest extends Assert {
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i instanceof LoggingInInterceptor) {
+            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
                 found = true;
             }
         }
@@ -143,18 +145,18 @@ public class BusDefinitionParserTest extends Assert {
     static class TestBean {
 
         boolean initialised;
-        
+
         @PostConstruct
         public void initialise() {
             initialised = true;
         }
     }
-    
+
     static class TestFeature extends AbstractFeature {
-        
+
         boolean initialised;
         TestBean testBean;
-        
+
         @PostConstruct
         public void initialise() {
             initialised = true;
@@ -164,5 +166,5 @@ public class BusDefinitionParserTest extends Assert {
             testBean = tb;
         }
     }
-    
+
 }

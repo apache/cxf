@@ -22,7 +22,7 @@ package org.apache.cxf.binding.soap.jms.interceptor;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *
  */
 public final class SoapJMSConstants {
 
@@ -30,7 +30,7 @@ public final class SoapJMSConstants {
     public static final String JMS_MESSAGE_TYPE = "JMSMessageType";
     public static final String TARGET_SERVICE_IN_REQUESTURI = "target.service.inrequesturi";
     public static final String MALFORMED_REQUESTURI = "malformed.requesturi";
-    
+
     // JMS Message properties' names.
     public static final String REQUESTURI_PARAMETER_NAME = "requestURI";
     public static final String BINDINGVERSION_PARAMETER_NAME = "bindingVersion";
@@ -39,7 +39,7 @@ public final class SoapJMSConstants {
     public static final String CONTENTTYPE_PARAMETER_NAME = "contentType";
     public static final String CONTENTENCODING_PARAMETER_NAME = "contentEncoding";
     public static final String ISFAULT_PARAMETER_NAME = "isFault";
-    
+
     // JMS Field name
     public static final String REQUESTURI_FIELD = SOAP_JMS_PREFIX + REQUESTURI_PARAMETER_NAME;
     public static final String BINDINGVERSION_FIELD = SOAP_JMS_PREFIX
@@ -52,7 +52,7 @@ public final class SoapJMSConstants {
 
     public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2010/soapjms/";
     public static final String SOAP_JMS_NAMESPACE = SOAP_JMS_SPECIFICIATION_TRANSPORTID;
-    
+
     // fault codes
     private static final String JMS_CONTENTTYPEMISMATCH_FAULT_CODE = "contentTypeMismatch";
     private static final String JMS_CONTENTENCODINGNOTSUPPORTED_FAULT_CODE = "contentEncodingNotSupported";
@@ -61,18 +61,18 @@ public final class SoapJMSConstants {
     private static final String JMS_MISSINGCONTENTTYPE_FAULT_CODE = "missingContentType";
     private static final String JMS_MISSINGSOAPACTION_FAULT_CODE = "missingSoapAction";
     private static final String JMS_MISSINGREQUESTURI_FAULT_CODE = "missingRequestURI";
-    private static final String JMS_TARGETSERVICENOTALLOWEDINREQUESTURI_FAULT_CODE = 
+    private static final String JMS_TARGETSERVICENOTALLOWEDINREQUESTURI_FAULT_CODE =
         "targetServiceNotAllowedInRequestURI";
     private static final String JMS_UNRECOGNIZEDBINDINGVERSION_FAULT_CODE = "unrecognizedBindingVersion";
     private static final String JMS_UNSUPPORTEDJMSMESSAGEFORMAT_FAULT_CODE = "unsupportedJMSMessageFormat";
 
     private SoapJMSConstants() {
     }
-    
+
     public static QName getContentTypeMismatchQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_CONTENTTYPEMISMATCH_FAULT_CODE);
     }
-    
+
     public static QName getContentEncodingNotSupportedQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_CONTENTENCODINGNOTSUPPORTED_FAULT_CODE);
     }
@@ -92,7 +92,7 @@ public final class SoapJMSConstants {
     public static QName getMissingSoapActionQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_MISSINGSOAPACTION_FAULT_CODE);
     }
-    
+
     public static QName getMissingRequestURIQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_MISSINGREQUESTURI_FAULT_CODE);
     }

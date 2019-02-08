@@ -28,7 +28,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import org.w3c.dom.Element;
-import org.apache.cxf.attachment.AttachmentUtil;
+
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
@@ -47,10 +47,10 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.AsymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.SymmetricBindingHandler;
 import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.message.WSSecHeader;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AsymmetricBinding;
@@ -60,12 +60,12 @@ import org.apache.wss4j.policy.model.TransportBinding;
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public static final String SECURITY_PROCESSED = PolicyBasedWSS4JOutInterceptor.class.getName() + ".DONE";
     public static final PolicyBasedWSS4JOutInterceptor INSTANCE = new PolicyBasedWSS4JOutInterceptor();
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JOutInterceptor.class);
 
-    
+
     private PolicyBasedWSS4JOutInterceptorInternal ending;
-    private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();    
+    private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
 
     public PolicyBasedWSS4JOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
@@ -75,8 +75,8 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
 
     public void handleMessage(SoapMessage mc) throws Fault {
-        boolean enableStax = 
-            MessageUtils.isTrue(mc.getContextualProperty(SecurityConstants.ENABLE_STREAMING_SECURITY));
+        boolean enableStax =
+            MessageUtils.getContextualBoolean(mc, SecurityConstants.ENABLE_STREAMING_SECURITY);
         if (!enableStax) {
             if (mc.getContent(SOAPMessage.class) == null) {
                 saajOut.handleMessage(mc);
@@ -84,16 +84,16 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             mc.put(SECURITY_PROCESSED, Boolean.TRUE);
             mc.getInterceptorChain().add(ending);
         }
-    }    
+    }
     public void handleFault(SoapMessage message) {
         saajOut.handleFault(message);
-    } 
-    
+    }
+
     public final PolicyBasedWSS4JOutInterceptorInternal createEndingInterceptor() {
         return new PolicyBasedWSS4JOutInterceptorInternal();
     }
-    
-    public final class PolicyBasedWSS4JOutInterceptorInternal 
+
+    public final class PolicyBasedWSS4JOutInterceptorInternal
         implements PhaseInterceptor<SoapMessage> {
         public PolicyBasedWSS4JOutInterceptorInternal() {
             super();
@@ -113,7 +113,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 }
             }
         }
-        
+
         private void handleMessageInternal(SoapMessage message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             if (aim == null) {
@@ -122,18 +122,12 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             }
             SOAPMessage saaj = message.getContent(SOAPMessage.class);
 
-            boolean mustUnderstand = 
+            boolean mustUnderstand =
                 MessageUtils.getContextualBoolean(
                     message, SecurityConstants.MUST_UNDERSTAND, true
                 );
             String actor = (String)message.getContextualProperty(SecurityConstants.ACTOR);
-            
-            if (AttachmentUtil.isMtomEnabled(message) && hasAttachments(message)) {
-                LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is "
-                    + "referenced in the SOAP Body, only the reference will be signed and not the "
-                    + "SOAP Body!");
-            }
-            
+
             // extract Assertion information
             AbstractBinding binding = PolicyUtils.getSecurityBinding(aim);
 
@@ -167,13 +161,13 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                 }
                 translateProperties(message);
 
-                String asymSignatureAlgorithm = 
+                String asymSignatureAlgorithm =
                     (String)message.getContextualProperty(SecurityConstants.ASYMMETRIC_SIGNATURE_ALGORITHM);
                 if (asymSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
                     binding.getAlgorithmSuite().setAsymmetricSignature(asymSignatureAlgorithm);
                 }
-                
-                String symSignatureAlgorithm = 
+
+                String symSignatureAlgorithm =
                     (String)message.getContextualProperty(SecurityConstants.SYMMETRIC_SIGNATURE_ALGORITHM);
                 if (symSignatureAlgorithm != null && binding.getAlgorithmSuite() != null) {
                     binding.getAlgorithmSuite().setSymmetricSignature(symSignatureAlgorithm);
@@ -200,14 +194,9 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     el.getParentNode().removeChild(el);
                 }
             }
-            
+
         }
-        
-        private boolean hasAttachments(SoapMessage mc) {
-            final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
-            return attachments != null && attachments.size() > 0;
-        }
-        
+
         public Set<String> getAfter() {
             return Collections.emptySet();
         }
@@ -228,16 +217,16 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
             //nothing
         }
 
-        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>> 
+        public Collection<PhaseInterceptor<? extends org.apache.cxf.message.Message>>
         getAdditionalInterceptors() {
-            
+
             return null;
         }
-        
+
         private void translateProperties(SoapMessage msg) {
             String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
             if (bspCompliant != null) {
-                msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
+                msg.put(ConfigurationConstants.IS_BSP_COMPLIANT, bspCompliant);
             }
         }
     }

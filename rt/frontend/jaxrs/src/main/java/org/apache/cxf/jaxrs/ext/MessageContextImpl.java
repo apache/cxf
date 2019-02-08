@@ -45,6 +45,7 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.attachment.HeaderSizeExceededException;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
@@ -55,6 +56,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
 import org.apache.cxf.jaxrs.interceptor.AttachmentOutputInterceptor;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -68,7 +70,7 @@ public class MessageContextImpl implements MessageContext {
     public MessageContextImpl(Message m) {
         this.m = m;
     }
-    
+
     public Object get(Object key) {
         String keyValue = key.toString();
         if (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS.equals(keyValue)
@@ -78,12 +80,14 @@ public class MessageContextImpl implements MessageContext {
             } catch (CacheSizeExceededException e) {
                 m.getExchange().put("cxf.io.cacheinput", Boolean.FALSE);
                 throw new WebApplicationException(e, 413);
+            } catch (HeaderSizeExceededException e) {
+                throw new WebApplicationException(e, 413);
             }
         }
         if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
             return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
         }
-        
+
         Message currentMessage = getCurrentMessage();
         Object value = currentMessage.get(key);
         if (value == null) {
@@ -92,7 +96,7 @@ public class MessageContextImpl implements MessageContext {
             }
             Exchange exchange = currentMessage.getExchange();
             if (exchange != null) {
-                Message otherMessage = exchange.getInMessage() == currentMessage 
+                Message otherMessage = exchange.getInMessage() == currentMessage
                     ? exchange.getOutMessage() : exchange.getInMessage();
                 if (otherMessage != null) {
                     value = otherMessage.get(key);
@@ -101,10 +105,10 @@ public class MessageContextImpl implements MessageContext {
                     value = m.getExchange().get(key);
                 }
             }
-        } 
+        }
         return value;
     }
-    
+
     private Message getCurrentMessage() {
         Message currentMessage = JAXRSUtils.getCurrentMessage();
         if (currentMessage == null) {
@@ -117,38 +121,37 @@ public class MessageContextImpl implements MessageContext {
         if (MessageUtils.isRequestor(m) && m.getExchange().getInMessage() != null) {
             Message inMessage = m.getExchange().getInMessage();
             return inMessage.getContent(format);
-        } 
+        }
         return m.getContent(format);
     }
-    
+
     public Object getContextualProperty(Object key) {
         Object value = m.getContextualProperty(key.toString());
         if (value == null && key.getClass() == Class.class) {
             return m.getExchange().get((Class<?>)key);
-        } else {
-            return value;
         }
+        return value;
     }
 
     public <T> T getContext(Class<T> contextClass) {
         return getContext(contextClass, contextClass);
     }
-    
+
     protected <T> T getContext(Type genericType, Class<T> clazz) {
         return JAXRSUtils.createContextValue(m, genericType, clazz);
     }
-    
+
     public <T, E> T getResolver(Class<T> resolverClazz, Class<E> resolveClazz) {
         if (ContextResolver.class == resolverClazz) {
             return resolverClazz.cast(getContext(resolveClazz, ContextResolver.class));
         }
         return null;
     }
-    
+
     public Request getRequest() {
         return getContext(Request.class);
     }
-    
+
     public HttpHeaders getHttpHeaders() {
         return getContext(HttpHeaders.class);
     }
@@ -164,7 +167,7 @@ public class MessageContextImpl implements MessageContext {
     public UriInfo getUriInfo() {
         return getContext(UriInfo.class);
     }
-    
+
     public HttpServletRequest getHttpServletRequest() {
         try {
             return getContext(HttpServletRequest.class);
@@ -176,7 +179,7 @@ public class MessageContextImpl implements MessageContext {
     public HttpServletResponse getHttpServletResponse() {
         return getContext(HttpServletResponse.class);
     }
-    
+
     public ServletConfig getServletConfig() {
         return getContext(ServletConfig.class);
     }
@@ -192,14 +195,14 @@ public class MessageContextImpl implements MessageContext {
         Message currentMessage = getCurrentMessage();
         currentMessage.put(key.toString(), value);
         currentMessage.getExchange().put(key.toString(), value);
-            
+
     }
 
     private void convertToAttachments(Object value) {
         List<?> handlers = (List<?>)value;
-        List<org.apache.cxf.message.Attachment> atts = 
-            new ArrayList<org.apache.cxf.message.Attachment>();
-        
+        List<org.apache.cxf.message.Attachment> atts =
+            new ArrayList<>();
+
         for (int i = 1; i < handlers.size(); i++) {
             Attachment handler = (Attachment)handlers.get(i);
             AttachmentImpl att = new AttachmentImpl(handler.getContentId(), handler.getDataHandler());
@@ -213,32 +216,32 @@ public class MessageContextImpl implements MessageContext {
         outMessage.setAttachments(atts);
         outMessage.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, "true");
         Attachment root = (Attachment)handlers.get(0);
-        
+
         String rootContentType = root.getContentType().toString();
-        MultivaluedMap<String, String> rootHeaders = new MetadataMap<String, String>(root.getHeaders());
+        MultivaluedMap<String, String> rootHeaders = new MetadataMap<>(root.getHeaders());
         if (!AttachmentUtil.isMtomEnabled(outMessage)) {
             rootHeaders.putSingle(Message.CONTENT_TYPE, rootContentType);
         }
-        
+
         String messageContentType = outMessage.get(Message.CONTENT_TYPE).toString();
         int index = messageContentType.indexOf(";type");
         if (index > 0) {
             messageContentType = messageContentType.substring(0, index).trim();
         }
-        AttachmentOutputInterceptor attInterceptor =          
+        AttachmentOutputInterceptor attInterceptor =
             new AttachmentOutputInterceptor(messageContentType, rootHeaders);
-        
+
         outMessage.put(Message.CONTENT_TYPE, rootContentType);
-        Map<String, List<String>> allHeaders = 
+        Map<String, List<String>> allHeaders =
             CastUtils.cast((Map<?, ?>)outMessage.get(Message.PROTOCOL_HEADERS));
         if (allHeaders != null) {
             allHeaders.remove(Message.CONTENT_TYPE);
         }
         attInterceptor.handleMessage(outMessage);
     }
-    
+
     private Message getOutMessage() {
-        
+
         Message message = m.getExchange().getOutMessage();
         if (message == null) {
             Endpoint ep = m.getExchange().getEndpoint();
@@ -247,51 +250,54 @@ public class MessageContextImpl implements MessageContext {
             message = ep.getBinding().createMessage(message);
             m.getExchange().setOutMessage(message);
         }
-        
+
         return message;
     }
-    
+
     private MultipartBody createAttachments(String propertyName) {
         Message inMessage = m.getExchange().getInMessage();
         boolean embeddedAttachment = inMessage.get("org.apache.cxf.multipart.embedded") != null;
-        
+
         Object o = inMessage.get(propertyName);
         if (o != null) {
             return (MultipartBody)o;
         }
-        
+
         if (embeddedAttachment) {
             inMessage = new MessageImpl();
             inMessage.setExchange(new ExchangeImpl());
-            inMessage.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, 
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY,
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_DIRECTORY));
-            inMessage.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD,
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD));
             inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE,
                 m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_SIZE));
-            inMessage.setContent(InputStream.class, 
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE,
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MAX_HEADER_SIZE));
+            inMessage.setContent(InputStream.class,
                 m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.input"));
-            inMessage.put(Message.CONTENT_TYPE, 
+            inMessage.put(Message.CONTENT_TYPE,
                 m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.ctype").toString());
         }
-        
-        
+
+
         new AttachmentInputInterceptor().handleMessage(inMessage);
-    
-        List<Attachment> newAttachments = new LinkedList<Attachment>();
+
+        List<Attachment> newAttachments = new LinkedList<>();
         try {
-            Map<String, List<String>> headers 
+            Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)inMessage.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS));
+
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
-                                     inMessage.getContent(InputStream.class), 
+                                     inMessage.getContent(InputStream.class),
                                      headers),
                                      new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {
-            throw new WebApplicationException(500);
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
-        
-    
+
+
         Collection<org.apache.cxf.message.Attachment> childAttachments = inMessage.getAttachments();
         if (childAttachments == null) {
             childAttachments = Collections.emptyList();
@@ -300,12 +306,12 @@ public class MessageContextImpl implements MessageContext {
         for (org.apache.cxf.message.Attachment a : childAttachments) {
             newAttachments.add(new Attachment(a, new ProvidersImpl(inMessage)));
         }
-        MediaType mt = embeddedAttachment 
+        MediaType mt = embeddedAttachment
             ? (MediaType)inMessage.get("org.apache.cxf.multipart.embedded.ctype")
             : getHttpHeaders().getMediaType();
         MultipartBody body = new MultipartBody(newAttachments, mt, false);
         inMessage.put(propertyName, body);
         return body;
     }
-       
+
 }

@@ -28,8 +28,8 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.easymock.EasyMock;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 
 public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingInterceptorTest {
@@ -42,7 +42,7 @@ public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingIn
         ex.put(Service.class, service);
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
         EasyMock.expect(service.get(MethodDispatcher.class.getName())).andReturn(md).anyTimes();
-        
+
         BindingOperationInfo boi = EasyMock.createMock(BindingOperationInfo.class);
         ex.put(BindingOperationInfo.class, boi);
         EasyMock.expect(md.getMethod(boi)).andReturn(null);
@@ -51,20 +51,19 @@ public class OperationInfoAuthorizingInterceptorTest extends SimpleAuthorizingIn
         EasyMock.expect(boi.getOperationInfo()).andReturn(opinfo).anyTimes();
         EasyMock.replay(service, md, boi, opinfo);
     }
-    
+
     @Override
     protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptor() {
         return new OperationInfoAuthorizingInterceptor();
     }
-    
+
     @Override
     protected SimpleAuthorizingInterceptor createSimpleAuthorizingInterceptorWithDenyRoles(final String role) {
-        SimpleAuthorizingInterceptor in = new OperationInfoAuthorizingInterceptor() {
+        return new OperationInfoAuthorizingInterceptor() {
             @Override
             public List<String> getDenyRoles(String key) {
                 return Collections.singletonList(role);
             }
         };
-        return in;
     }
 }

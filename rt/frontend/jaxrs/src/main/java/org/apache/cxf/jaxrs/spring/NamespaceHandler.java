@@ -24,12 +24,12 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("server", new JAXRSServerFactoryBeanDefinitionParser());        
-        registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());    
-        
+        registerBeanDefinitionParser("server", new JAXRSServerFactoryBeanDefinitionParser());
+        registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());
+
         //for 2.x client object parsing
-        MappingBeanDefinitionParser mapping = 
+        MappingBeanDefinitionParser mapping =
             new MappingBeanDefinitionParser("http://cxf.apache.org/jaxrs", "http://cxf.apache.org/jaxrs-client");
-        registerBeanDefinitionParser("client", mapping); 
+        registerBeanDefinitionParser("client", mapping);
     }
 }

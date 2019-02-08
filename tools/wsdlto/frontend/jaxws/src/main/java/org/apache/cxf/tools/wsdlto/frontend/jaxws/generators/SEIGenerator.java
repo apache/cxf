@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
@@ -58,7 +58,6 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
     }
 
     private boolean hasHandlerConfig(JavaInterface intf) {
-        // TODO : enbale handler chain
         return intf.getHandlerChains() != null;
 
     }
@@ -71,10 +70,10 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
 
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
-        
+
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-    
-            if (interfaces.size() == 0) {
+
+            if (interfaces.isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);
@@ -84,14 +83,14 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 continue;
             }
             for (JavaInterface intf : interfaces.values()) {
-    
+
                 if (hasHandlerConfig(intf)) {
                     HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
                     // REVISIT: find a better way to handle Handler gen, should not
                     // pass JavaInterface around.
                     handlerGen.setJavaInterface(intf);
                     handlerGen.generate(getEnvironment());
-    
+
                     JAnnotation annot = handlerGen.getHandlerAnnotation();
                     if (handlerGen.getHandlerAnnotation() != null) {
                         boolean existHandlerAnno = false;
@@ -108,7 +107,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 }
                 if (penv.containsKey(ToolConstants.RUNTIME_DATABINDING_CLASS)) {
                     JAnnotation ann = new JAnnotation(DataBinding.class);
-                    JAnnotationElement el 
+                    JAnnotationElement el
                         = new JAnnotationElement(null,
                                                  penv.get(ToolConstants.RUNTIME_DATABINDING_CLASS),
                                                  true);
@@ -129,15 +128,15 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 if (!StringUtils.isEmpty(seiSc)) {
                     seiSc += " ";
                 }
-                setAttributes("sei-superinterface-string", seiSc);                        
+                setAttributes("seiSuperinterfaceString", seiSc);
                 setCommonAttributes();
-    
+
                 doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));
-    
+
             }
         }
     }
-    
+
     public void register(final ClassCollector collector, String packageName, String fileName) {
         collector.addSeiClassName(packageName, fileName, packageName + "." + fileName);
     }

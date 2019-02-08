@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider;
 import org.apache.cxf.rs.security.jose.common.JoseType;
@@ -47,25 +47,25 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public final class BigQueryServer {
     private BigQueryServer() {
     }
-    
+
     public static void main(String[] args) throws Exception {
         final String pc12File = args[0];
         final String keySecret = args[1];
         final String issuer = args[2];
         final String projectId = args[3];
-        
+
         PrivateKey privateKey = loadPrivateKey(pc12File, keySecret);
-        
-        
+
+
         ClientAccessToken accessToken = getAccessToken(privateKey, issuer);
-        
-        WebClient bigQueryClient = WebClient.create("https://www.googleapis.com/bigquery/v2/projects/" 
+
+        WebClient bigQueryClient = WebClient.create("https://www.googleapis.com/bigquery/v2/projects/"
                                                     + projectId + "/queries",
                                                     Collections.singletonList(new JsonMapObjectProvider()));
         bigQueryClient.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
-        
+
         List<ShakespeareText> texts = BigQueryService.getMatchingTexts(bigQueryClient, accessToken, "brave", "10");
-        
+
         System.out.println("Matching texts:");
         for (ShakespeareText text : texts) {
             System.out.println(text.getText() + ":" + text.getDate());
@@ -77,33 +77,34 @@ public final class BigQueryServer {
         JwtClaims claims = new JwtClaims();
         claims.setIssuer(issuer);
         claims.setAudience("https://www.googleapis.com/oauth2/v3/token");
-        
+
         long issuedAt = OAuthUtils.getIssuedAt();
         claims.setIssuedAt(issuedAt);
         claims.setExpiryTime(issuedAt + 60 * 60);
         claims.setProperty("scope", "https://www.googleapis.com/auth/bigquery.readonly");
-        
+
         JwtToken token = new JwtToken(headers, claims);
         JwsJwtCompactProducer p = new JwsJwtCompactProducer(token);
         String base64UrlAssertion = p.signWith(privateKey);
-        
+
         JwtBearerGrant grant = new JwtBearerGrant(base64UrlAssertion);
-        
+
         WebClient accessTokenService = WebClient.create("https://www.googleapis.com/oauth2/v3/token",
                                                         Arrays.asList(new OAuthJSONProvider(),
                                                                       new AccessTokenGrantWriter()));
         WebClient.getConfig(accessTokenService).getInInterceptors().add(new LoggingInInterceptor());
-        
+
         accessTokenService.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
-        
+
         return accessTokenService.post(grant, ClientAccessToken.class);
     }
 
     private static PrivateKey loadPrivateKey(String p12File, String password) throws Exception {
-        InputStream is = new FileInputStream(p12File);
-        KeyStore store = KeyStore.getInstance("PKCS12");
-        store.load(is, password.toCharArray());
-        return (PrivateKey)store.getKey("privateKey", password.toCharArray());
+        try (InputStream is = new FileInputStream(p12File)) {
+            KeyStore store = KeyStore.getInstance("PKCS12");
+            store.load(is, password.toCharArray());
+            return (PrivateKey)store.getKey("privateKey", password.toCharArray());
+        }
     }
 
 }

@@ -63,8 +63,8 @@ public final class ValidatorUtil {
 
     public static SchemaCollection getSchema(final Definition def) {
         ServiceInfo serviceInfo = new ServiceInfo();
-        new SchemaUtil(BusFactory.getThreadDefaultBus(), 
-                       new HashMap<String, Element>()).getSchemas(def, 
+        new SchemaUtil(BusFactory.getThreadDefaultBus(),
+                       new HashMap<String, Element>()).getSchemas(def,
                                                                   serviceInfo);
         return serviceInfo.getXmlSchemaCollection();
     }
@@ -72,17 +72,17 @@ public final class ValidatorUtil {
     /**
      * Get a list of schemas found in a wsdl Document.
      * The list will include any schemas from imported wsdls.
-     * 
+     *
      * @param document The wsdl Document.
      * @param baseURI The URI of the wsdl. Allows schemas with relative
-     *                paths to be resolved. 
+     *                paths to be resolved.
      * @return XmlSchemaCollection list
      * @throws IOException
      * @throws SAXException
      */
     public static List<SchemaCollection> getSchemaList(Document document,
             String baseURI) throws IOException, SAXException {
-        List<SchemaCollection> schemaList = new ArrayList<SchemaCollection>();
+        List<SchemaCollection> schemaList = new ArrayList<>();
         if (document == null) {
             return schemaList;
         }
@@ -91,9 +91,9 @@ public final class ValidatorUtil {
             baseURI = URLEncoder.encode(baseURI, "utf-8");
             SchemaCollection schemaCol = new SchemaCollection();
             schemaCol.setBaseUri(baseURI);
-            
-            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(), 
-                                                                         WSDLConstants.NS_SCHEMA_XSD, 
+
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(),
+                                                                         WSDLConstants.NS_SCHEMA_XSD,
                                                                          "schema");
             for (Element schemaEl : elemList) {
                 String tns = schemaEl.getAttribute("targetNamespace");
@@ -101,12 +101,10 @@ public final class ValidatorUtil {
                     schemaCol.read(schemaEl, tns);
                 } catch (RuntimeException ex) {
                     LOG.log(Level.WARNING, "SCHEMA_READ_FAIL", tns);
-                    //
                     // Couldn't find schema... check if it's relative to wsdl.
-                    // XXX - Using setBaseUri() on the XmlSchemaCollection,
+                    // Using setBaseUri() on the XmlSchemaCollection,
                     // only seems to work for the first imported xsd... so pass
                     // in the baseURI here.
-                    //
                     try {
                         schemaCol.read(schemaEl, baseURI);
                     } catch (RuntimeException ex2) {
@@ -116,22 +114,22 @@ public final class ValidatorUtil {
                 }
             }
             schemaList.add(schemaCol);
-            
+
             // Now add schemas from imported wsdl files.
             Map<String, Document> wsdlImports = getImportedWsdlMap(
                 document, baseURI);
             for (Document wsdlImport : wsdlImports.values()) {
                 schemaList.addAll(getSchemaList(wsdlImport, baseURI));
             }
-        }        
+        }
         return schemaList;
     }
-    
+
     /**
      * Get a map of wsdls imported by the given wsdl.  Keys in the
      * map are the imported namespaces.  Values are the imported
      * wsdl Documents.
-     * 
+     *
      * @param document The wsdl Document
      * @param basePath The path of the wsdl
      * @return map of imported wsdls
@@ -140,21 +138,22 @@ public final class ValidatorUtil {
      */
     public static Map<String, Document> getImportedWsdlMap(Document document,
         String basePath) throws IOException, SAXException {
-        Map<String, Document> docMap = new HashMap<String, Document>();
+        Map<String, Document> docMap = new HashMap<>();
         if (document == null) {
             return docMap;
         }
-        
+
         DocumentBuilder docBuilder = null;
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             docFactory.setNamespaceAware(true);
             docFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            docFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             docBuilder = docFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             throw new ToolException(e);
         }
-        
+
         //
         // Remove the scheme part of a URI - need to escape spaces in
         // case we are on Windows and have spaces in directory names.
@@ -165,9 +164,9 @@ public final class ValidatorUtil {
         } catch (URISyntaxException e1) {
             // This will be problematic...
         }
-        
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(), 
-                                                                     WSDLConstants.NS_WSDL11, 
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(document.getDocumentElement(),
+                                                                     WSDLConstants.NS_WSDL11,
                                                                      "import");
         for (Element elem : elemList) {
             NamedNodeMap attributes = elem.getAttributes();

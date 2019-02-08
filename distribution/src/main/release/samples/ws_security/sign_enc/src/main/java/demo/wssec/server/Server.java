@@ -37,7 +37,7 @@ import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
  * A DOM-based server
  */
 public class Server {
-    private static final String WSSE_NS 
+    private static final String WSSE_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
     private static final String WSU_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
@@ -48,8 +48,8 @@ public class Server {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         EndpointImpl endpoint = (EndpointImpl)Endpoint.publish(address, implementor);
-        
-        Map<String, Object> outProps = new HashMap<String, Object>();
+
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "UsernameToken Timestamp Signature Encrypt");
 
         outProps.put("passwordType", "PasswordText");
@@ -69,13 +69,13 @@ public class Server {
         outProps.put("signatureParts", "{Element}{" + WSU_NS + "}Timestamp;"
                          + "{Element}{http://schemas.xmlsoap.org/soap/envelope/}Body");
 
-        outProps.put("encryptionKeyTransportAlgorithm", 
+        outProps.put("encryptionKeyTransportAlgorithm",
                          "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
         outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
         endpoint.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
-        Map<String, Object> inProps = new HashMap<String, Object>();
+        Map<String, Object> inProps = new HashMap<>();
 
         inProps.put("action", "UsernameToken Timestamp Signature Encrypt");
         inProps.put("passwordType", "PasswordDigest");
@@ -86,7 +86,7 @@ public class Server {
 
         inProps.put("signaturePropFile", "etc/Server_SignVerf.properties");
         inProps.put("signatureKeyIdentifier", "DirectReference");
-        inProps.put("encryptionKeyTransportAlgorithm", 
+        inProps.put("encryptionKeyTransportAlgorithm",
                     "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p");
         inProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
@@ -102,13 +102,13 @@ public class Server {
 
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = Server.class.getResource("wssec.xml");
         Bus bus = bf.createBus(busFile.toString());
 
-        
+
         BusFactory.setDefaultBus(bus);
 
         new Server();

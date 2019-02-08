@@ -29,19 +29,19 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
-@WebService(serviceName = "NumberFactoryService", 
-            portName = "NumberFactoryPort", 
-            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory", 
+@WebService(serviceName = "NumberFactoryService",
+            portName = "NumberFactoryPort",
+            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class ManualNumberFactoryImpl extends NumberFactoryImpl {
 
     public ManualNumberFactoryImpl(Bus b, String p) {
         super(b, p);
     }
-    
+
     public W3CEndpointReference create(String id) {
         manageNumberServantInitialisation();
-        
+
         // manually force id into address context as context appendage
         EndpointReferenceType epr = EndpointReferenceUtils.duplicate(templateEpr);
         EndpointReferenceUtils.setAddress(epr, EndpointReferenceUtils.getAddress(epr) + id);
@@ -54,7 +54,7 @@ public class ManualNumberFactoryImpl extends NumberFactoryImpl {
 
         String wsdlLocation = "testutils/factory_pattern.wsdl";
         String bindingId = null;
-        EndpointImpl ep = 
+        EndpointImpl ep =
             new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(getServantAddressRoot());

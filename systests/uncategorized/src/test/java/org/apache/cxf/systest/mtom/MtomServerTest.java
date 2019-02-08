@@ -52,6 +52,10 @@ import org.apache.cxf.transport.MessageObserver;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MtomServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT1 = TestUtil.getPortNumber(MtomServerTest.class);
     public static final String PORT2 = TestUtil.getPortNumber(MtomServerTest.class, 2);
@@ -65,7 +69,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         createStaticBus();
         testUtilities.setBus(getStaticBus());
     }
-    
+
     @Test
     public void testMtomRequest() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -73,7 +77,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         sf.setBus(getStaticBus());
         String address = "http://localhost:" + PORT1 + "/EchoService";
         sf.setAddress(address);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(Message.MTOM_ENABLED, "true");
         sf.setProperties(props);
         sf.create();
@@ -122,10 +126,10 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         assertEquals(1, attachments.size());
 
         Attachment inAtt = attachments.iterator().next();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
-        out.close();
-        assertEquals(27364, out.size());
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
+            assertEquals(27364, out.size());
+        }
     }
 
     @Test
@@ -135,7 +139,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         sf.setBus(getStaticBus());
         String address = "http://localhost:" + PORT2 + "/EchoService";
         sf.setAddress(address);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(Message.MTOM_ENABLED, "true");
         sf.setProperties(props);
         Server server = sf.create();
@@ -168,12 +172,13 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         if (is == null) {
             throw new RuntimeException("Could not find resource " + "request");
         }
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        IOUtils.copy(is, bout);
-        String s = bout.toString(StandardCharsets.UTF_8.name());
-        s = s.replaceAll(":9036/", ":" + PORT2 + "/");
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
+            IOUtils.copy(is, bout);
+            String s = bout.toString(StandardCharsets.UTF_8.name());
+            s = s.replaceAll(":9036/", ":" + PORT2 + "/");
 
-        os.write(s.getBytes(StandardCharsets.UTF_8));
+            os.write(s.getBytes(StandardCharsets.UTF_8));
+        }
         os.flush();
         is.close();
         os.close();
@@ -191,12 +196,12 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         assertEquals(1, attachments.size());
 
         Attachment inAtt = attachments.iterator().next();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
-        out.close();
-        assertTrue("Wrong size: " + out.size()
-                   + "\n" + out.toString(),
-                   out.size() > 970 && out.size() < 1020);
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            IOUtils.copy(inAtt.getDataHandler().getInputStream(), out);
+            assertTrue("Wrong size: " + out.size()
+                    + "\n" + out.toString(),
+                    out.size() > 970 && out.size() < 1020);
+        }
         unregisterServStatic("http://localhost:" + PORT2 + "/policy.xsd");
 
     }

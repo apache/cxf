@@ -25,7 +25,7 @@ import java.util.Map;
 
 import javax.jws.WebService;
 
-@WebService(targetNamespace = "uri:org.apache.cxf.aegis.test.map", 
+@WebService(targetNamespace = "uri:org.apache.cxf.aegis.test.map",
     name = "StudentService")
 public interface StudentServiceDocLiteral {
 
@@ -36,7 +36,7 @@ public interface StudentServiceDocLiteral {
     List<Student> getStudents(Map<String, String> filters);
 
     List<Student> getStudentsByIds(List<String> ids);
-    
+
     //CHECKSTYLE:OFF
     void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData);
 

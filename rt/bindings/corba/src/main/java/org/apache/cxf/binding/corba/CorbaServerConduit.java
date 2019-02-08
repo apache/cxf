@@ -73,7 +73,7 @@ public class CorbaServerConduit implements Conduit {
         }
     }
 
-    public void close(Message message) throws IOException {        
+    public void close(Message message) throws IOException {
         if (message instanceof CorbaMessage) {
             buildRequestResult((CorbaMessage)message);
         }
@@ -109,17 +109,17 @@ public class CorbaServerConduit implements Conduit {
     public final String getAddress() {
         return endpointInfo.getAddress();
     }
-    
-    
-    public void buildRequestResult(CorbaMessage msg) {        
-        Exchange exg = msg.getExchange();        
+
+
+    public void buildRequestResult(CorbaMessage msg) {
+        Exchange exg = msg.getExchange();
         ServerRequest request = exg.get(ServerRequest.class);
         try {
-            if (!exg.isOneWay()) {                
+            if (!exg.isOneWay()) {
                 CorbaMessage inMsg = (CorbaMessage)msg.getExchange().getInMessage();
                 NVList list = inMsg.getList();
 
-                if (msg.getStreamableException() != null) {                    
+                if (msg.getStreamableException() != null) {
                     Any exAny = CorbaAnyHelper.createAny(orb);
                     CorbaStreamable exception = msg.getStreamableException();
                     exAny.insert_Streamable(exception);
@@ -134,7 +134,7 @@ public class CorbaServerConduit implements Conduit {
                             if (list.item(i).flags() != org.omg.CORBA.ARG_IN.value) {
                                 arguments[i].getObject().setIntoAny(list.item(i).value(),
                                                                     arguments[i], true);
-                            }   
+                            }
                         }
                     }
 
@@ -150,10 +150,10 @@ public class CorbaServerConduit implements Conduit {
         } catch (java.lang.Exception ex) {
             throw new CorbaBindingException("Exception during buildRequestResult", ex);
         }
-    }        
-    
+    }
+
     private class CorbaOutputStream extends CachedOutputStream {
-        
+
         CorbaOutputStream(Message m) {
         }
 

@@ -41,7 +41,7 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
         Endpoint e = ex.getEndpoint();
         Client c = ex.get(Client.class);
         InterceptorProvider ip = ex.get(InterceptorProvider.class);
-        
+
         chain.add(getBus().getInFaultInterceptors());
         if (c != null) {
             chain.add(c.getInFaultInterceptors());
@@ -54,25 +54,25 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
         if (e.getService().getDataBinding() instanceof InterceptorProvider) {
             chain.add(((InterceptorProvider)e.getService().getDataBinding()).getInFaultInterceptors());
         }
-        
+
         addToChain(chain, ex.getInFaultMessage());
         addToChain(chain, ex.getOutMessage());
     }
     private void addToChain(PhaseInterceptorChain chain, Message m) {
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
                 chain.add(p.getInFaultInterceptors());
             }
         }
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)m.get(Message.FAULT_IN_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }
     }
-    
+
     protected SortedSet<Phase> getPhases() {
         return getBus().getExtension(PhaseManager.class).getInPhases();
     }

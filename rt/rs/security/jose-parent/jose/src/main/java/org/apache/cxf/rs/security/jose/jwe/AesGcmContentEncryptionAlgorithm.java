@@ -28,28 +28,38 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
     private static final int DEFAULT_IV_SIZE = 96;
     public AesGcmContentEncryptionAlgorithm(ContentAlgorithm algo) {
-        this((byte[])null, null, algo);
+        this(algo, false);
+    }
+    public AesGcmContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
+        super(checkAlgorithm(algo), generateCekOnce);
     }
     public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, ContentAlgorithm algo) {
-        this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
+        this(CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
     }
     public AesGcmContentEncryptionAlgorithm(String encodedCek, ContentAlgorithm algo) {
-        this((byte[])CryptoUtils.decodeSequence(encodedCek), null, algo);
+        this(CryptoUtils.decodeSequence(encodedCek), null, algo);
     }
-    public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv, ContentAlgorithm algo) { 
-        this(key.getEncoded(), iv, algo);    
+    public AesGcmContentEncryptionAlgorithm(SecretKey key, ContentAlgorithm algo) {
+        this(key, (byte[])null, algo);
     }
-    public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
-        super(cek, iv, checkAlgorithm(algo));    
+    public AesGcmContentEncryptionAlgorithm(SecretKey key, byte[] iv, ContentAlgorithm algo) {
+        this(key.getEncoded(), iv, algo);
     }
-    protected int getIvSize() { 
+    public AesGcmContentEncryptionAlgorithm(byte[] cek, ContentAlgorithm algo) {
+        this(cek, (byte[])null, algo);
+    }
+    public AesGcmContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) {
+        super(cek, iv, checkAlgorithm(algo));
+    }
+    protected int getIvSize() {
         return DEFAULT_IV_SIZE;
     }
     private static ContentAlgorithm checkAlgorithm(ContentAlgorithm algo) {
-        if (AlgorithmUtils.isAesGcm(algo.getJwaName())) {       
+        if (AlgorithmUtils.isAesGcm(algo.getJwaName())) {
             return algo;
         }
         LOG.warning("Invalid content encryption algorithm");
         throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
     }
+    
 }

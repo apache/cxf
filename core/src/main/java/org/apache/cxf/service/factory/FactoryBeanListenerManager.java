@@ -29,47 +29,48 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class FactoryBeanListenerManager {
     Bus bus;
-    
+
     CopyOnWriteArrayList<FactoryBeanListener> listeners
-        = new CopyOnWriteArrayList<FactoryBeanListener>();
-    
+        = new CopyOnWriteArrayList<>();
+
     public FactoryBeanListenerManager() {
         listeners.add(new AnnotationsFactoryBeanListener());
+        listeners.add(new OldLoggingFactoryBeanListener());
     }
     public FactoryBeanListenerManager(Bus b) {
         this();
         setBus(b);
     }
-    
+
     @Resource
     public final void setBus(Bus bus) {
         this.bus = bus;
-        
+
         this.bus.setExtension(this, FactoryBeanListenerManager.class);
-        
+
         ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
         if (loc != null) {
             for (FactoryBeanListener f : loc.getBeansOfType(FactoryBeanListener.class)) {
-                listeners.addIfAbsent(f);
+                listeners.add(0, f);
             }
         }
     }
-    
+
     public List<FactoryBeanListener> getListeners() {
         return listeners;
     }
-    
+
     public void addListener(FactoryBeanListener l) {
         listeners.addIfAbsent(l);
     }
-    
+
     public void removeListener(FactoryBeanListener l) {
         listeners.remove(l);
     }
-    
+
 }

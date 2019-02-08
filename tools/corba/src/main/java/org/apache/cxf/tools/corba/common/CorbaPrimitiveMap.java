@@ -27,18 +27,18 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.CorbaType;
 
 public class CorbaPrimitiveMap extends PrimitiveMapBase {
-    
+
     public CorbaPrimitiveMap() {
-        corbaPrimitiveMap = new HashMap<String, QName>();        
+        corbaPrimitiveMap = new HashMap<>();
         initialiseMap();
-    }       
+    }
 
     private void initialiseMap() {
-        
-        corbaPrimitiveMap.put("string", CorbaConstants.NT_CORBA_STRING); 
+
+        corbaPrimitiveMap.put("string", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("boolean", CorbaConstants.NT_CORBA_BOOLEAN);
         corbaPrimitiveMap.put("float", CorbaConstants.NT_CORBA_FLOAT);
-        corbaPrimitiveMap.put("double", CorbaConstants.NT_CORBA_DOUBLE);       
+        corbaPrimitiveMap.put("double", CorbaConstants.NT_CORBA_DOUBLE);
         corbaPrimitiveMap.put("dateTime", CorbaConstants.NT_CORBA_DATETIME);
         corbaPrimitiveMap.put("date", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("time", CorbaConstants.NT_CORBA_STRING);
@@ -50,30 +50,30 @@ public class CorbaPrimitiveMap extends PrimitiveMapBase {
         corbaPrimitiveMap.put("duration", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("anyURI", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("QName", CorbaConstants.NT_CORBA_STRING);
-        corbaPrimitiveMap.put("normalizedString", CorbaConstants.NT_CORBA_STRING);                
+        corbaPrimitiveMap.put("normalizedString", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("token", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("language", CorbaConstants.NT_CORBA_STRING);
-        corbaPrimitiveMap.put("NMTOKEN", CorbaConstants.NT_CORBA_STRING);                   
+        corbaPrimitiveMap.put("NMTOKEN", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("Name", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("NCName", CorbaConstants.NT_CORBA_STRING);
         corbaPrimitiveMap.put("ID", CorbaConstants.NT_CORBA_STRING);
-        corbaPrimitiveMap.put("integer", CorbaConstants.NT_CORBA_LONGLONG);        
+        corbaPrimitiveMap.put("integer", CorbaConstants.NT_CORBA_LONGLONG);
         corbaPrimitiveMap.put("short", CorbaConstants.NT_CORBA_SHORT);
         corbaPrimitiveMap.put("byte", CorbaConstants.NT_CORBA_CHAR);
         corbaPrimitiveMap.put("int", CorbaConstants.NT_CORBA_LONG);
         corbaPrimitiveMap.put("long", CorbaConstants.NT_CORBA_LONGLONG);
         corbaPrimitiveMap.put("nonPositiveInteger", CorbaConstants.NT_CORBA_LONGLONG);
         corbaPrimitiveMap.put("negativeInteger", CorbaConstants.NT_CORBA_LONGLONG);
-        corbaPrimitiveMap.put("nonNegativeInteger", CorbaConstants.NT_CORBA_ULONGLONG);                
-        corbaPrimitiveMap.put("positiveInteger", CorbaConstants.NT_CORBA_ULONGLONG);                
+        corbaPrimitiveMap.put("nonNegativeInteger", CorbaConstants.NT_CORBA_ULONGLONG);
+        corbaPrimitiveMap.put("positiveInteger", CorbaConstants.NT_CORBA_ULONGLONG);
         corbaPrimitiveMap.put("unsignedInt", CorbaConstants.NT_CORBA_ULONG);
-        corbaPrimitiveMap.put("unsignedLong", CorbaConstants.NT_CORBA_ULONGLONG);                
+        corbaPrimitiveMap.put("unsignedLong", CorbaConstants.NT_CORBA_ULONGLONG);
         corbaPrimitiveMap.put("unsignedShort", CorbaConstants.NT_CORBA_USHORT);
         corbaPrimitiveMap.put("unsignedByte", CorbaConstants.NT_CORBA_OCTET);
         corbaPrimitiveMap.put("anyType", CorbaConstants.NT_CORBA_ANY);
-        
+
     }
-    
+
     public Object get(QName key) {
         CorbaType corbaTypeImpl = null;
 
@@ -84,8 +84,8 @@ public class CorbaPrimitiveMap extends PrimitiveMapBase {
             corbaTypeImpl.setType(key);
             corbaTypeImpl.setName(key.getLocalPart());
         }
-        
-        return corbaTypeImpl;        
+
+        return corbaTypeImpl;
     }
 
 

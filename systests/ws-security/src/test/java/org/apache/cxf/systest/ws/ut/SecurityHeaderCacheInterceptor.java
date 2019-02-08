@@ -45,21 +45,21 @@ import org.apache.wss4j.dom.WSConstants;
  * clear() is called.
  */
 public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMessage> {
-    
-    private static final QName SEC_HEADER = 
+
+    private static final QName SEC_HEADER =
         new QName(WSConstants.WSSE_NS, WSConstants.WSSE_LN, WSConstants.WSSE_PREFIX);
-    private Set<String> afterInterceptors = new HashSet<String>();
+    private Set<String> afterInterceptors = new HashSet<>();
     private SOAPHeaderElement cachedSecurityHeader;
-    
+
     public SecurityHeaderCacheInterceptor() {
         getAfter().add(PolicyBasedWSS4JOutInterceptor.class.getName());
     }
-    
+
     public void handleMessage(SoapMessage mc) throws Fault {
         SOAPMessage saaj = mc.getContent(SOAPMessage.class);
         if (cachedSecurityHeader == null) {
             try {
-                Iterator<?> cachedHeadersIterator = 
+                Iterator<?> cachedHeadersIterator =
                     SAAJUtils.getHeader(saaj).getChildElements(SEC_HEADER);
                 if (cachedHeadersIterator.hasNext()) {
                     cachedSecurityHeader = (SOAPHeaderElement)cachedHeadersIterator.next();
@@ -70,18 +70,17 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
         } else {
             try {
                 saaj.getSOAPHeader().removeContents();
-                
-                SOAPHeaderElement secHeaderElement = 
+
+                SOAPHeaderElement secHeaderElement =
                     SAAJUtils.getHeader(saaj).addHeaderElement(SEC_HEADER);
-                
-                Iterator<?> cachedHeadersIterator = 
+
+                Iterator<?> cachedHeadersIterator =
                     cachedSecurityHeader.getChildElements();
                 while (cachedHeadersIterator.hasNext()) {
                     secHeaderElement.addChildElement((SOAPElement)cachedHeadersIterator.next());
                 }
-                
+
             } catch (SOAPException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -90,7 +89,7 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
     public void clear() {
         cachedSecurityHeader = null;
     }
-    
+
     public void handleFault(SoapMessage arg0) {
         // Complete
     }
@@ -114,5 +113,5 @@ public class SecurityHeaderCacheInterceptor implements PhaseInterceptor<SoapMess
     public String getPhase() {
         return Phase.PRE_PROTOCOL_ENDING;
     }
-    
+
 }

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<xs:schema targetNamespace="http://cxf.apache.org/transports/http-undertow/configuration" 
+           xmlns:tns="http://cxf.apache.org/transports/http-undertow/configuration" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+           xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" 
+           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+           xmlns:sec="http://cxf.apache.org/configuration/security"
+  		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  		   xmlns:ptp="http://cxf.apache.org/configuration/parameterized-types" 
+  		   xsi:schemaLocation="
+  		     http://www.springframework.org/schema/beans
+  		       http://www.springframework.org/schema/beans/spring-beans.xsd"
+           elementFormDefault="qualified" 
+           attributeFormDefault="unqualified"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           jaxb:version="2.0">
+
+    <xs:import namespace="http://cxf.apache.org/configuration/security"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
+    
+    <!-- Is this really supposed to be supperceeded by http-conf:HTTPListenerPolicy? -->
+    <xs:complexType name="ThreadingParametersType">
+       <xs:attribute name="minThreads" type="ptp:ParameterizedUShort">
+          <xs:annotation>
+             <xs:documentation>Specify the number of "core" threads for the worker task thread pool. Generally this should be reasonably high, at least 10 per CPU core.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="maxThreads" type="ptp:ParameterizedUShort">
+       <xs:annotation>
+             <xs:documentation>Specify the maximum number of threads for the worker task thread pool.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="workerIOThreads" type="ptp:ParameterizedUShort">
+       <xs:annotation>
+             <xs:documentation>Specify the number of I/O threads to create for the worker.  If not specified, a default will be chosen. One IO thread per CPU core is a reasonable default.</xs:documentation>
+          </xs:annotation>
+       </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="ThreadingParametersIdentifiedType">
+       <xs:sequence>
+         <xs:element name="threadingParameters" type="tns:ThreadingParametersType">
+            <xs:annotation>
+               <xs:documentation>Specifies the thread pool properties for the parameter set.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+       </xs:sequence>
+         <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+         </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="TLSServerParametersIdentifiedType">
+       <xs:sequence>
+          <xs:element name="tlsServerParameters" type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies the properties for the parameter set.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+       </xs:sequence>
+          <xs:attribute name="id" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>Specifies a unique identifier by which the property set can be referred.</xs:documentation>
+             </xs:annotation>
+          </xs:attribute>
+    </xs:complexType>
+    
+    <xs:complexType name="ParametersRefType">
+       <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+    
+    <xs:complexType name="UndertowHTTPServerEngineConfigType">
+       <xs:sequence>
+         <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="tlsServerParameters" 
+                      type="sec:TLSServerParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the security parameters for the Undertow instance.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+          <xs:element name="tlsServerParametersRef"
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of security parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+         </xs:choice>
+         <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="threadingParameters" 
+                      type="tns:ThreadingParametersType">
+             <xs:annotation>
+                <xs:documentation>Specifies an instance of the threading configuration use for the Undertow engine.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+          <xs:element name="threadingParametersRef"
+                      type="tns:ParametersRefType">
+             <xs:annotation>
+                <xs:documentation>Specifies a reference to a reusable set of threading parameters.</xs:documentation>
+             </xs:annotation>
+          </xs:element>
+         </xs:choice>         
+         <xs:element name="handlers" type="xsd:anyType" minOccurs="0"/>
+       </xs:sequence>
+       
+       <xs:attribute name="port" type="ptp:ParameterizedInt" use="required">
+             <xs:annotation>
+                <xs:documentation>Specifies the port used by the Undertow instance.
+                You can specify a value of 0 for the port attribute. Any threading 
+                properties specified in an engine element with its port attribute
+                set to 0 are used as the configuration for all Undertow listeners that are not explicitly configured.</xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="host" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>
+                  Specifies the listen address used by the Undertow instance.
+                  Value can be a hostname or ip address.
+                  If not specified, Undertow will listen on all local addresses.
+                </xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+       <xs:attribute name="continuationsEnabled" type="ptp:ParameterizedBoolean">
+           <xs:annotation>
+                <xs:documentation>Specifies if Undertow Continuations will be explicitly supported
+                by Undertow destinations. Continuations will be checked if this attribute is set to true or omitted, ignored otherwise.</xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
+
+       <xs:attribute name="maxIdleTime" type="ptp:ParameterizedInt">
+           <xs:annotation>  
+                <xs:documentation>Specifies the maximum idle time for a undertow connection. The timer is reset whenever there are any read or write actions on the underlying stream.</xs:documentation> 
+           </xs:annotation>
+       </xs:attribute>
+
+    </xs:complexType>
+    
+    <xs:complexType name="UndertowHTTPServerEngineFactoryConfigType">
+       <xs:sequence>
+           <xs:element name="identifiedTLSServerParameters" 
+                       type="tns:TLSServerParametersIdentifiedType"
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for securing an HTTP service provider.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="identifiedThreadingParameters"
+                       type="tns:ThreadingParametersIdentifiedType"
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies a reusable set of properties for controlling a Undertow instance's thread pool.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="engine" 
+                       type="tns:UndertowHTTPServerEngineConfigType" 
+                       minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>Specifies the configuration for a particular Undertow runtime instance.</xs:documentation>
+              </xs:annotation>
+           </xs:element>
+       </xs:sequence>
+       <xs:attribute name="bus" type="xs:string" default="cxf"/>
+       <xs:attribute name="id" type="xs:ID" use="optional"/>
+    </xs:complexType>
+    
+    <xs:element name="engine-factory" 
+                type="tns:UndertowHTTPServerEngineFactoryConfigType">
+       <xs:annotation>
+          <xs:documentation>Contains the configuration for a Undertow instance.</xs:documentation>
+       </xs:annotation>
+    </xs:element>
+ </xs:schema>

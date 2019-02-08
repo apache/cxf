@@ -22,15 +22,43 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.cxf.common.logging.LogUtils;
+
 public final class JAXBUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
+
     private JAXBUtils() {
-        
+
     }
+
+    public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class<?>[] extraClass,
+                                                Map<String, Object> contextProperties) {
+        if (classes == null || classes.isEmpty()) {
+            return null;
+        }
+        org.apache.cxf.common.jaxb.JAXBUtils.scanPackages(classes, extraClass, null);
+
+        JAXBContext ctx;
+        try {
+            ctx = JAXBContext.newInstance(classes.toArray(new Class[0]), contextProperties);
+            return ctx;
+        } catch (JAXBException ex) {
+            LOG.log(Level.SEVERE, "No JAXB context can be created", ex);
+        }
+        return null;
+    }
+
     public static void closeUnmarshaller(Unmarshaller u) {
         if (u instanceof Closeable) {
             //need to do this to clear the ThreadLocal cache
@@ -41,17 +69,17 @@ public final class JAXBUtils {
             } catch (IOException e) {
                 //ignore
             }
-        }        
+        }
     }
     public static Object convertWithAdapter(Object obj,
                                             Class<?> adapterClass,
                                             Annotation[] anns) {
-        return useAdapter(obj, 
+        return useAdapter(obj,
                           getAdapter(adapterClass, anns),
-                          false, 
+                          false,
                           obj);
     }
-    
+
     public static Class<?> getValueTypeFromAdapter(Class<?> expectedBoundType,
                                                    Class<?> defaultClass,
                                                    Annotation[] anns) {
@@ -66,7 +94,7 @@ public final class JAXBUtils {
         } catch (Throwable ex) {
             // ignore
         }
-        return defaultClass; 
+        return defaultClass;
     }
 
     public static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
@@ -76,20 +104,29 @@ public final class JAXBUtils {
             if (typeAdapter == null) {
                 // lets just try the 1st interface for now
                 Class<?>[] interfaces = objectClass.getInterfaces();
-                typeAdapter = interfaces.length > 0 
+                typeAdapter = interfaces.length > 0
                     ? interfaces[0].getAnnotation(XmlJavaTypeAdapter.class) : null;
             }
         }
         return typeAdapter;
     }
-    
+
     public static Class<?> getTypeFromAdapter(XmlJavaTypeAdapter adapter, Class<?> theType,
                                               boolean boundType) {
         if (adapter != null) {
             if (adapter.type() != XmlJavaTypeAdapter.DEFAULT.class) {
                 theType = adapter.type();
             } else {
-                Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
+                Type topAdapterType = adapter.value().getGenericSuperclass();
+                Class<?> superClass = adapter.value().getSuperclass();
+                while (superClass != null) {
+                    Class<?> nextSuperClass = superClass.getSuperclass();
+                    if (nextSuperClass != null && !Object.class.equals(nextSuperClass)) {
+                        topAdapterType = superClass.getGenericSuperclass();
+                    }
+                    superClass = nextSuperClass;
+                }
+                Type[] types = InjectionUtils.getActualTypes(topAdapterType);
                 if (types != null && types.length == 2) {
                     int index = boundType ? 1 : 0;
                     theType = InjectionUtils.getActualType(types[index]);
@@ -98,32 +135,28 @@ public final class JAXBUtils {
         }
         return theType;
     }
-    
-    public static Object useAdapter(Object obj, 
-                                    XmlJavaTypeAdapter typeAdapter, 
+
+    public static Object useAdapter(Object obj,
+                                    XmlJavaTypeAdapter typeAdapter,
                                     boolean marshal) {
         return useAdapter(obj, typeAdapter, marshal, obj);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static Object useAdapter(Object obj, 
-                                    XmlJavaTypeAdapter typeAdapter, 
+    public static Object useAdapter(Object obj,
+                                    XmlJavaTypeAdapter typeAdapter,
                                     boolean marshal,
                                     Object defaultValue) {
         if (typeAdapter != null) {
-            if (InjectionUtils.isSupportedCollectionOrArray(typeAdapter.value().getClass())) {
-                return obj;
-            }
             try {
                 @SuppressWarnings("rawtypes")
                 XmlAdapter xmlAdapter = typeAdapter.value().newInstance();
                 if (marshal) {
                     return xmlAdapter.marshal(obj);
-                } else {
-                    return xmlAdapter.unmarshal(obj);
                 }
+                return xmlAdapter.unmarshal(obj);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.INFO, "(un)marshalling failed, using defaultValue", ex);
             }
         }
         return defaultValue;

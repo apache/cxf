@@ -27,11 +27,13 @@ import org.apache.cxf.test.AbstractCXFSpringTest;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * The majority of this test happens when the context is loaded.
  */
 public class BeanPostProcessorTest extends AbstractCXFSpringTest {
-    
+
     @Test
     public void verifyServices() throws Exception {
         JaxWsClientFactoryBean cf = new JaxWsClientFactoryBean();
@@ -48,6 +50,6 @@ public class BeanPostProcessorTest extends AbstractCXFSpringTest {
     protected String[] getConfigLocations() {
         return new String[] {"/org/apache/cxf/systest/jaxws/beanpostprocessor/context.xml" };
     }
-    
+
 
 }

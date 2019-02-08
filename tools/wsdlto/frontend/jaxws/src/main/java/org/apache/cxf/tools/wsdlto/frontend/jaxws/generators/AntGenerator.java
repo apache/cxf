@@ -51,16 +51,16 @@ public class AntGenerator extends AbstractJAXWSGenerator {
                 || env.optionSet(ToolConstants.CFG_GEN_ANT));
     }
 
-    public void generate(ToolContext penv) throws ToolException {       
+    public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
         if (passthrough()) {
             return;
         }
-        
+
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
 
-            if (javaModel.getServiceClasses().size() == 0) {
+            if (javaModel.getServiceClasses().isEmpty()) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
                 Message msg = new Message("CAN_NOT_GEN_ANT", LOG, wsdl);
@@ -69,10 +69,10 @@ public class AntGenerator extends AbstractJAXWSGenerator {
                 }
                 return;
             }
-            
-            Map<String, String> clientClassNamesMap = new HashMap<String, String>();
-            Map<String, String> serverClassNamesMap = new HashMap<String, String>();
-            
+
+            Map<String, String> clientClassNamesMap = new HashMap<>();
+            Map<String, String> serverClassNamesMap = new HashMap<>();
+
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
             int index = 1;
             for (JavaServiceClass js : javaModel.getServiceClasses().values()) {
@@ -83,10 +83,10 @@ public class AntGenerator extends AbstractJAXWSGenerator {
                         interfaceName = jp.getPortType();
                         intf = interfaces.get(interfaceName);
                     }
-                    
+
                     String clientClassName = intf.getPackageName() + "." + interfaceName + "_"
                                              + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Client";
-    
+
                     String serverClassName = intf.getPackageName() + "." + interfaceName + "_"
                                              + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Server";
                     String clientTargetName = interfaceName + "Client";
@@ -100,22 +100,22 @@ public class AntGenerator extends AbstractJAXWSGenerator {
                         serverTargetName = serverTargetName + index;
                         collison = true;
                     }
-                    
+
                     if (collison) {
                         index++;
                     }
                     clientClassNamesMap.put(clientTargetName, clientClassName);
                     serverClassNamesMap.put(serverTargetName, serverClassName);
-                    
+
                 }
             }
-    
+
             clearAttributes();
             setAttributes("clientClassNamesMap", clientClassNamesMap);
             setAttributes("serverClassNamesMap", serverClassNamesMap);
             setAttributes("wsdlLocation", javaModel.getLocation());
             setCommonAttributes();
-    
+
             doWrite(ANT_TEMPLATE, parseOutputName(null, "build", ".xml"));
         }
     }

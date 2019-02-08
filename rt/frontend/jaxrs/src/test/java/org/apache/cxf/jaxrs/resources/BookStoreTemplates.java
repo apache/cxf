@@ -33,7 +33,7 @@ public class BookStoreTemplates {
 
     public BookStoreTemplates() {
     }
-    
+
     @POST
     public Response updateBookStoreInfo(@PathParam("id") String id) {
         return null;
@@ -44,13 +44,13 @@ public class BookStoreTemplates {
     public Book getBooks(@PathParam("id") String id) {
         return null;
     }
-    
+
     @PUT
     @Path("{bookId}")
     @Produces("application/xml")
     public Response updateBook(@PathParam("id") String id, @PathParam("bookId") String bookId) {
         return null;
-    }    
+    }
 }
 
 

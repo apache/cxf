@@ -29,7 +29,6 @@ import javax.xml.ws.WebFault;
 
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.model.JavaClass;
 import org.apache.cxf.tools.common.model.JavaField;
@@ -54,9 +53,9 @@ public final class FaultBean {
                 return false;
             }
         }
-        return false; 
+        return false;
     }
-    
+
     private String getWebFaultBean(final Class<?> exceptionClass) {
         WebFault fault = exceptionClass.getAnnotation(WebFault.class);
         if (fault == null) {
@@ -68,7 +67,7 @@ public final class FaultBean {
     private boolean isWebFaultAbsent(final Class<?> exceptionClass) {
         return StringUtils.isEmpty(getWebFaultBean(exceptionClass));
     }
-    
+
     public WrapperBeanClass transform(final Class<?> exceptionClass, final String defaultPackage) {
         WrapperBeanClass jClass = new WrapperBeanClass();
         if (isWebFaultAbsent(exceptionClass)) {
@@ -79,23 +78,23 @@ public final class FaultBean {
         }
 
         buildBeanFields(exceptionClass, jClass);
-        
+
         String pkg = PackageUtils.getPackageName(exceptionClass);
         if (pkg.length() > 0) {
-            jClass.setElementName(new QName(URIParserUtil.getNamespace(pkg),
+            jClass.setElementName(new QName(PackageUtils.getNamespace(pkg),
                                         exceptionClass.getSimpleName()));
         } else {
-            jClass.setElementName(new QName(URIParserUtil.getNamespace(ToolConstants.DEFAULT_PACKAGE_NAME),
+            jClass.setElementName(new QName(PackageUtils.getNamespace(ToolConstants.DEFAULT_PACKAGE_NAME),
                                         exceptionClass.getSimpleName()));
         }
         jClass.annotate(new WrapperBeanAnnotator(exceptionClass));
-        
+
         return jClass;
     }
 
     private String getFieldName(final Method method) {
         String name = method.getName().substring(3);
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }
@@ -104,10 +103,10 @@ public final class FaultBean {
         return method.getName().startsWith("get")
             && !Arrays.asList(EXCLUDED_GETTER).contains(method.getName());
     }
-    
+
     private void buildBeanFields(final Class<?> exceptionClass, final JavaClass jClass) {
-        Map<String, JavaField> fields = new TreeMap<String, JavaField>(); 
-        
+        Map<String, JavaField> fields = new TreeMap<>();
+
         for (Method method : exceptionClass.getMethods()) {
             if (isIncludedGetter(method)) {
                 JavaField field = new JavaField(getFieldName(method),
@@ -123,5 +122,5 @@ public final class FaultBean {
             jClass.appendSetter(ent.getValue());
         }
     }
-    
+
 }

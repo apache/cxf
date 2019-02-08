@@ -30,14 +30,14 @@ import javax.xml.ws.WebServiceProvider;
 @WebServiceProvider(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http",
                       wsdlLocation = "wsdl/hello_world.wsdl")
-@ServiceMode(value = Service.Mode.MESSAGE)                      
+@ServiceMode(value = Service.Mode.MESSAGE)
 public class HWSoapMessageProvider implements Provider<SOAPMessage> {
 
     //private static final Logger LOG =
     //    Logger.getLogger(AnnotatedGreeterImpl.class.getName());
 
     private int invokeCount;
-    
+
     public HWSoapMessageProvider() {
         //Complete
     }
@@ -46,7 +46,7 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
         invokeCount++;
         return source;
     }
-    
+
     public int getInvokeCount() {
         return invokeCount;
     }

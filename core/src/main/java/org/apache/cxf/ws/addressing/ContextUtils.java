@@ -22,19 +22,13 @@ package org.apache.cxf.ws.addressing;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.jaxb.JAXBContextCache;
-import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -46,13 +40,9 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 
-import static org.apache.cxf.message.Message.ASYNC_POST_RESPONSE_DISPATCH;
-import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
-
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_OUTBOUND;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
-
 
 /**
  * Holder for utility methods relating to contexts.
@@ -62,37 +52,38 @@ public final class ContextUtils {
     public static final ObjectFactory WSA_OBJECT_FACTORY = new ObjectFactory();
     public static final String ACTION = ContextUtils.class.getName() + ".ACTION";
 
-    private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = 
-        EndpointReferenceUtils.getEndpointReference(Names.WSA_NONE_ADDRESS);
-    
+    private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = new EndpointReferenceType();
+
     private static final Logger LOG = LogUtils.getL7dLogger(ContextUtils.class);
-    
+
     /**
      * Used to fabricate a Uniform Resource Name from a UUID string
      */
     private static final String URN_UUID = "urn:uuid:";
-    
-    private static JAXBContext jaxbContext;
-    private static Set<Class<?>> jaxbContextClasses;
-     
+
     /**
      * Used by MAPAggregator to cache bad MAP fault name
      */
-    private static final String MAP_FAULT_NAME_PROPERTY = 
+    private static final String MAP_FAULT_NAME_PROPERTY =
         "org.apache.cxf.ws.addressing.map.fault.name";
 
     /**
      * Used by MAPAggregator to cache bad MAP fault reason
      */
-    private static final String MAP_FAULT_REASON_PROPERTY = 
+    private static final String MAP_FAULT_REASON_PROPERTY =
         "org.apache.cxf.ws.addressing.map.fault.reason";
-    
+
     /**
      * Indicates a partial response has already been sent
      */
     private static final String PARTIAL_RESPONSE_SENT_PROPERTY =
         "org.apache.cxf.ws.addressing.partial.response.sent";
- 
+
+    static {
+        NONE_ENDPOINT_REFERENCE.setAddress(new AttributedURIType());
+        NONE_ENDPOINT_REFERENCE.getAddress().setValue(Names.WSA_NONE_ADDRESS);
+    }
+
    /**
     * Prevents instantiation.
     */
@@ -132,7 +123,7 @@ public final class ContextUtils {
     * @return true if the current messaging role is that of requestor
     */
     public static boolean isRequestor(Message message) {
-        Boolean requestor = (Boolean)message.get(REQUESTOR_ROLE);
+        Boolean requestor = (Boolean)message.get(Message.REQUESTOR_ROLE);
         return requestor != null && requestor.booleanValue();
     }
 
@@ -141,13 +132,13 @@ public final class ContextUtils {
      *
      * @param isRequestor true if the current messaging role is that of
      * requestor
-     * @param isProviderContext true if the binding provider request context 
-     * available to the client application as opposed to the message context 
+     * @param isProviderContext true if the binding provider request context
+     * available to the client application as opposed to the message context
      * visible to handlers
      * @param isOutbound true if the message is outbound
      * @return the property name to use when caching the MAPs in the context
      */
-    public static String getMAPProperty(boolean isRequestor, 
+    public static String getMAPProperty(boolean isRequestor,
                                         boolean isProviderContext,
                                         boolean isOutbound) {
         if (isRequestor && isProviderContext) {
@@ -155,7 +146,7 @@ public final class ContextUtils {
         }
         return isOutbound
             ? ADDRESSING_PROPERTIES_OUTBOUND
-            : ADDRESSING_PROPERTIES_INBOUND;          
+            : ADDRESSING_PROPERTIES_INBOUND;
     }
 
     /**
@@ -180,11 +171,11 @@ public final class ContextUtils {
      */
     public static void storeMAPs(AddressingProperties maps,
                                  Message message,
-                                 boolean isOutbound, 
+                                 boolean isOutbound,
                                  boolean isRequestor) {
         storeMAPs(maps, message, isOutbound, isRequestor, false);
     }
-    
+
     /**
      * Store MAPs in the message.
      *
@@ -192,11 +183,11 @@ public final class ContextUtils {
      * @param message the current message
      * @param isOutbound true if the message is outbound
      * @param isRequestor true if the current messaging role is that of requestor
-     * @param isProviderContext true if the binding provider request context 
+     * @param isProviderContext true if the binding provider request context
      */
     public static void storeMAPs(AddressingProperties maps,
                                  Message message,
-                                 boolean isOutbound, 
+                                 boolean isOutbound,
                                  boolean isRequestor,
                                  boolean isProviderContext) {
         if (maps != null) {
@@ -207,7 +198,7 @@ public final class ContextUtils {
             message.put(mapProperty, maps);
         }
     }
-    
+
     /**
      * @param message the current message
      * @param isProviderContext true if the binding provider request context
@@ -217,7 +208,7 @@ public final class ContextUtils {
      * @return the current addressing properties
      */
     public static AddressingProperties retrieveMAPs(
-                                                   Message message, 
+                                                   Message message,
                                                    boolean isProviderContext,
                                                    boolean isOutbound) {
         return retrieveMAPs(message, isProviderContext, isOutbound, true);
@@ -233,31 +224,31 @@ public final class ContextUtils {
      * @return the current addressing properties
      */
     public static AddressingProperties retrieveMAPs(
-                                                   Message message, 
+                                                   Message message,
                                                    boolean isProviderContext,
                                                    boolean isOutbound,
                                                    boolean warnIfMissing) {
         boolean isRequestor = ContextUtils.isRequestor(message);
         String mapProperty =
             ContextUtils.getMAPProperty(isRequestor,
-                                        isProviderContext, 
+                                        isProviderContext,
                                         isOutbound);
         LOG.log(Level.FINE,
                 "retrieving MAPs from context property {0}",
                 mapProperty);
-        
+
         AddressingProperties maps =
             (AddressingProperties)message.get(mapProperty);
         if (maps == null && isOutbound && !isRequestor
-            && message.getExchange() != null && message.getExchange().getInMessage() != null) { 
-            maps = (AddressingProperties)message.getExchange().getInMessage().get(mapProperty); 
+            && message.getExchange() != null && message.getExchange().getInMessage() != null) {
+            maps = (AddressingProperties)message.getExchange().getInMessage().get(mapProperty);
         }
-        
+
         if (maps != null) {
             LOG.log(Level.FINE, "current MAPs {0}", maps);
         } else if (!isProviderContext) {
-            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.FINE, 
-                "MAPS_RETRIEVAL_FAILURE_MSG");         
+            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.FINE,
+                "MAPS_RETRIEVAL_FAILURE_MSG");
         }
         return maps;
     }
@@ -269,7 +260,7 @@ public final class ContextUtils {
      * @return an AttributedURIType encapsulating the URI
      */
     public static AttributedURIType getAttributedURI(String uri) {
-        AttributedURIType attributedURI = 
+        AttributedURIType attributedURI =
             WSA_OBJECT_FACTORY.createAttributedURIType();
         attributedURI.setValue(uri);
         return attributedURI;
@@ -287,6 +278,13 @@ public final class ContextUtils {
         relatesTo.setValue(uri);
         return relatesTo;
     }
+    
+    private static boolean startsWith(String value, String ref) {
+        if (StringUtils.isEmpty(value)) {
+            return false;
+        }
+        return value.startsWith(ref);
+    }
 
     /**
      * Helper method to determine if an EPR address is generic (either null,
@@ -296,12 +294,12 @@ public final class ContextUtils {
      * @return true if the address is generic
      */
     public static boolean isGenericAddress(EndpointReferenceType ref) {
-        return ref == null 
+        return ref == null
                || ref.getAddress() == null
-               || Names.WSA_ANONYMOUS_ADDRESS.equals(ref.getAddress().getValue())
-               || Names.WSA_NONE_ADDRESS.equals(ref.getAddress().getValue());
+               || startsWith(ref.getAddress().getValue(), Names.WSA_ANONYMOUS_ADDRESS)
+               || startsWith(ref.getAddress().getValue(), Names.WSA_NONE_ADDRESS);
     }
-    
+
     /**
      * Helper method to determine if an EPR address is anon (either null,
      * anonymous).
@@ -310,11 +308,11 @@ public final class ContextUtils {
      * @return true if the address is generic
      */
     public static boolean isAnonymousAddress(EndpointReferenceType ref) {
-        return ref == null 
+        return ref == null
                || ref.getAddress() == null
-               || Names.WSA_ANONYMOUS_ADDRESS.equals(ref.getAddress().getValue());
+               || startsWith(ref.getAddress().getValue(), Names.WSA_ANONYMOUS_ADDRESS);
     }
-    
+
     /**
      * Helper method to determine if an EPR address is none.
      *
@@ -322,7 +320,7 @@ public final class ContextUtils {
      * @return true if the address is generic
      */
     public static boolean isNoneAddress(EndpointReferenceType ref) {
-        return ref != null 
+        return ref != null
                && ref.getAddress() != null
                && Names.WSA_NONE_ADDRESS.equals(ref.getAddress().getValue());
     }
@@ -337,18 +335,18 @@ public final class ContextUtils {
      */
     public static boolean hasEmptyAction(AddressingProperties maps) {
         boolean empty = maps.getAction() == null;
-        if (maps.getAction() != null 
-            && maps.getAction().getValue().length() == 0) {
+        if (maps.getAction() != null
+            && maps.getAction().getValue().isEmpty()) {
             maps.setAction(null);
             empty = false;
-        } 
+        }
         return empty;
     }
-    
-    
+
+
     /**
      * Propagate inbound MAPs onto full reponse & fault messages.
-     * 
+     *
      * @param inMAPs the inbound MAPs
      * @param exchange the current Exchange
      */
@@ -367,7 +365,7 @@ public final class ContextUtils {
     /**
      * Propogate inbound MAPs onto reponse message if applicable
      * (not applicable for oneways).
-     * 
+     *
      * @param inMAPs the inbound MAPs
      * @param responseMessage
      */
@@ -378,14 +376,14 @@ public final class ContextUtils {
         }
     }
 
-    
+
     /**
      * Store bad MAP fault name in the message.
      *
      * @param faultName the fault name to store
      * @param message the current message
      */
-    public static void storeMAPFaultName(String faultName, 
+    public static void storeMAPFaultName(String faultName,
                                          Message message) {
         message.put(MAP_FAULT_NAME_PROPERTY, faultName);
     }
@@ -406,7 +404,7 @@ public final class ContextUtils {
      * @param reason the fault reason to store
      * @param message the current message
      */
-    public static void storeMAPFaultReason(String reason, 
+    public static void storeMAPFaultReason(String reason,
                                            Message message) {
         message.put(MAP_FAULT_REASON_PROPERTY, reason);
     }
@@ -420,7 +418,7 @@ public final class ContextUtils {
     public static String retrieveMAPFaultReason(Message message) {
         return (String)message.get(MAP_FAULT_REASON_PROPERTY);
     }
-    
+
     /**
      * Store an indication that a partial response has been sent.
      * Relavant if *both* the replyTo & faultTo are decoupled,
@@ -453,7 +451,7 @@ public final class ContextUtils {
      * @param message the current message
      */
     public static void storeDeferUncorrelatedMessageAbort(Message message) {
-        if (message.getExchange() != null) { 
+        if (message.getExchange() != null) {
             message.getExchange().put("defer.uncorrelated.message.abort", Boolean.TRUE);
         }
     }
@@ -463,10 +461,10 @@ public final class ContextUtils {
      * supported
      *
      * @param message the current message
-     * @return the retrieved indication 
+     * @return the retrieved indication
      */
     public static boolean retrieveDeferUncorrelatedMessageAbort(Message message) {
-        Boolean ret = message.getExchange() != null 
+        Boolean ret = message.getExchange() != null
                       ? (Boolean)message.getExchange().get("defer.uncorrelated.message.abort")
                       : null;
         return ret != null && ret.booleanValue();
@@ -479,7 +477,7 @@ public final class ContextUtils {
      * @param message the current message
      */
     public static void storeDeferredUncorrelatedMessageAbort(Message message) {
-        if (message.getExchange() != null) { 
+        if (message.getExchange() != null) {
             message.getExchange().put("deferred.uncorrelated.message.abort", Boolean.TRUE);
         }
     }
@@ -489,10 +487,10 @@ public final class ContextUtils {
      * occur.
      *
      * @param message the current message
-     * @return the retrieved indication 
+     * @return the retrieved indication
      */
     public static boolean retrieveDeferredUncorrelatedMessageAbort(Message message) {
-        Boolean ret = message.getExchange() != null 
+        Boolean ret = message.getExchange() != null
                       ? (Boolean)message.getExchange().get("deferred.uncorrelated.message.abort")
                       : null;
         return ret != null && ret.booleanValue();
@@ -501,61 +499,26 @@ public final class ContextUtils {
     /**
      * Retrieve indication that an async post-response service invocation
      * is required.
-     * 
+     *
      * @param message the current message
      * @return the retrieved indication that an async post-response service
      * invocation is required.
      */
     public static boolean retrieveAsyncPostResponseDispatch(Message message) {
-        Boolean ret = (Boolean)message.get(ASYNC_POST_RESPONSE_DISPATCH);
+        Boolean ret = (Boolean)message.get(Message.ASYNC_POST_RESPONSE_DISPATCH);
         return ret != null && ret.booleanValue();
     }
-    
-    /**
-     * Retrieve a JAXBContext for marshalling and unmarshalling JAXB generated
-     * types.
-     *
-     * @return a JAXBContext 
-     */
-    public static JAXBContext getJAXBContext() throws JAXBException {
-        synchronized (ContextUtils.class) {
-            if (jaxbContext == null || jaxbContextClasses == null) {
-                Set<Class<?>> tmp = new HashSet<Class<?>>();
-                JAXBContextCache.addPackage(tmp, WSA_OBJECT_FACTORY.getClass().getPackage().getName(), 
-                                            WSA_OBJECT_FACTORY.getClass().getClassLoader());
-                JAXBContextCache.scanPackages(tmp);
-                CachedContextAndSchemas ccs 
-                    = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
-                jaxbContextClasses = ccs.getClasses();
-                jaxbContext = ccs.getContext();
-            }
-        }
-        return jaxbContext;
-    }
 
-    /**
-     * Set the encapsulated JAXBContext (used by unit tests).
-     * 
-     * @param ctx JAXBContext 
-     */
-    public static void setJAXBContext(JAXBContext ctx) throws JAXBException {
-        synchronized (ContextUtils.class) {
-            jaxbContext = ctx;
-            jaxbContextClasses = new HashSet<Class<?>>();
-        }
-    }
-    
-    
     /**
      * @return a generated UUID
      */
     public static String generateUUID() {
         return URN_UUID + UUID.randomUUID();
     }
-    
+
     /**
      * Retreive Conduit from Exchange if not already available
-     * 
+     *
      * @param conduit the current value for the Conduit
      * @param message the current message
      * @return the Conduit if available
@@ -567,7 +530,7 @@ public final class ContextUtils {
         }
         return conduit;
     }
-    
+
     public static EndpointReferenceType getNoneEndpointReference() {
         return NONE_ENDPOINT_REFERENCE;
     }
@@ -581,7 +544,7 @@ public final class ContextUtils {
 
     /**
      * Create a Binding specific Message.
-     * 
+     *
      * @param exchange the current exchange
      * @return the Method from the BindingOperationInfo
      */
@@ -597,8 +560,8 @@ public final class ContextUtils {
         }
         return msg;
     }
-    
-    public static Destination createDecoupledDestination(Exchange exchange, 
+
+    public static Destination createDecoupledDestination(Exchange exchange,
                                                          final EndpointReferenceType reference) {
         final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new Destination() {
@@ -610,7 +573,7 @@ public final class ContextUtils {
                 //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
                 //we don't wait for a response.
                 inMessage.getExchange().setOneWay(true);
-                ConduitInitiator conduitInitiator 
+                ConduitInitiator conduitInitiator
                     = bus.getExtension(ConduitInitiatorManager.class)
                         .getConduitInitiatorForUri(reference.getAddress().getValue());
                 if (conduitInitiator != null) {
@@ -640,5 +603,5 @@ public final class ContextUtils {
             public void setMessageObserver(MessageObserver observer) {
             }
         };
-    }    
+    }
 }

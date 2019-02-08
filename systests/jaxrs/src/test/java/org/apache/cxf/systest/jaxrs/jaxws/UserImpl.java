@@ -40,11 +40,11 @@ public class UserImpl implements User {
     public void setName(String s) {
         name = s;
     }
-    
+
     public int hashCode() {
         return name.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         return o instanceof User && name.equals(((User)o).getName());
     }

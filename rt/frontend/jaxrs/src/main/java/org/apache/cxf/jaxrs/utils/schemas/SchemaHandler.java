@@ -49,46 +49,46 @@ import org.apache.ws.commons.schema.constants.Constants;
 public class SchemaHandler {
 
     static final String DEFAULT_CATALOG_LOCATION = "classpath:META-INF/jax-rs-catalog.xml";
-    
+
     private Schema schema;
     private Bus bus;
     private String catalogLocation;
-    
+
     public SchemaHandler() {
-        
+
     }
-    
+
     public void setBus(Bus b) {
         bus = b;
     }
-    
+
     @Deprecated
     public void setSchemas(List<String> locations) {
         setSchemaLocations(locations);
     }
-    
+
     public void setSchemaLocations(List<String> locations) {
-        schema = createSchema(locations, catalogLocation, 
+        schema = createSchema(locations, catalogLocation,
                               bus == null ? BusFactory.getThreadDefaultBus() : bus);
     }
-    
+
     public void setCatalogLocation(String name) {
         this.catalogLocation = name;
     }
-    
+
     public Schema getSchema() {
         return schema;
     }
-    
+
     public static Schema createSchema(List<String> locations, String catalogLocation, final Bus bus) {
-        
+
         SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
         Schema s = null;
         try {
-            List<Source> sources = new ArrayList<Source>();
+            List<Source> sources = new ArrayList<>();
             for (String loc : locations) {
-                List<URL> schemaURLs = new LinkedList<URL>();
-                
+                List<URL> schemaURLs = new LinkedList<>();
+
                 if (loc.lastIndexOf(".") == -1 || loc.lastIndexOf('*') != -1) {
                     schemaURLs = ClasspathScanner.findResources(loc, "xsd");
                 } else {
@@ -113,27 +113,28 @@ public class SchemaHandler {
             }
             final OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
             if (catalogResolver != null) {
-                catalogLocation = catalogLocation == null 
+                catalogLocation = catalogLocation == null
                     ? SchemaHandler.DEFAULT_CATALOG_LOCATION : catalogLocation;
                 URL catalogURL = ResourceUtils.getResourceURL(catalogLocation, bus);
                 if (catalogURL != null) {
                     try {
                         catalogResolver.loadCatalog(catalogURL);
                         factory.setResourceResolver(new LSResourceResolver() {
-    
+
                             public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                                            String systemId, String baseURI) {
                                 try {
-                                    String resolvedLocation  = catalogResolver.resolveSystem(systemId);
-                                    
+                                    String resolvedLocation = catalogResolver.resolveSystem(systemId);
+
                                     if (resolvedLocation == null) {
                                         resolvedLocation = catalogResolver.resolveURI(namespaceURI);
                                     }
                                     if (resolvedLocation == null) {
-                                        resolvedLocation = catalogResolver.resolvePublic(publicId, systemId);
-                                    } 
+                                        resolvedLocation = catalogResolver.resolvePublic(
+                                            publicId != null ? publicId : namespaceURI, systemId);
+                                    }
                                     if (resolvedLocation != null) {
-                                        InputStream resourceStream = 
+                                        InputStream resourceStream =
                                             ResourceUtils.getResourceStream(resolvedLocation, bus);
                                         if (resourceStream != null) {
                                             return new LSInputImpl(publicId, systemId, resourceStream);
@@ -144,19 +145,19 @@ public class SchemaHandler {
                                 }
                                 return null;
                             }
-                            
+
                         });
                     } catch (IOException ex) {
                         throw new IllegalArgumentException("Catalog " + catalogLocation + " can not be loaded", ex);
                     }
                 }
             }
-            s = factory.newSchema(sources.toArray(new Source[sources.size()]));
+            s = factory.newSchema(sources.toArray(new Source[0]));
         } catch (Exception ex) {
             throw new IllegalArgumentException("Failed to load XML schema : " + ex.getMessage(), ex);
         }
         return s;
-        
+
     }
-    
+
 }

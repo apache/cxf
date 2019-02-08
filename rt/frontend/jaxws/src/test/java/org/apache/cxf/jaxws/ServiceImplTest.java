@@ -50,14 +50,22 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.handler.PortInfoImpl;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ServiceImplTest extends AbstractJaxWsTest {
 
-    private static final QName SERVICE_1 = 
+    private static final QName SERVICE_1 =
         new QName("http://apache.org/cxf/calculator", "CalculatorService");
 
-    private static final QName PORT_1 = 
+    private static final QName PORT_1 =
         new QName("http://apache.org/cxf/calculator", "CalculatorPort");
 
     private static final QName SOAP_PORT =
@@ -67,48 +75,48 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         new QName("http://apache.org/hello_world_soap_http", "SoapPort1");
 
     private boolean isJAXWSClientFactoryConfigured;
-    
+
     private boolean isClientProxyFactoryBeanConfigured;
-    
-    
+
+
     @Test
     public void testAddPort() throws Exception {
         QName sName = new QName("service");
         QName pName = new QName("port");
-        
+
         javax.xml.ws.Service service = Service.create(sName);
         service.addPort(pName, SOAPBinding.SOAP11HTTP_BINDING, "http://mysite.org/test");
-        
-        Iterator<QName> ports = service.getPorts(); 
+
+        Iterator<QName> ports = service.getPorts();
         assertTrue(ports.hasNext());
     }
-    
+
     @Test
     public void testServiceImpl() throws Exception {
         SOAPService service = new SOAPService();
-        
+
         Greeter proxy = service.getSoapPort();
-        
+
         Client client = ClientProxy.getClient(proxy);
         assertEquals("bar", client.getEndpoint().get("foo"));
         assertNotNull("expected ConduitSelector", client.getConduitSelector());
         assertTrue("unexpected ConduitSelector",
                    client.getConduitSelector() instanceof NullConduitSelector);
     }
-        
+
     @Test
     public void testNonSpecificGetPort() throws Exception {
         SOAPService service = new SOAPService();
-        
+
         Greeter proxy = service.getPort(Greeter.class);
-        
+
         Client client = ClientProxy.getClient(proxy);
         boolean boolA = client.getEndpoint().getEndpointInfo().getName().equals(SOAP_PORT);
         boolean boolB = client.getEndpoint().getEndpointInfo().getName().equals(SOAP_PORT1);
         assertTrue(boolA || boolB);
         assertNotNull("expected ConduitSelector", client.getConduitSelector());
     }
-    
+
     @Override
     protected Bus createBus() throws BusException {
         SpringBusFactory bf = new SpringBusFactory();
@@ -119,10 +127,10 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testBadServiceName() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
-        QName badService = 
+
+        QName badService =
             new QName("http://apache.org/cxf/calculator", "DoesNotExist");
-        
+
         try {
             new ServiceImpl(getBus(), wsdl1, badService, ServiceImpl.class);
             fail("Did not throw exception");
@@ -130,12 +138,12 @@ public class ServiceImplTest extends AbstractJaxWsTest {
             // that's expected
         }
     }
-    
+
     @Test
     public void testPorts() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
         Iterator<QName> iter = service.getPorts();
         assertNotNull(iter);
@@ -148,10 +156,10 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testGetBadPort() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        QName badPort = 
+        QName badPort =
             new QName("http://apache.org/cxf/calculator", "PortDoesNotExist");
         try {
             service.getPort(badPort, CalculatorPortType.class);
@@ -165,7 +173,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testGetBadSEI() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         try {
@@ -180,36 +188,36 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testGetGoodPort() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal);
     }
 
-    
+
     @Test
     public void testJAXBCachedOnRepeatGetPort() {
         System.gc();
         System.gc();
-        
+
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         CalculatorPortType cal1 = service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal1);
-        
+
         ClientProxy cp = (ClientProxy)Proxy.getInvocationHandler(cal1);
         JAXBDataBinding db1 = (JAXBDataBinding) cp.getClient().getEndpoint().getService().getDataBinding();
         assertNotNull(db1);
-        
+
         System.gc();
         System.gc();
         System.gc();
         System.gc();
-        
+
         CalculatorPortType cal2 = service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal2);
 
@@ -224,7 +232,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testCreateDispatchGoodPort() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         Dispatch<Source> dispatch = service.createDispatch(PORT_1, Source.class, Service.Mode.PAYLOAD);
@@ -235,10 +243,10 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     public void testCreateDispatchBadPort() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
-        QName badPort = 
+        QName badPort =
             new QName("http://apache.org/cxf/calculator", "PortDoesNotExist");
         try {
             service.createDispatch(badPort, Source.class, Service.Mode.PAYLOAD);
@@ -246,19 +254,19 @@ public class ServiceImplTest extends AbstractJaxWsTest {
             // that's ok
         }
     }
-    
+
     @Test
     public void testHandlerResolver() {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         assertNotNull(wsdl1);
-        
+
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
 
         TestHandlerResolver resolver = new TestHandlerResolver();
         assertNull(resolver.getPortInfo());
 
         service.setHandlerResolver(resolver);
-        
+
         CalculatorPortType cal = service.getPort(PORT_1, CalculatorPortType.class);
         assertNotNull(cal);
 
@@ -278,12 +286,12 @@ public class ServiceImplTest extends AbstractJaxWsTest {
 
         @SuppressWarnings("rawtypes")
         public List<Handler> getHandlerChain(PortInfo portInfo) {
-            List<Handler> handlerList = new ArrayList<Handler>();
+            List<Handler> handlerList = new ArrayList<>();
             this.info = portInfo;
             return handlerList;
         }
     }
-    
+
     @Test
     //CXF-2723 :Allow configuration of JaxWsClientFactoryBean during port creation
     public void testConfigureBean() throws Exception {
@@ -293,15 +301,15 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
         ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
         service.createPort(PORT_1,  null, CalculatorPortType.class);
-        assertTrue("The JAXWSClientFcatoryBean is not configured by the new configurer", 
+        assertTrue("The JAXWSClientFcatoryBean is not configured by the new configurer",
                    isJAXWSClientFactoryConfigured);
-        assertTrue("The ClientProxyFcatoryBean is not configured by the new configurer", 
-                   isClientProxyFactoryBeanConfigured);        
+        assertTrue("The ClientProxyFcatoryBean is not configured by the new configurer",
+                   isClientProxyFactoryBeanConfigured);
         getBus().setExtension(oldConfiguer, Configurer.class);
     }
-    
-    
-    
+
+
+
     @Test
     @SuppressWarnings("unchecked")
     // CXF-2819:<protocl-bindings>##SOAP12_Binding <protocl-bindings> in handler chain is not correctly
@@ -316,8 +324,8 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         Map<QName, PortInfoImpl> portInfoMap = (Map<QName, PortInfoImpl>)f.get(seviceImpl);
         assertEquals(portInfoMap.values().iterator().next().getBindingID(), SOAPBinding.SOAP12HTTP_BINDING);
     }
-    
-    
+
+
     class JAXWSClientFactoryCongfiguer extends ConfigurerImpl {
         @Override
         public synchronized void configureBean(String bn, Object beanInstance, boolean checkWildcards) {
@@ -329,5 +337,5 @@ public class ServiceImplTest extends AbstractJaxWsTest {
             }
         }
     }
-    
+
 }

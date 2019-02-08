@@ -33,14 +33,15 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(classes = org.apache.cxf.feature.LoggingFeature.class)              
+@Features(classes = org.apache.cxf.ext.logging.LoggingFeature.class)
 public class DoubleItPortTypeImpl implements DoubleItPortType {
-    
+
     @Resource
     WebServiceContext wsc;
 
@@ -49,15 +50,15 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
         // Get the transformed SAML Assertion from the STS and check it
         //
         MessageContext context = wsc.getMessageContext();
-        final List<WSHandlerResult> handlerResults = 
+        final List<WSHandlerResult> handlerResults =
             CastUtils.cast((List<?>)context.get(WSHandlerConstants.RECV_RESULTS));
         WSSecurityEngineResult actionResult =
             handlerResults.get(0).getActionResults().get(WSConstants.UT).get(0);
-        SamlAssertionWrapper assertion = 
+        SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)actionResult.get(WSSecurityEngineResult.TAG_TRANSFORMED_TOKEN);
         Assert.assertTrue(assertion != null && "DoubleItSTSIssuer".equals(assertion.getIssuerString()));
-        
+
         return numberToDouble * 2;
     }
-    
+
 }

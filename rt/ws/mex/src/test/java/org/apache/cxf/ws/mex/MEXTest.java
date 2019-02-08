@@ -23,25 +23,26 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.ws.mex.model._2004_09.Metadata;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 
 /**
- * 
+ *
  */
-public class MEXTest extends Assert {
+public class MEXTest {
     static Server server;
     static Server mexServer;
-    
+
     @WebService(targetNamespace = "org.apache.cxf.ws.mex.test.Echo")
     public static class EchoImpl {
         @WebMethod
@@ -60,7 +61,7 @@ public class MEXTest extends Assert {
         factory.setAddress("local://Echo");
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         server = factory.create();
-        
+
         factory = new JaxWsServerFactoryBean();
         factory.setServiceBean(new MEXEndpoint(server));
         factory.setAddress("local://Echo-mex");
@@ -88,8 +89,8 @@ public class MEXTest extends Assert {
         MetadataExchange exc = proxyFac.create(MetadataExchange.class);
         Metadata metadata = exc.get2004();
         assertNotNull(metadata);
-        
-        
+
+
         proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);

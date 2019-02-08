@@ -30,13 +30,13 @@ import org.w3c.dom.Element;
  * Test for mapping to DOM Document.
  */
 public class DocumentService implements IDocumentService {
-    
+
     private DocumentBuilderFactory documentBuilderFactory;
 
     public DocumentService() {
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
     }
-    
+
     /** {@inheritDoc}*/
     public Document returnDocument() {
         try {

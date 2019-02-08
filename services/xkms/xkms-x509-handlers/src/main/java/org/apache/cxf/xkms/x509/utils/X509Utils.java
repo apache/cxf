@@ -101,11 +101,10 @@ public final class X509Utils {
         Certificate certificate = X509_FACTORY.generateCertificate(stream);
         if (certificate instanceof X509Certificate) {
             return (X509Certificate) certificate;
-        } else {
-            throw new CertificateException("Unsupported certificate type encountered: "
-                    + ((certificate != null && certificate.getClass() != null) 
-                        ? certificate.getClass().getName() : "Null"));
         }
+        throw new CertificateException("Unsupported certificate type encountered: "
+                + ((certificate != null && certificate.getClass() != null)
+                    ? certificate.getClass().getName() : "Null"));
     }
 
     public static UnverifiedKeyBindingType getUnverifiedKeyBinding(X509Certificate cert)

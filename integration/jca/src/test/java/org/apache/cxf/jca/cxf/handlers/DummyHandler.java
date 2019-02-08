@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jca.cxf.handlers; 
+package org.apache.cxf.jca.cxf.handlers;
 
 import java.lang.reflect.Method;
 
@@ -24,31 +24,31 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandler;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 
 
-public class DummyHandler implements CXFInvocationHandler { 
+public class DummyHandler implements CXFInvocationHandler {
 
-    boolean invokeCalled; 
+    boolean invokeCalled;
 
     public CXFInvocationHandlerData getData() {
         return new CXFInvocationHandlerDataImpl();
     }
-   
+
     // Implementation of java.lang.reflect.InvocationHandler
 
-    public final Object invoke(final Object object, 
-                               final Method method, 
+    public final Object invoke(final Object object,
+                               final Method method,
                                final Object[] objectArray) throws Throwable {
-        invokeCalled = true; 
+        invokeCalled = true;
         return null;
     }
 
 
     public void setNext(CXFInvocationHandler next) {
-        
+
     }
 
 
     public CXFInvocationHandler getNext() {
         return null;
     }
-    
+
 }

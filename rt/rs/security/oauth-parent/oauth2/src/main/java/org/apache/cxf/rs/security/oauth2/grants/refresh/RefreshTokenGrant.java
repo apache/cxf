@@ -28,22 +28,22 @@ public class RefreshTokenGrant implements AccessTokenGrant {
     private static final long serialVersionUID = -4855594852737940210L;
     private String refreshToken;
     private String scope;
-    
+
     public RefreshTokenGrant(String refreshToken) {
         this.refreshToken = refreshToken;
     }
-    
+
     public RefreshTokenGrant(String refreshToken, String scope) {
         this.refreshToken = refreshToken;
         this.scope = scope;
     }
-    
+
     public String getType() {
         return OAuthConstants.REFRESH_TOKEN_GRANT;
     }
 
     public MultivaluedMap<String, String> toMap() {
-        MultivaluedMap<String, String> map = new MetadataMap<String, String>();
+        MultivaluedMap<String, String> map = new MetadataMap<>();
         map.putSingle(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN_GRANT);
         map.putSingle(OAuthConstants.REFRESH_TOKEN, refreshToken);
         if (scope != null) {

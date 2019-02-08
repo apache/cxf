@@ -25,15 +25,15 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/transports/http/configuration")
-public class HttpBPHandler implements NamespaceHandler {
-    
+public class HttpBPHandler extends BaseNamespaceHandler {
+
     public HttpBPHandler() {
     }
 
@@ -42,7 +42,7 @@ public class HttpBPHandler implements NamespaceHandler {
             return getClass().getClassLoader().
                 getResource("schemas/configuration/http-conf.xsd");
         }
-        return null;
+        return super.findCoreSchemaLocation(s);
     }
 
 
@@ -54,7 +54,7 @@ public class HttpBPHandler implements NamespaceHandler {
         } else if ("destination".equals(s)) {
             return new HttpDestinationBPBeanDefinitionParser().parse(element, context);
         }
-        
+
         return null;
     }
 
@@ -62,9 +62,9 @@ public class HttpBPHandler implements NamespaceHandler {
     public Set<Class> getManagedClasses() {
         return null;
     }
-    
+
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 }

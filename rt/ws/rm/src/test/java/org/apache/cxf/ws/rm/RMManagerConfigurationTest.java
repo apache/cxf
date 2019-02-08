@@ -30,22 +30,26 @@ import org.apache.cxf.ws.rm.persistence.RMStore;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class RMManagerConfigurationTest extends Assert {
+public class RMManagerConfigurationTest {
 
     private Bus bus;
-    
+
     @After
     public void tearDown() {
         bus.shutdown(true);
         BusFactory.setDefaultBus(null);
     }
-    
+
     @Test
     public void testManagerBean() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -64,7 +68,7 @@ public class RMManagerConfigurationTest extends Assert {
         assertEquals(da, DeliveryAssurance.EXACTLY_ONCE);
         assertFalse(cfg.isInOrder());
     }
-    
+
     @Test
     public void testFeature() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -72,28 +76,28 @@ public class RMManagerConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         verifyManager(manager);
     }
-    
+
     private void verifyManager(RMManager manager) {
         assertNotNull(manager);
         assertTrue(manager.getSourcePolicy().getSequenceTerminationPolicy().isTerminateOnShutdown());
         assertEquals(0L, manager.getDestinationPolicy().getAcksPolicy().getIntraMessageThreshold());
         assertEquals(2000L, manager.getDestinationPolicy().getAcksPolicy().getImmediaAcksTimeout());
         assertEquals(10000L, manager.getConfiguration().getBaseRetransmissionInterval().longValue());
-        assertEquals(10000L, manager.getConfiguration().getAcknowledgementInterval().longValue());        
+        assertEquals(10000L, manager.getConfiguration().getAcknowledgementInterval().longValue());
         assertEquals("http://www.w3.org/2005/08/addressing", manager.getConfiguration().getRM10AddressingNamespace());
         TestStore store = (TestStore)manager.getStore();
-        assertEquals("here", store.getLocation());     
+        assertEquals("here", store.getLocation());
         assertTrue(manager.getConfiguration().isInOrder());
     }
 
     static class TestStore implements RMStore {
-        
+
         private String location;
-        
+
         TestStore() {
             // this(null);
         }
-        
+
         public String getLocation() {
             return location;
         }
@@ -105,64 +109,52 @@ public class RMManagerConfigurationTest extends Assert {
 
 
         public void createDestinationSequence(DestinationSequence seq) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public void createSourceSequence(SourceSequence seq) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public void persistIncoming(DestinationSequence seq, RMMessage msg) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public void persistOutgoing(SourceSequence seq, RMMessage msg) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public void removeDestinationSequence(Identifier seq) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public void removeSourceSequence(Identifier seq) {
-            // TODO Auto-generated method stub
-            
+    
         }
 
         public SourceSequence getSourceSequence(Identifier seq) {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public DestinationSequence getDestinationSequence(Identifier seq) {
-            // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
 }

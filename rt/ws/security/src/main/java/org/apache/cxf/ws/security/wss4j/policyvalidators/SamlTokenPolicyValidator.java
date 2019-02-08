@@ -24,9 +24,11 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -42,17 +44,17 @@ import org.opensaml.saml.common.SAMLVersion;
  * Validate a SamlToken policy.
  */
 public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.SAML_TOKEN.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.SAML_TOKEN.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -64,7 +66,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
 
             if (!isTokenRequired(samlToken, parameters.getMessage())) {
                 PolicyUtils.assertPolicy(
-                    parameters.getAssertionInfoMap(), 
+                    parameters.getAssertionInfoMap(),
                     new QName(samlToken.getVersion().getNamespace(), samlToken.getSamlTokenType().name())
                 );
                 continue;
@@ -76,29 +78,40 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                 );
                 continue;
             }
-            
+
+            String valSAMLSubjectConf =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
+                                                               parameters.getMessage());
+            boolean validateSAMLSubjectConf = true;
+            if (valSAMLSubjectConf != null) {
+                validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
+            }
+
             // All of the received SAML Assertions must conform to the policy
             for (WSSecurityEngineResult result : parameters.getSamlResults()) {
-                SamlAssertionWrapper assertionWrapper = 
+                SamlAssertionWrapper assertionWrapper =
                     (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
-                
+
                 if (!checkVersion(parameters.getAssertionInfoMap(), samlToken, assertionWrapper)) {
                     ai.setNotAsserted("Wrong SAML Version");
                     continue;
                 }
-                TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
-                Certificate[] tlsCerts = null;
-                if (tlsInfo != null) {
-                    tlsCerts = tlsInfo.getPeerCertificates();
-                }
-                if (!checkHolderOfKey(assertionWrapper, parameters.getSignedResults(), tlsCerts)) {
-                    ai.setNotAsserted("Assertion fails holder-of-key requirements");
-                    continue;
-                }
-                if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
-                                                    parameters.getSignedResults())) {
-                    ai.setNotAsserted("Assertion fails sender-vouches requirements");
-                    continue;
+
+                if (validateSAMLSubjectConf) {
+                    TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
+                    Certificate[] tlsCerts = null;
+                    if (tlsInfo != null) {
+                        tlsCerts = tlsInfo.getPeerCertificates();
+                    }
+                    if (!checkHolderOfKey(assertionWrapper, parameters.getSignedResults(), tlsCerts)) {
+                        ai.setNotAsserted("Assertion fails holder-of-key requirements");
+                        continue;
+                    }
+                    if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
+                                                        parameters.getSignedResults())) {
+                        ai.setNotAsserted("Assertion fails sender-vouches requirements");
+                        continue;
+                    }
                 }
                 /*
                     if (!checkIssuerName(samlToken, assertionWrapper)) {
@@ -108,7 +121,7 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
             }
         }
     }
-    
+
     /**
      * Check the IssuerName policy against the received assertion
     private boolean checkIssuerName(SamlToken samlToken, AssertionWrapper assertionWrapper) {
@@ -122,13 +135,13 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
         return true;
     }
     */
-    
+
     /**
      * Check the policy version against the received assertion
      */
     private boolean checkVersion(
         AssertionInfoMap aim,
-        SamlToken samlToken, 
+        SamlToken samlToken,
         SamlAssertionWrapper assertionWrapper
     ) {
         SamlTokenType samlTokenType = samlToken.getSamlTokenType();
@@ -140,19 +153,19 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_20) {
             return false;
         }
-        
+
         if (samlTokenType != null) {
             PolicyUtils.assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), samlTokenType.name()));
         }
         return true;
     }
-    
+
     private void assertToken(SamlToken token, AssertionInfoMap aim) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isRequireKeyIdentifierReference()) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_KEY_IDENTIFIER_REFERENCE));
         }
     }
-    
+
 }

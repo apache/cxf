@@ -19,5 +19,5 @@
 
 package org.apache.cxf.tools.corba.processors.wsdl;
 
-public class WSDLToTypeProcessor extends WSDLToProcessor {    
+public class WSDLToTypeProcessor extends WSDLToProcessor {
 }

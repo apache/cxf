@@ -27,26 +27,26 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
  * Outputstream that will buffer a certain amount before writing anything to the underlying
  * stream.   When the threshold is reached, provides a callback point to allow the
  * subclass to update headers, replace/set the output stream, etc...
- * 
+ *
  * Also provides a callback for when the stream is closed without it reaching the threshold.
  */
 public abstract class AbstractThresholdOutputStream extends AbstractWrappedOutputStream {
-    
+
     protected int threshold;
     protected LoadingByteArrayOutputStream buffer;
-    
+
     public AbstractThresholdOutputStream(int threshold) {
         this.threshold = threshold;
         if (threshold >= 0) {
             buffer = new LoadingByteArrayOutputStream(threshold + 1);
         }
     }
-    
-    
+
+
     public abstract void thresholdReached() throws IOException;
     public abstract void thresholdNotReached() throws IOException;
-    
-    
+
+
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (buffer != null) {
@@ -57,7 +57,7 @@ public abstract class AbstractThresholdOutputStream extends AbstractWrappedOutpu
             buffer.write(b, off, space);
             len -= space;
             off += space;
-            
+
             if (buffer.size() >= threshold) {
                 thresholdReached();
                 unBuffer();
@@ -89,7 +89,7 @@ public abstract class AbstractThresholdOutputStream extends AbstractWrappedOutpu
                 super.write(buffer.getRawBytes(), 0, buffer.size());
             }
             buffer = null;
-        }  
+        }
     }
 
 

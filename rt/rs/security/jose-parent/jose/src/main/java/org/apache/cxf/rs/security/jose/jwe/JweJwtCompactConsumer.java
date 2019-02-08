@@ -18,14 +18,14 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 import java.nio.charset.StandardCharsets;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 
 import javax.crypto.SecretKey;
 
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
-import org.apache.cxf.rs.security.jose.jwt.JwtTokenReaderWriter;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JweJwtCompactConsumer  {
@@ -36,25 +36,25 @@ public class JweJwtCompactConsumer  {
         headers = jweConsumer.getJweHeaders();
     }
     public JwtToken decryptWith(JsonWebKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getContentEncryptionAlgorithm()));
     }
-    public JwtToken decryptWith(RSAPrivateKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+    public JwtToken decryptWith(PrivateKey key) {
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getKeyEncryptionAlgorithm(),
                                headers.getContentEncryptionAlgorithm()));
     }
     public JwtToken decryptWith(SecretKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getKeyEncryptionAlgorithm(),
                                headers.getContentEncryptionAlgorithm()));
     }
     public JwtToken decryptWith(JweDecryptionProvider jwe) {
         byte[] bytes = jwe.decrypt(jweConsumer.getJweDecryptionInput());
-        JwtClaims claims = new JwtTokenReaderWriter().fromJsonClaims(toString(bytes));
+        JwtClaims claims = JwtUtils.jsonToClaims(toString(bytes));
         return new JwtToken(headers, claims);
     }
-    
+
     public JweHeaders getHeaders() {
         return headers;
     }

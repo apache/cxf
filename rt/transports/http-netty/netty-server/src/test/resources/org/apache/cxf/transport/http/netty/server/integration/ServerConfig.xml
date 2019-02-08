@@ -20,7 +20,12 @@
 <!-- 
   ** This file configures the Server which runs the web service.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpn="http://cxf.apache.org/transports/http-netty-server/configuration" xsi:schemaLocation="             http://cxf.apache.org/configuration/security                       http://cxf.apache.org/schemas/configuration/security.xsd             http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd             http://cxf.apache.org/transports/http-netty-server/configuration                      http://cxf.apache.org/schemas/configuration/http-netty-server.xsd             http://www.springframework.org/schema/beans             http://www.springframework.org/schema/beans/spring-beans.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpn="http://cxf.apache.org/transports/http-netty-server/configuration"
+    xsi:schemaLocation="http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-netty-server/configuration http://cxf.apache.org/schemas/configuration/http-netty-server.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <http:destination name="{http://apache.org/hello_world_soap_http}GreeterPort.http-destination"> 
   </http:destination>
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
@@ -28,10 +33,10 @@
         <httpn:engine port="${SSLNettyServerTest.port}">
             <httpn:tlsServerParameters>
                 <sec:keyManagers keyPassword="skpass">
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/server/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore type="jks" password="sspass" resource="keys/servicestore.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore file="src/test/resources/org/apache/cxf/transport/http/netty/server/integration/serviceKeystore.jks" password="sspass" type="JKS"/>
+                    <sec:keyStore resource="keys/stsstore.jks" password="stsspass" type="JKS"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpn:tlsServerParameters>

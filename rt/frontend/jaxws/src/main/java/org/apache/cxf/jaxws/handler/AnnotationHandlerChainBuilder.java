@@ -20,6 +20,8 @@
 package org.apache.cxf.jaxws.handler;
 
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -56,9 +58,9 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationHandlerChainBuilder.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
     private static JAXBContext context;
-    
+
     private ClassLoader classLoader;
-    
+
     public AnnotationHandlerChainBuilder() {
     }
 
@@ -74,52 +76,52 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
     public List<Handler> buildHandlerChainFromClass(Class<?> clz, List<Handler> existingHandlers,
                                                     QName portQName, QName serviceQName, String bindingID) {
         LOG.fine("building handler chain");
-        classLoader = clz.getClassLoader();
+        classLoader = getClassLoader(clz);
         HandlerChainAnnotation hcAnn = findHandlerChainAnnotation(clz, true);
         List<Handler> chain = null;
         if (hcAnn == null) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("no HandlerChain annotation on " + clz);
             }
-            chain = new ArrayList<Handler>();
+            chain = new ArrayList<>();
         } else {
             hcAnn.validate();
 
             try {
-                
-                URL handlerFileURL  = resolveHandlerChainFile(clz, hcAnn.getFileName()); 
+
+                URL handlerFileURL = resolveHandlerChainFile(clz, hcAnn.getFileName());
                 if (handlerFileURL == null) {
                     throw new WebServiceException(new Message("HANDLER_CFG_FILE_NOT_FOUND_EXC", BUNDLE, hcAnn
                         .getFileName()).toString());
                 }
-                
+
                 Document doc = StaxUtils.read(handlerFileURL.openStream());
                 Element el = doc.getDocumentElement();
-                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI()) 
+                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())
                     || !"handler-chains".equals(el.getLocalName())) {
-                        
+
                     String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_ROOT_ELEMENT",
                                                        "http://java.sun.com/xml/ns/javaee"
-                                                           .equals(el.getNamespaceURI()), 
+                                                           .equals(el.getNamespaceURI()),
                                                        "handler-chains".equals(el.getLocalName()),
-                                                       xml, handlerFileURL));                    
+                                                       xml, handlerFileURL));
                 }
-                chain = new ArrayList<Handler>();
+                chain = new ArrayList<>();
                 Node node = el.getFirstChild();
                 while (node != null) {
                     if (node instanceof Element) {
                         el = (Element)node;
-                        if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee") 
-                            || !el.getLocalName().equals("handler-chain")) {
-                                
+                        if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())
+                            || !"handler-chain".equals(el.getLocalName())) {
+
                             String xml = StaxUtils.toString(el);
                             throw new WebServiceException(
                                 BundleUtils.getFormattedString(BUNDLE,
                                                                "NOT_VALID_ELEMENT_IN_HANDLER",
-                                                               xml));                    
+                                                               xml));
                         }
                         processHandlerChainElement(el, chain,
                                                    portQName, serviceQName, bindingID);
@@ -139,20 +141,32 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return sortHandlers(chain);
     }
 
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+
     private void processHandlerChainElement(Element el, List<Handler> chain,
                                             QName portQName, QName serviceQName, String bindingID) {
         Node node = el.getFirstChild();
         while (node != null) {
             Node cur = node;
-            node = node.getNextSibling();            
+            node = node.getNextSibling();
             if (cur instanceof Element) {
                 el = (Element)cur;
-                if (!el.getNamespaceURI().equals("http://java.sun.com/xml/ns/javaee")) {
+                if (!"http://java.sun.com/xml/ns/javaee".equals(el.getNamespaceURI())) {
                     String xml = StaxUtils.toString(el);
                     throw new WebServiceException(
                         BundleUtils.getFormattedString(BUNDLE,
                                                        "NOT_VALID_ELEMENT_IN_HANDLER",
-                                                       xml));                    
+                                                       xml));
                 }
                 String name = el.getLocalName();
                 if ("port-name-pattern".equals(name)) {
@@ -171,7 +185,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                     processHandlerElement(el, chain);
                 }
             }
-        }        
+        }
     }
     private boolean protocolMatches(Element el, String id) {
         if (id == null) {
@@ -217,7 +231,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
             throw new WebServiceException(
                 BundleUtils.getFormattedString(BUNDLE,
                                                "NOT_A_QNAME_PATTER",
-                                               namePattern, xml));                    
+                                               namePattern, xml));
         }
         String pfx = namePattern.substring(0, idx);
         String ns = el.lookupNamespaceURI(pfx);
@@ -237,7 +251,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         }
         return true;
     }
-    
+
     private String mapPattern(String s) {
         StringBuilder buf = new StringBuilder(s);
         for (int x = 0; x < buf.length(); x++) {
@@ -263,18 +277,17 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         }
         return buf.toString();
     }
-    
+
     private void processHandlerElement(Element el, List<Handler> chain) {
         try {
             JAXBContext ctx = getContextForPortComponentHandlerType();
             PortComponentHandlerType pt = JAXBUtils.unmarshall(ctx, el, PortComponentHandlerType.class).getValue();
             chain.addAll(buildHandlerChain(pt, classLoader));
         } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new IllegalArgumentException("Could not unmarshal handler chain", e);
         }
     }
-    
+
     private static synchronized JAXBContext getContextForPortComponentHandlerType()
         throws JAXBException {
         if (context == null) {
@@ -282,16 +295,16 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         }
         return context;
     }
-    
+
     public List<Handler> buildHandlerChainFromClass(Class<?> clz, QName portQName, QName serviceQName,
                                                     String bindingID) {
         return buildHandlerChainFromClass(clz, null, portQName, serviceQName, bindingID);
     }
-    
+
     protected URL resolveHandlerChainAnnotationFile(Class<?> clazz, String name) {
         return clazz.getResource(name);
     }
-    
+
     private HandlerChainAnnotation findHandlerChainAnnotation(Class<?> clz, boolean searchSEI) {
         if (clz == null) {
             return null;
@@ -304,7 +317,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         if (ann == null) {
             if (searchSEI) {
                 /* HandlerChain annotation can be specified on the SEI
-                 * but the implementation bean might not implement the SEI.          
+                 * but the implementation bean might not implement the SEI.
                  */
                 WebService ws = clz.getAnnotation(WebService.class);
                 if (ws != null && !StringUtils.isEmpty(ws.endpointInterface())) {
@@ -339,10 +352,10 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         } else {
             hcAnn = new HandlerChainAnnotation(ann, clz);
         }
-        
+
         return hcAnn;
     }
-    
+
     static class HandlerChainAnnotation {
         private final Class<?> declaringClass;
         private final HandlerChain ann;

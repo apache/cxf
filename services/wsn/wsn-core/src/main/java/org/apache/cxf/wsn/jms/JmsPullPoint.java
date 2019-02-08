@@ -55,7 +55,9 @@ public class JmsPullPoint extends AbstractPullPoint {
 
     private Connection connection;
 
-    private Session session;
+    private Session producerSession;
+
+    private Session consumerSession;
 
     private Queue queue;
 
@@ -72,52 +74,73 @@ public class JmsPullPoint extends AbstractPullPoint {
         }
     }
 
-    protected void initSession() throws JMSException {
-        if (session == null) {
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            queue = session.createQueue(getName());
-            producer = session.createProducer(queue);
-            consumer = session.createConsumer(queue);
+    protected synchronized void initSession() throws JMSException {
+        if (producerSession == null || consumerSession == null) {
+            producerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            consumerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            queue = producerSession.createQueue(getName());
+            producer = producerSession.createProducer(queue);
+            consumer = consumerSession.createConsumer(queue);
+        }
+    }
+
+    protected synchronized void closeSession() {
+        if (producerSession != null) {
+            try {
+                producerSession.close();
+            } catch (JMSException inner) {
+                LOGGER.log(Level.FINE, "Error closing ProducerSession", inner);
+            } finally {
+                producerSession = null;
+            }
+        }
+
+        if (consumerSession != null) {
+            try {
+                consumerSession.close();
+            } catch (JMSException inner) {
+                LOGGER.log(Level.FINE, "Error closing ConsumerSession", inner);
+            } finally {
+                consumerSession = null;
+            }
         }
     }
 
     @Override
-    protected synchronized void store(NotificationMessageHolderType messageHolder) {
+    protected void store(NotificationMessageHolderType messageHolder) {
         try {
             initSession();
             Notify notify = new Notify();
             notify.getNotificationMessage().add(messageHolder);
             StringWriter writer = new StringWriter();
             jaxbContext.createMarshaller().marshal(notify, writer);
-            Message message = session.createTextMessage(writer.toString());
-            producer.send(message);
+            synchronized (producerSession) {
+                Message message = producerSession.createTextMessage(writer.toString());
+                producer.send(message);
+            }
         } catch (JMSException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (JMSException inner) {
-                    LOGGER.log(Level.FINE, "Error closing session", inner);
-                } finally {
-                    session = null;
-                }
-            }
+            closeSession();
+
         } catch (JAXBException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
         }
     }
 
     @Override
-    protected synchronized List<NotificationMessageHolderType> getMessages(int max) 
+    protected List<NotificationMessageHolderType> getMessages(int max)
         throws ResourceUnknownFault, UnableToGetMessagesFault {
         try {
             if (max == 0) {
                 max = 256;
             }
             initSession();
-            List<NotificationMessageHolderType> messages = new ArrayList<NotificationMessageHolderType>();
+            List<NotificationMessageHolderType> messages = new ArrayList<>();
             for (int i = 0; i < max; i++) {
-                Message msg = consumer.receiveNoWait();
+                Message msg = null;
+                synchronized (consumerSession) {
+                    msg = consumer.receiveNoWait();
+                }
                 if (msg == null) {
                     break;
                 }
@@ -135,15 +158,7 @@ public class JmsPullPoint extends AbstractPullPoint {
             return messages;
         } catch (JMSException e) {
             LOGGER.log(Level.INFO, "Error retrieving messages", e);
-            if (session != null) {
-                try {
-                    session.close();
-                } catch (JMSException inner) {
-                    LOGGER.log(Level.FINE, "Error closing session", inner);
-                } finally {
-                    session = null;
-                }
-            }
+            closeSession();
             UnableToGetMessagesFaultType fault = new UnableToGetMessagesFaultType();
             throw new UnableToGetMessagesFault("Unable to retrieve messages", fault, e);
         } catch (JAXBException e) {

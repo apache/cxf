@@ -37,6 +37,7 @@ import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.configuration.security.SecureRandomParameters;
 import org.apache.cxf.configuration.security.TrustManagersType;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
@@ -49,7 +50,7 @@ class HttpConduitConfigApplier {
 
     HttpConduitConfigApplier() {
     }
-    
+
     void apply(Dictionary<String, String> d, HTTPConduit c, String address) {
         applyClientPolicies(d, c);
         applyAuthorization(d, c);
@@ -57,6 +58,7 @@ class HttpConduitConfigApplier {
         if (address != null && address.startsWith(SECURE_HTTP_PREFIX)) {
             applyTlsClientParameters(d, c);
         }
+        applyAuthSupplier(d, c);
     }
 
     private void applyTlsClientParameters(Dictionary<String, String> d, HTTPConduit c) {
@@ -65,6 +67,7 @@ class HttpConduitConfigApplier {
         SecureRandomParameters srp = null;
         KeyManagersType kmt = null;
         TrustManagersType tmt = null;
+        boolean enableRevocation = false;
         while (keys.hasMoreElements()) {
             String k = keys.nextElement();
             if (k.startsWith("tlsClientParameters.")) {
@@ -87,36 +90,10 @@ class HttpConduitConfigApplier {
                     p.setUseHttpsURLConnectionDefaultHostnameVerifier(Boolean.parseBoolean(v));
                 } else if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(k)) {
                     p.setUseHttpsURLConnectionDefaultSslSocketFactory(Boolean.parseBoolean(v));
+                } else if ("enableRevocation".equals(k)) {
+                    enableRevocation = Boolean.parseBoolean(v);
                 } else if (k.startsWith("certConstraints.")) {
-                    k = k.substring("certConstraints.".length());
-                    CertificateConstraintsType cct = p.getCertConstraints();
-                    if (cct == null) {
-                        cct = new CertificateConstraintsType();
-                        p.setCertConstraints(cct);
-                    }
-                    DNConstraintsType dnct = null;
-                    if (k.startsWith("SubjectDNConstraints.")) {
-                        dnct = cct.getSubjectDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setSubjectDNConstraints(dnct);
-                        }
-                        k = k.substring("SubjectDNConstraints.".length());
-                    } else if (k.startsWith("IssuerDNConstraints.")) {
-                        dnct = cct.getIssuerDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setIssuerDNConstraints(dnct);
-                        }
-                        k = k.substring("IssuerDNConstraints.".length());
-                    }
-                    if (dnct != null) {
-                        if ("combinator".equals(k)) {
-                            dnct.setCombinator(CombinatorType.fromValue(v));
-                        } else if ("RegularExpression".equals(k)) {
-                            dnct.getRegularExpression().add(k);
-                        }
-                    }
+                    parseCertConstaints(p, k, v);
                 } else if (k.startsWith("secureRandomParameters.")) {
                     k = k.substring("secureRandomParameters.".length());
                     if (srp == null) {
@@ -155,7 +132,7 @@ class HttpConduitConfigApplier {
                 }
             }
         }
-        
+
         try {
             if (srp != null) {
                 p.setSecureRandom(TLSParameterJaxBUtils.getSecureRandom(srp));
@@ -164,12 +141,44 @@ class HttpConduitConfigApplier {
                 p.setKeyManagers(TLSParameterJaxBUtils.getKeyManagers(kmt));
             }
             if (tmt != null) {
-                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt));
+                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt, enableRevocation));
             }
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void parseCertConstaints(TLSClientParameters p, String k, String v) {
+        k = k.substring("certConstraints.".length());
+        CertificateConstraintsType cct = p.getCertConstraints();
+        if (cct == null) {
+            cct = new CertificateConstraintsType();
+            p.setCertConstraints(cct);
+        }
+        DNConstraintsType dnct = null;
+        if (k.startsWith("SubjectDNConstraints.")) {
+            dnct = cct.getSubjectDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setSubjectDNConstraints(dnct);
+            }
+            k = k.substring("SubjectDNConstraints.".length());
+        } else if (k.startsWith("IssuerDNConstraints.")) {
+            dnct = cct.getIssuerDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setIssuerDNConstraints(dnct);
+            }
+            k = k.substring("IssuerDNConstraints.".length());
+        }
+        if (dnct != null) {
+            if ("combinator".equals(k)) {
+                dnct.setCombinator(CombinatorType.fromValue(v));
+            } else if ("RegularExpression".equals(k)) {
+                dnct.getRegularExpression().add(k);
+            }
         }
     }
 
@@ -257,7 +266,7 @@ class HttpConduitConfigApplier {
                 }
                 String v = d.get(k);
                 k = k.substring("proxyAuthorization.".length());
-                
+
                 if ("UserName".equals(k)) {
                     p.setUserName(v);
                 } else if ("Password".equals(k)) {
@@ -283,7 +292,7 @@ class HttpConduitConfigApplier {
                 }
                 String v = d.get(k);
                 k = k.substring("authorization.".length());
-                
+
                 if ("UserName".equals(k)) {
                     p.setUserName(v);
                 } else if ("Password".equals(k)) {
@@ -296,8 +305,8 @@ class HttpConduitConfigApplier {
             }
         }
     }
-    
-    
+
+
     private void applyClientPolicies(Dictionary<String, String> d, HTTPConduit c) {
         Enumeration<String> keys = d.keys();
         HTTPClientPolicy p = c.getClient();
@@ -340,6 +349,25 @@ class HttpConduitConfigApplier {
                     p.setProxyServerType(ProxyServerType.fromValue(v));
                 } else if ("NonProxyHosts".equals(k)) {
                     p.setNonProxyHosts(v);
+                }
+            }
+        }
+    }
+
+    private void applyAuthSupplier(Dictionary<String, String> d, HTTPConduit c) {
+        Enumeration<String> keys = d.keys();
+        while (keys.hasMoreElements()) {
+            String k = keys.nextElement();
+            if (k.startsWith("authSupplier")) {
+                String v = d.get(k);
+                Object obj;
+                try {
+                    obj = Class.forName(v).newInstance();
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                if (obj instanceof HttpAuthSupplier) {
+                    c.setAuthSupplier((HttpAuthSupplier)obj);
                 }
             }
         }

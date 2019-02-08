@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -75,8 +76,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
     public static final String USE_ASYNC = "use.async.http.conduit";
     final NettyHttpConduitFactory factory;
     private Bootstrap bootstrap;
-    
-    
+
+
     public NettyHttpConduit(Bus b, EndpointInfo ei, EndpointReferenceType t, NettyHttpConduitFactory conduitFactory)
         throws IOException {
         super(b, ei, t);
@@ -86,17 +87,17 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         bootstrap.group(eventLoopGroup);
         bootstrap.channel(NioSocketChannel.class);
     }
-    
+
     public NettyHttpConduitFactory getNettyHttpConduitFactory() {
         return factory;
     }
-    
+
     // Using Netty API directly
     protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
-        
+
         URI uri = address.getURI();
         boolean addressChanged = false;
-        
+
         // need to do some clean up work on the URI address
         String uriString = uri.toString();
         if (uriString.startsWith("netty://")) {
@@ -112,7 +113,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         if (!"http".equals(s) && !"https".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);
         }
-        
+
         Object o = message.getContextualProperty(USE_ASYNC);
         if (o == null) {
             o = factory.getUseAsyncPolicy();
@@ -129,13 +130,13 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             o = !message.getExchange().isSynchronous();
             break;
         }
-            
+
         // check tlsClientParameters from message header
         TLSClientParameters clientParameters = message.get(TLSClientParameters.class);
         if (clientParameters == null) {
             clientParameters = tlsClientParameters;
         }
-        if (uri.getScheme().equals("https") 
+        if ("https".equals(uri.getScheme())
             && clientParameters != null
             && clientParameters.getSSLSocketFactory() != null) {
             //if they configured in an SSLSocketFactory, we cannot do anything
@@ -143,7 +144,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             //the SSLSocketFactory.
             o = false;
         }
-        if (!MessageUtils.isTrue(o)) {
+        if (!PropertyUtils.isTrue(o)) {
             message.put(USE_ASYNC, Boolean.FALSE);
             super.setupConnection(message, addressChanged ? new Address(uriString, uri) : address, csPolicy);
             return;
@@ -168,9 +169,9 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         final int rtimeout = determineReceiveTimeout(message, csPolicy);
         request.setConnectionTimeout(ctimeout);
         request.setReceiveTimeout(rtimeout);
-        
+
         message.put(NettyHttpClientRequest.class, request);
-        
+
     }
 
     protected OutputStream createOutputStream(Message message,
@@ -190,7 +191,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             entity.createRequest(out.getOutBuffer());
             // TODO need to check how to set the Chunked feature
             //request.getRequest().setChunked(true);
-            entity.getRequest().headers().set(Message.CONTENT_TYPE, (String)message.get(Message.CONTENT_TYPE));
+            entity.getRequest().headers().set(Message.CONTENT_TYPE, message.get(Message.CONTENT_TYPE));
             return out;
         }
         return super.createOutputStream(message, needToCacheRequest, isChunking, chunkThreshold);
@@ -211,7 +212,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                                            boolean isChunking, int chunkThreshold, String conduitName, URI url) {
             super(message, possibleRetransmit, isChunking, chunkThreshold, conduitName, url);
             csPolicy = getClient(message);
-            entity  = message.get(NettyHttpClientRequest.class);
+            entity = message.get(NettyHttpClientRequest.class);
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             outBuffer = Unpooled.buffer(bufSize);
             outputStream = new ByteBufOutputStream(outBuffer);
@@ -248,7 +249,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
             }
             return httpResponse;
         }
-        
+
         protected HttpContent getHttpResponseContent() throws IOException {
             return (HttpContent) getHttpResponse();
         }
@@ -287,8 +288,8 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         @Override
         protected void setupWrappedStream() throws IOException {
             connect(true);
-            wrappedStream =  new OutputStream() {
-                public void write(byte b[], int off, int len) throws IOException {
+            wrappedStream = new OutputStream() {
+                public void write(byte[] b, int off, int len) throws IOException {
                     outputStream.write(b, off, len);
                 }
                 public void write(int b) throws IOException {
@@ -317,7 +318,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 wrappedStream = cachedStream;
             }
         }
-        
+
         protected TLSClientParameters findTLSClientParameters() {
             TLSClientParameters clientParameters = outMessage.get(TLSClientParameters.class);
             if (clientParameters == null) {
@@ -330,19 +331,19 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         }
 
         protected void connect(boolean output) {
-            if (url.getScheme().equals("https")) {
+            if ("https".equals(url.getScheme())) {
                 TLSClientParameters clientParameters = findTLSClientParameters();
                 bootstrap.handler(new NettyHttpClientPipelineFactory(clientParameters));
             } else {
                 bootstrap.handler(new NettyHttpClientPipelineFactory(null));
             }
-            ChannelFuture connFuture = 
+            ChannelFuture connFuture =
                 bootstrap.connect(new InetSocketAddress(url.getHost(), url.getPort() != -1 ? url.getPort()
                                                             : "http".equals(url.getScheme()) ? 80 : 443));
 
             // Setup the call back on the NettyHttpClientRequest
             ChannelFutureListener listener = new ChannelFutureListener() {
-                
+
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -352,7 +353,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                             session = sslHandler.engine().getSession();
                         }
                     } else {
-                        setException((Exception) future.cause());
+                        setException(future.cause());
                     }
                 }
             };
@@ -382,14 +383,14 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 return null;
             }
             connect(true);
-           
+
             HostnameVerifier verifier = org.apache.cxf.transport.https.SSLUtils
                 .getHostnameVerifier(findTLSClientParameters());
-            
+
             if (!verifier.verify(url.getHost(), session)) {
                 throw new IOException("Could not verify host " + url.getHost());
             }
-            
+
             String method = (String)outMessage.get(Message.HTTP_REQUEST_METHOD);
             String cipherSuite = null;
             Certificate[] localCerts = null;
@@ -403,7 +404,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                 serverCerts = session.getPeerCertificates();
                 peer = session.getPeerPrincipal();
             }
-            
+
             return new HttpsURLConnectionInfo(url, method, cipherSuite, localCerts, principal, serverCerts, peer);
         }
 
@@ -411,7 +412,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         protected void setProtocolHeaders() throws IOException {
             Headers h = new Headers(outMessage);
             entity.getRequest().headers().set(Message.CONTENT_TYPE, h.determineContentType());
-            boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
+            boolean addHeaders = MessageUtils.getContextualBoolean(outMessage, Headers.ADD_HEADERS_PROPERTY, false);
 
             for (Map.Entry<String, List<String>> header : h.headerMap().entrySet()) {
                 if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header.getKey())) {
@@ -621,21 +622,18 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
     @Override
     public void initComplete() {
-        // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void postShutdown() {
         // shutdown the conduit
         this.close();
-        
+
     }
 
     @Override
     public void preShutdown() {
-        // TODO Auto-generated method stub
-        
     }
 
 

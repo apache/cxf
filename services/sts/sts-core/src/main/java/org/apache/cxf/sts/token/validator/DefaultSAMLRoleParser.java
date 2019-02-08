@@ -38,7 +38,7 @@ public class DefaultSAMLRoleParser extends DefaultSubjectRoleParser implements S
      */
     public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    
+
     private boolean useJaasSubject = true;
     private String roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
 
@@ -55,17 +55,17 @@ public class DefaultSAMLRoleParser extends DefaultSubjectRoleParser implements S
         if (subject != null && useJaasSubject) {
             return super.parseRolesFromSubject(principal, subject);
         }
-        
+
         ClaimCollection claims = SAMLUtils.getClaims(assertion);
-        Set<Principal> roles = 
+        Set<Principal> roles =
             SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
-        
-        SAMLSecurityContext context = 
+
+        SAMLSecurityContext context =
             new SAMLSecurityContext(principal, roles, claims);
-        
+
         return context.getUserRoles();
     }
-    
+
     public boolean isUseJaasSubject() {
         return useJaasSubject;
     }
@@ -91,5 +91,5 @@ public class DefaultSAMLRoleParser extends DefaultSubjectRoleParser implements S
     public void setRoleAttributeName(String roleAttributeName) {
         this.roleAttributeName = roleAttributeName;
     }
-    
+
 }

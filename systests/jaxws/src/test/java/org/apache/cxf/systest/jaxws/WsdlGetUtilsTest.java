@@ -41,6 +41,8 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+
 public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(WsdlGetUtilsTest.class);
 
@@ -55,32 +57,31 @@ public class WsdlGetUtilsTest extends AbstractBusClientServerTestBase {
     public static void beforeClass() throws Exception {
         createStaticBus();
     }
-    
+
     @Test
     public void testNewDocumentIsCreatedForEachWsdlRequest() {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceBean(new StuffImpl());
         factory.setAddress("http://localhost:" + PORT + "/Stuff");
         Server server = factory.create();
-        
+
         try {
-            // FIXME - surely there is a better way to create a stubbed message and exchange
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             exchange.put(Bus.class, getBus());
             exchange.put(Service.class, server.getEndpoint().getService());
             exchange.put(Endpoint.class, server.getEndpoint());
             message.setExchange(exchange);
-    
+
             Map<String, String> map = UrlUtils.parseQueryString("wsdl");
             String baseUri = "http://localhost:" + PORT + "/Stuff";
             String ctx = "/Stuff";
-    
+
             WSDLGetUtils utils = new WSDLGetUtils();
             Document doc = utils.getDocument(message, baseUri, map, ctx, server.getEndpoint().getEndpointInfo());
-    
+
             Document doc2 = utils.getDocument(message, baseUri, map, ctx, server.getEndpoint().getEndpointInfo());
-    
+
             assertFalse(doc == doc2);
         } finally {
             server.stop();

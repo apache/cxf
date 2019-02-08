@@ -40,11 +40,11 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
     private String defaultCallback = DEFAULT_CALLBACK_VALUE;
     private String acceptType;
     private String mediaType = JSONP_TYPE;
-    
+
     public JsonpInInterceptor() {
         this(Phase.UNMARSHAL);
     }
-    
+
     public JsonpInInterceptor(String phase) {
         super(phase);
     }
@@ -53,7 +53,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
         String callbackValue = getCallbackValue(message);
         if (!StringUtils.isEmpty(callbackValue)) {
             if (getAcceptType() != null) {
-                // may be needed to enforce the selection of 
+                // may be needed to enforce the selection of
                 // JSON-aware provider
                 message.put(Message.ACCEPT_CONTENT_TYPE, getAcceptType());
             }
@@ -72,7 +72,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         return callback;
     }
-    
+
     public void setCallbackParam(String callbackParam) {
         this.callbackParam = callbackParam;
     }

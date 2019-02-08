@@ -17,7 +17,14 @@ KIND, either express or implied. See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation="         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd         ">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -28,10 +35,10 @@ under the License.
         <httpj:engine port="${testutil.ports.jaxrs-jwt}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
                 </sec:keyManagers>
                 <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
                 <sec:clientAuthentication want="true" required="true"/>
             </httpj:tlsServerParameters>
@@ -46,7 +53,7 @@ under the License.
         <constructor-arg value="A128KW"/>
     </bean>
     <bean id="aesCbcHmacEncryption" class="org.apache.cxf.rs.security.jose.jwe.AesCbcHmacJweEncryption">
-        <constructor-arg value="A128CBC-HS256"/>
+        <constructor-arg value="A128CBC_HS256"/>
         <constructor-arg ref="aesWrapEncryptionAlgo"/>
     </bean>
     
@@ -72,6 +79,10 @@ under the License.
        <property name="signatureVerifier" ref="hmacSigVerifier"/>
     </bean>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
+    <bean id="jwsInFilterHttpHeaders" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
+        <property name="validateHttpHeaders" value="true"/>
+    </bean>
+    <bean id="httpHeaderFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.HttpHeaderModifyingFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
     <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
     <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl">
@@ -207,6 +218,20 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkhmacHttpHeaders">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilterHttpHeaders"/>
+            <ref bean="httpHeaderFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkec">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -242,5 +267,17 @@ under the License.
             <ref bean="jweInAesCbcHmacFilter"/>
             <ref bean="jweOutAesCbcHmacFilter"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaesgcmdirect">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/jwe.direct.properties"/>
+        </jaxrs:properties>
     </jaxrs:server>
 </beans>

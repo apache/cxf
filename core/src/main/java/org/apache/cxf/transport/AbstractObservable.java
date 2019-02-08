@@ -34,7 +34,7 @@ public abstract class AbstractObservable implements Observable {
 
     /**
      * Register a message observer for incoming messages.
-     * 
+     *
      * @param observer the observer to notify on receipt of incoming
      * message
      */
@@ -68,7 +68,7 @@ public abstract class AbstractObservable implements Observable {
             }
         }
     }
-   
+
     /**
      * @return the observer to notify on receipt of incoming message
      */
@@ -78,17 +78,17 @@ public abstract class AbstractObservable implements Observable {
 
     /**
      * Get the target reference .
-     * 
+     *
      * @param ei the corresponding EndpointInfo
      * @return the actual target
      */
     protected static EndpointReferenceType getTargetReference(EndpointInfo ei, Bus bus) {
         return getTargetReference(ei, null, bus);
     }
-    
+
     /**
      * Get the target endpoint reference.
-     * 
+     *
      * @param ei the corresponding EndpointInfo
      * @param t the given target EPR if available
      * @param bus the Bus
@@ -104,8 +104,8 @@ public abstract class AbstractObservable implements Observable {
             address.setValue(ei.getAddress());
             ref.setAddress(address);
             if (ei.getService() != null) {
-                EndpointReferenceUtils.setServiceAndPortName(ref, 
-                                                             ei.getService().getName(), 
+                EndpointReferenceUtils.setServiceAndPortName(ref,
+                                                             ei.getService().getName(),
                                                              ei.getName().getLocalPart());
             }
         } else {
@@ -113,7 +113,7 @@ public abstract class AbstractObservable implements Observable {
         }
         return ref;
     }
-    
+
     /**
      * Activate messages flow.
      */
@@ -125,9 +125,9 @@ public abstract class AbstractObservable implements Observable {
      * Deactivate messages flow.
      */
     protected void deactivate() {
-        // nothing to do by default        
+        // nothing to do by default
     }
-    
+
     /**
      * @return the logger to use
      */

@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamReader;
  * hasMoreChildReaders() returns false.
  */
 public interface MessageReader {
-    
+
     String getValue();
 
     boolean isXsiNil();
@@ -57,7 +57,7 @@ public interface MessageReader {
 
     /**
      * Get the local name of the element this reader represents.
-     * 
+     *
      * @return Local Name
      */
     String getLocalName();

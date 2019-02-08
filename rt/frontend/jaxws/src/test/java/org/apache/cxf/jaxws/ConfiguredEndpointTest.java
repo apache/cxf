@@ -45,19 +45,22 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-public class ConfiguredEndpointTest extends Assert {
-    private static final QName SERVICE_NAME = 
-        new QName("http://apache.org/hello_world_soap_http", "SOAPService");    
-    private static final QName PORT_NAME = 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+
+public class ConfiguredEndpointTest {
+    private static final QName SERVICE_NAME =
+        new QName("http://apache.org/hello_world_soap_http", "SOAPService");
+    private static final QName PORT_NAME =
         new QName("http://apache.org/hello_world_soap_http", "SoapPort");
 
     private BusFactory factory;
-    
+
     @After
     public void tearDown() {
         Bus bus = BusFactory.getDefaultBus();
@@ -67,7 +70,7 @@ public class ConfiguredEndpointTest extends Assert {
         }
         System.clearProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
     }
-   
+
     @Test
     public void testCXFDefaultClientEndpoint() {
         factory = new CXFBusFactory();
@@ -76,7 +79,7 @@ public class ConfiguredEndpointTest extends Assert {
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, CXFBusFactory.class.getName());
         doTestDefaultClientEndpoint();
     }
-     
+
     @Test
     public void testSpringDefaultClientEndpoint() {
         factory = new SpringBusFactory();
@@ -85,22 +88,22 @@ public class ConfiguredEndpointTest extends Assert {
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, SpringBusFactory.class.getName());
         doTestDefaultClientEndpoint();
     }
-     
-    private void doTestDefaultClientEndpoint() {        
+
+    private void doTestDefaultClientEndpoint() {
 
         javax.xml.ws.Service service = new SOAPService();
         Greeter greeter = service.getPort(PORT_NAME, Greeter.class);
-        
+
         JaxWsClientProxy eih = (JaxWsClientProxy)Proxy.getInvocationHandler(greeter);
         Client client = eih.getClient();
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)client.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertTrue("Unexpected value for property validating", 
-                   !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
-   
+        assertFalse("Unexpected value for property validating",
+                   Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
+
         // System.out.println("endpoint interceptors");
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
-        printInterceptors("in", interceptors);        
+        printInterceptors("in", interceptors);
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
         interceptors = endpoint.getOutInterceptors();
         printInterceptors("out", interceptors);
@@ -111,7 +114,7 @@ public class ConfiguredEndpointTest extends Assert {
         interceptors = endpoint.getOutFaultInterceptors();
         printInterceptors("outFault", interceptors);
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
-        
+
         // System.out.println("service interceptors");
         org.apache.cxf.service.ServiceImpl svc = (org.apache.cxf.service.ServiceImpl)endpoint.getService();
         assertEquals("Unexpected bean name", SERVICE_NAME.toString(), svc.getBeanName());
@@ -130,20 +133,6 @@ public class ConfiguredEndpointTest extends Assert {
     }
 
     @Test
-    @Ignore
-    public void testCXFConfiguredClientEndpoint() {
-        CXFBusFactory cf = new CXFBusFactory();
-        factory = cf;
-        BusFactory.setDefaultBus(null);
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(Configurer.USER_CFG_FILE_PROPERTY_NAME,
-            "org/apache/cxf/jaxws/configured-endpoints.xml");
-        BusFactory.setDefaultBus(cf.createBus(null, properties));
-        System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, CXFBusFactory.class.getName());
-        doTestConfiguredClientEndpoint();
-    }
-    
-    @Test
     public void testSpringConfiguredClientEndpoint() {
         SpringBusFactory sf = new SpringBusFactory();
         factory = sf;
@@ -161,46 +150,27 @@ public class ConfiguredEndpointTest extends Assert {
         JaxWsClientProxy eih = (JaxWsClientProxy)Proxy.getInvocationHandler(greeter);
         Client client = eih.getClient();
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)client.getEndpoint();
-//      The service shouldn't pick up the <jaxws:endpoint>...
-//        assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-//        // assertTrue("Unexpected value for property validating", endpoint.getValidating());
-//        List<Interceptor> interceptors = endpoint.getInInterceptors();
-//        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-//        assertEquals("Unexpected interceptor id.", "endpoint-in", 
-//                     findTestInterceptor(interceptors).getId());
-//        interceptors = endpoint.getOutInterceptors();
-//        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-//        assertEquals("Unexpected interceptor id.", "endpoint-out", 
-//                     findTestInterceptor(interceptors).getId());
-//        interceptors = endpoint.getInFaultInterceptors();
-//        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-//        assertEquals("Unexpected interceptor id.", "endpoint-in-fault", 
-//                     findTestInterceptor(interceptors).getId());
-//        interceptors = endpoint.getOutFaultInterceptors();
-//        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-//        assertEquals("Unexpected interceptor id.", "endpoint-out-fault", 
-//                     findTestInterceptor(interceptors).getId());
-        
+
         org.apache.cxf.service.ServiceImpl svc = (org.apache.cxf.service.ServiceImpl)endpoint.getService();
         assertEquals("Unexpected bean name.", SERVICE_NAME.toString(), svc.getBeanName());
         List<Interceptor<? extends Message>> interceptors = svc.getInInterceptors();
-        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-in", 
+        assertEquals("Unexpected number of interceptors: " + interceptors, 1, interceptors.size());
+        assertEquals("Unexpected interceptor id.", "service-in",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getOutInterceptors();
-        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-out", 
+        assertEquals("Unexpected number of interceptors: " + interceptors, 1, interceptors.size());
+        assertEquals("Unexpected interceptor id.", "service-out",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getInFaultInterceptors();
-        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-in-fault", 
+        assertEquals("Unexpected number of interceptors: " + interceptors, 1, interceptors.size());
+        assertEquals("Unexpected interceptor id.", "service-in-fault",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getOutFaultInterceptors();
-        assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-out-fault", 
+        assertEquals("Unexpected number of interceptors: " + interceptors, 1, interceptors.size());
+        assertEquals("Unexpected interceptor id.", "service-out-fault",
                      findTestInterceptor(interceptors).getId());
     }
-    
+
     @Test
     public void testCXFDefaultServerEndpoint() {
         factory = new CXFBusFactory();
@@ -210,7 +180,7 @@ public class ConfiguredEndpointTest extends Assert {
         initializeBus();
         doTestDefaultServerEndpoint();
     }
-     
+
     @Test
     public void testSpringDefaultServerEndpoint() {
         factory = new SpringBusFactory();
@@ -220,18 +190,18 @@ public class ConfiguredEndpointTest extends Assert {
         initializeBus();
         doTestDefaultServerEndpoint();
     }
-     
+
     private void doTestDefaultServerEndpoint() {
-        
-        Object implementor = new GreeterImpl(); 
+
+        Object implementor = new GreeterImpl();
         EndpointImpl ei = (EndpointImpl)(javax.xml.ws.Endpoint.create(implementor));
         ei.publish("http://localhost/greeter");
-        
+
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertTrue("Unexpected value for property validating", 
-                   !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
-   
+        assertFalse("Unexpected value for property validating",
+                   Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
+
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
         interceptors = endpoint.getOutInterceptors();
@@ -240,7 +210,7 @@ public class ConfiguredEndpointTest extends Assert {
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
         interceptors = endpoint.getOutFaultInterceptors();
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
-        
+
         org.apache.cxf.service.ServiceImpl svc = (org.apache.cxf.service.ServiceImpl)endpoint.getService();
         assertEquals("Unexpected bean name", SERVICE_NAME.toString(), svc.getBeanName());
         interceptors = svc.getInInterceptors();
@@ -254,12 +224,11 @@ public class ConfiguredEndpointTest extends Assert {
     }
 
     @Test
-    @Ignore
     public void xtestCXFConfiguredServerEndpoint() {
         CXFBusFactory cf = new CXFBusFactory();
         factory = cf;
         BusFactory.setDefaultBus(null);
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(Configurer.USER_CFG_FILE_PROPERTY_NAME,
             "org/apache/cxf/jaxws/configured-endpoints.xml");
         BusFactory.setDefaultBus(cf.createBus(null, properties));
@@ -267,15 +236,13 @@ public class ConfiguredEndpointTest extends Assert {
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, CXFBusFactory.class.getName());
         //doTestConfiguredServerEndpoint();
     }
-    
+
     @Test
     public void testSpringConfiguredServerEndpoint() {
-        // FIXME - duplicating the config file just for one value is ugly, must be a better
-        // way.
         doTestConfiguredServerEndpoint("true", "org/apache/cxf/jaxws/configured-endpoints.xml");
         doTestConfiguredServerEndpoint("BOTH", "org/apache/cxf/jaxws/schemavalidationtype-configured-endpoints.xml");
     }
-    
+
     private void doTestConfiguredServerEndpoint(Object expectedValidionValue, String configFile) {
         SpringBusFactory sf = new SpringBusFactory();
         factory = sf;
@@ -283,55 +250,55 @@ public class ConfiguredEndpointTest extends Assert {
         BusFactory.setDefaultBus(sf.createBus(configFile));
         initializeBus();
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, SpringBusFactory.class.getName());
-        
-        Object implementor = new GreeterImpl(); 
+
+        Object implementor = new GreeterImpl();
         EndpointImpl ei = (EndpointImpl)(javax.xml.ws.Endpoint.create(implementor));
         ei.publish("http://localhost/greeter");
-        
+
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertEquals("Unexpected value for property validating", 
+        assertEquals("Unexpected value for property validating",
                      expectedValidionValue, ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED));
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertEquals("Unexpected number of interceptors.", 5, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "endpoint-in", 
+        assertEquals("Unexpected interceptor id.", "endpoint-in",
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getOutInterceptors();
         assertEquals("Unexpected number of interceptors.", 5, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "endpoint-out", 
+        assertEquals("Unexpected interceptor id.", "endpoint-out",
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getInFaultInterceptors();
         assertEquals("Unexpected number of interceptors.", 2, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "endpoint-in-fault", 
+        assertEquals("Unexpected interceptor id.", "endpoint-in-fault",
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getOutFaultInterceptors();
         assertEquals("Unexpected number of interceptors.", 2, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "endpoint-out-fault", 
+        assertEquals("Unexpected interceptor id.", "endpoint-out-fault",
                      findTestInterceptor(interceptors).getId());
-        
+
         org.apache.cxf.service.ServiceImpl svc = (org.apache.cxf.service.ServiceImpl)endpoint.getService();
         assertEquals("Unexpected bean name.", SERVICE_NAME.toString(), svc.getBeanName());
         interceptors = svc.getInInterceptors();
         assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-in", 
+        assertEquals("Unexpected interceptor id.", "service-in",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getOutInterceptors();
         assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-out", 
+        assertEquals("Unexpected interceptor id.", "service-out",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getInFaultInterceptors();
         assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-in-fault", 
+        assertEquals("Unexpected interceptor id.", "service-in-fault",
                      findTestInterceptor(interceptors).getId());
         interceptors = svc.getOutFaultInterceptors();
         assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
-        assertEquals("Unexpected interceptor id.", "service-out-fault", 
+        assertEquals("Unexpected interceptor id.", "service-out-fault",
                      findTestInterceptor(interceptors).getId());
     }
-      
+
     private void initializeBus() {
         Bus bus = BusFactory.getDefaultBus();
-        
+
         SoapBindingFactory bindingFactory = new SoapBindingFactory();
 
         bus.getExtension(BindingFactoryManager.class)
@@ -346,8 +313,8 @@ public class ConfiguredEndpointTest extends Assert {
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
     }
-      
-    
+
+
     private TestInterceptor findTestInterceptor(List<Interceptor<? extends Message>> interceptors) {
         for (Interceptor<? extends Message> i : interceptors) {
             if (i instanceof TestInterceptor) {
@@ -356,22 +323,21 @@ public class ConfiguredEndpointTest extends Assert {
         }
         return null;
     }
-    
-    
+
+
     private void printInterceptors(String type, List<Interceptor<? extends Message>> interceptors) {
         //for (Interceptor i : interceptors) {
             //System.out.println("    " + type + ": " + i.getClass().getName());
         //}
     }
-    
-    
+
+
     static final class TestInterceptor extends AbstractPhaseInterceptor<Message> {
         TestInterceptor(String name) {
             super(name, "");
         }
-    
+
         public void handleMessage(Message message) throws Fault {
-            // TODO Auto-generated method stub
         }
     }
 }

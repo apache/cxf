@@ -44,6 +44,11 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests failover within a static cluster.
@@ -67,7 +72,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             if (activeReplica1Started && activeReplica2Started) {
                 break;
             }
-            Thread.sleep(1000);    
+            Thread.sleep(1000);
         }
     }
     private static boolean checkReplica(String address) {
@@ -78,103 +83,103 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             return false;
         }
     }
-    
-    @Test    
+
+    @Test
     public void testSequentialStrategy() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature =
+            getFeature(false, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false, false);
     }
-    
+
     @Test
     public void testSequentialStrategyWebClient() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature =
+            getFeature(false, Server.ADDRESS2, Server.ADDRESS3);
         strategyTestWebClient(Server.ADDRESS1, feature, Server.ADDRESS2, null, false, false);
     }
-    
+
     @Test
     public void testSequentialStrategyWith404() throws Exception {
         FailoverFeature feature = getFeature(false, Server.ADDRESS3);
         feature.getTargetSelector().setSupportNotAvailableErrorsOnly(true);
         strategyTestWebClient(Server.ADDRESS2 + "/new", feature, Server.ADDRESS3, null, false, false);
     }
-    
+
     @Test
     public void testSequentialStrategyWith406() throws Exception {
         FailoverFeature feature = getFeature(false, Server.ADDRESS3);
         feature.getTargetSelector().setSupportNotAvailableErrorsOnly(false);
         strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, false);
     }
-    
+
     @Test
     public void testSequentialStrategyWith406NoFailover() throws Exception {
         FailoverFeature feature = getFeature(false, Server.ADDRESS3);
         strategyTestWebClientHttpError(Server.ADDRESS2, feature, Server.ADDRESS3, true);
     }
-    
+
     @Test
     public void testRandomStrategyWebClient() throws Exception {
-        FailoverFeature feature = 
-            getFeature(true, Server.ADDRESS3, Server.ADDRESS2); 
+        FailoverFeature feature =
+            getFeature(true, Server.ADDRESS3, Server.ADDRESS2);
         strategyTestWebClient(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, true);
     }
-    
-    @Test    
+
+    @Test
     public void testRandomStrategy() throws Exception {
-        FailoverFeature feature = 
-            getFeature(true, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature =
+            getFeature(true, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true, true);
     }
-    
-    @Test    
+
+    @Test
     public void testRandomStrategy2() throws Exception {
-        FailoverFeature feature = 
-            getFeature(true, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature =
+            getFeature(true, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, false, true, false);
     }
-    
-    @Test    
+
+    @Test
     public void testSequentialStrategyWithDiffBaseAddresses() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS3, null); 
+        FailoverFeature feature =
+            getFeature(false, Server.ADDRESS3, null);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, false);
     }
-    
+
     public void testSequentialStrategyWithDiffBaseAddresses2() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS3, null); 
+        FailoverFeature feature =
+            getFeature(false, Server.ADDRESS3, null);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, true);
     }
-    
+
     @Test(expected = InternalServerErrorException.class)
     public void testSequentialStrategyWithServerException() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature =
+            getFeature(false, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS2, Server.ADDRESS3, true, false, false);
     }
-    
-    @Test(expected = ProcessingException.class)    
+
+    @Test(expected = ProcessingException.class)
     public void testSequentialStrategyFailure() throws Exception {
-        FailoverFeature feature = 
-            getFeature(false, "http://localhost:" + NON_PORT + "/non-existent"); 
+        FailoverFeature feature =
+            getFeature(false, "http://localhost:" + NON_PORT + "/non-existent");
         strategyTest(Server.ADDRESS1, feature, null, null, false, false, false);
     }
-    
+
     @Test
     public void testSequentialStrategyWithRetries() throws Exception {
         String address = "http://localhost:" + NON_PORT + "/non-existent";
         String address2 = "http://localhost:" + NON_PORT + "/non-existent2";
-        
+
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         alternateAddresses.add(address);
         alternateAddresses.add(address2);
         CustomRetryStrategy strategy = new CustomRetryStrategy();
         strategy.setMaxNumberOfRetries(5);
         strategy.setAlternateAddresses(alternateAddresses);
         feature.setStrategy(strategy);
-            
+
         BookStore store = getBookStore(address, feature);
         try {
             store.getBook("1");
@@ -185,36 +190,36 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             assertEquals(5, strategy.getAddressCount(address2));
         }
     }
-    
+
     protected abstract FailoverFeature getFeature(boolean random, String ...address);
 
-    
-    
-    protected BookStore getBookStore(String address, 
+
+
+    protected BookStore getBookStore(String address,
                                      FailoverFeature feature) throws Exception {
         JAXRSClientFactoryBean bean = createBean(address, feature);
         bean.setServiceClass(BookStore.class);
         return bean.create(BookStore.class);
     }
-    
-    protected WebClient getWebClient(String address, 
+
+    protected WebClient getWebClient(String address,
                                      FailoverFeature feature) throws Exception {
         JAXRSClientFactoryBean bean = createBean(address, feature);
-        
+
         return bean.createWebClient();
     }
-    
-    protected JAXRSClientFactoryBean createBean(String address, 
+
+    protected JAXRSClientFactoryBean createBean(String address,
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<Feature> features = new ArrayList<Feature>();
+        List<Feature> features = new ArrayList<>();
         features.add(feature);
         bean.setFeatures(features);
-        
+
         return bean;
     }
-    
+
     protected void strategyTest(String inactiveReplica,
                                 FailoverFeature feature,
                                 String activeReplica1,
@@ -225,17 +230,17 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         boolean randomized = false;
         String prevEndpoint = null;
         BookStore bookStore = null;
-        
+
         if (singleProxy) {
             bookStore = getBookStore(inactiveReplica, feature);
-        } 
-        
+        }
+
         for (int i = 0; i < 20; i++) {
             if (!singleProxy) {
                 feature.getTargetSelector().close();
                 bookStore = getBookStore(inactiveReplica, feature);
             }
-            verifyStrategy(bookStore, expectRandom 
+            verifyStrategy(bookStore, expectRandom
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
             Exception ex = null;
@@ -267,7 +272,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 assertNotNull(ex);
                 throw ex;
             }
-            
+
             if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
                 randomized = true;
             }
@@ -279,7 +284,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                          randomized);
         }
     }
-    
+
     protected void strategyTestWebClient(String inactiveReplica,
                                 FailoverFeature feature,
                                 String activeReplica1,
@@ -291,7 +296,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         for (int i = 0; i < 20; i++) {
             feature.getTargetSelector().close();
             WebClient bookStore = getWebClient(inactiveReplica, feature);
-            verifyStrategy(bookStore, expectRandom 
+            verifyStrategy(bookStore, expectRandom
                               ? RandomStrategy.class
                               : SequentialStrategy.class);
             String bookId = expectServerException ? "9999" : "123";
@@ -318,7 +323,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                 assertNotNull(ex);
                 throw ex;
             }
-            
+
             if (!(prevEndpoint == null || currEndpoint.equals(prevEndpoint))) {
                 randomized = true;
             }
@@ -328,7 +333,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
                      expectRandom,
                      randomized);
     }
-    
+
     protected void strategyTestWebClientHttpError(String currentReplica,
                                  FailoverFeature feature,
                                  String newReplica,
@@ -346,15 +351,15 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         }
     }
 
-    
+
     protected String getCurrentEndpointAddress(Object client) {
         String currentBaseURI = WebClient.client(client).getBaseURI().toString();
         String currentURI = WebClient.client(client).getCurrentURI().toString();
         assertTrue(currentURI.startsWith(currentBaseURI));
         return currentBaseURI;
     }
-    
-        
+
+
     protected void verifyStrategy(Object proxy, Class<?> clz) {
         ConduitSelector conduitSelector =
             WebClient.getConfig(proxy).getConduitSelector();
@@ -366,10 +371,10 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             fail("unexpected conduit selector: " + conduitSelector);
         }
     }
-    
+
     private static class CustomRetryStrategy extends RetryStrategy {
         private int totalCount;
-        private Map<String, Integer> map = new HashMap<String, Integer>(); 
+        private Map<String, Integer> map = new HashMap<>();
         @Override
         protected <T> T getNextAlternate(List<T> alternates) {
             totalCount++;
@@ -377,17 +382,17 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             String address = (String)next;
             Integer count = map.get(address);
             if (count == null) {
-                count = 0; 
+                count = 0;
             }
             count++;
             map.put(address, count);
             return next;
         }
-        
+
         public int getTotalCount() {
             return totalCount - 2;
         }
-        
+
         public int getAddressCount(String address) {
             return map.get(address) - 1;
         }

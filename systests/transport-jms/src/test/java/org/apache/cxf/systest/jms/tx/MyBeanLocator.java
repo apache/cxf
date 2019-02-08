@@ -28,8 +28,8 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 public class MyBeanLocator implements ConfiguredBeanLocator {
     ConfiguredBeanLocator cbl;
-    Map<String, Object> registry = new HashMap<String, Object>();
-    
+    Map<String, Object> registry = new HashMap<>();
+
     public MyBeanLocator(ConfiguredBeanLocator cbl) {
         this.cbl = cbl;
     }
@@ -39,15 +39,14 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
     public <T> T getBeanOfType(String name, Class<T> type) {
         if (registry.containsKey(name)) {
             return (T)registry.get(name);
-        } else {
-            return cbl.getBeanOfType(name, type);
         }
+        return cbl.getBeanOfType(name, type);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
         for (String name : registry.keySet()) {
             Object bean = registry.get(name);
             if (type.isAssignableFrom(bean.getClass())) {
@@ -60,12 +59,12 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
 
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         return cbl.loadBeansOfType(type, listener);
-    
+
     }
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
         return cbl.hasConfiguredPropertyValue(beanName, propertyName, value);
     }
-    
+
     public List<String> getBeanNamesOfType(Class<?> type) {
         return cbl.getBeanNamesOfType(type);
     }
@@ -76,5 +75,5 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
     public void register(String name, Object object) {
         registry.put(name, object);
     }
-    
+
 }

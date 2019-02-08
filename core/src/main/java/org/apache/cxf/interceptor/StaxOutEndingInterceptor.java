@@ -34,10 +34,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutEndingInterceptor.class);
-    
+
     private String outStreamHolder;
     private String writerHolder;
-    
+
     public StaxOutEndingInterceptor(String outStreamHolder) {
         this(outStreamHolder, null);
     }
@@ -57,9 +57,9 @@ public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> 
                     xtw.flush();
                 } finally {
                     StaxUtils.close(xtw);
-                }                
+                }
             }
-       
+
             OutputStream os = (OutputStream)message.get(outStreamHolder);
             if (os != null) {
                 message.setContent(OutputStream.class, os);

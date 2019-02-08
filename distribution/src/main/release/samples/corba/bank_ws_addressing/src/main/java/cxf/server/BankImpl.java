@@ -27,7 +27,7 @@ import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import cxf.common.Bank;
 
-@javax.jws.WebService(portName = "BankCORBAPort", 
+@javax.jws.WebService(portName = "BankCORBAPort",
                       serviceName = "BankCORBAService",
                       targetNamespace = "http://cxf.apache.org/schemas/cxf/idl/Bank",
                       wsdlLocation = "classpath:/wsdl/BankWS-corba.wsdl",
@@ -35,13 +35,12 @@ import cxf.common.Bank;
 
 public class BankImpl implements Bank {
 
-    private Map<String, W3CEndpointReference> accountList = 
-        new HashMap<String, W3CEndpointReference>();
-    private Map<String, Endpoint> endpointList = new HashMap<String, Endpoint>();
+    private Map<String, W3CEndpointReference> accountList = new HashMap<>();
+    private Map<String, Endpoint> endpointList = new HashMap<>();
 
     public BankImpl() {
     }
-    
+
     public W3CEndpointReference createAccount(String accountName) {
         System.out.println("[Bank] Called createAccount( " + accountName + " )...");
         System.out.println();
@@ -79,7 +78,7 @@ public class BankImpl implements Bank {
     public W3CEndpointReference getAccountEprWithNoUseAttribute(String accountName) {
         return null;
     }
-    
+
     // TODO: What is the correct implementation for this operation?
     public void findAccount(javax.xml.ws.Holder<java.lang.Object> accountDetails) {
     }

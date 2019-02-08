@@ -40,34 +40,41 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
 
 /**
- * 
+ *
  */
-public class ExternalAttachmentProviderTest extends Assert {
+public class ExternalAttachmentProviderTest {
 
     private static final QName TEST_ASSERTION_TYPE = new QName("http://a.b.c", "x");
-    
-    
+
+
     private IMocksControl control;
     private Policy policy;
     private Assertion assertion;
     private PolicyAttachment attachment;
-    private Collection<PolicyAttachment> attachments = new ArrayList<PolicyAttachment>();
-    
+    private Collection<PolicyAttachment> attachments = new ArrayList<>();
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();  
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testBasic() {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
@@ -75,9 +82,9 @@ public class ExternalAttachmentProviderTest extends Assert {
         Resource uri = control.createMock(Resource.class);
         eap.setLocation(uri);
         assertSame(uri, eap.getLocation());
-        
+
     }
-    
+
     @Test
     public void testGetEffectiveFaultPolicy() {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
@@ -86,14 +93,14 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.replay();
         assertNull(eap.getEffectivePolicy(bfi, null));
         control.verify();
-        
+
         control.reset();
         setUpAttachment(bfi, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(bfi, null).getAssertions().get(0));
         control.verify();
     }
-    
+
     @Test
     public void testGetEffectiveMessagePolicy() {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
@@ -102,14 +109,14 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.replay();
         assertNull(eap.getEffectivePolicy(bmi, null));
         control.verify();
-        
+
         control.reset();
         setUpAttachment(bmi, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(bmi, null).getAssertions().get(0));
         control.verify();
     }
-    
+
     @Test
     public void testGetEffectiveOperationPolicy() {
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
@@ -118,7 +125,7 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.replay();
         assertNull(eap.getEffectivePolicy(boi, null));
         control.verify();
-        
+
         control.reset();
         setUpAttachment(boi, true, eap);
         control.replay();
@@ -134,7 +141,7 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.replay();
         assertNull(eap.getEffectivePolicy(ei, null));
         control.verify();
-        
+
         control.reset();
         setUpAttachment(ei, true, eap);
         control.replay();
@@ -150,14 +157,14 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.replay();
         assertNull(eap.getEffectivePolicy(si, null));
         control.verify();
-        
+
         control.reset();
         setUpAttachment(si, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(si, null).getAssertions().get(0));
         control.verify();
     }
-    
+
     @Test
     public void testReadDocumentNotExisting() throws MalformedURLException {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
@@ -172,39 +179,39 @@ public class ExternalAttachmentProviderTest extends Assert {
             assertTrue(ex.getCause() instanceof FileNotFoundException);
         }
     }
-    
+
     @Test
     public void testReadDocumentWithoutAttachmentElements() throws MalformedURLException {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments1.xml");
         String uri = url.toExternalForm();
         eap.setLocation(new UrlResource(uri));
-        eap.readDocument(); 
+        eap.readDocument();
         assertTrue(eap.getAttachments().isEmpty());
     }
-    
+
     @Test
     public void testReadDocumentAttachmentElementWithoutAppliesTo() throws MalformedURLException {
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments2.xml");
         String uri = url.toExternalForm();
         eap.setLocation(new UrlResource(uri));
-        eap.readDocument(); 
+        eap.readDocument();
         assertTrue(eap.getAttachments().isEmpty());
     }
-    
+
     @Test
     public void testReadDocumentUnknownDomainExpression() throws MalformedURLException {
 
         Bus bus = control.createMock(Bus.class);
-        
+
         DomainExpressionBuilderRegistry debr = control.createMock(DomainExpressionBuilderRegistry.class);
         EasyMock.expect(bus.getExtension(DomainExpressionBuilderRegistry.class)).andReturn(debr);
         EasyMock.expect(debr.build(EasyMock.isA(Element.class)))
             .andThrow(new PolicyException(new Exception()));
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments3.xml");
         String uri = url.toExternalForm();
-        
+
         control.replay();
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider(bus);
         eap.setLocation(new UrlResource(uri));
@@ -216,12 +223,12 @@ public class ExternalAttachmentProviderTest extends Assert {
         }
         control.verify();
     }
-    
+
     @Test
     public void testReadDocumentEPRDomainExpression() throws MalformedURLException {
-        
+
         Bus bus = control.createMock(Bus.class);
-        
+
         DomainExpressionBuilderRegistry debr = control.createMock(DomainExpressionBuilderRegistry.class);
         EasyMock.expect(bus.getExtension(DomainExpressionBuilderRegistry.class)).andReturn(debr);
         DomainExpression de = control.createMock(DomainExpression.class);
@@ -230,8 +237,8 @@ public class ExternalAttachmentProviderTest extends Assert {
         EasyMock.expect(bus.getExtension(PolicyBuilder.class)).andReturn(pb).anyTimes();
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(pb.getPolicy(EasyMock.isA(Element.class))).andReturn(p);
-                
-        
+
+
         control.replay();
         ExternalAttachmentProvider eap = new ExternalAttachmentProvider(bus);
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments4.xml");
@@ -245,7 +252,7 @@ public class ExternalAttachmentProviderTest extends Assert {
         assertSame(de, pa.getDomainExpressions().iterator().next());
         control.verify();
     }
-    
+
     void setUpAttachment(Object subject, boolean applies, ExternalAttachmentProvider eap) {
         attachments.clear();
         attachment = control.createMock(PolicyAttachment.class);
@@ -269,9 +276,9 @@ public class ExternalAttachmentProviderTest extends Assert {
         }
         if (applies) {
             EasyMock.expect(attachment.getPolicy()).andReturn(policy);
-        } 
+        }
     }
-    
-    
-    
+
+
+
 }

@@ -38,7 +38,7 @@ public class PersistInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     /**
      * Copied from LoggingInInterceptor
-     * 
+     *
      * @param soapMessage
      */
     private void getSoapRequest(Message soapMessage, ExchangeData exchange) {

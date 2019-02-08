@@ -19,32 +19,34 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import java.util.HashMap;
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.transports.http.configuration.ProxyServerType;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.littleshoot.proxy.DefaultHttpProxyServer;
-import org.littleshoot.proxy.HttpFilter;
-import org.littleshoot.proxy.ProxyUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CXF6655Test extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final int PROXY_PORT = Integer.parseInt(allocatePort(CXF6655Test.class));
-    static DefaultHttpProxyServer proxy;
+    static HttpProxyServer proxy;
 
     public static class Server extends AbstractBusTestServerBase {
 
@@ -76,11 +78,9 @@ public class CXF6655Test extends AbstractClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        proxy = new DefaultHttpProxyServer(PROXY_PORT, ProxyUtils.PASS_THROUGH_REQUEST_FILTER,
-                                           new HashMap<String, HttpFilter>());
-        proxy.start();
+        proxy = DefaultHttpProxyServer.bootstrap().withPort(PROXY_PORT).start();
     }
-    
+
     @Test
     public void testConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");

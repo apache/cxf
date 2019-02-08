@@ -54,11 +54,11 @@ public class ProxyFactory {
      * if there is no appropriate System properties)
      */
     private HTTPClientPolicy systemProxyConfiguration;
-    
+
     public ProxyFactory() {
         this.systemProxyConfiguration = createSystemProxyConfiguration();
     }
-    
+
     private static HTTPClientPolicy createSystemProxyConfiguration() {
         // Retrieve system properties (if any)
         HTTPClientPolicy systemProxyConfiguration = null;
@@ -78,8 +78,8 @@ public class ProxyFactory {
             if (StringUtils.isEmpty(proxyPort)) {
                 proxyPort = "8080";
             }
-            
-            systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
+
+            systemProxyConfiguration.setProxyServerPort(Integer.parseInt(proxyPort));
 
             // Load non proxy hosts
             String nonProxyHosts = SystemPropertyAction.getPropertyOrNull(HTTP_NON_PROXY_HOSTS);
@@ -89,11 +89,11 @@ public class ProxyFactory {
         }
         return systemProxyConfiguration;
     }
-    
+
     /**
-     * This method returns the Proxy server should it be set on the 
+     * This method returns the Proxy server should it be set on the
      * Client Side Policy.
-     * 
+     *
      * @return The proxy server or null, if not set.
      */
     public Proxy createProxy(HTTPClientPolicy policy, URI currentUrl) {
@@ -102,15 +102,13 @@ public class ProxyFactory {
             if (policy.isSetProxyServer()
                 && !StringUtils.isEmpty(policy.getProxyServer())) {
                 return getProxy(policy, currentUrl.getHost());
-            } else {
-                // There is a policy but no Proxy configuration,
-                // fallback on the system proxy configuration
-                return getSystemProxy(currentUrl.getHost());
             }
-        } else {
-            // Use system proxy configuration
+            // There is a policy but no Proxy configuration,
+            // fallback on the system proxy configuration
             return getSystemProxy(currentUrl.getHost());
         }
+        // Use system proxy configuration
+        return getSystemProxy(currentUrl.getHost());
     }
 
     /**

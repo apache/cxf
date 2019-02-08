@@ -21,8 +21,6 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 
-import javax.jms.DeliveryMode;
-
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -30,36 +28,11 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+
 import org.junit.Test;
 
 public class RequestResponseTest extends AbstractJMSTester {
 
-    private void verifyReceivedMessage(Message message) {
-        String response = getContent(message);
-        assertEquals("The response content should be equal", AbstractJMSTester.MESSAGE_CONTENT, response);
-    }
-
-    private void verifyHeaders(Message msgIn, Message msgOut) {
-        JMSMessageHeadersType outHeader = (JMSMessageHeadersType)msgOut
-            .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-
-        JMSMessageHeadersType inHeader = (JMSMessageHeadersType)msgIn
-            .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-
-        verifyJmsHeaderEquality(outHeader, inHeader);
-
-    }
-
-    private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
-            .getJMSPriority(), inHeader.getJMSPriority());
-        assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
-                     .getJMSDeliveryMode(), inHeader.getJMSDeliveryMode());
-        assertEquals("The inMessage and outMessage JMS Header's JMSType should be equals", outHeader
-            .getJMSType(), inHeader.getJMSType());
-    }
-
-    
     @Test
     public void testRequestQueueResponseTempQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
@@ -67,7 +40,7 @@ public class RequestResponseTest extends AbstractJMSTester {
         sendAndReceiveMessages(ei, true);
         sendAndReceiveMessages(ei, false);
     }
-    
+
     @Test
     public void testRequestQueueResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
@@ -75,14 +48,14 @@ public class RequestResponseTest extends AbstractJMSTester {
         sendAndReceiveMessages(ei, true);
         sendAndReceiveMessages(ei, false);
     }
-    
+
     @Test
     public void testRequestTopicResponseTempQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
                          "JMSSimpleService002X", "SimplePortTopicRequest");
         sendAndReceiveMessages(ei, true);
     }
-    
+
     @Test
     public void testRequestTopicResponseStaticQueue() throws Exception {
         EndpointInfo ei = setupServiceInfo("http://cxf.apache.org/jms_simple", "/wsdl/jms_spec_testsuite.wsdl",
@@ -90,20 +63,9 @@ public class RequestResponseTest extends AbstractJMSTester {
         sendAndReceiveMessages(ei, true);
         sendAndReceiveMessages(ei, false);
     }
-    
-    private Message createMessage() {
-        Message outMessage = new MessageImpl();
-        JMSMessageHeadersType header = new JMSMessageHeadersType();
-        header.setJMSDeliveryMode(DeliveryMode.PERSISTENT);
-        header.setJMSPriority(1);
-        header.setTimeToLive(1000);
-        outMessage.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, header);
-        outMessage.put(Message.ENCODING, "US-ASCII");
-        return outMessage;
-    }
 
-    protected void sendAndReceiveMessages(EndpointInfo ei, boolean synchronous) throws IOException {
-        inMessage = null;
+    private void sendAndReceiveMessages(EndpointInfo ei, boolean synchronous)
+            throws IOException, InterruptedException {
         // set up the conduit send to be true
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
         final Message outMessage = createMessage();
@@ -117,9 +79,8 @@ public class RequestResponseTest extends AbstractJMSTester {
                 verifyReceivedMessage(m);
                 verifyHeaders(m, outMessage);
                 // setup the message for
-                Conduit backConduit;
                 try {
-                    backConduit = destination.getBackChannel(m);
+                    Conduit backConduit = destination.getBackChannel(m);
                     // wait for the message to be got from the conduit
                     Message replyMessage = new MessageImpl();
                     sendOneWayMessage(backConduit, replyMessage);
@@ -129,19 +90,17 @@ public class RequestResponseTest extends AbstractJMSTester {
             }
         };
         destination.setMessageObserver(observer);
-        
+
         try {
             sendMessage(conduit, outMessage, synchronous);
             // wait for the message to be got from the destination,
             // create the thread to handler the Destination incoming message
-    
-            waitForReceiveInMessage();
-            verifyReceivedMessage(inMessage);
+
+            verifyReceivedMessage(waitForReceiveInMessage());
         } finally {
             conduit.close();
             destination.shutdown();
         }
     }
-
 
 }

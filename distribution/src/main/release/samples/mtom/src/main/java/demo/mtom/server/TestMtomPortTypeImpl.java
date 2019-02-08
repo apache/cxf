@@ -40,8 +40,8 @@ public class TestMtomPortTypeImpl implements TestMtomPortType {
 
     public void testByteArray(Holder<String> name, Holder<byte[]> attachinfo) {
         System.out.println("Received image from client");
-        System.out.println("The image data size is " + attachinfo.value.length);        
-        name.value = "Hello " + name.value;        
+        System.out.println("The image data size is " + attachinfo.value.length);
+        name.value = "Hello " + name.value;
     }
 
     public void testDataHandler(Holder<String> name, Holder<DataHandler> attachinfo) {
@@ -71,6 +71,6 @@ public class TestMtomPortTypeImpl implements TestMtomPortType {
         }
         return total;
     }
-    
-    
+
+
 }

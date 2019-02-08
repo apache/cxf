@@ -26,13 +26,13 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
-
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 
@@ -44,7 +44,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     private Document document;
 
     private W3CNamespaceContext context;
-    
+
     private String sysId;
 
     /**
@@ -54,7 +54,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         super(new ElementFrame<Node, Node>(element, null));
         content = element;
         newFrame(getCurrentFrame());
-                
+
         this.document = element.getOwnerDocument();
     }
     public W3CDOMStreamReader(Element element, String systemId) {
@@ -99,9 +99,9 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     @Override
     protected final void newFrame(ElementFrame<Node, Node> frame) {
         Node element = getCurrentNode();
-        frame.uris = new ArrayList<String>();
-        frame.prefixes = new ArrayList<String>();
-        frame.attributes = new ArrayList<Object>();
+        frame.uris = new ArrayList<>();
+        frame.prefixes = new ArrayList<>();
+        frame.attributes = new ArrayList<>();
 
         if (context == null) {
             context = new W3CNamespaceContext();
@@ -146,11 +146,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
     }
 
-    @Override
-    protected void endElement() {
-        super.endElement();
-    }
-
     public final Node getCurrentNode() {
         return getCurrentFrame().element;
     }
@@ -160,14 +155,14 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     @Override
     protected ElementFrame<Node, Node> getChildFrame() {
-        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild, 
+        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild,
                                 getCurrentFrame());
     }
 
     @Override
     protected boolean hasMoreChildren() {
         if (getCurrentFrame().currentChild == null) {
-            return getCurrentNode().getFirstChild() != null;            
+            return getCurrentNode().getFirstChild() != null;
         }
         return getCurrentFrame().currentChild.getNextSibling() != null;
     }
@@ -176,11 +171,11 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     protected int nextChild() {
         ElementFrame<Node, Node> frame = getCurrentFrame();
         if (frame.currentChild == null) {
-            content = getCurrentNode().getFirstChild();            
+            content = getCurrentNode().getFirstChild();
         } else {
             content = frame.currentChild.getNextSibling();
         }
-        
+
         frame.currentChild = content;
         switch (content.getNodeType()) {
         case Node.ELEMENT_NODE:
@@ -193,6 +188,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             return CDATA;
         case Node.ENTITY_REFERENCE_NODE:
             return ENTITY_REFERENCE;
+        case Node.PROCESSING_INSTRUCTION_NODE:
+            return PROCESSING_INSTRUCTION;
         default:
             throw new IllegalStateException("Found type: " + content.getClass().getName());
         }
@@ -232,7 +229,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     public String getAttributeValue(String ns, String local) {
         Attr at;
-        if (ns == null || ns.equals("")) {
+        if (ns == null || ns.isEmpty()) {
             at = getCurrentElement().getAttributeNode(local);
         } else {
             at = getCurrentElement().getAttributeNodeNS(ns, local);
@@ -271,9 +268,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
         if (prefix == null) {
             return new QName(ns, ln);
-        } else {
-            return new QName(ns, ln, prefix);
         }
+        return new QName(ns, ln, prefix);
     }
 
     public String getAttributeNamespace(int i) {
@@ -301,7 +297,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             //DOM level 2?
             schemaType = null;
         }
-        return (schemaType == null) ? "CDATA" 
+        return (schemaType == null) ? "CDATA"
             : schemaType.getTypeName() == null ? "CDATA" : schemaType.getTypeName();
     }
 
@@ -403,16 +399,16 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     }
 
     public String getPITarget() {
-        throw new UnsupportedOperationException();
+        return ((ProcessingInstruction)content).getTarget();
     }
 
     public String getPIData() {
-        throw new UnsupportedOperationException();
-    }   
+        return ((ProcessingInstruction)content).getData();
+    }
     public Location getLocation() {
         try {
             Object o = getCurrentNode().getUserData("location");
-            if (o instanceof Location) { 
+            if (o instanceof Location) {
                 return (Location)o;
             }
         } catch (Throwable ex) {
@@ -420,7 +416,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
         return super.getLocation();
     }
-    
+
     public String toString() {
         if (document == null) {
             return "<null>";
@@ -436,5 +432,5 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
     }
 
-    
+
 }

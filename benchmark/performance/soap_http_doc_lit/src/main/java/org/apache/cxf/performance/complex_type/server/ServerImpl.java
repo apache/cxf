@@ -29,7 +29,7 @@ import org.apache.cxf.cxf.performance.types.NestedComplexType;
 import org.apache.cxf.cxf.performance.types.NestedComplexTypeSeq;
 
 
-@javax.jws.WebService(portName = "SoapHttpDocLitPort", serviceName = "PerfService",                                      
+@javax.jws.WebService(portName = "SoapHttpDocLitPort", serviceName = "PerfService",
                       targetNamespace = "http://cxf.apache.org/cxf/performance",
                       endpointInterface = "org.apache.cxf.cxf.performance.DocPortType",
                       wsdlLocation="/wsdl/perf.wsdl")
@@ -38,24 +38,24 @@ public class ServerImpl implements DocPortType {
         //workaround issue of xmlsec logging too much
         Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
     }
-    
+
     public NestedComplexTypeSeq echoComplexTypeDoc(NestedComplexTypeSeq request, int id, javax.xml.ws.Holder<Integer> i) {
         //System.out.println("Executing operation echoComplexTypeDoc\n");
         //System.out.println("Message received: " + request + "\n");
         i.value = id;
         return request;
     }
-   
+
     public String echoStringDoc(String request) {
         //System.out.println("Executing operation echoStringDoc\n");
         //System.out.println("Message received: " + request + "\n");
         return request;
     }
-   
+
     public byte[] echoBase64Doc(byte[] request) {
         //System.out.println("Executing operation echoBase64Doc\n");
         //System.out.println("Message received: " + request + "\n");
         return request;
     }
 }
-    
+

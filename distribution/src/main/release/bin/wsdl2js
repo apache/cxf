@@ -67,7 +67,12 @@ else
    cxf_classpath=${cxf_jar}:${CLASSPATH}
 fi
 
-$JAVA_HOME/bin/java -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
+if [ "x${JAVA_MAX_MEM}" = "x" ]; then
+    JAVA_MAX_MEM=512M
+    export JAVA_MAX_MEM
+fi
+
+$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript "$@"
 
 
 

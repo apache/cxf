@@ -22,5 +22,5 @@ package org.apache.cxf.service.model;
 public abstract class AbstractDescriptionElement extends AbstractPropertiesHolder {
 
     public abstract DescriptionInfo getDescription();
-    
+
 }

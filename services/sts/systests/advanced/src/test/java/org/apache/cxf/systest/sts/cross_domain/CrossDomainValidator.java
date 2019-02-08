@@ -28,10 +28,10 @@ import org.apache.wss4j.dom.validate.SamlAssertionValidator;
  * This class validates a SAML Assertion by checking the issuer name.
  */
 public class CrossDomainValidator extends SamlAssertionValidator {
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        
+
         SamlAssertionWrapper token = validatedCredential.getSamlAssertion();
         if (token == null || token.getSaml2() == null
             || !"b-issuer".equals(token.getIssuerString())) {

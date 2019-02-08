@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -32,16 +33,19 @@ import org.apache.cxf.ws.security.trust.STSClient;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * In this test case, a CXF client requests a SecurityContextToken from an STS and then cancels it. When
- * cancelling the token, the WSDL of the STS has an EndorsingSupportingToken consisting of the 
- * SecureConversationToken. The client must use the secret associated with the SecurityContextToken it gets 
+ * cancelling the token, the WSDL of the STS has an EndorsingSupportingToken consisting of the
+ * SecureConversationToken. The client must use the secret associated with the SecurityContextToken it gets
  * back from the STS to sign the Timestamp.
  */
 public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -51,7 +55,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -64,28 +68,28 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         URL busFile = SecurityContextTokenCancelTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        String wsdlLocation =
             "https://localhost:" + STSPORT + "/SecurityTokenService/TransportSCT?wsdl";
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        
+
         // Cancel the SecurityContextToken - this should fail as the secret associated with the SCT
         // is not used to sign some part of the message
         String port = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port";
         boolean cancelled = cancelSecurityToken(bus, wsdlLocation, port, true, token);
         assertFalse(cancelled);
-        
+
         String endorsingPort = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Endorsing_Port";
         cancelled = cancelSecurityToken(bus, wsdlLocation, endorsingPort, true, token);
         assertTrue(cancelled);
-        
+
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, boolean enableEntropy
     ) throws Exception {
@@ -94,10 +98,10 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "security.callback-handler", 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");
@@ -110,7 +114,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
 
         return stsClient.requestSecurityToken(null);
     }
-    
+
     private boolean cancelSecurityToken(
         Bus bus, String wsdlLocation, String port, boolean enableEntropy, SecurityToken securityToken
     ) throws Exception {
@@ -119,11 +123,11 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName(port);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "myservicekey");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
@@ -137,5 +141,5 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         return stsClient.cancelSecurityToken(securityToken);
     }
 
-    
+
 }

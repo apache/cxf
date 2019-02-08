@@ -25,7 +25,7 @@ public interface W3CConstants {
 
     // XML Namespaces
     String NP_XMLNS = "xmlns";
-    String NU_XMLNS = "http://www.w3.org/2000/xmlns/";    
+    String NU_XMLNS = "http://www.w3.org/2000/xmlns/";
 
     // XML Schema(CR) datatypes + structures
     String NP_SCHEMA_XSD = "xsd";
@@ -78,7 +78,7 @@ public interface W3CConstants {
     QName NE_SCHEMA_ATTRIBUTEGROUP = new QName(NU_SCHEMA_XSD, "attributeGroup", NP_SCHEMA_XSD);
 
     QName NE_SCHEMA_GROUP = new QName(NU_SCHEMA_XSD, "group", NP_SCHEMA_XSD);
-    
+
 //  XML Schema primitive and derived built-in types
     // Primitives
     QName NT_SCHEMA_STRING = new QName(NU_SCHEMA_XSD, "string", NP_SCHEMA_XSD);
@@ -130,7 +130,7 @@ public interface W3CConstants {
 
     QName NT_SCHEMA_ANYTYPE = new QName(NU_SCHEMA_XSD, "anyType", NP_SCHEMA_XSD);
     QName NT_SCHEMA_ANYSIMPLETYPE = new QName(NU_SCHEMA_XSD, "anySimpleType", NP_SCHEMA_XSD);
-    QName NT_SCHEMA_ANY = new QName(NU_SCHEMA_XSD, "any", NP_SCHEMA_XSD); 
+    QName NT_SCHEMA_ANY = new QName(NU_SCHEMA_XSD, "any", NP_SCHEMA_XSD);
 
     String getValue(String value);
 }

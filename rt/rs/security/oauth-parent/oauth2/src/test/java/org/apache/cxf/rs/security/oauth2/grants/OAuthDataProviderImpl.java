@@ -28,6 +28,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.bearer.BearerAccessToken;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 
 public class OAuthDataProviderImpl implements OAuthDataProvider {
@@ -45,7 +46,6 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
 
     @Override
     public ServerAccessToken getAccessToken(String accessToken) throws OAuthServiceException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -53,33 +53,33 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
     public ServerAccessToken getPreauthorizedToken(Client client, List<String> requestedScopes,
                                                    UserSubject subject, String grantType)
         throws OAuthServiceException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshToken,
                                                 List<String> requestedScopes) throws OAuthServiceException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void removeAccessToken(ServerAccessToken accessToken) throws OAuthServiceException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScope) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void revokeToken(Client client, String token, String tokenTypeHint) throws OAuthServiceException {
-        // TODO Auto-generated method stub
-        
+
+    }
+
+    @Override
+    public List<ServerAccessToken> getAccessTokens(Client client, UserSubject sub) throws OAuthServiceException {
+        return null;
+    }
+
+    @Override
+    public List<RefreshToken> getRefreshTokens(Client client, UserSubject sub) throws OAuthServiceException {
+        return null;
     }
 
 }

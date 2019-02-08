@@ -35,29 +35,29 @@ import org.apache.cxf.validation.BeanValidationProvider;
 public class JAXRSBeanValidationInvoker extends JAXRSInvoker {
     private volatile BeanValidationProvider provider;
     private boolean validateServiceObject = true;
-    
+
     @Override
     public Object invoke(Exchange exchange, final Object serviceObject, Method m, List<Object> params) {
         Message message = JAXRSUtils.getCurrentMessage();
-        
+
         BeanValidationProvider theProvider = getProvider(message);
         try {
             if (isValidateServiceObject()) {
                 theProvider.validateBean(serviceObject);
             }
-            
+
             theProvider.validateParameters(serviceObject, m, params.toArray());
-            
+
             Object response = super.invoke(exchange, serviceObject, m, params);
-            
+
             if (response instanceof MessageContentsList) {
                 MessageContentsList list = (MessageContentsList)response;
                 if (list.size() == 1) {
-                    Object entity = ((MessageContentsList)list).get(0);
-                    
+                    Object entity = list.get(0);
+
                     if (entity instanceof Response) {
-                        theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());    
-                    } else {                
+                        theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());
+                    } else {
                         theProvider.validateReturnValue(serviceObject, m, entity);
                     }
                 }
@@ -68,21 +68,21 @@ public class JAXRSBeanValidationInvoker extends JAXRSInvoker {
         } catch (Throwable ex) {
             throw new Fault(ex);
         }
-        
+
     }
-    
+
     protected BeanValidationProvider getProvider(Message message) {
         if (provider == null) {
             Object prop = message.getContextualProperty(BeanValidationProvider.class.getName());
             if (prop != null) {
-                provider = (BeanValidationProvider)prop;    
+                provider = (BeanValidationProvider)prop;
             } else {
                 provider = new BeanValidationProvider();
             }
         }
         return provider;
     }
-    
+
     public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }

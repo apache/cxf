@@ -26,59 +26,64 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 /**
- * 
+ *
  */
-public class EndpointReferenceDomainExpressionTest extends Assert {
+public class EndpointReferenceDomainExpressionTest {
 
     private IMocksControl control;
-   
+
     // Avoid spurious failures on EasyMock detecting finalize calls
     // by using data members rather than local variables for these.
     private ServiceInfo si;
     private BindingOperationInfo boi;
     private BindingMessageInfo bmi;
     private BindingFaultInfo bfi;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testEndpointReferenceDomainExpression() {
         EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
-        
+
         EndpointReferenceDomainExpression eprde = new EndpointReferenceDomainExpression();
         assertNull(eprde.getEndpointReference());
         eprde.setEndpointReference(epr);
         assertSame(epr, eprde.getEndpointReference());
-        
+
         si = control.createMock(ServiceInfo.class);
         boi = control.createMock(BindingOperationInfo.class);
         bmi = control.createMock(BindingMessageInfo.class);
         bfi = control.createMock(BindingFaultInfo.class);
-        
-        assertTrue(!eprde.appliesTo(si));
-        assertTrue(!eprde.appliesTo(boi));
-        assertTrue(!eprde.appliesTo(bmi));
-        assertTrue(!eprde.appliesTo(bfi));
-        
+
+        assertFalse(eprde.appliesTo(si));
+        assertFalse(eprde.appliesTo(boi));
+        assertFalse(eprde.appliesTo(bmi));
+        assertFalse(eprde.appliesTo(bfi));
+
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(ei.getAddress()).andReturn("http://localhost:8080/GreeterPort");
         AttributedURIType auri = control.createMock(AttributedURIType.class);
         EasyMock.expect(epr.getAddress()).andReturn(auri);
         EasyMock.expect(auri.getValue()).andReturn("http://localhost:8080/Greeter");
         control.replay();
-        assertTrue(!eprde.appliesTo(ei));
+        assertFalse(eprde.appliesTo(ei));
         control.verify();
-        
+
         control.reset();
         EasyMock.expect(ei.getAddress()).andReturn("http://localhost:8080/GreeterPort");
         EasyMock.expect(epr.getAddress()).andReturn(auri);
@@ -86,11 +91,11 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         control.replay();
         assertTrue(eprde.appliesTo(ei));
         control.verify();
-        
+
         bfi = null;
         bmi = null;
         boi = null;
         si = null;
     }
-    
+
 }

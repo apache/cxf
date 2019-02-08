@@ -29,17 +29,17 @@ import org.apache.cxf.rs.security.jose.jwe.EcdhDirectKeyJweEncryption.EcdhHelper
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 
 public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider {
-    
+
     private static final Map<String, String> ECDH_AES_MAP;
     static {
-        ECDH_AES_MAP = new HashMap<String, String>();
+        ECDH_AES_MAP = new HashMap<>();
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A128KW.getJwaName(), KeyAlgorithm.A128KW.getJwaName());
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());
     }
     private KeyAlgorithm keyAlgo;
     private EcdhHelper helper;
-    
+
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              KeyAlgorithm keyAlgo) {
         this(peerPublicKey, JsonWebKey.EC_CURVE_P256, keyAlgo);
@@ -47,14 +47,14 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              KeyAlgorithm keyAlgo) {
-        
+
         this(peerPublicKey, curve, null, null, keyAlgo, ContentAlgorithm.A128GCM);
     }
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
                                              String curve,
                                              KeyAlgorithm keyAlgo,
                                              ContentAlgorithm ctAlgo) {
-        
+
         this(peerPublicKey, curve, null, null, keyAlgo, ctAlgo);
     }
     public EcdhAesWrapKeyEncryptionAlgorithm(ECPublicKey peerPublicKey,
@@ -63,16 +63,16 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
                                              String apvString,
                                              KeyAlgorithm keyAlgo,
                                              ContentAlgorithm ctAlgo) {
-        
+
         this.keyAlgo = keyAlgo;
-        helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString, 
+        helper = new EcdhHelper(peerPublicKey, curve, apuString, apvString,
                                 ctAlgo.getJwaName());
     }
-    
+
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         final byte[] derivedKey = helper.getDerivedKey(headers);
-        KeyEncryptionProvider aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey, 
+        KeyEncryptionProvider aesWrap = new AesWrapKeyEncryptionAlgorithm(derivedKey,
                                                                            keyAlgo) {
             protected void checkAlgorithms(JweHeaders headers) {
                 // complete
@@ -83,7 +83,7 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
         };
         return aesWrap.getEncryptedContentEncryptionKey(headers, cek);
     }
-    
+
     @Override
     public KeyAlgorithm getAlgorithm() {
         return keyAlgo;

@@ -19,11 +19,11 @@
 package org.apache.cxf.wsn;
 
 public interface EndpointMBean {
-    
+
     String getName();
-    
+
     String getAddress();
-    
+
     void register() throws EndpointRegistrationException;
 
     void unregister() throws EndpointRegistrationException;

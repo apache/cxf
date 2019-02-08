@@ -29,86 +29,86 @@ public class TestResource {
 
     public TestResource() {
     }
-    
+
     @Path("/resource")
     public TestResource subresource() {
         return this;
     }
-    
+
     @Path("/resource")
     @GET
     @Produces("application/json")
     public String resourceMethod() {
         return "";
     }
-    
+
     @Path("/resource2/1/{b}")
     public TestResource subresource2() {
         return this;
     }
-    
+
     @Path("/resource2/{a}/{b}")
     @GET
     @Produces("application/json")
     public String resourceMethod2() {
         return "";
     }
-    
+
     @GET
     @Produces("application/xml")
     @Path("/resource1")
     public TestResource xmlResource() {
         return this;
     }
-    
+
     @Path("/resource1")
     @GET
     @Produces("application/json")
     public String jsonResource() {
         return "";
     }
-    
+
     @GET
     @Path("/")
     @Produces("application/xml")
     public String listMethod() {
         return "This is a list method";
     }
-    
+
     @GET
     @Path("/{e}")
     @Produces("application/xml")
     public String readMethod() {
         return "This is a list method";
     }
-    
+
     @GET
     @Path("/{a}/{b}")
     public String limitedPath() {
         return "This is a list method";
     }
-    
+
     @GET
     @Path(value = "/{e}")
     @Produces("application/json")
     public String unlimitedPath() {
         return "This is a list method";
     }
-    
+
     @GET
     @Path("/{e}/bar/baz/baz")
     @Produces("application/json")
     public String readMethod2() {
         return "This is a list method";
     }
-    
+
     @GET
     @Path("{id:custom}")
     @Produces("application/bar")
     public String readBar() {
         return "This is a bar method";
     }
-    
+
     @GET
     @Path("{id:custom}")
     @Produces("application/foo")

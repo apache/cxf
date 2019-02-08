@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
-
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
@@ -31,11 +30,11 @@ import javax.xml.ws.ResponseWrapper;
 public interface ListTest {
 
     @WebMethod(operationName = "sayHi", exclude = false)
-    @ResponseWrapper(className = "apache.cxf.SayHiResponse", 
-                     localName = "sayHiResponse", 
+    @ResponseWrapper(className = "apache.cxf.SayHiResponse",
+                     localName = "sayHiResponse",
                      targetNamespace = "http://cxf.apache/")
-    @RequestWrapper(className = "apache.cxf.SayHi", 
-                    localName = "sayHi", 
+    @RequestWrapper(className = "apache.cxf.SayHi",
+                    localName = "sayHi",
                     targetNamespace = "http://cxf.apache/")
     List<?> sayHi(String hi);
 

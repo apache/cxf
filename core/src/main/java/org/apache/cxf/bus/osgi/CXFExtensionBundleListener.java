@@ -44,18 +44,18 @@ import org.osgi.framework.SynchronousBundleListener;
 public class CXFExtensionBundleListener implements SynchronousBundleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFActivator.class);
     private long id;
-    private ConcurrentMap<Long, List<OSGiExtension>> extensions 
-        = new ConcurrentHashMap<Long, List<OSGiExtension>>(16, 0.75f, 4);
-    
+    private ConcurrentMap<Long, List<OSGiExtension>> extensions
+        = new ConcurrentHashMap<>(16, 0.75f, 4);
+
     public CXFExtensionBundleListener(long bundleId) {
         this.id = bundleId;
     }
-    
+
     public void registerExistingBundles(BundleContext context) throws IOException {
         for (Bundle bundle : context.getBundles()) {
-            if ((bundle.getState() == Bundle.RESOLVED 
-                || bundle.getState() == Bundle.STARTING 
-                || bundle.getState() == Bundle.ACTIVE 
+            if ((bundle.getState() == Bundle.RESOLVED
+                || bundle.getState() == Bundle.STARTING
+                || bundle.getState() == Bundle.ACTIVE
                 || bundle.getState() == Bundle.STOPPING)
                 && bundle.getBundleId() != context.getBundle().getBundleId()) {
                 register(bundle);
@@ -71,7 +71,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             unregister(event.getBundle().getBundleId());
         }
     }
-  
+
     protected void register(final Bundle bundle) {
         Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
@@ -84,16 +84,16 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         if (orig.isEmpty()) {
             return false;
         }
-        
-        List<String> names = new ArrayList<String>(orig.size());
+
+        List<String> names = new ArrayList<>(orig.size());
         for (Extension ext : orig) {
             names.add(ext.getName());
         }
-        LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName() 
-                 + " (" + bundle.getBundleId() + ") " + names); 
+        LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName()
+                 + " (" + bundle.getBundleId() + ") " + names);
         List<OSGiExtension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
-            list = new CopyOnWriteArrayList<OSGiExtension>();
+            list = new CopyOnWriteArrayList<>();
             List<OSGiExtension> preList = extensions.putIfAbsent(bundle.getBundleId(), list);
             if (preList != null) {
                 list = preList;
@@ -119,7 +119,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             unregister(extensions.keySet().iterator().next());
         }
     }
-    
+
     public class OSGiExtension extends Extension {
         final Bundle bundle;
         Object serviceObject;
@@ -134,7 +134,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         }
         public Object load(ClassLoader cl, Bus b) {
             if (interfaceName == null && bundle.getBundleContext() != null) {
-                ServiceReference ref = bundle.getBundleContext().getServiceReference(className);
+                ServiceReference<?> ref = bundle.getBundleContext().getServiceReference(className);
                 if (ref != null && ref.getBundle().getBundleId() == bundle.getBundleId()) {
                     Object o = bundle.getBundleContext().getService(ref);
                     serviceObject = o;
@@ -160,9 +160,8 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
                         throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS",
                                                                  Extension.LOG, name),
                                                      origExc);
-                    } else {
-                        throw ee;
                     }
+                    throw ee;
                 }
             }
             return c;

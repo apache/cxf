@@ -21,12 +21,13 @@ package org.apache.cxf.configuration.jsse;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
  * This class extends {@link TLSParameterBase} with client-specific
  * SSL/TLS parameters.
- * 
+ *
  */
 public class TLSClientParameters extends TLSParameterBase {
     private boolean disableCNCheck;
@@ -35,26 +36,27 @@ public class TLSClientParameters extends TLSParameterBase {
     private boolean useHttpsURLConnectionDefaultSslSocketFactory;
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
     private HostnameVerifier hostnameVerifier;
-    
+    private SSLContext sslContext;
+
     /**
      * Set custom HostnameVerifier
      * @param verifier hostname verifier
      */
     public void setHostnameVerifier(HostnameVerifier verifier) {
-        hostnameVerifier = verifier;    
+        hostnameVerifier = verifier;
     }
-    
+
     /**
      * Get custom HostnameVerifier
      * @return hostname verifier
      */
     public HostnameVerifier getHostnameVerifier() {
-        return hostnameVerifier; 
+        return hostnameVerifier;
     }
     /**
      * Set whether or not JSEE should omit checking if the host name
      * specified in the URL matches that of the Common Name
-     * (CN) on the server's certificate. Default is false;  
+     * (CN) on the server's certificate. Default is false;
      * this attribute should not be set to true during production use.
      */
     public void setDisableCNCheck(boolean disableCNCheck) {
@@ -85,7 +87,7 @@ public class TLSClientParameters extends TLSParameterBase {
     public final SSLSocketFactory getSSLSocketFactory() {
         return sslSocketFactory;
     }
-    
+
     /**
      * Returns the SSL cache timeout in seconds if it has been configured or the default value
      */
@@ -100,7 +102,7 @@ public class TLSClientParameters extends TLSParameterBase {
         this.sslCacheTimeout = sslCacheTimeout;
     }
 
-    
+
     /**
      * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()} should be
      * used to create https connections. If <code>true</code> , {@link #getJsseProvider()} ,
@@ -115,7 +117,7 @@ public class TLSClientParameters extends TLSParameterBase {
     /**
      * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()} should be
      * used to create https connections.
-     * 
+     *
      * @see #isUseHttpsURLConnectionDefaultSslSocketFactory()
      */
     public void setUseHttpsURLConnectionDefaultSslSocketFactory(
@@ -134,18 +136,21 @@ public class TLSClientParameters extends TLSParameterBase {
     /**
      * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultHostnameVerifier()} should be
      * used to create https connections.
-     * 
+     *
      * @see #isUseHttpsURLConnectionDefaultHostnameVerifier()
      */
     public void setUseHttpsURLConnectionDefaultHostnameVerifier(
                       boolean useHttpsURLConnectionDefaultHostnameVerifier) {
         this.useHttpsURLConnectionDefaultHostnameVerifier = useHttpsURLConnectionDefaultHostnameVerifier;
     }
-    
+
     public int hashCode() {
         int hash = disableCNCheck ? 37 : 17;
         if (sslSocketFactory != null) {
             hash = hash * 41 + System.identityHashCode(sslSocketFactory);
+        }
+        if (sslContext != null) {
+            hash = hash * 41 + System.identityHashCode(sslContext);
         }
         hash = hash(hash, useHttpsURLConnectionDefaultSslSocketFactory);
         hash = hash(hash, useHttpsURLConnectionDefaultHostnameVerifier);
@@ -184,7 +189,7 @@ public class TLSClientParameters extends TLSParameterBase {
         }
         return i;
     }
-    
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -193,6 +198,7 @@ public class TLSClientParameters extends TLSParameterBase {
             TLSClientParameters that = (TLSClientParameters)o;
             boolean eq = disableCNCheck == that.disableCNCheck;
             eq &= sslSocketFactory == that.sslSocketFactory;
+            eq &= sslContext == that.sslContext;
             eq &= useHttpsURLConnectionDefaultSslSocketFactory == that.useHttpsURLConnectionDefaultSslSocketFactory;
             eq &= useHttpsURLConnectionDefaultHostnameVerifier == that.useHttpsURLConnectionDefaultHostnameVerifier;
             eq &= sslCacheTimeout == that.sslCacheTimeout;
@@ -215,7 +221,7 @@ public class TLSClientParameters extends TLSParameterBase {
             }
             if (certConstraints != null) {
                 if (that.certConstraints != null) {
-                    eq &= equals(certConstraints.getIssuerDNConstraints(), 
+                    eq &= equals(certConstraints.getIssuerDNConstraints(),
                                  that.certConstraints.getIssuerDNConstraints());
                     eq &= equals(certConstraints.getSubjectDNConstraints(),
                                  that.certConstraints.getSubjectDNConstraints());
@@ -229,7 +235,7 @@ public class TLSClientParameters extends TLSParameterBase {
         }
         return false;
     }
-    
+
     private static boolean equals(final List<?> obj1, final List<?> obj2) {
         if (obj1.size() == obj2.size()) {
             for (int x = 0; x < obj1.size(); x++) {
@@ -247,17 +253,29 @@ public class TLSClientParameters extends TLSParameterBase {
     private static boolean equals(final Object[] a1, final Object[] a2) {
         if (a1 == null) {
             return a2 == null;
-        } else {
-            if (a2 != null && a1.length == a2.length) {
-                for (int i = 0; i < a1.length; i++) {
-                    if (!equals(a1[i], a2[i])) {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
         }
+        if (a2 != null && a1.length == a2.length) {
+            for (int i = 0; i < a1.length; i++) {
+                if (!equals(a1[i], a2[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the SSLContext parameter to use (if it has been set)
+     */
+    public SSLContext getSslContext() {
+        return sslContext;
+    }
+
+    /**
+     * Set an SSLContext parameter to use to create https connections
+     */
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
     }
 }

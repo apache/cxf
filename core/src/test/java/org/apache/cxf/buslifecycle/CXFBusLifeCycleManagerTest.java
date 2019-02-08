@@ -20,12 +20,12 @@
 package org.apache.cxf.buslifecycle;
 
 import org.apache.cxf.bus.managers.CXFBusLifeCycleManager;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class CXFBusLifeCycleManagerTest extends Assert {
+public class CXFBusLifeCycleManagerTest {
 
     @Test
     public void testListenerNotRegistered() {
@@ -48,13 +48,13 @@ public class CXFBusLifeCycleManagerTest extends Assert {
         mgr.postShutdown();
         EasyMock.verify(listener1);
     }
-    
+
     @Test
     public void testSingleListenerRegistration() {
 
         BusLifeCycleListener listener1 = EasyMock.createMock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
-        
+
         mgr.registerLifeCycleListener(listener1);
 
         EasyMock.reset(listener1);
@@ -73,35 +73,35 @@ public class CXFBusLifeCycleManagerTest extends Assert {
         listener1.postShutdown();
         EasyMock.replay(listener1);
         mgr.postShutdown();
-        EasyMock.verify(listener1);        
+        EasyMock.verify(listener1);
     }
-    
+
     @Test
     public void testMultipleListeners() {
-       
+
         IMocksControl ctrl = EasyMock.createStrictControl();
-        
+
         BusLifeCycleListener listener1 = ctrl.createMock(BusLifeCycleListener.class);
         BusLifeCycleListener listener2 = ctrl.createMock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
 
         mgr.registerLifeCycleListener(listener1);
         mgr.registerLifeCycleListener(listener2);
-        
+
         ctrl.reset();
         listener1.initComplete();
         listener2.initComplete();
         ctrl.replay();
         mgr.initComplete();
         ctrl.verify();
-        
+
         ctrl.reset();
         listener2.preShutdown();
         listener1.preShutdown();
         ctrl.replay();
         mgr.preShutdown();
         ctrl.verify();
-        
+
         ctrl.reset();
         listener2.postShutdown();
         listener1.postShutdown();
@@ -109,12 +109,12 @@ public class CXFBusLifeCycleManagerTest extends Assert {
         mgr.postShutdown();
         ctrl.verify();
     }
-    
+
     @Test
     public void testDeregistration() {
-        
+
         IMocksControl ctrl = EasyMock.createStrictControl();
-        
+
         BusLifeCycleListener listener1 = ctrl.createMock(BusLifeCycleListener.class);
         BusLifeCycleListener listener2 = ctrl.createMock(BusLifeCycleListener.class);
         CXFBusLifeCycleManager mgr = new CXFBusLifeCycleManager();
@@ -122,19 +122,19 @@ public class CXFBusLifeCycleManagerTest extends Assert {
         mgr.registerLifeCycleListener(listener2);
         mgr.registerLifeCycleListener(listener1);
         mgr.unregisterLifeCycleListener(listener2);
-        
+
         ctrl.reset();
         listener1.initComplete();
         ctrl.replay();
         mgr.initComplete();
         ctrl.verify();
-        
+
         ctrl.reset();
         listener1.preShutdown();
         ctrl.replay();
         mgr.preShutdown();
         ctrl.verify();
-        
+
         ctrl.reset();
         listener1.postShutdown();
         ctrl.replay();

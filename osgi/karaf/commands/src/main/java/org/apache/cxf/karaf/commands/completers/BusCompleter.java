@@ -21,35 +21,32 @@ package org.apache.cxf.karaf.commands.completers;
 import java.util.List;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.karaf.commands.CXFController;
+import org.apache.cxf.karaf.commands.internal.CXFController;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.apache.karaf.shell.api.console.CommandLine;
+import org.apache.karaf.shell.api.console.Completer;
+import org.apache.karaf.shell.api.console.Session;
+import org.apache.karaf.shell.support.completers.StringsCompleter;
 
-import org.apache.karaf.shell.console.Completer;
-import org.apache.karaf.shell.console.completer.StringsCompleter;
-
-public class BusCompleter implements Completer {
-    
-    private CXFController cxfController;
-
-    public void setController(CXFController controller) {
-        this.cxfController = controller;
-    }
+@Service
+public class BusCompleter extends CXFController implements Completer {
 
     @Override
-    public int complete(final String buffer, 
-                        final int cursor, 
-                        @SuppressWarnings("rawtypes") final List candidates) {
+    public int complete(Session session,
+                        CommandLine commandLine,
+                        List<String> list) {
         StringsCompleter delegate = new StringsCompleter();
         try {
-            List<Bus> busses = cxfController.getBusses();
-           
+            List<Bus> busses = getBusses();
+
             for (Bus bus : busses) {
                 delegate.getStrings().add(bus.getId());
             }
-            
+
         } catch (Exception e) {
             // Ignore
         }
-        return delegate.complete(buffer, cursor, candidates);
+        return delegate.complete(session, commandLine, list);
     }
 
 }

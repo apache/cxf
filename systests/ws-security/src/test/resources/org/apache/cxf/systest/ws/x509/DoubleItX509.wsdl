@@ -55,6 +55,35 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItSymmetricAddressingBinding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricAddressingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItSymmetricAddressingOneWayBinding" type="tns:DoubleItOneWayPortType">
+        <wsp:PolicyReference URI="#DoubleItSymmetricAddressingPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItKeyIdentifierDerivedBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItKeyIdentifierDerivedPolicy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -219,6 +248,24 @@
     </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricIssuerSerialBinding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricIssuerSerialPolicy"/>
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricSHA512Binding" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#DoubleItAsymmetricSHA512Policy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="DoubleIt">
             <soap:operation soapAction=""/>
@@ -630,6 +677,12 @@
         <wsdl:port name="DoubleItKeyIdentifierPort" binding="tns:DoubleItKeyIdentifierBinding">
             <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifier"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricAddressingPort" binding="tns:DoubleItSymmetricAddressingBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509SymmetricAddressing"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItSymmetricAddressingOneWayPort" binding="tns:DoubleItSymmetricAddressingOneWayBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509SymmetricAddressingOneWay"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItKeyIdentifierDerivedPort" binding="tns:DoubleItKeyIdentifierDerivedBinding">
             <soap:address location="http://localhost:9001/DoubleItX509KeyIdentifierDerived"/>
         </wsdl:port>
@@ -661,6 +714,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricIssuerSerialPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricSHA512Port" binding="tns:DoubleItAsymmetricSHA512Binding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricSHA512"/>
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricOldConfigPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509AsymmetricOldConfig"/>
@@ -754,6 +810,39 @@
     <wsp:Policy wsu:Id="DoubleItKeyIdentifierPolicy">
         <wsp:ExactlyOne>
             <wsp:All>
+                <sp:SymmetricBinding>
+                    <wsp:Policy>
+                        <sp:ProtectionToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                        <sp:RequireKeyIdentifierReference/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:ProtectionToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:SymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItSymmetricAddressingPolicy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" wsp:Optional="false"/>
                 <sp:SymmetricBinding>
                     <wsp:Policy>
                         <sp:ProtectionToken>
@@ -1102,6 +1191,48 @@
                         <sp:AlgorithmSuite>
                             <wsp:Policy>
                                 <sp:Basic128/>
+                            </wsp:Policy>
+                        </sp:AlgorithmSuite>
+                    </wsp:Policy>
+                </sp:AsymmetricBinding>
+            </wsp:All>
+        </wsp:ExactlyOne>
+    </wsp:Policy>
+    <wsp:Policy wsu:Id="DoubleItAsymmetricSHA512Policy">
+        <wsp:ExactlyOne>
+            <wsp:All>
+                <sp:AsymmetricBinding>
+                    <wsp:Policy>
+                        <sp:InitiatorToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                        <sp:RequireIssuerSerialReference/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:InitiatorToken>
+                        <sp:RecipientToken>
+                            <wsp:Policy>
+                                <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                                    <wsp:Policy>
+                                        <sp:WssX509V3Token10/>
+                                        <sp:RequireIssuerSerialReference/>
+                                    </wsp:Policy>
+                                </sp:X509Token>
+                            </wsp:Policy>
+                        </sp:RecipientToken>
+                        <sp:Layout>
+                            <wsp:Policy>
+                                <sp:Lax/>
+                            </wsp:Policy>
+                        </sp:Layout>
+                        <sp:IncludeTimestamp/>
+                        <sp:OnlySignEntireHeadersAndBody/>
+                        <sp:AlgorithmSuite>
+                            <wsp:Policy>
+                                <cxf:Basic128RsaSha512 xmlns:cxf="http://cxf.apache.org/custom/security-policy"/>
                             </wsp:Policy>
                         </sp:AlgorithmSuite>
                     </wsp:Policy>

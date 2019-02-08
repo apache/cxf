@@ -19,6 +19,7 @@
 
 package org.apache.cxf.sts.operation;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.QNameConstants;
@@ -61,91 +61,92 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
 
     private static final Logger LOG = LogUtils.getL7dLogger(TokenRenewOperation.class);
 
-    private List<TokenRenewer> tokenRenewers = new ArrayList<TokenRenewer>();
+    private List<TokenRenewer> tokenRenewers = new ArrayList<>();
 
     public void setTokenRenewers(List<TokenRenewer> tokenRenewerList) {
         this.tokenRenewers = tokenRenewerList;
     }
-    
+
     public List<TokenRenewer> getTokenRenewers() {
         return tokenRenewers;
     }
 
     public RequestSecurityTokenResponseType renew(
-        RequestSecurityTokenType request, WebServiceContext context
+        RequestSecurityTokenType request, Principal principal,
+        Map<String, Object> messageContext
     ) {
         long start = System.currentTimeMillis();
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
-        
+
         try {
-            RequestRequirements requestRequirements = parseRequest(request, context);
-    
+            RequestRequirements requestRequirements = parseRequest(request, messageContext);
+
             KeyRequirements keyRequirements = requestRequirements.getKeyRequirements();
             TokenRequirements tokenRequirements = requestRequirements.getTokenRequirements();
-            
+
             renewerParameters.setStsProperties(stsProperties);
-            renewerParameters.setPrincipal(context.getUserPrincipal());
-            renewerParameters.setWebServiceContext(context);
+            renewerParameters.setPrincipal(principal);
+            renewerParameters.setMessageContext(messageContext);
             renewerParameters.setTokenStore(getTokenStore());
-            
+
             renewerParameters.setKeyRequirements(keyRequirements);
-            renewerParameters.setTokenRequirements(tokenRequirements);  
-            
+            renewerParameters.setTokenRequirements(tokenRequirements);
+
             ReceivedToken renewTarget = tokenRequirements.getRenewTarget();
             if (renewTarget == null || renewTarget.getToken() == null) {
                 throw new STSException("No element presented for renewal", STSException.INVALID_REQUEST);
             }
             renewerParameters.setToken(renewTarget);
-            
+
             if (tokenRequirements.getTokenType() == null) {
                 LOG.fine("Received TokenType is null");
             }
-            
+
             // Get the realm of the request
             String realm = null;
             if (stsProperties.getRealmParser() != null) {
                 RealmParser realmParser = stsProperties.getRealmParser();
-                realm = realmParser.parseRealm(context);
+                realm = realmParser.parseRealm(messageContext);
             }
             renewerParameters.setRealm(realm);
-            
+
             // Validate the request
             TokenValidatorResponse tokenResponse = validateReceivedToken(
-                    context, realm, tokenRequirements, renewTarget);
-            
+                    principal, messageContext, realm, tokenRequirements, renewTarget);
+
             if (tokenResponse == null) {
                 LOG.fine("No Token Validator has been found that can handle this token");
                 renewTarget.setState(STATE.INVALID);
                 throw new STSException(
-                    "No Token Validator has been found that can handle this token" 
-                    + tokenRequirements.getTokenType(), 
+                    "No Token Validator has been found that can handle this token"
+                    + tokenRequirements.getTokenType(),
                     STSException.REQUEST_FAILED
                 );
             }
-            
+
             // Reject an invalid token
             if (tokenResponse.getToken().getState() != STATE.EXPIRED
                 && tokenResponse.getToken().getState() != STATE.VALID) {
                 LOG.fine("The token is not valid or expired, and so it cannot be renewed");
                 throw new STSException(
-                    "No Token Validator has been found that can handle this token" 
-                    + tokenRequirements.getTokenType(), 
+                    "No Token Validator has been found that can handle this token"
+                    + tokenRequirements.getTokenType(),
                     STSException.REQUEST_FAILED
                 );
             }
-            
+
             //
             // Renew the token
             //
             TokenRenewerResponse tokenRenewerResponse = null;
-            renewerParameters = createTokenRenewerParameters(requestRequirements, context);
+            renewerParameters = createTokenRenewerParameters(requestRequirements, principal, messageContext);
             Map<String, Object> additionalProperties = tokenResponse.getAdditionalProperties();
             if (additionalProperties != null) {
                 renewerParameters.setAdditionalProperties(additionalProperties);
             }
             renewerParameters.setRealm(tokenResponse.getTokenRealm());
             renewerParameters.setToken(tokenResponse.getToken());
-    
+
             realm = tokenResponse.getTokenRealm();
             for (TokenRenewer tokenRenewer : tokenRenewers) {
                 boolean canHandle = false;
@@ -175,17 +176,19 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
                     "No token renewer found for requested token type", STSException.REQUEST_FAILED
                 );
             }
-    
+
             // prepare response
             try {
                 EncryptionProperties encryptionProperties = renewerParameters.getEncryptionProperties();
-                RequestSecurityTokenResponseType response = 
+                RequestSecurityTokenResponseType response =
                     createResponse(
-                        encryptionProperties, tokenRenewerResponse, tokenRequirements, keyRequirements, context
+                        encryptionProperties, tokenRenewerResponse, tokenRequirements, keyRequirements
                     );
                 STSRenewSuccessEvent event = new STSRenewSuccessEvent(renewerParameters,
                         System.currentTimeMillis() - start);
                 publishEvent(event);
+
+                cleanRequest(requestRequirements);
                 return response;
             } catch (Throwable ex) {
                 LOG.log(Level.WARNING, "", ex);
@@ -196,17 +199,16 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
                                                               System.currentTimeMillis() - start, ex);
             publishEvent(event);
             throw ex;
-        }            
+        }
     }
-   
-    private RequestSecurityTokenResponseType createResponse(
+
+    protected RequestSecurityTokenResponseType createResponse(
             EncryptionProperties encryptionProperties,
-            TokenRenewerResponse tokenRenewerResponse, 
+            TokenRenewerResponse tokenRenewerResponse,
             TokenRequirements tokenRequirements,
-            KeyRequirements keyRequirements,
-            WebServiceContext webServiceContext
+            KeyRequirements keyRequirements
     ) throws WSSecurityException {
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseType();
 
         String context = tokenRequirements.getContext();
@@ -215,14 +217,14 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         }
 
         // TokenType
-        JAXBElement<String> jaxbTokenType = 
+        JAXBElement<String> jaxbTokenType =
             QNameConstants.WS_TRUST_FACTORY.createTokenType(tokenRequirements.getTokenType());
         response.getAny().add(jaxbTokenType);
 
         // RequestedSecurityToken
-        RequestedSecurityTokenType requestedTokenType = 
+        RequestedSecurityTokenType requestedTokenType =
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityTokenType();
-        JAXBElement<RequestedSecurityTokenType> requestedToken = 
+        JAXBElement<RequestedSecurityTokenType> requestedToken =
             QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(requestedTokenType);
         LOG.fine("Encrypting Issued Token: " + encryptIssuedToken);
         requestedTokenType.setAny(tokenRenewerResponse.getToken());
@@ -235,13 +237,13 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             if (attachedReference != null) {
                 requestedAttachedReferenceType = createRequestedReference(attachedReference, true);
             } else {
-                requestedAttachedReferenceType = 
+                requestedAttachedReferenceType =
                     createRequestedReference(
                             tokenRenewerResponse.getTokenId(), tokenRequirements.getTokenType(), true
                     );
             }
 
-            JAXBElement<RequestedReferenceType> requestedAttachedReference = 
+            JAXBElement<RequestedReferenceType> requestedAttachedReference =
                 QNameConstants.WS_TRUST_FACTORY.createRequestedAttachedReference(
                         requestedAttachedReferenceType
                 );
@@ -253,13 +255,13 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             if (unAttachedReference != null) {
                 requestedUnattachedReferenceType = createRequestedReference(unAttachedReference, false);
             } else {
-                requestedUnattachedReferenceType = 
+                requestedUnattachedReferenceType =
                     createRequestedReference(
                             tokenRenewerResponse.getTokenId(), tokenRequirements.getTokenType(), false
                     );
             }
 
-            JAXBElement<RequestedReferenceType> requestedUnattachedReference = 
+            JAXBElement<RequestedReferenceType> requestedUnattachedReference =
                 QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(
                         requestedUnattachedReferenceType
                 );
@@ -270,20 +272,23 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         response.getAny().add(tokenRequirements.getAppliesTo());
 
         // Lifetime
-        LifetimeType lifetime = 
-            createLifetime(tokenRenewerResponse.getCreated(), tokenRenewerResponse.getExpires());
-        JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
-        response.getAny().add(lifetimeType);
+        if (includeLifetimeElement) {
+            LifetimeType lifetime =
+                createLifetime(tokenRenewerResponse.getCreated(), tokenRenewerResponse.getExpires());
+            JAXBElement<LifetimeType> lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetime(lifetime);
+            response.getAny().add(lifetimeType);
+        }
 
         return response;
     }
 
     private TokenRenewerParameters createTokenRenewerParameters(
-        RequestRequirements requestRequirements, WebServiceContext context
+        RequestRequirements requestRequirements, Principal principal,
+        Map<String, Object> messageContext
     ) {
-        TokenProviderParameters providerParameters = 
-            createTokenProviderParameters(requestRequirements, context);
-        
+        TokenProviderParameters providerParameters =
+            createTokenProviderParameters(requestRequirements, principal, messageContext);
+
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress(providerParameters.getAppliesToAddress());
         renewerParameters.setEncryptionProperties(providerParameters.getEncryptionProperties());
@@ -292,8 +297,8 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         renewerParameters.setStsProperties(providerParameters.getStsProperties());
         renewerParameters.setTokenRequirements(providerParameters.getTokenRequirements());
         renewerParameters.setTokenStore(providerParameters.getTokenStore());
-        renewerParameters.setWebServiceContext(providerParameters.getWebServiceContext());
-        
+        renewerParameters.setMessageContext(providerParameters.getMessageContext());
+
         return renewerParameters;
     }
 

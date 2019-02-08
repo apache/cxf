@@ -71,7 +71,7 @@ import org.omg.CORBA.UnionMember;
 public final class CorbaUtils {
 
     static final QName EMPTY_QNAME = new QName("", "");
-    static final Map<QName, TCKind> PRIMITIVE_TYPECODES = new HashMap<QName, TCKind>();
+    static final Map<QName, TCKind> PRIMITIVE_TYPECODES = new HashMap<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaUtils.class);
     private static final class LastExport {
@@ -89,7 +89,7 @@ public final class CorbaUtils {
         }
     }
     private static final ThreadLocal<LastExport> LAST_EXPORT_CACHE =
-        new ThreadLocal<LastExport>();
+        new ThreadLocal<>();
 
     private CorbaUtils() {
         //utility class
@@ -101,7 +101,7 @@ public final class CorbaUtils {
     }
 
     public static TypeCode getTypeCode(ORB orb, QName type, CorbaTypeMap typeMap) {
-        Stack<QName> seenTypes = new Stack<QName>();
+        Stack<QName> seenTypes = new Stack<>();
         return getTypeCode(orb, type, null, typeMap, seenTypes);
     }
 
@@ -116,7 +116,7 @@ public final class CorbaUtils {
                                        QName type,
                                        CorbaType obj,
                                        CorbaTypeMap typeMap) {
-        Stack<QName> seenTypes = new Stack<QName>();
+        Stack<QName> seenTypes = new Stack<>();
         return getTypeCode(orb, type, obj, typeMap, seenTypes);
     }
 
@@ -214,7 +214,6 @@ public final class CorbaUtils {
             } else if (obj instanceof Exception) {
                 Exception exceptType = (Exception)obj;
 
-                // TODO: check to see if this is a recursive type.
                 List<MemberType> list = exceptType.getMember();
                 StructMember[] members = new StructMember[list.size()];
                 for (int i = 0; i < members.length; ++i) {
@@ -231,7 +230,7 @@ public final class CorbaUtils {
             } else if (obj instanceof org.apache.cxf.binding.corba.wsdl.Object) {
                 org.apache.cxf.binding.corba.wsdl.Object objType =
                     (org.apache.cxf.binding.corba.wsdl.Object)obj;
-                if (objType.getName().equals("CORBA.Object")) {
+                if ("CORBA.Object".equals(objType.getName())) {
                     tc = orb.create_interface_tc(objType.getRepositoryID(), "Object");
                 } else {
                     tc = orb.create_interface_tc(objType.getRepositoryID(),
@@ -244,7 +243,6 @@ public final class CorbaUtils {
             } else if (obj instanceof Struct) {
                 Struct structType = (Struct)obj;
 
-                // TODO: check to see if this is a recursive type.
                 if (seenTypes.contains(new QName(structType.getName()))) {
                     tc = orb.create_recursive_tc(structType.getRepositoryID());
                 } else {
@@ -303,86 +301,85 @@ public final class CorbaUtils {
 
         if (seenTypes.contains(new QName(unionType.getName()))) {
             return orb.create_recursive_tc(unionType.getRepositoryID());
-        } else {
-            seenTypes.push(new QName(unionType.getName()));
+        }
+        seenTypes.push(new QName(unionType.getName()));
 
-            TypeCode discTC = getTypeCode(orb, unionType.getDiscriminator(), typeMap, seenTypes);
-            Map<String, UnionMember> members = new LinkedHashMap<String, UnionMember>();
-            List<Unionbranch> branches = unionType.getUnionbranch();
-            for (Iterator<Unionbranch> branchIter = branches.iterator(); branchIter.hasNext();) {
-                Unionbranch branch = branchIter.next();
-                List<CaseType> cases = branch.getCase();
-                for (Iterator<CaseType> caseIter = cases.iterator(); caseIter.hasNext();) {
-                    CaseType cs = caseIter.next();
-                    if (!members.containsKey(cs.getLabel())) {
-                        UnionMember member = new UnionMember();
-                        member.name = branch.getName();
-                        member.type = getTypeCode(orb, branch.getIdltype(), typeMap, seenTypes);
-                        member.label = orb.create_any();
-                        // We need to insert the labels in a way that depends on the type of the
-                        // discriminator.  According to the CORBA specification, the following types
-                        // are permissable as discriminator types:
-                        //    * signed & unsigned short
-                        //    * signed & unsigned long
-                        //    * signed & unsigned long long
-                        //    * char
-                        //    * boolean
-                        //    * enum
-                        switch (discTC.kind().value()) {
-                        case TCKind._tk_short:
-                            member.label.insert_short(Short.parseShort(cs.getLabel()));
-                            break;
-                        case TCKind._tk_ushort:
-                            member.label.insert_ushort(Short.parseShort(cs.getLabel()));
-                            break;
-                        case TCKind._tk_long:
-                            member.label.insert_long(Integer.parseInt(cs.getLabel()));
-                            break;
-                        case TCKind._tk_ulong:
-                            member.label.insert_ulong(Integer.parseInt(cs.getLabel()));
-                            break;
-                        case TCKind._tk_longlong:
-                            member.label.insert_longlong(Long.parseLong(cs.getLabel()));
-                            break;
-                        case TCKind._tk_ulonglong:
-                            member.label.insert_ulonglong(Long.parseLong(cs.getLabel()));
-                            break;
-                        case TCKind._tk_char:
-                            member.label.insert_char(cs.getLabel().charAt(0));
-                            break;
-                        case TCKind._tk_boolean:
-                            member.label.insert_boolean(Boolean.parseBoolean(cs.getLabel()));
-                            break;
-                        case TCKind._tk_enum:
-                            org.omg.CORBA.portable.OutputStream out =
-                                member.label.create_output_stream();
-                            Enum enumVal = (Enum)getCorbaType(unionType.getDiscriminator(), typeMap);
-                            List<Enumerator> enumerators = enumVal.getEnumerator();
-                            for (int i = 0; i < enumerators.size(); ++i) {
-                                Enumerator e = enumerators.get(i);
-                                if (e.getValue().equals(cs.getLabel())) {
-                                    out.write_long(i);
-                                }
+        TypeCode discTC = getTypeCode(orb, unionType.getDiscriminator(), typeMap, seenTypes);
+        Map<String, UnionMember> members = new LinkedHashMap<>();
+        List<Unionbranch> branches = unionType.getUnionbranch();
+        for (Iterator<Unionbranch> branchIter = branches.iterator(); branchIter.hasNext();) {
+            Unionbranch branch = branchIter.next();
+            List<CaseType> cases = branch.getCase();
+            for (Iterator<CaseType> caseIter = cases.iterator(); caseIter.hasNext();) {
+                CaseType cs = caseIter.next();
+                if (!members.containsKey(cs.getLabel())) {
+                    UnionMember member = new UnionMember();
+                    member.name = branch.getName();
+                    member.type = getTypeCode(orb, branch.getIdltype(), typeMap, seenTypes);
+                    member.label = orb.create_any();
+                    // We need to insert the labels in a way that depends on the type of the
+                    // discriminator.  According to the CORBA specification, the following types
+                    // are permissable as discriminator types:
+                    //    * signed & unsigned short
+                    //    * signed & unsigned long
+                    //    * signed & unsigned long long
+                    //    * char
+                    //    * boolean
+                    //    * enum
+                    switch (discTC.kind().value()) {
+                    case TCKind._tk_short:
+                        member.label.insert_short(Short.parseShort(cs.getLabel()));
+                        break;
+                    case TCKind._tk_ushort:
+                        member.label.insert_ushort(Short.parseShort(cs.getLabel()));
+                        break;
+                    case TCKind._tk_long:
+                        member.label.insert_long(Integer.parseInt(cs.getLabel()));
+                        break;
+                    case TCKind._tk_ulong:
+                        member.label.insert_ulong(Integer.parseInt(cs.getLabel()));
+                        break;
+                    case TCKind._tk_longlong:
+                        member.label.insert_longlong(Long.parseLong(cs.getLabel()));
+                        break;
+                    case TCKind._tk_ulonglong:
+                        member.label.insert_ulonglong(Long.parseLong(cs.getLabel()));
+                        break;
+                    case TCKind._tk_char:
+                        member.label.insert_char(cs.getLabel().charAt(0));
+                        break;
+                    case TCKind._tk_boolean:
+                        member.label.insert_boolean(Boolean.parseBoolean(cs.getLabel()));
+                        break;
+                    case TCKind._tk_enum:
+                        org.omg.CORBA.portable.OutputStream out =
+                            member.label.create_output_stream();
+                        Enum enumVal = (Enum)getCorbaType(unionType.getDiscriminator(), typeMap);
+                        List<Enumerator> enumerators = enumVal.getEnumerator();
+                        for (int i = 0; i < enumerators.size(); ++i) {
+                            Enumerator e = enumerators.get(i);
+                            if (e.getValue().equals(cs.getLabel())) {
+                                out.write_long(i);
                             }
-                            member.label.read_value(out.create_input_stream(), discTC);
-                            break;
-                        default:
-                            throw new CorbaBindingException("Unsupported discriminator type");
                         }
-                        // Some orbs are strict on how the case labels are stored for
-                        // each member.  So we can't
-                        // simply insert the labels as strings
-                        members.put(cs.getLabel(), member);
+                        member.label.read_value(out.create_input_stream(), discTC);
+                        break;
+                    default:
+                        throw new CorbaBindingException("Unsupported discriminator type");
                     }
+                    // Some orbs are strict on how the case labels are stored for
+                    // each member.  So we can't
+                    // simply insert the labels as strings
+                    members.put(cs.getLabel(), member);
                 }
             }
-            seenTypes.pop();
-            return orb.create_union_tc(unionType.getRepositoryID(),
-                                       getTypeCodeName(unionType.getName()),
-                                       discTC,
-                                       members.values().toArray(
-                                           new UnionMember[members.size()]));
         }
+        seenTypes.pop();
+        return orb.create_union_tc(unionType.getRepositoryID(),
+                                   getTypeCodeName(unionType.getName()),
+                                   discTC,
+                                   members.values().toArray(
+                                       new UnionMember[members.size()]));
     }
 
     public static String getTypeCodeName(String name) {
@@ -624,7 +621,7 @@ public final class CorbaUtils {
     public static QName processQName(QName qname, ServiceInfo serviceInfo) {
         QName result = qname;
         if ((qname.getNamespaceURI() != null)
-            && (!qname.getNamespaceURI().equals(""))
+            && (!qname.getNamespaceURI().isEmpty())
             && (!isElementFormQualified(serviceInfo, qname.getNamespaceURI()))) {
             result = new QName("", qname.getLocalPart());
         }

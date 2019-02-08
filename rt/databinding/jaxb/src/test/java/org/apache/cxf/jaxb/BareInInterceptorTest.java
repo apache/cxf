@@ -54,17 +54,19 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 import org.apache.hello_world_soap_http.types.GreetMe;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
-import org.easymock.IMocksControl;
 
-import org.junit.Assert;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class BareInInterceptorTest extends Assert {
-    
+public class BareInInterceptorTest {
+
     PhaseInterceptorChain chain;
     MessageImpl message;
     Bus bus;
@@ -74,7 +76,7 @@ public class BareInInterceptorTest extends Assert {
     EndpointInfo endpointInfo;
     EndpointImpl endpoint;
     BindingOperationInfo operation;
-    
+
     @Before
     public void setUp() throws Exception {
         bus = BusFactory.newInstance().createBus();
@@ -89,16 +91,16 @@ public class BareInInterceptorTest extends Assert {
             .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
         expect(binding.getOutFaultInterceptors())
             .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
-        
-        bfm.registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bf);      
-    
+
+        bfm.registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bf);
+
     }
-    
+
     @Test
     public void testInterceptorInbound() throws Exception {
         setUpUsingHelloWorld();
 
-        BareInInterceptor interceptor = new BareInInterceptor();        
+        BareInInterceptor interceptor = new BareInInterceptor();
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/GreetMeDocLiteralReq.xml")));
 
@@ -114,14 +116,14 @@ public class BareInInterceptorTest extends Assert {
         Object obj = parameters.get(0);
         assertTrue(obj instanceof GreetMe);
         GreetMe greet = (GreetMe)obj;
-        assertEquals("TestSOAPInputPMessage", greet.getRequestType());        
+        assertEquals("TestSOAPInputPMessage", greet.getRequestType());
     }
 
     @Test
     public void testInterceptorInbound1() throws Exception {
         setUpUsingDocLit();
 
-        BareInInterceptor interceptor = new BareInInterceptor();        
+        BareInInterceptor interceptor = new BareInInterceptor();
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/sayHiDocLitBareReq.xml")));
 
@@ -137,18 +139,18 @@ public class BareInInterceptorTest extends Assert {
         Object obj = parameters.get(0);
         assertTrue(obj instanceof TradePriceData);
         TradePriceData greet = (TradePriceData)obj;
-        assertTrue(1.0 == greet.getTickerPrice()); 
-        assertEquals("CXF", greet.getTickerSymbol());        
+        assertTrue(1.0 == greet.getTickerPrice());
+        assertEquals("CXF", greet.getTickerSymbol());
     }
-    
+
     @Test
     public void testInterceptorInboundBareNoParameter() throws Exception {
         setUpUsingDocLit();
-        
-        BareInInterceptor interceptor = new BareInInterceptor();        
+
+        BareInInterceptor interceptor = new BareInInterceptor();
         message.setContent(XMLStreamReader.class, XMLInputFactory.newInstance()
             .createXMLStreamReader(getTestStream(getClass(), "resources/bareNoParamDocLitBareReq.xml")));
-        
+
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         // skip to the end element of soap body, so that we can serve an empty request to
         // interceptor
@@ -164,7 +166,7 @@ public class BareInInterceptorTest extends Assert {
         List<?> parameters = message.getContent(List.class);
         assertNull(parameters);
     }
-    
+
     @Test
     public void testInterceptorOutbound() throws Exception {
         setUpUsingHelloWorld();
@@ -185,8 +187,7 @@ public class BareInInterceptorTest extends Assert {
         GreetMeResponse greet = (GreetMeResponse)obj;
         assertEquals("TestSOAPOutputPMessage", greet.getResponseType());
     }
-    
-    //TODO: remove duplicate code in setUpUsingHelloWorld and setUpUsingDocLit
+
     private void setUpUsingHelloWorld() throws Exception {
         String ns = "http://apache.org/hello_world_soap_http";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
@@ -215,8 +216,8 @@ public class BareInInterceptorTest extends Assert {
         exchange.put(Service.class, service);
         exchange.put(Endpoint.class, endpoint);
         exchange.put(Binding.class, endpoint.getBinding());
-    }    
-    
+    }
+
     private void setUpUsingDocLit() throws Exception {
         String ns = "http://apache.org/hello_world_doc_lit_bare";
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, getClass()
@@ -245,7 +246,7 @@ public class BareInInterceptorTest extends Assert {
         exchange.put(Endpoint.class, endpoint);
         exchange.put(Binding.class, endpoint.getBinding());
     }
-    
+
     public InputStream getTestStream(Class<?> clz, String file) {
         return clz.getResourceAsStream(file);
     }
@@ -257,5 +258,5 @@ public class BareInInterceptorTest extends Assert {
     public XMLStreamWriter getXMLStreamWriter(OutputStream os) {
         return StaxUtils.createXMLStreamWriter(os);
     }
-    
+
 }

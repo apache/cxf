@@ -100,21 +100,20 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
     private static final Logger LOG = LogUtils.getL7dLogger(WSSecurityPolicyLoader.class);
 
     Bus bus;
-    
+
     public WSSecurityPolicyLoader(Bus b) {
         bus = b;
         registerBuilders();
         try {
             registerProviders();
         } catch (Throwable t) {
-            //probably wss4j isn't found or something. We'll ignore this
-            //as the policy framework will then not find the providers
-            //and error out at that point.  If nothing uses ws-securitypolicy
-            //no warnings/errors will display
-            LOG.log(Level.FINE, "Could not load or register WS-SecurityPolicy related classes.", t);
+            String error = "Could not load or register WS-SecurityPolicy related classes. "
+                + "Please check that (the correct version of) Apache WSS4J is on the classpath";
+            LOG.log(Level.WARNING, error + ": " + t.getMessage());
+            LOG.log(Level.FINE, error, t);
         }
     }
-    
+
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg == null) {
@@ -158,13 +157,13 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.registerBuilder(new WSS10Builder());
         reg.registerBuilder(new WSS11Builder());
         reg.registerBuilder(new X509TokenBuilder());
-        
+
         //add generic assertions for these known things to prevent warnings
         List<QName> others = Arrays.asList(new QName[] {
             SP12Constants.INCLUDE_TIMESTAMP, SP11Constants.INCLUDE_TIMESTAMP,
             SP12Constants.ENCRYPT_SIGNATURE, SP11Constants.ENCRYPT_SIGNATURE,
             SP12Constants.PROTECT_TOKENS, SP11Constants.PROTECT_TOKENS,
-            SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, 
+            SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY,
             SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY,
             SP12Constants.WSS_X509_V1_TOKEN_10,
             SP12Constants.WSS_X509_V1_TOKEN_11,
@@ -197,50 +196,50 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.PROTECT_TOKENS,
             SP11Constants.PROTECT_TOKENS,
             SP12Constants.RSA_KEY_VALUE,
-            
+
             // Layout
-            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST, SP11Constants.STRICT, 
+            SP11Constants.LAX, SP11Constants.LAXTSFIRST, SP11Constants.LAXTSLAST, SP11Constants.STRICT,
             SP12Constants.LAX, SP12Constants.LAXTSFIRST, SP12Constants.LAXTSLAST, SP12Constants.STRICT,
-            
+
             // UsernameToken
-            SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,  
+            SP11Constants.WSS_USERNAME_TOKEN10, SP12Constants.WSS_USERNAME_TOKEN10,
             SP11Constants.WSS_USERNAME_TOKEN11, SP12Constants.WSS_USERNAME_TOKEN11,
             SP12Constants.HASH_PASSWORD, SP12Constants.NO_PASSWORD,
             SP13Constants.CREATED, SP13Constants.NONCE,
-            
+
             SP12Constants.REQUIRE_INTERNAL_REFERENCE, SP11Constants.REQUIRE_INTERNAL_REFERENCE,
             SP12Constants.REQUIRE_EXTERNAL_REFERNCE, SP11Constants.REQUIRE_EXTERNAL_REFERNCE,
-            
+
             // Kerberos
             new QName(SP11Constants.SP_NS, "WssKerberosV5ApReqToken11"),
             new QName(SP12Constants.SP_NS, "WssKerberosV5ApReqToken11"),
             new QName(SP11Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
             new QName(SP12Constants.SP_NS, "WssGssKerberosV5ApReqToken11"),
-            
+
             // Spnego
             SP12Constants.MUST_NOT_SEND_AMEND,
             SP12Constants.MUST_NOT_SEND_CANCEL,
-            SP12Constants.MUST_NOT_SEND_RENEW,            
-            
+            SP12Constants.MUST_NOT_SEND_RENEW,
+
             // Backwards compatibility thing
             new QName("http://schemas.microsoft.com/ws/2005/07/securitypolicy", SPConstants.MUST_NOT_SEND_CANCEL),
-            
+
             // SCT
             SP12Constants.REQUIRE_EXTERNAL_URI_REFERENCE,
             SP12Constants.SC13_SECURITY_CONTEXT_TOKEN,
             SP11Constants.SC10_SECURITY_CONTEXT_TOKEN,
-            
+
             // WSS10
             SP12Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER, SP11Constants.MUST_SUPPORT_REF_KEY_IDENTIFIER,
             SP12Constants.MUST_SUPPORT_REF_ISSUER_SERIAL, SP11Constants.MUST_SUPPORT_REF_ISSUER_SERIAL,
             SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI, SP12Constants.MUST_SUPPORT_REF_EXTERNAL_URI,
             SP12Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN, SP11Constants.MUST_SUPPORT_REF_EMBEDDED_TOKEN,
-            
+
             // WSS11
             SP12Constants.MUST_SUPPORT_REF_THUMBPRINT, SP11Constants.MUST_SUPPORT_REF_THUMBPRINT,
             SP12Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY, SP11Constants.MUST_SUPPORT_REF_ENCRYPTED_KEY,
             SP12Constants.REQUIRE_SIGNATURE_CONFIRMATION, SP11Constants.REQUIRE_SIGNATURE_CONFIRMATION,
-            
+
             // SAML
             new QName(SP11Constants.SP_NS, "WssSamlV11Token10"),
             new QName(SP12Constants.SP_NS, "WssSamlV11Token10"),
@@ -248,12 +247,12 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             new QName(SP12Constants.SP_NS, "WssSamlV11Token11"),
             new QName(SP11Constants.SP_NS, "WssSamlV20Token11"),
             new QName(SP12Constants.SP_NS, "WssSamlV20Token11"),
-            
+
             // HTTPs
             SP12Constants.HTTP_BASIC_AUTHENTICATION,
             SP12Constants.HTTP_DIGEST_AUTHENTICATION,
             SP12Constants.REQUIRE_CLIENT_CERTIFICATE,
-            
+
             // Trust13
             SP12Constants.MUST_SUPPORT_CLIENT_CHALLENGE, SP11Constants.MUST_SUPPORT_CLIENT_CHALLENGE,
             SP12Constants.MUST_SUPPORT_SERVER_CHALLENGE, SP11Constants.MUST_SUPPORT_SERVER_CHALLENGE,
@@ -264,12 +263,12 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             SP12Constants.REQUIRE_APPLIES_TO,
             SP13Constants.SCOPE_POLICY_15,
             SP13Constants.MUST_SUPPORT_INTERACTIVE_CHALLENGE,
-            
+
             // AlgorithmSuite misc
             new QName(SP11Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
             new QName(SP12Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
         });
-        final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+        final Map<QName, Assertion> assertions = new HashMap<>();
         for (QName q : others) {
             assertions.put(q, new PrimitiveAssertion(q));
         }
@@ -287,10 +286,10 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
                 }
                 QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                 return assertions.get(q);
-            }            
+            }
         });
     }
-    
+
     public void registerProviders() {
         //interceptor providers for all of the above
         PolicyInterceptorProviderRegistry reg = bus.getExtension(PolicyInterceptorProviderRegistry.class);

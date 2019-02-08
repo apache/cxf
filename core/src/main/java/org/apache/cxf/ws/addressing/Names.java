@@ -23,6 +23,7 @@ package org.apache.cxf.ws.addressing;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 
@@ -30,78 +31,78 @@ import javax.xml.namespace.QName;
  * Holder for WS-Addressing names (of headers, namespaces etc.).
  */
 public final class Names {
-   
-    public static final String WSA_NAMESPACE_NAME = 
+
+    public static final String WSA_NAMESPACE_NAME =
         "http://www.w3.org/2005/08/addressing";
-    
+
     public static final String WSA_NAMESPACE_WSDL_NAME = "http://www.w3.org/2006/05/addressing/wsdl";
 
-    public static final String WSA_NAMESPACE_WSDL_NAME_OLD = 
+    public static final String WSA_NAMESPACE_WSDL_NAME_OLD =
         "http://www.w3.org/2005/02/addressing/wsdl";
-    public static final String WSA_NAMESPACE_WSDL_METADATA = 
+    public static final String WSA_NAMESPACE_WSDL_METADATA =
         "http://www.w3.org/2007/05/addressing/metadata";
     public static final String WSA_NAMESPACE_PATTERN = "/addressing";
 
-    public static final String WSA_REFERENCE_PARAMETERS_NAME = 
+    public static final String WSA_REFERENCE_PARAMETERS_NAME =
         "ReferenceParameters";
-    public static final QName WSA_REFERENCE_PARAMETERS_QNAME = 
+    public static final QName WSA_REFERENCE_PARAMETERS_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_REFERENCE_PARAMETERS_NAME);
-    
-    public static final String WSA_IS_REFERENCE_PARAMETER_NAME = 
+
+    public static final String WSA_IS_REFERENCE_PARAMETER_NAME =
         "IsReferenceParameter";
     public static final QName WSA_IS_REFERENCE_PARAMETER_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_IS_REFERENCE_PARAMETER_NAME);
-    
+
     public static final String WSA_ADDRESS_NAME = "Address";
-    public static final QName WSA_ADDRESS_QNAME = 
+    public static final QName WSA_ADDRESS_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_ADDRESS_NAME);
-    
+
     public static final String WSA_METADATA_NAME = "Metadata";
-    public static final QName WSA_METADATA_QNAME = 
+    public static final QName WSA_METADATA_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_METADATA_NAME);
-    
+
     public static final String WSA_FROM_NAME = "From";
-    public static final QName WSA_FROM_QNAME = 
+    public static final QName WSA_FROM_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_FROM_NAME);
 
     public static final String WSA_TO_NAME = "To";
-    public static final QName WSA_TO_QNAME = 
+    public static final QName WSA_TO_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_TO_NAME);
-    
+
     public static final String WSA_REPLYTO_NAME = "ReplyTo";
-    public static final QName WSA_REPLYTO_QNAME = 
+    public static final QName WSA_REPLYTO_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_REPLYTO_NAME);
 
     public static final String WSA_FAULTTO_NAME = "FaultTo";
-    public static final QName WSA_FAULTTO_QNAME = 
+    public static final QName WSA_FAULTTO_QNAME =
         new QName(WSA_NAMESPACE_NAME, "FaultTo");
-    
+
     public static final String WSA_ACTION_NAME = "Action";
-    public static final QName WSA_ACTION_QNAME = 
+    public static final QName WSA_ACTION_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_ACTION_NAME);
 
     public static final String WSA_MESSAGEID_NAME = "MessageID";
-    public static final QName WSA_MESSAGEID_QNAME = 
-        new QName(WSA_NAMESPACE_NAME, WSA_MESSAGEID_NAME);    
-    
+    public static final QName WSA_MESSAGEID_QNAME =
+        new QName(WSA_NAMESPACE_NAME, WSA_MESSAGEID_NAME);
+
     public static final String WSA_REPLY_NAME = "reply";
     public static final String WSA_RELATIONSHIP_DELIMITER = "/";
-    public static final String WSA_RELATIONSHIP_REPLY = 
+    public static final String WSA_RELATIONSHIP_REPLY =
         WSA_NAMESPACE_NAME + WSA_RELATIONSHIP_DELIMITER + WSA_REPLY_NAME;
-    
+
     public static final String WSA_RELATESTO_NAME = "RelatesTo";
     public static final QName WSA_RELATESTO_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_RELATESTO_NAME);
 
     public static final String WSA_RELATIONSHIPTYPE_NAME = "RelationshipType";
-    public static final QName WSA_RELATIONSHIPTYPE_QNAME = 
+    public static final QName WSA_RELATIONSHIPTYPE_QNAME =
         new QName(WSA_NAMESPACE_NAME, WSA_RELATIONSHIPTYPE_NAME);
-    
-    public static final String WSA_ANONYMOUS_ADDRESS = 
+
+    public static final String WSA_ANONYMOUS_ADDRESS =
         WSA_NAMESPACE_NAME + "/anonymous";
     public static final String WSA_NONE_ADDRESS =
         WSA_NAMESPACE_NAME + "/none";
-    
+
     public static final String WSA_UNSPECIFIED_RELATIONSHIP =
         WSA_NAMESPACE_NAME + "/unspecified";
 
@@ -109,37 +110,39 @@ public final class Names {
         "/fault";
     public static final String WSA_DEFAULT_FAULT_ACTION =
         WSA_NAMESPACE_NAME + WSA_FAULT_DELIMITER;
-        
+    public static final String WSA_DEFAULT_SOAP_FAULT_ACTION =
+        WSA_NAMESPACE_NAME + "/soap" + WSA_FAULT_DELIMITER;
+
     public static final String WSAW_ACTION_NAME = "Action";
-    public static final QName WSAW_ACTION_QNAME = 
+    public static final QName WSAW_ACTION_QNAME =
         new QName(WSA_NAMESPACE_WSDL_NAME, WSAW_ACTION_NAME);
-    
+
     public static final String WSAW_USING_ADDRESSING_NAME = "UsingAddressing";
-    public static final QName WSAW_USING_ADDRESSING_QNAME = 
+    public static final QName WSAW_USING_ADDRESSING_QNAME =
         new QName(WSA_NAMESPACE_WSDL_NAME, WSAW_USING_ADDRESSING_NAME);
-    
-    public static final String WSDL_INSTANCE_NAMESPACE_NAME = 
+
+    public static final String WSDL_INSTANCE_NAMESPACE_NAME =
         "http://www.w3.org/2004/08/wsdl-instance";
 
     public static final String INVALID_MAP_NAME =
-        "InvalidMessageAddressingProperty";    
-    public static final QName INVALID_MAP_QNAME = 
+        "InvalidMessageAddressingProperty";
+    public static final QName INVALID_MAP_QNAME =
         new QName(WSA_NAMESPACE_NAME, INVALID_MAP_NAME);
     public static final String MAP_REQUIRED_NAME =
         "MessageAddressingPropertyRequired";
-    public static final QName MAP_REQUIRED_QNAME = 
+    public static final QName MAP_REQUIRED_QNAME =
         new QName(WSA_NAMESPACE_NAME, MAP_REQUIRED_NAME);
     public static final String DESTINATION_UNREACHABLE_NAME =
         "DestinationUnreachable";
-    public static final QName DESTINATION_UNREACHABLE_QNAME = 
+    public static final QName DESTINATION_UNREACHABLE_QNAME =
         new QName(WSA_NAMESPACE_NAME, DESTINATION_UNREACHABLE_NAME);
     public static final String ACTION_NOT_SUPPORTED_NAME =
         "ActionNotSupported";
-    public static final QName ACTION_NOT_SUPPORTED_QNAME = 
+    public static final QName ACTION_NOT_SUPPORTED_QNAME =
         new QName(WSA_NAMESPACE_NAME, ACTION_NOT_SUPPORTED_NAME);
     public static final String ENDPOINT_UNAVAILABLE_NAME =
         "EndpointUnavailable";
-    public static final QName ENDPOINT_UNAVAILABLE_QNAME = 
+    public static final QName ENDPOINT_UNAVAILABLE_QNAME =
         new QName(WSA_NAMESPACE_NAME, ENDPOINT_UNAVAILABLE_NAME);
 
     public static final String DUPLICATE_MESSAGE_ID_NAME =
@@ -157,32 +160,33 @@ public final class Names {
     public static final QName HEADER_REQUIRED_QNAME =
         new QName(WSA_NAMESPACE_NAME, HEADER_REQUIRED_NAME);
 
-    public static final String ONLY_ANONYMOUS_ADDRESS_SUPPORTED_NAME = 
+    public static final String ONLY_ANONYMOUS_ADDRESS_SUPPORTED_NAME =
         "OnlyAnonymousAddressSupported";
     public static final QName ONLY_ANONYMOUS_ADDRESS_SUPPORTED_QNAME =
         new QName(WSA_NAMESPACE_NAME, ONLY_ANONYMOUS_ADDRESS_SUPPORTED_NAME);
-        
-    public static final String ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME = 
+
+    public static final String ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME =
         "OnlyNonAnonymousAddressSupported";
     public static final QName ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME =
         new QName(WSA_NAMESPACE_NAME, ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME);
-    
+
     public static final String INVALID_CARDINALITY_NAME = "InvalidCardinality";
     public static final QName INVALID_CARDINALITY_QNAME = new QName(WSA_NAMESPACE_NAME,
                                                                     INVALID_CARDINALITY_NAME);
-    
+
     /**
      * The set of headers understood by the protocol binding.
      */
     public static final Set<QName> HEADERS;
     static {
-        Set<QName> headers = new HashSet<QName>();
+        Set<QName> headers = new HashSet<>();
         headers.add(WSA_FROM_QNAME);
         headers.add(WSA_TO_QNAME);
         headers.add(WSA_REPLYTO_QNAME);
         headers.add(WSA_FAULTTO_QNAME);
         headers.add(WSA_ACTION_QNAME);
         headers.add(WSA_MESSAGEID_QNAME);
+        headers.add(WSA_RELATESTO_QNAME);
         HEADERS = Collections.unmodifiableSet(headers);
     }
 

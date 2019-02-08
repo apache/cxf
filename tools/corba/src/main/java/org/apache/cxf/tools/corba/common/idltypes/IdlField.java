@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class IdlField extends IdlDefnImplBase {
-    
+
     protected static final Logger LOG = LogUtils.getL7dLogger(IdlField.class);
     private IdlType type;
 
@@ -35,7 +35,7 @@ public class IdlField extends IdlDefnImplBase {
         super(parent, name);
         this.type = idlType;
     }
-    
+
     public static IdlField create(IdlScopeBase parent, String name, IdlType type) {
         return new IdlField(parent, name, type);
     }
@@ -59,7 +59,7 @@ public class IdlField extends IdlDefnImplBase {
     public boolean isEmptyDef() {
         return type.isEmptyDef();
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         return type.getCircularScope(startScope, doneDefn);
     }

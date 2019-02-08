@@ -38,19 +38,19 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
 
 public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements Exchange {
-    
+
     private static final long serialVersionUID = -3112077559217623594L;
     private Destination destination;
     private boolean oneWay;
     private boolean synchronous = true;
-    
+
     private Message inMessage;
     private Message outMessage;
     private Message inFaultMessage;
     private Message outFaultMessage;
-    
+
     private Session session;
-    
+
     private Bus bus;
     private Endpoint endpoint;
     private Service service;
@@ -90,10 +90,10 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
             outFaultMessage.resetContextCache();
         }
     }
-    
+
     public <T> T get(Class<T> key) {
         T t = key.cast(get(key.getName()));
-        
+
         if (t == null) {
             if (key == Bus.class) {
                 t = key.cast(bus);
@@ -129,7 +129,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
 
     public <T> void put(Class<T> key, T value) {
         if (value == null) {
-            super.remove(key);
+            super.remove((Object)key);
         } else if (key == Bus.class) {
             resetContextCaches();
             bus = (Bus)value;
@@ -147,7 +147,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
             super.put(key.getName(), value);
         }
     }
-    
+
     public Object put(String key, Object value) {
         setMessageContextProperty(inMessage, key, value);
         setMessageContextProperty(outMessage, key, value);
@@ -157,6 +157,10 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
             return super.remove(key);
         }
         return super.put(key, value);
+    }
+
+    public <T> T remove(Class<T> key) {
+        return key.cast(super.remove(key.getName()));
     }
 
     private void setMessageContextProperty(Message m, String key, Object value) {
@@ -172,7 +176,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
             m.resetContextCache();
         }
     }
-    
+
     public Destination getDestination() {
         return destination;
     }
@@ -243,7 +247,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
     public void setOneWay(boolean b) {
         oneWay = b;
     }
-    
+
     public boolean isSynchronous() {
         return synchronous;
     }
@@ -259,7 +263,7 @@ public class ExchangeImpl extends ConcurrentHashMap<String, Object>  implements 
     public void setSession(Session session) {
         this.session = session;
     }
-    
+
     public void clear() {
         super.clear();
         resetContextCaches();

@@ -33,8 +33,8 @@ public class Server extends AbstractBusTestServerBase  {
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     Endpoint ep;
-    
-    
+
+
     protected void run()  {
 
         SpringBusFactory factory = new SpringBusFactory();
@@ -45,17 +45,17 @@ public class Server extends AbstractBusTestServerBase  {
         GreeterImpl implementor = new GreeterImpl();
         ep = Endpoint.publish(ADDRESS, implementor);
     }
-    
+
     @Override
     public void tearDown() {
         if (ep != null) {
             ep.stop();
         }
     }
-        
+
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

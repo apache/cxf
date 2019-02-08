@@ -28,5 +28,5 @@ public class SpringComponentScanServer extends AbstractSpringComponentScanServer
     public Server jaxRsServer() {
         return super.createJaxRsServer();
     }
-    
+
 }

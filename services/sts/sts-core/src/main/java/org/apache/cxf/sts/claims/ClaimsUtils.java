@@ -24,11 +24,11 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
  * Some common utility methods for claims
  */
 public final class ClaimsUtils {
-    
+
     private ClaimsUtils() {
         // complete
     }
-    
+
     public static ProcessedClaimCollection processClaims(TokenProviderParameters providerParameters) {
         // Handle Claims
         ClaimsManager claimsManager = providerParameters.getClaimsManager();
@@ -43,7 +43,7 @@ public final class ClaimsUtils {
                 params.setPrincipal(providerParameters.getTokenRequirements().getOnBehalfOf().getPrincipal());
                 params.setRoles(providerParameters.getTokenRequirements().getOnBehalfOf().getRoles());
             } else if (providerParameters.getTokenRequirements().getActAs() != null) {
-                params.setPrincipal(providerParameters.getTokenRequirements().getActAs().getPrincipal());    
+                params.setPrincipal(providerParameters.getTokenRequirements().getActAs().getPrincipal());
                 params.setRoles(providerParameters.getTokenRequirements().getActAs().getRoles());
             } else {
                 params.setPrincipal(providerParameters.getPrincipal());
@@ -52,8 +52,8 @@ public final class ClaimsUtils {
             params.setStsProperties(providerParameters.getStsProperties());
             params.setTokenRequirements(providerParameters.getTokenRequirements());
             params.setTokenStore(providerParameters.getTokenStore());
-            params.setWebServiceContext(providerParameters.getWebServiceContext());
-            retrievedClaims = 
+            params.setMessageContext(providerParameters.getMessageContext());
+            retrievedClaims =
                 claimsManager.retrieveClaimValues(
                     providerParameters.getRequestedPrimaryClaims(),
                     providerParameters.getRequestedSecondaryClaims(),

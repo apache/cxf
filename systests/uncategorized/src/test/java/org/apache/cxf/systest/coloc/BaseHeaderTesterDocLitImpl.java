@@ -20,8 +20,8 @@
 package org.apache.cxf.systest.coloc;
 
 import java.util.ResourceBundle;
-import javax.xml.ws.Holder;
 
+import javax.xml.ws.Holder;
 
 import org.apache.commons.logging.Log;
 import org.apache.cxf.common.i18n.Message;
@@ -98,7 +98,7 @@ public class BaseHeaderTesterDocLitImpl implements HeaderTester {
                                         new Object[]{"FAULT TEST"}));
         } else if ("RUNTIME".equals(msgType)) {
             throw new IllegalArgumentException(HeaderTesterUtil.EX_STRING);
-        } 
+        }
     }
 
     public void init(Log log) {

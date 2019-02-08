@@ -85,7 +85,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
     private static final String XML_PI_START = "<?xml version=\"1.0\" encoding=\"";
     private static final String XML_PI_PROPERTY_RI = "com.sun.xml.bind.xmlHeaders";
     private static final String XML_PI_PROPERTY_RI_INT = "com.sun.xml.internal.bind.xmlHeaders";
-    
+
     private static final List<String> MARSHALLER_PROPERTIES =
         Arrays.asList(new String[] {Marshaller.JAXB_ENCODING,
                                     Marshaller.JAXB_FORMATTED_OUTPUT,
@@ -96,28 +96,28 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                                     NS_MAPPER_PROPERTY_RI_INT,
                                     XML_PI_PROPERTY_RI,
                                     XML_PI_PROPERTY_RI_INT});
-    
+
     private Map<String, Object> mProperties = Collections.emptyMap();
     private Map<String, String> nsPrefixes = Collections.emptyMap();
     private String xmlResourceOffset = "";
     private String xmlPiPropertyName;
-    
+
     public JAXBElementProvider() {
-        
+
     }
-    
+
     protected boolean objectFactoryOrIndexAvailable(Class<?> type) {
-        return !Document.class.isAssignableFrom(type) && super.objectFactoryOrIndexAvailable(type); 
+        return !Document.class.isAssignableFrom(type) && super.objectFactoryOrIndexAvailable(type);
     }
-    
+
     public void setXmlResourceOffset(String value) {
         xmlResourceOffset = value;
     }
-    
+
     public void setNamespacePrefixes(Map<String, String> prefixes) {
         nsPrefixes = prefixes;
     }
-    
+
     protected void setXmlPiProperty(Marshaller ms, String value) throws Exception {
         if (xmlPiPropertyName != null) {
             setMarshallerProp(ms, value, xmlPiPropertyName, null);
@@ -125,53 +125,40 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             setMarshallerProp(ms, value, XML_PI_PROPERTY_RI, XML_PI_PROPERTY_RI_INT);
         }
     }
-    
+
     @Override
     protected boolean canBeReadAsJaxbElement(Class<?> type) {
-        return super.canBeReadAsJaxbElement(type) 
+        return super.canBeReadAsJaxbElement(type)
             && type != XMLSource.class && !Source.class.isAssignableFrom(type);
     }
-    
+
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
     }
-    
-    public void setEnableBuffering(boolean enableBuf) {
-        super.setEnableBuffering(enableBuf);
-    }
-    
-    public void setConsumeMediaTypes(List<String> types) {
-        super.setConsumeMediaTypes(types);
-    }
-    
-    public void setProduceMediaTypes(List<String> types) {
-        super.setProduceMediaTypes(types);
-    }
-    
+
     public void setMarshallerProperties(Map<String, Object> marshallProperties) {
         mProperties = marshallProperties;
     }
-    
+
     public void setSchemaLocation(String schemaLocation) {
         mProperties.put(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
     }
-    
-    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+
+    public T readFrom(Class<T> type, Type genericType, Annotation[] anns, MediaType mt,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         if (isPayloadEmpty(headers)) {
             if (AnnotationUtils.getAnnotation(anns, Nullable.class) != null) {
                 return null;
-            } else {
-                reportEmptyContentLength();
             }
+            reportEmptyContentLength();
         }
-        
+
         XMLStreamReader reader = null;
         Unmarshaller unmarshaller = null;
         try {
-            
+
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theGenericType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             Class<?> theType = getActualType(theGenericType, genericType, anns);
@@ -179,8 +166,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             addAttachmentUnmarshaller(unmarshaller);
             Object response = null;
-            if (JAXBElement.class.isAssignableFrom(type) 
-                || !isCollection && (unmarshalAsJaxbElement  
+            if (JAXBElement.class.isAssignableFrom(type)
+                || !isCollection && (unmarshalAsJaxbElement
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName()))) {
                 reader = getStreamReader(is, type, mt);
                 reader = TransformUtils.createNewReaderIfNeeded(reader, is);
@@ -193,17 +180,17 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 response = doUnmarshal(unmarshaller, type, is, anns, mt);
             }
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
-                response = ((JAXBElement<?>)response).getValue();    
+                response = ((JAXBElement<?>)response).getValue();
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(
-                                 unmarshaller, theType, type, genericType, 
-                                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns)); 
+                                 unmarshaller, theType, type, genericType,
+                                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(theGenericType, anns));
             } else {
                 response = checkAdapter(response, type, anns, false);
             }
             return type.cast(response);
-            
+
         } catch (JAXBException e) {
             handleJAXBException(e, true);
         } catch (DepthExceededStaxException e) {
@@ -212,7 +199,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             throw e;
         } catch (Exception e) {
             LOG.warning(ExceptionUtils.getStackTrace(e));
-            throw ExceptionUtils.toBadRequestException(e, null);        
+            throw ExceptionUtils.toBadRequestException(e, null);
         } finally {
             try {
                 StaxUtils.close(reader);
@@ -225,8 +212,8 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         return null;
     }
 
-    protected Object doUnmarshal(Unmarshaller unmarshaller, Class<?> type, InputStream is, 
-                                 Annotation[] anns, MediaType mt) 
+    protected Object doUnmarshal(Unmarshaller unmarshaller, Class<?> type, InputStream is,
+                                 Annotation[] anns, MediaType mt)
         throws JAXBException {
         XMLStreamReader reader = getStreamReader(is, type, mt);
         if (reader != null) {
@@ -244,7 +231,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         return unmarshalFromInputStream(unmarshaller, is, anns, mt);
     }
-    
+
     protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
         MessageContext mc = getContext();
         XMLStreamReader reader = mc != null ? mc.getContent(XMLStreamReader.class) : null;
@@ -259,23 +246,22 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 }
             }
         }
-        
+
         if (reader == null && is == null) {
             reader = getStreamHandlerFromCurrentMessage(XMLStreamReader.class);
         }
-        
+
         reader = createTransformReaderIfNeeded(reader, is);
         reader = createDepthReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return new JAXBCollectionWrapperReader(TransformUtils.createNewReaderIfNeeded(reader, is));
-        } else {
-            return reader;
         }
-        
+        return reader;
+
     }
-    
-    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, 
-                                              Annotation[] anns, MediaType mt) 
+
+    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is,
+                                              Annotation[] anns, MediaType mt)
         throws JAXBException {
         // Try to create the read before unmarshalling the stream
         XMLStreamReader xmlReader = null;
@@ -300,23 +286,23 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             }
         }
     }
-    
-    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, 
-                                         Annotation[] anns, MediaType mt) 
+
+    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader,
+                                         Annotation[] anns, MediaType mt)
         throws JAXBException {
         return unmarshaller.unmarshal(reader);
     }
-    
-    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,  
-        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+
+    public void writeTo(T obj, Class<?> cls, Type genericType, Annotation[] anns,
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         try {
-            String encoding = HttpUtils.getSetEncoding(m, headers, null);
+            String encoding = HttpUtils.getSetEncoding(m, headers, StandardCharsets.UTF_8.name());
             if (InjectionUtils.isSupportedCollectionOrArray(cls)) {
                 marshalCollection(cls, obj, genericType, encoding, os, m, anns);
             } else {
                 Object actualObject = checkAdapter(obj, cls, anns, true);
-                Class<?> actualClass = obj != actualObject || cls.isInterface() 
+                Class<?> actualClass = obj != actualObject || cls.isInterface()
                     ? actualObject.getClass() : cls;
                 marshal(actualObject, actualClass, genericType, encoding, os, m, anns);
             }
@@ -326,23 +312,23 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             throw e;
         } catch (Exception e) {
             LOG.warning(ExceptionUtils.getStackTrace(e));
-            throw ExceptionUtils.toInternalServerErrorException(e, null);        
+            throw ExceptionUtils.toInternalServerErrorException(e, null);
         }
     }
 
-    protected void marshalCollection(Class<?> originalCls, Object collection, 
-                                     Type genericType, String enc, OutputStream os, 
-                                     MediaType m, Annotation[] anns) 
+    protected void marshalCollection(Class<?> originalCls, Object collection,
+                                     Type genericType, String enc, OutputStream os,
+                                     MediaType m, Annotation[] anns)
         throws Exception {
-        
+
         Class<?> actualClass = InjectionUtils.getActualType(genericType);
         actualClass = getActualType(actualClass, genericType, anns);
-        
-        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection) 
+
+        Collection<?> c = originalCls.isArray() ? Arrays.asList((Object[]) collection)
                                              : (Collection<?>) collection;
 
         Iterator<?> it = c.iterator();
-        
+
         Object firstObj = it.hasNext() ? it.next() : null;
 
         QName qname = null;
@@ -354,67 +340,67 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             qname = getCollectionWrapperQName(actualClass, genericType, firstObj, true);
         }
         if (qname == null) {
-            String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
+            String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT",
                                                                     BUNDLE).toString();
             throw new WebApplicationException(Response.serverError()
                                               .entity(message).build());
         }
-        
+
         StringBuilder pi = new StringBuilder();
         pi.append(XML_PI_START + (enc == null ? StandardCharsets.UTF_8.name() : enc) + "\"?>");
         os.write(pi.toString().getBytes());
         String startTag = null;
         String endTag = null;
-        
+
         if (qname.getNamespaceURI().length() > 0) {
             String prefix = nsPrefixes.get(qname.getNamespaceURI());
             if (prefix == null) {
                 prefix = "ns1";
             }
-            startTag = "<" + prefix + ":" + qname.getLocalPart() + " xmlns:" + prefix + "=\"" 
+            startTag = "<" + prefix + ":" + qname.getLocalPart() + " xmlns:" + prefix + "=\""
                 + qname.getNamespaceURI() + "\">";
-            endTag = "</" + prefix + ":" + qname.getLocalPart() + ">"; 
+            endTag = "</" + prefix + ":" + qname.getLocalPart() + ">";
         } else {
             startTag = "<" + qname.getLocalPart() + ">";
             endTag = "</" + qname.getLocalPart() + ">";
         }
         os.write(startTag.getBytes());
         if (firstObj != null) {
-            XmlJavaTypeAdapter adapter = 
+            XmlJavaTypeAdapter adapter =
                 org.apache.cxf.jaxrs.utils.JAXBUtils.getAdapter(firstObj.getClass(), anns);
-            marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true), 
-                                    actualClass, genericType, enc, os, anns, m, 
+            marshalCollectionMember(JAXBUtils.useAdapter(firstObj, adapter, true),
+                                    actualClass, genericType, enc, os, anns, m,
                                     qname.getNamespaceURI());
             while (it.hasNext()) {
-                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), actualClass, 
-                                        genericType, enc, os, anns, m, 
+                marshalCollectionMember(JAXBUtils.useAdapter(it.next(), adapter, true), actualClass,
+                                        genericType, enc, os, anns, m,
                                         qname.getNamespaceURI());
             }
         }
         os.write(endTag.getBytes());
     }
     //CHECKSTYLE:OFF
-    protected void marshalCollectionMember(Object obj, 
-                                           Class<?> cls, 
-                                           Type genericType, 
-                                           String enc, 
+    protected void marshalCollectionMember(Object obj,
+                                           Class<?> cls,
+                                           Type genericType,
+                                           String enc,
                                            OutputStream os,
                                            Annotation[] anns,
-                                           MediaType mt, 
+                                           MediaType mt,
                                            String ns) throws Exception {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         if (!(obj instanceof JAXBElement)) {
             obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         }
-                
+
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
         }
-        
+
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             // set the default just in case
             if (!nsPrefixes.containsKey(ns)) {
                 map.put(ns, "ns1");
@@ -424,20 +410,20 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         marshal(obj, cls, genericType, enc, os, anns, mt, ms);
     }
-    
-    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+
+    protected void marshal(Object obj, Class<?> cls, Type genericType,
                            String enc, OutputStream os, MediaType mt) throws Exception {
         marshal(obj, cls, genericType, enc, os, mt, new Annotation[]{});
     }
-    
-    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+
+    protected void marshal(Object obj, Class<?> cls, Type genericType,
                            String enc, OutputStream os, MediaType mt,
                            Annotation[] anns) throws Exception {
         obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
         if (obj instanceof JAXBElement && cls != JAXBElement.class) {
             cls = JAXBElement.class;
         }
-        
+
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         if (!nsPrefixes.isEmpty()) {
             setNamespaceMapper(ms, nsPrefixes);
@@ -446,7 +432,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         processXmlAnnotations(ms, mt, anns);
         marshal(obj, cls, genericType, enc, os, anns, mt, ms);
     }
-    
+
     private void processXmlAnnotations(Marshaller ms, MediaType mt, Annotation[] anns) throws Exception {
         if (anns == null) {
             return;
@@ -461,7 +447,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             }
         }
     }
-    
+
     private void addProcessingInstructions(Marshaller ms, XMLInstruction pi) throws Exception {
         String value = pi.value();
         int ind = value.indexOf("href='");
@@ -476,10 +462,10 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         }
         setXmlPiProperty(ms, value);
     }
-    
-    private void addXslProcessingInstruction(Marshaller ms, MediaType mt, XSLTTransform ann) 
+
+    private void addXslProcessingInstruction(Marshaller ms, MediaType mt, XSLTTransform ann)
         throws Exception {
-        if (ann.type() == XSLTTransform.TransformType.CLIENT 
+        if (ann.type() == XSLTTransform.TransformType.CLIENT
             || ann.type() == XSLTTransform.TransformType.BOTH && ann.mediaTypes().length > 0) {
             for (String s : ann.mediaTypes()) {
                 if (mt.isCompatible(JAXRSUtils.toMediaType(s))) {
@@ -491,14 +477,14 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             setXmlPiProperty(ms, xslPi);
         }
     }
-    
+
     private void addSchemaLocation(Marshaller ms, XSISchemaLocation sl) throws Exception {
         String value = sl.resolve() ? resolveXMLResourceURI(sl.value()) : sl.value();
-        String propName = !sl.noNamespace() 
+        String propName = !sl.noNamespace()
             ? Marshaller.JAXB_SCHEMA_LOCATION : Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
         ms.setProperty(propName, value);
     }
-    
+
     protected String resolveXMLResourceURI(String path) {
         MessageContext mc = getContext();
         if (mc != null) {
@@ -510,23 +496,22 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 builder = mc.getUriInfo().getBaseUriBuilder();
             }
             return builder.path(path).path(xmlResourceOffset).build().toString();
-        } else {
-            return path; 
         }
+        return path;
     }
-    
-    
-    
+
+
+
     protected void addAttachmentMarshaller(Marshaller ms) {
         Collection<Attachment> attachments = getAttachments(true);
         if (attachments != null) {
             Object value = getContext().getContextualProperty(Message.MTOM_THRESHOLD);
-            Integer threshold = value != null ? Integer.valueOf(value.toString()) : 0;
+            Integer threshold = value != null ? Integer.valueOf(value.toString()) : Integer.valueOf(0);
             ms.setAttachmentMarshaller(new JAXBAttachmentMarshaller(
                 attachments, threshold));
         }
     }
-    
+
     protected void addAttachmentUnmarshaller(Unmarshaller um) {
         Collection<Attachment> attachments = getAttachments(false);
         if (attachments != null) {
@@ -534,23 +519,22 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 attachments));
         }
     }
-    
+
     private Collection<Attachment> getAttachments(boolean write) {
         MessageContext mc = getContext();
         if (mc != null) {
             // TODO: there has to be a better fix
             String propertyName = write ? "WRITE-" + Message.ATTACHMENTS : Message.ATTACHMENTS;
             return CastUtils.cast((Collection<?>)mc.get(propertyName));
-        } else {
-            return null;
         }
+        return null;
     }
     //CHECKSTYLE:OFF
-    protected void marshal(Object obj, Class<?> cls, Type genericType, 
-                           String enc, OutputStream os, 
+    protected final void marshal(Object obj, Class<?> cls, Type genericType,
+                           String enc, OutputStream os,
                            Annotation[] anns, MediaType mt, Marshaller ms)
         throws Exception {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
             ms.setProperty(entry.getKey(), entry.getValue());
         }
@@ -564,7 +548,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                     ms.setProperty(key, value);
                 }
             }
-            
+
         }
         XMLStreamWriter writer = getStreamWriter(obj, os, mt);
         if (writer != null) {
@@ -574,17 +558,17 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
                 if (mc.getContent(XMLStreamWriter.class) != null) {
                     ms.setProperty(Marshaller.JAXB_FRAGMENT, true);
                 }
-                mc.put(XMLStreamWriter.class.getName(), writer);    
+                mc.put(XMLStreamWriter.class.getName(), writer);
             }
             marshalToWriter(ms, obj, writer, anns, mt);
-            if (mc != null) { 
+            if (mc != null) {
                 writer.writeEndDocument();
             }
         } else {
             marshalToOutputStream(ms, obj, os, anns, mt);
         }
     }
-    
+
     protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
         XMLStreamWriter writer = null;
         MessageContext mc = getContext();
@@ -604,17 +588,18 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             if (writer == null && getEnableStreaming()) {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }
-        } 
-        
+        }
+
         if (writer == null && os == null) {
             writer = getStreamHandlerFromCurrentMessage(XMLStreamWriter.class);
         }
         return createTransformWriterIfNeeded(writer, os, true);
     }
-    
-    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, 
-                                         Annotation[] anns, MediaType mt) 
+
+    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
+                                         Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setMinimumEscapeHandler(ms);
         if (os == null) {
             Writer writer = getStreamHandlerFromCurrentMessage(Writer.class);
             if (writer == null) {
@@ -627,15 +612,16 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
             ms.marshal(obj, os);
         }
     }
-    
-    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, 
-                                   Annotation[] anns, MediaType mt) 
+
+    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer,
+                                   Annotation[] anns, MediaType mt)
         throws Exception {
+        org.apache.cxf.common.jaxb.JAXBUtils.setNoEscapeHandler(ms);
         ms.marshal(obj, writer);
     }
 
     public void setXmlPiPropertyName(String xmlPiPropertyName) {
         this.xmlPiPropertyName = xmlPiPropertyName;
     }
-    
+
 }

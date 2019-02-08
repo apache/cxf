@@ -19,26 +19,30 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Provider;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
@@ -56,71 +60,75 @@ import org.apache.wss4j.stax.setup.InboundWSSec;
 import org.apache.wss4j.stax.setup.WSSec;
 import org.apache.wss4j.stax.validate.Validator;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.stax.securityEvent.AbstractSecuredElementSecurityEvent;
+import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventListener;
-import org.apache.xml.security.stax.securityEvent.TokenSecurityEvent;
 
 public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
-    
+
     public static final String SECURITY_PROCESSED = WSS4JStaxInInterceptor.class.getName() + ".DONE";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JStaxInInterceptor.class);
-    
+
     public WSS4JStaxInInterceptor(WSSSecurityProperties securityProperties) {
         super(securityProperties);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
-    
+
     public WSS4JStaxInInterceptor(Map<String, Object> props) {
         super(props);
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
-    
+
     public WSS4JStaxInInterceptor() {
         super();
+        WSSec.init();
         setPhase(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
     public final boolean isGET(SoapMessage message) {
-        String method = (String)message.get(SoapMessage.HTTP_REQUEST_METHOD);
+        String method = (String)message.get(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
-    
+
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
-        
+
         if (soapMessage.containsKey(SECURITY_PROCESSED) || isGET(soapMessage)) {
             return;
         }
+
+        soapMessage.getInterceptorChain().add(new StaxStartBodyInterceptor());
 
         XMLStreamReader originalXmlStreamReader = soapMessage.getContent(XMLStreamReader.class);
         XMLStreamReader newXmlStreamReader;
 
         soapMessage.getInterceptorChain().add(new StaxSecurityContextInInterceptor());
-        
+
         try {
             @SuppressWarnings("unchecked")
-            List<SecurityEvent> requestSecurityEvents = 
+            List<SecurityEvent> requestSecurityEvents =
                 (List<SecurityEvent>) soapMessage.getExchange().get(SecurityEvent.class.getName() + ".out");
-            
+
             WSSSecurityProperties secProps = createSecurityProperties();
             translateProperties(soapMessage, secProps);
             configureCallbackHandler(soapMessage, secProps);
             configureProperties(soapMessage, secProps);
-            
+
             if (secProps.getActions() != null && secProps.getActions().size() > 0) {
                 soapMessage.getInterceptorChain().add(new StaxActionInInterceptor(secProps.getActions()));
             }
-            
+
             if (secProps.getAttachmentCallbackHandler() == null) {
                 secProps.setAttachmentCallbackHandler(new AttachmentCallbackHandler(soapMessage));
             }
-            
-            final TokenStoreCallbackHandler callbackHandler = 
+
+            final TokenStoreCallbackHandler callbackHandler =
                 new TokenStoreCallbackHandler(
                     secProps.getCallbackHandler(), TokenStoreUtils.getTokenStore(soapMessage)
                 );
@@ -128,17 +136,17 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
 
             setTokenValidators(secProps, soapMessage);
             secProps.setMsgContext(soapMessage);
-            
-            final List<SecurityEventListener> securityEventListeners = 
+
+            final List<SecurityEventListener> securityEventListeners =
                 configureSecurityEventListeners(soapMessage, secProps);
-            
-            boolean returnSecurityError = 
+
+            boolean returnSecurityError =
                 MessageUtils.getContextualBoolean(soapMessage, SecurityConstants.RETURN_SECURITY_ERROR, false);
-            
-            final InboundWSSec inboundWSSec = 
+
+            final InboundWSSec inboundWSSec =
                 WSSec.getInboundWSSec(secProps, MessageUtils.isRequestor(soapMessage), returnSecurityError);
-            
-            newXmlStreamReader = 
+
+            newXmlStreamReader =
                 inboundWSSec.processInMessage(originalXmlStreamReader, requestSecurityEvents, securityEventListeners);
             final Object provider = soapMessage.getExchange().get(Provider.class);
             if (provider != null && ThreadLocalSecurityProvider.isInstalled()) {
@@ -157,8 +165,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             soapMessage.setContent(XMLStreamReader.class, newXmlStreamReader);
 
             // Warning: The exceptions which can occur here are not security relevant exceptions
-            // but configuration-errors. To catch security relevant exceptions you have to catch 
-            // them e.g.in the FaultOutInterceptor. Why? Because we do streaming security. This 
+            // but configuration-errors. To catch security relevant exceptions you have to catch
+            // them e.g.in the FaultOutInterceptor. Why? Because we do streaming security. This
             // interceptor doesn't handle the ws-security stuff but just setup the relevant stuff
             // for it. Exceptions will be thrown as a wrapped XMLStreamException during further
             // processing in the WS-Stack.
@@ -173,34 +181,31 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             throw new SoapFault(new Message("STAX_EX", LOG), e, soapMessage.getVersion().getSender());
         }
     }
-    
+
     protected List<SecurityEventListener> configureSecurityEventListeners(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws WSSPolicyException {
         final List<SecurityEvent> incomingSecurityEventList = new LinkedList<>();
         msg.getExchange().put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
         msg.put(SecurityEvent.class.getName() + ".in", incomingSecurityEventList);
-        
+
         final SecurityEventListener securityEventListener = new SecurityEventListener() {
             @Override
             public void registerSecurityEvent(SecurityEvent securityEvent) throws WSSecurityException {
-                if (securityEvent.getSecurityEventType() == WSSecurityEventConstants.Timestamp
-                    || securityEvent.getSecurityEventType() == WSSecurityEventConstants.SignatureValue
-                    || securityEvent instanceof TokenSecurityEvent
-                    || securityEvent instanceof AbstractSecuredElementSecurityEvent) {
+                if (securityEvent.getSecurityEventType() != WSSecurityEventConstants.AlgorithmSuite) {
                     // Store events required for the security context setup, or the crypto coverage checker
                     incomingSecurityEventList.add(securityEvent);
                 }
             }
         };
-        
+
         return Collections.singletonList(securityEventListener);
     }
-    
+
     protected void configureProperties(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) throws XMLSecurityException {
-        
+
         // Configure replay caching
         ReplayCache nonceCache = null;
         if (isNonceCacheRequired(msg, securityProperties)) {
@@ -208,51 +213,33 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 msg, SecurityConstants.ENABLE_NONCE_CACHE, SecurityConstants.NONCE_CACHE_INSTANCE
             );
         }
-        if (nonceCache == null) {
-            securityProperties.setEnableNonceReplayCache(false);
-            securityProperties.setNonceReplayCache(null);
-        } else {
-            securityProperties.setEnableNonceReplayCache(true);
-            securityProperties.setNonceReplayCache(nonceCache);
-        }
-        
+        securityProperties.setNonceReplayCache(nonceCache);
+
         ReplayCache timestampCache = null;
         if (isTimestampCacheRequired(msg, securityProperties)) {
             timestampCache = WSS4JUtils.getReplayCache(
                 msg, SecurityConstants.ENABLE_TIMESTAMP_CACHE, SecurityConstants.TIMESTAMP_CACHE_INSTANCE
             );
         }
-        if (timestampCache == null) {
-            securityProperties.setEnableTimestampReplayCache(false);
-            securityProperties.setTimestampReplayCache(null);
-        } else {
-            securityProperties.setEnableTimestampReplayCache(true);
-            securityProperties.setTimestampReplayCache(timestampCache);
-        }
-        
+        securityProperties.setTimestampReplayCache(timestampCache);
+
         ReplayCache samlCache = null;
         if (isSamlCacheRequired(msg, securityProperties)) {
             samlCache = WSS4JUtils.getReplayCache(
-                msg, SecurityConstants.ENABLE_SAML_ONE_TIME_USE_CACHE, 
+                msg, SecurityConstants.ENABLE_SAML_ONE_TIME_USE_CACHE,
                 SecurityConstants.SAML_ONE_TIME_USE_CACHE_INSTANCE
             );
         }
-        if (samlCache == null) {
-            securityProperties.setEnableSamlOneTimeUseReplayCache(false);
-            securityProperties.setSamlOneTimeUseReplayCache(null);
-        } else {
-            securityProperties.setEnableSamlOneTimeUseReplayCache(true);
-            securityProperties.setSamlOneTimeUseReplayCache(samlCache);
-        }
-        
-        boolean enableRevocation = 
-            MessageUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
+        securityProperties.setSamlOneTimeUseReplayCache(samlCache);
+
+        boolean enableRevocation =
+            PropertyUtils.isTrue(SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENABLE_REVOCATION, msg));
         securityProperties.setEnableRevocation(enableRevocation);
-        
+
         // Crypto loading only applies for Map
         Map<String, Object> config = getProperties();
         if (config != null && !config.isEmpty()) {
-            Crypto sigVerCrypto = 
+            Crypto sigVerCrypto =
                 loadCrypto(
                     msg,
                     ConfigurationConstants.SIG_VER_PROP_FILE,
@@ -261,7 +248,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 );
             if (sigVerCrypto == null) {
                 // Fall back to using the Signature properties for verification
-                sigVerCrypto = 
+                sigVerCrypto =
                     loadCrypto(
                         msg,
                         ConfigurationConstants.SIG_PROP_FILE,
@@ -273,8 +260,8 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 config.put(ConfigurationConstants.SIG_VER_PROP_REF_ID, "RefId-" + sigVerCrypto.hashCode());
                 config.put("RefId-" + sigVerCrypto.hashCode(), sigVerCrypto);
             }
-            
-            Crypto decCrypto = 
+
+            Crypto decCrypto =
                 loadCrypto(
                     msg,
                     ConfigurationConstants.DEC_PROP_FILE,
@@ -287,36 +274,16 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             }
             ConfigurationConverter.parseCrypto(config, securityProperties);
         }
-        
+
         // Add Audience Restrictions for SAML
-        configureAudienceRestriction(msg, securityProperties);
+        securityProperties.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg, true));
     }
-    
-    private void configureAudienceRestriction(SoapMessage msg, WSSSecurityProperties securityProperties) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = true;
-        String audRestrStr = 
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
-        if (audRestrStr != null) {
-            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
-        }
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<String>();
-            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
-            }
-            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
-            }
-            securityProperties.setAudienceRestrictions(audiences);
-        }
-    }
-    
+
     /**
-     * Is a Nonce Cache required, i.e. are we expecting a UsernameToken 
+     * Is a Nonce Cache required, i.e. are we expecting a UsernameToken
      */
     protected boolean isNonceCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
-        
+
         if (securityProperties != null && securityProperties.getActions() != null) {
             for (WSSConstants.Action action : securityProperties.getActions()) {
                 if (action == WSSConstants.USERNAMETOKEN) {
@@ -324,17 +291,17 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
-     * Is a Timestamp cache required, i.e. are we expecting a Timestamp 
+     * Is a Timestamp cache required, i.e. are we expecting a Timestamp
      */
     protected boolean isTimestampCacheRequired(
         SoapMessage msg, WSSSecurityProperties securityProperties
     ) {
-        
+
         if (securityProperties != null && securityProperties.getActions() != null) {
             for (WSSConstants.Action action : securityProperties.getActions()) {
                 if (action == WSSConstants.TIMESTAMP) {
@@ -342,61 +309,61 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
-     * Is a SAML Cache required, i.e. are we expecting a SAML Token 
+     * Is a SAML Cache required, i.e. are we expecting a SAML Token
      */
     protected boolean isSamlCacheRequired(SoapMessage msg, WSSSecurityProperties securityProperties) {
-        
+
         if (securityProperties != null && securityProperties.getActions() != null) {
             for (WSSConstants.Action action : securityProperties.getActions()) {
-                if (action == WSSConstants.SAML_TOKEN_UNSIGNED 
+                if (action == WSSConstants.SAML_TOKEN_UNSIGNED
                     || action == WSSConstants.SAML_TOKEN_SIGNED) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     private void setTokenValidators(
         WSSSecurityProperties properties, SoapMessage message
     ) throws WSSecurityException {
         Validator validator = loadValidator(SecurityConstants.SAML1_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_saml_Assertion, validator);
+            properties.addValidator(WSSConstants.TAG_SAML_ASSERTION, validator);
         }
         validator = loadValidator(SecurityConstants.SAML2_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_saml2_Assertion, validator);
+            properties.addValidator(WSSConstants.TAG_SAML2_ASSERTION, validator);
         }
         validator = loadValidator(SecurityConstants.USERNAME_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_wsse_UsernameToken, validator);
+            properties.addValidator(WSSConstants.TAG_WSSE_USERNAME_TOKEN, validator);
         }
         validator = loadValidator(SecurityConstants.SIGNATURE_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_dsig_Signature, validator);
+            properties.addValidator(XMLSecurityConstants.TAG_dsig_Signature, validator);
         }
         validator = loadValidator(SecurityConstants.TIMESTAMP_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_wsu_Timestamp, validator);
+            properties.addValidator(WSSConstants.TAG_WSU_TIMESTAMP, validator);
         }
         validator = loadValidator(SecurityConstants.BST_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_wsse_BinarySecurityToken, validator);
+            properties.addValidator(WSSConstants.TAG_WSSE_BINARY_SECURITY_TOKEN, validator);
         }
         validator = loadValidator(SecurityConstants.SCT_TOKEN_VALIDATOR, message);
         if (validator != null) {
-            properties.addValidator(WSSConstants.TAG_wsc0502_SecurityContextToken, validator);
-            properties.addValidator(WSSConstants.TAG_wsc0512_SecurityContextToken, validator);
+            properties.addValidator(WSSConstants.TAG_WSC0502_SCT, validator);
+            properties.addValidator(WSSConstants.TAG_WSC0512_SCT, validator);
         }
     }
-    
+
     private Validator loadValidator(String validatorKey, SoapMessage message) throws WSSecurityException {
         Object o = message.getContextualProperty(validatorKey);
         if (o == null) {
@@ -412,7 +379,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
                                                              WSS4JStaxInInterceptor.class)
                                                              .newInstance();
             } else {
-                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+                throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                   "Cannot load Validator: " + o);
             }
         } catch (RuntimeException t) {
@@ -421,5 +388,45 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
     }
+
+    /**
+     * This interceptor runs after the StartBodyInterceptor. It skips any white space after the SOAP:Body start tag,
+     * to make sure that the WSS4J OperationInputProcessor is triggered by the first SOAP Body child (if it is not,
+     * then WS-Security processing does not happen correctly).
+     */
+    private class StaxStartBodyInterceptor extends AbstractSoapInterceptor {
+
+        StaxStartBodyInterceptor() {
+            super(Phase.READ);
+            super.addAfter(StartBodyInterceptor.class.getName());
+        }
+
+        StaxStartBodyInterceptor(String phase) {
+            super(phase);
+        }
+
+        /** {@inheritDoc}*/
+        public void handleMessage(SoapMessage message) throws Fault {
+            if (isGET(message)) {
+                LOG.fine("StartBodyInterceptor skipped in HTTP GET method");
+                return;
+            }
+            XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
+            try {
+                int i = xmlReader.getEventType();
+                while (i == XMLStreamConstants.NAMESPACE
+                    || i == XMLStreamConstants.ATTRIBUTE
+                    || i == XMLStreamConstants.CHARACTERS) {
+                    i = xmlReader.next();
+                }
+            } catch (XMLStreamException e) {
+                throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e,
+                                    message.getVersion().getSender());
+            }
+
+        }
+
+    }
+
 
 }

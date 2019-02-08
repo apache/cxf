@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
@@ -36,9 +37,15 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class WSAClientServerTest extends AbstractWSATestBase {
     static final String PORT = Server.PORT;
@@ -68,7 +75,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
 
         assertEquals(3, port.addNumbers(1, 2));
-        
+
         assertLogNotContains(output.toString(), "//wsa:Address");
         assertLogNotContains(input.toString(), "//wsa:RelatesTo");
     }
@@ -85,9 +92,9 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
         ((BindingProvider)port).getRequestContext().put("ws-addressing.write.optional.replyto", Boolean.TRUE);
         assertEquals(3, port.addNumbers(1, 2));
-        
+
         assertLogContains(output.toString(), "//wsa:Address", "http://www.w3.org/2005/08/addressing/anonymous");
-        assertLogContains(input.toString(), "//wsa:RelatesTo", 
+        assertLogContains(input.toString(), "//wsa:RelatesTo",
                           getLogValue(output.toString(), "//wsa:MessageID"));
     }
 
@@ -102,10 +109,10 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         assertEquals(3, port.addNumbers(1, 2));
 
         assertLogContains(output.toString(), "//wsa:Address", "http://www.w3.org/2005/08/addressing/anonymous");
-        assertLogContains(input.toString(), "//wsa:RelatesTo", 
+        assertLogContains(input.toString(), "//wsa:RelatesTo",
                           getLogValue(output.toString(), "//wsa:MessageID"));
     }
-    
+
     //CXF-3456
     @Test
     public void testDuplicateHeaders() throws Exception {
@@ -119,26 +126,26 @@ public class WSAClientServerTest extends AbstractWSATestBase {
                                                             new AddressingFeature(false, false));
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                  "http://localhost:" + PORT + "/jaxws/add");
-        
+
         InputStream msgIns = getClass().getResourceAsStream("./duplicate-wsa-header-msg.xml");
         String msg = new String(IOUtils.readBytesFromStream(msgIns));
         msg = msg.replaceAll("$PORT", PORT);
-        
+
         ByteArrayInputStream bout = new ByteArrayInputStream(msg.getBytes());
-        
+
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, bout);
         assertNotNull(soapReqMsg);
-        
+
         try {
             disp.invoke(soapReqMsg);
             fail("SOAPFaultFxception is expected");
         } catch (SOAPFaultException ex) {
             assertTrue("WSA header exception is expected",
                        ex.getMessage().indexOf("A header representing a Message Addressing") > -1);
-        }         
+        }
     }
-    
-    
+
+
     @Test
     public void testNonAnonSoap12Fault() throws Exception {
         try {
@@ -163,7 +170,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
 
     }
 
-  
+
     private AddNumbersPortType getNonAnonPort() {
         URL wsdl = getClass().getResource("/wsdl_systest_soap12/add_numbers_soap12.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -172,9 +179,9 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         assertNotNull("Service is null ", service);
         return service.getAddNumbersNonAnonPort(new AddressingFeature());
     }
-    
-    
-    
+
+
+
     private AddNumbersPortType getPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);

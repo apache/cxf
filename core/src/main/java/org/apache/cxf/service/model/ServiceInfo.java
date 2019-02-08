@@ -35,10 +35,10 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     QName name;
     String targetNamespace;
     InterfaceInfo intf;
-    List<BindingInfo> bindings = new CopyOnWriteArrayList<BindingInfo>();
-    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<EndpointInfo>();
+    List<BindingInfo> bindings = new CopyOnWriteArrayList<>();
+    List<EndpointInfo> endpoints = new CopyOnWriteArrayList<>();
     Map<QName, MessageInfo> messages;
-    List<SchemaInfo> schemas = new ArrayList<SchemaInfo>(4);
+    List<SchemaInfo> schemas = new ArrayList<>(4);
     private SchemaCollection xmlSchemaCollection;
     private String topLevelDoc;
     private DescriptionInfo description;
@@ -46,7 +46,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     public ServiceInfo() {
         xmlSchemaCollection = new SchemaCollection();
     }
-    
+
     public DescriptionInfo getDescription() {
         return description;
     }
@@ -137,7 +137,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     }
 
     private void initMessagesMap() {
-        messages = new ConcurrentHashMap<QName, MessageInfo>(16, 0.75f, 2);
+        messages = new ConcurrentHashMap<>(16, 0.75f, 2);
         for (OperationInfo operation : getInterface().getOperations()) {
             if (operation.getInput() != null) {
                 messages.put(operation.getInput().getName(), operation.getInput());
@@ -159,7 +159,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     public void addSchema(SchemaInfo schemaInfo) {
         schemas.add(schemaInfo);
     }
-    
+
     public SchemaInfo addNewSchema(String namespaceURI) {
         SchemaInfo schemaInfo = new SchemaInfo(namespaceURI);
         schemaInfo.setSchema(getXmlSchemaCollection().

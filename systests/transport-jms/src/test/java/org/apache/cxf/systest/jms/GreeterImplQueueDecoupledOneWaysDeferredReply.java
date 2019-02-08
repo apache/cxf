@@ -24,8 +24,8 @@ import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 
 
 
-@WebService(serviceName = "HelloWorldQueueDecoupledOneWaysService", 
-            portName = "HelloWorldQueueDecoupledOneWaysReplyPort", 
+@WebService(serviceName = "HelloWorldQueueDecoupledOneWaysService",
+            portName = "HelloWorldQueueDecoupledOneWaysReplyPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldOneWayPort",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
@@ -33,7 +33,7 @@ public class GreeterImplQueueDecoupledOneWaysDeferredReply implements HelloWorld
 
     private String request;
     private Throwable asyncEx;
-    
+
     public void greetMeOneWay(String value) {
         synchronized (this) {
             request = value;
@@ -52,7 +52,7 @@ public class GreeterImplQueueDecoupledOneWaysDeferredReply implements HelloWorld
         }
         return request;
     }
-    
+
     public Throwable getException() {
         return asyncEx;
     }

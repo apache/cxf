@@ -27,7 +27,7 @@ public interface JweEncryptionProvider extends JweKeyProperties {
     String encrypt(byte[] jweContent, JweHeaders jweHeaders);
     /**
      * Prepare JWE state for completing either
-     * JWE compact or JSON encryption 
+     * JWE compact or JSON encryption
      */
     JweEncryptionOutput getEncryptionOutput(JweEncryptionInput jweInput);
 }

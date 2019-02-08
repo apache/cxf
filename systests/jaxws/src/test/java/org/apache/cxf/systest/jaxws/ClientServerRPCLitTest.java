@@ -53,9 +53,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CNamespaceContext;
@@ -65,50 +65,55 @@ import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.SOAPServiceRPCLit;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 import org.apache.hello_world_soap_http.RPCLitGreeterImpl;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
 
     private final QName portName = new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");
 
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run()  {
             String address;
             Object implementor = new RPCLitGreeterImpl();
             address = "http://localhost:" + PORT + "/SOAPServiceRPCLit/SoapPort";
-            Endpoint.publish(address, implementor);  
+            Endpoint.publish(address, implementor);
             address = "http://localhost:" + PORT + "/TestRPCWsdl";
-            Endpoint.publish(address, new MyService());  
+            Endpoint.publish(address, new MyService());
         }
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
     }
-   
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testBasicConnection() throws Exception {
-        
+
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
         assertNotNull(service);
-        
+
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
         try {
@@ -133,7 +138,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
                     fail("should catch WebServiceException");
                     throw e;
                 }
-                
+
                 try {
                     greeter.greetMe(null);
                     fail("should catch WebServiceException");
@@ -148,11 +153,11 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     }
-     
+
     @Test
     public void testDispatchClient() throws Exception {
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, 
+        Dispatch<Source> disp = service.createDispatch(portName, Source.class,
                                                        javax.xml.ws.Service.Mode.PAYLOAD);
         updateAddressPort(disp, PORT);
 
@@ -163,7 +168,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         Source source = new StreamSource(new StringReader(req));
         Source resp = disp.invoke(source);
         assertNotNull(resp);
-        
+
         Node nd = StaxUtils.read(resp);
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
@@ -179,71 +184,71 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
         updateAddressPort(greeter, PORT);
 
-        MyComplexStruct in = new MyComplexStruct(); 
+        MyComplexStruct in = new MyComplexStruct();
         in.setElem1("elem1");
         in.setElem2("elem2");
         in.setElem3(45);
 
-        try {            
+        try {
             ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-            MyComplexStruct out = greeter.sendReceiveData(in); 
+            MyComplexStruct out = greeter.sendReceiveData(in);
             assertNotNull("no response received from service", out);
             assertEquals(in.getElem1(), out.getElem1());
             assertEquals(in.getElem2(), out.getElem2());
             assertEquals(in.getElem3(), out.getElem3());
-            
-            
-            
+
+
+
         } catch (UndeclaredThrowableException ex) {
             throw (Exception) ex.getCause();
         }
-        
+
         try {
             in.setElem2("invalid");
-            greeter.sendReceiveData(in); 
+            greeter.sendReceiveData(in);
         } catch (SOAPFaultException f) {
             assertTrue(f.getCause() instanceof UnmarshalException);
         }
     }
-    
+
     @Test
     public void testNoElementParts() throws Exception {
-        HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:" + PORT + "/TestRPCWsdl?wsdl");    
-        httpConnection.connect();        
-        
+        HttpURLConnection httpConnection =
+            getHttpConnection("http://localhost:" + PORT + "/TestRPCWsdl?wsdl");
+        httpConnection.connect();
+
         assertEquals(200, httpConnection.getResponseCode());
         assertEquals("OK", httpConnection.getResponseMessage());
         InputStream in = httpConnection.getInputStream();
         assertNotNull(in);
-        
+
         Document doc = StaxUtils.read(in);
         assertNotNull(doc);
-        
-        
-        Map<String, String> ns = new HashMap<String, String>();
+
+
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap", Soap11.SOAP_NAMESPACE);
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("xs", "http://www.w3.org/2001/XMLSchema");
-        
-        
+
+
         XPathUtils xu = new XPathUtils(ns);
-        
+
         //make sure the wrapper types are anonymous types
         NodeList ct = (NodeList) xu.getValue("//wsdl:definitions/wsdl:message/wsdl:part[@element != '']",
                                              doc, XPathConstants.NODESET);
         assertNotNull(ct);
         assertEquals(0, ct.getLength());
-        
+
         ct = (NodeList) xu.getValue("//wsdl:definitions/wsdl:message/wsdl:part[@type != '']",
                                      doc, XPathConstants.NODESET);
         assertEquals(4, ct.getLength());
     }
-    
+
     @WebService(serviceName = "MyObjectService", portName = "MyObjectServicePort")
     @SOAPBinding(use = Use.LITERAL, style = Style.RPC)
     public static class MyService {
-            
+
         @WebMethod
         public MyObject getMyObject(@WebParam(name = "longField1") long longField1) {
             return generateMyObject();
@@ -255,7 +260,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         }
         private static MyObject generateMyObject() {
             MyObject myObject = new MyObject();
-            
+
             long tempLong = 1;
             myObject.setStringField1("S:" + tempLong++);
             myObject.setStringField2("S:" + tempLong++);
@@ -264,7 +269,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
             return myObject;
         }
     }
-    
+
     @XmlType(name = "MyObject")
     @XmlAccessorType(XmlAccessType.PROPERTY)
     @XmlRootElement(name = "MyObject")
@@ -273,7 +278,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         private String stringField2;
         private long longField1;
         private long longField2;
-        
+
         public String getStringField1() {
             return stringField1;
         }

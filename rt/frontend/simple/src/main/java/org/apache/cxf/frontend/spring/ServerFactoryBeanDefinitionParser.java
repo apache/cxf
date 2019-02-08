@@ -43,13 +43,13 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
-    
+
 
     public ServerFactoryBeanDefinitionParser() {
         super();
         setBeanClass(SpringServerFactoryBean.class);
     }
-    
+
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
         if ("endpointName".equals(name) || "serviceName".equals(name)) {
@@ -59,7 +59,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
             mapToProperty(bean, name, val);
         }
     }
-    protected boolean parseAttribute(Element element, Attr node, 
+    protected boolean parseAttribute(Element element, Attr node,
                                      ParserContext ctx, BeanDefinitionBuilder bean) {
         if (!node.getSpecified() && "start".equals(node.getLocalName())) {
             return false;
@@ -84,10 +84,10 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
             List<?> list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
-    
+
 
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
@@ -95,21 +95,21 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
 
         bean.setInitMethodName("create");
         bean.setDestroyMethodName("destroy");
-        
+
         // We don't really want to delay the registration of our Server
         bean.setLazyInit(false);
     }
 
     @Override
-    protected String resolveId(Element elem, 
-                               AbstractBeanDefinition definition, 
-                               ParserContext ctx) 
+    protected String resolveId(Element elem,
+                               AbstractBeanDefinition definition,
+                               ParserContext ctx)
         throws BeanDefinitionStoreException {
         String id = super.resolveId(elem, definition, ctx);
         if (StringUtils.isEmpty(id)) {
             id = getBeanClass().getName() + "--" + definition.hashCode();
         }
-        
+
         return id;
     }
 
@@ -117,7 +117,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
     protected boolean hasBusProperty() {
         return true;
     }
-    
+
     @NoJSR250Annotations
     public static class SpringServerFactoryBean extends ServerFactoryBean
         implements ApplicationContextAware {
@@ -133,7 +133,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         public Server getServer() {
             return server;
         }
-        
+
         public void init() {
             create();
         }

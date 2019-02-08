@@ -43,19 +43,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cxf.transport.http.netty.server.util.Utils;
+
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.CookieDecoder;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.ssl.SslHandler;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
 public class NettyHttpServletRequest implements HttpServletRequest {
-    
+
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
@@ -71,12 +72,12 @@ public class NettyHttpServletRequest implements HttpServletRequest {
 
     private QueryStringDecoder queryStringDecoder;
 
-    private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-  
+    private Map<String, Object> attributes = new ConcurrentHashMap<>();
+
     private String characterEncoding;
 
     private String contextPath;
-    
+
     private ChannelHandlerContext channelHandlerContext;
 
     public NettyHttpServletRequest(HttpRequest request, String contextPath, ChannelHandlerContext ctx) {
@@ -116,18 +117,16 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     public Cookie[] getCookies() {
         String cookieString = this.originalRequest.headers().get(COOKIE);
         if (cookieString != null) {
-            Set<io.netty.handler.codec.http.Cookie> cookies = CookieDecoder.decode(cookieString);
+            Set<io.netty.handler.codec.http.cookie.Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieString);
             if (!cookies.isEmpty()) {
                 Cookie[] cookiesArray = new Cookie[cookies.size()];
                 int indx = 0;
-                for (io.netty.handler.codec.http.Cookie c : cookies) {
-                    Cookie cookie = new Cookie(c.getName(), c.getValue());
-                    cookie.setComment(c.getComment());
-                    cookie.setDomain(c.getDomain());
-                    cookie.setMaxAge((int)c.getMaxAge());
-                    cookie.setPath(c.getPath());
+                for (io.netty.handler.codec.http.cookie.Cookie c : cookies) {
+                    Cookie cookie = new Cookie(c.name(), c.value());
+                    cookie.setDomain(c.domain());
+                    cookie.setMaxAge((int)c.maxAge());
+                    cookie.setPath(c.path());
                     cookie.setSecure(c.isSecure());
-                    cookie.setVersion(c.getVersion());
                     cookiesArray[indx] = cookie;
                     indx++;
                 }
@@ -254,7 +253,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
         if (values == null || values.isEmpty()) {
             return null;
         }
-        return values.toArray(new String[values.size()]);
+        return values.toArray(new String[0]);
     }
 
     @Override
@@ -408,7 +407,7 @@ public class NettyHttpServletRequest implements HttpServletRequest {
                                 HttpHeaders.Names.ACCEPT_LANGUAGE));
 
         if (locales == null || locales.isEmpty()) {
-            locales = new ArrayList<Locale>();
+            locales = new ArrayList<>();
             locales.add(Locale.getDefault());
         }
         return Utils.enumeration(locales);

@@ -21,11 +21,11 @@ package org.apache.cxf.tools.java2js.processor;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -84,12 +84,12 @@ public class JavaToJSProcessor implements Processor {
         Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
         BufferedWriter writer = null;
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
+            OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
-                JavascriptGetInterceptor.writeUtilsToResponseStream(JavaToJSProcessor.class, fileOutputStream);
+                JavascriptGetInterceptor.writeUtilsToResponseStream(JavaToJSProcessor.class, outputStream);
             }
 
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
             writer = new BufferedWriter(outputStreamWriter);
 
             for (SchemaInfo schema : schemata) {
@@ -104,8 +104,6 @@ public class JavaToJSProcessor implements Processor {
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
-        } catch (FileNotFoundException e) {
-            throw new ToolException(e);
         } catch (IOException e) {
             throw new ToolException(e);
         } finally {
@@ -125,7 +123,7 @@ public class JavaToJSProcessor implements Processor {
     @SuppressWarnings("unchecked")
     public ServiceBuilder getServiceBuilder() throws ToolException {
         Object beanFilesParameter = context.get(ToolConstants.CFG_BEAN_CONFIG);
-        List<String> beanDefinitions = new ArrayList<String>();
+        List<String> beanDefinitions = new ArrayList<>();
         if (beanFilesParameter != null) {
             if (beanFilesParameter instanceof String) {
                 beanDefinitions.add((String)beanFilesParameter);
@@ -133,15 +131,15 @@ public class JavaToJSProcessor implements Processor {
                 // is there a better way to avoid the warning?
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
-                String list[] = (String[])beanFilesParameter;
+                String[] list = (String[])beanFilesParameter;
                 for (String b : list) {
                     beanDefinitions.add(b);
                 }
             }
         }
 
-        
-        ServiceBuilderFactory builderFactory 
+
+        ServiceBuilderFactory builderFactory
             = ServiceBuilderFactory.getInstance(beanDefinitions,
                                                 getDataBindingName());
         Class<?> clz = getServiceClass();
@@ -154,8 +152,6 @@ public class JavaToJSProcessor implements Processor {
             if (clz.getInterfaces().length == 1) {
                 context.put(ToolConstants.SEI_CLASS, clz.getInterfaces()[0].getName());
             }
-            // TODO: if it is simple frontend, and the impl class implements
-            // multiple interfaces
             context.put(ToolConstants.GEN_FROM_SEI, Boolean.FALSE);
         }
         builderFactory.setServiceClass(clz);
@@ -183,9 +179,8 @@ public class JavaToJSProcessor implements Processor {
     protected String getBindingId() {
         if (isSOAP12()) {
             return WSDLConstants.NS_SOAP12;
-        } else {
-            return WSDLConstants.NS_SOAP11;
         }
+        return WSDLConstants.NS_SOAP11;
     }
 
     protected boolean isSOAP12() {

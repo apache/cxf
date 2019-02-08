@@ -19,42 +19,43 @@
 
 package org.apache.cxf.jca.servant;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 
 
 
 /**
- * 
+ *
  */
-public class EJBEndpointTest extends Assert {
-    
+public class EJBEndpointTest {
+
     private EJBEndpoint endpoint;
-    
+
     @Before
     public void setUp() throws Exception {
         endpoint = new EJBEndpoint(null);
     }
-    
+
     @Test
     public void testGetAddressPort() throws Exception {
         int port = endpoint.getAddressPort("http://localhost:8080/services");
         assertEquals(8080, port);
     }
-    
-    @Test  
+
+    @Test
     public void testGetAddress80Port() throws Exception {
         int port = endpoint.getAddressPort("http://localhost/services");
         assertEquals(80, port);
     }
-    
+
     @Test
     public void testGetAddressEndPort() throws Exception {
         int port = endpoint.getAddressPort("http://localhost:9999");
         assertEquals(9999, port);
     }
-    
+
 }

@@ -51,16 +51,16 @@ public class OperationResourceInfo {
     private List<Parameter> parameters;
     private boolean oneway;
     private boolean async;
-    private Set<String> nameBindings = new LinkedHashSet<String>();
+    private Set<String> nameBindings = new LinkedHashSet<>();
     private Class<?>[] actualInParamTypes;
     private Type[] actualInGenericParamTypes;
     private Annotation[][] actualInParamAnnotations;
     private Annotation[] actualOutParamAnnotations;
-    
+
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
     }
-    
+
     OperationResourceInfo(OperationResourceInfo ori, ClassResourceInfo cri) {
         this.uriTemplate = ori.uriTemplate;
         this.methodToInvoke = ori.methodToInvoke;
@@ -77,7 +77,7 @@ public class OperationResourceInfo {
         this.nameBindings = ori.nameBindings;
         initActualMethodProperties();
     }
-    
+
     public OperationResourceInfo(Method mInvoke, Method mAnnotated, ClassResourceInfo cri) {
         methodToInvoke = mInvoke;
         annotatedMethod = mAnnotated;
@@ -93,9 +93,9 @@ public class OperationResourceInfo {
         checkSuspended();
         initActualMethodProperties();
     }
-    
+
     //CHECKSTYLE:OFF
-    public OperationResourceInfo(Method m, 
+    public OperationResourceInfo(Method m,
                                  ClassResourceInfo cri,
                                  URITemplate template,
                                  String httpVerb,
@@ -103,7 +103,7 @@ public class OperationResourceInfo {
                                  String produceMediaTypes,
                                  List<Parameter> params,
                                  boolean oneway) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         methodToInvoke = m;
         annotatedMethod = null;
         classResourceInfo = cri;
@@ -114,13 +114,13 @@ public class OperationResourceInfo {
         this.oneway = oneway;
         initActualMethodProperties();
     }
-    
+
     private void initActualMethodProperties() {
         Method actualMethod = annotatedMethod == null ? methodToInvoke : annotatedMethod;
         actualInParamTypes = actualMethod.getParameterTypes();
         actualInGenericParamTypes = actualMethod.getGenericParameterTypes();
         actualInParamAnnotations = actualMethod.getParameterAnnotations();
-        
+
         // out annotations
         Annotation[] invokedAnns = methodToInvoke.getAnnotations();
         if (methodToInvoke != annotatedMethod && annotatedMethod != null) {
@@ -137,22 +137,21 @@ public class OperationResourceInfo {
             actualOutParamAnnotations = invokedAnns;
         }
     }
-    
+
     public void addNameBindings(List<String> names) {
         nameBindings.addAll(names);
     }
-    
+
     public Set<String> getNameBindings() {
         Set<String> criNames = classResourceInfo.getNameBindings();
         if (criNames.isEmpty()) {
             return nameBindings;
-        } else {
-            Set<String> all = new LinkedHashSet<String>(criNames);
-            all.addAll(nameBindings);
-            return all;
         }
+        Set<String> all = new LinkedHashSet<>(criNames);
+        all.addAll(nameBindings);
+        return all;
     }
-    
+
     private void checkOneway() {
         if (annotatedMethod != null) {
             oneway = AnnotationUtils.getAnnotation(annotatedMethod.getAnnotations(), Oneway.class) != null;
@@ -175,11 +174,11 @@ public class OperationResourceInfo {
     public boolean isAsync() {
         return async;
     }
-    
+
     public List<Parameter> getParameters() {
         return parameters;
     }
-        
+
     public URITemplate getURITemplate() {
         return uriTemplate;
     }
@@ -195,7 +194,7 @@ public class OperationResourceInfo {
     public Method getMethodToInvoke() {
         return methodToInvoke;
     }
-    
+
     public Method getAnnotatedMethod() {
         return annotatedMethod;
     }
@@ -211,28 +210,28 @@ public class OperationResourceInfo {
     public void setHttpMethod(String m) {
         httpMethod = m;
     }
-    
+
     public boolean isSubResourceLocator() {
         return httpMethod == null ? true : false;
     }
 
-    
+
     public List<MediaType> getProduceTypes() {
-        
+
         return produceMimes;
     }
-    
+
     public List<MediaType> getConsumeTypes() {
-        
+
         return consumeMimes;
     }
-    
+
     private void checkMediaTypes(String consumeMediaTypes,
                                  String produceMediaTypes) {
         if (consumeMediaTypes != null) {
             consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes, null);
         } else {
-            Consumes cm = 
+            Consumes cm =
                 AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
             if (cm != null) {
                 consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()), null);
@@ -243,7 +242,7 @@ public class OperationResourceInfo {
         if (produceMediaTypes != null) {
             produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes, JAXRSUtils.MEDIA_TYPE_QS_PARAM);
         } else {
-            Produces pm = 
+            Produces pm =
                 AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
             if (pm != null) {
                 produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()),
@@ -254,30 +253,30 @@ public class OperationResourceInfo {
             }
         }
     }
-    
+
     public boolean isEncodedEnabled() {
         return encoded;
     }
-    
+
     public String getDefaultParameterValue() {
         return defaultParamValue;
     }
-    
+
     private void checkEncoded() {
-        encoded = AnnotationUtils.getMethodAnnotation(annotatedMethod, 
+        encoded = AnnotationUtils.getMethodAnnotation(annotatedMethod,
                                             Encoded.class) != null;
         if (!encoded && classResourceInfo != null) {
-            encoded = AnnotationUtils.getClassAnnotation(classResourceInfo.getServiceClass(), 
+            encoded = AnnotationUtils.getClassAnnotation(classResourceInfo.getServiceClass(),
                                                           Encoded.class) != null;
         }
     }
-    
+
     private void checkDefaultParameterValue() {
-        DefaultValue dv = AnnotationUtils.getMethodAnnotation(annotatedMethod, 
+        DefaultValue dv = AnnotationUtils.getMethodAnnotation(annotatedMethod,
                                             DefaultValue.class);
         if (dv == null && classResourceInfo != null) {
             dv = AnnotationUtils.getClassAnnotation(
-                                         classResourceInfo.getServiceClass(), 
+                                         classResourceInfo.getServiceClass(),
                                          DefaultValue.class);
         }
         if (dv != null) {
@@ -296,5 +295,5 @@ public class OperationResourceInfo {
     public Annotation[] getOutAnnotations() {
         return actualOutParamAnnotations;
     }
-    
+
 }

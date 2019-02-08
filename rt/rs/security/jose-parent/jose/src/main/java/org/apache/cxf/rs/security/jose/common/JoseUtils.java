@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -44,29 +44,29 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public final class JoseUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JoseUtils.class);
     private static final String CLASSPATH_PREFIX = "classpath:";
-    
+
     private JoseUtils() {
-        
+
     }
     public static String[] getCompactParts(String compactContent) {
         if (compactContent.startsWith("\"") && compactContent.endsWith("\"")) {
             compactContent = compactContent.substring(1, compactContent.length() - 1);
         }
-        return StringUtils.split(compactContent, "\\.");    
+        return compactContent.split("\\.");
     }
-    public static void setJoseContextProperty(JoseHeaders headers) {    
+    public static void setJoseContextProperty(JoseHeaders headers) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         String context = (String)message.get(JoseConstants.JOSE_CONTEXT_PROPERTY);
         if (context != null) {
             headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, context);
         }
     }
-    public static void setJoseMessageContextProperty(JoseHeaders headers, String value) {    
+    public static void setJoseMessageContextProperty(JoseHeaders headers, String value) {
         headers.setHeader(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
         Message message = PhaseInterceptorChain.getCurrentMessage();
         message.put(JoseConstants.JOSE_CONTEXT_PROPERTY, value);
     }
-    public static void setMessageContextProperty(JoseHeaders headers) {    
+    public static void setMessageContextProperty(JoseHeaders headers) {
         String context = (String)headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
         if (context != null) {
             Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -87,7 +87,7 @@ public final class JoseUtils {
             throw new JoseException();
         }
     }
-    
+
     public static String checkContentType(String contentType, String defaultType) {
         if (contentType != null) {
             int paramIndex = contentType.indexOf(';');
@@ -108,34 +108,34 @@ public final class JoseUtils {
         }
         return contentType;
     }
-    
+
     public static String decodeToString(String encoded) {
         return new String(decode(encoded), StandardCharsets.UTF_8);
     }
     public static byte[] decode(String encoded) {
         return CryptoUtils.decodeSequence(encoded);
     }
-    
+
     public static boolean validateCriticalHeaders(JoseHeaders headers) {
         List<String> critical = headers.getCritical();
         if (critical == null) {
             return true;
         }
         // The "crit" value MUST NOT be empty "[]" or contain either duplicate values or "crit"
-        if (critical.isEmpty() 
+        if (critical.isEmpty()
             || detectDoubleEntry(critical)
             || critical.contains(JoseConstants.HEADER_CRITICAL)) {
             return false;
         }
-        
+
         // Check that the headers contain these critical headers
         return headers.asMap().keySet().containsAll(critical);
     }
     private static boolean detectDoubleEntry(List<?> list) {
-        Set<Object> inputSet = new HashSet<Object>(list);
+        Set<Object> inputSet = new HashSet<>(list);
         return list.size() > inputSet.size();
     }
-    
+
     public static void traceHeaders(JoseHeaders headers) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (MessageUtils.getContextualBoolean(m, JoseConstants.JOSE_DEBUG, false)) {
@@ -147,12 +147,12 @@ public final class JoseUtils {
     //
     // <Start> Copied from JAX-RS RT FRONTEND ResourceUtils
     //
-    
+
     public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
         URL url = getResourceURL(loc, bus);
         return url == null ? null : url.openStream();
     }
-    
+
     public static URL getResourceURL(String loc, Bus bus) throws Exception {
         URL url = null;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
@@ -177,12 +177,12 @@ public final class JoseUtils {
         }
         return url;
     }
-    
+
     public static URL getClasspathResourceURL(String path, Class<?> callingClass, Bus bus) {
         URL url = ClassLoaderUtils.getResource(path, callingClass);
         return url == null ? getResource(path, URL.class, bus) : url;
     }
-    
+
     public static <T> T getResource(String path, Class<T> resourceClass, Bus bus) {
         if (bus != null) {
             ResourceManager rm = bus.getExtension(ResourceManager.class);
@@ -192,16 +192,31 @@ public final class JoseUtils {
         }
         return null;
     }
-    
+
     public static Properties loadProperties(String propertiesLocation, Bus bus) throws Exception {
         Properties props = new Properties();
-        InputStream is = getResourceStream(propertiesLocation, bus);
-        props.load(is);
+        try (InputStream is = getResourceStream(propertiesLocation, bus)) {
+            if (is == null) {
+                throw new JoseException("The properties file " + propertiesLocation + " could not be read");
+            }
+            props.load(is);
+        }
         return props;
+    }
+
+    public static boolean checkBooleanProperty(JoseHeaders headers, Properties props, Message m,
+                                                String propertyName) {
+        if (headers == null) {
+            return false;
+        }
+        if (props.containsKey(propertyName)) {
+            return PropertyUtils.isTrue(props.get(propertyName));
+        }
+        return MessageUtils.getContextualBoolean(m, propertyName, false);
     }
     
     //
     // <End> Copied from JAX-RS RT FRONTEND ResourceUtils
     //
-    
+
 }

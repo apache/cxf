@@ -39,13 +39,13 @@ public enum KeyAlgorithm {
     ECDH_ES_A192KW(AlgorithmUtils.ECDH_ES_A192KW_ALGO, "AESWrap", 192),
     ECDH_ES_A256KW(AlgorithmUtils.ECDH_ES_A256KW_ALGO, "AESWrap", 256),
     ECDH_ES_DIRECT(AlgorithmUtils.ECDH_ES_DIRECT_ALGO, null, -1),
-    
-    DIRECT("direct", null, -1);
-        
+
+    DIRECT("dir", null, -1);
+
     private final String jwaName;
     private final String javaName;
     private final int keySizeBits;
-    
+
     KeyAlgorithm(String jwaName, String javaName, int keySizeBits) {
         this.jwaName = jwaName;
         this.javaName = javaName;
@@ -59,7 +59,7 @@ public enum KeyAlgorithm {
     public String getJavaName() {
         return javaName == null ? name() : javaName;
     }
-    
+
     public String getJavaAlgoName() {
         return AlgorithmUtils.stripAlgoProperties(getJavaName());
     }
@@ -71,10 +71,13 @@ public enum KeyAlgorithm {
         if (algo == null) {
             return null;
         }
+        if (KeyAlgorithm.DIRECT.getJwaName().equals(algo)) {
+            return KeyAlgorithm.DIRECT;
+        }
         return KeyAlgorithm.valueOf(algo.replace('-', '_')
                                     .replace('+', '_'));
-        
+
     }
-    
-    
+
+
 }

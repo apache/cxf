@@ -45,17 +45,17 @@ public class XPathProvider<T> implements MessageBodyReader<T> {
     private String globalExpression;
     private String className;
     private boolean forceDOM;
-    private Map<String, String> globalNamespaces = 
+    private Map<String, String> globalNamespaces =
         Collections.emptyMap();
-    
+
     public void setConsumeMediaTypes(List<String> types) {
         consumeMediaTypes = types;
     }
-    
+
     public List<String> getConsumeMediaTypes() {
-        return consumeMediaTypes;    
+        return consumeMediaTypes;
     }
-    
+
     public void setForceDOM(boolean b) {
         forceDOM = b;
     }
@@ -63,27 +63,27 @@ public class XPathProvider<T> implements MessageBodyReader<T> {
     public void setExpression(String expr) {
         globalExpression = expr;
     }
-    
+
     public void setClassName(String name) {
         className = name;
     }
-    
+
     public void setExpressions(Map<String, String> expressions) {
         classExpressions = expressions;
     }
-    
+
     public void setNamespaces(Map<String, String> nsMap) {
         globalNamespaces = nsMap;
     }
-    
+
     public boolean isReadable(Class<?> cls, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        
-        return globalExpression != null && (className == null 
-            || className.equals(cls.getName()))  
+
+        return globalExpression != null && (className == null
+            || className.equals(cls.getName()))
             || classExpressions != null && classExpressions.containsKey(cls.getName());
     }
 
-    public T readFrom(Class<T> cls, Type type, Annotation[] anns, MediaType mt, 
+    public T readFrom(Class<T> cls, Type type, Annotation[] anns, MediaType mt,
         MultivaluedMap<String, String> hrs, InputStream is) throws IOException, WebApplicationException {
         String expression = globalExpression != null ? globalExpression
             : classExpressions.get(cls.getName());

@@ -45,18 +45,23 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.hello_world_soap_http.Greeter;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LifeCycleTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class LifeCycleTest {
     public static final String PORT1 = TestUtil.getPortNumber(LifeCycleTest.class, 1);
     public static final String PORT2 = TestUtil.getPortNumber(LifeCycleTest.class, 2);
     public static final String PORT3 = TestUtil.getPortNumber(LifeCycleTest.class, 3);
     public static final String PORT4 = TestUtil.getPortNumber(LifeCycleTest.class, 4);
-    
+
     private static final int RECURSIVE_LIMIT = 3;
-    private static final String[] ADDRESSES = 
+    private static final String[] ADDRESSES =
     {"http://localhost:" + PORT1 + "/SoapContext/SoapPort",
      "http://localhost:" + PORT2 + "/SoapContext/SoapPort",
      "http://localhost:" + PORT3 + "/SoapContext/SoapPort",
@@ -70,29 +75,29 @@ public class LifeCycleTest extends Assert {
     private Endpoint[] recursiveEndpoints;
     private Map<String, Integer> startNotificationMap;
     private Map<String, Integer> stopNotificationMap;
-    
+
     @Before
     public void setUp() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();    
+        SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus(CONFIG);
         BusFactory.setDefaultBus(bus);
         manager = bus.getExtension(ServerLifeCycleManager.class);
         recursiveCount = 0;
         recursiveEndpoints = new Endpoint[RECURSIVE_LIMIT];
-        startNotificationMap = new HashMap<String, Integer>();
-        stopNotificationMap = new HashMap<String, Integer>();
+        startNotificationMap = new HashMap<>();
+        stopNotificationMap = new HashMap<>();
     }
-    
+
     @After
     public void tearDown() throws Exception {
         bus.shutdown(true);
     }
-    
-    @Test 
+
+    @Test
     public void testClientLifecycle() throws Exception {
         final AtomicBoolean created = new AtomicBoolean();
         final AtomicBoolean destroyed = new AtomicBoolean();
-        
+
         bus.getExtension(ClientLifeCycleManager.class)
             .registerListener(new ClientLifeCycleListener() {
                 public void clientCreated(Client client) {
@@ -103,10 +108,10 @@ public class LifeCycleTest extends Assert {
                     destroyed.set(true);
                 }
             });
-        
-        org.apache.hello_world_soap_http.SOAPService service 
+
+        org.apache.hello_world_soap_http.SOAPService service
             = new org.apache.hello_world_soap_http.SOAPService();
-        
+
         Greeter client = service.getSoapPort();
         ((BindingProvider)client).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
@@ -123,10 +128,10 @@ public class LifeCycleTest extends Assert {
             }
         }
         assertTrue("clientDestroyed not called", destroyed.get());
-        
+
         created.set(false);
         destroyed.set(false);
-        
+
         client = service.getSoapPort();
         ((BindingProvider)client).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
@@ -135,41 +140,41 @@ public class LifeCycleTest extends Assert {
         ((java.io.Closeable)client).close();
         assertTrue("clientDestroyed not called", destroyed.get());
     }
-    
+
     @Test
-    public void testRecursive() {        
+    public void testRecursive() {
         assertNotNull("unexpected non-null ServerLifeCycleManager", manager);
-        
+
         manager.registerListener(new ServerLifeCycleListener() {
             public void startServer(Server server) {
                 String address =
-                    server.getEndpoint().getEndpointInfo().getAddress();           
+                    server.getEndpoint().getEndpointInfo().getAddress();
                 verifyNotification(startNotificationMap, address, 0);
                 updateMap(startNotificationMap, address);
                 if (recursiveCount < RECURSIVE_LIMIT) {
                     recursiveEndpoints[recursiveCount++] =
                         Endpoint.publish(ADDRESSES[recursiveCount],
-                                         new GreeterImpl());                    
+                                         new GreeterImpl());
                 }
             }
             public void stopServer(Server server) {
                 String address =
-                    server.getEndpoint().getEndpointInfo().getAddress();           
+                    server.getEndpoint().getEndpointInfo().getAddress();
                 verifyNotification(stopNotificationMap, address, 0);
                 updateMap(stopNotificationMap, address);
                 if (recursiveCount > 0) {
-                    recursiveEndpoints[--recursiveCount].stop();                    
+                    recursiveEndpoints[--recursiveCount].stop();
                 }
             }
         });
-        
+
         Endpoint.publish(ADDRESSES[0], new GreeterImpl()).stop();
         for (int i = 0; i < ADDRESSES.length; i++) {
             verifyNotification(startNotificationMap, ADDRESSES[i], 1);
             verifyNotification(stopNotificationMap, ADDRESSES[i], 1);
         }
     }
-    
+
     @Test
     public void testGetActiveFeatures() {
         assertNotNull("unexpected non-null ServerLifeCycleManager", manager);
@@ -183,7 +188,7 @@ public class LifeCycleTest extends Assert {
                 String portName =
                     endpoint.getEndpointInfo().getName().getLocalPart();
                 if ("SoapPort".equals(portName)) {
-                    
+
                     List<Feature> active = endpoint.getActiveFeatures();
                     assertNotNull(active);
                     assertEquals(1, active.size());
@@ -202,7 +207,7 @@ public class LifeCycleTest extends Assert {
             public void stopServer(Server server) {
                 updateMap(stopNotificationMap,
                           server.getEndpoint().getEndpointInfo().getAddress());
-            }                
+            }
         });
 
         Endpoint greeter = Endpoint.publish(ADDRESSES[0], new GreeterImpl());
@@ -214,7 +219,7 @@ public class LifeCycleTest extends Assert {
             verifyNotification(stopNotificationMap, ADDRESSES[i], 1);
         }
     }
-    
+
     private void verifyNotification(Map<String, Integer> notificationMap,
                                     String address,
                                     int expected) {
@@ -226,27 +231,27 @@ public class LifeCycleTest extends Assert {
                 assertEquals("unexpected prior notification for: " + address,
                              expected,
                              count.intValue());
-            }  
+            }
         }
     }
-    
+
     private void updateMap(Map<String, Integer> notificationMap, String address) {
         synchronized (notificationMap) {
             Integer count = notificationMap.get(address);
             if (count != null) {
                 notificationMap.put(address,
-                                    new Integer(count.intValue() + 1));
+                                    Integer.valueOf(count.intValue() + 1));
             } else {
                 notificationMap.put(address,
-                                    new Integer(1));                
+                                    Integer.valueOf(1));
             }
         }
     }
-    
-    
-    @WebService(serviceName = "SOAPServiceAddressing", 
-                portName = "SoapPort", 
-                endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+
+
+    @WebService(serviceName = "SOAPServiceAddressing",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
                 wsdlLocation = "testutils/hello_world.wsdl")
     public class GreeterImpl extends org.apache.hello_world_soap_http.BaseGreeterImpl {

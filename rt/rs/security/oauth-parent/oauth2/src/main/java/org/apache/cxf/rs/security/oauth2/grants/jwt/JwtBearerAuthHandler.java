@@ -20,6 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.grants.jwt;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,19 +30,25 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rs.security.jose.jaxrs.JwtAuthenticationFilter;
+import org.apache.cxf.rs.security.jose.jaxrs.JwtTokenSecurityContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
+import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServerJoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.security.SecurityContext;
 
-public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
-    private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
-    
+public class JwtBearerAuthHandler extends OAuthServerJoseJwtConsumer implements ContainerRequestFilter {
+    private ClientRegistrationProvider clientProvider;
+    private FormEncodingProvider<Form> provider = new FormEncodingProvider<>(true);
+    private boolean validateAudience = true;
+
     public JwtBearerAuthHandler() {
     }
-    
+
     @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
@@ -52,26 +59,39 @@ public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
         if (decodedAssertionType == null || !Constants.CLIENT_AUTH_JWT_BEARER.equals(decodedAssertionType)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-        
+
         String assertion = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
-        JwtToken token = super.getJwtToken(assertion);
-        
+        if (assertion == null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }
+
         String clientId = formData.getFirst(OAuthConstants.CLIENT_ID);
+
+        Client client = null;
+        if (clientId != null && clientProvider != null) {
+            client = clientProvider.getClient(clientId);
+            if (client == null) {
+                throw ExceptionUtils.toNotAuthorizedException(null, null);
+            }
+            message.put(Client.class, client);
+        }
+        JwtToken token = super.getJwtToken(assertion, client);
+
         String subjectName = (String)token.getClaim(JwtConstants.CLAIM_SUBJECT);
         if (clientId != null && !clientId.equals(subjectName)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         message.put(OAuthConstants.CLIENT_ID, subjectName);
-        
+
         formData.remove(OAuthConstants.CLIENT_ID);
         formData.remove(Constants.CLIENT_AUTH_ASSERTION_PARAM);
         formData.remove(Constants.CLIENT_AUTH_ASSERTION_TYPE);
-        
+
         SecurityContext securityContext = configureSecurityContext(token);
         if (securityContext != null) {
             JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
         }
-        
+
         // restore input stream
         try {
             FormUtils.restoreForm(provider, form, message);
@@ -79,33 +99,50 @@ public class JwtBearerAuthHandler extends JwtAuthenticationFilter {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
+    protected SecurityContext configureSecurityContext(JwtToken token) {
+        return new JwtTokenSecurityContext(token, null);
+    }
+
     private Form readFormData(Message message) {
         try {
             return FormUtils.readForm(provider, message);
         } catch (Exception ex) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);    
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
     @Override
     protected void validateToken(JwtToken jwt) {
         super.validateToken(jwt);
-        
+
         // We must have an issuer
         if (jwt.getClaim(JwtConstants.CLAIM_ISSUER) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
-        
+
         // We must have a Subject
         if (jwt.getClaim(JwtConstants.CLAIM_SUBJECT) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
-        
+
         // We must have an Expiry
         if (jwt.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
+
+        JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
     }
-    
+
+    public void setClientProvider(ClientRegistrationProvider clientProvider) {
+        this.clientProvider = clientProvider;
+    }
+
+    public boolean isValidateAudience() {
+        return validateAudience;
+    }
+
+    public void setValidateAudience(boolean validateAudience) {
+        this.validateAudience = validateAudience;
+    }
 }

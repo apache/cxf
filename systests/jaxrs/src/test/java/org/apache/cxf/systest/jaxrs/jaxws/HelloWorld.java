@@ -38,7 +38,7 @@ public interface HelloWorld {
     @Path("/clear")
     @Produces("text/plain")
     int clearUsers();
-    
+
     @GET
     @Produces("text/plain")
     String sayHi(@QueryParam("text") String text);
@@ -54,13 +54,13 @@ public interface HelloWorld {
     @Produces("text/xml")
     @XmlJavaTypeAdapter(IntegerUserMapAdapter.class)
     Map<Integer, User> getUsers();
-    
+
     @POST
     @Produces("text/xml")
     @Consumes("text/xml")
     @XmlJavaTypeAdapter(IntegerUserMapAdapter.class)
     Map<Integer, User> echoUsers(@XmlJavaTypeAdapter(IntegerUserMapAdapter.class) Map<Integer, User> users);
-    
+
     @POST
     @Produces("text/xml")
     @Consumes("text/xml")

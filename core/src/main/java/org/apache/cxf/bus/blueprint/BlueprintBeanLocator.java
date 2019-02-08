@@ -41,33 +41,33 @@ import org.osgi.service.blueprint.reflect.BeanProperty;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 
 /**
- * 
+ *
  */
 public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     private static final Logger LOG = LogUtils.getL7dLogger(BlueprintBeanLocator.class);
     ConfiguredBeanLocator orig;
     BlueprintContainer container;
     BundleContext context;
-    
-    public BlueprintBeanLocator(ConfiguredBeanLocator orig, 
-                                BlueprintContainer cont, 
+
+    public BlueprintBeanLocator(ConfiguredBeanLocator orig,
+                                BlueprintContainer cont,
                                 BundleContext context) {
         this.orig = orig;
         this.container = cont;
         this.context = context;
         if (orig instanceof ExtensionManagerImpl) {
-            List<String> names = new ArrayList<String>(container.getComponentIds());
+            List<String> names = new ArrayList<>(container.getComponentIds());
             ((ExtensionManagerImpl)orig).removeBeansOfNames(names);
         }
     }
-    
+
     static Class<?> getClassForMetaData(BlueprintContainer container, ComponentMetadata cmd) {
         Class<?> cls = null;
         if (cmd instanceof BeanMetadata) {
             BeanMetadata bm = (BeanMetadata)cmd;
             if (bm instanceof ExtendedBeanMetadata) {
                 cls = ((ExtendedBeanMetadata)bm).getRuntimeClass();
-            } 
+            }
             if (cls == null && container instanceof ExtendedBlueprintContainer && bm.getClassName() != null) {
                 try {
                     cls = ((ExtendedBlueprintContainer)container).loadClass(bm.getClassName());
@@ -88,9 +88,9 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             return null;
         }
     }
-    
+
     public <T> T getBeanOfType(String name, Class<T> type) {
-        
+
         ComponentMetadata cmd = getComponentMetadata(name);
         Class<?> cls = getClassForMetaData(cmd);
         if (cls != null && type.isAssignableFrom(cls)) {
@@ -100,7 +100,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
     }
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        Set<String> names = new LinkedHashSet<String>();
+        Set<String> names = new LinkedHashSet<>();
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);
             Class<?> cls = getClassForMetaData(cmd);
@@ -109,13 +109,13 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             }
         }
         names.addAll(orig.getBeanNamesOfType(type));
-        return new ArrayList<String>(names);
+        return new ArrayList<>(names);
     }
 
     /** {@inheritDoc}*/
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        List<T> list = new ArrayList<T>();
-        
+        List<T> list = new ArrayList<>();
+
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);
             Class<?> cls = getClassForMetaData(cmd);
@@ -125,26 +125,26 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         }
         if (list.isEmpty() && context != null) {
             try {
-                ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+                ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
                 if (refs != null) {
-                    for (ServiceReference r : refs) {
+                    for (ServiceReference<?> r : refs) {
                         list.add(type.cast(context.getService(r)));
                     }
                 }
             } catch (Exception ex) {
                 //ignore, just don't support the OSGi services
-                LOG.info("Try to find the Bean with type:" + type 
-                    + " from OSGi services and get error: " + ex);  
+                LOG.info("Try to find the Bean with type:" + type
+                    + " from OSGi services and get error: " + ex);
             }
         }
         list.addAll(orig.getBeansOfType(type));
-        
+
         return list;
     }
 
     /** {@inheritDoc}*/
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         boolean loaded = false;
         for (String s : container.getComponentIds()) {
             ComponentMetadata cmd = container.getComponentMetadata(s);
@@ -166,12 +166,12 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
                 loaded = true;
             }
         }
-        
+
         try {
             if (context != null) {
-                ServiceReference refs[] = context.getServiceReferences(type.getName(), null);
+                ServiceReference<?>[] refs = context.getServiceReferences(type.getName(), null);
                 if (refs != null) {
-                    for (ServiceReference r : refs) {
+                    for (ServiceReference<?> r : refs) {
                         Object o2 = context.getService(r);
                         Class<? extends T> t = o2.getClass().asSubclass(type);
                         if (listener.loadBean(t.getName(), t)) {
@@ -185,9 +185,9 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
             }
         } catch (Exception ex) {
             //ignore, just don't support the OSGi services
-            LOG.info("Try to find the Bean with type:" + type 
-                + " from OSGi services and get error: " + ex);  
-        }        
+            LOG.info("Try to find the Bean with type:" + type
+                + " from OSGi services and get error: " + ex);
+        }
         return orig.loadBeansOfType(type, listener) || loaded;
     }
 
@@ -209,7 +209,7 @@ public class BlueprintBeanLocator implements ConfiguredBeanLocator {
         ComponentMetadata cmd = getComponentMetadata(name);
         if (cmd instanceof BeanMetadata) {
             return true;
-        }        
+        }
         return orig.hasBeanOfName(name);
     }
 

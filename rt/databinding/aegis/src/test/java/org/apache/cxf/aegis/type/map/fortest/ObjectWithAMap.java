@@ -27,9 +27,9 @@ import java.util.Map;
  */
 public class ObjectWithAMap {
     private Map<String, Boolean> theMap;
-    
+
     public ObjectWithAMap() {
-        theMap = new HashMap<String, Boolean>();
+        theMap = new HashMap<>();
     }
 
     public Map<String, Boolean> getTheMap() {

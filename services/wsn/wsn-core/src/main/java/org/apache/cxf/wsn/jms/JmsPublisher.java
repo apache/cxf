@@ -100,11 +100,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
             jaxbContext.createMarshaller().marshal(notify, writer);
             Message message = session.createTextMessage(writer.toString());
             producer.send(message);
-        } catch (JMSException e) {
-            LOGGER.log(Level.WARNING, "Error dispatching message", e);
-        } catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "Error dispatching message", e);
-        } catch (InvalidTopicException e) {
+        } catch (JMSException | JAXBException | InvalidTopicException e) {
             LOGGER.log(Level.WARNING, "Error dispatching message", e);
         } finally {
             if (session != null) {
@@ -118,8 +114,8 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     }
 
     @Override
-    protected void validatePublisher(RegisterPublisher registerPublisherRequest) 
-        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault, 
+    protected void validatePublisher(RegisterPublisher registerPublisherRequest)
+        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
             PublisherRegistrationRejectedFault, ResourceUnknownFault,
             TopicNotSupportedFault {
         super.validatePublisher(registerPublisherRequest);
@@ -135,10 +131,10 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     protected void start() throws PublisherRegistrationFailedFault {
         if (demand) {
             try {
-                producers = new HashMap<Destination, Object>();
-                advisories = new ArrayList<ConsumerEventSource>();
+                producers = new HashMap<>();
+                advisories = new ArrayList<>();
                 for (TopicExpressionType topic : this.topic) {
-                    ConsumerEventSource advisory 
+                    ConsumerEventSource advisory
                         = new ConsumerEventSource(connection, topicConverter.toActiveMQTopic(topic));
                     advisory.setConsumerListener(this);
                     advisory.start();

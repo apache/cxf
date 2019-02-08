@@ -62,7 +62,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             Endpoint.publish("/Greeter", impl);
             HelloImpl helloImpl = new HelloImpl();
             Endpoint.publish("/Hello", helloImpl);
-            
+
             ((EndpointImpl)Endpoint.create(helloImpl)).publish("/");
 
         } catch (Exception e) {
@@ -82,11 +82,11 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             httpServer.stop();
         }
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-    
+
 
     public static void main(String[] args) {
         try {

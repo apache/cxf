@@ -29,7 +29,7 @@ public class SpringServer {
         new ClassPathXmlApplicationContext(new String[] {"/server-beans.xml"});
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         new SpringServer();
         System.out.println("Server ready...");
 

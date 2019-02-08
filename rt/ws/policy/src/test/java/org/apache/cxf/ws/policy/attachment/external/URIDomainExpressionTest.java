@@ -32,6 +32,7 @@ import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
@@ -63,18 +64,18 @@ public class URIDomainExpressionTest {
     private static final QName FAULT_QNAME = new QName(TARGET_NAMESPACE, FAULT_NAME);
 
     private IMocksControl control;
-    
+
     private ServiceInfo si;
     private EndpointInfo ei;
     private BindingOperationInfo boi;
     private BindingMessageInfo bmi;
     private BindingFaultInfo bfi;
     private MessageInfo mi;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
+        control = EasyMock.createNiceControl();
+    }
 
     @Test
     public void testServiceInfo() {
@@ -104,7 +105,7 @@ public class URIDomainExpressionTest {
 
         control.reset();
     }
-    
+
     @Test
     public void testEndpointInfo() {
         mockInfoObjects();
@@ -163,11 +164,11 @@ public class URIDomainExpressionTest {
         Assert.assertFalse("Expected false for expression: " + expression, ude.appliesTo(bmi));
 
         control.reset();
-        
+
         mockInfoObjects();
         EasyMock.expect(mi.getType()).andReturn(Type.INPUT).anyTimes();
         control.replay();
-        
+
         expression = TARGET_NAMESPACE + "#wsdl11.bindingOperation.input(" + BINDING_NAME +  "/" + OPERATION_NAME + ")";
         ude = new URIDomainExpression(expression);
         Assert.assertTrue("Expected true for expression: " + expression, ude.appliesTo(bmi));
@@ -178,7 +179,7 @@ public class URIDomainExpressionTest {
         Assert.assertTrue("Expected true for expression: " + expression, ude.appliesTo(bmi));
 
         control.reset();
-        
+
         mockInfoObjects();
         EasyMock.expect(mi.getType()).andReturn(Type.OUTPUT).anyTimes();
         control.replay();
@@ -224,20 +225,20 @@ public class URIDomainExpressionTest {
         ei = control.createMock(EndpointInfo.class);
         boi = control.createMock(BindingOperationInfo.class);
         bmi = control.createMock(BindingMessageInfo.class);
-        bfi = control.createMock(BindingFaultInfo.class); 
+        bfi = control.createMock(BindingFaultInfo.class);
 
-        InterfaceInfo ii = control.createMock(InterfaceInfo.class); 
+        InterfaceInfo ii = control.createMock(InterfaceInfo.class);
 
         EasyMock.expect(si.getTargetNamespace()).andReturn(TARGET_NAMESPACE).anyTimes();
         EasyMock.expect(si.getName()).andReturn(SERVICE_QNAME).anyTimes();
         EasyMock.expect(si.getInterface()).andReturn(ii).anyTimes();
         EasyMock.expect(ii.getName()).andReturn(INTERFACE_QNAME).anyTimes();
-        
+
         EasyMock.expect(ei.getName()).andReturn(PORT_QNAME).anyTimes();
         EasyMock.expect(ei.getService()).andReturn(si).anyTimes();
-        
-        BindingInfo bi = control.createMock(BindingInfo.class); 
-        OperationInfo oi = control.createMock(OperationInfo.class); 
+
+        BindingInfo bi = control.createMock(BindingInfo.class);
+        OperationInfo oi = control.createMock(OperationInfo.class);
 
         EasyMock.expect(boi.getName()).andReturn(OPERATION_QNAME).anyTimes();
         EasyMock.expect(boi.getBinding()).andReturn(bi).anyTimes();
@@ -245,15 +246,15 @@ public class URIDomainExpressionTest {
         EasyMock.expect(boi.getOperationInfo()).andReturn(oi).anyTimes();
         EasyMock.expect(oi.getInterface()).andReturn(ii).anyTimes();
         EasyMock.expect(oi.getName()).andReturn(OPERATION_QNAME).anyTimes();
-        
+
         mi = control.createMock(MessageInfo.class);
-        
+
         EasyMock.expect(bmi.getMessageInfo()).andReturn(mi).anyTimes();
         EasyMock.expect(mi.getName()).andReturn(MESSAGE_QNAME).anyTimes();
         EasyMock.expect(bmi.getBindingOperation()).andReturn(boi).anyTimes();
 
         FaultInfo fi = control.createMock(FaultInfo.class);
-        
+
         bfi = control.createMock(BindingFaultInfo.class);
         EasyMock.expect(bfi.getBindingOperation()).andReturn(boi).anyTimes();
         EasyMock.expect(bfi.getFaultInfo()).andReturn(fi).anyTimes();

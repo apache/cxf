@@ -19,26 +19,24 @@
 
 package org.apache.cxf.systest.aegis;
 
-
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.authservice.AuthService;
 import org.apache.cxf.authservice.Authenticate;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.aegis.SportsService.Pair;
@@ -48,10 +46,15 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(AegisServer.class);
-    static final Logger LOG = LogUtils.getLogger(AegisClientServerTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(AegisServer.class, true));
@@ -66,18 +69,18 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.setAddress("http://localhost:" + PORT + "/service");
         AuthService service = (AuthService) proxyFactory.create();
         assertTrue(service.authenticate("Joe", "Joe", "123"));
-        assertFalse(service.authenticate("Joe1", "Joe", "fang"));      
+        assertFalse(service.authenticate("Joe1", "Joe", "fang"));
         assertTrue(service.authenticate("Joe", null, "123"));
         List<String> list = service.getRoles("Joe");
         assertEquals(3, list.size());
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);
-        
+
         assertEquals("get Joe", service.getAuthentication("Joe"));
         Authenticate au = new Authenticate();
         au.setSid("ffang");
@@ -86,7 +89,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         au.setUid("ffang1");
         assertFalse(service.authenticate(au));
     }
-    
+
     @Test
     public void testJaxWsAegisClient() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -96,24 +99,24 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegis");
         AuthService service = (AuthService) proxyFactory.create();
         assertTrue(service.authenticate("Joe", "Joe", "123"));
-        assertFalse(service.authenticate("Joe1", "Joe", "fang"));      
+        assertFalse(service.authenticate("Joe1", "Joe", "fang"));
         assertTrue(service.authenticate("Joe", null, "123"));
         List<String> list = service.getRoles("Joe");
         assertEquals(3, list.size());
         assertEquals("Joe", list.get(0));
         assertEquals("Joe-1", list.get(1));
         assertEquals("Joe-2", list.get(2));
-        String roles[] = service.getRolesAsArray("Joe");
+        String[] roles = service.getRolesAsArray("Joe");
         assertEquals(2, roles.length);
         assertEquals("Joe", roles[0]);
         assertEquals("Joe-1", roles[1]);
-        
+
         roles = service.getRolesAsArray("null");
         assertNull(roles);
-        
+
         roles = service.getRolesAsArray("0");
         assertEquals(0, roles.length);
-        
+
         assertEquals("get Joe", service.getAuthentication("Joe"));
         Authenticate au = new Authenticate();
         au.setSid("ffang");
@@ -122,7 +125,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         au.setUid("ffang1");
         assertFalse(service.authenticate(au));
     }
-    
+
     @Test
     public void testWSDL() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/jaxwsAndAegis?wsdl");
@@ -137,13 +140,13 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
                            + "xsd:complexType[@name='getRolesAsArrayResponse']/"
                            + "xsd:sequence/xsd:element[@nillable='true']",
                            dom);
-        
+
         url = new URL("http://localhost:" + PORT + "/serviceWithCustomNS?wsdl");
         dom = StaxUtils.read(url.openStream());
         util.assertValid("//wsdl:definitions[@targetNamespace='http://foo.bar.com']",
                          dom);
     }
-    
+
     @Test
     public void testCollection() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -158,12 +161,12 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         Collection<Team> teams = service.getTeams();
         assertEquals(1, teams.size());
         assertEquals("Patriots", teams.iterator().next().getName());
-        
+
         //CXF-1251
         String s = service.testForMinOccurs0("A", null, "b");
-        assertEquals("Anullb", s);        
+        assertEquals("Anullb", s);
     }
-    
+
     @Test
     public void testComplexMapResult() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -180,7 +183,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(result.get("key1"));
         assertEquals(result.toString(), "{key1={1=3}}");
     }
-    
+
     @Test
     public void testGenericCollection() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -191,12 +194,12 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.getInInterceptors().add(new LoggingInInterceptor());
         proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("ffang");
         String ret = service.getGeneric(list);
         assertEquals(ret, "ffang");
     }
-    
+
     @Test
     public void testGenericPair() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -209,9 +212,9 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         SportsService service = (SportsService) proxyFactory.create();
         Pair<String, Integer> ret = service.getReturnGenericPair("ffang", 111);
         assertEquals("ffang", ret.getFirst());
-        assertEquals(new Integer(111), ret.getSecond());
+        assertEquals(Integer.valueOf(111), ret.getSecond());
     }
-    
+
     @Test
     public void testReturnQualifiedPair() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -223,11 +226,11 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         proxyFactory.getOutInterceptors().add(new LoggingOutInterceptor());
         SportsService service = (SportsService) proxyFactory.create();
         Pair<Integer, String> ret = service.getReturnQualifiedPair(111, "ffang");
-        assertEquals(new Integer(111), ret.getFirst());
+        assertEquals(Integer.valueOf(111), ret.getFirst());
         assertEquals("ffang", ret.getSecond());
     }
 
-    
+
     @Test
     public void testReturnGenericPair() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -241,7 +244,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         int ret = service.getGenericPair(new Pair<Integer, String>(111, "String"));
         assertEquals(111, ret);
     }
-    
+
     @Test
     public void testQualifiedPair() throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
@@ -256,9 +259,12 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(111, ret);
     }
 
-          
+
     @Test
     public void testDynamicClient() throws Exception {
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl&dynamic");
 

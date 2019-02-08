@@ -21,6 +21,7 @@ package org.apache.cxf.systest.sts.username_actas;
 import java.util.List;
 
 import org.w3c.dom.Element;
+
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.dom.handler.RequestData;
@@ -30,28 +31,36 @@ import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.Subject;
 
 /**
  * This class validates a SAML 2 Assertion and checks that it has a CustomActAs Attribute with
  * a value containing "alice" or "bob".
  */
 public class ActAsValidator extends SamlAssertionValidator {
-    
+
     @Override
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
         SamlAssertionWrapper assertion = validatedCredential.getSamlAssertion();
-        
+
         Assertion saml2Assertion = assertion.getSaml2();
         if (saml2Assertion == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
+        // The technical user should be in the Subject
+        Subject subject = saml2Assertion.getSubject();
+        if (subject == null || subject.getNameID() == null
+            || !subject.getNameID().getValue().contains("www.client.com")) {
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
+        }
+
         List<AttributeStatement> attributeStatements = saml2Assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         for (AttributeStatement statement : attributeStatements) {
             List<Attribute> attributes = statement.getAttributes();
             for (Attribute attribute : attributes) {
@@ -67,7 +76,7 @@ public class ActAsValidator extends SamlAssertionValidator {
                 }
             }
         }
-        
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
     }
 

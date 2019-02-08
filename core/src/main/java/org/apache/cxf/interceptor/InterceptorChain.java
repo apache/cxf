@@ -28,13 +28,13 @@ import org.apache.cxf.transport.MessageObserver;
 /**
  * Base interface for all interceptor chains.  An interceptor chain is an
  * ordered list of interceptors associated with one portion of the message
- * processing pipeline. Interceptor chains are defined for a client's request 
- * processing, response processing, and incoming SOAP fault processing. Interceptor 
- * chains are defined for a service's request processing, response processing, and 
+ * processing pipeline. Interceptor chains are defined for a client's request
+ * processing, response processing, and incoming SOAP fault processing. Interceptor
+ * chains are defined for a service's request processing, response processing, and
  * outgoing SOAP fault processing.
  */
 public interface InterceptorChain extends Iterable<Interceptor<? extends Message>> {
-    
+
     enum State {
         PAUSED,
         SUSPENDED,
@@ -42,27 +42,27 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
         COMPLETE,
         ABORTED,
     };
-    
+
     String STARTING_AFTER_INTERCEPTOR_ID = "starting_after_interceptor_id";
     String STARTING_AT_INTERCEPTOR_ID = "starting_at_interceptor_id";
-    
+
     /**
      * Adds a single interceptor to the interceptor chain.
-     * 
+     *
      * @param i the interceptor to add
      */
     void add(Interceptor<? extends Message> i);
-    
+
     /**
-     * Adds multiple interceptors to the interceptor chain. 
+     * Adds multiple interceptors to the interceptor chain.
      * @param i the interceptors to add to the chain
      */
     void add(Collection<Interceptor<? extends Message>> i);
-    
+
     void remove(Interceptor<? extends Message> i);
-    
+
     boolean doIntercept(Message message);
-    
+
     boolean doInterceptStartingAfter(Message message, String startingAfterInterceptorID);
 
     boolean doInterceptStartingAt(Message message, String startingAtInterceptorID);
@@ -79,7 +79,7 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
      * be re-entered) and then throw a SuspendedInvocationException to the caller
      */
     void suspend();
-    
+
     /**
      * Resumes the chain.  The chain will use the current thread to continue processing
      * the last message that was passed into doIntercept
@@ -94,15 +94,15 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
      */
     void unpause();
 
-    
+
     void reset();
-    
+
     State getState();
-    
+
     ListIterator<Interceptor<? extends Message>> getIterator();
 
     MessageObserver getFaultObserver();
-    
+
     void setFaultObserver(MessageObserver i);
 
     void abort();

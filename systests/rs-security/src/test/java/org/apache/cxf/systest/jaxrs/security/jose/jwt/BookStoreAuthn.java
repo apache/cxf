@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,18 +28,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.security.claims.authorization.Claim;
+import org.apache.cxf.security.claims.authorization.Claims;
 import org.apache.cxf.systest.jaxrs.security.Book;
+
 import org.junit.Assert;
 
 @Path("/bookstore")
 public class BookStoreAuthn {
-    
-    @Context 
+
+    @Context
     MessageContext jaxrsContext;
-    
+
     public BookStoreAuthn() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("text/plain")
@@ -47,7 +51,7 @@ public class BookStoreAuthn {
         checkAuthentication();
         return text;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/json")
@@ -56,7 +60,7 @@ public class BookStoreAuthn {
         checkAuthentication();
         return book;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
@@ -65,7 +69,30 @@ public class BookStoreAuthn {
         checkAuthentication();
         return book;
     }
-    
+
+    @POST
+    @Path("/booksclaims")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @Claims({
+        @Claim(name = "http://claims/authentication",
+               value = {"fingertip", "smartcard" })
+    })
+    public Book echoBook3(Book book) {
+        checkAuthentication();
+        return book;
+    }
+
+    @POST
+    @Path("/booksrolesallowed")
+    @Produces("application/json")
+    @Consumes("application/json")
+    @RolesAllowed({"boss" })
+    public Book echoBook4(Book book) {
+        checkAuthentication();
+        return book;
+    }
+
     private void checkAuthentication() {
         // Check that we have an authenticated principal
         Assert.assertNotNull(jaxrsContext.getSecurityContext().getUserPrincipal());

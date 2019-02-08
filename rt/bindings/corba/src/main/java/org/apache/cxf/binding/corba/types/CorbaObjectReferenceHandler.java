@@ -42,5 +42,5 @@ public class CorbaObjectReferenceHandler extends CorbaObjectHandler {
 
     public void clear() {
         value = null;
-    }  
+    }
 }

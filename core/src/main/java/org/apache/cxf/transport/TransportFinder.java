@@ -30,14 +30,14 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.helpers.CastUtils;
 
 /**
- * 
+ *
  */
 public class TransportFinder<T> {
     Map<String, T> map;
     Set<String> loaded;
     Class<T> cls;
     ConfiguredBeanLocator locator;
-    
+
     public TransportFinder(Bus b,
                            Map<String, T> m,
                            Set<String> l,
@@ -47,7 +47,7 @@ public class TransportFinder<T> {
         locator = b.getExtension(ConfiguredBeanLocator.class);
         loaded = l;
     }
-    
+
     public T findTransportForNamespace(final String namespace) {
         if (locator == null) {
             return null;
@@ -65,7 +65,7 @@ public class TransportFinder<T> {
         }
         return factory;
     }
-    
+
 
     public T findTransportForURI(String uri) {
         if (locator == null) {
@@ -79,7 +79,7 @@ public class TransportFinder<T> {
         if (factory == null) {
             //didn't find, now well need to search
             factory = loadDefaultURIs(uri);
-            
+
             if (factory == null) {
                 loadAll();
                 factory = checkForURI(uri);
@@ -87,7 +87,7 @@ public class TransportFinder<T> {
         }
         return factory;
     }
-    
+
     private static Set<String> getPrefixes(Object t) {
         Set<String> prefixes = null;
         if (t instanceof AbstractTransportFactory) {
@@ -95,10 +95,10 @@ public class TransportFinder<T> {
             prefixes = atf.getUriPrefixes();
         } else if (t instanceof DestinationFactory) {
             DestinationFactory atf = (DestinationFactory)t;
-            prefixes = atf.getUriPrefixes();                
+            prefixes = atf.getUriPrefixes();
         } else if (t instanceof ConduitInitiator) {
             ConduitInitiator atf = (ConduitInitiator)t;
-            prefixes = atf.getUriPrefixes();                
+            prefixes = atf.getUriPrefixes();
         }
         return prefixes;
     }
@@ -122,9 +122,9 @@ public class TransportFinder<T> {
         }
         return null;
     }
-    
+
     private void loadAll() {
-        ConfiguredBeanLocator.BeanLoaderListener<T> listener 
+        ConfiguredBeanLocator.BeanLoaderListener<T> listener
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
                     loaded.add(name);
@@ -139,9 +139,9 @@ public class TransportFinder<T> {
     }
 
     private void registerBean(T bean) {
-        if (bean instanceof AbstractTransportFactory) { 
+        if (bean instanceof AbstractTransportFactory) {
             if (((AbstractTransportFactory)bean).getTransportIds() != null) {
-                for (String ns 
+                for (String ns
                     : ((AbstractTransportFactory)bean).getTransportIds()) {
                     if (!map.containsKey(ns)) {
                         map.put(ns, bean);
@@ -150,7 +150,7 @@ public class TransportFinder<T> {
             }
         } else {
             try {
-                Method m = bean.getClass().getMethod("getActivationNamespaces", new Class[0]);
+                Method m = bean.getClass().getMethod("getActivationNamespaces");
                 Collection<String> c = CastUtils.cast((Collection<?>)m.invoke(bean));
                 for (String s : c) {
                     if (!map.containsKey(s)) {
@@ -163,16 +163,16 @@ public class TransportFinder<T> {
         }
     }
 
-    
+
     private T loadActivationNamespaces(final String namespace) {
-        //Try old method of having activationNamespaces configured in. 
-        ConfiguredBeanLocator.BeanLoaderListener<T> listener 
+        //Try old method of having activationNamespaces configured in.
+        ConfiguredBeanLocator.BeanLoaderListener<T> listener
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
                     loaded.add(name);
                     if (!map.containsKey(namespace)) {
                         registerBean(bean);
-                    } 
+                    }
                     return map.containsKey(namespace);
                 }
 
@@ -185,14 +185,14 @@ public class TransportFinder<T> {
         locator.loadBeansOfType(cls, listener);
         return map.get(namespace);
     }
-    
-    
+
+
 
 
     private T loadDefaultURIs(final String uri) {
         //First attempt will be to examine the factory class
         //for a DEFAULT_URIS field and use it
-        URIBeanLoaderListener listener 
+        URIBeanLoaderListener listener
             = new URIBeanLoaderListener(uri) {
 
                 public boolean loadBean(String name, Class<? extends T> type) {
@@ -208,19 +208,19 @@ public class TransportFinder<T> {
                     }
                     return false;
                 }
-            };                
+            };
         locator.loadBeansOfType(cls, listener);
         return listener.getFactory();
     }
-    
+
     abstract class URIBeanLoaderListener implements ConfiguredBeanLocator.BeanLoaderListener<T> {
         T factory;
         String uri;
-        
+
         URIBeanLoaderListener(String u) {
             uri = u;
         }
-        
+
         public T getFactory() {
             return factory;
         }
@@ -232,13 +232,13 @@ public class TransportFinder<T> {
             }
             return false;
         }
-        
+
     }
-    
+
     private T loadDefaultNamespace(final String namespace) {
         //First attempt will be to examine the factory class
         //for a DEFAULT_NAMESPACES field and use it
-        ConfiguredBeanLocator.BeanLoaderListener<T> listener 
+        ConfiguredBeanLocator.BeanLoaderListener<T> listener
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
                     loaded.add(name);
@@ -262,16 +262,16 @@ public class TransportFinder<T> {
                     }
                     return false;
                 }
-            };                
+            };
         locator.loadBeansOfType(cls, listener);
-        
+
         return map.get(namespace);
     }
     private T loadNoDefaultNamespace(final String namespace) {
         //Second attempt will be to examine the factory class
-        //for a DEFAULT_NAMESPACES field and if it doesn't exist, try 
+        //for a DEFAULT_NAMESPACES field and if it doesn't exist, try
         //loading.  This will then load most of the "older" things
-        ConfiguredBeanLocator.BeanLoaderListener<T> listener 
+        ConfiguredBeanLocator.BeanLoaderListener<T> listener
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
                     loaded.add(name);
@@ -291,9 +291,9 @@ public class TransportFinder<T> {
                     }
                     return true;
                 }
-            };                
+            };
         locator.loadBeansOfType(cls, listener);
-        
+
         return map.get(namespace);
     }
 

@@ -34,13 +34,13 @@ import javax.xml.stream.XMLStreamReader;
 public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     protected int currentEvent = XMLStreamConstants.START_DOCUMENT;
 
-    private FastStack<ElementFrame<T, I>> frames = new FastStack<ElementFrame<T, I>>();
+    private FastStack<ElementFrame<T, I>> frames = new FastStack<>();
 
     private ElementFrame<T, I> frame;
 
-    
+
     /**
-     *     
+     *
      */
     public static class ElementFrame<T, I> {
         T element;
@@ -48,18 +48,18 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
         boolean started;
         boolean ended;
-        
+
         List<String> uris;
         List<String> prefixes;
         List<Object> attributes;
 
         final ElementFrame<T, I> parent;
-        
+
         public ElementFrame(T element, ElementFrame<T, I> parent) {
             this.element = element;
             this.parent = parent;
         }
-        
+
         public ElementFrame(T element, ElementFrame<T, I> parent, I ch) {
             this.element = element;
             this.parent = parent;
@@ -75,7 +75,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         }
         public ElementFrame(T doc) {
             this(doc, true);
-        }        
+        }
         public T getElement() {
             return element;
         }
@@ -108,7 +108,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#getProperty(java.lang.String)
      */
     public Object getProperty(String key) throws IllegalArgumentException {
@@ -117,7 +117,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#next()
      */
     public int next() throws XMLStreamException {
@@ -149,7 +149,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         } else {
             frame.ended = true;
             if (frame.isDocument()) {
-                currentEvent = END_DOCUMENT;                
+                currentEvent = END_DOCUMENT;
             } else {
                 currentEvent = END_ELEMENT;
                 endElement();
@@ -170,7 +170,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#require(int, java.lang.String,
      *      java.lang.String)
      */
@@ -180,7 +180,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#getElementText()
      */
     public abstract String getElementText() throws XMLStreamException;
@@ -189,16 +189,16 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         frame.started = true;
         frame.ended = true;
         if (frame.isDocument()) {
-            currentEvent = END_DOCUMENT;                
+            currentEvent = END_DOCUMENT;
         } else {
             currentEvent = END_ELEMENT;
             endElement();
         }
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#nextTag()
      */
     public int nextTag() throws XMLStreamException {
@@ -213,18 +213,18 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#hasNext()
      */
     public boolean hasNext() throws XMLStreamException {
-        
-        return !(frame.ended && (frames.size() == 0 || frame.isDocumentFragment()));
+
+        return !(frame.ended && (frames.isEmpty() || frame.isDocumentFragment()));
 
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#close()
      */
     public void close() throws XMLStreamException {
@@ -232,14 +232,14 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#getNamespaceURI(java.lang.String)
      */
     public abstract String getNamespaceURI(String prefix);
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#isStartElement()
      */
     public boolean isStartElement() {
@@ -248,7 +248,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#isEndElement()
      */
     public boolean isEndElement() {
@@ -257,7 +257,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#isCharacters()
      */
     public boolean isCharacters() {
@@ -266,7 +266,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.xml.stream.XMLStreamReader#isWhiteSpace()
      */
     public boolean isWhiteSpace() {
@@ -352,12 +352,10 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
     }
 
     public boolean standaloneSet() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     public String getCharacterEncodingScheme() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

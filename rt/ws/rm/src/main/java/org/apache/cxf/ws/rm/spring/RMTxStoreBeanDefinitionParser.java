@@ -39,7 +39,7 @@ public class RMTxStoreBeanDefinitionParser extends AbstractBeanDefinitionParser 
                 bean.addPropertyReference("dataSource", val);
             }
         } else {
-            super.mapAttribute(bean, e, name, val);    
+            super.mapAttribute(bean, e, name, val);
         }
     }
 
@@ -52,5 +52,5 @@ public class RMTxStoreBeanDefinitionParser extends AbstractBeanDefinitionParser 
     protected boolean shouldGenerateIdAsFallback() {
         return true;
     }
-       
+
 }

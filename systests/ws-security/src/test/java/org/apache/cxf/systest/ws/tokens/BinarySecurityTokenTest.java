@@ -27,7 +27,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
@@ -36,7 +38,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.wss4j.common.token.BinarySecurity;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This is a test to add a custom BinarySecurityToken to the security header of a service request,
@@ -44,7 +50,7 @@ import org.junit.BeforeClass;
  */
 public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(BSTServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -57,13 +63,13 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
             launchServer(BSTServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testBinarySecurityToken() throws Exception {
 
@@ -71,34 +77,34 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         URL busFile = BinarySecurityTokenTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItBinarySecurityTokenPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Mock up a BinarySecurityToken to add
         SecurityToken securityToken = new SecurityToken();
         securityToken.setId("_" + UUID.randomUUID().toString());
-        
+
         Document doc = DOMUtils.newDocument();
         BinarySecurity binarySecurity = new BinarySecurity(doc);
         binarySecurity.setValueType("http://custom-value-type");
         binarySecurity.setToken("This is a token".getBytes());
-        
+
         securityToken.setToken(binarySecurity.getElement());
-        
+
         ((BindingProvider)port).getRequestContext().put(SecurityConstants.TOKEN, securityToken);
-        
-        port.doubleIt(25);
-        
+
+        assertEquals(50, port.doubleIt(25));
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

@@ -31,53 +31,53 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.ws.addressing.AddressingConstants;
 
 public final class RMUtils {
-   
+
     private static final org.apache.cxf.ws.rm.v200702.ObjectFactory WSRM_FACTORY;
     private static final org.apache.cxf.ws.rm.v200502.ObjectFactory WSRM200502_FACTORY;
     private static final org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory WSRM200502_WSA200508_FACTORY;
     private static final AddressingConstants WSA_CONSTANTS;
     private static final Pattern GENERATED_BUS_ID_PATTERN = Pattern.compile(Bus.DEFAULT_BUS_ID + "\\d+$");
-    
+
     static {
-        WSRM_FACTORY = new org.apache.cxf.ws.rm.v200702.ObjectFactory();        
+        WSRM_FACTORY = new org.apache.cxf.ws.rm.v200702.ObjectFactory();
         WSRM200502_FACTORY = new org.apache.cxf.ws.rm.v200502.ObjectFactory();
         WSRM200502_WSA200508_FACTORY = new org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory();
         WSA_CONSTANTS = new AddressingConstants();
     }
-    
-    private RMUtils() {        
+
+    private RMUtils() {
     }
-    
+
     /**
      * Get the factory for the internal representation of WS-RM data (WS-ReliableMessaging 1.1).
-     * 
+     *
      * @return factory
      */
     public static org.apache.cxf.ws.rm.v200702.ObjectFactory getWSRMFactory() {
         return WSRM_FACTORY;
     }
-    
+
     /**
      * Get the factory for WS-ReliableMessaging 1.0 using the standard 200408 WS-Addressing namespace.
-     * 
+     *
      * @return factory
      */
     public static org.apache.cxf.ws.rm.v200502.ObjectFactory getWSRM200502Factory() {
         return WSRM200502_FACTORY;
     }
-    
+
     /**
      * Get the factory for WS-ReliableMessaging 1.0 using the current 200508 WS-Addressing namespace.
-     * 
+     *
      * @return factory
      */
     public static org.apache.cxf.ws.rm.v200502wsa15.ObjectFactory getWSRM200502WSA200508Factory() {
         return WSRM200502_WSA200508_FACTORY;
     }
-    
+
     /**
      * Get the constants for a particular WS-ReliableMessaging namespace.
-     * 
+     *
      * @param uri
      * @return constants
      */
@@ -90,7 +90,7 @@ public final class RMUtils {
             return null;
         }
     }
-    
+
     public static AddressingConstants getAddressingConstants() {
         return WSA_CONSTANTS;
     }
@@ -98,21 +98,21 @@ public final class RMUtils {
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createAnonymousReference() {
         return createReference(org.apache.cxf.ws.addressing.Names.WSA_ANONYMOUS_ADDRESS);
     }
-    
+
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createNoneReference() {
         return createReference(org.apache.cxf.ws.addressing.Names.WSA_NONE_ADDRESS);
     }
-    
+
     public static org.apache.cxf.ws.addressing.EndpointReferenceType createReference(String address) {
-        org.apache.cxf.ws.addressing.ObjectFactory factory = 
+        org.apache.cxf.ws.addressing.ObjectFactory factory =
             new org.apache.cxf.ws.addressing.ObjectFactory();
         org.apache.cxf.ws.addressing.EndpointReferenceType epr = factory.createEndpointReferenceType();
         org.apache.cxf.ws.addressing.AttributedURIType uri = factory.createAttributedURIType();
         uri.setValue(address);
-        epr.setAddress(uri);        
-        return epr;        
+        epr.setAddress(uri);
+        return epr;
     }
-    
+
     public static String getEndpointIdentifier(Endpoint endpoint) {
         return getEndpointIdentifier(endpoint, null);
     }
@@ -132,7 +132,7 @@ public final class RMUtils {
         return endpoint.getEndpointInfo().getService().getName() + "."
             + endpoint.getEndpointInfo().getName() + "@" + busId;
     }
-    
+
     public static ObjectName getManagedObjectName(RMManager manager) throws JMException {
         StringBuilder buffer = new StringBuilder();
         writeTypeProperty(buffer, manager.getBus(), "WSRM.Manager");
@@ -140,7 +140,7 @@ public final class RMUtils {
         buffer.append(',').append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(manager.hashCode());
         return new ObjectName(buffer.toString());
     }
-    
+
     public static ObjectName getManagedObjectName(RMEndpoint endpoint) throws JMException {
         StringBuilder buffer = new StringBuilder();
         writeTypeProperty(buffer, endpoint.getManager().getBus(), "WSRM.Endpoint");
@@ -148,7 +148,7 @@ public final class RMUtils {
         writeEndpointProperty(buffer, ep);
         return new ObjectName(buffer.toString());
     }
-    
+
     public static ObjectName getManagedObjectName(RMManager manager, Endpoint ep) throws JMException {
         StringBuilder buffer = new StringBuilder();
         writeTypeProperty(buffer, manager.getBus(), "WSRM.Endpoint");
@@ -175,7 +175,7 @@ public final class RMUtils {
 
     /**
      * Utility method to compare two (possibly-null) String values.
-     * 
+     *
      * @param aval
      * @param bval
      * @return <code>true</code> if equal, <code>false</code> if not
@@ -183,14 +183,13 @@ public final class RMUtils {
     public static boolean equalStrings(String aval, String bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 
     /**
      * Utility method to compare two (possibly-null) Long values.
-     * 
+     *
      * @param aval
      * @param bval
      * @return <code>true</code> if equal, <code>false</code> if not
@@ -198,8 +197,7 @@ public final class RMUtils {
     public static boolean equalLongs(Long aval, Long bval) {
         if (null != aval) {
             return aval.equals(bval);
-        } else {
-            return null == bval;
         }
+        return null == bval;
     }
 }

@@ -26,7 +26,7 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 public class TLSConfiguration {
     private SSLContext sslContext;
     private TLSClientParameters tlsClientParams = new TLSClientParameters();
-    
+
     public SSLContext getSslContext() {
         return sslContext;
     }
@@ -44,5 +44,5 @@ public class TLSConfiguration {
     public void setTlsClientParams(TLSClientParameters tlsClientParams) {
         this.tlsClientParams = tlsClientParams;
     }
-    
+
 }

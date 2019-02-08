@@ -49,7 +49,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private AegisDatabinding databinding;
     private Collection<Attachment> attachments;
     private Map<String, Object> properties;
-    
+
     public XMLStreamDataWriter(AegisDatabinding databinding, Bus bus) {
         this.databinding = databinding;
     }
@@ -69,17 +69,17 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         if (type == null) {
             throw new Fault(new Message("NO_MESSAGE_FOR_PART", LOG, part));
         }
-        
+
         Context context = new Context(databinding.getAegisContext());
-        
+
         context.setAttachments(attachments);
         type = TypeUtil.getWriteType(databinding.getAegisContext(), obj, type);
-        
-        /* 
+
+        /*
          * We arrive here with a 'type' of the inner type if isWriteOuter is null.
-         * However, in that case, the original type is available. 
+         * However, in that case, the original type is available.
          */
-        AegisType outerType  = null;
+        AegisType outerType = null;
         if (part != null) {
             outerType = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
         }
@@ -100,7 +100,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             ElementWriter writer = new ElementWriter(output);
             // outerType is only != null for a flat array.
             if (outerType == null) {
-                MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName() 
+                MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName()
                     : type.getSchemaType());
                 type.writeObject(obj, w2, context);
                 w2.close();
@@ -122,9 +122,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void setProperty(String prop, Object value) {
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
-        
+
         properties.put(prop, value);
     }
 

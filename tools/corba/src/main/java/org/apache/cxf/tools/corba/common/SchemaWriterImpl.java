@@ -40,17 +40,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 
  /*
-  * This class is extending the wsdl4j RI class to print out the 
+  * This class is extending the wsdl4j RI class to print out the
   * extensibility elements of the schema into a separate file.
-  * 
+  *
   */
 public class SchemaWriterImpl implements WSDLWriter {
 
     public static final int DEFAULT_INDENT_LEVEL = 0;
 
-    
+
     public Element getElement(Definition wsdlDef) throws WSDLException {
-        Types types = wsdlDef.getTypes();          
+        Types types = wsdlDef.getTypes();
         if (types != null) {
             List<ExtensibilityElement> l = CastUtils.cast(types.getExtensibilityElements());
             if (l == null) {
@@ -88,12 +88,12 @@ public class SchemaWriterImpl implements WSDLWriter {
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
-    }    
+    }
     public void writeWSDL(Definition wsdlDef, OutputStream sink) throws WSDLException {
         try {
             StaxUtils.writeTo(getDocument(wsdlDef), sink, 2);
         } catch (XMLStreamException e) {
             throw new RuntimeException(e);
         }
-    }   
+    }
 }

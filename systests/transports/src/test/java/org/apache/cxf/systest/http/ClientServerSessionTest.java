@@ -38,18 +38,23 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     public static final String PORT = SessionServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
-        
+
         assertTrue("server did not launch correctly",
                        launchServer(SessionServer.class, true));
-        
+
     }
-    
-    
-    @Test    
+
+
+    @Test
     public void testInvocationWithSession() throws Exception {
 
         GreeterService service = new GreeterService();
@@ -57,24 +62,24 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
 
         try {
             Greeter greeter = service.getGreeterPort();
-            
+
             BindingProvider bp = (BindingProvider)greeter;
             updateAddressPort(bp, PORT);
             bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
-            
-            
-            Map<String, List<String>> headers 
+
+
+            Map<String, List<String>> headers
                 = CastUtils.cast((Map<?, ?>)bp.getRequestContext().get("javax.xml.ws.http.request.headers"));
 
             if (headers == null) {
-                headers = new HashMap<String, List<String>>();
+                headers = new HashMap<>();
                 bp.getRequestContext()
                     .put("javax.xml.ws.http.request.headers", headers);
             }
 
             List<String> cookies = Arrays.asList(new String[] {"a=a", "b=b"});
             headers.put("Cookie", cookies);
-            
+
             String greeting = greeter.greetMe("Bonjour");
             String cookie = "";
             if (greeting.indexOf(';') != -1) {
@@ -85,8 +90,8 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Bonjour", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
-            
-            
+
+
             greeting = greeter.greetMe("Hello");
             cookie = "";
             if (greeting.indexOf(';') != -1) {
@@ -98,8 +103,8 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Bonjour", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
-            
-            
+
+
             greeting = greeter.greetMe("NiHao");
             cookie = "";
             if (greeting.indexOf(';') != -1) {
@@ -110,12 +115,24 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             assertEquals("Hello Hello", greeting);
             assertTrue(cookie.contains("a=a"));
             assertTrue(cookie.contains("b=b"));
+
+            Thread.sleep(30 * 1000); //let session expire
+            greeting = greeter.greetMe("SessionExpire");
+            cookie = "";
+            if (greeting.indexOf(';') != -1) {
+                cookie = greeting.substring(greeting.indexOf(';'));
+                greeting = greeting.substring(0, greeting.indexOf(';'));
+            }
+            assertNotNull("no response received from service", greeting);
+            assertEquals("Hello SessionExpire", greeting);
+            assertTrue(cookie.contains("a=a"));
+            assertTrue(cookie.contains("b=b"));
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
     }
-    
-    @Test    
+
+    @Test
     public void testInvocationWithoutSession() throws Exception {
 
         GreeterService service = new GreeterService();
@@ -126,15 +143,15 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             updateAddressPort(greeter, PORT);
 
             String greeting = greeter.greetMe("Bonjour");
-            
+
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Bonjour", greeting);
-            
+
             greeting = greeter.greetMe("Hello");
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Hello", greeting);
-            
-            
+
+
             greeting = greeter.greetMe("NiHao");
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello NiHao", greeting);
@@ -143,13 +160,13 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     }
-    
+
     @Test
     @Ignore("seem to get random failures on everything except Linux with this."
             + " Maybe a jetty issue.")
     public void testPublishOnBusyPort() {
         boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        
+
         GreeterSessionImpl implementor = new GreeterSessionImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
         try {
@@ -161,7 +178,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
                                    + "of Windows allow this.");
             }
         } catch (WebServiceException ex) {
-            //ignore            
+            //ignore
         }
         try {
             //CXF-1589
@@ -175,47 +192,47 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException ex) {
             //ignore
         }
-        
+
     }
-    
-    @Test    
+
+    @Test
     public void testInvocationWithSessionFactory() throws Exception {
         doSessionsTest("http://localhost:" + PORT + "/Stateful1");
     }
-    @Test    
+    @Test
     public void testInvocationWithSessionAnnotation() throws Exception {
         doSessionsTest("http://localhost:" + PORT + "/Stateful2");
     }
-    @Test    
+    @Test
     public void testInvocationWithPerRequestAnnotation() throws Exception {
         GreeterService service = new GreeterService();
         assertNotNull(service);
 
         Greeter greeter = service.getGreeterPort();
         BindingProvider bp = (BindingProvider)greeter;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    "http://localhost:" + PORT + "/PerRequest");
         bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         String result = greeter.greetMe("World");
         assertEquals("Hello World", result);
         assertEquals("Bonjour default", greeter.sayHi());
     }
-    @Test    
+    @Test
     public void testInvocationWithSpringBeanAnnotation() throws Exception {
         GreeterService service = new GreeterService();
         assertNotNull(service);
 
         Greeter greeter = service.getGreeterPort();
         BindingProvider bp = (BindingProvider)greeter;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    "http://localhost:" + PORT + "/SpringBean");
         bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         String result = greeter.greetMe("World");
         assertEquals("Hello World", result);
         assertEquals("Bonjour World", greeter.sayHi());
     }
-    
-    @Test    
+
+    @Test
     public void testOnewayInvocationWithSession() throws Exception {
 
         GreeterService service = new GreeterService();
@@ -223,34 +240,34 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
 
         try {
             Greeter greeter = service.getGreeterPort();
-            
+
             BindingProvider bp = (BindingProvider)greeter;
             updateAddressPort(bp, PORT);
             bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
-            
-            
-                                             
+
+
+
             greeter.greetMeOneWay("Bonjour");
-            
+
             String greeting = greeter.greetMe("Hello");
             if (greeting.indexOf(';') != -1) {
                 greeting = greeting.substring(0, greeting.indexOf(';'));
             }
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Bonjour", greeting);
-            
+
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
     }
-    
+
     private void doSessionsTest(String url) {
         GreeterService service = new GreeterService();
         assertNotNull(service);
 
         Greeter greeter = service.getGreeterPort();
         Greeter greeter2 = service.getGreeterPort();
-        
+
         BindingProvider bp = (BindingProvider)greeter;
 
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
@@ -264,11 +281,11 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         String result = greeter.greetMe("World");
         assertEquals("Hello World", result);
         assertEquals("Bonjour World", greeter.sayHi());
-        
+
         result = greeter2.greetMe("Universe");
         assertEquals("Hello Universe", result);
         assertEquals("Bonjour Universe", greeter2.sayHi());
-        
+
         //make sure session 1 was maintained
         assertEquals("Bonjour World", greeter.sayHi());
     }

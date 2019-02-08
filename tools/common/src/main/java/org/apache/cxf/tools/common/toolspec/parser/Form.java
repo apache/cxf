@@ -37,35 +37,35 @@ public class Form implements TokenConsumer {
     private static final Logger LOG = LogUtils.getL7dLogger(Form.class);
     private final Element element;
 
-    private final List<Object> arguments = new ArrayList<Object>();
-    private final List<Object> optionGroups = new ArrayList<Object>();
-    private final List<Object> options = new ArrayList<Object>();
+    private final List<Object> arguments = new ArrayList<>();
+    private final List<Object> optionGroups = new ArrayList<>();
+    private final List<Object> options = new ArrayList<>();
 
     public Form(Element el) {
         this.element = el;
-        
-        List<Element> elemList = 
-            DOMUtils.findAllElementsByTagNameNS(element, 
-                                                Tool.TOOL_SPEC_PUBLIC_ID, 
+
+        List<Element> elemList =
+            DOMUtils.findAllElementsByTagNameNS(element,
+                                                Tool.TOOL_SPEC_PUBLIC_ID,
                                                 "optionGroup");
-        
+
         for (Element elem : elemList) {
             optionGroups.add(new OptionGroup(elem));
         }
-        
-        elemList = 
-            DOMUtils.findAllElementsByTagNameNS(element, 
-                                                Tool.TOOL_SPEC_PUBLIC_ID, 
+
+        elemList =
+            DOMUtils.findAllElementsByTagNameNS(element,
+                                                Tool.TOOL_SPEC_PUBLIC_ID,
                                                 "argument");
         for (Element elem : elemList) {
             arguments.add(new Argument(elem));
-        }     
-        
+        }
+
         getOptions(element);
     }
 
     private void getOptions(Element el) {
-        
+
         Node node = el.getFirstChild();
         while (node != null) {
             if ("option".equals(node.getNodeName())) {
@@ -188,9 +188,8 @@ public class Form implements TokenConsumer {
     public String getName() {
         if (element.hasAttribute("value")) {
             return element.getAttribute("value");
-        } else {
-            return "default";
         }
+        return "default";
 
     }
 

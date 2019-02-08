@@ -20,13 +20,15 @@
 package org.apache.cxf.tools.corba.processors.idl;
 
 import javax.wsdl.Definition;
+
 import antlr.collections.AST;
+
 import org.apache.ws.commons.schema.XmlSchema;
 
 public class TemplateTypeSpecVisitor extends VisitorBase {
-    
+
     private AST identifierNode;
-    
+
     public TemplateTypeSpecVisitor(Scope scope,
                                    Definition defn,
                                    XmlSchema schemaRef,
@@ -37,13 +39,11 @@ public class TemplateTypeSpecVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result = 
-            SequenceVisitor.accept(node)
+        return SequenceVisitor.accept(node)
             || StringVisitor.accept(node)
             || FixedVisitor.accept(node);
-        return result;
     }
-    
+
     public void visit(AST node) {
         // <template_type_spec> ::= <sequence_type>
         //                        | <string_type>
@@ -52,7 +52,7 @@ public class TemplateTypeSpecVisitor extends VisitorBase {
 
 
         Visitor visitor = null;
-        
+
         if (SequenceVisitor.accept(node)) {
             // <sequence_type>
             visitor = new SequenceVisitor(getScope(), definition, schema, wsdlVisitor, identifierNode);

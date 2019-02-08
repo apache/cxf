@@ -44,8 +44,12 @@ import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 public class SAAJInInterceptorTest extends TestBase {
@@ -66,7 +70,7 @@ public class SAAJInInterceptorTest extends TestBase {
 
         saajIntc = new SAAJInInterceptor("phase2");
         chain.add(saajIntc);
-        
+
         chain.add(new CheckFaultInterceptor("phase3"));
     }
 
@@ -89,9 +93,9 @@ public class SAAJInInterceptorTest extends TestBase {
         assertEquals("check the first entry of body", "itinerary", xmlReader.getLocalName());
 
         List<Header> eleHeaders = soapMessage.getHeaders();
-        List<Element> headerChilds = new ArrayList<Element>();
+        List<Element> headerChilds = new ArrayList<>();
         Iterator<Header> iter = eleHeaders.iterator();
-        
+
         while (iter.hasNext()) {
             Header hdr = iter.next();
 
@@ -99,10 +103,10 @@ public class SAAJInInterceptorTest extends TestBase {
                 headerChilds.add((Element) hdr.getObject());
             }
         }
-        
+
         assertEquals(2, headerChilds.size());
     }
-    
+
     @Test
     public void testFaultDetail() throws Exception {
         try {
@@ -120,7 +124,7 @@ public class SAAJInInterceptorTest extends TestBase {
         XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
         xmlReader.nextTag();
         saajIntc.handleMessage(soapMessage);
-        
+
         SOAPMessage parsedMessage = soapMessage.getContent(SOAPMessage.class);
         SOAPFault fault = parsedMessage.getSOAPBody().getFault();
         assertEquals("soap:Server", fault.getFaultCode());
@@ -135,7 +139,7 @@ public class SAAJInInterceptorTest extends TestBase {
             nd = nd.getNextSibling();
         }
         assertEquals(2, count);
-        
+
         Iterator<?> detailEntries = faultDetail.getDetailEntries();
         DetailEntry detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorcode", detailEntry.getLocalName());
@@ -143,9 +147,9 @@ public class SAAJInInterceptorTest extends TestBase {
         detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorstring", detailEntry.getLocalName());
         assertEquals("This is a fault detail error string", detailEntry.getTextContent());
-        
+
     }
-    
+
     @Test
     public void testFaultDetailSOAP12() throws Exception {
         try {
@@ -163,14 +167,14 @@ public class SAAJInInterceptorTest extends TestBase {
         XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
         xmlReader.nextTag();
         saajIntc.handleMessage(soapMessage);
-        
+
         SOAPMessage parsedMessage = soapMessage.getContent(SOAPMessage.class);
         SOAPFault fault = parsedMessage.getSOAPBody().getFault();
         assertEquals("Simulated failure", fault.getFaultReasonTexts().next());
         assertEquals("soap:Receiver", fault.getFaultCode());
-        
+
     }
-    
+
 
     private void prepareSoapMessage(String message) throws IOException {
 

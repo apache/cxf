@@ -34,10 +34,10 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * are received. Alternatively the back-channel destination may be decoupled,
  * in which case the response it is received via a separate Conduit.
  * The crucial distinction is whether the Conduit can itself correlate
- * the response (which may be synchronous, or may be delivered via 
- * a dedicated destination). 
+ * the response (which may be synchronous, or may be delivered via
+ * a dedicated destination).
  * <p>
- * Conduits may be used for multiple messages, either serially or 
+ * Conduits may be used for multiple messages, either serially or
  * concurrently, with the implementation taking care of mapping onto
  * multiple transport resources (e.g. connections) if neccessary to
  * support concurrency.
@@ -45,25 +45,25 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * Binding-level MEPs may be realized over one or more Conduits.
  */
 public interface Conduit extends Observable {
-    
+
     /**
      * Prepare the message for sending. This will typically involve setting
      * an OutputStream on the message, but it may do nothing at all.
-     * 
+     *
      * @param message the message to be sent.
      */
     void prepare(Message message) throws IOException;
-    
+
     /**
      * Close the connections associated with the message
      */
     void close(Message message) throws IOException;
-    
+
     /**
      * @return the reference associated with the target Destination
-     */    
+     */
     EndpointReferenceType getTarget();
-    
+
     /**
      * Close the conduit
      */

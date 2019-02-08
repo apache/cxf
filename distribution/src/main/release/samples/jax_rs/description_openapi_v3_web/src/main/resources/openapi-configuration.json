@@ -1,0 +1,30 @@
+{
+	"resourcePackages": [
+		"demo.jaxrs.openapi.server"
+	],
+	"prettyPrint": true,
+	"cacheTTL": 0,
+	"openAPI": {
+		"info": {
+			"version": "1.0.0",
+			"title": "Sample API",
+			"description": "A sample API",
+			"contact": {
+				"email": "cxf-dev@apache.org"
+			},
+			"license": {
+				"name": "Apache 2.0",
+				"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+			}
+		},
+		"servers": [
+			{
+				"url": "/app",
+				"description": "The sample API server"
+			}
+		]
+	},
+	"userDefinedOptions": {
+		"support.swagger.ui": true
+	}
+}

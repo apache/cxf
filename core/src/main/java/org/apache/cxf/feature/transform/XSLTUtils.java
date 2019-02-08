@@ -109,7 +109,7 @@ public final class XSLTUtils {
     public static Document transform(Templates xsltTemplate, Document in) {
         try {
             DOMSource beforeSource = new DOMSource(in);
-            
+
             Document out = DOMUtils.createDocument();
 
             Transformer trans = xsltTemplate.newTransformer();

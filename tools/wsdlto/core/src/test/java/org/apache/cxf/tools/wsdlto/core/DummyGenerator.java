@@ -31,6 +31,6 @@ public class DummyGenerator extends AbstractGenerator {
         // empty
     }
     public void generate(ToolContext context) {
-        // empty            
+        // empty
     }
 }

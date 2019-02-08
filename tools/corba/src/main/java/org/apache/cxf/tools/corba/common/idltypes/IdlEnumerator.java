@@ -22,11 +22,11 @@ package org.apache.cxf.tools.corba.common.idltypes;
 import java.io.PrintWriter;
 
 public final class IdlEnumerator extends IdlDefnImplBase {
-    
+
     private IdlEnumerator(IdlScopeBase parent, String name) {
         super(parent, name);
     }
-    
+
     public static IdlEnumerator create(IdlScopeBase parent, String name) {
         return new IdlEnumerator(parent, name);
     }
@@ -35,5 +35,5 @@ public final class IdlEnumerator extends IdlDefnImplBase {
     public void write(PrintWriter pw) {
         // intentionally empty
     }
-    
+
 }

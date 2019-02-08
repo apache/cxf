@@ -21,7 +21,7 @@ package org.apache.cxf.customer.book;
 
 
 public class GetAnotherBook {
- 
+
     private long id;
 
     public long getId() {

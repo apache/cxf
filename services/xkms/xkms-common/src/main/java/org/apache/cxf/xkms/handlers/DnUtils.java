@@ -23,9 +23,9 @@ package org.apache.cxf.xkms.handlers;
  * A couple of utility methods for working with X500 Distinguished Names
  */
 public final class DnUtils {
-    
+
     private DnUtils() {
-        
+
     }
 
     public static String extractMostSignificantAttribute(String identifier) {
@@ -63,13 +63,12 @@ public final class DnUtils {
             // normalize the prefix if present
             if (split.length == 2) {
                 return split[1].trim();
-            } else {
-                return attr.trim();
             }
+            return attr.trim();
         }
         return attr;
     }
-    
+
     private static String normalizeAttribute(String val) {
         String[] split;
         String normalized = val;

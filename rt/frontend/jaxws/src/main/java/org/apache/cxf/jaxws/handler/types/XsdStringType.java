@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Java class for xsdStringType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="xsdStringType">
  *   &lt;simpleContent>
@@ -57,7 +57,7 @@ public class XsdStringType {
 
     /**
      * Gets the value of the value property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getValue() {
@@ -66,7 +66,7 @@ public class XsdStringType {
 
     /**
      * Sets the value of the value property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setValue(java.lang.String value) {
@@ -75,7 +75,7 @@ public class XsdStringType {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -84,7 +84,7 @@ public class XsdStringType {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String v) {

@@ -38,14 +38,14 @@ import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyException;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations(unlessNull = "bus")
-public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainExpressionBuilder> 
+public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainExpressionBuilder>
     implements BusExtension {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionBuilderRegistry.class);
-    
+
     private boolean dynamicLoaded;
     private Bus bus;
     public DomainExpressionBuilderRegistry() {
@@ -70,7 +70,7 @@ public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainE
     public Class<?> getRegistrationType() {
         return DomainExpressionBuilderRegistry.class;
     }
-    
+
     protected synchronized void loadDynamic() {
         if (!dynamicLoaded && bus != null) {
             dynamicLoaded = true;
@@ -93,7 +93,7 @@ public class DomainExpressionBuilderRegistry extends RegistryImpl<QName, DomainE
         builder = get(qname);
 
         if (null == builder) {
-            throw new PolicyException(new Message("NO_DOMAINEXPRESSIONBUILDER_EXC", 
+            throw new PolicyException(new Message("NO_DOMAINEXPRESSIONBUILDER_EXC",
                                                   BUNDLE, qname.toString()));
         }
 

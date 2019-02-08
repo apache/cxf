@@ -31,14 +31,14 @@ public interface WorkQueueManager {
      * @return AutomaticWorkQueue
      */
     AutomaticWorkQueue getNamedWorkQueue(String name);
-    
+
     /**
      * Adds a named work queue
      * @param name
      * @param q
      */
     void addNamedWorkQueue(String name, AutomaticWorkQueue q);
-    
+
     /**
      * Shuts down the manager's work queue. If
      * <code>processRemainingTasks</code> is true, waits for the work queue to
@@ -46,7 +46,7 @@ public interface WorkQueueManager {
      * @param processRemainingTasks - whether or not to wait for completion
      */
     void shutdown(boolean processRemainingTasks);
-    
+
     /**
      * Only returns after workqueue has been shutdown.
      *

@@ -29,5 +29,5 @@ public interface ServiceListWriter {
                           String baseAddress,
                           AbstractDestination[] soapDestinations,
                           AbstractDestination[] restDestinations) throws IOException;
-    
+
 }

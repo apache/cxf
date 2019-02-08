@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.transport.http_jetty.blueprint;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
@@ -27,14 +26,12 @@ import org.w3c.dom.Element;
 
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
-import org.apache.aries.blueprint.reflect.MapEntryImpl;
-import org.apache.aries.blueprint.reflect.MapMetadataImpl;
+import org.apache.aries.blueprint.mutable.MutableMapMetadata;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
-import org.osgi.service.blueprint.reflect.MapEntry;
 import org.osgi.service.blueprint.reflect.Metadata;
 import org.osgi.service.blueprint.reflect.ValueMetadata;
 
@@ -71,7 +68,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         ef.setRuntimeClass(JettyHTTPServerEngineFactoryHolder.class);
 
         // setup the ConnectorMap and HandlersMap property for the JettyHTTPServerEngineFactoryHolder
-        
+
         try {
             // Print the DOM node
             String xmlString = StaxUtils.toString(element);
@@ -79,7 +76,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
             ef.setDestroyMethod("destroy");
-            
+
             // setup the EngineConnector
             List<Element> engines = DOMUtils
                 .getChildrenWithName(element, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT, "engine");
@@ -90,10 +87,13 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             throw new RuntimeException("Could not process configuration.", e);
         }
     }
-    
+
     protected Metadata parseEngineConnector(List<Element> engines, ComponentMetadata enclosingComponent,
                                             ParserContext context) {
-        List<MapEntry> entries = new ArrayList<MapEntry>();
+        MutableMapMetadata map = context.createMetadata(MutableMapMetadata.class);
+        map.setKeyType("java.lang.String");
+        map.setValueType("org.eclipse.jetty.server.Connector");
+
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);
@@ -103,16 +103,19 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             if (connector != null) {
                 Element first = DOMUtils.getFirstElement(connector);
                 Metadata valValue = context.parseElement(Metadata.class, enclosingComponent, first);
-                entries.add(new MapEntryImpl(keyValue, valValue));
+                map.addEntry(keyValue, valValue);
             }
         }
 
-        return new MapMetadataImpl("java.lang.String", "org.eclipse.jetty.server.Connector", entries);
+        return map;
     }
-    
-    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent, 
+
+    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent,
                                            ParserContext context) {
-        List<MapEntry> entries = new ArrayList<MapEntry>();
+        MutableMapMetadata map = context.createMetadata(MutableMapMetadata.class);
+        map.setKeyType("java.lang.String");
+        map.setValueType("java.util.List");
+
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);
@@ -121,11 +124,11 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
                                        "handlers");
             if (handlers != null) {
                 Metadata valValue = parseListData(context, enclosingComponent, handlers);
-                entries.add(new MapEntryImpl(keyValue, valValue));
+                map.addEntry(keyValue, valValue);
             }
         }
-        return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
+        return map;
     }
-    
-    
+
+
 }

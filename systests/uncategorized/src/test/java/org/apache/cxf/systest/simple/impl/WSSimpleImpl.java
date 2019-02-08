@@ -27,7 +27,7 @@ import org.apache.cxf.systest.simple.intf.WSSimple;
 public class WSSimpleImpl implements WSSimple {
 
     public void pingMe() {
-            
+
     }
 
 }

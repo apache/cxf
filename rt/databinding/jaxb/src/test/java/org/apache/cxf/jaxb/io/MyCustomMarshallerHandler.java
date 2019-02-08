@@ -27,16 +27,16 @@ import javax.xml.bind.util.ValidationEventCollector;
 import org.apache.cxf.jaxb.MarshallerEventHandler;
 import org.apache.cxf.jaxb.UnmarshallerEventHandler;
 
-public class MyCustomMarshallerHandler extends ValidationEventCollector implements 
+public class MyCustomMarshallerHandler extends ValidationEventCollector implements
         UnmarshallerEventHandler, MarshallerEventHandler {
     private boolean used;
     private boolean onMarshalComplete;
     private boolean onUnmarshalComplete;
-    
+
     public boolean getUsed() {
         return used;
     }
-    
+
     public boolean isOnMarshalComplete() {
         return onMarshalComplete;
     }
@@ -47,7 +47,7 @@ public class MyCustomMarshallerHandler extends ValidationEventCollector implemen
 
     public boolean handleEvent(ValidationEvent event) {
         super.handleEvent(event);
-        
+
         used = true;
         return true;
     }
@@ -55,7 +55,7 @@ public class MyCustomMarshallerHandler extends ValidationEventCollector implemen
     @Override
     public void onUnmarshalComplete() throws UnmarshalException {
         this.onUnmarshalComplete = true;
-        
+
         if (hasEvents()) {
             throw new UnmarshalException("My unmarshalling exception");
         }
@@ -64,7 +64,7 @@ public class MyCustomMarshallerHandler extends ValidationEventCollector implemen
     @Override
     public void onMarshalComplete() throws MarshalException {
         this.onMarshalComplete = true;
-        
+
         if (hasEvents()) {
             throw new MarshalException("My marshalling exception");
         }

@@ -28,15 +28,12 @@ import java.util.Locale;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import io.netty.handler.codec.http.ClientCookieEncoder;
-import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.LOCATION;
-import static io.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
 
 
 public class NettyServletResponse implements HttpServletResponse {
@@ -57,12 +54,6 @@ public class NettyServletResponse implements HttpServletResponse {
 
     public HttpResponse getOriginalResponse() {
         return originalResponse;
-    }
-
-    public void addCookie(Cookie cookie) {
-        HttpHeaders.addHeader(this.originalResponse, 
-                              SET_COOKIE, 
-                              ClientCookieEncoder.encode(cookie.getName(), cookie.getValue()));
     }
 
     public void addDateHeader(String name, long date) {

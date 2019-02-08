@@ -26,14 +26,14 @@ import javax.xml.stream.util.StreamReaderDelegate;
 
 /**
  * A StreamReaderDelegate that expands property references in element and attribute values.
- * 
+ *
  */
 public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
 
     public static final String DELIMITER = "@";
-    
+
     private final Map<String, String> props;
-    
+
     public PropertiesExpandingStreamReader(XMLStreamReader reader, Map<String, String> props) {
         super(reader);
         this.props = props;
@@ -43,7 +43,7 @@ public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
         if (isEmpty(value)) {
             return value;
         }
-        
+
         final int startIndx = value.indexOf(DELIMITER);
         if (startIndx > -1) {
             final int endIndx = value.lastIndexOf(DELIMITER);
@@ -61,7 +61,7 @@ public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
                 }
             }
         }
-        
+
         return value;
     }
 

@@ -26,10 +26,8 @@ import java.util.Properties;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
@@ -58,18 +56,21 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Some unit tests for the cancel operation to cancel SecurityContextTokens.
  */
-public class CancelSCTUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+public class CancelSCTUnitTest {
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    private static final QName QNAME_REQ_TOKEN_CANCELLED = 
+    private static final QName QNAME_REQ_TOKEN_CANCELLED =
         QNameConstants.WS_TRUST_FACTORY.createRequestedTokenCancelled(null).getName();
-    
+
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     /**
      * Test to successfully cancel a SecurityContextToken
      */
@@ -77,14 +78,14 @@ public class CancelSCTUnitTest extends org.junit.Assert {
     public void testCancelSCT() throws Exception {
         TokenCancelOperation cancelOperation = new TokenCancelOperation();
         cancelOperation.setTokenStore(tokenStore);
-        
+
         // Add Token Canceller
-        List<TokenCanceller> cancellerList = new ArrayList<TokenCanceller>();
+        List<TokenCanceller> cancellerList = new ArrayList<>();
         TokenCanceller sctCanceller = new SCTCanceller();
         sctCanceller.setVerifyProofOfPossession(false);
         cancellerList.add(sctCanceller);
         cancelOperation.setTokenCancellers(cancellerList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -95,45 +96,43 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         cancelOperation.setStsProperties(stsProperties);
-        
+
         // Get a SecurityContextToken via the SCTProvider
         TokenProviderResponse providerResponse = createSCT();
         Element sct = (Element)providerResponse.getToken();
-        Document doc = sct.getOwnerDocument();
-        sct = (Element)doc.appendChild(sct);
         CancelTargetType cancelTarget = new CancelTargetType();
         cancelTarget.setAny(sct);
-        
+
         // Mock up a request
-        JAXBElement<CancelTargetType> cancelTargetType = 
+        JAXBElement<CancelTargetType> cancelTargetType =
             new JAXBElement<CancelTargetType>(
                 QNameConstants.CANCEL_TARGET, CancelTargetType.class, cancelTarget
             );
         RequestSecurityTokenType request = new RequestSecurityTokenType();
         request.getAny().add(cancelTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(new CustomTokenPrincipal("alice"))
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
         );
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        
+
         // Cancel a token
-        RequestSecurityTokenResponseType response = 
-            cancelOperation.cancel(request, webServiceContext);
+        RequestSecurityTokenResponseType response =
+            cancelOperation.cancel(request, principal, msgCtx);
         assertTrue(validateResponse(response));
-        
+
         // Now try to cancel again
         try {
-            cancelOperation.cancel(request, webServiceContext);
+            cancelOperation.cancel(request, principal, msgCtx);
         } catch (STSException ex) {
             // expected
         }
     }
-    
+
     /*
      * Create a security context object
      */
@@ -147,13 +146,13 @@ public class CancelSCTUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /**
      * Return true if the response has a valid RequestTokenCancelled element, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
@@ -164,27 +163,27 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         }
         return false;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
             "org.apache.wss4j.crypto.provider", "org.apache.wss4j.common.crypto.Merlin"
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
-        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "stsstore.jks");
-        
+        properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
+
         return properties;
     }
-    
+
     private TokenProviderResponse createSCT() throws WSSecurityException {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         assertTrue(sctTokenProvider.canHandleToken(STSUtils.TOKEN_TYPE_SCT_05_12));
         TokenProviderResponse providerResponse = sctTokenProvider.createToken(providerParameters);
-        assertTrue(providerResponse != null);
+        assertNotNull(providerResponse);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return providerResponse;
@@ -192,25 +191,24 @@ public class CancelSCTUnitTest extends org.junit.Assert {
 
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        WebServiceContextImpl webServiceContext = new WebServiceContextImpl(msgCtx);
-        parameters.setWebServiceContext(webServiceContext);
-        
+        parameters.setMessageContext(msgCtx);
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -219,11 +217,11 @@ public class CancelSCTUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
 
-    
+
 }

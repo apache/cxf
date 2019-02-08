@@ -31,7 +31,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 
-public interface Client extends InterceptorProvider, MessageObserver, ConduitSelectorHolder {
+public interface Client extends InterceptorProvider, MessageObserver, ConduitSelectorHolder, AutoCloseable {
     String REQUEST_CONTEXT = "RequestContext";
     String RESPONSE_CONTEXT = "ResponseContext";
     String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
@@ -40,19 +40,19 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
-     * @param params  The params that matches the parts of the input message of the operation.  If the 
-     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * @param params  The params that matches the parts of the input message of the operation.  If the
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If
      * params are in the wrapped form, use invokeWrapped
      * @return The return values that matche the parts of the output message of the operation
      */
     Object[] invoke(String operationName,
                     Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked
-     * @param params  The params that matches the parts of the input message of the operation.  If the 
-     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * @param params  The params that matches the parts of the input message of the operation.  If the
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If
      * params are in the wrapped form, use invokeWrapped
      * @return The return values that matche the parts of the output message of the operation
      */
@@ -69,7 +69,7 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      */
     Object[] invokeWrapped(String operationName,
                     Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation synchronously
      * @param operationName The name of the operation to be invoked
@@ -78,7 +78,7 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      */
     Object[] invokeWrapped(QName operationName,
                     Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation synchronously
      * @param oi  The operation to be invoked
@@ -92,48 +92,48 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * Invokes an operation synchronously
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
-     * @param context  Optional (can be null) contextual information for the invocation     
+     * @param context  Optional (can be null) contextual information for the invocation
      * @return The return values that matche the parts of the output message of the operation
      */
     Object[] invoke(BindingOperationInfo oi,
                     Object[] params,
                     Map<String, Object> context) throws Exception;
-    
+
     /**
      * Invokes an operation synchronously
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
      * @param context  Optional (can be null) contextual information for the invocation
-     * @param exchange The Exchange to be used for the invocation     
+     * @param exchange The Exchange to be used for the invocation
      * @return The return values that matche the parts of the output message of the operation
      */
     Object[] invoke(BindingOperationInfo oi,
-            Object[] params, 
+            Object[] params,
             Map<String, Object> context,
             Exchange exchange) throws Exception;
-    
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
-     * @param params  The params that matches the parts of the input message of the operation.  If the 
-     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * @param params  The params that matches the parts of the input message of the operation.  If the
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If
      * params are in the wrapped form, use invokeWrapped
-     * 
+     *
      */
     void invoke(ClientCallback callback,
                     String operationName,
                     Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked
-     * @param params  The params that matches the parts of the input message of the operation.  If the 
-     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
+     * @param params  The params that matches the parts of the input message of the operation.  If the
+     * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If
      * params are in the wrapped form, use invokeWrapped
-     * 
+     *
      */
     void invoke(ClientCallback callback,
                     QName operationName,
@@ -151,18 +151,18 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
     void invokeWrapped(ClientCallback callback,
                            String operationName,
                     Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
-     * 
+     *
      */
     void invokeWrapped(ClientCallback callback,
                            QName operationName,
-                    Object... params) throws Exception;    
-    
+                    Object... params) throws Exception;
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
@@ -173,7 +173,7 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
     void invoke(ClientCallback callback,
                 BindingOperationInfo oi,
                 Object... params) throws Exception;
-    
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
@@ -184,8 +184,8 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
     void invoke(ClientCallback callback,
                 BindingOperationInfo oi,
                 Object[] params,
-                Map<String, Object> context) throws Exception;  
-    
+                Map<String, Object> context) throws Exception;
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
@@ -197,23 +197,23 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
     void invoke(ClientCallback callback,
                 BindingOperationInfo oi,
                 Object[] params,
-                Exchange exchange) throws Exception;  
-    
+                Exchange exchange) throws Exception;
+
     /**
      * Invokes an operation asynchronously
      * @param callback The callback that is called when the response is ready
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
      * @param context  Optional (can be null) contextual information for the invocation
-     * @param exchange Optional (can be null) The Exchange to be used for the invocation  
+     * @param exchange Optional (can be null) The Exchange to be used for the invocation
      */
     void invoke(ClientCallback callback,
                 BindingOperationInfo oi,
                 Object[] params,
                 Map<String, Object> context,
-                Exchange exchange) throws Exception;  
-    
-    
+                Exchange exchange) throws Exception;
+
+
     /**
      * Gets the request context used for future invocations
      * @return context The context
@@ -224,21 +224,49 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * @return context The context
      */
     Map<String, Object> getResponseContext();
-    
+
     /**
-     * Sets whether the request context is thread local or global to this client.  By 
+     * Sets whether the request context is thread local or global to this client.  By
      * default, the request context is "global" in that any values set in the context
-     * are seen by all threads using this client.  If set to true, the context is changed 
+     * are seen by all threads using this client.  If set to true, the context is changed
      * to be a ThreadLocal and values set are not seen by other threads.
      * @param b
      */
     void setThreadLocalRequestContext(boolean b);
-    
+
     /**
      * Checks if the Request context is thread local or global.
      * @return true if the request context is a thread local
      */
     boolean isThreadLocalRequestContext();
+    
+    
+    /**
+     * Wrappers the contexts in a way that allows the contexts
+     * to be cleared and released in an try-with-resources block
+     */
+    interface Contexts extends AutoCloseable {
+        Map<String, Object> getRequestContext();
+        Map<String, Object> getResponseContext();
+    }
+    
+    default Contexts getContexts() {
+        return new Contexts() {
+            @Override
+            public void close() throws Exception {
+                getRequestContext().clear();
+                getResponseContext().clear();
+            }
+            @Override
+            public Map<String, Object> getRequestContext() {
+                return Client.this.getRequestContext();
+            }
+            @Override
+            public Map<String, Object> getResponseContext() {
+                return Client.this.getResponseContext();
+            }
+        };
+    }
 
 
     Endpoint getEndpoint();
@@ -248,36 +276,36 @@ public interface Client extends InterceptorProvider, MessageObserver, ConduitSel
      * @return Conduit
      */
     Conduit getConduit();
-    
+
     /**
      * Get the ConduitSelector responsible for retreiving the Conduit.
-     * 
+     *
      * @return the current ConduitSelector
      */
     ConduitSelector getConduitSelector();
 
     /**
      * Set the ConduitSelector responsible for retreiving the Conduit.
-     * 
+     *
      * @param selector the ConduitSelector to use
      */
     void setConduitSelector(ConduitSelector selector);
-    
+
     /**
      * Indicates that the client is no longer needed and that any resources it holds
      * can now be freed.
      *
      */
     void destroy();
-    
+
     /**
      * Sets the executor which is used to process Asynchronous responses.  The default
-     * is to use the threads provided by the transport.  (example: the JMS listener threads) 
+     * is to use the threads provided by the transport.  (example: the JMS listener threads)
      * @param executor
      */
     void setExecutor(Executor executor);
-    
-    
+
+
     /**
      * Retrieves the Bus that was used to create the Client
      * @return the Bus

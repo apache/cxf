@@ -24,34 +24,33 @@ import java.util.Set;
 
 /**
  * Utility bean for simplifying the way Search expressions can be captured and
- * subsequently introspected or converted into different language expressions  
+ * subsequently introspected or converted into different language expressions
  */
 public class SearchBean {
-    private Map<String, String> values = new HashMap<String, String>(1);
-    
+    private Map<String, String> values = new HashMap<>(1);
+
     public void set(String name, String value) {
         values.put(name, value);
     }
-    
+
     public String get(String name) {
         return values.get(name);
     }
-    
+
     public Set<String> getKeySet() {
         return values.keySet();
     }
-    
+
     @Override
     public int hashCode() {
         return values.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof SearchBean) {
             return values.equals(((SearchBean)o).values);
-        } else {
-            return false;
         }
+        return false;
     }
 }

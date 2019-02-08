@@ -24,5 +24,7 @@
             <ref bean="testStore"/>
         </wsrm-mgr:store>
     </wsrm-mgr:rmManager>
-    <wsrm-mgr:jdbcStore id="testStore" userName="scott" password="tiger" url="jdbc:derby://localhost:1527/rmdb;create=true" driverClassName="org.apache.derby.jdbc.NoDriver"/>
+    <wsrm-mgr:jdbcStore id="testStore" userName="scott" password="tiger" 
+    	url="jdbc:derby:target/wsrmdb3;create=true"
+    	driverClassName="org.apache.derby.jdbc.EmbeddedDriver"/>
 </beans>

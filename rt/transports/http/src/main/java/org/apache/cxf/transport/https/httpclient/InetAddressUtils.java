@@ -30,14 +30,15 @@ import java.util.regex.Pattern;
 
 /**
  * A collection of utilities relating to InetAddresses.
- * 
+ *
  * Copied from httpclient.
  */
 public final class InetAddressUtils {
 
     private static final String IPV4_BASIC_PATTERN_STRING =
-            "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}" // initial 3 fields, 0-255 followed by .
-            + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"; // final field, 0-255
+        "(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){1}" // initial first field, 1-255
+        + "(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){2}" // following 2 fields, 0-255 followed by .
+        + "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"; // final field, 0-255
 
     private static final Pattern IPV4_PATTERN =
         Pattern.compile("^" + IPV4_BASIC_PATTERN_STRING + "$");
@@ -62,7 +63,7 @@ public final class InetAddressUtils {
 
     // Must not have more than 7 colons (i.e. 8 fields)
     private static final int MAX_COLON_COUNT = 7;
-    
+
     private InetAddressUtils() {
     }
 
@@ -103,7 +104,7 @@ public final class InetAddressUtils {
                 colonCount++;
             }
         }
-        return  colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
+        return colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
     }
 
     /**

@@ -49,9 +49,9 @@ import org.apache.neethi.PolicyRegistry;
 
 
 /**
- * Configures a Server, Client, Bus with the specified policies. If a series of 
+ * Configures a Server, Client, Bus with the specified policies. If a series of
  * Policy <code>Element</code>s are supplied, these will be loaded into a Policy
- * class using the <code>PolicyBuilder</code> extension on the bus. If the 
+ * class using the <code>PolicyBuilder</code> extension on the bus. If the
  * PolicyEngine has not been started, this feature will start it.
  *
  * @see PolicyBuilder
@@ -59,17 +59,17 @@ import org.apache.neethi.PolicyRegistry;
  */
 @NoJSR250Annotations
 public class WSPolicyFeature extends AbstractFeature {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WSPolicyFeature.class);
-    
+
     private Collection<Policy> policies;
     private Collection<Element> policyElements;
     private Collection<Element> policyReferenceElements;
     private boolean ignoreUnknownAssertions;
-    private AlternativeSelector alternativeSelector; 
+    private AlternativeSelector alternativeSelector;
     private boolean enabled = true;
-  
-       
+
+
 
     public WSPolicyFeature() {
         super();
@@ -77,7 +77,7 @@ public class WSPolicyFeature extends AbstractFeature {
 
     public WSPolicyFeature(Policy... ps) {
         super();
-        policies = new ArrayList<Policy>();
+        policies = new ArrayList<>();
         Collections.addAll(policies, ps);
     }
 
@@ -88,15 +88,56 @@ public class WSPolicyFeature extends AbstractFeature {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-    
+
     @Override
     public void initialize(Bus bus) {
-        
-        // this should never be null as features are initialised only
+        initializePolicyEngine(bus);
+        Collection<Policy> loadedPolicies = null;
+        if (policyElements != null || policyReferenceElements != null) {
+            loadedPolicies = new ArrayList<>();
+            PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
+            if (null != policyElements) {
+                for (Element e : policyElements) {
+                    loadedPolicies.add(builder.getPolicy(e));
+                }
+            }
+            if (null != policyReferenceElements) {
+                for (Element e : policyReferenceElements) {
+                    PolicyReference pr = builder.getPolicyReference(e);
+                    Policy resolved = resolveReference(pr, builder, bus, null);
+                    if (null != resolved) {
+                        loadedPolicies.add(resolved);
+                    }
+                }
+            }
+        }
+
+        Policy thePolicy = new Policy();
+        if (policies != null) {
+            for (Policy p : policies) {
+                thePolicy = thePolicy.merge(p);
+            }
+        }
+
+        if (loadedPolicies != null) {
+            for (Policy p : loadedPolicies) {
+                thePolicy = thePolicy.merge(p);
+            }
+        }
+        if (!thePolicy.isEmpty()) {
+            PolicyEngine pe = bus.getExtension(PolicyEngine.class);
+
+            synchronized (pe) {
+                pe.addPolicy(thePolicy);
+            }
+        }
+    }
+    public void initializePolicyEngine(Bus bus) {
+        // this should never be null as features are initialized only
         // after the bus and all its extensions have been created
-        
+
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
-        
+
         synchronized (pe) {
             pe.setEnabled(enabled);
             pe.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
@@ -105,7 +146,7 @@ public class WSPolicyFeature extends AbstractFeature {
             }
         }
     }
-    
+
     private MessageImpl createMessage(Endpoint e, Bus b) {
         MessageImpl m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
@@ -149,13 +190,12 @@ public class WSPolicyFeature extends AbstractFeature {
     }
 
     private Policy initializeEndpointPolicy(Endpoint endpoint, Bus bus) {
-        
-        initialize(bus);
+        initializePolicyEngine(bus);
         DescriptionInfo i = endpoint.getEndpointInfo().getDescription();
         Collection<Policy> loadedPolicies = null;
         if (policyElements != null || policyReferenceElements != null) {
-            loadedPolicies = new ArrayList<Policy>();
-            PolicyBuilder builder = bus.getExtension(PolicyBuilder.class); 
+            loadedPolicies = new ArrayList<>();
+            PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
             if (null != policyElements) {
                 for (Element e : policyElements) {
                     loadedPolicies.add(builder.getPolicy(e));
@@ -170,28 +210,28 @@ public class WSPolicyFeature extends AbstractFeature {
                     }
                 }
             }
-        } 
-        
+        }
+
         Policy thePolicy = new Policy();
-        
+
         if (policies != null) {
             for (Policy p : policies) {
                 thePolicy = thePolicy.merge(p);
             }
         }
-        
+
         if (loadedPolicies != null) {
             for (Policy p : loadedPolicies) {
                 thePolicy = thePolicy.merge(p);
             }
         }
-        
+
         return thePolicy;
     }
-    
+
     public Collection<Policy> getPolicies() {
         if (policies == null) {
-            policies = new ArrayList<Policy>();
+            policies = new ArrayList<>();
         }
         return policies;
     }
@@ -202,7 +242,7 @@ public class WSPolicyFeature extends AbstractFeature {
 
     public Collection<Element> getPolicyElements() {
         if (policyElements == null) {
-            policyElements = new ArrayList<Element>();
+            policyElements = new ArrayList<>();
         }
         return policyElements;
     }
@@ -210,10 +250,10 @@ public class WSPolicyFeature extends AbstractFeature {
     public void setPolicyElements(Collection<Element> elements) {
         policyElements = elements;
     }
-    
+
     public Collection<Element> getPolicyReferenceElements() {
         if (policyReferenceElements == null) {
-            policyReferenceElements = new ArrayList<Element>();
+            policyReferenceElements = new ArrayList<>();
         }
         return policyReferenceElements;
     }
@@ -221,16 +261,16 @@ public class WSPolicyFeature extends AbstractFeature {
     public void setPolicyReferenceElements(Collection<Element> elements) {
         policyReferenceElements = elements;
     }
-      
+
     public void setIgnoreUnknownAssertions(boolean ignore) {
         ignoreUnknownAssertions = ignore;
-    } 
-    
-    
+    }
+
+
     public void setAlternativeSelector(AlternativeSelector as) {
         alternativeSelector = as;
     }
-    
+
     Policy resolveReference(PolicyReference ref, PolicyBuilder builder, Bus bus, DescriptionInfo i) {
         Policy p = null;
         if (!ref.getURI().startsWith("#")) {
@@ -242,10 +282,10 @@ public class WSPolicyFeature extends AbstractFeature {
         if (null == p) {
             throw new PolicyException(new Message("UNRESOLVED_POLICY_REFERENCE_EXC", BUNDLE, ref.getURI()));
         }
-        
+
         return p;
-    }   
-    
+    }
+
     Policy resolveLocal(PolicyReference ref, final Bus bus, DescriptionInfo i) {
         String uri = ref.getURI().substring(1);
         String absoluteURI = i == null ? uri : i.getBaseURI() + uri;
@@ -260,7 +300,7 @@ public class WSPolicyFeature extends AbstractFeature {
                         .getBeanOfType(uri, PolicyBean.class);
                 if (null != pb) {
                     PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-                    return builder.getPolicy(pb.getElement()); 
+                    return builder.getPolicy(pb.getElement());
                 }
                 return null;
             }
@@ -272,7 +312,7 @@ public class WSPolicyFeature extends AbstractFeature {
         }
         return resolved;
     }
-    
+
     protected Policy resolveExternal(PolicyReference ref,  String baseURI, Bus bus) {
         PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
         ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);

@@ -26,8 +26,8 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 @WebService(name = "MyHelloWorldService", targetNamespace = "http://nstest.helloworld")
-@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED, 
-             style = SOAPBinding.Style.DOCUMENT, 
+@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED,
+             style = SOAPBinding.Style.DOCUMENT,
              use = SOAPBinding.Use.LITERAL)
 public interface HelloWorld {
     @WebMethod

@@ -24,7 +24,7 @@ public class SamlRequestInfo {
     private String idpServiceAddress;
     private String webAppContext;
     private String webAppDomain;
-    
+
     public void setSamlRequest(String encodedSaml) {
         this.samlRequest = encodedSaml;
     }

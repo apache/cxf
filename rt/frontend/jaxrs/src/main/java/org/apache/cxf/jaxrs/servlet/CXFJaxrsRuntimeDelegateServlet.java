@@ -24,10 +24,10 @@ public class CXFJaxrsRuntimeDelegateServlet extends CXFNonSpringJaxrsServlet {
 
     private static final long serialVersionUID = -1990992780035068714L;
 
-    static { 
-        // Ensure that the correct JAX-RS implementation is loaded 
-        RuntimeDelegate runtimeDelegate = new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl(); 
+    static {
+        // Ensure that the correct JAX-RS implementation is loaded
+        RuntimeDelegate runtimeDelegate = new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl();
         RuntimeDelegate.setInstance(runtimeDelegate);
     }
-    
+
 }

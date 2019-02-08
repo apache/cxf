@@ -28,10 +28,10 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public class Lifetime {
     private static final Logger LOG = LogUtils.getL7dLogger(Lifetime.class);
-    
+
     private String created;
     private String expires;
-    
+
     public String getCreated() {
         return created;
     }
@@ -53,5 +53,5 @@ public class Lifetime {
             LOG.fine("Found expires value: " + expires);
         }
     }
-    
+
 }

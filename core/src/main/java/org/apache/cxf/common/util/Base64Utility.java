@@ -20,7 +20,7 @@
 package org.apache.cxf.common.util;
 
 /**
- * Base64Utility - this static class provides useful base64 
+ * Base64Utility - this static class provides useful base64
  *                 encoding utilities.
  */
 
@@ -46,45 +46,45 @@ import org.apache.cxf.common.logging.LogUtils;
  *    byte[]     into OutStream
  *    byte[]     into Writer
  * decode:
- *    char[]     into byte[] 
+ *    char[]     into byte[]
  *    String     into byte[]
  *    char[]     into OutStream
  *    String     into OutStream
- * 
+ *
  */
 public final class Base64Utility {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(Base64Utility.class);
 
-    
+
     // base 64 character set
     //
     private static final char[] BCS = {
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 
-        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 
-        'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 
-        'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 
-        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
-        'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', 
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+        'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+        'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
         '8', '9', '+', '/'
     };
 
     private static final char[] BCS_URL_SAFE = Arrays.copyOf(BCS, BCS.length);
-    
+
     // base 64 padding
     private static final char PAD = '=';
 
     // size of base 64 decode table
     private static final int BDTSIZE = 128;
 
-    // base 64 decode table  
+    // base 64 decode table
     private static final byte[] BDT = new byte[128];
 
-    
+
     private static final int PAD_SIZE0 = 1;
     private static final int PAD_SIZE4 = 2;
     private static final int PAD_SIZE8 = 3;
-    
+
     // class static initializer for building decode table
     static {
         for (int i = 0;  i < BDTSIZE;  i++) {
@@ -94,18 +94,18 @@ public final class Base64Utility {
         for (int i = 0;  i < BCS.length;  i++) {
             BDT[BCS[i]] = (byte)i;
         }
-        
+
         BCS_URL_SAFE[62] = '-';
         BCS_URL_SAFE[63] = '_';
     }
-    
-    
+
+
     private Base64Utility() {
         //utility class, never constructed
     }
-    
-    
-    
+
+
+
     /**
      * The <code>decode_chunk</code> routine decodes a chunk of data
      * into its native encoding.
@@ -115,21 +115,25 @@ public final class Base64Utility {
      * 24 bits which are then split into 4 x 6bit values. Each 6 bit
      * value is then used as an index into the 64 character table of
      * base64 chars. If the total data length is not a 3 octet multiple
-     * the '=' char is used as padding for the final 4 char group, 
+     * the '=' char is used as padding for the final 4 char group,
      * either 1 octet + '==' or 2 octets + '='.
      *
      * @param   id  The input data to be processed
      * @param   o   The offset from which to begin processing
      * @param   l   The length (bound) at which processing is to end
-     * @return  The decoded data   
+     * @return  The decoded data
      * @exception   Base64Exception Thrown is processing fails due to
-     * formatting exceptions in the encoded data 
+     * formatting exceptions in the encoded data
      */
     public static byte[] decodeChunk(char[] id,
                                      int o,
-                                     int l) 
+                                     int l)
         throws Base64Exception {
-        
+
+        if (id != null && id.length == 0 && l == 0) {
+            return new byte[0];
+        }
+
         // Keep it simple - must be >= 4. Unpadded
         // base64 data contain < 3 octets is invalid.
         //
@@ -141,7 +145,7 @@ public final class Base64Utility {
         int ibcount = 0;
 
         // cryan. Calc the num of octets. Each 4 chars of base64 chars
-        // (representing 24 bits) encodes 3 octets. 
+        // (representing 24 bits) encodes 3 octets.
         //
         int octetCount = 3 * (l / 4);
 
@@ -161,7 +165,7 @@ public final class Base64Utility {
             if (id[i] == PAD
                 || id[i] < BDT.length
                 && BDT[id[i]] != Byte.MAX_VALUE) {
-                
+
                 ib[ibcount++] = id[i];
 
                 // Decode each 4 char sequence.
@@ -172,7 +176,7 @@ public final class Base64Utility {
                 }
             }
         }
-        
+
         if (obcount != ob.length) {
             byte []tmp = new byte[obcount];
             System.arraycopy(ob, 0, tmp, 0, obcount);
@@ -185,21 +189,20 @@ public final class Base64Utility {
     public static byte[] decode(String id) throws Base64Exception {
         return decode(id, false);
     }
-    
+
     public static byte[] decode(String id, boolean urlSafe) throws Base64Exception {
         if (urlSafe) {
-            //TODO: optimize further
-            id = id.replace("-", "+").replace('_', '/');
+            id = id.replace('-', '+').replace('_', '/');
             switch (id.length() % 4) {
-            case 0: 
-                break; 
-            case 2: 
-                id += "=="; 
-                break; 
-            case 3: 
-                id += "="; 
-                break; 
-            default: 
+            case 0:
+                break;
+            case 2:
+                id += "==";
+                break;
+            case 3:
+                id += "=";
+                break;
+            default:
                 throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG));
             }
         }
@@ -215,7 +218,7 @@ public final class Base64Utility {
     public static void decode(char[] id,
                              int o,
                              int l,
-                             OutputStream ostream) 
+                             OutputStream ostream)
         throws Base64Exception {
 
         try {
@@ -227,9 +230,9 @@ public final class Base64Utility {
     }
 
     public static void decode(String id,
-                              OutputStream ostream) 
+                              OutputStream ostream)
         throws Base64Exception {
-        
+
         try {
             char[] cd = id.toCharArray();
             ostream.write(decodeChunk(cd, 0, cd.length));
@@ -246,7 +249,7 @@ public final class Base64Utility {
     public static String encode(byte[] id) {
         return encode(id, false);
     }
-    
+
     public static String encode(byte[] id, boolean urlSafe) {
         char[] cd = encodeChunk(id, 0, id.length);
         return new String(cd, 0, cd.length);
@@ -259,12 +262,14 @@ public final class Base64Utility {
                                      int l) {
         return encodeChunk(id, o, l, false);
     }
-    
+
     public static char[] encodeChunk(byte[] id,
                                      int o,
                                      int l,
                                      boolean urlSafe) {
-        if (l <= 0) {
+        if (id != null && id.length == 0 && l == 0) {
+            return new char[0];
+        } else if (l <= 0) {
             return null;
         }
 
@@ -317,14 +322,14 @@ public final class Base64Utility {
         }
         return out;
     }
-    
+
     public static void encodeAndStream(byte[] id,
                                        int o,
                                        int l,
                                        OutputStream os) throws IOException {
         encodeAndStream(id, o, l, false, os);
     }
-    
+
     public static void encodeAndStream(byte[] id,
                                            int o,
                                            int l,
@@ -337,13 +342,13 @@ public final class Base64Utility {
         int rindex = o;
         int rest = l;
         final char[] base64Table = urlSafe ? BCS_URL_SAFE : BCS;
-        
+
         char[] chunk = new char[4];
         while (rest >= 3) {
             int i = ((id[rindex] & 0xff) << 16)
                     + ((id[rindex + 1] & 0xff) << 8)
                     + (id[rindex + 2] & 0xff);
-            chunk[0] = base64Table[i >> 18]; 
+            chunk[0] = base64Table[i >> 18];
             chunk[1] = base64Table[(i >> 12) & 0x3f];
             chunk[2] = base64Table[(i >> 6) & 0x3f];
             chunk[3] = base64Table[i & 0x3f];
@@ -380,9 +385,9 @@ public final class Base64Utility {
         byte[] bytes = StandardCharsets.UTF_8.encode(CharBuffer.wrap(chunk, 0, len)).array();
         os.write(bytes);
     }
-    
+
     //
-    // Outputs base64 representation of the specified byte array 
+    // Outputs base64 representation of the specified byte array
     // to a byte stream.
     //
     public static void encodeChunk(byte[] id,
@@ -395,8 +400,8 @@ public final class Base64Utility {
             throw new Base64Exception(new Message("BASE64_ENCODE_IOEXCEPTION", LOG), e);
         }
     }
-    
-    // Outputs base64 representation of the specified byte 
+
+    // Outputs base64 representation of the specified byte
     // array to a character stream.
     //
     public static void encode(byte[] id,
@@ -422,15 +427,15 @@ public final class Base64Utility {
      * @param   p   Pointer to the encodeme of interest
      * @return  The decoded encodeme
      * @exception   Base64Exception Thrown is processing fails due to
-     * formatting exceptions in the encoded data 
-     */ 
+     * formatting exceptions in the encoded data
+     */
     private static int processEncodeme(char[] ib,
                                        byte[] ob,
-                                       int p) 
+                                       int p)
         throws Base64Exception {
-        
 
-        int spad = PAD_SIZE8;        
+
+        int spad = PAD_SIZE8;
         if (ib[3] == PAD) {
             spad = PAD_SIZE4;
         }
@@ -459,11 +464,11 @@ public final class Base64Utility {
         default:
             // We should never get here
             throw new IllegalStateException();
-        } 
+        }
     }
 
     public static boolean isValidBase64(int ch) {
         return ch == PAD || BDT[ch] != Byte.MAX_VALUE;
-    } 
+    }
 
 }

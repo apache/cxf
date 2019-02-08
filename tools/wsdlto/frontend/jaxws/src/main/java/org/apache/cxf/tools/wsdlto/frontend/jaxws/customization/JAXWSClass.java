@@ -24,7 +24,7 @@ public class JAXWSClass {
 
     public JAXWSClass(String clzName, String comment) {
         className = clzName;
-        comments  = comment;
+        comments = comment;
     }
 
     public void setClassName(String clzName) {

@@ -36,23 +36,23 @@ public class WADLToJava {
 
 
     private String[] args;
-    
+
     public WADLToJava() {
         args = new String[0];
     }
-    public WADLToJava(String pargs[]) {
+    public WADLToJava(String[] pargs) {
         args = pargs;
     }
 
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
+
     public void run(ToolContext context) throws Exception {
         run(context, null);
     }
@@ -89,9 +89,9 @@ public class WADLToJava {
         return false;
     }
 
-    
-    public static void main(String[] pargs) {
 
+    public static void main(String[] pargs) {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         CommandInterfaceUtils.commandCommonMain();
         WADLToJava w2j = new WADLToJava(pargs);
         try {
@@ -117,9 +117,6 @@ public class WADLToJava {
             if (w2j.isExitOnFinish()) {
                 System.exit(1);
             }
-        }
-        if (w2j.isExitOnFinish()) {
-            System.exit(0);
         }
     }
 

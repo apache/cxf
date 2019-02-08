@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class TestBean1 {
-    
+
     public TestBean1() {
         intItem = 43;
         doubleItem = -1.0;
@@ -39,7 +39,7 @@ public class TestBean1 {
         beanTwoNotRequiredItem = null;
         enumeration = AnEnum.Animal;
     }
-    
+
     //CHECKSTYLE:OFF
     public String stringItem;
     @XmlElement(namespace = "uri:org.apache.cxf.javascript.testns2")
@@ -61,17 +61,17 @@ public class TestBean1 {
     public TestBean2 beanTwoNotRequiredItem;
     @XmlElement(defaultValue = "Animal", required = true)
     public AnEnum enumeration;
-    @XmlElement 
+    @XmlElement
     public AnEnum enum2;
     //CHECKSTYLE:ON
-    
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof TestBean1)) {
             return false;
         }
         TestBean1 other = (TestBean1) obj;
-        boolean equalSoFar = 
+        boolean equalSoFar =
             intItem == other.intItem
             && longItem == other.longItem
             && optionalIntItem == other.optionalIntItem
@@ -81,13 +81,13 @@ public class TestBean1 {
         if (!equalSoFar) {
             return false;
         }
-        
+
         if (null == base64Item) {
             if (null != other.base64Item) {
                 return false;
             }
         } else {
-            if (!base64Item.equals(other.base64Item)) {
+            if (!Arrays.equals(base64Item, other.base64Item)) {
                 return false;
             }
         }
@@ -115,9 +115,8 @@ public class TestBean1 {
         // decisions are simpler for the last one.
         if (null == beanTwoNotRequiredItem) {
             return other.beanTwoNotRequiredItem == null;
-        } else {
-            return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
         }
+        return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
     }
 
     @Override
@@ -145,7 +144,7 @@ public class TestBean1 {
                 builder.append(Integer.toHexString(b));
             }
         }
-        
+
         builder.append(" optionalIntItem ");
         builder.append(optionalIntItem);
         builder.append(" optionalIntArrayItem ");
@@ -161,17 +160,17 @@ public class TestBean1 {
         if (beanTwoItem == null) {
             builder.append("Null");
         } else {
-            builder.append(beanTwoItem.toString()); 
+            builder.append(beanTwoItem.toString());
         }
         builder.append(" beanTwoNotRequiredItem ");
         if (beanTwoNotRequiredItem == null) {
             builder.append("Null");
         } else {
-            builder.append(beanTwoNotRequiredItem.toString()); 
+            builder.append(beanTwoNotRequiredItem.toString());
         }
         builder.append(" " + enumeration);
-        
+
         return builder.toString();
     }
-    
+
 }

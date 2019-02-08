@@ -21,6 +21,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
@@ -48,7 +49,7 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
         if (env.optionSet(ToolConstants.CFG_GEN_FAULT)
             || env.optionSet(ToolConstants.CFG_ALL)) {
             return false;
-        } 
+        }
         return env.optionSet(ToolConstants.CFG_GEN_ANT)
             || env.optionSet(ToolConstants.CFG_GEN_TYPES)
             || env.optionSet(ToolConstants.CFG_GEN_CLIENT)
@@ -68,14 +69,13 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
 
             Map<String, JavaExceptionClass> exceptionClasses = javaModel
                     .getExceptionClasses();
-            for (String expClassName : exceptionClasses.keySet()) {
-                JavaExceptionClass expClz =
-                    exceptionClasses.get(expClassName);
-    
+            for (Entry<String, JavaExceptionClass> entry : exceptionClasses.entrySet()) {
+                JavaExceptionClass expClz = entry.getValue();
+
                 clearAttributes();
-                
+
                 if (penv.containsKey(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID)) {
-                    String faultSerialVersionUID 
+                    String faultSerialVersionUID
                         = penv.get(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID).toString();
                     setAttributes("faultSerialVersionUID", faultSerialVersionUID);
                     if ("FQCN".equalsIgnoreCase(faultSerialVersionUID)) {
@@ -104,7 +104,7 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                 } else {
                     exceptionSuperclass = "java.lang.Exception";
                 }
-                String simpleName = exceptionSuperclass.indexOf('.') == -1 ? exceptionSuperclass 
+                String simpleName = exceptionSuperclass.indexOf('.') == -1 ? exceptionSuperclass
                     : exceptionSuperclass.substring(exceptionSuperclass.lastIndexOf('.') + 1);
                 String exceptionSuperclassString = simpleName;
                 for (JavaField jf : expClz.getFields()) {

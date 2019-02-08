@@ -32,6 +32,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -46,6 +47,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
@@ -79,7 +81,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
     public SamlTokenInterceptor() {
         super();
     }
-    
+
     protected void processToken(SoapMessage message) {
         Header h = findSecurityHeader(message, false);
         if (h == null) {
@@ -89,8 +91,8 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if ("Assertion".equals(child.getLocalName())
-                && (WSConstants.SAML_NS.equals(child.getNamespaceURI())
-                    || WSConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
+                && (WSS4JConstants.SAML_NS.equals(child.getNamespaceURI())
+                    || WSS4JConstants.SAML2_NS.equals(child.getNamespaceURI()))) {
                 try {
                     List<WSSecurityEngineResult> samlResults = processToken(child, message);
                     if (samlResults != null) {
@@ -103,7 +105,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
                         boolean signed = false;
                         for (WSSecurityEngineResult result : samlResults) {
-                            SamlAssertionWrapper wrapper = 
+                            SamlAssertionWrapper wrapper =
                                 (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                             if (wrapper.isSigned()) {
                                 signed = true;
@@ -111,29 +113,29 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                             }
                         }
                         assertTokens(message, SPConstants.SAML_TOKEN, signed);
-                        
+
                         Integer key = WSConstants.ST_UNSIGNED;
                         if (signed) {
                             key = WSConstants.ST_SIGNED;
                         }
-                        WSHandlerResult rResult = 
+                        WSHandlerResult rResult =
                             new WSHandlerResult(null, samlResults,
                                                 Collections.singletonMap(key, samlResults));
                         results.add(0, rResult);
-                        
+
                         // Check version against policy
                         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                        for (AssertionInfo ai 
+                        for (AssertionInfo ai
                             : PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN)) {
                             SamlToken samlToken = (SamlToken)ai.getAssertion();
                             for (WSSecurityEngineResult result : samlResults) {
-                                SamlAssertionWrapper assertionWrapper = 
+                                SamlAssertionWrapper assertionWrapper =
                                     (SamlAssertionWrapper)result.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
 
                                 if (!checkVersion(aim, samlToken, assertionWrapper)) {
                                     ai.setNotAsserted("Wrong SAML Version");
                                 }
-                                
+
                                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);
                                 Certificate[] tlsCerts = null;
                                 if (tlsInfo != null) {
@@ -149,11 +151,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                                 }
                             }
                         }
-                        
+
                         if (signed) {
-                            Principal principal = 
+                            Principal principal =
                                 (Principal)samlResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                            
+
                             SecurityContext sc = message.get(SecurityContext.class);
                             if (sc == null || sc.getUserPrincipal() == null) {
                                 message.put(SecurityContext.class, new DefaultSecurityContext(principal, null));
@@ -170,8 +172,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
 
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
-        
+
         RequestData data = new CXFRequestData();
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
@@ -181,12 +182,15 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         }
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
-        
+
         data.setSigVerCrypto(getCrypto(null, SecurityConstants.SIGNATURE_CRYPTO,
                                      SecurityConstants.SIGNATURE_PROPERTIES, message));
-        
+
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        data.setWsDocInfo(wsDocInfo);
+
         SAMLTokenProcessor p = new SAMLTokenProcessor();
-        return p.handleToken(tokenElement, data, wsDocInfo);
+        return p.handleToken(tokenElement, data);
     }
 
     protected AbstractToken assertTokens(SoapMessage message) {
@@ -206,7 +210,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             SamlAssertionWrapper wrapper = addSamlToken(tok, message);
             if (wrapper == null) {
                 AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-                Collection<AssertionInfo> ais = 
+                Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SAML_TOKEN);
                 for (AssertionInfo ai : ais) {
                     if (ai.isAsserted()) {
@@ -216,20 +220,21 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                 return;
             }
             Element el = (Element)h.getObject();
+            el = (Element)DOMUtils.getDomElement(el);
             el.appendChild(wrapper.toDOM(el.getOwnerDocument()));
         } catch (WSSecurityException ex) {
             policyNotAsserted(tok, ex.getMessage(), message);
         }
     }
 
-    
+
     private SamlAssertionWrapper addSamlToken(
         SamlToken token, SoapMessage message
     ) throws WSSecurityException {
         //
         // Get the SAML CallbackHandler
         //
-        Object o = 
+        Object o =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_CALLBACK_HANDLER, message);
 
         CallbackHandler handler = null;
@@ -248,14 +253,14 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         }
 
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SamlTokenType tokenType = token.getSamlTokenType();
         if (tokenType == SamlTokenType.WssSamlV11Token10 || tokenType == SamlTokenType.WssSamlV11Token11) {
             samlCallback.setSamlVersion(Version.SAML_11);
             PolicyUtils.assertPolicy(aim, "WssSamlV11Token10");
             PolicyUtils.assertPolicy(aim, "WssSamlV11Token11");
-            
+
         } else if (tokenType == SamlTokenType.WssSamlV20Token11) {
             samlCallback.setSamlVersion(Version.SAML_20);
             PolicyUtils.assertPolicy(aim, "WssSamlV20Token11");
@@ -271,20 +276,20 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
             }
             String password = samlCallback.getIssuerKeyPassword();
             if (password == null) {
-                password = 
+                password =
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
                 if (StringUtils.isEmpty(password)) {
-                    password = 
+                    password =
                         getPassword(issuerName, token, WSPasswordCallback.SIGNATURE, message);
                 }
             }
             Crypto crypto = samlCallback.getIssuerCrypto();
             if (crypto == null) {
-                crypto = 
-                    getCrypto(token, SecurityConstants.SIGNATURE_CRYPTO, 
+                crypto =
+                    getCrypto(token, SecurityConstants.SIGNATURE_CRYPTO,
                               SecurityConstants.SIGNATURE_PROPERTIES, message);
             }
-            
+
             assertion.signAssertion(
                     issuerName,
                     password,
@@ -294,13 +299,13 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                     samlCallback.getSignatureAlgorithm()
             );
         }
-        
+
         return assertion;
     }
 
     private Crypto getCrypto(
-        SamlToken samlToken, 
-        String cryptoKey, 
+        SamlToken samlToken,
+        String cryptoKey,
         String propKey,
         SoapMessage message
     ) throws WSSecurityException {
@@ -329,11 +334,11 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
      */
     private boolean checkVersion(
         AssertionInfoMap aim,
-        SamlToken samlToken, 
+        SamlToken samlToken,
         SamlAssertionWrapper assertionWrapper
     ) {
         SamlTokenType tokenType = samlToken.getSamlTokenType();
-        if ((tokenType == SamlTokenType.WssSamlV11Token10 
+        if ((tokenType == SamlTokenType.WssSamlV11Token10
             || tokenType == SamlTokenType.WssSamlV11Token11)
             && assertionWrapper.getSamlVersion() != SAMLVersion.VERSION_11) {
             return false;
@@ -344,5 +349,5 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
         PolicyUtils.assertPolicy(aim, new QName(samlToken.getVersion().getNamespace(), tokenType.name()));
         return true;
     }
-    
+
 }

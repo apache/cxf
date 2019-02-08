@@ -24,16 +24,21 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookCxfContinuationServer.PORT;
@@ -45,49 +50,49 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookCxfContinuationServer.class));
     }
-    
+
     @Test
     public void testContinuation() throws Exception {
-        
+
         doTestContinuation("books");
     }
-    
+
     @Test
     public void testContinuationSubresource() throws Exception {
-        
+
         doTestContinuation("books/subresources");
     }
-    
+
     private void doTestContinuation(String pathSegment) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(1);
-        
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/1", 
-                                        "1", 
+
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/1",
+                                        "1",
                                         "CXF in Action1", startSignal, doneSignal));
         startSignal.countDown();
         doneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
     }
-    
+
     private void checkBook(String address, String id, String expected) throws Exception {
-        GetMethod get = new GetMethod(address);
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+
         try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             assertEquals("Book description for id " + id + " is wrong",
-                         expected, get.getResponseBodyAsString());
+                         expected, EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();
         }
     }
-    
+
     @Ignore
     private class BookWorker implements Runnable {
 
@@ -107,9 +112,9 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
             this.startSignal = startSignal;
             this.doneSignal = doneSignal;
         }
-        
+
         public void run() {
-            
+
             try {
                 startSignal.await();
                 checkBook(address, id, expected);
@@ -119,9 +124,27 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Assert.fail("Book thread failed for : " + id);
-            } 
-            
+            }
+
         }
-        
+
+    }
+
+    @Test
+    public void testEncodedURL() throws Exception {
+        String id = "A%20B%20C"; // "A B C"
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + PORT + "/bookstore/books/" + id);
+
+        try {
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals("Encoded path '/" + id + "' is not handled successfully",
+                         200,  response.getStatusLine().getStatusCode());
+            assertEquals("Book description for id " + id + " is wrong",
+                         "CXF in Action A B C", EntityUtils.toString(response.getEntity()));
+        } finally {
+            // Release current connection to the connection pool once you are done
+            get.releaseConnection();
+        }
     }
 }

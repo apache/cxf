@@ -82,8 +82,8 @@ public class TokenRequestController {
             OAuthAccessor accessor = new OAuthAccessor(consumer);
             accessor.requestToken = oauthToken;
             accessor.tokenSecret = Common.findCookieValue(request, "tokenSec");
-            
-            Map<String, String> parameters = new HashMap<String, String>();
+
+            Map<String, String> parameters = new HashMap<>();
             parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, oAuthParams.getSignatureMethod());
             parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
             parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));

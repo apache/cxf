@@ -41,11 +41,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<Message> {
-    private static final TransformerFactory TRANSFORM_FACTORIY = TransformerFactory.newInstance();
 
     private String contextPropertyName;
     private final Templates xsltTemplate;
-        
+
     public AbstractXSLTInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
         super(phase);
         if (before != null) {
@@ -54,23 +53,27 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
         if (after != null) {
             addAfter(after.getName());
         }
-        
+
         try {
             InputStream xsltStream = ClassLoaderUtils.getResourceAsStream(xsltPath, this.getClass());
             if (xsltStream == null) {
                 throw new IllegalArgumentException("Cannot load XSLT from path: " + xsltPath);
             }
             Document doc = StaxUtils.read(xsltStream);
-            xsltTemplate = TRANSFORM_FACTORIY.newTemplates(new DOMSource(doc));
-        } catch (TransformerConfigurationException e) {
+
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            try {
+                transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            } catch (javax.xml.transform.TransformerConfigurationException ex) {
+                //
+            }
+
+            xsltTemplate = transformerFactory.newTemplates(new DOMSource(doc));
+        } catch (TransformerConfigurationException | XMLStreamException e) {
             throw new IllegalArgumentException(
-                                               String.format("Cannot create XSLT template from path: %s, error: ",
-                                                             xsltPath, e.getException()), e);
-        } catch (XMLStreamException e) {
-            throw new IllegalArgumentException(
-                                               String.format("Cannot create XSLT template from path: %s, error: ",
-                                                             xsltPath, e.getNestedException()), e);
-        }        
+                                               String.format("Cannot create XSLT template from path: %s",
+                                                             xsltPath), e);
+        }
     }
 
     public void setContextPropertyName(String propertyName) {
@@ -78,10 +81,10 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
     }
 
     protected boolean checkContextProperty(Message message) {
-        return contextPropertyName != null 
+        return contextPropertyName != null
             && !MessageUtils.getContextualBoolean(message, contextPropertyName, false);
     }
-    
+
     protected Templates getXSLTTemplate() {
         return xsltTemplate;
     }

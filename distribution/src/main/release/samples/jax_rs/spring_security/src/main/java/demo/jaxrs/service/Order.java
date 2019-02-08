@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Order {
     private long id;
     private String description;
-    private Map<Long, Product> products = new HashMap<Long, Product>();
+    private Map<Long, Product> products = new HashMap<>();
 
     public Order() {
         init();
@@ -56,8 +56,7 @@ public class Order {
     @Path("products/{productId}/")
     public Product getProduct(@PathParam("productId")int productId) {
         System.out.println("----invoking getProduct with id: " + productId);
-        Product p = products.get(new Long(productId));
-        return p;
+        return products.get(Long.valueOf(productId));
     }
 
     final void init() {

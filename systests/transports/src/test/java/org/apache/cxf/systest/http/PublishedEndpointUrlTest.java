@@ -38,17 +38,20 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
-import org.junit.Assert;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public class PublishedEndpointUrlTest extends Assert {
+
+public class PublishedEndpointUrlTest {
     public static final String PORT = TestUtil.getPortNumber(PublishedEndpointUrlTest.class);
 
-    
+
     @Test
     public void testPublishedEndpointUrl() throws Exception {
-        
+
         Greeter implementor = new org.apache.hello_world_soap_http.GreeterImpl();
         String publishedEndpointUrl = "http://cxf.apache.org/publishedEndpointUrl";
         Bus bus = BusFactory.getDefaultBus();
@@ -58,22 +61,22 @@ public class PublishedEndpointUrlTest extends Assert {
         svrFactory.setAddress("http://localhost:" + PORT + "/publishedEndpointUrl");
         svrFactory.setPublishedEndpointUrl(publishedEndpointUrl);
         svrFactory.setServiceBean(implementor);
-        
+
         Server server = svrFactory.create();
 
         WSDLReader wsdlReader = WSDLFactory.newInstance().newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
-        
+
         URL url = new URL(svrFactory.getAddress() + "?wsdl=1");
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
         assertEquals(500, connect.getResponseCode());
-        
+
         Definition wsdl = wsdlReader.readWSDL(svrFactory.getAddress() + "?wsdl");
         assertNotNull(wsdl);
-        
+
         Collection<Service> services = CastUtils.cast(wsdl.getAllServices().values());
         final String failMesg = "WSDL provided incorrect soap:address location";
-        
+
         for (Service service : services) {
             Collection<Port> ports = CastUtils.cast(service.getPorts().values());
             for (Port port : ports) {
@@ -85,7 +88,7 @@ public class PublishedEndpointUrlTest extends Assert {
                     } else if (extension instanceof SOAPAddress) {
                         actualUrl = ((SOAPAddress)extension).getLocationURI();
                     }
-                    
+
                     //System.out.println("Checking url: " + actualUrl + " against " + publishedEndpointUrl);
                     assertEquals(failMesg, publishedEndpointUrl, actualUrl);
                 }

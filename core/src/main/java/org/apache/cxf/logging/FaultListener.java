@@ -38,7 +38,7 @@ public interface FaultListener {
      * the exception occurred.
      * @param message the message processed while the exception occurred.
      * @return <code>true</code> if CXF should use default handling for this
-     * exception which normally is just logging the exception, <code>false</code> 
+     * exception which normally is just logging the exception, <code>false</code>
      * if CXF not should do any logging.
      */
     boolean faultOccurred(Exception exception, String description, Message message);

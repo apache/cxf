@@ -27,13 +27,13 @@ import java.util.zip.Inflater;
 
 public final class CompressionUtils {
     private CompressionUtils() {
-        
+
     }
-    public static InputStream inflate(byte[] deflatedToken) 
+    public static InputStream inflate(byte[] deflatedToken)
         throws DataFormatException {
         return inflate(deflatedToken, true);
     }
-    public static InputStream inflate(byte[] deflatedToken, boolean nowrap) 
+    public static InputStream inflate(byte[] deflatedToken, boolean nowrap)
         throws DataFormatException {
         Inflater inflater = new Inflater(true);
         inflater.setInput(deflatedToken);
@@ -46,35 +46,34 @@ public final class CompressionUtils {
             if (inflateLen == 0 && !inflater.finished()) {
                 if (inflater.needsInput()) {
                     throw new DataFormatException("Inflater can not inflate all the token bytes");
-                } else {
-                    break;
                 }
+                break;
             }
-            
+
             inflatedToken.write(buffer, 0, inflateLen);
         }
 
         return new ByteArrayInputStream(inflatedToken.toByteArray());
     }
-    
+
     public static byte[] deflate(byte[] tokenBytes) {
         return deflate(tokenBytes, true);
     }
-    
+
     public static byte[] deflate(byte[] tokenBytes, boolean nowrap) {
         return deflate(tokenBytes, Deflater.DEFLATED, nowrap);
     }
-    
+
     public static byte[] deflate(byte[] tokenBytes, int level, boolean nowrap) {
         Deflater compresser = new Deflater(level, nowrap);
-        
+
         compresser.setInput(tokenBytes);
         compresser.finish();
-        
+
         byte[] output = new byte[tokenBytes.length * 2];
-        
+
         int compressedDataLength = compresser.deflate(output);
-        
+
         byte[] result = new byte[compressedDataLength];
         System.arraycopy(output, 0, result, 0, compressedDataLength);
         return result;

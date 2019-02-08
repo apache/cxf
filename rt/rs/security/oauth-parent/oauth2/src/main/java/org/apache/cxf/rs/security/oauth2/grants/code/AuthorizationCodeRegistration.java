@@ -19,25 +19,29 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
  * Captures the information associated with the code grant registration request.
- * @see ServerAuthorizationCodeGrant  
+ * @see ServerAuthorizationCodeGrant
  */
 public class AuthorizationCodeRegistration {
-    private Client client; 
+    private Client client;
     private List<String> requestedScope = Collections.emptyList();
     private List<String> approvedScope = Collections.emptyList();
     private String redirectUri;
     private UserSubject subject;
     private String audience;
     private String nonce;
+    private String responseType;
     private String clientCodeChallenge;
-    
+    private boolean preauthorizedTokenAvailable;
+    private Map<String, String> extraProperties = new LinkedHashMap<>();
     /**
      * Sets the {@link Client} reference
      * @param client the client
@@ -66,7 +70,7 @@ public class AuthorizationCodeRegistration {
     public String getRedirectUri() {
         return redirectUri;
     }
-    
+
     /**
      * Sets the scopes request by the client
      * @param requestedScope the requested scopes
@@ -74,7 +78,7 @@ public class AuthorizationCodeRegistration {
     public void setRequestedScope(List<String> requestedScope) {
         this.requestedScope = requestedScope;
     }
-    
+
     /**
      * Gets the scopes request by the client
      * @return the requested scopes
@@ -82,16 +86,16 @@ public class AuthorizationCodeRegistration {
     public List<String> getRequestedScope() {
         return requestedScope;
     }
-    
+
     /**
      * Sets the scopes explicitly approved by the end user.
-     * If this list is empty then the end user had no way to down-scope. 
+     * If this list is empty then the end user had no way to down-scope.
      * @param approvedScope the approved scopes
      */
     public void setApprovedScope(List<String> approvedScope) {
         this.approvedScope = approvedScope;
     }
-    
+
     /**
      * Gets the scopes explicitly approved by the end user
      * @return the approved scopes
@@ -99,7 +103,7 @@ public class AuthorizationCodeRegistration {
     public List<String> getApprovedScope() {
         return approvedScope;
     }
-    
+
     /**
      * Sets the user subject representing the end user
      * @param subject the subject
@@ -107,7 +111,7 @@ public class AuthorizationCodeRegistration {
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
-    
+
     /**
      * Gets the user subject representing the end user
      * @return the subject
@@ -132,5 +136,23 @@ public class AuthorizationCodeRegistration {
     }
     public void setNonce(String nonce) {
         this.nonce = nonce;
+    }
+    public boolean isPreauthorizedTokenAvailable() {
+        return preauthorizedTokenAvailable;
+    }
+    public void setPreauthorizedTokenAvailable(boolean preauthorizedTokenAvailable) {
+        this.preauthorizedTokenAvailable = preauthorizedTokenAvailable;
+    }
+    public Map<String, String> getExtraProperties() {
+        return extraProperties;
+    }
+    public void setExtraProperties(Map<String, String> extraProperties) {
+        this.extraProperties = extraProperties;
+    }
+    public String getResponseType() {
+        return responseType;
+    }
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
 }

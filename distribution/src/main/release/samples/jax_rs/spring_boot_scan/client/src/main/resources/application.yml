@@ -1,0 +1,12 @@
+cxf:
+  jaxrs:
+    client:
+      address: eureka://registry
+      classes-scan-packages: sample.rs.service
+
+eureka:
+  client:
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+

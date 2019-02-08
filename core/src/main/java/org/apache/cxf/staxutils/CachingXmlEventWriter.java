@@ -39,17 +39,17 @@ import org.apache.cxf.common.util.StringUtils;
 
 
 /**
- * 
+ *
  */
 public class CachingXmlEventWriter implements XMLStreamWriter {
     protected XMLEventFactory factory;
-    
-    List<XMLEvent> events = new ArrayList<XMLEvent>(1000);
-    Stack<NSContext> contexts = new Stack<NSContext>();
-    Stack<QName> elNames = new Stack<QName>();
+
+    List<XMLEvent> events = new ArrayList<>(1000);
+    Stack<NSContext> contexts = new Stack<>();
+    Stack<QName> elNames = new Stack<>();
     QName lastStart;
     NSContext curContext = new NSContext(null);
-    
+
     public CachingXmlEventWriter() {
         factory = XMLEventFactory.newInstance();
     }
@@ -57,7 +57,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     protected void addEvent(XMLEvent event) {
         events.add(event);
     }
-    
+
     public List<XMLEvent> getEvents() {
         return events;
     }
@@ -109,11 +109,11 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String arg0) throws XMLStreamException {
-        addEvent(factory.createCharacters(arg0));        
+        addEvent(factory.createCharacters(arg0));
     }
 
     public void writeCharacters(char[] arg0, int arg1, int arg2) throws XMLStreamException {
-        addEvent(factory.createCharacters(new String(arg0, arg1, arg2)));                
+        addEvent(factory.createCharacters(new String(arg0, arg1, arg2)));
     }
 
     public void writeComment(String arg0) throws XMLStreamException {
@@ -121,7 +121,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void writeDTD(String arg0) throws XMLStreamException {
-        addEvent(factory.createDTD(arg0));        
+        addEvent(factory.createDTD(arg0));
     }
 
     public void writeEndDocument() throws XMLStreamException {
@@ -130,16 +130,16 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
 
     public void writeEntityRef(String arg0) throws XMLStreamException {
-        addEvent(factory.createEntityReference(arg0, null));        
+        addEvent(factory.createEntityReference(arg0, null));
     }
 
 
     public void writeProcessingInstruction(String arg0) throws XMLStreamException {
-        addEvent(factory.createProcessingInstruction(arg0, null));                
+        addEvent(factory.createProcessingInstruction(arg0, null));
     }
 
     public void writeProcessingInstruction(String arg0, String arg1) throws XMLStreamException {
-        addEvent(factory.createProcessingInstruction(arg0, arg1));        
+        addEvent(factory.createProcessingInstruction(arg0, arg1));
     }
 
     public void writeStartDocument() throws XMLStreamException {
@@ -147,33 +147,33 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument(String version) throws XMLStreamException {
-        addEvent(factory.createStartDocument(null, version));        
+        addEvent(factory.createStartDocument(null, version));
     }
 
     public void writeStartDocument(String arg0, String arg1) throws XMLStreamException {
-        addEvent(factory.createStartDocument(arg0, arg1));        
+        addEvent(factory.createStartDocument(arg0, arg1));
     }
-    
+
     public void setDefaultNamespace(String ns) throws XMLStreamException {
         curContext.addNs("", ns);
     }
 
-    
+
     public void writeNamespace(String pfx, String ns) throws XMLStreamException {
         curContext.addNs(pfx, ns);
         if (StringUtils.isEmpty(pfx)) {
-            addEvent(factory.createNamespace(ns));            
+            addEvent(factory.createNamespace(ns));
         } else {
             addEvent(factory.createNamespace(pfx, ns));
-        } 
+        }
     }
-    
+
     public void writeAttribute(String uri, String name, String value) throws XMLStreamException {
         if (!StringUtils.isEmpty(uri)) {
             String pfx = StaxUtils.getUniquePrefix(this, uri, false);
-            addEvent(factory.createAttribute(pfx, uri, name, value));            
-        } else {            
-            addEvent(factory.createAttribute(name, value));            
+            addEvent(factory.createAttribute(pfx, uri, name, value));
+        } else {
+            addEvent(factory.createAttribute(name, value));
         }
     }
     public void setPrefix(String pfx, String uri) throws XMLStreamException {
@@ -182,16 +182,17 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
 
     public void writeEndElement() throws XMLStreamException {
-        addEvent(factory.createEndElement(lastStart, Collections.emptyList().iterator()));
+        addEvent(factory.createEndElement(lastStart,
+                                          Collections.<javax.xml.stream.events.Namespace>emptyList().iterator()));
         curContext = contexts.pop();
         lastStart = elNames.pop();
     }
-    
-    
+
+
     public void writeDefaultNamespace(String ns) throws XMLStreamException {
         writeNamespace("", ns);
     }
-    
+
     public void writeEmptyElement(String name) throws XMLStreamException {
         writeStartElement(name);
         writeEndElement();
@@ -204,7 +205,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         writeStartElement(pfx, name, ns);
         writeEndElement();
     }
-    
+
     public void writeStartElement(String name) throws XMLStreamException {
         elNames.push(lastStart);
         contexts.push(curContext);
@@ -232,18 +233,18 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
                                             Collections.EMPTY_SET.iterator(),
                                             Collections.EMPTY_SET.iterator()));
     }
-    
+
     public static class NSContext implements NamespaceContext {
         NamespaceContext parent;
-        Map<String, String> map = new HashMap<String, String>();
-        
+        Map<String, String> map = new HashMap<>();
+
         public NSContext(NamespaceContext p) {
             parent = p;
         }
         public void addNs(String pfx, String ns) {
             map.put(pfx, ns);
         }
-        
+
         public String getNamespaceURI(String prefix) {
             String ret = map.get(prefix);
             if (ret == null && parent != null) {
@@ -265,7 +266,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         }
 
         public Iterator<String> getPrefixes(String namespaceURI) {
-            List<String> l = new ArrayList<String>();
+            List<String> l = new ArrayList<>();
             for (Map.Entry<String, String> e : map.entrySet()) {
                 if (e.getValue().equals(namespaceURI)) {
                     l.add(e.getKey());
@@ -281,6 +282,6 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
             }
             return l.iterator();
         }
-        
+
     }
 }

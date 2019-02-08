@@ -27,16 +27,20 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            
-            @Override
-            public Object createNamespaceHandler() {
-                return new RMBPHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/ws/rm/manager",
-                                            "http://schemas.xmlsoap.org/ws/2005/02/rm/policy");
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+
+                @Override
+                public Object createNamespaceHandler() {
+                    return new RMBPHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, factory,
+                                                "http://cxf.apache.org/ws/rm/manager",
+                                                "http://schemas.xmlsoap.org/ws/2005/02/rm/policy");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
     }
 
     @Override

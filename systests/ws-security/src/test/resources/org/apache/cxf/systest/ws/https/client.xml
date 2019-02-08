@@ -17,7 +17,14 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xmlns:sec="http://cxf.apache.org/configuration/security" xsi:schemaLocation="           http://www.springframework.org/schema/beans           http://www.springframework.org/schema/beans/spring-beans.xsd           http://cxf.apache.org/jaxws                           http://cxf.apache.org/schemas/jaxws.xsd           http://cxf.apache.org/transports/http/configuration   http://cxf.apache.org/schemas/configuration/http-conf.xsd           http://cxf.apache.org/configuration/security          http://cxf.apache.org/schemas/configuration/security.xsd           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd           http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://cxf.apache.org/transports/http/configuration"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:cxf="http://cxf.apache.org/core"
+    xmlns:p="http://cxf.apache.org/policy"
+    xmlns:sec="http://cxf.apache.org/configuration/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd">
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -27,10 +34,17 @@
     <http:conduit name="https://localhost:.*/DoubleItRequireClientCert">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Morpit.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Morpit.jks"/>
             </sec:keyManagers>
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
+    <http:conduit name="https://localhost:.*/DoubleItNoClientCertRequirement.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
@@ -46,7 +60,7 @@
     <http:conduit name="https://localhost:.*/DoubleItRequireClientCert2">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
@@ -59,10 +73,29 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItNoClientCertRequirementPort" createdFromAPI="true">
+        <jaxws:properties>
+       </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/req-client-cert-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItNoClientCertRequirementPort2" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.disable.require.client.cert.check" value="true"/>
+       </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/req-client-cert-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
     <http:conduit name="https://localhost:.*/DoubleItBasicAuth">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
         <http:authorization>
@@ -83,7 +116,7 @@
     <http:conduit name="https://localhost:.*/DoubleItBasicAuth2">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:trustManagers>
-                <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/security/Truststore.jks"/>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
         </http:tlsClientParameters>
     </http:conduit>
@@ -93,6 +126,22 @@
         <jaxws:features>
             <p:policies>
                 <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/clean-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
+    <http:conduit name="https://localhost:.*/DoubleItNoChildPolicy.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItNoChildPolicyPort" createdFromAPI="true">
+        <jaxws:properties>
+       </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/nochild-policy.xml"/>
             </p:policies>
         </jaxws:features>
     </jaxws:client>

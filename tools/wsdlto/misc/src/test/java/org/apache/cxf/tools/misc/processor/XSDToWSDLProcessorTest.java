@@ -25,11 +25,14 @@ import java.net.URISyntaxException;
 
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.misc.XSDToWSDL;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class XSDToWSDLProcessorTest
     extends ProcessorTestBase {
-    
+
     @Test
     public void testNewTypes() throws Exception {
         String[] args = new String[] {"-t", "http://org.apache/invoice", "-n", "Invoice", "-d",
@@ -59,7 +62,7 @@ public class XSDToWSDLProcessorTest
                                          + "/apache.org/Invoice\" xmlns:wsdl=\"http:/"
                                          + "/schemas.xmlsoap.org/wsdl/\">") >= 0);
         assertTrue(serviceString.indexOf("<complexType name=\"InvoiceHeader\">") >= 0);
-        
+
     }
 
     @Test
@@ -88,7 +91,7 @@ public class XSDToWSDLProcessorTest
                                          + "/schemas.xmlsoap.org/wsdl/soap/\" xmlns:tns=\"http:/"
                                          + "/apache.org/Invoice\" xmlns:wsdl=\"http:/"
                                          + "/schemas.xmlsoap.org/wsdl/\">") >= 0);
-        assertTrue(serviceString.indexOf("<complexType name=\"InvoiceHeader\">") >= 0);        
+        assertTrue(serviceString.indexOf("<complexType name=\"InvoiceHeader\">") >= 0);
     }
 
 

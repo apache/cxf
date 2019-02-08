@@ -72,38 +72,38 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 public class AtomPojoProvider extends AbstractConfigurableProvider
     implements MessageBodyWriter<Object>, MessageBodyReader<Object> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AtomPojoProvider.class);
     private static final Abdera ATOM_ENGINE = new Abdera();
     private static final String DEFAULT_ENTRY_CONTENT_METHOD = "getContent";
-    
-    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<Object>();
+
+    private JAXBElementProvider<Object> jaxbProvider = new JAXBElementProvider<>();
     private Map<String, String> collectionGetters = Collections.emptyMap();
     private Map<String, String> collectionSetters = Collections.emptyMap();
-    
+
     private Map<Class<?>, AtomElementWriter<?, ?>> atomClassWriters = Collections.emptyMap();
     private Map<Class<?>, AtomElementReader<?, ?>> atomClassReaders = Collections.emptyMap();
     private Map<Class<?>, AbstractAtomElementBuilder<?>> atomClassBuilders = Collections.emptyMap();
-    
-    //Consider deprecating String based maps 
+
+    //Consider deprecating String based maps
     private Map<String, AtomElementWriter<?, ?>> atomWriters = Collections.emptyMap();
     private Map<String, AtomElementReader<?, ?>> atomReaders = Collections.emptyMap();
     private Map<String, AbstractAtomElementBuilder<?>> atomBuilders = Collections.emptyMap();
-    
-    private MessageContext mc;   
+
+    private MessageContext mc;
     private boolean formattedOutput;
     private boolean useJaxbForContent = true;
     private boolean autodetectCharset;
     private String entryContentMethodName = DEFAULT_ENTRY_CONTENT_METHOD;
-    
+
     public void setUseJaxbForContent(boolean use) {
         this.useJaxbForContent = use;
     }
-    
+
     public void setEntryContentMethodName(String name) {
         this.entryContentMethodName = name;
     }
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         mc = context;
@@ -126,7 +126,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             tryInjectMessageContext(reader);
         }
     }
-    
+
     protected void tryInjectMessageContext(Object handler) {
         Method m = null;
         try {
@@ -137,19 +137,19 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         try {
             InjectionUtils.injectThroughMethod(handler, m, mc);
         } catch (Throwable t) {
-            LOG.warning("Message context can not be injected into " + handler.getClass().getName() 
+            LOG.warning("Message context can not be injected into " + handler.getClass().getName()
                         + " : " + t.getMessage());
         }
     }
-    
+
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
-    
+
     public void setCollectionGetters(Map<String, String> methods) {
         collectionGetters = methods;
     }
-    
+
     public void setCollectionSetters(Map<String, String> methods) {
         collectionSetters = methods;
     }
@@ -158,20 +158,20 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         return !Feed.class.isAssignableFrom(type) && !Entry.class.isAssignableFrom(type);
     }
 
-    public void writeTo(Object o, Class<?> cls, Type genericType, Annotation[] annotations, 
+    public void writeTo(Object o, Class<?> cls, Type genericType, Annotation[] annotations,
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        boolean isFeed = isFeedRequested(mt);        
+        boolean isFeed = isFeedRequested(mt);
         boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(cls);
-        
-        
+
+
         if (isFeed && isCollection) {
             reportError("Atom feed can only be created from a collection wrapper", null);
         } else if (!isFeed && isCollection) {
             reportError("Atom entry can only be created from a single object", null);
         }
         Factory factory = Abdera.getNewFactory();
-        
+
         Element atomElement = null;
         try {
             if (isFeed && !isCollection) {
@@ -182,14 +182,14 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         } catch (Exception ex) {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
-        
+
         try {
             writeAtomElement(atomElement, os);
         } catch (IOException ex) {
             reportError("Atom element can not be serialized", ex);
         }
     }
-    
+
     private void writeAtomElement(Element atomElement, OutputStream os) throws IOException {
         Writer w = formattedOutput ? createWriter("prettyxml") : null;
         if (w != null) {
@@ -198,26 +198,26 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             atomElement.writeTo(os);
         }
     }
-    
+
     protected Writer createWriter(String writerName) {
         return ATOM_ENGINE.getWriterFactory().getWriter(writerName);
     }
-    
+
     public void setFormattedOutput(boolean formattedOutput) {
         this.formattedOutput = formattedOutput;
     }
-    
-    protected Feed createFeedFromCollectionWrapper(Factory factory, Object o, Class<?> pojoClass) 
+
+    protected Feed createFeedFromCollectionWrapper(Factory factory, Object o, Class<?> pojoClass)
         throws Exception {
-        
+
         Feed feed = factory.newFeed();
-        
+
         boolean writerUsed = buildFeed(feed, o, pojoClass);
-        
+
         if (feed.getEntries().size() > 0) {
             return feed;
         }
-        
+
         String methodName = getCollectionMethod(o.getClass(), true);
         Object collection = null;
         Method m = null;
@@ -227,14 +227,14 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         } catch (Exception ex) {
             reportError("Collection for " + o.getClass().getName() + " can not be retrieved", ex);
         }
-        
-        setFeedFromCollection(factory, feed, o, pojoClass, collection, m.getReturnType(), 
+
+        setFeedFromCollection(factory, feed, o, pojoClass, collection, m.getReturnType(),
                               m.getGenericReturnType(), writerUsed);
         return feed;
     }
-    
+
     private String getCollectionMethod(Class<?> cls, boolean getter) {
-        Map<String, String> map = getter ? collectionGetters : collectionSetters; 
+        Map<String, String> map = getter ? collectionGetters : collectionSetters;
         String methodName = getCollectionMethod(map, cls);
         if (methodName == null) {
             try {
@@ -249,7 +249,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         return methodName;
     }
-    
+
     private String getCollectionMethod(Map<String, String> map, Class<?> pojoClass) {
         if (pojoClass == Object.class) {
             return null;
@@ -257,11 +257,10 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         String method = map.get(pojoClass.getName());
         if (method != null) {
             return method;
-        } else {
-            return getCollectionMethod(map, pojoClass.getSuperclass());
         }
+        return getCollectionMethod(map, pojoClass.getSuperclass());
     }
-    
+
     @SuppressWarnings("unchecked")
     protected <X> boolean buildFeed(Feed feed, X o, Class<?> pojoClass) {
         AtomElementWriter<?, ?> builder = getAtomWriter(pojoClass);
@@ -271,19 +270,19 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         return false;
     }
-    
+
     protected AtomElementWriter<?, ?> getAtomWriter(Class<?> pojoClass) {
         AtomElementWriter<?, ?> writer = getAtomClassElementHandler(atomClassWriters, pojoClass);
-        return writer == null && atomWriters != null 
-            ? getAtomElementHandler(atomWriters, pojoClass) : writer; 
+        return writer == null && atomWriters != null
+            ? getAtomElementHandler(atomWriters, pojoClass) : writer;
     }
-    
+
     protected AtomElementReader<?, ?> getAtomReader(Class<?> pojoClass) {
         AtomElementReader<?, ?> reader = getAtomClassElementHandler(atomClassReaders, pojoClass);
-        return reader == null && atomReaders != null 
-            ? getAtomElementHandler(atomReaders, pojoClass) : reader; 
+        return reader == null && atomReaders != null
+            ? getAtomElementHandler(atomReaders, pojoClass) : reader;
     }
-    
+
     private <T> T getAtomClassElementHandler(Map<Class<?>, T> handlers, Class<?> pojoClass) {
         for (Map.Entry<Class<?>, T> entry : handlers.entrySet()) {
             if (entry.getKey().isAssignableFrom(pojoClass)) {
@@ -292,7 +291,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         return null;
     }
-    
+
     protected <T> T getAtomElementHandler(Map<String, T> handlers, Class<?> pojoClass) {
         T handler = getAtomElementHandlerSuperClass(handlers, pojoClass);
         if (handler == null) {
@@ -306,7 +305,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         return handler;
     }
-    
+
     private <T> T getAtomElementHandlerSuperClass(Map<String, T> handlers, Class<?> pojoClass) {
         if (pojoClass == null || pojoClass == Object.class) {
             return null;
@@ -314,24 +313,23 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         T handler = handlers.get(pojoClass.getName());
         if (handler != null) {
             return handler;
-        } else {
-            return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
         }
+        return getAtomElementHandlerSuperClass(handlers, pojoClass.getSuperclass());
     }
-    
+
     //CHECKSTYLE:OFF
-    protected void setFeedFromCollection(Factory factory, 
-                                         Feed feed, 
+    protected void setFeedFromCollection(Factory factory,
+                                         Feed feed,
                                          Object wrapper,
                                          Class<?> wrapperCls,
                                          Object collection,
-                                         Class<?> collectionCls, 
-                                         Type collectionType, 
+                                         Class<?> collectionCls,
+                                         Type collectionType,
                                          boolean writerUsed) throws Exception {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         Object[] arr = collectionCls.isArray() ? (Object[])collection : ((Collection<?>)collection).toArray();
         Class<?> memberClass = InjectionUtils.getActualType(collectionType);
-        
+
         for (Object o : arr) {
             Entry entry = createEntryFromObject(factory, o, memberClass);
             feed.addEntry(entry);
@@ -340,34 +338,34 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             setFeedProperties(factory, feed, wrapper, wrapperCls, collection, collectionCls, collectionType);
         }
     }
-    
+
     protected AbstractAtomElementBuilder<?> getAtomBuilder(Class<?> pojoClass) {
         AbstractAtomElementBuilder<?> builder = getAtomClassElementHandler(atomClassBuilders, pojoClass);
-        return builder == null && atomBuilders != null 
+        return builder == null && atomBuilders != null
             ? getAtomElementHandler(atomBuilders, pojoClass) : builder;
     }
-    
+
     @SuppressWarnings("unchecked")
-    protected void setFeedProperties(Factory factory, 
-                                     Feed feed, 
-                                     Object wrapper, 
+    protected void setFeedProperties(Factory factory,
+                                     Feed feed,
+                                     Object wrapper,
                                      Class<?> wrapperCls,
-                                     Object collection, 
-                                     Class<?> collectionCls, 
+                                     Object collection,
+                                     Class<?> collectionCls,
                                      Type collectionType) {
-        
-        AbstractAtomElementBuilder<Object> builder = 
+
+        AbstractAtomElementBuilder<Object> builder =
             (AbstractAtomElementBuilder<Object>)getAtomBuilder(wrapperCls);
         if (builder == null) {
             return;
         }
         setCommonElementProperties(factory, feed, builder, wrapper);
-        
+
         AbstractFeedBuilder<Object> theBuilder = (AbstractFeedBuilder<Object>)builder;
-        
+
         // the hierarchy is a bit broken in that we can not set author/title.etc on some
         // common Feed/Entry super type
-        
+
         String author = theBuilder.getAuthor(wrapper);
         if (author != null) {
             feed.addAuthor(author);
@@ -381,7 +379,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             feed.setTitle(String.format(wrapper.getClass().getSimpleName()
                           + " collection with %d entry(ies)", feed.getEntries().size()));
         }
-        
+
         String id = theBuilder.getId(wrapper);
         if (id != null) {
             feed.setId(id);
@@ -394,8 +392,8 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         } else {
             feed.setUpdated(new Date());
         }
-        
-        
+
+
         Map<String, String> links = theBuilder.getLinks(wrapper);
         if (links != null) {
             for (Map.Entry<String, String> entry : links.entrySet()) {
@@ -408,10 +406,10 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
                 feed.addCategory(term);
             }
         }
-        
-        
+
+
         // feed specific
-        
+
         String logo = theBuilder.getLogo(wrapper);
         if (logo != null) {
             feed.setLogo(logo);
@@ -420,26 +418,26 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         if (icon != null) {
             feed.setIcon(icon);
         }
-        
+
     }
-    
-    
-    
+
+
+
     protected Entry createEntryFromObject(Factory factory, Object o, Class<?> cls) throws Exception {
         Entry entry = factory.getAbdera().newEntry();
-        
+
         if (!buildEntry(entry, o, cls)) {
             setEntryProperties(factory, entry, o, cls);
         }
-        
-        if (entry.getContentElement() == null 
-            && entry.getExtensions().size() == 0) {
-            createEntryContent(factory, entry, o, cls);    
+
+        if (entry.getContentElement() == null
+            && entry.getExtensions().isEmpty()) {
+            createEntryContent(factory, entry, o, cls);
         }
         return entry;
-    
+
     }
-    
+
     @SuppressWarnings("unchecked")
     protected boolean buildEntry(Entry entry, Object o, Class<?> pojoClass) {
         AtomElementWriter<?, ?> builder = getAtomWriter(pojoClass);
@@ -449,11 +447,11 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         return false;
     }
-    
+
     protected void createEntryContent(Factory factory, Entry e, Object o, Class<?> cls) throws Exception {
-    
+
         String content = null;
-        
+
         if (useJaxbForContent) {
             JAXBContext jc = jaxbProvider.getJAXBContext(cls, cls);
             StringWriter writer = new StringWriter();
@@ -463,28 +461,28 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
             Method m = cls.getMethod(entryContentMethodName, new Class[]{});
             content = (String)m.invoke(o, new Object[]{});
         }
-        
+
         setEntryContent(factory, e, content);
-        
+
     }
-    
+
     protected void setEntryContent(Factory factory, Entry e, String content) {
         Content ct = factory.newContent(Content.Type.XML);
         ct.setValue(content);
         e.setContentElement(ct);
     }
-    
-    protected void setEntryProperties(Factory factory, Entry entry, 
+
+    protected void setEntryProperties(Factory factory, Entry entry,
                                           Object o, Class<?> cls) {
         @SuppressWarnings("unchecked")
-        AbstractAtomElementBuilder<Object> builder 
+        AbstractAtomElementBuilder<Object> builder
             = (AbstractAtomElementBuilder<Object>)getAtomBuilder(cls);
         if (builder == null) {
             return;
         }
-        
+
         setCommonElementProperties(factory, entry, builder, o);
-        
+
         AbstractEntryBuilder<Object> theBuilder = (AbstractEntryBuilder<Object>)builder;
         String author = theBuilder.getAuthor(o);
         if (author != null) {
@@ -498,7 +496,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         } else {
             entry.setTitle(o.getClass().getSimpleName());
         }
-        
+
         String id = theBuilder.getId(o);
         if (id != null) {
             entry.setId(id);
@@ -511,48 +509,48 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         } else {
             entry.setUpdated(new Date());
         }
-        
+
         Map<String, String> links = theBuilder.getLinks(o);
         if (links != null) {
             for (Map.Entry<String, String> e : links.entrySet()) {
                 entry.addLink(e.getKey(), e.getValue());
             }
         }
-        
+
         // entry specific
-        
+
         String published = theBuilder.getPublished(o);
         if (published != null) {
-            entry.setPublished(published);    
+            entry.setPublished(published);
         }
-        
+
         String summary = theBuilder.getSummary(o);
         if (summary != null) {
-            entry.setSummary(summary);    
+            entry.setSummary(summary);
         }
-        
+
         List<String> terms = theBuilder.getCategories(o);
         if (terms != null) {
             for (String term : terms) {
                 entry.addCategory(term);
             }
         }
-        
+
         String content = theBuilder.getContent(o);
         if (content != null) {
-            setEntryContent(factory, entry, content);    
+            setEntryContent(factory, entry, content);
         }
-        
+
     }
 
-    private void setCommonElementProperties(Factory factory, ExtensibleElement element, 
+    private void setCommonElementProperties(Factory factory, ExtensibleElement element,
                                             AbstractAtomElementBuilder<Object> builder,
                                             Object o) {
         String baseUri = builder.getBaseUri(o);
         if (baseUri != null) {
             element.setBaseUri(baseUri);
         }
-        
+
     }
     private void reportError(String message, Exception ex, int status) {
         LOG.warning(message);
@@ -562,7 +560,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     private void reportError(String message, Exception ex) {
         reportError(message, ex, 500);
     }
-    
+
     protected boolean isFeedRequested(MediaType mt) {
         return !"entry".equalsIgnoreCase(mt.getParameters().get("type"));
     }
@@ -570,7 +568,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     public void setAtomWriters(Map<String, AtomElementWriter<?, ?>> writers) {
         this.atomWriters = writers;
     }
-    
+
     public void setAtomReaders(Map<String, AtomElementReader<?, ?>> readers) {
         this.atomReaders = readers;
     }
@@ -578,11 +576,11 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     public void setAtomBuilders(Map<String, AbstractAtomElementBuilder<?>> builders) {
         this.atomBuilders = builders;
     }
-    
+
     public void setAtomClassWriters(Map<Class<?>, AtomElementWriter<?, ?>> writers) {
         this.atomClassWriters = writers;
     }
-    
+
     public void setAtomClassReaders(Map<Class<?>, AtomElementReader<?, ?>> readers) {
         this.atomClassReaders = readers;
     }
@@ -591,39 +589,38 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         this.atomClassBuilders = builders;
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                               MediaType mediaType) {
         return true;
     }
 
-    public Object readFrom(Class<Object> cls, Type type, Annotation[] anns, MediaType mt, 
-                      MultivaluedMap<String, String> headers, InputStream is) 
+    public Object readFrom(Class<Object> cls, Type type, Annotation[] anns, MediaType mt,
+                      MultivaluedMap<String, String> headers, InputStream is)
         throws IOException, WebApplicationException {
         boolean isFeed = isFeedRequested(mt);
-        
+
         if (isFeed) {
             return readFromFeedOrEntry(cls, mt, headers, is);
-        } else {
-            AtomEntryProvider p = new AtomEntryProvider();
-            p.setAutodetectCharset(autodetectCharset);
-            Entry entry = p.readFrom(Entry.class, Entry.class, 
-                                     new Annotation[]{}, mt, headers, is);
-            return readFromEntry(entry, cls);
         }
+        AtomEntryProvider p = new AtomEntryProvider();
+        p.setAutodetectCharset(autodetectCharset);
+        Entry entry = p.readFrom(Entry.class, Entry.class,
+                                 new Annotation[]{}, mt, headers, is);
+        return readFromEntry(entry, cls);
     }
-    
+
     @SuppressWarnings("unchecked")
-    private Object readFromFeedOrEntry(Class<Object> cls, MediaType mt, 
-                           MultivaluedMap<String, String> headers, InputStream is) 
+    private Object readFromFeedOrEntry(Class<Object> cls, MediaType mt,
+                           MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        
+
         AtomFeedProvider p = new AtomFeedProvider();
         p.setAutodetectCharset(autodetectCharset);
         Object atomObject = p.readFrom(Feed.class, Feed.class, new Annotation[]{}, mt, headers, is);
         if (atomObject instanceof Entry) {
             return this.readFromEntry((Entry)atomObject, cls);
         }
-            
+
         Feed feed = (Feed)atomObject;
         AtomElementReader<?, ?> reader = getAtomReader(cls);
         if (reader != null) {
@@ -633,25 +630,25 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         try {
             String methodName = getCollectionMethod(cls, false);
             Method m = cls.getMethod(methodName, new Class[]{List.class});
-            Class<Object> realCls 
+            Class<Object> realCls
                 = (Class<Object>)InjectionUtils.getActualType(m.getGenericParameterTypes()[0]);
-            List<Object> objects = new ArrayList<Object>();
+            List<Object> objects = new ArrayList<>();
             for (Entry e : feed.getEntries()) {
                 objects.add(readFromEntry(e, realCls));
             }
             instance = cls.newInstance();
             m.invoke(instance, new Object[]{objects});
-            
+
         } catch (Exception ex) {
             reportError("Object of type " + cls.getName() + " can not be deserialized from Feed", ex, 400);
         }
         return instance;
     }
-    
+
     @SuppressWarnings("unchecked")
-    private Object readFromEntry(Entry entry, Class<Object> cls) 
+    private Object readFromEntry(Entry entry, Class<Object> cls)
         throws IOException {
-        
+
         AtomElementReader<?, ?> reader = getAtomReader(cls);
         if (reader != null) {
             return ((AtomElementReader<Entry, Object>)reader).readFrom(entry);
@@ -660,7 +657,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         if (entryContent != null) {
             XMLStreamReader xreader = StaxUtils.createXMLStreamReader(new StringReader(entryContent));
             try {
-                Unmarshaller um = 
+                Unmarshaller um =
                     jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
                 return cls.cast(um.unmarshal(xreader));
             } catch (Exception ex) {
@@ -680,5 +677,5 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         this.autodetectCharset = autodetectCharset;
     }
 
-    
+
 }

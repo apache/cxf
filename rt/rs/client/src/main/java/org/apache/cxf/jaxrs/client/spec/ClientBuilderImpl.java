@@ -20,6 +20,9 @@ package org.apache.cxf.jaxrs.client.spec;
 
 import java.security.KeyStore;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -29,18 +32,22 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
+
+import org.apache.cxf.jaxrs.client.AbstractClient;
+
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_CONNECTION_TIMEOUT_PROP;
+import static org.apache.cxf.jaxrs.client.ClientProperties.HTTP_RECEIVE_TIMEOUT_PROP;
 
 public class ClientBuilderImpl extends ClientBuilder {
 
-    private Configurable<ClientBuilder> configImpl;
+    private ClientConfigurableImpl<ClientBuilder> configImpl;
     private TLSConfiguration secConfig = new TLSConfiguration();
-    
+
     public ClientBuilderImpl() {
-        configImpl = new ClientConfigurableImpl<ClientBuilder>(this);
+        configImpl = new ClientConfigurableImpl<>(this);
     }
-    
+
     @Override
     public Configuration getConfiguration() {
         return configImpl.getConfiguration();
@@ -93,7 +100,13 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public Client build() {
-        return new ClientImpl(configImpl.getConfiguration(), secConfig);
+        return new ClientImpl(configImpl.getConfiguration(), secConfig) {
+            @Override
+            public void close() {
+                super.close();
+                configImpl.close();
+            }
+        };
     }
 
     @Override
@@ -114,7 +127,7 @@ public class ClientBuilderImpl extends ClientBuilder {
     public ClientBuilder keyStore(KeyStore store, char[] password) {
         secConfig.setSslContext(null);
         try {
-            KeyManagerFactory tmf = 
+            KeyManagerFactory tmf =
                 KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             tmf.init(store, password);
             secConfig.getTlsClientParams().setKeyManagers(tmf.getKeyManagers());
@@ -123,19 +136,19 @@ public class ClientBuilderImpl extends ClientBuilder {
         }
         return this;
     }
-    
+
     @Override
     public ClientBuilder trustStore(KeyStore store) {
         secConfig.setSslContext(null);
         try {
-            TrustManagerFactory tmf = 
+            TrustManagerFactory tmf =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(store);
             secConfig.getTlsClientParams().setTrustManagers(tmf.getTrustManagers());
         } catch (Exception ex) {
             throw new ProcessingException(ex);
         }
-        
+
         return this;
     }
 
@@ -144,8 +157,36 @@ public class ClientBuilderImpl extends ClientBuilder {
         if (cfg.getRuntimeType() != RuntimeType.CLIENT) {
             throw new IllegalArgumentException();
         }
-        configImpl = new ClientConfigurableImpl<ClientBuilder>(this, cfg);
+        configImpl = new ClientConfigurableImpl<>(this, cfg);
         return this;
     }
 
+    @Override
+    public ClientBuilder executorService(ExecutorService executorService) {
+        return configImpl.property(AbstractClient.EXECUTOR_SERVICE_PROPERTY, executorService);
+    }
+
+    @Override
+    public ClientBuilder scheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
+        return configImpl.property("scheduledExecutorService", scheduledExecutorService);
+    }
+
+    @Override
+    public ClientBuilder connectTimeout(long timeout, TimeUnit timeUnit) {
+        validateTimeout(timeout);
+        return property(HTTP_CONNECTION_TIMEOUT_PROP, timeUnit.toMillis(timeout));
+    }
+
+    @Override
+    public ClientBuilder readTimeout(long timeout, TimeUnit timeUnit) {
+        validateTimeout(timeout);
+        return property(HTTP_RECEIVE_TIMEOUT_PROP, timeUnit.toMillis(timeout));
+    }
+
+    private void validateTimeout(long timeout) {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("Negative timeout is not allowed.");
+        }
+    }
 }
+

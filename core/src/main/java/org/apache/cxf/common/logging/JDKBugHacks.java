@@ -40,19 +40,19 @@ import org.apache.cxf.common.util.StringUtils;
  * This is called from LogUtils as LogUtils is almost always one of the VERY
  * first classes loaded in CXF so we can try and register to hacks/workarounds
  * for various bugs in the JDK.
- * 
+ *
  * Much of this is taken from work the Tomcat folks have done to find
  * places where memory leaks and jars are locked and such.
  * See:
  * http://svn.apache.org/viewvc/tomcat/trunk/java/org/apache/catalina/
  * core/JreMemoryLeakPreventionListener.java
- * 
+ *
  */
 final class JDKBugHacks {
     private JDKBugHacks() {
         //not constructed
     }
-    
+
     private static boolean skipHack(final String key) {
         return skipHack(key, "false");
     }
@@ -87,11 +87,11 @@ final class JDKBugHacks {
         }
         return Boolean.parseBoolean(cname);
     }
-    
+
     public static void doHacks() {
         if (skipHack("org.apache.cxf.JDKBugHacks.all")) {
             return;
-        }                
+        }
         try {
             // Use the system classloader as the victim for all this
             // ClassLoader pinning we're about to do.
@@ -128,16 +128,15 @@ final class JDKBugHacks {
                         Long l = (Long)method.invoke(null);
                         if (l != null && l.longValue() == 0) {
                             //something already set it, move on
-                            method = clazz.getDeclaredMethod("requestLatency",
-                                new Class[] {Long.TYPE});
+                            method = clazz.getDeclaredMethod("requestLatency", Long.TYPE);
                             method.invoke(null, Long.valueOf(36000000));
                         }
-                    }                    
+                    }
                 } catch (Throwable e) {
                     //ignore
                 }
-                
-                // Calling getPolicy retains a static reference to the context 
+
+                // Calling getPolicy retains a static reference to the context
                 // class loader.
                 try {
                     // Policy.getPolicy();
@@ -151,10 +150,10 @@ final class JDKBugHacks {
                     // ignore
                 }
                 try {
-                    // Initializing javax.security.auth.login.Configuration retains a static reference 
+                    // Initializing javax.security.auth.login.Configuration retains a static reference
                     // to the context class loader.
                     if (!skipHack("org.apache.cxf.JDKBugHacks.authConfiguration")) {
-                        Class.forName("javax.security.auth.login.Configuration", true, 
+                        Class.forName("javax.security.auth.login.Configuration", true,
                                       ClassLoader.getSystemClassLoader());
                     }
                 } catch (Throwable e) {
@@ -167,7 +166,7 @@ final class JDKBugHacks {
                 if (!skipHack("org.apache.cxf.JDKBugHacks.securityProviders")) {
                     java.security.Security.getProviders();
                 }
-                
+
                 try {
                     // Several components end up opening JarURLConnections without first
                     // disabling caching. This effectively locks the file.
@@ -186,7 +185,7 @@ final class JDKBugHacks {
                     }
                 } catch (Throwable e) {
                     //ignore
-                }                
+                }
             } finally {
                 if (orig != null) {
                     orig.reset();

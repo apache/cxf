@@ -21,6 +21,7 @@ package org.apache.cxf.sts;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.dom.WSConstants;
 
 /**
@@ -37,18 +38,19 @@ public class SignatureProperties {
     private long minimumKeySize = 128;
     private long maximumKeySize = 512;
     private String digestAlgorithm = WSConstants.SHA256;
-    
+
     public SignatureProperties() {
         // Default signature algorithms
-        acceptedSignatureAlgorithms.add(WSConstants.RSA_SHA1);
+        acceptedSignatureAlgorithms.add(WSS4JConstants.RSA_SHA1);
         acceptedSignatureAlgorithms.add(signatureAlgorithm);
-        
+        acceptedSignatureAlgorithms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+
         // Default c14n algorithms
         acceptedC14nAlgorithms.add(c14nAlgorithm);
     }
-    
+
     /**
-     * Get whether a KeyValue is used to refer to a a certificate used to sign an issued token. 
+     * Get whether a KeyValue is used to refer to a a certificate used to sign an issued token.
      * The default is false.
      */
     public boolean isUseKeyValue() {
@@ -56,7 +58,7 @@ public class SignatureProperties {
     }
 
     /**
-     * Set whether a KeyValue is used to refer to a a certificate used to sign an issued token. 
+     * Set whether a KeyValue is used to refer to a a certificate used to sign an issued token.
      * The default is false.
      */
     public void setUseKeyValue(boolean useKeyValue) {
@@ -77,9 +79,9 @@ public class SignatureProperties {
     public void setKeySize(long keySize) {
         this.keySize = keySize;
     }
-    
+
     /**
-     * Get the minimum key size to use when generating a symmetric key. The requestor can 
+     * Get the minimum key size to use when generating a symmetric key. The requestor can
      * specify a KeySize value to use. The default is 128 bits.
      */
     public long getMinimumKeySize() {
@@ -158,7 +160,7 @@ public class SignatureProperties {
         this.acceptedSignatureAlgorithms = acceptedSignatureAlgorithms;
     }
 
-    
+
     /**
      * Get the list of accepted c14n algorithms. A request can contain a wst:CanonicalizationAlgorithm
      * uri to use for c14n in an issued token. The algorithm specified must be contained in this list.
@@ -192,5 +194,5 @@ public class SignatureProperties {
     public void setDigestAlgorithm(String digestAlgorithm) {
         this.digestAlgorithm = digestAlgorithm;
     }
-    
+
 }

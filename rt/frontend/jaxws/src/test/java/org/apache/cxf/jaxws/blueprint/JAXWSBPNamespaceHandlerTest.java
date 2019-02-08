@@ -19,17 +19,18 @@
 
 package org.apache.cxf.jaxws.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
- * 
+ *
  */
-public class JAXWSBPNamespaceHandlerTest extends Assert {
+public class JAXWSBPNamespaceHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         JAXWSBPNamespaceHandler handler = new JAXWSBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/jaxws"));
     }
 

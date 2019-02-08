@@ -34,13 +34,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class W3CDOMStreamReaderTest extends Assert {
-    
-    private static final String RESULT = 
+
+public class W3CDOMStreamReaderTest {
+
+    private static final String RESULT =
         "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<SOAP-ENV:Header/><SOAP-ENV:Body/>"
         + "<Test xmlns=\"http://example.org/types\">"
@@ -69,7 +71,7 @@ public class W3CDOMStreamReaderTest extends Assert {
         assertTrue(StaxUtils.toString(writer.getDocument()).endsWith(RESULT));
 
     }
-    
+
     @Test
     public void testTopLevelText() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(

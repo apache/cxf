@@ -24,10 +24,10 @@ import javax.jws.WebService;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 
-@WebService(name = "AddNumbers", 
-            targetNamespace = "http://apache.org/handlers", 
-            portName = "AddNumbersPort", 
-            endpointInterface = "org.apache.handlers.AddNumbers", 
+@WebService(name = "AddNumbers",
+            targetNamespace = "http://apache.org/handlers",
+            portName = "AddNumbersPort",
+            endpointInterface = "org.apache.handlers.AddNumbers",
             serviceName = "AddNumbersService")
 public class AddNumbersNoHandlers implements AddNumbers {
 

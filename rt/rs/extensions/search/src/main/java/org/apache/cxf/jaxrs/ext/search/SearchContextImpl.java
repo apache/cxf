@@ -53,48 +53,48 @@ public class SearchContextImpl implements SearchContext {
     private static final String KEEP_QUERY_ENCODED = "search.keep.query.encoded";
     private static final Logger LOG = LogUtils.getL7dLogger(SearchContextImpl.class);
     private Message message;
-    
+
     public SearchContextImpl(Message message) {
         this.message = message;
     }
-    
+
     public <T> SearchCondition<T> getCondition(Class<T> cls) {
         return getCondition(null, cls);
     }
-    
+
     public <T> SearchCondition<T> getCondition(Class<T> cls, Map<String, String> beanProperties) {
         return getCondition(null, cls, beanProperties);
     }
-    
-    public <T> SearchCondition<T> getCondition(Class<T> cls, 
+
+    public <T> SearchCondition<T> getCondition(Class<T> cls,
                                                Map<String, String> beanProperties,
                                                Map<String, String> parserProperties) {
         return getCondition(null, cls, beanProperties, parserProperties);
     }
-    
+
     public <T> SearchCondition<T> getCondition(String expression, Class<T> cls) {
         return getCondition(expression, cls, null);
     }
-    
-    public <T> SearchCondition<T> getCondition(String expression, 
-                                               Class<T> cls, 
+
+    public <T> SearchCondition<T> getCondition(String expression,
+                                               Class<T> cls,
                                                Map<String, String> beanProperties) {
         return getCondition(expression, cls, beanProperties, null);
     }
-    
-    public <T> SearchCondition<T> getCondition(String expression, 
-                                               Class<T> cls, 
+
+    public <T> SearchCondition<T> getCondition(String expression,
+                                               Class<T> cls,
                                                Map<String, String> beanProperties,
-                                               Map<String, String> parserProperties) {    
+                                               Map<String, String> parserProperties) {
         if (InjectionUtils.isPrimitive(cls)) {
-            String errorMessage = "Primitive condition types are not supported"; 
+            String errorMessage = "Primitive condition types are not supported";
             LOG.warning(errorMessage);
             throw new IllegalArgumentException(errorMessage);
         }
-        
+
         SearchConditionParser<T> parser = getParser(cls, beanProperties, parserProperties);
-        
-        String theExpression = expression == null 
+
+        String theExpression = expression == null
             ? getSearchExpression() : expression;
         if (theExpression != null) {
             try {
@@ -102,26 +102,24 @@ public class SearchContextImpl implements SearchContext {
             } catch (SearchParseException ex) {
                 if (PropertyUtils.isTrue(message.getContextualProperty(BLOCK_SEARCH_EXCEPTION))) {
                     return null;
-                } else {
-                    throw ex;
                 }
+                throw ex;
             }
-        } else {
-            return null;
         }
-        
+        return null;
+
     }
 
     public String getSearchExpression() {
-        
+
         String queryStr = (String)message.get(Message.QUERY_STRING);
-        if (queryStr != null) { 
-            if (MessageUtils.isTrue(message.getContextualProperty(USE_ALL_QUERY_COMPONENT))) {
+        if (queryStr != null) {
+            if (MessageUtils.getContextualBoolean(message, USE_ALL_QUERY_COMPONENT)) {
                 return queryStr;
             }
             boolean encoded = PropertyUtils.isTrue(getKeepEncodedProperty());
-            
-            MultivaluedMap<String, String> params = 
+
+            MultivaluedMap<String, String> params =
                 JAXRSUtils.getStructuredParams(queryStr, "&", !encoded, false);
             String customQueryParamName = (String)message.getContextualProperty(CUSTOM_SEARCH_QUERY_PARAM_NAME);
             if (customQueryParamName != null) {
@@ -130,36 +128,35 @@ public class SearchContextImpl implements SearchContext {
             if (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY)) {
                 if (params.containsKey(SHORT_SEARCH_QUERY)) {
                     return params.getFirst(SHORT_SEARCH_QUERY);
-                } else {
-                    return params.getFirst(SEARCH_QUERY);
                 }
-            } else if (MessageUtils.isTrue(message.getContextualProperty(USE_PLAIN_QUERY_PARAMETERS))) {
-                return convertPlainQueriesToFiqlExp(params);     
+                return params.getFirst(SEARCH_QUERY);
+            } else if (MessageUtils.getContextualBoolean(message, USE_PLAIN_QUERY_PARAMETERS)) {
+                return convertPlainQueriesToFiqlExp(params);
             }
         }
         return null;
-        
+
     }
-    
+
     private String convertPlainQueriesToFiqlExp(MultivaluedMap<String, String> params) {
         SearchConditionBuilder builder = SearchConditionBuilder.instance();
-        List<CompleteCondition> list = new ArrayList<CompleteCondition>(params.size());
-        
+        List<CompleteCondition> list = new ArrayList<>(params.size());
+
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             list.add(getOrCondition(builder, entry));
         }
         return builder.and(list).query();
     }
-    
+
     private String getKeepEncodedProperty() {
         return (String)message.getContextualProperty(KEEP_QUERY_ENCODED);
     }
-    
+
     private CompleteCondition getOrCondition(SearchConditionBuilder builder,
                                              Map.Entry<String, List<String>> entry) {
         String key = entry.getKey();
         ConditionType ct = null;
-        if (key.endsWith("From")) { 
+        if (key.endsWith("From")) {
             ct = ConditionType.GREATER_OR_EQUALS;
             key = key.substring(0, key.length() - 4);
         } else if (key.endsWith("Till")) {
@@ -168,67 +165,67 @@ public class SearchContextImpl implements SearchContext {
         } else {
             ct = ConditionType.EQUALS;
         }
-        
-        List<CompleteCondition> list = new ArrayList<CompleteCondition>(entry.getValue().size());
+
+        List<CompleteCondition> list = new ArrayList<>(entry.getValue().size());
         for (String value : entry.getValue()) {
             list.add(builder.is(key).comparesTo(ct, value));
         }
         return builder.or(list);
     }
-    
-    
-    
-    private <T> SearchConditionParser<T> getParser(Class<T> cls, 
+
+
+
+    private <T> SearchConditionParser<T> getParser(Class<T> cls,
                                                    Map<String, String> beanProperties,
                                                    Map<String, String> parserProperties) {
-        
+
         Object parserProp = message.getContextualProperty(CUSTOM_SEARCH_PARSER_PROPERTY);
         if (parserProp != null) {
             return getCustomParser(parserProp);
         }
-        
+
         Map<String, String> props = null;
         if (parserProperties == null) {
-            props = new LinkedHashMap<String, String>(4);
-            props.put(SearchUtils.DATE_FORMAT_PROPERTY, 
+            props = new LinkedHashMap<>(4);
+            props.put(SearchUtils.DATE_FORMAT_PROPERTY,
                       (String)message.getContextualProperty(SearchUtils.DATE_FORMAT_PROPERTY));
-            props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, 
+            props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY,
                       (String)message.getContextualProperty(SearchUtils.TIMEZONE_SUPPORT_PROPERTY));
-            props.put(SearchUtils.LAX_PROPERTY_MATCH, 
+            props.put(SearchUtils.LAX_PROPERTY_MATCH,
                       (String)message.getContextualProperty(SearchUtils.LAX_PROPERTY_MATCH));
-            props.put(SearchUtils.DECODE_QUERY_VALUES, 
+            props.put(SearchUtils.DECODE_QUERY_VALUES,
                       (String)message.getContextualProperty(SearchUtils.DECODE_QUERY_VALUES));
             // FIQL specific
-            props.put(FiqlParser.SUPPORT_SINGLE_EQUALS, 
-                      (String)message.getContextualProperty(FiqlParser.SUPPORT_SINGLE_EQUALS)); 
+            props.put(FiqlParser.SUPPORT_SINGLE_EQUALS,
+                      (String)message.getContextualProperty(FiqlParser.SUPPORT_SINGLE_EQUALS));
         } else {
             props = parserProperties;
         }
-        
+
         Map<String, String> beanProps = null;
-            
-        if (beanProperties == null) {    
+
+        if (beanProperties == null) {
             beanProps = CastUtils.cast((Map<?, ?>)message.getContextualProperty(SearchUtils.BEAN_PROPERTY_MAP));
         } else {
             beanProps = beanProperties;
         }
-        
+
         String parserClassProp = (String) message.getContextualProperty(CUSTOM_SEARCH_PARSER_CLASS_PROPERTY);
         if (parserClassProp != null) {
             try {
                 final Class<?> parserClass = ClassLoaderUtils.loadClass(parserClassProp, SearchContextImpl.class);
                 final Constructor<?> constructor = parserClass.getConstructor(Class.class, Map.class, Map.class);
                 @SuppressWarnings("unchecked")
-                SearchConditionParser<T> customParser = 
+                SearchConditionParser<T> customParser =
                     (SearchConditionParser<T>)constructor.newInstance(cls, props, beanProps);
                 return customParser;
             } catch (Exception ex) {
                 throw new SearchParseException(ex);
             }
         }
-        return new FiqlParser<T>(cls, props, beanProps); 
+        return new FiqlParser<T>(cls, props, beanProps);
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> SearchConditionParser<T> getCustomParser(Object parserProp) {
         return (SearchConditionParser<T>)parserProp;

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.security.trust;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,11 +32,6 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
-import org.apache.wss4j.common.ext.WSSecurityException;
-import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 
@@ -48,78 +42,33 @@ public final class STSTokenRetriever {
     private static final Logger LOG = LogUtils.getL7dLogger(STSTokenRetriever.class);
     private static final String ASSOCIATED_TOKEN =
         STSTokenRetriever.class.getName() + "-" + "Associated_Token";
-    
+
     private STSTokenRetriever() {
     }
 
     public static SecurityToken getToken(Message message, TokenRequestParams params) {
-        SecurityToken tok = retrieveCachedToken(message);
-        if (tok == null) {
-            tok = issueToken(message, params);
-        } else {
-            tok = renewToken(message, tok, params);
-        }
-
-        boolean cacheIssuedToken =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
-                                              message,
-                                              true)
-                && !isOneTimeUse(tok);
-        if (cacheIssuedToken) {
-            message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, tok);
-            message.getExchange().put(SecurityConstants.TOKEN, tok);
-            message.put(SecurityConstants.TOKEN_ELEMENT, tok.getToken());
-            message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-            message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID,
-                                                          tok.getId());
-        } else {
-            message.put(SecurityConstants.TOKEN, tok);
-            message.put(SecurityConstants.TOKEN_ID, tok.getId());
-            message.put(SecurityConstants.TOKEN_ELEMENT, tok.getToken());
-        }
-        // ?
-        TokenStoreUtils.getTokenStore(message).add(tok);
-
-        return tok;
+        return getToken(message, params, new DefaultSTSTokenCacher());
     }
 
-    private static SecurityToken retrieveCachedToken(Message message) {
-        boolean cacheIssuedToken =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
-                                              message,
-                                              true);
-        SecurityToken tok = null;
-        if (cacheIssuedToken) {
-            tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
-            if (tok == null) {
-                String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
-                if (tokId != null) {
-                    tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
-                }
+    public static SecurityToken getToken(Message message, TokenRequestParams params, STSTokenCacher tokenCacher) {
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
+        String appliesTo = o == null ? null : o.toString();
+        if (appliesTo == null) {
+            String endpointAddress =
+                message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+            // Strip out any query parameters if they exist
+            int query = endpointAddress.indexOf('?');
+            if (query > 0) {
+                endpointAddress = endpointAddress.substring(0, query);
             }
-        } else {
-            tok = (SecurityToken)message.get(SecurityConstants.TOKEN);
-            if (tok == null) {
-                String tokId = (String)message.get(SecurityConstants.TOKEN_ID);
-                if (tokId != null) {
-                    tok = TokenStoreUtils.getTokenStore(message).getToken(tokId);
-                }
-            }
+            appliesTo = endpointAddress;
         }
-        return tok;
-    }
-
-    private static SecurityToken issueToken(Message message, TokenRequestParams params) {
-        AddressingProperties maps =
-            (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
-        if (maps == null) {
-            maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
-        }
+        
         STSClient client = STSUtils.getClientWithIssuer(message, "sts", params.getIssuer());
         synchronized (client) {
             try {
+                client.setMessage(message);
+                
                 // Transpose ActAs/OnBehalfOf info from original request to the STS client.
                 Object token =
                     SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_ACT_AS, message);
@@ -131,41 +80,41 @@ public final class STSTokenRetriever {
                 if (token != null) {
                     client.setOnBehalfOf(token);
                 }
-                Map<String, Object> ctx = client.getRequestContext();
-                mapSecurityProps(message, ctx);
 
-                Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
-                String appliesTo = o == null ? null : o.toString();
-                if (appliesTo == null) {
-                    String endpointAddress = 
-                        message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
-                    // Strip out any query parameters if they exist
-                    int query = endpointAddress.indexOf('?');
-                    if (query > 0) {
-                        endpointAddress = endpointAddress.substring(0, query);
-                    }
-                    appliesTo = endpointAddress;
-                }
                 boolean enableAppliesTo = client.isEnableAppliesTo();
 
-                client.setMessage(message);
                 Element onBehalfOfToken = client.getOnBehalfOfToken();
                 Element actAsToken = client.getActAsToken();
 
-                SecurityToken secToken =
-                    handleDelegation(
-                                     message, onBehalfOfToken, actAsToken, appliesTo,
-                                     enableAppliesTo
-                    );
-                if (secToken != null) {
-                    // Check to see whether the delegated token needs to be renewed
-                    secToken = renewToken(message, secToken, params);
-                } else {
-                    secToken = getTokenFromSTS(message, client, maps, appliesTo, params);
+                String key = appliesTo;
+                if (!enableAppliesTo || key == null || "".equals(key)) {
+                    key = ASSOCIATED_TOKEN;
                 }
-                storeDelegationTokens(
-                                      message, secToken, onBehalfOfToken, actAsToken, appliesTo,
-                                      enableAppliesTo);
+                
+                boolean cacheToken = isCachedTokenFromEndpoint(message, onBehalfOfToken, actAsToken);
+                // Try to retrieve a cached token from the message
+                SecurityToken secToken = tokenCacher.retrieveToken(message, cacheToken);
+
+                // Otherwise try to get a cached token corresponding to the delegation token
+                if (secToken == null && onBehalfOfToken != null) {
+                    secToken = tokenCacher.retrieveToken(message, onBehalfOfToken, key);
+                }
+                if (secToken == null && actAsToken != null) {
+                    secToken = tokenCacher.retrieveToken(message, actAsToken, key);
+                }
+
+                if (secToken != null) {
+                    // Check to see whether the token needs to be renewed
+                    secToken = renewToken(message, secToken, params, tokenCacher);
+                } else {
+                    secToken = getTokenFromSTS(message, client, appliesTo, params);
+                }
+
+                if (secToken != null) {
+                    tokenCacher.storeToken(message, onBehalfOfToken, secToken.getId(), key);
+                    tokenCacher.storeToken(message, actAsToken, secToken.getId(), key);
+                    tokenCacher.storeToken(message, secToken, cacheToken);
+                }
                 return secToken;
             } catch (RuntimeException e) {
                 throw e;
@@ -179,13 +128,24 @@ public final class STSTokenRetriever {
             }
         }
     }
+    
+    private static boolean isCachedTokenFromEndpoint(Message message, Element onBehalfOfToken, Element actAsToken) {
+        if (onBehalfOfToken != null || actAsToken != null) {
+            return false;
+        }
+        return
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
+                                              message,
+                                              true);
+    }
 
     private static SecurityToken renewToken(
                                      Message message,
                                      SecurityToken tok,
-                                     TokenRequestParams params) {
+                                     TokenRequestParams params,
+                                     STSTokenCacher tokenCacher) {
         String imminentExpiryValue =
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE, 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE,
                                                            message);
         long imminentExpiry = 10L;
         if (imminentExpiryValue != null) {
@@ -198,26 +158,15 @@ public final class STSTokenRetriever {
         }
 
         // Remove token from cache
-        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN);
-        message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
-        message.getExchange().remove(SecurityConstants.TOKEN_ID);
-        message.getExchange().remove(SecurityConstants.TOKEN);
-        TokenStoreUtils.getTokenStore(message).remove(tok.getId());
+        tokenCacher.removeToken(message, tok);
 
         // If the user has explicitly disabled Renewing then we can't renew a token,
         // so just get a new one
         STSClient client = STSUtils.getClientWithIssuer(message, "sts", params.getIssuer());
         if (!client.isAllowRenewing()) {
-            return issueToken(message, params);
+            return getToken(message, params, tokenCacher);
         }
 
-        AddressingProperties maps =
-            (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
-        if (maps == null) {
-            maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
-        }
         synchronized (client) {
             try {
                 Map<String, Object> ctx = client.getRequestContext();
@@ -225,8 +174,9 @@ public final class STSTokenRetriever {
 
                 client.setMessage(message);
 
-                if (maps != null) {
-                    client.setAddressingNamespace(maps.getNamespaceURI());
+                String addressingNamespace = getAddressingNamespaceURI(message);
+                if (addressingNamespace != null) {
+                    client.setAddressingNamespace(addressingNamespace);
                 }
 
                 client.setTrust(params.getTrust10());
@@ -241,10 +191,9 @@ public final class STSTokenRetriever {
                                               SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, message, true);
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
-                    return issueToken(message, params);
-                } else {
-                    throw ex;
+                    return getToken(message, params, tokenCacher);
                 }
+                throw ex;
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "Error renewing a token", ex);
                 boolean issueAfterFailedRenew =
@@ -252,10 +201,9 @@ public final class STSTokenRetriever {
                                               SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, message, true);
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
-                    return issueToken(message, params);
-                } else {
-                    throw new Fault(ex);
+                    return getToken(message, params, tokenCacher);
                 }
+                throw new Fault(ex);
             } finally {
                 client.setTrust((Trust10)null);
                 client.setTrust((Trust13)null);
@@ -264,26 +212,20 @@ public final class STSTokenRetriever {
             }
         }
     }
-
-    // Check to see if the received token is a SAML2 Token with "OneTimeUse" set. If so,
-    // it should not be cached on the endpoint, but only on the message.
-    private static boolean isOneTimeUse(SecurityToken issuedToken) {
-        Element token = issuedToken.getToken();
-        if (token != null && "Assertion".equals(token.getLocalName())
-            && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
-            try {
-                SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
-
-                if (assertion.getSaml2().getConditions() != null
-                    && assertion.getSaml2().getConditions().getOneTimeUse() != null) {
-                    return true;
-                }
-            } catch (WSSecurityException ex) {
-                throw new Fault(ex);
-            }
+    
+    private static String getAddressingNamespaceURI(Message message) {
+        AddressingProperties maps =
+            (AddressingProperties)message
+                .get("javax.xml.ws.addressing.context.outbound");
+        if (maps == null) {
+            maps = (AddressingProperties)message
+                .get("javax.xml.ws.addressing.context");
         }
-
-        return false;
+        if (maps != null) {
+            return maps.getNamespaceURI();
+        }
+        
+        return null;
     }
 
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
@@ -298,119 +240,8 @@ public final class STSTokenRetriever {
         }
     }
 
-    /**
-     * Parse ActAs/OnBehalfOf appropriately. See if the required token is stored in the cache.
-     */
-    private static SecurityToken handleDelegation(
-                                           Message message,
-                                           Element onBehalfOfToken,
-                                           Element actAsToken,
-                                           String appliesTo,
-                                           boolean enableAppliesTo) throws Exception {
-        TokenStore tokenStore = TokenStoreUtils.getTokenStore(message);
-        String key = appliesTo;
-        if (!enableAppliesTo || key == null || "".equals(key)) {
-            key = ASSOCIATED_TOKEN;
-        }
-        // See if the token corresponding to the OnBehalfOf Token is stored in the cache
-        // and if it points to an issued token
-        if (onBehalfOfToken != null) {
-            String id = getIdFromToken(onBehalfOfToken);
-            SecurityToken cachedToken = tokenStore.getToken(id);
-            if (cachedToken != null) {
-                Map<String, Object> properties = cachedToken.getProperties();
-                if (properties != null && properties.containsKey(key)) {
-                    String associatedToken = (String)properties.get(key);
-                    SecurityToken issuedToken = tokenStore.getToken(associatedToken);
-                    if (issuedToken != null) {
-                        return issuedToken;
-                    }
-                }
-            }
-        }
-
-        // See if the token corresponding to the ActAs Token is stored in the cache
-        // and if it points to an issued token
-        if (actAsToken != null) {
-            String id = getIdFromToken(actAsToken);
-            SecurityToken cachedToken = tokenStore.getToken(id);
-            if (cachedToken != null) {
-                Map<String, Object>  properties = cachedToken.getProperties();
-                if (properties != null && properties.containsKey(key)) {
-                    String associatedToken = (String)properties.get(key);
-                    SecurityToken issuedToken = tokenStore.getToken(associatedToken);
-                    if (issuedToken != null) {
-                        return issuedToken;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private static String getIdFromToken(Element token) {
-        if (token != null) {
-            // Try to find the "Id" on the token.
-            if (token.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-                return token.getAttributeNS(WSConstants.WSU_NS, "Id");
-            } else if (token.hasAttributeNS(null, "ID")) {
-                return token.getAttributeNS(null, "ID");
-            } else if (token.hasAttributeNS(null, "AssertionID")) {
-                return token.getAttributeNS(null, "AssertionID");
-            }
-        }
-        return "";
-    }
-
-    private static void storeDelegationTokens(
-                                       Message message,
-                                       SecurityToken issuedToken,
-                                       Element onBehalfOfToken,
-                                       Element actAsToken,
-                                       String appliesTo,
-                                       boolean enableAppliesTo) throws Exception {
-        if (issuedToken == null) {
-            return;
-        }
-        TokenStore tokenStore = TokenStoreUtils.getTokenStore(message);
-        String key = appliesTo;
-        if (!enableAppliesTo || key == null || "".equals(key)) {
-            key = ASSOCIATED_TOKEN;
-        }
-        if (onBehalfOfToken != null) {
-            String id = getIdFromToken(onBehalfOfToken);
-            SecurityToken cachedToken = tokenStore.getToken(id);
-            if (cachedToken == null) {
-                cachedToken = new SecurityToken(id);
-                cachedToken.setToken(onBehalfOfToken);
-            }
-            Map<String, Object> properties = cachedToken.getProperties();
-            if (properties == null) {
-                properties = new HashMap<>();
-                cachedToken.setProperties(properties);
-            }
-            properties.put(key, issuedToken.getId());
-            tokenStore.add(cachedToken);
-        }
-        if (actAsToken != null) {
-            String id = getIdFromToken(actAsToken);
-            SecurityToken cachedToken = tokenStore.getToken(id);
-            if (cachedToken == null) {
-                cachedToken = new SecurityToken(id);
-                cachedToken.setToken(actAsToken);
-            }
-            Map<String, Object>  properties = cachedToken.getProperties();
-            if (properties == null) {
-                properties = new HashMap<>();
-                cachedToken.setProperties(properties);
-            }
-            properties.put(key, issuedToken.getId());
-            tokenStore.add(cachedToken);
-        }
-    }
-
-    private static SecurityToken getTokenFromSTS(Message message, STSClient client,
-                                          AddressingProperties maps, String appliesTo,
+    private static SecurityToken getTokenFromSTS(Message message,
+                                          STSClient client, String appliesTo,
                                           TokenRequestParams params) throws Exception {
         client.setTrust(params.getTrust10());
         client.setTrust(params.getTrust13());
@@ -418,12 +249,16 @@ public final class STSTokenRetriever {
         if (params.getWspNamespace() != null) {
             client.setWspNamespace(params.getWspNamespace());
         }
-        if (maps != null && maps.getNamespaceURI() != null) {
-            client.setAddressingNamespace(maps.getNamespaceURI());
+        String addressingNamespace = getAddressingNamespaceURI(message);
+        if (addressingNamespace != null) {
+            client.setAddressingNamespace(addressingNamespace);
         }
         if (params.getClaims() != null) {
             client.setClaims(params.getClaims());
         }
+        Map<String, Object> ctx = client.getRequestContext();
+        mapSecurityProps(message, ctx);
+        
         return client.requestSecurityToken(appliesTo);
     }
 

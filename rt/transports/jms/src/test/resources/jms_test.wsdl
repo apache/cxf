@@ -249,4 +249,9 @@
 	        <soap:address location="jms:topic:test.jmstransport.oneway.topic" />
         </port>
     </service>
+    <service name="HelloWorldSelectorService">
+         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
+             <soap:address location="jms:queue:test.jmstransport.text?username=testUser&amp;password=testPassword&amp;messageSelector=customJMSAttribute=helloWorld" />
+         </port>
+     </service>
 </definitions>

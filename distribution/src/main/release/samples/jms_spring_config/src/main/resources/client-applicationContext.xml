@@ -39,7 +39,7 @@
     	address="jms:queue:test.queue" 
     	serviceClass="com.example.customerservice.CustomerService">
         <jaxws:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             
             <!-- We use the feature to inject the ConnectionFactory. This approach also allows to publish
             	a java first service as we need no jms config in the wsdl.

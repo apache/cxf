@@ -20,16 +20,22 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
-import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.stream.XMLStreamException;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
 import org.apache.cxf.common.security.UsernameToken;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
@@ -37,53 +43,55 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.handler.RequestData;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.validate.UsernameTokenValidator;
-import org.apache.wss4j.dom.validate.Validator;
 
 
 /**
- * Base class providing an extensibility point for populating 
+ * Base class providing an extensibility point for populating
  * javax.security.auth.Subject from a current UsernameToken.
- * 
+ *
  * WSS4J requires a password for validating digests which may not be available
  * when external security systems provide for the authentication. This class
  * implements WSS4J Processor interface so that it can delegate a UsernameToken
  * validation to an external system.
- * 
+ *
  * In order to handle digests, this class currently creates a new WSS4J Security Engine for
  * every request. If clear text passwords are expected then a supportDigestPasswords boolean
  * property with a false value can be used to disable creating security engines.
- * 
+ *
  * Note that if a UsernameToken containing a clear text password has been encrypted then
- * an application is expected to provide a password callback handler for decrypting the token only.     
+ * an application is expected to provide a password callback handler for decrypting the token only.
  *
  */
 public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS4JInInterceptor {
-    
-    private static final Logger LOG = 
+
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractUsernameTokenAuthenticatingInterceptor.class);
-    
+
     private boolean supportDigestPasswords;
-    
+
     public AbstractUsernameTokenAuthenticatingInterceptor() {
         this(new HashMap<String, Object>());
     }
-    
+
     public AbstractUsernameTokenAuthenticatingInterceptor(Map<String, Object> properties) {
         super(properties);
         getAfter().add(PolicyBasedWSS4JInInterceptor.class.getName());
     }
-    
+
     public void setSupportDigestPasswords(boolean support) {
         supportDigestPasswords = support;
     }
-    
+
     public boolean getSupportDigestPasswords() {
         return supportDigestPasswords;
     }
-    
+
     @Override
     public void handleMessage(SoapMessage msg) throws Fault {
         SecurityToken token = msg.get(SecurityToken.class);
@@ -93,40 +101,54 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
             return;
         }
         UsernameToken ut = (UsernameToken)token;
-        
+
         Subject subject = createSubject(ut.getName(), ut.getPassword(), ut.isHashed(),
                                         ut.getNonce(), ut.getCreatedTime());
-        
+
         SecurityContext sc = doCreateSecurityContext(context.getUserPrincipal(), subject);
         msg.put(SecurityContext.class, sc);
     }
-    
+
     @Override
-    protected SecurityContext createSecurityContext(final Principal p) {
-        Message msg = PhaseInterceptorChain.getCurrentMessage();
-        if (msg == null) {
-            throw new IllegalStateException("Current message is not available");
+    protected void doResults(
+                             SoapMessage msg,
+                             String actor,
+                             Element soapHeader,
+                             Element soapBody,
+                             WSHandlerResult wsResult,
+                             boolean utWithCallbacks
+    ) throws SOAPException, XMLStreamException, WSSecurityException {
+        /*
+         * All ok up to this point. Now construct and setup the security result
+         * structure. The service may fetch this and check it.
+         */
+        List<WSHandlerResult> results = CastUtils.cast((List<?>)msg.get(WSHandlerConstants.RECV_RESULTS));
+        if (results == null) {
+            results = new LinkedList<>();
+            msg.put(WSHandlerConstants.RECV_RESULTS, results);
         }
-        return doCreateSecurityContext(p, msg.get(Subject.class));
+        results.add(0, wsResult);
+
+        new UsernameTokenSecurityContextCreator().createSecurityContext(msg, wsResult);
     }
-    
+
     /**
      * Creates default SecurityContext which implements isUserInRole using the
      * following approach : skip the first Subject principal, and then check optional
      * Groups the principal is a member of. Subclasses can override this method and implement
      * a custom strategy instead
-     *   
+     *
      * @param p principal
-     * @param subject subject 
+     * @param subject subject
      * @return security context
      */
     protected SecurityContext doCreateSecurityContext(final Principal p, final Subject subject) {
         return new DefaultSecurityContext(p, subject);
     }
 
-        
-    protected void setSubject(String name, 
-                              String password, 
+
+    protected void setSubject(String name,
+                              String password,
                               boolean isDigest,
                               String nonce,
                               String created) throws WSSecurityException {
@@ -140,24 +162,24 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         } catch (Exception ex) {
             String errorMessage = "Failed Authentication : Subject has not been created";
             LOG.severe(errorMessage);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
                                           ex);
         }
-        if (subject == null || subject.getPrincipals().size() == 0
+        if (subject == null || subject.getPrincipals().isEmpty()
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
             String errorMessage = "Failed Authentication : Invalid Subject";
             LOG.severe(errorMessage);
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION,
                                           new Exception(errorMessage));
         }
         msg.put(Subject.class, subject);
     }
-    
+
     /**
-     * Create a Subject representing a current user and its roles. 
+     * Create a Subject representing a current user and its roles.
      * This Subject is expected to contain at least one Principal representing a user
      * and optionally followed by one or more principal Groups this user is a member of.
-     * It will also be available in doCreateSecurityContext.   
+     * It will also be available in doCreateSecurityContext.
      * @param name username
      * @param password password
      * @param isDigest true if a password digest is used
@@ -166,23 +188,23 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
      * @return subject
      * @throws SecurityException
      */
-    protected abstract Subject createSubject(String name, 
-                                    String password, 
+    protected abstract Subject createSubject(String name,
+                                    String password,
                                     boolean isDigest,
                                     String nonce,
                                     String created) throws SecurityException;
-    
-    @Override 
+
+    @Override
     protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
-        Map<QName, Object> profiles = new HashMap<QName, Object>(1);
-        
-        Validator validator = new CustomValidator();
-        profiles.put(WSConstants.USERNAME_TOKEN, validator);
-        return createSecurityEngine(profiles);
+        WSSConfig config = WSSConfig.getNewInstance();
+        config.setValidator(WSConstants.USERNAME_TOKEN, new CustomValidator());
+        WSSecurityEngine ret = new WSSecurityEngine();
+        ret.setWssConfig(config);
+        return ret;
     }
-    
+
     protected class CustomValidator extends UsernameTokenValidator {
-        
+
         @Override
         protected void verifyCustomPassword(
             org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
@@ -192,7 +214,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                 usernameToken.getName(), usernameToken.getPassword(), false, null, null
             );
         }
-        
+
         @Override
         protected void verifyPlaintextPassword(
             org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
@@ -202,7 +224,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                 usernameToken.getName(), usernameToken.getPassword(), false, null, null
             );
         }
-        
+
         @Override
         protected void verifyDigestPassword(
             org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
@@ -220,7 +242,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                 user, password, isHashed, nonce, createdTime
             );
         }
-        
+
         @Override
         protected void verifyUnknownPassword(
             org.apache.wss4j.dom.message.token.UsernameToken usernameToken,
@@ -230,7 +252,18 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
                 usernameToken.getName(), null, false, null, null
             );
         }
-        
+
     }
-    
+
+    private static class UsernameTokenSecurityContextCreator extends DefaultWSS4JSecurityContextCreator {
+
+        @Override
+        protected SecurityContext createSecurityContext(final Principal p) {
+            Message msg = PhaseInterceptorChain.getCurrentMessage();
+            if (msg == null) {
+                throw new IllegalStateException("Current message is not available");
+            }
+            return new DefaultSecurityContext(p, msg.get(Subject.class));
+        }
+    }
 }

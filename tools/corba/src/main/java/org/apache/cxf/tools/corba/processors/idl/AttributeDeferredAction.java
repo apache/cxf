@@ -31,26 +31,26 @@ public class AttributeDeferredAction implements SchemaDeferredAction {
     protected ArgType argType;
     protected ParamType param;
     protected XmlSchemaElement element;
-    
-    
+
+
     public AttributeDeferredAction(ParamType paramType, ArgType arg, XmlSchemaElement elem) {
-        param = paramType;  
+        param = paramType;
         argType = arg;
-        element = elem;        
+        element = elem;
     }
-    
+
     public AttributeDeferredAction(ParamType paramType) {
-        param = paramType;         
+        param = paramType;
     }
-    
+
     public AttributeDeferredAction(ArgType arg) {
-        argType = arg;         
+        argType = arg;
     }
-    
+
     public AttributeDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (param != null) {
             param.setIdltype(ctype.getQName());
@@ -63,9 +63,9 @@ public class AttributeDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }        
+        }
     }
-       
+
 }
 
 

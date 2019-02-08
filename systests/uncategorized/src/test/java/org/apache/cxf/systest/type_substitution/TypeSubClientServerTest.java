@@ -30,10 +30,16 @@ import org.apache.type_substitution.Car;
 import org.apache.type_substitution.CarDealer;
 import org.apache.type_substitution.CarDealerService;
 import org.apache.type_substitution.Porsche;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/type_substitution/",
@@ -60,15 +66,15 @@ public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals(2, cars.size());
         Porsche car = (Porsche) cars.get(0);
         assertNotNull(car);
-        if (car != null && "Porsche".equals(car.getMake()) 
-            && "Boxster".equals(car.getModel()) 
-            && "1998".equals(car.getYear()) 
+        if (car != null && "Porsche".equals(car.getMake())
+            && "Boxster".equals(car.getModel())
+            && "1998".equals(car.getYear())
             && "white".equals(car.getColor())) {
             // get the right car
         } else {
             fail("Get the wrong car!");
         }
-        
+
         /**
          * CarDealer.tradeIn(Car) takes an abstract class Car and returns the same.
          * We will send a sub-class instead and expect to get the same.
@@ -82,9 +88,9 @@ public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
         Porsche newCar = (Porsche)dealer.tradeIn(oldCar);
         assertNotNull(newCar);
 
-        if (newCar != null && "Porsche".equals(newCar.getMake()) 
-            && "911GT3".equals(newCar.getModel()) 
-            && "2007".equals(newCar.getYear()) 
+        if (newCar != null && "Porsche".equals(newCar.getMake())
+            && "911GT3".equals(newCar.getModel())
+            && "2007".equals(newCar.getYear())
             && "black".equals(newCar.getColor())) {
             // get the right car
         } else {
@@ -98,7 +104,7 @@ public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
 
         CarDealerService service = new CarDealerService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        
+
         CarDealer dealer = service.getCarDealerPort();
         updateAddressPort(dealer, PORT);
         return dealer;

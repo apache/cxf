@@ -41,6 +41,7 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
@@ -61,9 +62,9 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreFactory;
 import org.apache.cxf.ws.security.trust.claims.RoleClaimsCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -76,77 +77,77 @@ import org.apache.wss4j.dom.validate.Credential;
  */
 public class STSLoginModule implements LoginModule {
     /**
-     * Whether we require roles or not from the STS. If this is not set then the 
-     * WS-Trust validate binding is used. If it is set then the issue binding is 
+     * Whether we require roles or not from the STS. If this is not set then the
+     * WS-Trust validate binding is used. If it is set then the issue binding is
      * used, where the Username + Password credentials are passed via "OnBehalfOf"
-     * (unless the DISABLE_ON_BEHALF_OF property is set to "true", see below). In addition, 
+     * (unless the DISABLE_ON_BEHALF_OF property is set to "true", see below). In addition,
      * claims are added to the request for the standard "role" ClaimType.
      */
     public static final String REQUIRE_ROLES = "require.roles";
-    
+
     /**
      * Whether to disable passing Username + Password credentials via "OnBehalfOf". If the
      * REQUIRE_ROLES property (see above) is set to "true", then the Issue Binding is used
      * and the credentials are passed via OnBehalfOf. If this (DISABLE_ON_BEHALF_OF) property
-     * is set to "true", then the credentials instead are passed through to the 
+     * is set to "true", then the credentials instead are passed through to the
      * WS-SecurityPolicy layer and used depending on the security policy of the STS endpoint.
-     * For example, if the STS endpoint requires a WS-Security UsernameToken, then the 
+     * For example, if the STS endpoint requires a WS-Security UsernameToken, then the
      * credentials are inserted here.
      */
     public static final String DISABLE_ON_BEHALF_OF = "disable.on.behalf.of";
-    
+
     /**
      * Whether to disable caching of validated credentials or not. The default is "false", meaning that
      * caching is enabled. However, caching only applies when token transformation takes place, i.e. when
      * the "require.roles" property is set to "true".
      */
     public static final String DISABLE_CACHING = "disable.caching";
-    
+
     /**
      * The WSDL Location of the STS
      */
     public static final String WSDL_LOCATION = "wsdl.location";
-    
+
     /**
      * The Service QName of the STS
      */
     public static final String SERVICE_NAME = "service.name";
-    
+
     /**
      * The Endpoint QName of the STS
      */
     public static final String ENDPOINT_NAME = "endpoint.name";
-    
+
     /**
      * The default key size to use if using the SymmetricKey KeyType. Defaults to 256.
      */
     public static final String KEY_SIZE = "key.size";
-    
+
     /**
      * The key type to use. The default is the standard "Bearer" URI.
      */
     public static final String KEY_TYPE = "key.type";
-    
+
     /**
      * The token type to use. The default is the standard SAML 2.0 URI.
      */
     public static final String TOKEN_TYPE = "token.type";
-    
+
     /**
      * The WS-Trust namespace to use. The default is the WS-Trust 1.3 namespace.
      */
     public static final String WS_TRUST_NAMESPACE = "ws.trust.namespace";
-    
+
     /**
      * The location of a Spring configuration file that can be used to configure the
      * STS client (for example, to configure the TrustStore if TLS is used). This is
      * designed to be used if the service that is being secured is not CXF-based.
      */
     public static final String CXF_SPRING_CFG = "cxf.spring.config";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(STSLoginModule.class);
     private static final String TOKEN_STORE_KEY = "sts.login.module.tokenstore";
-    
+
     private Set<Principal> roles = new HashSet<>();
     private Principal userPrincipal;
     private Subject subject;
@@ -163,7 +164,11 @@ public class STSLoginModule implements LoginModule {
     private String tokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private String namespace;
     private Map<String, Object> stsClientProperties = new HashMap<>();
-    
+
+    /** the authentication status*/
+    private boolean succeeded;
+    private boolean commitSucceeded;
+
     @Override
     public void initialize(Subject subj, CallbackHandler cbHandler, Map<String, ?> sharedState,
                            Map<String, ?> options) {
@@ -202,7 +207,7 @@ public class STSLoginModule implements LoginModule {
         if (options.containsKey(CXF_SPRING_CFG)) {
             cxfSpringCfg = (String)options.get(CXF_SPRING_CFG);
         }
-        
+
         stsClientProperties.clear();
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             if (options.containsKey(s)) {
@@ -223,7 +228,7 @@ public class STSLoginModule implements LoginModule {
         } catch (IOException ioException) {
             throw new LoginException(ioException.getMessage());
         } catch (UnsupportedCallbackException unsupportedCallbackException) {
-            throw new LoginException(unsupportedCallbackException.getMessage() 
+            throw new LoginException(unsupportedCallbackException.getMessage()
                                      + " not available to obtain information from user.");
         }
 
@@ -234,24 +239,24 @@ public class STSLoginModule implements LoginModule {
             tmpPassword = new char[0];
         }
         String password = new String(tmpPassword);
-        
-        roles = new HashSet<Principal>();
+
+        roles = new HashSet<>();
         userPrincipal = null;
-        
+
         STSTokenValidator validator = new STSTokenValidator(true);
         validator.setUseIssueBinding(requireRoles);
         validator.setUseOnBehalfOf(!disableOnBehalfOf);
         validator.setDisableCaching(!requireRoles || disableCaching);
-        
+
         // Authenticate token
         try {
             UsernameToken token = convertToToken(user, password);
             Credential credential = new Credential();
             credential.setUsernametoken(token);
-            
+
             RequestData data = new RequestData();
             Message message = PhaseInterceptorChain.getCurrentMessage();
-            
+
             STSClient stsClient = configureSTSClient(message);
             if (message != null) {
                 message.put(SecurityConstants.STS_CLIENT, stsClient);
@@ -261,22 +266,23 @@ public class STSLoginModule implements LoginModule {
                 validator.setStsClient(stsClient);
                 validator.setTokenStore(tokenStore);
             }
-            
+
             credential = validator.validate(credential, data);
 
             // Add user principal
             userPrincipal = new SimplePrincipal(user);
-            
+
             // Add roles if a SAML Assertion was returned from the STS
             roles.addAll(getRoles(message, credential));
         } catch (Exception e) {
             LOG.log(Level.INFO, "User " + user + " authentication failed", e);
             throw new LoginException("User " + user + " authentication failed: " + e.getMessage());
         }
-        
+
+        succeeded = true;
         return true;
     }
-    
+
     private STSClient configureSTSClient(Message msg) throws BusException, EndpointException {
         STSClient c = null;
         if (cxfSpringCfg != null) {
@@ -284,8 +290,8 @@ public class STSLoginModule implements LoginModule {
             URL busFile = Loader.getResource(cxfSpringCfg);
 
             Bus bus = bf.createBus(busFile.toString());
-            SpringBusFactory.setDefaultBus(bus);
-            SpringBusFactory.setThreadDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
             c = new STSClient(bus);
         } else if (msg == null) {
             Bus bus = BusFactory.getDefaultBus(true);
@@ -293,7 +299,7 @@ public class STSLoginModule implements LoginModule {
         } else {
             c = STSUtils.getClient(msg, "sts");
         }
-        
+
         if (wsdlLocation != null) {
             c.setWsdlLocation(wsdlLocation);
         }
@@ -315,16 +321,16 @@ public class STSLoginModule implements LoginModule {
         if (namespace != null) {
             c.setNamespace(namespace);
         }
-        
+
         c.setProperties(stsClientProperties);
-        
+
         if (requireRoles && c.getClaimsCallbackHandler() == null) {
             c.setClaimsCallbackHandler(new RoleClaimsCallbackHandler());
         }
-        
+
         return c;
     }
-    
+
     private TokenStore configureTokenStore() throws MalformedURLException {
         if (TokenStoreFactory.isEhCacheInstalled()) {
             String cfg = "cxf-ehcache.xml";
@@ -342,17 +348,17 @@ public class STSLoginModule implements LoginModule {
         return null;
     }
 
-    private UsernameToken convertToToken(String username, String password) 
+    private UsernameToken convertToToken(String username, String password)
         throws Exception {
 
-        Document doc = DOMUtils.createDocument();
-        UsernameToken token = new UsernameToken(false, doc, 
-                                                WSConstants.PASSWORD_TEXT);
+        Document doc = DOMUtils.getEmptyDocument();
+        UsernameToken token = new UsernameToken(false, doc,
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(username);
         token.setPassword(password);
         return token;
     }
-    
+
     private Set<Principal> getRoles(Message msg, Credential credential) {
         SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
         if (samlAssertion == null) {
@@ -361,35 +367,50 @@ public class STSLoginModule implements LoginModule {
         if (samlAssertion != null) {
             String roleAttributeName = null;
             if (msg != null) {
-                roleAttributeName = 
-                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, 
+                roleAttributeName =
+                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME,
                                                                    msg);
             }
             if (roleAttributeName == null || roleAttributeName.length() == 0) {
                 roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
             }
 
-            ClaimCollection claims = 
-                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+            ClaimCollection claims =
+                SAMLUtils.getClaims(samlAssertion);
             return SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
         }
-        
+
         return Collections.emptySet();
     }
 
-    
+
     @Override
     public boolean commit() throws LoginException {
-        if (userPrincipal == null) {
+        if (!succeeded || userPrincipal == null) {
+            roles.clear();
+            succeeded = false;
+            userPrincipal = null;
             return false;
-        }
+        } 
         subject.getPrincipals().add(userPrincipal);
         subject.getPrincipals().addAll(roles);
+        commitSucceeded = true;
         return true;
     }
 
     @Override
     public boolean abort() throws LoginException {
+        if (!succeeded) {
+            return false;
+        } else if (succeeded && commitSucceeded) {
+            // we succeeded, but another required module failed
+            logout();
+        } else {
+            // our commit failed
+            roles.clear();
+            userPrincipal = null;
+            succeeded = false;
+        }
         return true;
     }
 
@@ -399,8 +420,12 @@ public class STSLoginModule implements LoginModule {
         subject.getPrincipals().removeAll(roles);
         roles.clear();
         userPrincipal = null;
+
+        succeeded = false;
+        commitSucceeded = false;
+
         return true;
     }
-    
-    
+
+
 }

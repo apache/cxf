@@ -31,30 +31,30 @@ import org.apache.neethi.builders.AssertionBuilder;
 
 public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
 
-    private QName knownElements[] = {};
-    
+    private QName[] knownElements = {};
+
     public PrimitiveAssertionBuilder() {
     }
     public PrimitiveAssertionBuilder(Collection<QName> els) {
-        knownElements = els.toArray(new QName[els.size()]);
+        knownElements = els.toArray(new QName[0]);
     }
-    public PrimitiveAssertionBuilder(QName els[]) {
+    public PrimitiveAssertionBuilder(QName[] els) {
         knownElements = els;
     }
-    
-    
-    public Assertion build(Element element, AssertionBuilderFactory fact) { 
+
+
+    public Assertion build(Element element, AssertionBuilderFactory fact) {
         return new PrimitiveAssertion(element);
     }
-    
+
     public QName[] getKnownElements() {
         return knownElements;
     }
-    
+
     public void setKnownElements(Collection<QName> k) {
-        knownElements = k.toArray(new QName[k.size()]);
+        knownElements = k.toArray(new QName[0]);
     }
-    public void setKnownElements(QName k[]) {
+    public void setKnownElements(QName[] k) {
         knownElements = k;
     }
 

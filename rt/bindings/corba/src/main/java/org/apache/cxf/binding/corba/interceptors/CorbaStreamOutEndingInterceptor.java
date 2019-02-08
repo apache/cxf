@@ -117,7 +117,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
             QName idlType = param.getIdltype();
-            
+
             QName paramName;
             CorbaObjectHandler obj = null;
             if (param.getMode().equals(ModeType.OUT)) {
@@ -138,9 +138,9 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
             }
             CorbaStreamable streamable = message.createStreamableObject(obj, paramName);
             ModeType paramMode = param.getMode();
-            if (paramMode.value().equals("in")) {
+            if ("in".equals(paramMode.value())) {
                 streamable.setMode(org.omg.CORBA.ARG_IN.value);
-            } else if (paramMode.value().equals("inout")) {
+            } else if ("inout".equals(paramMode.value())) {
                 streamable.setMode(org.omg.CORBA.ARG_INOUT.value);
             } // default mode is out
             message.addStreamableArgument(streamable);
@@ -198,16 +198,16 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
             }
             CorbaStreamable streamable = message.createStreamableObject(obj, paramName);
             ModeType paramMode = param.getMode();
-            if (paramMode.value().equals("in")) {
+            if ("in".equals(paramMode.value())) {
                 streamable.setMode(org.omg.CORBA.ARG_IN.value);
-            } else if (paramMode.value().equals("inout")) {
+            } else if ("inout".equals(paramMode.value())) {
                 streamable.setMode(org.omg.CORBA.ARG_INOUT.value);
-            } else if (paramMode.value().equals("out")) {
+            } else if ("out".equals(paramMode.value())) {
                 streamable.setMode(org.omg.CORBA.ARG_OUT.value);
             }
             message.addStreamableArgument(streamable);
         }
-        
+
     }
 
     protected QName getMessageParamQName(MessageInfo msgInfo,
@@ -223,13 +223,12 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         return paramQName;
     }
 
-    protected String getWrappedParamNamespace(MessageInfo msgInfo) {    
+    protected String getWrappedParamNamespace(MessageInfo msgInfo) {
         MessagePartInfo part = msgInfo.getMessageParts().get(0);
         if (part.isElement()) {
             return part.getElementQName().getNamespaceURI();
-        } else {
-            return part.getName().getNamespaceURI();
         }
+        return part.getName().getNamespaceURI();
     }
 
 }

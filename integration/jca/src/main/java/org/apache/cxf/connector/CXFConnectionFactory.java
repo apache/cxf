@@ -27,7 +27,7 @@ import javax.resource.ResourceException;
  */
 
 public interface CXFConnectionFactory {
-    
+
     /**
      *  Creates a client proxy based on the connection parameter object.
      * @param param,
@@ -37,8 +37,8 @@ public interface CXFConnectionFactory {
      * @throws ResourceException
      */
     Object getConnection(CXFConnectionParam param) throws ResourceException;
-    
-    
+
+
     /**
      * Returns the underlying {@link Bus} for this connection factory. In some
      * J2EE environments, for example Weblogic, the {@link Bus} and dependent
@@ -51,7 +51,7 @@ public interface CXFConnectionFactory {
      * should be safe without having to modify the classpath <code>
      *    org.apache.cxf.Bus = (org.apache.cxf.Bus)connectionFactory.getBus();
      * </code>
-     * 
+     *
      * @return the connection factory&amp;s {@link Bus}
      */
     Object getBus();

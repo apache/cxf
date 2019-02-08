@@ -22,10 +22,10 @@ package org.apache.cxf.ws.policy.attachment.reference;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public interface ReferenceResolver {
-    
+
     Policy resolveReference(String uri);
-    
+
 }

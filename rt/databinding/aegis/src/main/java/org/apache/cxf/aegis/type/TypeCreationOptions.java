@@ -21,12 +21,12 @@
  * This class contains a set of flags that control Aegis' process of mapping from Java types to XML Schema.
  * These options are respected by the standard Aegis type creation classes. An application that replaces
  * these with custom creators will make its own arrangements.
- * 
+ *
  * @see AbstractTypeCreator
  * @see DefaultTypeCreator
  * @see XMLTypeCreator
  * @see Java5TypeCreator
- * 
+ *
  * @since 2.1
  */
 package org.apache.cxf.aegis.type;
@@ -92,11 +92,11 @@ public class TypeCreationOptions {
         this.defaultNillable = defaultNillable;
     }
 
-    /** 
+    /**
      * Whether or not elements are qualified absent any annotations
-     * or mapping files. 
+     * or mapping files.
      * True by default.
-     * @return 
+     * @return
      */
     public boolean isQualifyElements() {
         return qualifyElements;
@@ -104,7 +104,7 @@ public class TypeCreationOptions {
 
     /**
      * Turn on of off element qualification.
-     * @param qualifyElements 
+     * @param qualifyElements
      */
     public void setQualifyElements(boolean qualifyElements) {
         this.qualifyElements = qualifyElements;
@@ -113,16 +113,16 @@ public class TypeCreationOptions {
     /**
      * Whether or not attributes are qualified absent any annotations
      * or mapping files.
-     * False by default. 
-     * @return 
+     * False by default.
+     * @return
      */
     public boolean isQualifyAttributes() {
         return qualifyAttributes;
     }
 
     /**
-     * Turn on or off attribute qualification. 
-     * @param qualifyAttributes 
+     * Turn on or off attribute qualification.
+     * @param qualifyAttributes
      */
     public void setQualifyAttributes(boolean qualifyAttributes) {
         this.qualifyAttributes = qualifyAttributes;

@@ -34,23 +34,23 @@ import javax.xml.ws.soap.Addressing;
     org.apache.cxf.ws.mex.model._2004_09.ObjectFactory.class })
 @WebService(targetNamespace = "http://www.w3.org/2009/09/ws-mex")
 public interface MetadataExchange {
-    
-    @WebResult(name = "Metadata", 
-        targetNamespace = "http://schemas.xmlsoap.org/ws/2004/09/mex", 
+
+    @WebResult(name = "Metadata",
+        targetNamespace = "http://schemas.xmlsoap.org/ws/2004/09/mex",
         partName = "body")
     @Action(input = "http://schemas.xmlsoap.org/ws/2004/09/transfer/Get",
         output = "http://schemas.xmlsoap.org/ws/2004/09/transfer/GetResponse")
     @WebMethod(operationName = "Get2004")
     org.apache.cxf.ws.mex.model._2004_09.Metadata get2004();
-    
-    @WebResult(name = "Metadata", 
-        targetNamespace = "http://schemas.xmlsoap.org/ws/2004/09/mex", 
+
+    @WebResult(name = "Metadata",
+        targetNamespace = "http://schemas.xmlsoap.org/ws/2004/09/mex",
         partName = "body")
-    @Action(input = "http://schemas.xmlsoap.org/ws/2004/09/mex/GetMetadata/Request", 
+    @Action(input = "http://schemas.xmlsoap.org/ws/2004/09/mex/GetMetadata/Request",
         output = "http://schemas.xmlsoap.org/ws/2004/09/mex/GetMetadata/Response")
     @WebMethod(operationName = "GetMetadata2004")
     org.apache.cxf.ws.mex.model._2004_09.Metadata getMetadata(
-        @WebParam(partName = "body", name = "GetMetadata", 
+        @WebParam(partName = "body", name = "GetMetadata",
             targetNamespace = "http://schemas.xmlsoap.org/ws/2004/09/mex")
         org.apache.cxf.ws.mex.model._2004_09.GetMetadata body
     );

@@ -32,7 +32,7 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 @NoJSR250Annotations
 public final class RSPPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
     Bus bus;
-    
+
     public RSPPolicyLoader(Bus b) {
         bus = b;
         registerBuilders();
@@ -43,7 +43,7 @@ public final class RSPPolicyLoader implements PolicyInterceptorProviderLoader, A
             // that point. If nothing uses WS-I RSP no warnings/errors will display
         }
     }
-    
+
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg == null) {
@@ -51,7 +51,7 @@ public final class RSPPolicyLoader implements PolicyInterceptorProviderLoader, A
         }
         reg.registerBuilder(new RSPAssertionBuilder());
     }
-    
+
     public void registerProviders() {
         //interceptor provider for the policy
         PolicyInterceptorProviderRegistry reg = bus.getExtension(PolicyInterceptorProviderRegistry.class);

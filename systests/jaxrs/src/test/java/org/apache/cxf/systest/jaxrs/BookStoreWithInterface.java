@@ -54,7 +54,7 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {
         checkPostConstruct();
         if (!id.toString().equals(s)) {
@@ -62,32 +62,30 @@ public class BookStoreWithInterface extends BookStoreStorage implements BookInte
         }
         return doGetBook(id);
     }
-    
+
     @SchemaValidation
     public Book getThatBook(Long id) throws BookNotFoundFault {
         checkPostConstruct();
         return doGetBook(id);
     }
-    
+
     public Book echoBook(Book b) {
         String ct = (String)JAXRSUtils.getCurrentMessage().get(Message.CONTENT_TYPE);
         if ("application/xml;a=b".equals(ct)) {
             return b;
-        } else {
-            throw new RuntimeException();
         }
+        throw new RuntimeException();
     }
-    
+
     private Book doGetBook(Long id) throws BookNotFoundFault {
         //System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(id);
         if (book != null) {
             return book;
-        } else {
-            BookNotFoundDetails details = new BookNotFoundDetails();
-            details.setId(id);
-            throw new BookNotFoundFault(details);
         }
+        BookNotFoundDetails details = new BookNotFoundDetails();
+        details.setId(id);
+        throw new BookNotFoundFault(details);
     }
 
     public Book getThatBook() throws BookNotFoundFault {

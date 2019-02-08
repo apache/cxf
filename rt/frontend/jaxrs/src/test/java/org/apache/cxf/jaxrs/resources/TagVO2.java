@@ -23,11 +23,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "thetag", namespace = "http://tags")
 public class TagVO2 extends TagVO {
-    
+
     public TagVO2() {
-        
+
     }
-    
+
     public TagVO2(String name, String group) {
         super(name, group);
     }

@@ -21,10 +21,11 @@ package org.apache.cxf.tools.validator.internal.model;
 
 import org.apache.cxf.wsdl.WSDLConstants;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class XNodeTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class XNodeTest {
     @Test
     public void testWSDLDefinition() {
         XDef def = new XDef();
@@ -48,7 +49,7 @@ public class XNodeTest extends Assert {
         String ns = "{http://apache.org/hello_world/messages}";
         definition.setTargetNamespace("http://apache.org/hello_world/messages");
         assertEquals(ns, definition.getPlainText());
-        
+
         XPortType portType = new XPortType();
         portType.setName("Greeter");
         portType.setParentNode(definition);

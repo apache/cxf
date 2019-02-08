@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
-@WebService(targetNamespace = "http://client.webservice.crm.ecot.com/skeleton/StudentService", 
+@WebService(targetNamespace = "http://client.webservice.crm.ecot.com/skeleton/StudentService",
     name = "StudentService")
 @SOAPBinding(style = SOAPBinding.Style.RPC, use = SOAPBinding.Use.LITERAL)
 public interface StudentService {
@@ -32,7 +32,7 @@ public interface StudentService {
     Student findStudent(Long id);
 
     Map<Long, Student> getStudentsMap();
-    
+
     Map<String, ?> getWildcardMap();
 
     List<Student> getStudents(Map<String, String> filters);

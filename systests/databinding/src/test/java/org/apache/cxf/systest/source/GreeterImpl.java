@@ -30,14 +30,13 @@ import org.apache.hello_world_soap_http_source.source.GreetMeFault;
 import org.apache.hello_world_soap_http_source.source.Greeter;
 import org.apache.hello_world_soap_http_source.source.PingMeFault;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http_source/source", 
+@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/hello_world_soap_http_source/source",
                       endpointInterface = "org.apache.hello_world_soap_http_source.source.Greeter")
 public class GreeterImpl implements Greeter {
 
     public void greetMeOneWay(DOMSource in) {
-        // TODO Auto-generated method stub
-        
+
     }
 
     public DOMSource sayHi(DOMSource in) {
@@ -57,7 +56,7 @@ public class GreeterImpl implements Greeter {
         }
         return (Element)nd;
     }
-    
+
     public DOMSource greetMe(DOMSource in) throws GreetMeFault {
         Element eval = getElement(in.getNode());
         eval = DOMUtils.getFirstElement(eval);
@@ -69,10 +68,10 @@ public class GreeterImpl implements Greeter {
                     "ns1:greetMeFaultDetail");
             el.appendChild(doc.createTextNode("Some fault detail"));
             doc.appendChild(el);
-            
+
             throw new GreetMeFault("Fault String", new DOMSource(doc));
         }
-        
+
         Document doc = DOMUtils.newDocument();
         Element el = doc.createElementNS("http://apache.org/hello_world_soap_http_source/source/types",
             "ns1:greetMeResponse");
@@ -80,16 +79,15 @@ public class GreeterImpl implements Greeter {
             "ns1:responseType");
         el2.appendChild(doc.createTextNode("Hello " + val));
         el.appendChild(el2);
-        
+
         doc.appendChild(el);
-        
+
         return new DOMSource(doc);
     }
 
     public void pingMe() throws PingMeFault {
-        // TODO Auto-generated method stub
-        
+
     }
 
-    
+
 }

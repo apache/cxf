@@ -27,9 +27,9 @@ import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 @WebService(
-    name = "AddNumbers", 
-    portName = "AddNumbersPort", 
-    targetNamespace = "http://foobar.org/", 
+    name = "AddNumbers",
+    portName = "AddNumbersPort",
+    targetNamespace = "http://foobar.org/",
     serviceName = "AddNumbersService"
 )
 @BindingType(value = SOAPBinding.SOAP11HTTP_BINDING)

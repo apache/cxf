@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,44 +35,67 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     private static final Logger LOG = LogUtils.getL7dLogger(MediaTypeHeaderProvider.class);
-    private static final String STRICT_MEDIA_TYPE_CHECK = 
+    private static final String STRICT_MEDIA_TYPE_CHECK =
         "org.apache.cxf.jaxrs.mediaTypeCheck.strict";
-    private static final Pattern COMPLEX_PARAMETERS = 
+    private static final Pattern COMPLEX_PARAMETERS =
         Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/\\+]+))");
-    
+
+    private static Map<String, MediaType> map = new ConcurrentHashMap<>();
+    private static final int MAX_MT_CACHE_SIZE =
+        SystemPropertyAction.getInteger("org.apache.cxf.jaxrs.max_mediatype_cache_size", 200);
+
     public MediaType fromString(String mType) {
-        
+
         return valueOf(mType);
     }
 
     public static MediaType valueOf(String mType) {
-        
         if (mType == null) {
             throw new IllegalArgumentException("Media type value can not be null");
         }
-        
+
+        MediaType result = map.get(mType);
+        if (result == null) {
+            result = internalValueOf(mType);
+            final int size = map.size();
+            if (size >= MAX_MT_CACHE_SIZE) {
+                map.clear();
+            }
+            map.put(mType, result);
+        }
+        return result;
+    }
+
+    public static MediaType internalValueOf(String mType) {
+
         int i = mType.indexOf('/');
         if (i == -1) {
             return handleMediaTypeWithoutSubtype(mType.trim());
+        } else if (i == 0) {
+            throw new IllegalArgumentException("Invalid media type string: " + mType);
         }
-        
+
         int paramsStart = mType.indexOf(';', i + 1);
         int end = paramsStart == -1  ? mType.length() : paramsStart;
-        
-        String type = mType.substring(0, i); 
+
+        String type = mType.substring(0, i);
         String subtype = mType.substring(i + 1, end);
-        
+        if (subtype.indexOf("/") != -1) {
+            throw new IllegalArgumentException("Invalid media type string: " + mType);
+        }
+
         Map<String, String> parameters = Collections.emptyMap();
         if (paramsStart != -1) {
 
-            parameters = new LinkedHashMap<String, String>();
-            
+            parameters = new LinkedHashMap<>();
+
             String paramString = mType.substring(paramsStart + 1);
             if (paramString.contains("\"")) {
                 Matcher m = COMPLEX_PARAMETERS.matcher(paramString);
@@ -86,28 +110,28 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                 }
             }
         }
-        
-        return new MediaType(type.trim().toLowerCase(), 
-                             subtype.trim().toLowerCase(), 
+
+        return new MediaType(type.trim().toLowerCase(),
+                             subtype.trim().toLowerCase(),
                              parameters);
     }
-    
+
     private static void addParameter(Map<String, String> parameters, String token) {
         int equalSign = token.indexOf('=');
         if (equalSign == -1) {
             throw new IllegalArgumentException("Wrong media type parameter, separator is missing");
         }
-        parameters.put(token.substring(0, equalSign).trim().toLowerCase(), 
+        parameters.put(token.substring(0, equalSign).trim().toLowerCase(),
                        token.substring(equalSign + 1).trim());
     }
-    
+
     public String toString(MediaType type) {
         return typeToString(type);
     }
     public static String typeToString(MediaType type) {
         return typeToString(type, null);
     }
-    // Max number of parameters that may be ignored is 3, at least as known 
+    // Max number of parameters that may be ignored is 3, at least as known
     // to the implementation
     public static String typeToString(MediaType type, List<String> ignoreParams) {
         if (type == null) {
@@ -115,7 +139,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         }
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());
-        
+
         Map<String, String> params = type.getParameters();
         if (params != null) {
             for (Iterator<Map.Entry<String, String>> iter = params.entrySet().iterator();
@@ -127,7 +151,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                 sb.append(';').append(entry.getKey()).append('=').append(entry.getValue());
             }
         }
-        
+
         return sb.toString();
     }
 
@@ -137,7 +161,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             boolean mTypeNextEmpty = StringUtils.isEmpty(mTypeNext);
             if (mTypeNextEmpty || mTypeNext.startsWith(";")) {
                 if (!mTypeNextEmpty) {
-                    Map<String, String> parameters = new LinkedHashMap<String, String>();
+                    Map<String, String> parameters = new LinkedHashMap<>();
                     StringTokenizer st = new StringTokenizer(mType.substring(2).trim(), ";");
                     while (st.hasMoreTokens()) {
                         addParameter(parameters, st.nextToken());
@@ -145,15 +169,14 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                     return new MediaType(MediaType.MEDIA_TYPE_WILDCARD,
                                          MediaType.MEDIA_TYPE_WILDCARD,
                                          parameters);
-                } else { 
-                    return MediaType.WILDCARD_TYPE;
                 }
-                
+                return MediaType.WILDCARD_TYPE;
+
             }
         }
         Message message = PhaseInterceptorChain.getCurrentMessage();
-        if (message != null 
-            && !MessageUtils.isTrue(message.getContextualProperty(STRICT_MEDIA_TYPE_CHECK))) {
+        if (message != null
+            && !MessageUtils.getContextualBoolean(message, STRICT_MEDIA_TYPE_CHECK, false)) {
             MediaType mt = null;
             if (mType.equals(MediaType.TEXT_PLAIN_TYPE.getType())) {
                 mt = MediaType.TEXT_PLAIN_TYPE;
@@ -164,8 +187,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
             }
             LOG.fine("Converting a malformed media type '" + mType + "' to '" + typeToString(mt) + "'");
             return mt;
-        } else {
-            throw new IllegalArgumentException("Media type separator is missing");
         }
+        throw new IllegalArgumentException("Media type separator is missing");
     }
 }

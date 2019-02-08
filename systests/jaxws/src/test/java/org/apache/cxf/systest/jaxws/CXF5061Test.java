@@ -22,19 +22,23 @@ package org.apache.cxf.systest.jaxws;
 
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class CXF5061Test extends AbstractBusClientServerTestBase {
 
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber("org.apache.cxf.systest.jaxws.CXF5061Test")
             + "/cxf5061";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
@@ -58,9 +62,12 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCxf5061() throws Exception {
+        if (JavaUtils.isJava9Compatible()) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
         //using dcf to generate client from the wsdl which ensure the wsdl is valid
         JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
         dcf.createClient(ADDRESS + "?wsdl");

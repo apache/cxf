@@ -44,21 +44,21 @@ import org.apache.cxf.security.SecurityContext;
 public class WebServiceContextImpl implements WebServiceContext {
     private static final Logger LOG = LogUtils.getL7dLogger(WebServiceContextImpl.class);
 
-    private static ThreadLocal<MessageContext> context = new ThreadLocal<MessageContext>();
+    private static ThreadLocal<MessageContext> context = new ThreadLocal<>();
 
     private final MessageContext localCtx;
-    
-    public WebServiceContextImpl() { 
+
+    public WebServiceContextImpl() {
         localCtx = null;
     }
-    
+
     public WebServiceContextImpl(MessageContext c) {
         localCtx = c;
     }
 
     // Implementation of javax.xml.ws.WebServiceContext
     public final MessageContext getMessageContext() {
-        return localCtx == null ? context.get() : localCtx; 
+        return localCtx == null ? context.get() : localCtx;
     }
 
     public final Principal getUserPrincipal() {
@@ -76,7 +76,7 @@ public class WebServiceContextImpl implements WebServiceContext {
         }
         return ctx.isUserInRole(role);
     }
-    
+
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         WrappedMessageContext ctx = (WrappedMessageContext)getMessageContext();
         org.apache.cxf.message.Message msg = ctx.getWrappedMessage();
@@ -99,7 +99,7 @@ public class WebServiceContextImpl implements WebServiceContext {
         if (wsdlDescription != null) {
             builder.wsdlDocumentLocation(wsdlDescription.toString());
         }
-        
+
         /*
         if (ep.getEndpointInfo().getService().getDescription() != null) {
             builder.wsdlDocumentLocation(ep.getEndpointInfo().getService()
@@ -111,7 +111,7 @@ public class WebServiceContextImpl implements WebServiceContext {
                 builder.referenceParameter(referenceParameter);
             }
         }
-        
+
         ClassLoaderHolder orig = null;
         try {
             orig = ClassLoaderUtils.setThreadContextClassloader(EndpointReferenceBuilder.class.getClassLoader());
@@ -127,15 +127,14 @@ public class WebServiceContextImpl implements WebServiceContext {
                                                                 Element... referenceParameters) {
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
-        } else {
-            throw new WebServiceException(new Message("ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED",
-                                                      LOG, clazz.getName()).toString());
         }
+        throw new WebServiceException(new Message("ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED",
+                                                  LOG, clazz.getName()).toString());
     }
 
     /**
      * Sets reference to the specified MessageContext and returns the previous reference, if any.
-     * 
+     *
      * @param ctx       The MessageContext to set
      * @return          The former MessageContext reference, if any.
      */

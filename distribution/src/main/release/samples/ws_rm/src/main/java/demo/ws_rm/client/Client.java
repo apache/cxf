@@ -38,9 +38,9 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         try {
-            
+
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("/client.xml");
             Bus bus = bf.createBus(busFile.toString());

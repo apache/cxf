@@ -28,7 +28,6 @@ public class FooServiceImpl implements FooService {
 //    }
 
     public Foo echo2(Foo foo, String name) {
-        // TODO Auto-generated method stub
         return null;
     }
 

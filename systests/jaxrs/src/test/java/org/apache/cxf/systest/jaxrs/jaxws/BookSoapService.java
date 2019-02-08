@@ -26,14 +26,14 @@ import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 
 /**
- * 
+ *
  */
 
-@WebServiceClient(name = "BookService", 
+@WebServiceClient(name = "BookService",
                   targetNamespace = "http://books.com")
 public class BookSoapService extends Service {
     static final QName SERVICE = new QName("http://books.com", "BookService");
-    static final QName BOOK_PORT = 
+    static final QName BOOK_PORT =
         new QName("http://books.com", "BookPort");
     public BookSoapService(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);
@@ -41,7 +41,7 @@ public class BookSoapService extends Service {
 
     @WebEndpoint(name = "BookPort")
     public BookStoreJaxrsJaxws getBookPort() {
-        return super.getPort(BOOK_PORT, 
+        return super.getPort(BOOK_PORT,
                                                   BookStoreJaxrsJaxws.class);
     }
 

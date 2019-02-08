@@ -30,7 +30,7 @@ import javax.ws.rs.Produces;
 import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
 
 /**
- * 
+ *
  */
 public class ConfigServer {
     private CrossOriginResourceSharingFilter inputFilter;
@@ -45,7 +45,7 @@ public class ConfigServer {
         }
         return "ok";
     }
-    
+
     @POST
     @Path("/setAllowCredentials/{yn}")
     @Produces("text/plain")
@@ -53,7 +53,7 @@ public class ConfigServer {
         inputFilter.setAllowCredentials(yn);
         return "ok";
     }
-          
+
 
     public CrossOriginResourceSharingFilter getInputFilter() {
         return inputFilter;

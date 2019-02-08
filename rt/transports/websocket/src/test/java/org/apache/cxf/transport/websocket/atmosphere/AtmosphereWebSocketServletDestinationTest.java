@@ -32,45 +32,48 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.atmosphere.cpr.AtmosphereInterceptor;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
- * 
+ *
  */
-public class AtmosphereWebSocketServletDestinationTest extends Assert {
+public class AtmosphereWebSocketServletDestinationTest {
     private static final String ENDPOINT_ADDRESS = "/websocket/nada";
     private static final QName ENDPOINT_NAME = new QName("urn:websocket:probe", "nada");
 
     @Test
     public void testRegisteration() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
+        Bus bus = new ExtensionManagerBus();
         DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        TestAtmosphereWebSocketServletDestination dest = 
+        TestAtmosphereWebSocketServletDestination dest =
             new TestAtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         dest.activate();
-        
+
         assertNotNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
-        
+
         dest.deactivate();
 
         assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
     }
-    
+
     @Test
     public void testUseCXFDefaultAtmoosphereInterceptor() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
+        Bus bus = new ExtensionManagerBus();
         DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -93,7 +96,7 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -102,7 +105,7 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
             if (CustomInterceptor1.class.equals(a.getClass())) {
                 added++;
                 break;
-            } 
+            }
         }
         assertEquals(1, added);
     }
@@ -116,7 +119,7 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -127,11 +130,11 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
             } else if (CustomInterceptor2.class.equals(a.getClass())) {
                 added++;
                 break;
-            } 
+            }
         }
         assertEquals(2, added);
     }
-    
+
     private static class TestAtmosphereWebSocketServletDestination extends AtmosphereWebSocketServletDestination {
 
 
@@ -150,7 +153,7 @@ public class AtmosphereWebSocketServletDestinationTest extends Assert {
             super.deactivate();
         }
     }
-    
+
     private static class CustomInterceptor1 extends DefaultProtocolInterceptor {
     }
     private static class CustomInterceptor2 extends DefaultProtocolInterceptor {

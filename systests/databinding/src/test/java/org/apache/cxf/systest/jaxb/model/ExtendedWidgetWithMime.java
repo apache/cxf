@@ -34,7 +34,7 @@ public class ExtendedWidgetWithMime extends Widget {
 
     @XmlMimeType("application/octet-stream")
     private byte[] xmlData;
-    
+
 
     /**
      * @return the extended

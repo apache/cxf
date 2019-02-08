@@ -29,15 +29,15 @@ import org.apache.hello_world_soap_http.types.FaultDetail;
 
 @WebService(name = "SoapPort",
             portName = "SoapPort",
-            serviceName = "SOAPService", 
-            targetNamespace = "http://apache.org/hello_world_soap_http", 
+            serviceName = "SOAPService",
+            targetNamespace = "http://apache.org/hello_world_soap_http",
             wsdlLocation = "file:./src/main/resources/hello_world_addr.wsdl")
-                  
+
 public class GreeterImpl implements Greeter {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMe(java.lang.String)
      */
@@ -47,7 +47,7 @@ public class GreeterImpl implements Greeter {
         System.out.println("Message received: " + me + "\n");
         return "Hello " + me;
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMeOneWay(java.lang.String)
      */
@@ -65,7 +65,7 @@ public class GreeterImpl implements Greeter {
         System.out.println("Executing operation sayHi\n");
         return "Bonjour";
     }
-    
+
     public void pingMe() throws PingMeFault {
         FaultDetail faultDetail = new FaultDetail();
         faultDetail.setMajor((short)2);
@@ -75,5 +75,5 @@ public class GreeterImpl implements Greeter {
         throw new PingMeFault("PingMeFault raised by server", faultDetail);
     }
 
-    
+
 }

@@ -38,6 +38,7 @@ import org.apache.cxf.interceptor.security.callback.CertKeyToUserNameMapper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Test;
@@ -142,7 +143,7 @@ public class JAASLoginInterceptorTest {
 
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-                Map<String, String> options = new HashMap<String, String>();
+                Map<String, String> options = new HashMap<>();
                 AppConfigurationEntry configEntry = new AppConfigurationEntry(
                                                                               TestUserPasswordLoginModule.class
                                                                                   .getName(),

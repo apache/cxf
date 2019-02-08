@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.oauth2.grants.owner;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -27,33 +28,34 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.AbstractGrantHandler;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * The "resource owner" grant handler
  */
 public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
     private ResourceOwnerLoginHandler loginHandler;
-    
+
     public ResourceOwnerGrantHandler() {
         super(OAuthConstants.RESOURCE_OWNER_GRANT);
     }
-
+    
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        
+
         String ownerName = params.getFirst(OAuthConstants.RESOURCE_OWNER_NAME);
         String ownerPassword = params.getFirst(OAuthConstants.RESOURCE_OWNER_PASSWORD);
         if (ownerName == null || ownerPassword == null) {
             throw new OAuthServiceException(
                  new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
-        UserSubject subject = loginHandler.createSubject(ownerName, ownerPassword);
+        UserSubject subject = loginHandler.createSubject(client, ownerName, ownerPassword);
         if (subject == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
         return doCreateAccessToken(client, subject, params);
     }
-    
+
     public ResourceOwnerLoginHandler getLoginHandler() {
         return this.loginHandler;
     }
@@ -62,5 +64,10 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
         this.loginHandler = loginHandler;
     }
 
-
+    public void setMessageContext(MessageContext context) {
+        if (loginHandler != null) {
+            OAuthUtils.injectContextIntoOAuthProvider(context, loginHandler);
+        }
+    }
+    
 }

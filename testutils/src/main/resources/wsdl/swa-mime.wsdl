@@ -114,7 +114,7 @@
     <wsdl:binding name="SwAServiceBinding" type="tns:SwAServiceInterface">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="echoDataRef">
-            <soap:operation soapAction="" style="literal"/>
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input>
                 <soap:body parts="data" use="literal"/>
             </wsdl:input>
@@ -123,7 +123,7 @@
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="echoData">
-            <soap:operation soapAction="" style="literal"/>
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input>
                 <mime:multipartRelated>
                     <mime:part>
@@ -146,7 +146,7 @@
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="echoDataWithHeader">
-            <soap:operation soapAction="" style="literal"/>
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input>
                 <mime:multipartRelated>
                     <mime:part>
@@ -171,7 +171,7 @@
             </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="echoAllAttachmentTypes">
-            <soap:operation/>
+            <soap:operation soapAction="" style="document"/>
             <wsdl:input>
                 <mime:multipartRelated>
                     <mime:part>
@@ -190,7 +190,7 @@
                         <mime:content part="attach4" type="image/jpeg"/>
                     </mime:part>
                     <mime:part>
-                        <mime:content part="attach5" type="image/jpeg"/>
+                        <mime:content part="attach5" type="image/gif"/>
                     </mime:part>
                 </mime:multipartRelated>
             </wsdl:input>
@@ -212,7 +212,7 @@
                         <mime:content part="attach4" type="image/jpeg"/>
                     </mime:part>
                     <mime:part>
-                        <mime:content part="attach5" type="image/jpeg"/>
+                        <mime:content part="attach5" type="image/gif"/>
                     </mime:part>
                 </mime:multipartRelated>
             </wsdl:output>

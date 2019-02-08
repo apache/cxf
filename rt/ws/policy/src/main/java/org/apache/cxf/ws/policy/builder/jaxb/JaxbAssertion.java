@@ -36,12 +36,12 @@ import org.apache.neethi.PolicyComponent;
 
 
 /**
- * 
+ *
  */
 public class JaxbAssertion<T> extends PrimitiveAssertion {
     private JAXBContext context;
     private Set<Class<?>> classes;
-    
+
     private T data;
 
     public JaxbAssertion() {
@@ -50,11 +50,11 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
     public JaxbAssertion(QName qn, boolean optional) {
         super(qn, optional);
     }
-    
+
     public JaxbAssertion(QName qn, boolean optional, boolean ignorable) {
         super(qn, optional, ignorable);
     }
-      
+
     @Override
     @SuppressWarnings("unchecked")
     public boolean equal(PolicyComponent policyComponent) {
@@ -63,6 +63,23 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
         }
         JaxbAssertion<T> a = (JaxbAssertion<T>)policyComponent;
         return data.equals(a.getData());
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof JaxbAssertion) {
+            return super.equals(o) && equal((PolicyComponent)o);
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        int i = super.hashCode();
+        if (data != null) {
+            i ^= data.hashCode();
+        }
+        return i;
     }
 
     public void setData(T d) {
@@ -74,16 +91,16 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
     }
 
     protected Assertion clone(boolean optional) {
-        JaxbAssertion<T> a = new JaxbAssertion<T>(getName(), optional, ignorable);
+        JaxbAssertion<T> a = new JaxbAssertion<>(getName(), optional, ignorable);
         a.setData(data);
-        return a;        
-    } 
-    
+        return a;
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> JaxbAssertion<T> cast(Assertion a) {
         return (JaxbAssertion<T>)a;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static <T> JaxbAssertion<T> cast(Assertion a, Class<T> type) {
         return (JaxbAssertion<T>)a;
@@ -91,14 +108,14 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
 
     private synchronized JAXBContext getContext() throws JAXBException {
         if (context == null || classes == null) {
-            CachedContextAndSchemas ccs 
+            CachedContextAndSchemas ccs
                 = JAXBContextCache.getCachedContextAndSchemas(data.getClass());
             classes = ccs.getClasses();
             context = ccs.getContext();
         }
         return context;
     }
-    
+
     @Override
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
         try {

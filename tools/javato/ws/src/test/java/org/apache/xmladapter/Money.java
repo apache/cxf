@@ -22,8 +22,8 @@ package org.apache.xmladapter;
 import java.util.Currency;
 
 public class Money {
-    protected  Currency currency;
-    
+    protected Currency currency;
+
     public Currency getCurrency() {
         return currency;
     }

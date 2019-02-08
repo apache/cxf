@@ -19,11 +19,11 @@
 package org.apache.cxf.jca.outbound;
 
 import java.net.URL;
+import java.util.Objects;
 
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang.ObjectUtils;
 
 /**
  *
@@ -31,14 +31,14 @@ import org.apache.commons.lang.ObjectUtils;
  * a {@link CXFConnection}.
  */
 public class CXFConnectionSpec implements ConnectionRequestInfo {
-        
+
     private Class<?> serviceClass;
     private URL wsdlURL;
     private URL busConfigURL;
     private QName serviceName;
     private QName endpointName;
     private String address;
-    
+
     /**
      * @return the serviceClass
      */
@@ -111,8 +111,8 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
     public void setAddress(String address) {
         this.address = address;
     }
-    
-    // Required by JCA Spec 
+
+    // Required by JCA Spec
     public boolean equals(Object other) {
         if (other != null && !this.getClass().isAssignableFrom(other.getClass())) {
             return false;
@@ -121,62 +121,62 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
         if (!(other instanceof CXFConnectionSpec)) {
             return false;
         }
-        
+
         CXFConnectionSpec that = (CXFConnectionSpec)other;
-        
-        if (!ObjectUtils.equals(that.getWsdlURL(), wsdlURL)) {
+
+        if (!Objects.equals(that.getWsdlURL(), wsdlURL)) {
             return false;
         }
-        
-        if (!ObjectUtils.equals(that.getBusConfigURL(), busConfigURL)) {
+
+        if (!Objects.equals(that.getBusConfigURL(), busConfigURL)) {
             return false;
         }
-        
-        if (!ObjectUtils.equals(that.getServiceClass(), serviceClass)) {
+
+        if (!Objects.equals(that.getServiceClass(), serviceClass)) {
             return false;
         }
-        
-        if (!ObjectUtils.equals(that.getServiceName(), serviceName)) {
+
+        if (!Objects.equals(that.getServiceName(), serviceName)) {
             return false;
         }
-        
-        if (!ObjectUtils.equals(that.getEndpointName(), endpointName)) {
+
+        if (!Objects.equals(that.getEndpointName(), endpointName)) {
             return false;
         }
-        
-        return ObjectUtils.equals(that.getAddress(), address);
+
+        return Objects.equals(that.getAddress(), address);
     }
 
     // Required by JCA Spec
     public int hashCode() {
         int retval = 0;
-        
+
         if (wsdlURL != null) {
             retval += wsdlURL.hashCode(); //NOSONAR
         }
-        
+
         if (busConfigURL != null) {
             retval += busConfigURL.hashCode();  //NOSONAR
         }
-        
+
         if (serviceClass != null) {
             retval += serviceClass.hashCode();
         }
-        
+
         if (serviceName != null) {
             retval += serviceName.hashCode();
         }
-        
+
         if (endpointName != null) {
             retval += endpointName.hashCode();
         }
-        
+
         if (address != null) {
             retval += address.hashCode();
         }
-        
+
         return retval;
-    
+
     }
 
     public String toString() {
@@ -189,5 +189,5 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
         buf.append(",address=" + address);
         return buf.toString();
     }
-    
+
 }

@@ -29,8 +29,8 @@ import javax.xml.bind.annotation.XmlType;
 public class TestJAXBClass {
     @XmlElement(name = "EndPart", required = true)
     protected String endPart;
-    
-    
+
+
     public String getEndPart() {
         return endPart;
     }

@@ -41,7 +41,7 @@ import org.apache.cxf.service.invoker.Invoker;
  * the Exchange.
  */
 public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     public ServiceInvokerInterceptor() {
         super(Phase.INVOKE);
     }
@@ -50,7 +50,7 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
         final Exchange exchange = message.getExchange();
         final Endpoint endpoint = exchange.getEndpoint();
         final Service service = endpoint.getService();
-        final Invoker invoker = service.getInvoker();        
+        final Invoker invoker = service.getInvoker();
 
         Runnable invocation = new Runnable() {
 
@@ -59,7 +59,7 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                 Object result = invoker.invoke(runableEx, getInvokee(message));
                 if (!exchange.isOneWay()) {
                     Endpoint ep = exchange.getEndpoint();
-                    
+
                     Message outMessage = runableEx.getOutMessage();
                     if (outMessage == null) {
                         outMessage = new MessageImpl();
@@ -77,17 +77,17 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                         } else if (result.getClass().isArray()) {
                             resList = new MessageContentsList((Object[])result);
                         } else {
-                            outMessage.setContent(Object.class, result);                            
+                            outMessage.setContent(Object.class, result);
                         }
                         if (resList != null) {
                             outMessage.setContent(List.class, resList);
                         }
-                    }                    
+                    }
                 }
             }
 
         };
-        
+
         Executor executor = getExecutor(endpoint);
         Executor executor2 = exchange.get(Executor.class);
         if (executor2 == executor || executor == null
@@ -101,9 +101,9 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             // synchronized PhaseInterceptorChain methods the current thread
             // needs to release the chain lock and re-acquire it after the
             // executor thread is done
-            
+
             final PhaseInterceptorChain chain = (PhaseInterceptorChain)message.getInterceptorChain();
-            final AtomicBoolean contextSwitched = new AtomicBoolean(); 
+            final AtomicBoolean contextSwitched = new AtomicBoolean();
             final FutureTask<Object> o = new FutureTask<Object>(invocation, null) {
                 @Override
                 protected void done() {
@@ -114,14 +114,14 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                     }
                     chain.releaseChain();
                 }
-                
+
                 @Override
                 public void run() {
                     if (PhaseInterceptorChain.setCurrentMessage(chain, message)) {
                         contextSwitched.set(true);
                         message.put(Message.THREAD_CONTEXT_SWITCHED, true);
                     }
-                    
+
                     synchronized (chain) {
                         super.run();
                     }
@@ -140,13 +140,12 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof RuntimeException) {
                     throw (RuntimeException)e.getCause();
-                } else {
-                    throw new Fault(e.getCause());
                 }
+                throw new Fault(e.getCause());
             }
         }
     }
-    
+
     private Object getInvokee(Message message) {
         Object invokee = message.getContent(List.class);
         if (invokee == null) {
@@ -162,12 +161,12 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
     private Executor getExecutor(final Endpoint endpoint) {
         return endpoint.getService().getExecutor();
     }
-    
-    private void copyJaxwsProperties(Message inMsg, Message outMsg) {       
+
+    private void copyJaxwsProperties(Message inMsg, Message outMsg) {
         outMsg.put(Message.WSDL_OPERATION, inMsg.get(Message.WSDL_OPERATION));
         outMsg.put(Message.WSDL_SERVICE, inMsg.get(Message.WSDL_SERVICE));
         outMsg.put(Message.WSDL_INTERFACE, inMsg.get(Message.WSDL_INTERFACE));
         outMsg.put(Message.WSDL_PORT, inMsg.get(Message.WSDL_PORT));
         outMsg.put(Message.WSDL_DESCRIPTION, inMsg.get(Message.WSDL_DESCRIPTION));
-    }    
+    }
 }

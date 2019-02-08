@@ -35,9 +35,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class CollectionService implements CollectionServiceInterface {
-    
+
     private Map<String, Map<String, BeanWithGregorianDate>> lastComplexMap;
-    
+
     /** {@inheritDoc}*/
     public Collection<String> getStrings() {
         return null;
@@ -56,11 +56,11 @@ public class CollectionService implements CollectionServiceInterface {
     public Collection<Collection<String>> getStringCollections() {
         return null;
     }
-    
+
     /** {@inheritDoc}*/
     public void takeDoubleList(List<Double> doublesList) {
     }
-    
+
     /** {@inheritDoc}*/
     public String takeSortedStrings(SortedSet<String> strings) {
         return strings.first();
@@ -93,7 +93,7 @@ public class CollectionService implements CollectionServiceInterface {
     }
 
     public Collection<double[]> returnCollectionOfPrimitiveArrays() {
-        List<double[]> data = new ArrayList<double[]>();
+        List<double[]> data = new ArrayList<>();
         double[] dataArray = new double[] {3.14, 2.0, -666.6 };
         data.add(dataArray);
         dataArray = new double[] {-666.6, 3.14, 2.0, 0 };
@@ -113,7 +113,7 @@ public class CollectionService implements CollectionServiceInterface {
             d2.appendChild(e);
             e.setAttribute("not-an", "ungulate");
             Document[] da = new Document[] {d1, d2};
-            List<Document[]> l = new ArrayList<Document[]>();
+            List<Document[]> l = new ArrayList<>();
             l.add(da);
             da = new Document[] {d2, d1};
             l.add(da);

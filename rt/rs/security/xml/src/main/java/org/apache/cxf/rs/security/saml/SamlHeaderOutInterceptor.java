@@ -39,43 +39,43 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 
 public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(SamlHeaderOutInterceptor.class);
-    
+
     public SamlHeaderOutInterceptor() {
         this(Phase.WRITE);
     }
-    
+
     public SamlHeaderOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         try {
             SamlAssertionWrapper assertionWrapper = createAssertion(message);
-            
+
             Document doc = DOMUtils.newDocument();
             Element assertionElement = assertionWrapper.toDOM(doc);
             String encodedToken = encodeToken(DOM2Writer.nodeToString(assertionElement));
-            
+
             Map<String, List<String>> headers = getHeaders(message);
-            
+
             StringBuilder builder = new StringBuilder();
             builder.append("SAML").append(" ").append(encodedToken);
-            headers.put("Authorization", 
+            headers.put("Authorization",
                 CastUtils.cast(Collections.singletonList(builder.toString()), String.class));
-            
+
         } catch (Exception ex) {
             StringWriter sw = new StringWriter();
             ex.printStackTrace(new PrintWriter(sw));
             LOG.warning(sw.toString());
             throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
-        
+
     }
-        
+
     private Map<String, List<String>> getHeaders(Message message) {
-        Map<String, List<String>> headers = 
+        Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
             headers = new HashMap<>();
@@ -83,6 +83,6 @@ public class SamlHeaderOutInterceptor extends AbstractSamlOutInterceptor {
         }
         return headers;
     }
-    
-    
+
+
 }

@@ -18,13 +18,20 @@
  */
 package org.apache.cxf.rs.security.xml;
 
+import java.util.Map;
+
 public class SignatureProperties {
     private String signatureAlgo;
     private String signatureDigestAlgo;
     private String signatureC14nMethod;
     private String signatureC14nTransform;
     private String signatureKeyIdType;
-    
+    private String signatureKeyName;
+    private Map<String, String> keyNameAliasMap;
+    private Integer signatureLocation;
+    private Boolean signatureGenerateIdAttributes;
+    private Boolean signatureOmitC14nTransform;
+
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
     }
@@ -37,30 +44,14 @@ public class SignatureProperties {
     public String getSignatureDigestAlgo() {
         return signatureDigestAlgo;
     }
-    @Deprecated
-    public void setSignatureC14Method(String signatureC14Method) {
-        setSignatureC14nMethod(signatureC14Method);
-    }
     public void setSignatureC14nMethod(String signatureC14nMethod) {
         this.signatureC14nMethod = signatureC14nMethod;
-    }
-    @Deprecated
-    public String getSignatureC14Method() {
-        return getSignatureC14nMethod();
     }
     public String getSignatureC14nMethod() {
         return signatureC14nMethod;
     }
-    @Deprecated
-    public void setSignatureC14Transform(String signatureC14Transform) {
-        setSignatureC14nTransform(signatureC14Transform);
-    }
     public void setSignatureC14nTransform(String signatureC14nTransform) {
         this.signatureC14nTransform = signatureC14nTransform;
-    }
-    @Deprecated
-    public String getSignatureC14Transform() {
-        return getSignatureC14nTransform();
     }
     public String getSignatureC14nTransform() {
         return signatureC14nTransform;
@@ -71,5 +62,47 @@ public class SignatureProperties {
     public void setSignatureKeyIdType(String signatureKeyIdType) {
         this.signatureKeyIdType = signatureKeyIdType;
     }
-    
+    public String getSignatureKeyName() {
+        return signatureKeyName;
+    }
+    public void setSignatureKeyName(String signatureKeyName) {
+        this.signatureKeyName = signatureKeyName;
+    }
+
+    public Map<String, String> getKeyNameAliasMap() {
+        return keyNameAliasMap;
+    }
+
+    /**
+     * Set the Signature KeyName alias lookup map. It is used on the receiving side for signature.
+     * It maps a KeyName to a key alias - so it allows us to associate a (e.g.) key alias in
+     * a keystore with a given KeyName contained in a KeyInfo structure of the Signature.
+     */
+    public void setKeyNameAliasMap(Map<String, String> keyNameAliasMap) {
+        this.keyNameAliasMap = keyNameAliasMap;
+    }
+
+    public Integer getSignatureLocation() {
+        return signatureLocation;
+    }
+
+    public void setSignatureLocation(Integer signatureLocation) {
+        this.signatureLocation = signatureLocation;
+    }
+
+    public Boolean getSignatureGenerateIdAttributes() {
+        return signatureGenerateIdAttributes;
+    }
+
+    public void setSignatureGenerateIdAttributes(Boolean signatureGenerateIdAttributes) {
+        this.signatureGenerateIdAttributes = signatureGenerateIdAttributes;
+    }
+
+    public Boolean getSignatureOmitC14nTransform() {
+        return signatureOmitC14nTransform;
+    }
+
+    public void setSignatureOmitC14nTransform(Boolean signatureOmitC14nTransform) {
+        this.signatureOmitC14nTransform = signatureOmitC14nTransform;
+    }
 }

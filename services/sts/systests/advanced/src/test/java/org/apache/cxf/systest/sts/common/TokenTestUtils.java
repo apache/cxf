@@ -23,6 +23,7 @@ import java.util.List;
 import javax.xml.ws.BindingProvider;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
@@ -38,12 +39,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public final class TokenTestUtils {
-    
+
     private TokenTestUtils() {
         //
     }
-    
-    
+
+
     public static void verifyToken(DoubleItPortType port) throws Exception {
         Client client = ClientProxy.getClient(port);
         Endpoint ep = client.getEndpoint();
@@ -52,10 +53,10 @@ public final class TokenTestUtils {
         org.apache.cxf.ws.security.tokenstore.SecurityToken tok = store.getToken(id);
         assertNotNull(tok);
         STSClient sts = (STSClient)ep.get(SecurityConstants.STS_CLIENT);
-        
+
         List<SecurityToken> validTokens = sts.validateSecurityToken(tok);
         assertTrue(validTokens != null && !validTokens.isEmpty());
-        
+
         //mess with the token a bit to force it to fail to validate
         Element e = tok.getToken();
         Element e2 = DOMUtils.getFirstChildWithName(e, e.getNamespaceURI(), "Conditions");
@@ -93,5 +94,5 @@ public final class TokenTestUtils {
             }
         }
     }
-    
+
 }

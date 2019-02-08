@@ -40,7 +40,7 @@ public abstract class VisitorBase implements Visitor {
     protected DeferredActionCollection deferredActions;
     protected XmlSchema schema;
     protected Definition definition;
-    
+
     private XmlSchemaType schemaType;
     private CorbaType corbaType;
     private Scope fullyQualifiedName;
@@ -56,13 +56,13 @@ public abstract class VisitorBase implements Visitor {
         scopedNames = wsdlVisitor.getScopedNames();
         deferredActions = wsdlVisitor.getDeferredActions();
         typeMap = wsdlVisitor.getTypeMap();
-        
+
         manager = wsdlVisitor.getManager();
         mapper = wsdlVisitor.getModuleToNSMapper();
 
         scope = scopeRef;
         scope.setPrefix(wsdlASTVisitor.getPragmaPrefix());
-        fullyQualifiedName = null;        
+        fullyQualifiedName = null;
         schemaType = null;
         corbaType = null;
         definition = defn;
@@ -70,39 +70,39 @@ public abstract class VisitorBase implements Visitor {
     }
 
     public abstract void visit(AST node);
-    
+
     protected void setSchemaType(XmlSchemaType type) {
         schemaType = type;
     }
-    
+
     public XmlSchemaType getSchemaType() {
         return schemaType;
     }
-    
+
     protected void setCorbaType(CorbaType type) {
         corbaType = type;
     }
-    
+
     public CorbaType getCorbaType() {
-        return corbaType;        
+        return corbaType;
     }
-    
+
     public Scope getScope() {
         return scope;
     }
-    
+
     public static ScopeNameCollection getScopedNames() {
         return scopedNames;
     }
-    
+
     public void setFullyQualifiedName(Scope declaredName) {
         fullyQualifiedName = declaredName;
     }
-    
+
     public Scope getFullyQualifiedName() {
         return fullyQualifiedName;
     }
-    
+
     public WSDLASTVisitor getWsdlVisitor() {
         return wsdlVisitor;
     }

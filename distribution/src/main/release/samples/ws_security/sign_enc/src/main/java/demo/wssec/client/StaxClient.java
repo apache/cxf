@@ -50,7 +50,7 @@ public final class StaxClient {
     private StaxClient() {
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         try {
 
             SpringBusFactory bf = new SpringBusFactory();
@@ -58,12 +58,12 @@ public final class StaxClient {
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
-            Properties encCryptoProperties = 
+            Properties encCryptoProperties =
                 CryptoFactory.getProperties("etc/Client_Encrypt.properties",
                     StaxClient.class.getClassLoader());
-            Properties sigCryptoProperties = 
+            Properties sigCryptoProperties =
                 CryptoFactory.getProperties("etc/Client_Sign.properties", StaxClient.class.getClassLoader());
-            
+
             WSSSecurityProperties properties = new WSSSecurityProperties();
             properties.addAction(WSSConstants.USERNAMETOKEN);
             properties.addAction(WSSConstants.TIMESTAMP);
@@ -74,7 +74,7 @@ public final class StaxClient {
             properties.setTokenUser("abcd");
             properties.setSignatureUser("clientx509v1");
             properties.setEncryptionUser("serverx509v1");
-            
+
             properties.setEncryptionCryptoProperties(encCryptoProperties);
             properties.setEncryptionKeyIdentifier(
                 WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
@@ -89,10 +89,10 @@ public final class StaxClient {
             properties.addEncryptionPart(
                 new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
             );
-            
+
             properties.setSignatureCryptoProperties(sigCryptoProperties);
             properties.setSignatureKeyIdentifier(
-                WSSecurityTokenConstants.KeyIdentifier_SecurityTokenDirectReference
+                WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
             );
             properties.setSignatureAlgorithm("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
             properties.addSignaturePart(
@@ -106,10 +106,10 @@ public final class StaxClient {
                     SecurePart.Modifier.Element)
             );
             properties.setCallbackHandler(new UTPasswordCallback());
-            
+
             WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
             bus.getOutInterceptors().add(ohandler);
-            
+
             WSSSecurityProperties inProperties = new WSSSecurityProperties();
             inProperties.addAction(WSSConstants.USERNAMETOKEN);
             inProperties.addAction(WSSConstants.TIMESTAMP);
@@ -119,7 +119,7 @@ public final class StaxClient {
             inProperties.setCallbackHandler(new UTPasswordCallback());
             inProperties.setDecryptionCryptoProperties(sigCryptoProperties);
             inProperties.setSignatureVerificationCryptoProperties(encCryptoProperties);
-            
+
             WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
             bus.getInInterceptors().add(inhandler);
 

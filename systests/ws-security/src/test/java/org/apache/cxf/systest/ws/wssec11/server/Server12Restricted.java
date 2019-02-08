@@ -29,11 +29,11 @@ public class Server12Restricted extends AbstractServerRestricted {
     public Server12Restricted() throws Exception {
         super("http://localhost:" + PORT);
     }
-    
+
     public Server12Restricted(String baseUrl) throws Exception {
         super(baseUrl);
     }
-    
+
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(
             "org/apache/cxf/systest/ws/wssec11/server.xml");
@@ -42,5 +42,5 @@ public class Server12Restricted extends AbstractServerRestricted {
         setBus(busLocal);
         super.run();
     }
-    
+
 }

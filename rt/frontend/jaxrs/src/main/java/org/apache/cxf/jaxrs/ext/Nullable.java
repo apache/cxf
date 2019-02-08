@@ -28,9 +28,9 @@ import java.lang.annotation.Target;
  * Some JAX-RS providers, notably JAXB-based ones
  * return 400 when the incoming payload is empty.
  * This annotation can be attached to a method parameter
- * identifying a request body in order to get a null 
- * injected instead  
- * 
+ * identifying a request body in order to get a null
+ * injected instead
+ *
  */
 @Target({ElementType.PARAMETER, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

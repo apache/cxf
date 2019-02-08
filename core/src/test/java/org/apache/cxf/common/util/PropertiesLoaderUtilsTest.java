@@ -21,22 +21,24 @@ package org.apache.cxf.common.util;
 
 import java.util.*;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PropertiesLoaderUtilsTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class PropertiesLoaderUtilsTest {
 
     Properties properties;
     String soapBindingFactory = "org.apache.cxf.bindings.soap.SOAPBindingFactory";
-    
+
     @Before
     public void setUp() throws Exception {
         properties = PropertiesLoaderUtils.
             loadAllProperties("org/apache/cxf/common/util/resources/bindings.properties.xml",
                               Thread.currentThread().getContextClassLoader());
-        assertNotNull(properties);        
-        
+        assertNotNull(properties);
+
     }
     @Test
     public void testLoadBindings() throws Exception {

@@ -32,48 +32,48 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 
-public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {    
+public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
     // for initialise behaviours
     static int initializeCount;
     static int shutdownCount;
     static boolean correctThreadContextClassLoader;
     static boolean throwException;
     static Bus bus = new DummyBus();
-  
-   
+
+
     static String[] invokeArgs;
     static String cxfHome = "File:/local/temp";
-    
-    
+
+
     public static void reset() {
         initializeCount = 0;
-        shutdownCount = 0; 
+        shutdownCount = 0;
         correctThreadContextClassLoader = false;
         throwException = false;
     }
-    
+
     public boolean hasExtensionByName(String name) {
         return false;
     }
 
     public static Bus init(String[] args) throws BusException {
-        
+
         initializeCount++;
-        correctThreadContextClassLoader = 
-            Thread.currentThread().getContextClassLoader() 
+        correctThreadContextClassLoader =
+            Thread.currentThread().getContextClassLoader()
             == org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl.class.getClassLoader();
         if (throwException) {
-            throw new BusException(new Message("tested bus exception!", 
+            throw new BusException(new Message("tested bus exception!",
                                                (ResourceBundle)null, new Object[]{}));
         }
         return bus;
-        
+
     }
 
-    
+
     public void shutdown(boolean wait) {
-        shutdownCount++; 
-        
+        shutdownCount++;
+
     }
 
 
@@ -87,24 +87,21 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
     public <T> void setExtension(T extension, Class<T> extensionType) {
 
     }
-    
+
     //    @Override
     public String getId() {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     public <T> T getConfiguration(AbstractPropertiesHolder props, T defaultValue, Class<T> type) {
-        // TODO Auto-generated method stub
         return null;
     }
 
 
     //    @Override
     public void run() {
-        // TODO Auto-generated method stub
-        
+
     }
 
     public static boolean isCorrectThreadContextClassLoader() {
@@ -142,7 +139,6 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
 
 
     public Collection<Feature> getFeatures() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -151,18 +147,15 @@ public class DummyBus extends AbstractBasicInterceptorProvider implements Bus {
     }
 
     public void setId(String i) {
-        // TODO Auto-generated method stub
-        
+
     }
 
     public void setProperties(Map<String, Object> properties) {
-        // TODO Auto-generated method stub
-        
+
     }
 
     public void setFeatures(Collection<? extends Feature> features) {
-        // TODO Auto-generated method stub
-        
+
     }
 
 }

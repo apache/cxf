@@ -20,12 +20,14 @@
 package org.apache.cxf.ws.addressing.policy;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.neethi.Assertion;
@@ -36,9 +38,11 @@ import org.apache.neethi.builders.PolicyContainingPrimitiveAssertion;
 import org.apache.neethi.builders.xml.XMLPrimitiveAssertionBuilder;
 
 /**
- * 
+ *
  */
 public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
+    private static final Logger LOG =
+        LogUtils.getL7dLogger(AddressingAssertionBuilder.class);
 
     private static final QName[] KNOWN_ELEMENTS = {
         MetadataConstants.ADDRESSING_ASSERTION_QNAME,
@@ -48,18 +52,18 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
         MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705,
         MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705
     };
-    
+
     public AddressingAssertionBuilder() {
     }
-    
-    
+
+
     public Assertion build(Element elem, AssertionBuilderFactory factory) {
-        
+
         String localName = elem.getLocalName();
         QName qn = new QName(elem.getNamespaceURI(), localName);
-        
+
         boolean optional = false;
-        
+
         Attr attribute = PolicyConstants.findOptionalAttribute(elem);
         if (attribute != null) {
             optional = Boolean.valueOf(attribute.getValue());
@@ -69,10 +73,10 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
             Assertion nap = new XMLPrimitiveAssertionBuilder() {
                 public Assertion newPrimitiveAssertion(Element element, Map<QName, String> mp) {
                     return new PrimitiveAssertion(MetadataConstants.ADDRESSING_ASSERTION_QNAME,
-                                                  isOptional(element), isIgnorable(element), mp);        
+                                                  isOptional(element), isIgnorable(element), mp);
                 }
-                public Assertion newPolicyContainingAssertion(Element element, 
-                                                              Map<QName, String> mp, 
+                public Assertion newPolicyContainingAssertion(Element element,
+                                                              Map<QName, String> mp,
                                                               Policy policy) {
                     return new PolicyContainingPrimitiveAssertion(
                                                   MetadataConstants.ADDRESSING_ASSERTION_QNAME,
@@ -80,11 +84,16 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
                                                   mp,
                                                   policy);
                 }
-            }.build(elem, factory); 
+            }.build(elem, factory);
+            if (!(nap instanceof PolicyContainingPrimitiveAssertion
+                    || nap instanceof org.apache.neethi.builders.PrimitiveAssertion)) {
+                // this happens when neethi fails to recognize the specified addressing policy element
+                LOG.warning("Unable to recognize the addressing policy");
+            }
             return nap;
         } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
             || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {
-            return new PrimitiveAssertion(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME, 
+            return new PrimitiveAssertion(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME,
                                           optional);
         } else if (MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME.getLocalPart()
             .equals(localName)
@@ -99,5 +108,5 @@ public class AddressingAssertionBuilder implements AssertionBuilder<Element> {
     public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
-    
+
 }

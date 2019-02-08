@@ -21,6 +21,6 @@ package org.apache.cxf.rs.security.oauth2.tokens.hawk;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public interface NonceVerifier {
-    void verifyNonce(String tokenKey, String clientNonce, String clientTimestamp) 
+    void verifyNonce(String tokenKey, String clientNonce, String clientTimestamp)
         throws OAuthServiceException;
 }

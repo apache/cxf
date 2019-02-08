@@ -24,7 +24,14 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DynamicProxyTest extends AbstractAegisTest {
     TypeMapping mapping;
@@ -36,7 +43,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
         context.initialize();
         mapping = context.getTypeMapping();
     }
-    
+
     @Test
     public void testDynamicProxy() throws Exception {
         BeanType type = new BeanType();

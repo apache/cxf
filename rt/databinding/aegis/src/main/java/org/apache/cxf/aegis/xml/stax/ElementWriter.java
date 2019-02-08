@@ -40,7 +40,7 @@ public class ElementWriter extends AbstractMessageWriter {
 
     /**
      * Create an ElementWriter but without writing an element name.
-     * 
+     *
      * @param writer
      */
     public ElementWriter(XMLStreamWriter writer) {
@@ -93,9 +93,9 @@ public class ElementWriter extends AbstractMessageWriter {
             String decPrefix = writer.getNamespaceContext().getPrefix(namespace);
 
             // If the user didn't specify a prefix, create one
-            if (StringUtils.isEmpty(prefix) 
+            if (StringUtils.isEmpty(prefix)
                 && decPrefix == null) {
-               
+
                 if (!StringUtils.isEmpty(namespace)) {
                     declare = true;
                     prefix = StaxUtils.getUniquePrefix(writer);
@@ -154,11 +154,10 @@ public class ElementWriter extends AbstractMessageWriter {
          */
         if ("".equals(qname.getPrefix())) {
             return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI());
-        } else {
-            return new ElementWriter(writer, qname.getLocalPart(), 
-                                     qname.getNamespaceURI(), 
-                                     qname.getPrefix());
         }
+        return new ElementWriter(writer, qname.getLocalPart(),
+                                 qname.getNamespaceURI(),
+                                 qname.getPrefix());
     }
 
     public String getNamespace() {
@@ -217,8 +216,8 @@ public class ElementWriter extends AbstractMessageWriter {
 
             if (pfx == null) {
                 String ns2 = writer.getNamespaceContext().getNamespaceURI(hint);
-                // if the hint is "" (the default) and the context does 
-                if (ns2 == null && !"".equals(hint)) { 
+                // if the hint is "" (the default) and the context does
+                if (ns2 == null && !"".equals(hint)) {
                     pfx = hint;
                 } else if (ns.equals(ns2)) {
                     // just because it's in the context, doesn't mean it has been written.

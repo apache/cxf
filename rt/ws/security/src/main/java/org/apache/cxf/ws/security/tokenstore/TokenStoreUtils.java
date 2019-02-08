@@ -26,7 +26,7 @@ import org.apache.cxf.ws.security.SecurityConstants;
  * Some common functionality
  */
 public final class TokenStoreUtils {
-    
+
     private TokenStoreUtils() {
         // complete
     }
@@ -34,7 +34,7 @@ public final class TokenStoreUtils {
     public static TokenStore getTokenStore(Message message) {
         EndpointInfo info = message.getExchange().getEndpoint().getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = 
+            TokenStore tokenStore =
                 (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
@@ -42,7 +42,7 @@ public final class TokenStoreUtils {
             if (tokenStore == null) {
                 TokenStoreFactory tokenStoreFactory = TokenStoreFactory.newInstance();
                 String cacheKey = SecurityConstants.TOKEN_STORE_CACHE_INSTANCE;
-                String cacheIdentifier = 
+                String cacheIdentifier =
                     (String)message.getContextualProperty(SecurityConstants.CACHE_IDENTIFIER);
                 if (cacheIdentifier != null) {
                     cacheKey += "-" + cacheIdentifier;

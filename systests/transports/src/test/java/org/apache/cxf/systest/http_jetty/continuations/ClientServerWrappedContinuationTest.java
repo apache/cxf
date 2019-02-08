@@ -33,20 +33,25 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ClientServerWrappedContinuationTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String HTTPS_PORT = allocatePort(Server.class, 1);
-    
+
     private static final String CLIENT_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/cxf.xml";
     private static final String CLIENT_HTTPS_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/cxf_https.xml";
     private static final String SERVER_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/jaxws-server.xml";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
@@ -54,7 +59,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
             Bus bus = bf.createBus(SERVER_CONFIG_FILE);
             setBus(bus);
             BusFactory.setDefaultBus(bus);
-            
+
             Object implementor = new HelloImplWithWrapppedContinuation();
             String address = "http://localhost:" + PORT + "/hellocontinuation";
             Endpoint.publish(address, implementor);
@@ -83,28 +88,28 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus(CLIENT_CONFIG_FILE);
         BusFactory.setDefaultBus(bus);
-        
+
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
-        
+
         URL wsdlURL = new URL("http://localhost:" + PORT + "/hellocontinuation?wsdl");
-        
+
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();
         doTest(helloPort);
         bus.shutdown(true);
     }
-        
+
     @Test
     public void testHttpsWrappedContinuations() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus(CLIENT_HTTPS_CONFIG_FILE);
         BusFactory.setDefaultBus(bus);
-        
+
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
-        
+
         URL wsdlURL = new URL("https://localhost:" + HTTPS_PORT + "/securecontinuation?wsdl");
-        
+
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();
@@ -121,31 +126,31 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
 
         executor.execute(new ControlWorker(helloPort, "Fred", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Fred", "", startSignal, helloDoneSignal));
-        
+
         executor.execute(new ControlWorker(helloPort, "Barry", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Barry", "Jameson", startSignal, helloDoneSignal));
-        
+
         executor.execute(new ControlWorker(helloPort, "Harry", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Harry", "", startSignal, helloDoneSignal));
-        
+
         executor.execute(new ControlWorker(helloPort, "Rob", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Rob", "Davidson", startSignal, helloDoneSignal));
-        
+
         executor.execute(new ControlWorker(helloPort, "James", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "James", "ServiceMix", startSignal, helloDoneSignal));
-        
+
         startSignal.countDown();
-        
+
         controlDoneSignal.await(100, TimeUnit.SECONDS);
         helloDoneSignal.await(100, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have been resumed", 0, controlDoneSignal.getCount());
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());
-        
+
         helloPort.sayHi("Dan1", "to:100");
         helloPort.sayHi("Dan2", "to:100");
         helloPort.sayHi("Dan3", "to:100");
     }
-    
-    
+
+
 }

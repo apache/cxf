@@ -43,8 +43,8 @@ public class Server {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         EndpointImpl impl = (EndpointImpl)Endpoint.publish(address, implementor);
-        
-        Map<String, Object> outProps = new HashMap<String, Object>();
+
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "UsernameToken Timestamp");
 
         outProps.put("passwordType", "PasswordText");
@@ -53,7 +53,7 @@ public class Server {
 
         impl.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
-        Map<String, Object> inProps = new HashMap<String, Object>();
+        Map<String, Object> inProps = new HashMap<>();
         inProps.put("action", "UsernameToken Timestamp");
         inProps.put("passwordType", "PasswordDigest");
         inProps.put("passwordCallbackClass", "demo.wssec.server.UTPasswordCallback");
@@ -61,7 +61,7 @@ public class Server {
         impl.getInInterceptors().add(new WSS4JInInterceptor(inProps));
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = Server.class.getResource("/wssec.xml");

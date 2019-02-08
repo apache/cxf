@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/customerservice/")
 public interface CustomerService {
-    
+
     @GET
     @Path("/customers/{id}/")
     Customer getCustomer(@PathParam("id") String id);
@@ -36,7 +36,7 @@ public interface CustomerService {
     @PUT
     @Path("/customers/{id}")
     Response updateCustomer(@PathParam("id") Long id, Customer customer);
-    
+
     @POST
     @Path("/customers/")
     Response addCustomer(Customer customer);

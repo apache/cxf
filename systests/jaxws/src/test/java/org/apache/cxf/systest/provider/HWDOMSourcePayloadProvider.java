@@ -52,22 +52,22 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
 
-    @Resource 
+    @Resource
     WebServiceContext ctx;
 
     private Document sayHiResponse;
     private Document greetMeResponse;
     private MessageFactory factory;
-    
+
 
     public HWDOMSourcePayloadProvider() {
         try {
             factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
+            sayHiResponse = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            greetMeResponse =  factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
+            greetMeResponse = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -79,7 +79,7 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         DOMSource response = new DOMSource();
 
         Node n = request.getNode();
@@ -91,30 +91,29 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
             Element el = DOMUtils.getFirstElement(n);
             String s = DOMUtils.getContent(el);
-            if (s.trim().equals("throwFault")) {
+            if ("throwFault".equals(s.trim())) {
                 try {
-                    SOAPFactory f = SOAPFactory.newInstance(); 
-                    SOAPFault soapFault = f.createFault(); 
-                    
-                    soapFault.setFaultString("Test Fault String ****"); 
-       
-                    Detail detail = soapFault.addDetail(); 
-                    detail = soapFault.getDetail(); 
-       
-                    QName qName = new QName("http://www.Hello.org/greeter", "TestFault", "ns"); 
-                    DetailEntry de = detail.addDetailEntry(qName); 
-       
-                    qName = new QName("http://www.Hello.org/greeter", "ErrorCode", "ns"); 
-                    SOAPElement errorElement = de.addChildElement(qName); 
-                    errorElement.setTextContent("errorcode"); 
-                               
+                    SOAPFactory f = SOAPFactory.newInstance();
+                    SOAPFault soapFault = f.createFault();
+
+                    soapFault.setFaultString("Test Fault String ****");
+
+                    Detail detail = soapFault.addDetail();
+                    detail = soapFault.getDetail();
+
+                    QName qName = new QName("http://www.Hello.org/greeter", "TestFault", "ns");
+                    DetailEntry de = detail.addDetailEntry(qName);
+
+                    qName = new QName("http://www.Hello.org/greeter", "ErrorCode", "ns");
+                    SOAPElement errorElement = de.addChildElement(qName);
+                    errorElement.setTextContent("errorcode");
+
                     throw new SOAPFaultException(soapFault);
                 } catch (SOAPException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
-            
+
             response.setNode(greetMeResponse);
         }
         return response;

@@ -86,7 +86,7 @@ public final class ServiceModelUtil {
             ? "ServiceModel.WRAPPER.MAP_OUT" : "ServiceModel.WRAPPER.MAP", Map.class));
 
         if (wrapperMap == null) {
-            wrapperMap = new HashMap<QName, BindingOperationInfo>();
+            wrapperMap = new HashMap<>();
             for (BindingOperationInfo b : service.getOperations()) {
                 if (b.isUnwrappedCapable()) {
                     MessagePartInfo part = null;
@@ -130,9 +130,9 @@ public final class ServiceModelUtil {
     }
 
     public static List<String> getOperationInputPartNames(OperationInfo operation) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         List<MessagePartInfo> parts = operation.getInput().getMessageParts();
-        if (parts == null || parts.size() == 0) {
+        if (parts == null || parts.isEmpty()) {
             return names;
         }
 
@@ -175,7 +175,7 @@ public final class ServiceModelUtil {
                 if (best == null) {
                     best = ep;
                 }
-                if (ep.getTransportId().equals("http://schemas.xmlsoap.org/wsdl/soap/")) {
+                if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(ep.getTransportId())) {
                     return ep;
                 }
             }
@@ -183,7 +183,7 @@ public final class ServiceModelUtil {
 
         return best;
     }
-    
+
     public static QName getServiceQName(EndpointInfo ei) {
         InterfaceInfo ii = ei.getInterface();
         if (ii != null) {
@@ -193,6 +193,6 @@ public final class ServiceModelUtil {
         } else {
             return ei.getName();
         }
-        
+
     }
 }

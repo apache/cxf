@@ -37,8 +37,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -47,35 +45,42 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                                    new SingletonResourceProvider(new BookStore()));
-            JAXBElementProvider<?> p1 = new JAXBElementProvider<Object>();
+            JAXBElementProvider<?> p1 = new JAXBElementProvider<>();
             p1.setEnableBuffering(true);
             p1.setEnableStreaming(true);
-            
+
             JAXBElementProvider<?> p2 = new CustomJaxbProvider();
             p2.setProduceMediaTypes(Collections.singletonList("text/xml"));
-            
-            List<Object> providers = new ArrayList<Object>();
+
+            List<Object> providers = new ArrayList<>();
             providers.add(p1);
             providers.add(p2);
             sf.setProviders(providers);
             sf.setAddress("http://localhost:" + PORT + "/");
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("org.apache.cxf.serviceloader-context", "true");
             sf.setProperties(properties);
             sf.create();
@@ -94,7 +99,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -103,13 +108,13 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
                    launchServer(Server.class));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetBook123Fail() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/text/xml/123");
@@ -118,56 +123,54 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         Response r = wc.get();
         assertEquals(500, r.getStatus());
     }
-    
+
     @Test
     public void testGetBookUsingStaxWriter() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/text/xml/123",
                       "text/xml", 200);
     }
-    
-    private void getAndCompare(String address, 
+
+    private void getAndCompare(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.setHeader("Accept", acceptType);
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            Book book = readBook(get.getResponseBodyAsStream());
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+            Book book = readBook(response.getEntity().getContent());
             assertEquals(123, book.getId());
             assertEquals("CXF in Action", book.getName());
         } finally {
             get.releaseConnection();
         }
     }
-    
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
     }
-    
+
     @Ignore
     public static class CustomJaxbProvider extends JAXBElementProvider<Object> {
         @Override
         protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
             if (mt.equals(MediaType.TEXT_XML_TYPE)) {
                 return new CachingXmlEventWriter();
-            } else {
-                throw new RuntimeException();
             }
+            throw new RuntimeException();
         }
         @Override
-        public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
+        public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
             List<String> failHeaders = getContext().getHttpHeaders().getRequestHeader("fail-write");
-            if (failHeaders != null && failHeaders.size() > 0) {
+            if (failHeaders != null && !failHeaders.isEmpty()) {
                 os.write("fail".getBytes());
                 throw new IOException();
-            } else {
-                super.writeTo(obj, cls, genericType, anns, m, headers, os);
             }
+            super.writeTo(obj, cls, genericType, anns, m, headers, os);
         }
     }
 }

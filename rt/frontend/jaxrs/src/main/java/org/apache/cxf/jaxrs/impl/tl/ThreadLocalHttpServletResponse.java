@@ -28,12 +28,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<HttpServletResponse> 
+public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<HttpServletResponse>
     implements HttpServletResponse {
 
     public void addCookie(Cookie cookie) {
         get().addCookie(cookie);
-        
+
     }
 
     public void addDateHeader(String name, long date) {
@@ -42,12 +42,12 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
 
     public void addHeader(String name, String value) {
         get().addHeader(name, value);
-        
+
     }
 
     public void addIntHeader(String name, int value) {
         get().addIntHeader(name, value);
-        
+
     }
 
     public boolean containsHeader(String name) {
@@ -90,7 +90,7 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
 
     public void setHeader(String name, String value) {
         get().setHeader(name, value);
-        
+
     }
 
     public void setIntHeader(String name, int value) {
@@ -99,7 +99,7 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
 
     public void setStatus(int sc) {
         get().setStatus(sc);
-        
+
     }
 
     @SuppressWarnings("deprecation")
@@ -109,7 +109,7 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
 
     public void flushBuffer() throws IOException {
         get().flushBuffer();
-        
+
     }
 
     public int getBufferSize() {
@@ -142,37 +142,37 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
 
     public void reset() {
         get().reset();
-        
+
     }
 
     public void resetBuffer() {
         get().resetBuffer();
-        
+
     }
 
     public void setBufferSize(int size) {
         get().setBufferSize(size);
-        
+
     }
 
     public void setCharacterEncoding(String charset) {
         get().setCharacterEncoding(charset);
-        
+
     }
 
     public void setContentLength(int len) {
         get().setContentLength(len);
-        
+
     }
 
     public void setContentType(String type) {
         get().setContentType(type);
-        
+
     }
 
     public void setLocale(Locale loc) {
         get().setLocale(loc);
-        
+
     }
 
     public String getHeader(String name) {
@@ -196,6 +196,6 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
         get().setContentLengthLong(len);
     }
 
-    
+
 
 }

@@ -26,7 +26,7 @@ import org.apache.cxf.metrics.MetricsProvider;
 import org.apache.cxf.phase.Phase;
 
 public class MetricsMessageInOneWayInterceptor extends AbstractMetricsInterceptor {
-    public MetricsMessageInOneWayInterceptor(MetricsProvider p[]) {
+    public MetricsMessageInOneWayInterceptor(MetricsProvider[] p) {
         super(Phase.INVOKE, p);
         addAfter(ServiceInvokerInterceptor.class.getName());
     }
@@ -36,5 +36,5 @@ public class MetricsMessageInOneWayInterceptor extends AbstractMetricsIntercepto
         if (ex.isOneWay() && !isRequestor(message)) {
             stop(message);
         }
-    }               
+    }
 }

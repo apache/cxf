@@ -41,13 +41,13 @@ public final class Client {
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {
-        
+    public static void main(String[] args) throws Exception {
+
         if (args.length < 2) {
             System.out.println("please specify wsdl and configuration file");
             System.exit(1);
         }
-        
+
         URL wsdlURL;
         File wsdlFile = new File(args[0]);
         if (wsdlFile.exists()) {
@@ -55,7 +55,7 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busURL;
         File busFile = new File(args[1]);
@@ -65,7 +65,7 @@ public final class Client {
             busURL = new URL(args[1]);
         }
 
-        Bus bus = bf.createBus(busFile.toString());
+        Bus bus = bf.createBus(busURL);
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 

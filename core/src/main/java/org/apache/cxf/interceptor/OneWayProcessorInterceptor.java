@@ -39,13 +39,13 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 
 
 /**
- * 
+ *
  */
 public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message> {
-    public static final String USE_ORIGINAL_THREAD 
-        = OneWayProcessorInterceptor.class.getName() + ".USE_ORIGINAL_THREAD"; 
+    public static final String USE_ORIGINAL_THREAD
+        = OneWayProcessorInterceptor.class.getName() + ".USE_ORIGINAL_THREAD";
     private static final Logger LOG = LogUtils.getL7dLogger(OneWayProcessorInterceptor.class);
-    
+
     public OneWayProcessorInterceptor() {
         super(Phase.PRE_LOGICAL);
     }
@@ -53,7 +53,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
         super(phase);
     }
     public void handleFault(Message message) {
-        if (message.getExchange().isOneWay() 
+        if (message.getExchange().isOneWay()
             && !isRequestor(message)) {
             //in a one way, if an exception is thrown, the stream needs to be closed
             InputStream in = message.getContent(InputStream.class);
@@ -64,37 +64,37 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                     //ignore
                 }
             }
-            
+
         }
     }
     public void handleMessage(Message message) throws Fault {
-        
-        if (message.getExchange().isOneWay() 
+
+        if (message.getExchange().isOneWay()
             && !isRequestor(message)
             && message.get(OneWayProcessorInterceptor.class) == null
-            && message.getExchange().get(Executor.class) == null) { 
+            && message.getExchange().get(Executor.class) == null) {
             //one way on server side, fork the rest of this chain onto the
             //workqueue, call the Outgoing chain directly.
-            
+
             message.put(OneWayProcessorInterceptor.class, this);
             final InterceptorChain chain = message.getInterceptorChain();
 
-            boolean robust = 
-                MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
+            boolean robust =
+                MessageUtils.getContextualBoolean(message, Message.ROBUST_ONEWAY, false);
 
-            boolean useOriginalThread = 
-                MessageUtils.isTrue(message.getContextualProperty(USE_ORIGINAL_THREAD));
-            
+            boolean useOriginalThread =
+                MessageUtils.getContextualBoolean(message, USE_ORIGINAL_THREAD, false);
+
             if (!useOriginalThread && !robust) {
                 //need to suck in all the data from the input stream as
-                //the transport might discard any data on the stream when this 
+                //the transport might discard any data on the stream when this
                 //thread unwinds or when the empty response is sent back
                 DelegatingInputStream in = message.getContent(DelegatingInputStream.class);
                 if (in != null) {
                     in.cacheInput();
                 }
             }
-            
+
             if (robust) {
                 // continue to invoke the chain
                 chain.pause();
@@ -104,7 +104,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                     return;
                 }
             }
-            
+
             try {
                 Message partial = createMessage(message.getExchange());
                 partial.remove(Message.CONTENT_TYPE);
@@ -122,7 +122,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             } catch (IOException e) {
                 //IGNORE
             }
-            
+
             if (!useOriginalThread && !robust) {
                 chain.pause();
                 try {
@@ -138,29 +138,28 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                                 }
                             });
                         //wait a few milliseconds for the background thread to start processing
-                        //Mostly just to make an attempt at keeping the ordering of the 
+                        //Mostly just to make an attempt at keeping the ordering of the
                         //messages coming in from a client.  Not guaranteed though.
                         lock.wait(20);
                     }
                 } catch (RejectedExecutionException e) {
                     LOG.warning(
-                        "Executor queue is full, run the oneway invocation task in caller thread." 
+                        "Executor queue is full, run the oneway invocation task in caller thread."
                         + "  Users can specify a larger executor queue to avoid this.");
                     // only block the thread if the prop is unset or set to false, otherwise let it go
-                    if (!MessageUtils.isTrue(
-                        message.getContextualProperty(
-                            "org.apache.cxf.oneway.rejected_execution_exception"))) {
+                    if (!MessageUtils.getContextualBoolean(message,
+                            "org.apache.cxf.oneway.rejected_execution_exception", false)) {
                         //the executor queue is full, so run the task in the caller thread
                         chain.unpause();
                     }
-                    
+
                 } catch (InterruptedException e) {
                     //ignore - likely a busy work queue so we'll just let the one-way go
                 }
             }
         }
     }
-    
+
     private static Message createMessage(Exchange exchange) {
         Endpoint ep = exchange.getEndpoint();
         Message msg = null;

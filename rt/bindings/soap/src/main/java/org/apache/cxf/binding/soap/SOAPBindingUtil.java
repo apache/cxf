@@ -21,6 +21,8 @@ package org.apache.cxf.binding.soap;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +64,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public final class SOAPBindingUtil {
-    private static Map<String, String> bindingMap = new HashMap<String, String>();
+    private static Map<String, String> bindingMap = new HashMap<>();
 
     static {
         bindingMap.put("RPC", "SOAPBinding.Style.RPC");
@@ -87,13 +89,14 @@ public final class SOAPBindingUtil {
          */
         Object proxy = null;
         try {
-            proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+            proxy = Proxy.newProxyInstance(getContextClassLoader(),
                                               new Class[] {cls}, ih);
         } catch (Throwable ex) {
-            // Using cls classloader as a fallback to make it work within OSGi  
-            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
-            if (contextLoader != cls.getClassLoader()) {
-                proxy = Proxy.newProxyInstance(cls.getClassLoader(),
+            // Using cls classloader as a fallback to make it work within OSGi
+            ClassLoader contextLoader = getContextClassLoader();
+            final ClassLoader clsClassLoader = getClassLoader(cls);
+            if (contextLoader != clsClassLoader) {
+                proxy = Proxy.newProxyInstance(clsClassLoader,
                                               new Class[] {cls}, ih);
             } else {
                 if (ex instanceof RuntimeException) {
@@ -103,6 +106,30 @@ public final class SOAPBindingUtil {
             }
         }
         return cls.cast(proxy);
+    }
+
+    private static ClassLoader getContextClassLoader() {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return Thread.currentThread().getContextClassLoader();
+                }
+            });
+        }
+        return Thread.currentThread().getContextClassLoader();
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     public static boolean isSOAPBinding(Binding binding) {
@@ -207,7 +234,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getSoapHeaders(List<ExtensibilityElement> exts) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         if (exts != null) {
             for (ExtensibilityElement ext : exts) {
                 if (isSOAPHeader(ext)) {
@@ -250,7 +277,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getBindingInputSOAPHeaders(BindingOperation bop) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         BindingInput bindingInput = bop.getBindingInput();
         if (bindingInput != null) {
             for (Object obj : bindingInput.getExtensibilityElements()) {
@@ -276,7 +303,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapHeader> getBindingOutputSOAPHeaders(BindingOperation bop) {
-        List<SoapHeader> headers = new ArrayList<SoapHeader>();
+        List<SoapHeader> headers = new ArrayList<>();
         BindingOutput bindingOutput = bop.getBindingOutput();
         if (bindingOutput != null) {
             for (Object obj : bindingOutput.getExtensibilityElements()) {
@@ -309,7 +336,7 @@ public final class SOAPBindingUtil {
     }
 
     public static List<SoapFault> getBindingOperationSoapFaults(BindingOperation bop) {
-        List<SoapFault> faults = new ArrayList<SoapFault>();
+        List<SoapFault> faults = new ArrayList<>();
         for (Object obj : bop.getBindingFaults().values()) {
             if (!(obj instanceof BindingFault)) {
                 continue;
@@ -336,7 +363,7 @@ public final class SOAPBindingUtil {
         String bindingStyle = "";
         String previousOpStyle = "";
         String style = "";
-        
+
         for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 SoapBinding soapBinding = getSoapBinding(obj);

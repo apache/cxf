@@ -35,20 +35,23 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.ImplGenerator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11.JAXWSDefinitionBuilder;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAXWSProfileTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSProfileTest {
+
     @Test
     public void testLoadPlugins() {
         PluginLoader loader = PluginLoader.getInstance();
         assertNotNull(loader);
 
         loader.loadPlugin("/org/apache/cxf/tools/wsdlto/frontend/jaxws/jaxws-plugin.xml");
-        
+
         assertEquals(3, loader.getPlugins().size());
-        
+
         Plugin plugin = null;
         for (Plugin p : loader.getPlugins().values()) {
             if (p.getName().contains("jaxws")) {
@@ -97,7 +100,7 @@ public class JAXWSProfileTest extends Assert {
     protected Generator getGenerator(FrontEnd frontend, int index) {
         return frontend.getGenerators().getGenerator().get(index);
     }
-    
+
     protected FrontEnd getFrontEnd(Map<String, FrontEnd> frontends, int index) {
         int size = frontends.size();
         return frontends.values().toArray(new FrontEnd[size])[index];

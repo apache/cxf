@@ -46,16 +46,16 @@ import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersTyp
 @NoJSR250Annotations
 public final class JettySpringTypesFactory {
     public JettySpringTypesFactory() {
-        
+
     }
     private static Map<String, ThreadingParameters> toThreadingParameters(
         List <ThreadingParametersIdentifiedType> list) {
-        Map<String, ThreadingParameters> map = new TreeMap<String, ThreadingParameters>();
+        Map<String, ThreadingParameters> map = new TreeMap<>();
         for (ThreadingParametersIdentifiedType t : list) {
-            ThreadingParameters parameter = 
+            ThreadingParameters parameter =
                 toThreadingParameters(t.getThreadingParameters());
             map.put(t.getId(), parameter);
-        } 
+        }
         return map;
     }
     private static ThreadingParameters toThreadingParameters(ThreadingParametersType paramtype) {
@@ -65,70 +65,66 @@ public final class JettySpringTypesFactory {
         params.setThreadNamePrefix(paramtype.getThreadNamePrefix());
         return params;
     }
-        
+
     private static Map<String, TLSServerParameters> toTLSServerParamenters(
         List <TLSServerParametersIdentifiedType> list) {
-        Map<String, TLSServerParameters> map = new TreeMap<String, TLSServerParameters>();
+        Map<String, TLSServerParameters> map = new TreeMap<>();
         for (TLSServerParametersIdentifiedType t : list) {
-            try {             
+            try {
                 TLSServerParameters parameter = new TLSServerParametersConfig(t.getTlsServerParameters());
                 map.put(t.getId(), parameter);
             } catch (Exception e) {
                 throw new RuntimeException(
                         "Could not configure TLS for id " + t.getId(), e);
             }
-            
+
         }
         return map;
     }
     public Map<String, ThreadingParameters> createThreadingParametersMap(String s,
-                                                                         JAXBContext ctx) 
+                                                                         JAXBContext ctx)
         throws Exception {
         Document doc = StaxUtils.read(new StringReader(s));
-        List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes = 
+        List <ThreadingParametersIdentifiedType> threadingParametersIdentifiedTypes =
             JettySpringTypesFactory
-                .parseListElement(doc.getDocumentElement(), 
+                .parseListElement(doc.getDocumentElement(),
                                   new QName(JettyHTTPServerEngineFactoryBeanDefinitionParser.HTTP_JETTY_NS,
-                                            "identifiedThreadingParameters"), 
+                                            "identifiedThreadingParameters"),
                                   ThreadingParametersIdentifiedType.class, ctx);
-        Map<String, ThreadingParameters> threadingParametersMap =
-            toThreadingParameters(threadingParametersIdentifiedTypes);
-        return threadingParametersMap;
+        return toThreadingParameters(threadingParametersIdentifiedTypes);
     }
-    
+
     public Map<String, TLSServerParameters> createTLSServerParametersMap(String s,
-                                                                         JAXBContext ctx) 
+                                                                         JAXBContext ctx)
         throws Exception {
         Document doc = StaxUtils.read(new StringReader(s));
-        
+
         List <TLSServerParametersIdentifiedType> tlsServerParameters =
             JettySpringTypesFactory
-                .parseListElement(doc.getDocumentElement(), 
+                .parseListElement(doc.getDocumentElement(),
                                   new QName(JettyHTTPServerEngineFactoryBeanDefinitionParser.HTTP_JETTY_NS,
                                             "identifiedTLSServerParameters"),
                                   TLSServerParametersIdentifiedType.class,
                                   ctx);
-        Map<String, TLSServerParameters> tlsServerParametersMap =
-            toTLSServerParamenters(tlsServerParameters);
-        return tlsServerParametersMap;
+        return toTLSServerParamenters(tlsServerParameters);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static <V> List<V> parseListElement(Element parent, 
-                                           QName name, 
+    public static <V> List<V> parseListElement(Element parent,
+                                           QName name,
                                            Class<?> c,
                                            JAXBContext context) throws JAXBException {
-        List<V> list = new ArrayList<V>();
+        List<V> list = new ArrayList<>();
         Node data = null;
-           
+
         Unmarshaller u = context.createUnmarshaller();
-        Node node = parent.getFirstChild();           
+        Node node = parent.getFirstChild();
         while (node != null) {
             if (node.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(node.getLocalName())
                 && name.getNamespaceURI().equals(node.getNamespaceURI())) {
                 data = node;
-                Object obj = unmarshal(u, data, c);                
-                if (obj != null) {                    
+                Object obj = unmarshal(u, data, c);
+                if (obj != null) {
                     list.add((V) obj);
                 }
             }
@@ -136,18 +132,18 @@ public final class JettySpringTypesFactory {
         }
         return list;
     }
-    
-    
 
-    
-    
+
+
+
+
     private static Object unmarshal(Unmarshaller u,
                                      Node data, Class<?> c) {
         if (u == null) {
             return null;
         }
-        
-        Object obj = null;        
+
+        Object obj = null;
         try {
             if (c != null) {
                 obj = u.unmarshal(data, c);
@@ -159,14 +155,14 @@ public final class JettySpringTypesFactory {
                 JAXBElement<?> el = (JAXBElement<?>)obj;
                 obj = el.getValue();
             }
-           
+
         } catch (JAXBException e) {
             throw new RuntimeException("Could not parse configuration.", e);
         }
-        
-        return obj; 
-        
+
+        return obj;
+
     }
-               
+
 
 }

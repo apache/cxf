@@ -55,14 +55,14 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
 
     @Resource
     protected WebServiceContext wsContext;
-    
+
     public StreamSource invoke(StreamSource source) {
-        
+
         MessageContext mc = wsContext.getMessageContext();
-        
+
         String httpMethod = (String)mc.get(MessageContext.HTTP_REQUEST_METHOD);
         if ("POST".equals(httpMethod)) {
-            
+
             int count = 0;
             // we really want to verify that a root part is a proper XML as expected
             try {
@@ -71,7 +71,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             } catch (Exception ex) {
                 // ignore
             }
-            
+
             Map<String, DataHandler> dataHandlers = CastUtils.cast(
                 (Map<?, ?>)mc.get(MessageContext.INBOUND_MESSAGE_ATTACHMENTS));
             StringBuilder buf = new StringBuilder();
@@ -81,34 +81,33 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
                 if (i++ > count) {
                     break;
                 }
-                try {
+                try (ByteArrayOutputStream bous = new ByteArrayOutputStream()) {
                     InputStream is = entry.getValue().getInputStream();
-                    ByteArrayOutputStream bous = new ByteArrayOutputStream();
                     IOUtils.copy(is, bous);
-            
+
                     buf.append("<att contentId=\"" + entry.getKey() + "\">");
                     buf.append(Base64Utility.encode(bous.toByteArray()));
                     buf.append("</att>");
-                    
+
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
             }
             buf.append("</response>");
-            
+
             Map<String, List<String>> respHeaders = CastUtils
                 .cast((Map<?, ?>)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
             if (respHeaders == null) {
-                respHeaders = new HashMap<String, List<String>>();
+                respHeaders = new HashMap<>();
                 mc.put(MessageContext.HTTP_RESPONSE_HEADERS, respHeaders);
             }
 
-            
-            List<String> contentTypeValues = new ArrayList<String>();
+
+            List<String> contentTypeValues = new ArrayList<>();
             contentTypeValues.add("application/xml+custom");
             respHeaders.put(Message.CONTENT_TYPE, contentTypeValues);
 
-            Map<String, DataHandler> outDataHandlers 
+            Map<String, DataHandler> outDataHandlers
                 = CastUtils.cast((Map<?, ?>)mc.get(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS));
             byte[] data = new byte[50];
             for (int x = 0; x < data.length; x++) {
@@ -116,11 +115,11 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             }
             DataHandler foo = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
             outDataHandlers.put("foo", foo);
-            
+
             return new StreamSource(new StringReader(buf.toString()));
         }
         return source;
-        
+
     }
 
 }

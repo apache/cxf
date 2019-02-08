@@ -28,19 +28,19 @@ import org.apache.hello_world_rpclit.types.MyComplexStruct;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME = 
+    private static final QName SERVICE_NAME =
         new QName("http://apache.org/hello_world_rpclit", "SOAPServiceRPCLit");
-    private static final QName PORT_NAME = 
+    private static final QName PORT_NAME =
         new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");
 
     private Client() {
-    } 
+    }
 
     public static void main(String[] args) throws Exception {
 
-        if (args.length == 0) { 
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
 
         URL wsdlURL;
@@ -50,24 +50,24 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         SOAPServiceRPCLit service = new SOAPServiceRPCLit(wsdlURL, SERVICE_NAME);
         GreeterRPCLit greeter = (GreeterRPCLit)service.getPort(PORT_NAME, GreeterRPCLit.class);
 
         System.out.println("Invoking sayHi...");
         System.out.println("server responded with: " + greeter.sayHi());
-        System.out.println(); 
+        System.out.println();
 
         System.out.println("Invoking greetMe...");
         System.out.println("server responded with: " + greeter.greetMe(System.getProperty("user.name")));
         System.out.println();
-        
+
         MyComplexStruct argument = new MyComplexStruct();
         MyComplexStruct retVal = null;
 
-        String str1 = "this is element 1"; 
-        String str2 = "this is element 2"; 
-        int int1 = 42; 
+        String str1 = "this is element 1";
+        String str2 = "this is element 2";
+        int int1 = 42;
 
         argument.setElem1(str1);
         argument.setElem2(str2);
@@ -83,6 +83,6 @@ public final class Client {
         System.out.println();
 
 
-        System.exit(0); 
+        System.exit(0);
     }
 }

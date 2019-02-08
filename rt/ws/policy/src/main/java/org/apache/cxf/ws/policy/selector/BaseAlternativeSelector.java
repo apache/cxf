@@ -31,10 +31,10 @@ import org.apache.neethi.builders.PrimitiveAssertion;
 
 
 /**
- * 
+ *
  */
 public abstract class BaseAlternativeSelector implements AlternativeSelector {
- 
+
     protected boolean isCompatibleWithRequest(List<Assertion> alternative,
                                    List<List<Assertion>> request) {
         if (request == null) {
@@ -49,24 +49,23 @@ public abstract class BaseAlternativeSelector implements AlternativeSelector {
     }
 
     protected boolean isCompatible(List<Assertion> alternative, List<Assertion> r) {
-        List<QName> rNames = new ArrayList<QName>(r.size());
+        List<QName> rNames = new ArrayList<>(r.size());
         for (Assertion ra : r) {
             rNames.add(ra.getName());
         }
-        
+
         for (Assertion a : alternative) {
             for (Assertion ra : r) {
                 if (a.equals(ra)) {
                     rNames.remove(ra.getName());
                     break;
-                } else {
-                    // Workaround until Neethi assertions implementations do not override equals(): 
-                    // objects in lists can be different instances
-                    if ((a instanceof PrimitiveAssertion) && (ra instanceof PrimitiveAssertion) 
-                        && ((PrimitiveAssertion) a).equal(ra)) {
-                        rNames.remove(ra.getName());
-                        break;
-                    }
+                }
+                // Workaround until Neethi assertions implementations do not override equals():
+                // objects in lists can be different instances
+                if ((a instanceof PrimitiveAssertion) && (ra instanceof PrimitiveAssertion)
+                    && ((PrimitiveAssertion) a).equal(ra)) {
+                    rNames.remove(ra.getName());
+                    break;
                 }
             }
         }

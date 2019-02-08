@@ -39,22 +39,22 @@ import org.apache.ws.commons.schema.constants.Constants;
  * Static methods/constants for Aegis.
  */
 public final class TypeUtil {
-    public static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);
 
     private TypeUtil() {
         //utility class
     }
-    
+
     public static AegisType getReadType(XMLStreamReader xsr, AegisContext context, AegisType baseType) {
 
         if (!context.isReadXsiTypes()) {
             if (baseType == null) {
-                LOG.warning("xsi:type reading disabled, and no type available for "  
+                LOG.warning("xsi:type reading disabled, and no type available for "
                          + xsr.getName());
             }
             return baseType;
         }
-        
+
         String overrideType = xsr.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
         if (overrideType != null) {
             QName overrideName = NamespaceHelper.createQName(xsr.getNamespaceContext(), overrideType);
@@ -73,24 +73,22 @@ public final class TypeUtil {
                     return improvedType;
                 }
             }
-        
+
             if (baseType != null) {
                 LOG.finest("xsi:type=\"" + overrideName
                          + "\" was specified, but no corresponding AegisType was registered; defaulting to "
                          + baseType.getSchemaType());
                 return baseType;
-            } else {
-                LOG.warning("xsi:type=\"" + overrideName
-                         + "\" was specified, but no corresponding AegisType was registered; no default.");
-                return null;
             }
-        } else {
-            if (baseType == null) {
-                LOG.warning("xsi:type absent, and no type available for "  
-                         + xsr.getName());
-            }
-            return baseType;
+            LOG.warning("xsi:type=\"" + overrideName
+                     + "\" was specified, but no corresponding AegisType was registered; no default.");
+            return null;
         }
+        if (baseType == null) {
+            LOG.warning("xsi:type absent, and no type available for "
+                     + xsr.getName());
+        }
+        return baseType;
     }
 
     /**
@@ -101,35 +99,35 @@ public final class TypeUtil {
      * @param context
      * @return
      */
-    public static AegisType getReadTypeStandalone(XMLStreamReader xsr, 
+    public static AegisType getReadTypeStandalone(XMLStreamReader xsr,
                                                   AegisContext context, AegisType baseType) {
-        
+
         if (baseType != null) {
             return getReadType(xsr, context, baseType);
         }
 
         if (!context.isReadXsiTypes()) {
-            LOG.warning("xsi:type reading disabled, and no type available for "  
+            LOG.warning("xsi:type reading disabled, and no type available for "
                      + xsr.getName());
             return null;
         }
-        
+
         String typeNameString = xsr.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
         if (typeNameString != null) {
-            QName schemaTypeName = NamespaceHelper.createQName(xsr.getNamespaceContext(), 
+            QName schemaTypeName = NamespaceHelper.createQName(xsr.getNamespaceContext(),
                                                                typeNameString);
             TypeMapping tm;
             tm = context.getTypeMapping();
             AegisType type = tm.getType(schemaTypeName);
-            
+
             if (type == null) {
                 type = context.getRootType(schemaTypeName);
             }
-            
+
             if (type != null) {
                 return type;
             }
-                    
+
             LOG.warning("xsi:type=\"" + schemaTypeName
                      + "\" was specified, but no corresponding AegisType was registered; no default.");
             return null;
@@ -137,7 +135,7 @@ public final class TypeUtil {
         LOG.warning("xsi:type was not specified for top-level element " + xsr.getName());
         return null;
     }
-    
+
     public static AegisType getWriteType(AegisContext globalContext, Object value, AegisType type) {
         if (value != null && type != null && type.getTypeClass() != value.getClass()) {
             AegisType overrideType = globalContext.getRootType(value.getClass());
@@ -152,7 +150,7 @@ public final class TypeUtil {
         if (type != null) {
             return getWriteType(globalContext, value, type);
         }
-        
+
         TypeMapping tm;
         tm = globalContext.getTypeMapping();
         // don't use this for null!
@@ -160,7 +158,7 @@ public final class TypeUtil {
 
         return type;
     }
-    
+
     /**
      * Allow writing of collections when the type of the collection object is known via
      * an {@link java.lang.reflect.Type} object.
@@ -169,18 +167,17 @@ public final class TypeUtil {
      * @param reflectType the type to use in writing the object.
      * @return
      */
-    public static AegisType getWriteTypeStandalone(AegisContext globalContext, 
-                                              Object value, 
+    public static AegisType getWriteTypeStandalone(AegisContext globalContext,
+                                              Object value,
                                               java.lang.reflect.Type reflectType) {
         if (reflectType == null) {
             return getWriteTypeStandalone(globalContext, value, (AegisType)null);
-        } else {
-            return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
         }
-        
-        
+        return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
+
+
     }
-    
+
     public static void setAttributeAttributes(QName name, AegisType type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();
         XmlSchemaUtils.addImportIfNeeded(root, ns);
@@ -188,7 +185,7 @@ public final class TypeUtil {
 
     /**
      * Utility function to cast a Type to a Class. This throws an unchecked exception if the Type is
-     * not a Class. The idea here is that these Type references should have been checked for 
+     * not a Class. The idea here is that these Type references should have been checked for
      * reasonableness before the point of calls to this function.
      * @param type Reflection type.
      * @param throwForNonClass whether to throw (true) or return null (false) if the Type
@@ -245,12 +242,12 @@ public final class TypeUtil {
         if (directClass != null) {
             return directClass;
         }
-        
+
         if (type instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) type;
             return getTypeRelatedClass(pType.getRawType());
         }
-        
+
         if (type instanceof GenericArrayType) {
             GenericArrayType gat = (GenericArrayType) type;
             Type compType = gat.getGenericComponentType();

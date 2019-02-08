@@ -32,10 +32,10 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * 
+ *
  */
 public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<String, byte[]>> {
-    
+
     @XmlType()
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class HashMapEntryType {
@@ -62,7 +62,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
     }
 
     public static class HashMapType {
-        private List<HashMapEntryType> entry = new ArrayList<HashMapEntryType>();
+        private List<HashMapEntryType> entry = new ArrayList<>();
 
         public List<HashMapEntryType> getEntry() {
             return entry;
@@ -72,10 +72,10 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
             this.entry = entry;
         }
     }
-    
+
     public HashMapType marshal(Map<String, byte[]> arg0) throws Exception {
         HashMapType myHashMapType = new HashMapType();
-        if (arg0 != null && arg0.size() > 0) {
+        if (arg0 != null && !arg0.isEmpty()) {
             for (Map.Entry<String, byte[]> entry : arg0.entrySet()) {
                 if (entry != null) {
                     HashMapEntryType myHashEntryType = new HashMapEntryType();
@@ -89,7 +89,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
     }
 
     public Map<String, byte[]> unmarshal(HashMapType arg0) throws Exception {
-        Map<String, byte[]> hashMap = new HashMap<String, byte[]>();
+        Map<String, byte[]> hashMap = new HashMap<>();
         if (arg0 != null && arg0.entry != null) {
             for (HashMapEntryType myHashEntryType : arg0.entry) {
                 if (myHashEntryType.key != null) {

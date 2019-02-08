@@ -33,10 +33,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
  */
 public interface DataWriter<T> {
     String ENDPOINT = DataWriter.class.getName() + "Endpoint";
-    
+
     /**
      * Attach a schema to the writer. If the binding supports validation, it will
-     * validate the XML that it produces (assuming that it produces XML). 
+     * validate the XML that it produces (assuming that it produces XML).
      * @param s the schema.
      */
     void setSchema(Schema s);
@@ -47,11 +47,11 @@ public interface DataWriter<T> {
     void setAttachments(Collection<Attachment> attachments);
     /**
      * Set a property for the writer.
-     * @param key property key 
+     * @param key property key
      * @param value property value.
      */
     void setProperty(String key, Object value);
-    
+
     /**
      * Write an object to an output sink.
      * @param obj the object to write.
@@ -59,10 +59,10 @@ public interface DataWriter<T> {
      */
     void write(Object obj, T output);
     /**
-     * Write an object to an output sink, including extra processing based on the WSDL 
+     * Write an object to an output sink, including extra processing based on the WSDL
      * service model for a particular message part.
      * @param obj The object to write.
-     * @param part the message part. 
+     * @param part the message part.
      * @param output the output sink.
      */
     void write(Object obj, MessagePartInfo part, T output);

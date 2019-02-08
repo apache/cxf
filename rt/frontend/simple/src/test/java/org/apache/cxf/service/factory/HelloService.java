@@ -24,5 +24,5 @@ public interface HelloService {
     String sayHello();
     void ping();
     String echoWithExchange(Exchange ex, String text);
-    String echo(String text);    
+    String echo(String text);
 }

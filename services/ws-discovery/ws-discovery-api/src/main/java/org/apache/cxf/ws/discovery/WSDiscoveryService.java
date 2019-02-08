@@ -25,12 +25,12 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ws.discovery.wsdl.HelloType;
 
 public interface WSDiscoveryService {
-    
+
     /** Registers the given EndpointReference with the service.  Also sends the UDP "Hello"
      * @param ref
      * @return the HelloType that was sent so it can be used to call unregister
      */
-    HelloType register(EndpointReference ref);  
+    HelloType register(EndpointReference ref);
 
     void register(HelloType ht);
     void unregister(HelloType ht);
@@ -41,11 +41,11 @@ public interface WSDiscoveryService {
      */
     void serverStarted(Server server);
     void serverStopped(Server server);
-    
+
     /**
      * The service requires a WSDiscoveryClient in order to interact with a DiscoveryProxy, send Hello/Bye/etc..
      * @return the client being used
      */
     WSDiscoveryClient getClient();
-    
+
 }

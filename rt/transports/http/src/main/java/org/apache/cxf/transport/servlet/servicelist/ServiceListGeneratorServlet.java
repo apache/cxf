@@ -21,9 +21,7 @@ package org.apache.cxf.transport.servlet.servicelist;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
@@ -51,6 +50,10 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     public ServiceListGeneratorServlet(DestinationRegistry destinationRegistry, Bus bus) {
         this.destinationRegistry = destinationRegistry;
         this.bus = bus;
+        if (this.bus == null) {
+            this.bus = BusFactory.getDefaultBus(false);
+        }
+
         this.title = "CXF - Service list";
     }
 
@@ -61,11 +64,11 @@ public class ServiceListGeneratorServlet extends HttpServlet {
     public void setTitle(String title) {
         this.title = title;
     }
-    
+
 
     @SuppressWarnings("unchecked")
     @Override
-    public void service(HttpServletRequest request, 
+    public void service(HttpServletRequest request,
                         HttpServletResponse response) throws ServletException, IOException {
         Object obj = request.getAttribute(ServletController.AUTH_SERVICE_LIST);
         boolean isAuthServiceList = false;
@@ -88,36 +91,45 @@ public class ServiceListGeneratorServlet extends HttpServlet {
             return;
         }
         List<String> privateEndpoints;
-        Map<String, String> atomMap;
-        
         if (bus != null) {
             privateEndpoints = (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
-            // TODO : we may introduce a bus extension instead
-
-            atomMap = (Map<String, String>)bus
-                .getProperty("org.apache.cxf.extensions.logging.atom.pull");
         } else {
-            privateEndpoints = new ArrayList<String>();
-            atomMap = new HashMap<String, String>();
+            privateEndpoints = new ArrayList<>();
         }
-        
+
         AbstractDestination[] soapEndpoints = getSOAPEndpoints(destinations, privateEndpoints);
         AbstractDestination[] restEndpoints = getRestEndpoints(destinations, privateEndpoints);
         ServiceListWriter serviceListWriter;
         if ("false".equals(request.getParameter("formatted"))) {
             boolean renderWsdlList = "true".equals(request.getParameter("wsdlList"));
-            serviceListWriter = new UnformattedServiceListWriter(renderWsdlList);
+            serviceListWriter = new UnformattedServiceListWriter(renderWsdlList, bus);
         } else {
             String styleSheetPath;
             if (serviceListStyleSheet != null) {
                 styleSheetPath = request.getContextPath() + "/" + serviceListStyleSheet;
-                
             } else {
-                styleSheetPath = request.getRequestURI() + "/?stylesheet=1";
+                styleSheetPath = "";
+                String contextPath = request.getContextPath();
+                if (contextPath != null) {
+                    styleSheetPath += contextPath;
+                }
+                String servletPath = request.getServletPath();
+                if (servletPath != null) {
+                    styleSheetPath += servletPath;
+                }
+                String pathInfo = request.getPathInfo();
+                if (pathInfo != null) {
+                    styleSheetPath += pathInfo;
+                }
+
+                if (!styleSheetPath.endsWith("/")) {
+                    styleSheetPath += "/";
+                }
+                styleSheetPath += "?stylesheet=1";
             }
-            serviceListWriter = 
-                new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, atomMap);
-            
+            serviceListWriter =
+                new FormattedServiceListWriter(styleSheetPath, title, showForeignContexts, bus);
+
         }
         response.setContentType(serviceListWriter.getContentType());
         Object basePath = request.getAttribute(Message.BASE_PATH);
@@ -125,7 +137,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
                                            basePath == null ? null : basePath.toString(),
                                            soapEndpoints, restEndpoints);
     }
-    
+
 
     private boolean isPrivate(EndpointInfo ei, List<String> privateEndpoints) {
         if (privateEndpoints != null) {
@@ -140,19 +152,19 @@ public class ServiceListGeneratorServlet extends HttpServlet {
 
     private AbstractDestination[] getSOAPEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
-        List<AbstractDestination> soapEndpoints = new ArrayList<AbstractDestination>();
+        List<AbstractDestination> soapEndpoints = new ArrayList<>();
         for (AbstractDestination sd : destinations) {
             if (null != sd.getEndpointInfo().getName() && null != sd.getEndpointInfo().getInterface()
                 && !isPrivate(sd.getEndpointInfo(), privateEndpoints)) {
                 soapEndpoints.add(sd);
             }
         }
-        return soapEndpoints.toArray(new AbstractDestination[soapEndpoints.size()]);
+        return soapEndpoints.toArray(new AbstractDestination[0]);
     }
-    
+
     private AbstractDestination[] getRestEndpoints(AbstractDestination[] destinations,
                                                    List<String> privateEndpoints) {
-        List<AbstractDestination> restfulDests = new ArrayList<AbstractDestination>();
+        List<AbstractDestination> restfulDests = new ArrayList<>();
         for (AbstractDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
             if (null == sd.getEndpointInfo().getInterface()
@@ -160,9 +172,9 @@ public class ServiceListGeneratorServlet extends HttpServlet {
                 restfulDests.add(sd);
             }
         }
-        return restfulDests.toArray(new AbstractDestination[restfulDests.size()]);
+        return restfulDests.toArray(new AbstractDestination[0]);
     }
-    
+
 
     private void renderStyleSheet(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
@@ -182,7 +194,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         if (!StringUtils.isEmpty(configTitle)) {
             this.title = configTitle;
         }
-        
+
         String showAllContexts = servletConfig.getInitParameter("service-list-all-contexts");
         if (!StringUtils.isEmpty(showAllContexts)) {
             this.showForeignContexts = Boolean.valueOf(showAllContexts);
@@ -197,7 +209,7 @@ public class ServiceListGeneratorServlet extends HttpServlet {
         return null;
     }
 
-    public void destroy() { 
+    public void destroy() {
     }
-    
+
 }

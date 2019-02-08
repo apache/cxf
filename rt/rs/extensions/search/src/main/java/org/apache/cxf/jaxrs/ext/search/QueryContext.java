@@ -22,57 +22,39 @@ package org.apache.cxf.jaxrs.ext.search;
  * Captures the converted search expression.
  */
 public interface QueryContext {
-    
+
     /**
-     * Uses {@link SearchBean} and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
+     * Uses a custom bean and a visitor registered with
+     * "search.visitor" contextual property to capture and
      * convert the original expression
-     * 
-     * @return converted search expression
-     */
-    String getConvertedExpression();
-    
-    /**
-     * Uses a custom bean and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
-     * convert the original expression
-     * 
+     *
      * @return converted search expression
      */
     <T> String getConvertedExpression(Class<T> beanClass);
-    
+
     /**
-     * Uses a custom bean and query classes and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
+     * Uses a custom bean and query classes and a visitor registered with
+     * "search.visitor" contextual property to capture and
      * convert the original expression
-     * 
+     *
      * @return converted search expression
      */
     <T, E> E getConvertedExpression(Class<T> beanClass, Class<E> queryClass);
-    
+
     /**
-     * Uses {@link SearchBean} and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
+     * Uses a custom bean and a visitor registered with
+     * "search.visitor" contextual property to capture and
      * convert the original expression
-     * 
-     * @return converted search expression
-     */
-    String getConvertedExpression(String originalExpression);
-    
-    /**
-     * Uses a custom bean and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
-     * convert the original expression
-     * 
+     *
      * @return converted search expression
      */
     <T> String getConvertedExpression(String originalExpression, Class<T> beanClass);
-    
+
     /**
-     * Uses a custom bean and query classes and a visitor registered with 
-     * "search.visitor" contextual property to capture and 
+     * Uses a custom bean and query classes and a visitor registered with
+     * "search.visitor" contextual property to capture and
      * convert the original expression
-     * 
+     *
      * @return converted search expression
      */
     <T, E> E getConvertedExpression(String originalExpression, Class<T> beanClass, Class<E> queryClass);

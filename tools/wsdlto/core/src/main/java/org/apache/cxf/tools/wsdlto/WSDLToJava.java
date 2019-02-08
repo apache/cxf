@@ -50,7 +50,7 @@ public class WSDLToJava {
     public WSDLToJava() {
         args = new String[0];
     }
-    public WSDLToJava(String pargs[]) {
+    public WSDLToJava(String[] pargs) {
         args = pargs;
     }
 
@@ -75,13 +75,13 @@ public class WSDLToJava {
     }
 
     private boolean isExitOnFinish() {
-        String exit = System.getProperty("exitOnFinish");
+        String exit = System.getProperty("exitOnFinish", "true");
         if (StringUtils.isEmpty(exit)) {
             return false;
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
+
     public void run(ToolContext context) throws Exception {
         run(context, null);
     }
@@ -176,6 +176,7 @@ public class WSDLToJava {
     }
 
     public static void main(String[] pargs) {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
         CommandInterfaceUtils.commandCommonMain();
         WSDLToJava w2j = new WSDLToJava(pargs);
@@ -202,9 +203,6 @@ public class WSDLToJava {
             if (w2j.isExitOnFinish()) {
                 System.exit(1);
             }
-        }
-        if (w2j.isExitOnFinish()) {
-            System.exit(0);
         }
     }
 

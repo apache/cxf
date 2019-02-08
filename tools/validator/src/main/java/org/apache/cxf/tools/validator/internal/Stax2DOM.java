@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolException;
@@ -82,7 +83,7 @@ public class Stax2DOM {
             try {
                 if (reader != null) {
                     try {
-                        //on woodstox, calling closeCompletely will allow any 
+                        //on woodstox, calling closeCompletely will allow any
                         //cached things like dtds and such to be completely
                         //closed and cleaned up.
                         reader.getClass().getMethod("closeCompletely").invoke(reader);

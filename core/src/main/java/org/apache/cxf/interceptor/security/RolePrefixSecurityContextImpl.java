@@ -30,20 +30,20 @@ import org.apache.cxf.security.LoginSecurityContext;
 
 public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     private Principal p;
-    private Set<Principal> roles; 
+    private Set<Principal> roles;
     private Subject theSubject;
-    
+
     public RolePrefixSecurityContextImpl(Subject subject, String rolePrefix) {
         this(subject, rolePrefix, JAASLoginInterceptor.ROLE_CLASSIFIER_PREFIX);
     }
-    
+
     public RolePrefixSecurityContextImpl(Subject subject, String roleClassifier,
                                          String roleClassifierType) {
         this.p = findPrincipal(subject, roleClassifier, roleClassifierType);
         this.roles = findRoles(subject, roleClassifier, roleClassifierType);
         this.theSubject = subject;
     }
-    
+
     public Principal getUserPrincipal() {
         return p;
     }
@@ -58,8 +58,8 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
         }
         return false;
     }
-    
-    private static Principal findPrincipal(Subject subject, 
+
+    private static Principal findPrincipal(Subject subject,
         String roleClassifier, String roleClassifierType) {
         for (Principal p : subject.getPrincipals()) {
             if (!isRole(p, roleClassifier, roleClassifierType)) {
@@ -68,10 +68,10 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
         }
         return null;
     }
-    
-    private static Set<Principal> findRoles(Subject subject, 
+
+    private static Set<Principal> findRoles(Subject subject,
         String roleClassifier, String roleClassifierType) {
-        Set<Principal> set = new HashSet<Principal>();
+        Set<Principal> set = new HashSet<>();
         for (Principal p : subject.getPrincipals()) {
             if (isRole(p, roleClassifier, roleClassifierType)) {
                 set.add(p);
@@ -83,11 +83,10 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     private static boolean isRole(Principal p, String roleClassifier, String roleClassifierType) {
         if (JAASLoginInterceptor.ROLE_CLASSIFIER_PREFIX.equals(roleClassifierType)) {
             return p.getName().startsWith(roleClassifier);
-        } else {
-            return p.getClass().getName().endsWith(roleClassifier);
         }
+        return p.getClass().getName().endsWith(roleClassifier);
     }
-    
+
     public Subject getSubject() {
         return theSubject;
     }

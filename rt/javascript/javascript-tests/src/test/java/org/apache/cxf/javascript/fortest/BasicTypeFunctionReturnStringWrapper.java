@@ -34,7 +34,7 @@ public class BasicTypeFunctionReturnStringWrapper {
     private long l;
     private float f;
     private double d;
-    
+
     public String getS() {
         return s;
     }

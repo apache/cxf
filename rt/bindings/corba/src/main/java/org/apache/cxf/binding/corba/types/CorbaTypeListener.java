@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 public interface CorbaTypeListener {
 
     void setNamespaceContext(NamespaceContext ctx);
-    
+
     void processStartElement(QName name);
     void processEndElement(QName name);
     void processCharacters(String text);

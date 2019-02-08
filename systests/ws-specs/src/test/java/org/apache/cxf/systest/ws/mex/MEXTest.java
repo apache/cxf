@@ -19,18 +19,22 @@
 
 package org.apache.cxf.systest.ws.mex;
 
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.ws.mex.MetadataExchange;
 import org.apache.cxf.ws.mex.model._2004_09.GetMetadata;
 import org.apache.cxf.ws.mex.model._2004_09.Metadata;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  */
 public class MEXTest extends AbstractWSATestBase {
     static final String PORT = Server.PORT;
@@ -51,20 +55,20 @@ public class MEXTest extends AbstractWSATestBase {
         Metadata metadata = exc.get2004();
         assertNotNull(metadata);
         assertEquals(2, metadata.getMetadataSection().size());
-        
+
 
         assertEquals("http://schemas.xmlsoap.org/wsdl/",
                      metadata.getMetadataSection().get(0).getDialect());
         assertEquals("http://apache.org/cxf/systest/ws/addr_feature/",
                      metadata.getMetadataSection().get(0).getIdentifier());
-        assertEquals("http://www.w3.org/2001/XMLSchema", 
+        assertEquals("http://www.w3.org/2001/XMLSchema",
                      metadata.getMetadataSection().get(1).getDialect());
-        
+
         GetMetadata body = new GetMetadata();
         body.setDialect("http://www.w3.org/2001/XMLSchema");
         metadata = exc.getMetadata(body);
         assertEquals(1, metadata.getMetadataSection().size());
-        assertEquals("http://www.w3.org/2001/XMLSchema", 
+        assertEquals("http://www.w3.org/2001/XMLSchema",
                      metadata.getMetadataSection().get(0).getDialect());
     }
 }

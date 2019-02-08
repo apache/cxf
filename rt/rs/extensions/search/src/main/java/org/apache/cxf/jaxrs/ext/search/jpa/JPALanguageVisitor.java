@@ -26,29 +26,29 @@ import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
 
 public class JPALanguageVisitor<T> extends SQLPrinterVisitor<T> {
 
-    
+
     public JPALanguageVisitor(Class<T> tClass) {
         this(tClass, "t", null);
     }
-    
+
     public JPALanguageVisitor(Class<T> tClass, String tableAlias) {
         this(tClass, tableAlias, null);
     }
-    
+
     public JPALanguageVisitor(Class<T> tClass,
                               Map<String, String> fieldMap) {
         this(tClass, "t", fieldMap);
     }
-    
+
     public JPALanguageVisitor(Class<T> tClass,
                               String tableAlias,
                               Map<String, String> fieldMap) {
-        super(fieldMap, 
-              tClass.getSimpleName(), 
-              tableAlias, 
+        super(fieldMap,
+              tClass.getSimpleName(),
+              tableAlias,
               tableAlias != null ? Collections.singletonList(tableAlias) : null);
     }
-        
+
     public void visit(SearchCondition<T> sc) {
         // provide more customizations as needed
         super.visit(sc);

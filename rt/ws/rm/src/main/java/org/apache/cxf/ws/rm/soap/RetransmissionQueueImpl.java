@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.rm.soap;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,6 +60,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.io.WriteOnCloseOutputStream;
 import org.apache.cxf.message.Message;
@@ -91,7 +95,6 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.RMUtils;
 import org.apache.cxf.ws.rm.RetransmissionQueue;
 import org.apache.cxf.ws.rm.RetryStatus;
-import org.apache.cxf.ws.rm.RewindableInputStream;
 import org.apache.cxf.ws.rm.SourceSequence;
 import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 import org.apache.cxf.ws.rm.persistence.RMStore;
@@ -100,21 +103,21 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
- * 
+ *
  */
 public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     private static final Logger LOG = LogUtils.getL7dLogger(RetransmissionQueueImpl.class);
 
-    private Map<String, List<ResendCandidate>> candidates = 
-        new HashMap<String, List<ResendCandidate>>();
-    private Map<String, List<ResendCandidate>> suspendedCandidates = 
-        new HashMap<String, List<ResendCandidate>>();
+    private Map<String, List<ResendCandidate>> candidates =
+        new HashMap<>();
+    private Map<String, List<ResendCandidate>> suspendedCandidates =
+        new HashMap<>();
     private Resender resender;
     private RMManager manager;
 
     private int unacknowledgedCount;
-    
+
     public RetransmissionQueueImpl(RMManager m) {
         manager = m;
     }
@@ -153,7 +156,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     /**
      * Purge all candidates for the given sequence that have been acknowledged.
-     * 
+     *
      * @param seq the sequence object.
      */
     public void purgeAcknowledged(SourceSequence seq) {
@@ -161,19 +164,19 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     /**
-     * Purge all candidates for the given sequence. This method is used to 
+     * Purge all candidates for the given sequence. This method is used to
      * terminate the sequence by force and release the resource associated
      * with the sequence.
-     *  
+     *
      * @param seq the sequence object.
      */
     public void purgeAll(SourceSequence seq) {
         purgeCandidates(seq, true);
     }
-    
+
     private void purgeCandidates(SourceSequence seq, boolean any) {
-        Collection<Long> purged = new ArrayList<Long>();
-        Collection<ResendCandidate> resends = new ArrayList<ResendCandidate>();
+        Collection<Long> purged = new ArrayList<>();
+        Collection<ResendCandidate> resends = new ArrayList<>();
         Identifier sid = seq.getIdentifier();
         synchronized (this) {
             LOG.fine("Start purging resend candidates.");
@@ -196,7 +199,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             LOG.fine("Completed purging resend candidates.");
         }
-        if (purged.size() > 0) {
+        if (!purged.isEmpty()) {
             RMStore store = manager.getStore();
             if (null != store) {
                 store.removeMessages(sid, purged, true);
@@ -209,7 +212,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     public List<Long> getUnacknowledgedMessageNumbers(SourceSequence seq) {
-        List<Long> unacknowledged = new ArrayList<Long>();
+        List<Long> unacknowledged = new ArrayList<>();
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -219,7 +222,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
         return unacknowledged;
     }
-    
+
     public RetryStatus getRetransmissionStatus(SourceSequence seq, long num) {
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
@@ -232,9 +235,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
         return null;
     }
-    
+
     public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
-        Map<Long, RetryStatus> cp = new HashMap<Long, RetryStatus>();
+        Map<Long, RetryStatus> cp = new HashMap<>();
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -271,14 +274,14 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     candidate.cancel();
                 }
                 LOG.log(Level.FINE, "Cancelled resends for sequence {0}.", seq.getIdentifier().getValue());
-            }           
+            }
         }
     }
-    
+
     void stop() {
-        
+
     }
-    
+
     public void suspend(SourceSequence seq) {
         synchronized (this) {
             String key = seq.getIdentifier().getValue();
@@ -293,7 +296,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
         }
     }
-    
+
     public void resume(SourceSequence seq) {
         synchronized (this) {
             String key = seq.getIdentifier().getValue();
@@ -305,10 +308,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 }
                 candidates.put(key, sequenceCandidates);
                 LOG.log(Level.FINE, "Resumed resends for sequence {0}.", key);
-            }           
+            }
         }
     }
-    
+
     /**
      * @return the exponential backoff
      */
@@ -320,31 +323,31 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @param message the message context
      * @return a ResendCandidate
      */
-    protected ResendCandidate createResendCandidate(SoapMessage message) {
+    protected ResendCandidate createResendCandidate(Message message) {
         return new ResendCandidate(message);
     }
 
     /**
      * Accepts a new resend candidate.
-     * 
+     *
      * @param ctx the message context.
      * @return ResendCandidate
-     */    
+     */
     protected ResendCandidate cacheUnacknowledged(Message message) {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
         SequenceType st = rmps.getSequence();
         Identifier sid = st.getIdentifier();
         String key = sid.getValue();
-        
+
         ResendCandidate candidate = null;
-        
+
         synchronized (this) {
             List<ResendCandidate> sequenceCandidates = getSequenceCandidates(key);
             if (null == sequenceCandidates) {
-                sequenceCandidates = new ArrayList<ResendCandidate>();
+                sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
-            candidate = new ResendCandidate(message);
+            candidate = createResendCandidate(message);
             if (isSequenceSuspended(key)) {
                 candidate.suspend();
             }
@@ -390,7 +393,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
         return sc;
     }
-    
+
     /**
      * @param key the sequence identifier under consideration
      * @return true if the sequence is currently suspended; false otherwise
@@ -423,19 +426,20 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             message = m;
             retries = 0;
             RMConfiguration cfg = manager.getEffectiveConfiguration(message);
-            long baseRetransmissionInterval = 
+            long baseRetransmissionInterval =
                 cfg.getBaseRetransmissionInterval().longValue();
             backoff = cfg.isExponentialBackoff()  ? RetransmissionQueue.DEFAULT_EXPONENTIAL_BACKOFF : 1;
             next = new Date(System.currentTimeMillis() + baseRetransmissionInterval);
             nextInterval = baseRetransmissionInterval * backoff;
-            RetryPolicyType rmrp = null != manager.getSourcePolicy() 
-                ? manager.getSourcePolicy().getRetryPolicy() : null; 
+            RetryPolicyType rmrp = null != manager.getSourcePolicy()
+                ? manager.getSourcePolicy().getRetryPolicy() : null;
             maxRetries = null != rmrp ? rmrp.getMaxRetries() : -1;
-            
+
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
             AttributedURIType to = null;
             if (null != maps) {
                 to = maps.getTo();
+                maps.exposeAs(cfg.getAddressingNamespace());
             }
             if (to != null  && RMUtils.getAddressingConstants().getAnonymousURI().equals(to.getValue())) {
                 LOG.log(Level.INFO, "Cannot resend to anonymous target.  Not scheduling a resend.");
@@ -452,7 +456,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
         /**
          * Initiate resend asynchronsly.
-         * 
+         *
          * @param requestAcknowledge true if a AckRequest header is to be sent
          *            with resend
          */
@@ -471,7 +475,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             } else {
                 LOG.log(Level.FINE, "Using endpoint executor {0}", executor.getClass().getName());
             }
-            
+
             try {
                 executor.execute(this);
             } catch (RejectedExecutionException ex) {
@@ -495,7 +499,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         public long getNumber() {
             return number;
         }
-        
+
         /**
          * @return number of resend attempts
          */
@@ -509,7 +513,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         public int getMaxRetries() {
             return maxRetries;
         }
-        
+
         /**
          * @return date of next resend
          */
@@ -518,7 +522,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
 
         /**
-         * @return date of previous resend or null if no attempt is yet taken 
+         * @return date of previous resend or null if no attempt is yet taken
          */
         public Date getPrevious() {
             if (retries > 0) {
@@ -557,7 +561,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 releaseSavedMessage();
             }
         }
-        
+
         /**
          * Cancel further resend (although no ACK has been received).
          */
@@ -585,9 +589,23 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         }
 
         private void releaseSavedMessage() {
-            RewindableInputStream is = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-            if (is != null) {
-                is.release();
+            CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            if (cos != null) {
+                cos.releaseTempFileHold();
+                try {
+                    cos.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+            // REVISIT -- When reference holder is not needed anymore, code can be removed.
+            Closeable closeable = (Closeable)message.get(RMMessageConstants.ATTACHMENTS_CLOSEABLE);
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    // ignore
+                }
             }
         }
 
@@ -644,7 +662,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     public interface Resender {
         /**
          * Resend mechanics.
-         * 
+         *
          * @param message
          * @param if a AckRequest should be included
          */
@@ -653,7 +671,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     /**
      * Create default Resender logic.
-     * 
+     *
      * @return default Resender
      */
     protected final Resender getDefaultResender() {
@@ -675,7 +693,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     /**
      * Plug in replacement resend logic (facilitates unit testing).
-     * 
+     *
      * @param replacement resend logic
      */
     protected void replaceResender(Resender replacement) {
@@ -686,7 +704,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     protected JaxbAssertion<RMAssertion> getAssertion(AssertionInfo ai) {
         return (JaxbAssertion<RMAssertion>)ai.getAssertion();
     }
-    
+
     private void readHeaders(XMLStreamReader xmlReader, SoapMessage message) throws XMLStreamException {
 
         // read header portion of SOAP document into DOM
@@ -708,11 +726,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
         // get the actual SOAP header
         Element element = doc.getDocumentElement();
-        QName header = version.getHeader();                
-        List<Element> elemList = 
+        QName header = version.getHeader();
+        List<Element> elemList =
             DOMUtils.findAllElementsByTagNameNS(element, header.getNamespaceURI(), header.getLocalPart());
         for (Element elem : elemList) {
-            
+
             // set all child elements as headers for message transmission
             Element hel = DOMUtils.getFirstElement(elem);
             while (hel != null) {
@@ -724,8 +742,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     private void doResend(SoapMessage message) {
+        InputStream is = null;
         try {
-            
+
             // initialize copied interceptor chain for message
             PhaseInterceptorChain retransmitChain = manager.getRetransmitChain(message);
             ProtocolVariation protocol = RMContextUtils.getProtocolVariation(message);
@@ -733,7 +752,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             PhaseChainCache cache = new PhaseChainCache();
             boolean after = true;
             if (retransmitChain == null) {
-                
+
                 // no saved retransmit chain, so construct one from scratch (won't work for WS-Security on server, so
                 //  need to fix)
                 retransmitChain = buildRetransmitChain(endpoint, cache);
@@ -741,10 +760,10 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
             }
             message.setInterceptorChain(retransmitChain);
-            
+
             // clear flag for SOAP out interceptor so envelope will be written
             message.remove(SoapOutInterceptor.WROTE_ENVELOPE_START);
-            
+
             // discard all saved content
             Set<Class<?>> formats = message.getContentFormats();
             List<CachedOutputStreamCallback> callbacks = null;
@@ -758,10 +777,11 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     }
                 }
             }
-            
+
             // read SOAP headers from saved input stream
-            RewindableInputStream is = (RewindableInputStream)message.get(RMMessageConstants.SAVED_CONTENT);
-            is.rewind();
+            CachedOutputStream cos = (CachedOutputStream)message.get(RMMessageConstants.SAVED_CONTENT);
+            cos.holdTempFile(); // CachedOutputStream is hold until delivering was successful
+            is = cos.getInputStream(); // instance is needed to close input stream later on
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(is, StandardCharsets.UTF_8.name());
             message.getHeaders().clear();
             if (reader.getEventType() != XMLStreamConstants.START_ELEMENT
@@ -775,9 +795,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     throw new IllegalStateException("No body content present");
                 }
             }
-            
+
             // set message addressing properties
-            AddressingProperties maps = new MAPCodec().unmarshalMAPs(message);
+            AddressingProperties maps = MAPCodec.getInstance(message.getExchange().getBus()).unmarshalMAPs(message);
             RMContextUtils.storeMAPs(maps, message, true, MessageUtils.isRequestor(message));
             AttributedURIType to = null;
             if (null != maps) {
@@ -791,31 +811,31 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 LOG.log(Level.FINE, "Cannot resend to anonymous target");
                 return;
             }
-            
+
             // initialize conduit for new message
             Conduit c = message.getExchange().getConduit(message);
             if (c == null) {
                 c = buildConduit(message, endpoint, to);
             }
             c.prepare(message);
-            
+
             // replace standard message marshaling with copy from saved stream
             ListIterator<Interceptor<? extends Message>> iterator = retransmitChain.getIterator();
             while (iterator.hasNext()) {
                 Interceptor<? extends Message> incept = iterator.next();
-                
+
                 // remove JAX-WS interceptors which handle message modes and such
                 if (incept.getClass().getName().startsWith("org.apache.cxf.jaxws.interceptors")) {
                     retransmitChain.remove(incept);
                 } else if (incept instanceof PhaseInterceptor
                     && (((PhaseInterceptor<?>)incept).getPhase() == Phase.MARSHAL)) {
-                    
+
                     // remove any interceptors from the marshal phase
                     retransmitChain.remove(incept);
                 }
             }
             retransmitChain.add(new CopyOutInterceptor(reader));
-            
+
             // restore callbacks on output stream
             if (callbacks != null) {
                 OutputStream os = message.getContent(OutputStream.class);
@@ -832,7 +852,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     }
                 }
             }
-            
+
             // send the message
             message.put(RMMessageConstants.RM_RETRANSMISSION, Boolean.TRUE);
             if (after) {
@@ -847,9 +867,18 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                     + seq.getIdentifier().getValue());
                 rmps = new RMProperties();
             }
-            
+
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "RESEND_FAILED_MSG", ex);
+        } finally {
+            // make sure to always close InputStreams of the CachedOutputStream to avoid leaving temp files undeleted
+            if (null != is) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
     }
 
@@ -867,7 +896,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             public synchronized Conduit selectConduit(Message message) {
                 Conduit conduit = null;
                 EndpointInfo endpointInfo = endpoint.getEndpointInfo();
-                EndpointReferenceType original =  endpointInfo.getTarget();
+                EndpointReferenceType original = endpointInfo.getTarget();
                 try {
                     if (null != address) {
                         endpointInfo.setAddress(address);
@@ -880,9 +909,9 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 return conduit;
             }
         };
-        
+
         cs.setEndpoint(endpoint);
-        c = cs.selectConduit(message);   
+        c = cs.selectConduit(message);
         // REVISIT
         // use application endpoint message observer instead?
         c.setMessageObserver(new MessageObserver() {
@@ -919,15 +948,15 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         retransmitChain = cache.get(pm.getOutPhases(), i1, i2, i3);
         return retransmitChain;
     }
-    
+
     public static class CopyOutInterceptor extends AbstractOutDatabindingInterceptor {
         private final XMLStreamReader reader;
-        
+
         public CopyOutInterceptor(XMLStreamReader rdr) {
             super(Phase.MARSHAL);
             reader = rdr;
         }
-        
+
         @Override
         public void handleMessage(Message message) throws Fault {
             try {

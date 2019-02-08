@@ -24,34 +24,32 @@ import org.apache.cxf.transport.MessageObserver;
 
 public class DummyServer implements Server {
     private ServerRegistryImpl serverRegistry;
-    
+
     public DummyServer(ServerRegistryImpl sri) {
         serverRegistry = sri;
     }
 
     public Destination getDestination() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public Endpoint getEndpoint() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public void start() {
-        serverRegistry.register(this);        
+        serverRegistry.register(this);
     }
 
     public void stop() {
         serverRegistry.unregister(this);
-        
+
     }
-    
+
     public void destroy() {
         stop();
     }
-    
+
     public MessageObserver getMessageObserver() {
         return null;
     }

@@ -30,7 +30,7 @@ public class BookStoreSimple {
     public static class BookBean {
         private long id;
         public BookBean() {
-            
+
         }
         public BookBean(long id) {
             this.id = id;
@@ -44,24 +44,24 @@ public class BookStoreSimple {
         }
     }
     @Resource
-    private Book injectedBook; 
-    
-    
+    private Book injectedBook;
+
+
     @GET
     public Book getBook(@PathParam("id") long id) {
-        return new Book("Simple", id);    
+        return new Book("Simple", id);
     }
-    
+
     @GET
     @Path("/book")
     public Book getBook2(@PathParam("id") long id) {
-        return getBook(id);    
+        return getBook(id);
     }
     @PostConstruct
     public void postConstruct() {
         if (injectedBook == null) {
             throw new IllegalStateException("Book resource has not been injected");
-        }    
+        }
     }
     @GET
     @Path("/beanparam")

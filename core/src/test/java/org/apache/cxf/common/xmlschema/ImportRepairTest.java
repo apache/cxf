@@ -57,13 +57,14 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  *
  */
-public class ImportRepairTest extends Assert {
+public class ImportRepairTest {
 
     static boolean dumpSchemas;
 
@@ -135,7 +136,7 @@ public class ImportRepairTest extends Assert {
         collection.addCrossImports();
         tryToParseSchemas();
     }
-    
+
     Method findMethod(Object o, String name) {
         for (Method m: o.getClass().getMethods()) {
             if (m.getName() == name) {
@@ -147,8 +148,8 @@ public class ImportRepairTest extends Assert {
 
     private void tryToParseSchemas() throws Exception {
         // Get DOM Implementation using DOM Registry
-        final List<DOMLSInput> inputs = new ArrayList<DOMLSInput>();
-        final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
+        final List<DOMLSInput> inputs = new ArrayList<>();
+        final Map<String, LSInput> resolverMap = new HashMap<>();
 
         for (XmlSchema schema : collection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
@@ -164,18 +165,18 @@ public class ImportRepairTest extends Assert {
         DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
         DOMImplementation impl = registry.getDOMImplementation("XS-Loader");
 
-        
+
         try {
             Object schemaLoader = findMethod(impl, "createXSLoader").invoke(impl, new Object[1]);
             DOMConfiguration config = (DOMConfiguration)findMethod(schemaLoader, "getConfig").invoke(schemaLoader);
-            
+
             config.setParameter("validate", Boolean.TRUE);
             try {
-                //bug in the JDK doesn't set this, but accesses it 
+                //bug in the JDK doesn't set this, but accesses it
                 config.setParameter("http://www.oracle.com/xml/jaxp/properties/xmlSecurityPropertyManager",
                                     Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityPropertyManager")
                                         .newInstance());
-                
+
                 config.setParameter("http://apache.org/xml/properties/security-manager",
                                     Class.forName("com.sun.org.apache.xerces.internal.utils.XMLSecurityManager")
                                         .newInstance());
@@ -183,7 +184,7 @@ public class ImportRepairTest extends Assert {
                 //ignore
             }
             config.setParameter("error-handler", new DOMErrorHandler() {
-    
+
                 public boolean handleError(DOMError error) {
                     LOG.info("Schema parsing error: " + error.getMessage()
                              + " " + error.getType()
@@ -194,20 +195,20 @@ public class ImportRepairTest extends Assert {
                 }
             });
             config.setParameter("resource-resolver", new LSResourceResolver() {
-    
+
                 public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                                String systemId, String baseURI) {
                     return resolverMap.get(namespaceURI);
                 }
             });
-    
+
             Method m = findMethod(schemaLoader, "loadInputList");
             String name = m.getParameterTypes()[0].getName() + "Impl";
             name = name.replace("xs.LS", "impl.xs.util.LS");
             Class<?> c = Class.forName(name);
             Object inputList = c.getConstructor(LSInput[].class, Integer.TYPE)
-            .newInstance(inputs.toArray(new LSInput[inputs.size()]), inputs.size());
-        
+            .newInstance(inputs.toArray(new LSInput[0]), inputs.size());
+
             findMethod(schemaLoader, "loadInputList").invoke(schemaLoader, inputList);
         } catch (InvocationTargetException ite) {
             throw (Exception)ite.getTargetException();
@@ -218,7 +219,7 @@ public class ImportRepairTest extends Assert {
         if (!dumpSchemas) {
             return;
         }
-        
+
         XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(System.err);
         xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
         StaxUtils.copy(new DOMSource(document), xwriter);

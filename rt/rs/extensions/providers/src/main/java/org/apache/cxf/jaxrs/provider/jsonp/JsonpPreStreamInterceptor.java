@@ -44,11 +44,11 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
     private String paddingEnd = "(";
-    
+
     public JsonpPreStreamInterceptor() {
         super(Phase.PRE_STREAM);
     }
-  
+
     public void handleMessage(Message message) throws Fault {
         String callback = getCallbackValue(message);
         if (!StringUtils.isEmpty(callback)) {
@@ -61,12 +61,12 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
     protected void setContentType(Message message) {
         Map<String, List<String>> headers = (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
         if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+            headers = new HashMap<>();
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
-        headers.put(Message.CONTENT_TYPE, Collections.singletonList(getMediaType()));            
+        headers.put(Message.CONTENT_TYPE, Collections.singletonList(getMediaType()));
     }
-    
+
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }

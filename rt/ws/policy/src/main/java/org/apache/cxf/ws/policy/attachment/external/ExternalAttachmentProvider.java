@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
@@ -50,30 +51,30 @@ import org.apache.neethi.PolicyReference;
 import org.springframework.core.io.Resource;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class ExternalAttachmentProvider extends AbstractPolicyProvider {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ExternalAttachmentProvider.class);
-    
+
     // Use a Resource object here instead of a String so that the resource can be resolved when
     // this bean is created
-  
+
     private Resource location;
     private Collection<PolicyAttachment> attachments;
-    
-    ExternalAttachmentProvider() {        
+
+    ExternalAttachmentProvider() {
     }
-    
+
     ExternalAttachmentProvider(Bus b) {
         super(b);
     }
-    
+
     public void setLocation(Resource u) {
         location = u;
     }
-    
+
     public Resource getLocation() {
         return location;
     }
@@ -89,7 +90,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                 p = p.merge(pa.getPolicy());
             }
         }
-                
+
         return p;
     }
 
@@ -118,7 +119,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                 p = p.merge(pa.getPolicy());
             }
         }
-                
+
         return p;
     }
 
@@ -133,7 +134,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                 p = p.merge(pa.getPolicy());
             }
         }
-                
+
         return p;
     }
 
@@ -148,17 +149,17 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                 p = p.merge(pa.getPolicy());
             }
         }
-                
+
         return p;
-    } 
-    
+    }
+
     void readDocument() {
         if (null != attachments) {
             return;
         }
-        
+
         // read the document and build the attachments
-        attachments = new ArrayList<PolicyAttachment>();
+        attachments = new ArrayList<>();
         Document doc = null;
         try {
             InputStream is = location.getInputStream();
@@ -172,18 +173,18 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         } catch (Exception ex) {
             throw new PolicyException(ex);
         }
-        
-        for (Element ae 
+
+        for (Element ae
                 : PolicyConstants
-                    .findAllPolicyElementsOfLocalName(doc, 
-                                                      Constants.ELEM_POLICY_ATTACHMENT)) {    
+                    .findAllPolicyElementsOfLocalName(doc,
+                                                      Constants.ELEM_POLICY_ATTACHMENT)) {
             PolicyAttachment attachment = new PolicyAttachment();
-            
+
             for (Node nd = ae.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
                 if (Node.ELEMENT_NODE != nd.getNodeType()) {
                     continue;
                 }
-                
+
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
                 if (Constants.isAppliesToElem(qn)) {
                     Collection<DomainExpression> des = readDomainExpressions((Element)nd);
@@ -191,37 +192,37 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
                         // forget about this attachment
                         continue;
                     }
-                    attachment.setDomainExpressions(des);                    
+                    attachment.setDomainExpressions(des);
                 } else if (Constants.isPolicyElement(qn)) {
                     Policy p = builder.getPolicy(nd);
                     if (null != attachment.getPolicy()) {
                         p = p.merge(attachment.getPolicy());
                     }
                     attachment.setPolicy(p);
-                    
+
                     // cache the element so it can be used when generating the wsdl
                     attachment.setElement((Element) nd);
 
                 } else if (Constants.isPolicyRef(qn)) {
                     PolicyReference ref = builder.getPolicyReference(nd);
-                    if (null != ref) {   
+                    if (null != ref) {
                         Policy p = resolveReference(ref, doc);
                         if (null != attachment.getPolicy()) {
                             p = p.merge(attachment.getPolicy());
                         }
                         attachment.setPolicy(p);
-                    }                    
+                    }
                 } // TODO: wsse:Security child element
             }
-            
-            if (null == attachment.getPolicy() || null == attachment.getDomainExpressions()) {                
+
+            if (null == attachment.getPolicy() || null == attachment.getDomainExpressions()) {
                 continue;
             }
-            
+
             attachments.add(attachment);
         }
     }
-    
+
     Policy resolveReference(PolicyReference ref, Document doc) {
         Policy p = null;
         if (isExternal(ref)) {
@@ -232,7 +233,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         checkResolved(ref, p);
         return p;
     }
-    
+
     Policy resolveLocal(PolicyReference ref, Document doc) {
         String relativeURI = ref.getURI().substring(1);
         String absoluteURI = doc.getBaseURI() + ref.getURI();
@@ -247,13 +248,13 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
             registry.register(absoluteURI, resolved);
         }
         return resolved;
-    }  
-    
+    }
+
     Collection<DomainExpression> readDomainExpressions(Element appliesToElem) {
-        Collection<DomainExpression> des = new ArrayList<DomainExpression>();
+        Collection<DomainExpression> des = new ArrayList<>();
         for (Node nd = appliesToElem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType()) {
-                DomainExpressionBuilderRegistry debr 
+                DomainExpressionBuilderRegistry debr
                     = bus.getExtension(DomainExpressionBuilderRegistry.class);
                 assert null != debr;
                 DomainExpression de = debr.build((Element)nd);
@@ -262,15 +263,15 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider {
         }
         return des;
     }
-    
+
     // for test
-    
+
     void setAttachments(Collection<PolicyAttachment> a) {
-        attachments = a;    
+        attachments = a;
     }
-    
+
     public Collection<PolicyAttachment> getAttachments() {
         return attachments;
     }
-    
+
 }

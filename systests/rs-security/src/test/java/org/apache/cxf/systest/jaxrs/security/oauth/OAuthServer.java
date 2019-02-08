@@ -36,7 +36,7 @@ public class OAuthServer extends AbstractBusTestServerBase {
         "/org/apache/cxf/systest/jaxrs/oauth/server";
     private org.eclipse.jetty.server.Server server;
 
-    
+
     protected void run() {
 
         server = new org.eclipse.jetty.server.Server(PORT);
@@ -58,7 +58,7 @@ public class OAuthServer extends AbstractBusTestServerBase {
         server.setHandler(handlers);
         try {
             server.start();
-                       
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,6 +71,6 @@ public class OAuthServer extends AbstractBusTestServerBase {
             server.destroy();
             server = null;
         }
-    }    
+    }
 
 }

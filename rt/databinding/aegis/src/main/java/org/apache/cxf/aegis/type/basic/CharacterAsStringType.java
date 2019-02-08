@@ -28,15 +28,15 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * 
+ *
  */
 public class CharacterAsStringType extends AegisType {
-    
-    public static final QName CHARACTER_AS_STRING_TYPE_QNAME 
+
+    public static final QName CHARACTER_AS_STRING_TYPE_QNAME
         = new QName("http://cxf.apache.org/aegisTypes", "char");
-    
+
     private IntType intType;
-    
+
     public CharacterAsStringType() {
         intType = new IntType();
     }
@@ -50,7 +50,7 @@ public class CharacterAsStringType extends AegisType {
 
     /** {@inheritDoc}*/
     @Override
-    public void writeObject(Object object, MessageWriter writer, Context context) 
+    public void writeObject(Object object, MessageWriter writer, Context context)
         throws DatabindingException {
         Character charObject = (Character) object;
         intType.writeObject(Integer.valueOf(charObject.charValue()), writer, context);

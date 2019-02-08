@@ -51,7 +51,6 @@ import org.apache.cxf.transport.http.netty.server.ThreadingParameters;
 import org.apache.cxf.transports.http_netty_server.configuration.TLSServerParametersIdentifiedType;
 import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_netty_server.configuration.ThreadingParametersType;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
@@ -66,31 +65,31 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
         "http://cxf.apache.org/configuration/security";
 
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        
+
         String portStr = element.getAttribute("port");
         bean.addPropertyValue("port", portStr);
-        
+
         String hostStr = element.getAttribute("host");
         if (hostStr != null && !"".equals(hostStr.trim())) {
             bean.addPropertyValue("host", hostStr);
         }
-        
+
         String readIdleTimeStr = element.getAttribute("readIdleTime");
         if (readIdleTimeStr != null && !"".equals(readIdleTimeStr.trim())) {
             bean.addPropertyValue("readIdleTime", readIdleTimeStr);
         }
-        
+
         String writeIdleTimeStr = element.getAttribute("writeIdleTime");
         if (writeIdleTimeStr != null && !"".equals(writeIdleTimeStr.trim())) {
             bean.addPropertyValue("writeIdleTime", writeIdleTimeStr);
         }
-        
+
         String maxChunkContentSizeStr = element.getAttribute("maxChunkContentSize");
         if (maxChunkContentSizeStr != null && !"".equals(maxChunkContentSizeStr.trim())) {
             bean.addPropertyValue("maxChunkContentSize", maxChunkContentSizeStr);
         }
-        
-        
+
+
         ValueHolder busValue = ctx.getContainingBeanDefinition()
             .getConstructorArgumentValues().getArgumentValue(0, Bus.class);
         bean.addPropertyValue("bus", busValue.getValue());
@@ -123,11 +122,11 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
                                                     "createThreadingParametersRef"
                                                     );
                 } else if ("sessionSupport".equals(name) || "reuseAddress".equals(name)) {
-                    String text = elem.getTextContent();                        
+                    String text = elem.getTextContent();
                     bean.addPropertyValue(name, text);
-                }                         
+                }
 
-                elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);          
+                elem = org.apache.cxf.helpers.DOMUtils.getNextElement(elem);
             }
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
@@ -135,28 +134,28 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         bean.setLazyInit(false);
     }
-    
+
     private void mapTLSServerParameters(Element e, BeanDefinitionBuilder bean) {
-        BeanDefinitionBuilder paramsbean 
+        BeanDefinitionBuilder paramsbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.TLSServerParametersTypeInternal.class);
-        
+
         // read the attributes
         NamedNodeMap as = e.getAttributes();
         for (int i = 0; i < as.getLength(); i++) {
             Attr a = (Attr) as.item(i);
             if (a.getNamespaceURI() == null) {
                 String aname = a.getLocalName();
-                if ("jsseProvider".equals(aname) 
+                if ("jsseProvider".equals(aname)
                     || "secureSocketProtocol".equals(aname)) {
                     paramsbean.addPropertyValue(aname, a.getValue());
                 }
             }
         }
-        
+
         // read the child elements
         Node n = e.getFirstChild();
         while (n != null) {
-            if (Node.ELEMENT_NODE != n.getNodeType() 
+            if (Node.ELEMENT_NODE != n.getNodeType()
                 || !SECURITY_NS.equals(n.getNamespaceURI())) {
                 n = n.getNextSibling();
                 continue;
@@ -169,14 +168,14 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("keyManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                              KeyManagersType.class);
                 }
             } else if ("trustManagers".equals(ename)) {
                 if (ref != null && ref.length() > 0) {
                     paramsbean.addPropertyReference("trustManagersRef", ref);
                 } else {
-                    mapElementToJaxbProperty((Element)n, paramsbean, ename, 
+                    mapElementToJaxbProperty((Element)n, paramsbean, ename,
                                              TrustManagersType.class);
                 }
             } else if ("cipherSuites".equals(ename)) {
@@ -200,17 +199,17 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             n = n.getNextSibling();
         }
 
-        BeanDefinitionBuilder jaxbbean 
+        BeanDefinitionBuilder jaxbbean
             = BeanDefinitionBuilder.rootBeanDefinition(TLSServerParametersConfig.class);
         jaxbbean.addConstructorArgValue(paramsbean.getBeanDefinition());
         bean.addPropertyValue("tlsServerParameters", jaxbbean.getBeanDefinition());
     }
 
-    
-       
+
+
     /*
      * We do not require an id from the configuration.
-     * 
+     *
      * (non-Javadoc)
      * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
      */
@@ -223,16 +222,16 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
     protected Class<?> getBeanClass(Element arg0) {
         return SpringNettyHttpServerEngine.class;
     }
-    
+
     @NoJSR250Annotations
     public static class SpringNettyHttpServerEngine extends NettyHttpServerEngine
         implements ApplicationContextAware, InitializingBean {
-        
+
         String threadingRef;
         String tlsRef;
         Bus bus;
         NettyHttpServerEngineFactory factory;
-        
+
         public SpringNettyHttpServerEngine(
             NettyHttpServerEngineFactory fac,
             Bus b,
@@ -242,31 +241,31 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
             bus = b;
             factory = fac;
         }
-        
+
         public SpringNettyHttpServerEngine() {
             super();
         }
-        
+
         public void setBus(Bus b) {
             bus = b;
             if (null != bus && null == factory) {
                 factory = bus.getExtension(NettyHttpServerEngineFactory.class);
-            } 
+            }
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (bus == null) {
                 bus = BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx);
             }
         }
-        
+
         public void setThreadingParametersRef(String s) {
             threadingRef = s;
         }
         public void setTlsServerParametersRef(String s) {
             tlsRef = s;
         }
-        
+
         @PostConstruct
         public void finalizeConfig() {
             if (tlsRef != null) {
@@ -283,27 +282,27 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
         }
 
     }
-    
-    public static TLSServerParametersConfig createTLSServerParametersConfig(String s, 
-                                                                            JAXBContext context) 
+
+    public static TLSServerParametersConfig createTLSServerParametersConfig(String s,
+                                                                            JAXBContext context)
         throws GeneralSecurityException, IOException {
-        
-        TLSServerParametersType parametersType = 
+
+        TLSServerParametersType parametersType =
             unmarshalFactoryString(s, context, TLSServerParametersType.class);
-        
+
         return new TLSServerParametersConfig(parametersType);
     }
-    
+
     public static String createTLSServerParametersConfigRef(String s, JAXBContext context)
-    
+
         throws GeneralSecurityException, IOException {
-        
-        TLSServerParametersIdentifiedType parameterTypeRef 
+
+        TLSServerParametersIdentifiedType parameterTypeRef
             = unmarshalFactoryString(s, context, TLSServerParametersIdentifiedType.class);
-        
-        return parameterTypeRef.getId(); 
+
+        return parameterTypeRef.getId();
     }
-    
+
     private static ThreadingParameters toThreadingParameters(ThreadingParametersType paramtype) {
         ThreadingParameters params = new ThreadingParameters();
         if (paramtype.getThreadPoolSize() != null) {
@@ -312,17 +311,17 @@ public class NettyHttpServerEngineBeanDefinitionParser extends AbstractBeanDefin
 
         return params;
     }
-    
+
     public static ThreadingParameters createThreadingParameters(String s, JAXBContext context) {
-        ThreadingParametersType parametersType = 
+        ThreadingParametersType parametersType =
             unmarshalFactoryString(s, context, ThreadingParametersType.class);
         return toThreadingParameters(parametersType);
     }
 
     public static String createThreadingParametersRef(String s, JAXBContext context) {
-        ThreadingParametersIdentifiedType parametersType = 
+        ThreadingParametersIdentifiedType parametersType =
             unmarshalFactoryString(s, context, ThreadingParametersIdentifiedType.class);
         return parametersType.getId();
     }
-   
+
 }

@@ -31,31 +31,31 @@ import org.apache.cxf.interceptor.Fault;
  *  This wrapper helper will use reflection to handle the wrapped message
  */
 public abstract class AbstractWrapperHelper implements WrapperHelper {
-    
-    public static final Class<?> NO_CLASSES[] = new Class[0];
-    public static final Object NO_PARAMS[] = new Object[0];
-        
+
+    public static final Class<?>[] NO_CLASSES = new Class<?>[0];
+    public static final Object[] NO_PARAMS = new Object[0];
+
     protected final Class<?> wrapperType;
-    protected final Method setMethods[];
-    protected final Method getMethods[];    
-    protected final Field fields[];   
+    protected final Method[] setMethods;
+    protected final Method[] getMethods;
+    protected final Field[] fields;
     protected boolean validate;
-    
-                 
+
+
     protected AbstractWrapperHelper(Class<?> wt,
-                  Method sets[],
-                  Method gets[],                  
-                  Field f[]) {
+                  Method[] sets,
+                  Method[] gets,
+                  Field[] f) {
         setMethods = sets;
         getMethods = gets;
-        fields = f;        
-        wrapperType = wt;        
+        fields = f;
+        wrapperType = wt;
     }
-    
+
     /**
      * WrapperClassOutInterceptor may call this if the wrapper class needs to be validated.
      * Implementations may choose to ignore this as the SchemaValidation that occurs later
-     * may catch the errors, but this allows quicker failures if the databinding 
+     * may catch the errors, but this allows quicker failures if the databinding
      * can support it.
      */
     public void setValidate(boolean v) {
@@ -64,39 +64,39 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     public boolean getValidate() {
         return validate;
     }
-    
+
     public String getSignature() {
         return "" + System.identityHashCode(this);
     }
-    
+
     protected abstract Object createWrapperObject(Class<?> typeClass) throws Exception;
-    
+
     protected abstract Object getWrapperObject(Object object) throws Exception;
-    
+
     protected Object getPartObject(int index, Object object) throws Exception {
         return object;
     }
-    
+
     protected Object getValue(Method method, Object in) throws IllegalAccessException,
-    InvocationTargetException {        
-        return method.invoke(in);    
+        InvocationTargetException {
+        return method.invoke(in);
     }
-    
-    public Object createWrapperObject(List<?> lst) 
+
+    public Object createWrapperObject(List<?> lst)
         throws Fault {
         try {
             Object wrapperObject = createWrapperObject(wrapperType);
-            
+
             for (int x = 0; x < setMethods.length; x++) {
                 if (getMethods[x] == null
-                    && setMethods[x] == null 
+                    && setMethods[x] == null
                     && fields[x] == null) {
                     //this part is a header or something
                     //that is not part of the wrapper.
                     continue;
                 }
                 Object o = lst.get(x);
-                o = getPartObject(x, o);                
+                o = getPartObject(x, o);
                 if (o instanceof List && getMethods[x] != null) {
                     List<Object> col = CastUtils.cast((List<?>)getMethods[x].invoke(wrapperObject));
                     if (col == null) {
@@ -110,7 +110,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
                         List<Object> olst = CastUtils.cast((List<?>)o);
                         col.addAll(olst);
                     }
-                } else if (setMethods[x] != null) {                        
+                } else if (setMethods[x] != null) {
                     setMethods[x].invoke(wrapperObject, o);
                 } else if (fields[x] != null) {
                     fields[x].set(wrapperObject, lst.get(x));
@@ -122,14 +122,14 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
             throw new Fault(ex.getCause());
         }
     }
-    
+
     public List<Object> getWrapperParts(Object o) throws Fault {
         try {
-            Object wrapperObject = getWrapperObject(o);                          
-            List<Object> ret = new ArrayList<Object>(getMethods.length);
+            Object wrapperObject = getWrapperObject(o);
+            List<Object> ret = new ArrayList<>(getMethods.length);
             for (int x = 0; x < getMethods.length; x++) {
                 if (getMethods[x] != null) {
-                    ret.add(getValue(getMethods[x], wrapperObject));                        
+                    ret.add(getValue(getMethods[x], wrapperObject));
                 } else if (fields[x] != null) {
                     ret.add(fields[x].get(wrapperObject));
                 } else {
@@ -137,7 +137,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
                     ret.add(null);
                 }
             }
-            
+
             return ret;
         } catch (Exception ex) {
             if (ex.getCause() == null) {
@@ -146,8 +146,8 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
             throw new Fault(ex.getCause());
         }
     }
-    
-   
+
+
 }
 
 

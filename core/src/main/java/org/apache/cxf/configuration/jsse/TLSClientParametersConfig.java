@@ -50,18 +50,18 @@ import org.apache.cxf.staxutils.StaxUtils;
 public final class TLSClientParametersConfig {
     private static Set<Class<?>> classes;
     private static JAXBContext context;
-    
+
     private TLSClientParametersConfig() {
         //not constructed
     }
-    
+
     private static synchronized JAXBContext getContext() throws JAXBException {
         if (context == null || classes == null) {
-            Set<Class<?>> c2 = new HashSet<Class<?>>();
-            JAXBContextCache.addPackage(c2, 
-                                        PackageUtils.getPackageName(TLSClientParametersType.class), 
+            Set<Class<?>> c2 = new HashSet<>();
+            JAXBContextCache.addPackage(c2,
+                                        PackageUtils.getPackageName(TLSClientParametersType.class),
                                         TLSClientParametersConfig.class.getClassLoader());
-            CachedContextAndSchemas ccs 
+            CachedContextAndSchemas ccs
                 = JAXBContextCache.getCachedContextAndSchemas(c2, null, null, null, false);
             classes = ccs.getClasses();
             context = ccs.getContext();
@@ -69,18 +69,18 @@ public final class TLSClientParametersConfig {
         return context;
     }
 
-    public static TLSClientParameters createTLSClientParametersFromType(TLSClientParametersType params) 
+    public static TLSClientParameters createTLSClientParametersFromType(TLSClientParametersType params)
         throws GeneralSecurityException,
                IOException {
 
-        TLSClientParameters ret = new TLSClientParameters(); 
+        TLSClientParameters ret = new TLSClientParameters();
         boolean usingDefaults = params.isUseHttpsURLConnectionDefaultSslSocketFactory();
 
         TLSClientParametersTypeInternal iparams = null;
         if (params instanceof TLSClientParametersTypeInternal) {
             iparams = (TLSClientParametersTypeInternal)params;
         }
-        
+
         if (params.isDisableCNCheck()) {
             ret.setDisableCNCheck(true);
         }
@@ -108,13 +108,19 @@ public final class TLSClientParametersConfig {
                         params.getSecureRandomParameters()));
         }
         if (params.isSetKeyManagers() && !usingDefaults) {
-            ret.setKeyManagers(
-                TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
+            if (!params.isSetCertAlias()) {
+                ret.setKeyManagers(
+                                    TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
+            } else {
+                ret.setKeyManagers(
+                                    TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers(), 
+                                                                         params.getCertAlias()));
+            }
         }
         if (params.isSetTrustManagers() && !usingDefaults) {
             ret.setTrustManagers(
                 TLSParameterJaxBUtils.getTrustManagers(
-                        params.getTrustManagers()));
+                        params.getTrustManagers(), params.isEnableRevocation()));
         }
         if (params.isSetCertConstraints()) {
             ret.setCertConstraints(params.getCertConstraints());
@@ -133,15 +139,15 @@ public final class TLSClientParametersConfig {
         }
         return ret;
     }
-    
+
 
 
     public static Object createTLSClientParameters(String s) {
-        
+
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
         try {
-            JAXBElement<TLSClientParametersType> type = JAXBUtils.unmarshall(getContext(), 
+            JAXBElement<TLSClientParametersType> type = JAXBUtils.unmarshall(getContext(),
                                                                              data,
                                                                              TLSClientParametersType.class);
             TLSClientParametersType cpt = type.getValue();
@@ -158,7 +164,7 @@ public final class TLSClientParametersConfig {
             }
         }
     }
-    
+
     public static class TLSClientParametersTypeInternal extends TLSClientParametersType {
         private KeyManager[] keyManagersRef;
         private TrustManager[] trustManagersRef;
@@ -170,7 +176,7 @@ public final class TLSClientParametersConfig {
         public void setKeyManagersRef(KeyManager[] keyManagersRef) {
             this.keyManagersRef = keyManagersRef;
         }
-        
+
         public boolean isSetKeyManagersRef() {
             return this.keyManagersRef != null;
         }
@@ -182,7 +188,7 @@ public final class TLSClientParametersConfig {
         public void setTrustManagersRef(TrustManager[] trustManagersRef) {
             this.trustManagersRef = trustManagersRef;
         }
-        
+
         public boolean isSetTrustManagersRef() {
             return this.trustManagersRef != null;
         }

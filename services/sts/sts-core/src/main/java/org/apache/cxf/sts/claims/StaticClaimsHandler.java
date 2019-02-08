@@ -19,8 +19,6 @@
 
 package org.apache.cxf.sts.claims;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(StaticClaimsHandler.class);
 
     private Map<String, String> globalClaims;
-        
+
     public void setGlobalClaims(Map<String, String> globalClaims) {
         this.globalClaims = globalClaims;
     }
@@ -45,23 +43,14 @@ public class StaticClaimsHandler implements ClaimsHandler {
         return globalClaims;
     }
 
-    
-    public List<URI> getSupportedClaimTypes() {
-        List<URI> uriList = new ArrayList<>();
-        for (String uri : getGlobalClaims().keySet()) {
-            try {
-                uriList.add(new URI(uri));
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
 
-        return uriList;
-    }    
-    
+    public List<String> getSupportedClaimTypes() {
+        return new ArrayList<>(getGlobalClaims().keySet());
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
+
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         for (Claim claim : claims) {
             if (getGlobalClaims().keySet().contains(claim.getClaimType().toString())) {
@@ -77,7 +66,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
             }
         }
         return claimsColl;
-        
+
     }
 
 }

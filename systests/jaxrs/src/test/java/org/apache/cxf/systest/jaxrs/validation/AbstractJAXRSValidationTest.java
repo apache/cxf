@@ -31,6 +31,6 @@ public abstract class AbstractJAXRSValidationTest extends AbstractBusClientServe
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
     }
-    
+
     protected abstract String getPort();
 }

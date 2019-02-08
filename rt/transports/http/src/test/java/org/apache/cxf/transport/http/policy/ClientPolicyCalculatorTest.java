@@ -18,12 +18,18 @@
  */
 package org.apache.cxf.transport.http.policy;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.junit.Assert;
+
 import org.junit.Test;
 
-public class ClientPolicyCalculatorTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ClientPolicyCalculatorTest {
     @Test
     public void testCompatibleClientPolicies() {
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
@@ -37,13 +43,15 @@ public class ClientPolicyCalculatorTest extends Assert {
         p1.setConnectionTimeout(10000);
         assertTrue("Policies are not compatible.", calc.compatible(p1, p2));
         p1.setAllowChunking(false);
-        assertTrue("Policies are compatible.", !calc.compatible(p1, p2));
+        p2.setAllowChunking(true);
+        assertFalse("Policies are compatible.", calc.compatible(p1, p2));
         p2.setAllowChunking(false);
         assertTrue("Policies are compatible.", calc.compatible(p1, p2));
     }
 
     @Test
     public void testIntersectClientPolicies() {
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
         HTTPClientPolicy p1 = new HTTPClientPolicy();
         HTTPClientPolicy p2 = new HTTPClientPolicy();
@@ -53,30 +61,43 @@ public class ClientPolicyCalculatorTest extends Assert {
         p = calc.intersect(p1, p2);
         assertEquals("browser", p.getBrowserType());
         p1.setBrowserType(null);
-        p1.setConnectionTimeout(10000L);
+
+        long connectionRequestTimeout = random.nextLong(0, 10000);
+        p1.setConnectionRequestTimeout(connectionRequestTimeout);
         p = calc.intersect(p1, p2);
-        assertEquals(10000L, p.getConnectionTimeout());
+        assertEquals(connectionRequestTimeout, p.getConnectionRequestTimeout());
+
+        long receiveTimeout = random.nextLong(0, 10000);
+        p1.setReceiveTimeout(receiveTimeout);
+        p = calc.intersect(p1, p2);
+        assertEquals(receiveTimeout, p.getReceiveTimeout());
+
+        long connectionTimeout = random.nextLong(0, 10000);
+        p1.setConnectionTimeout(connectionTimeout);
+        p = calc.intersect(p1, p2);
+        assertEquals(connectionTimeout, p.getConnectionTimeout());
+
         p1.setAllowChunking(false);
         p2.setAllowChunking(false);
         p = calc.intersect(p1, p2);
-        assertTrue(!p.isAllowChunking());
+        assertFalse(p.isAllowChunking());
     }
-    
+
     @Test
     public void testEqualClientPolicies() {
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
         HTTPClientPolicy p1 = new HTTPClientPolicy();
         assertTrue(calc.equals(p1, p1));
-        HTTPClientPolicy p2 = new HTTPClientPolicy();        
+        HTTPClientPolicy p2 = new HTTPClientPolicy();
         assertTrue(calc.equals(p1, p2));
         p1.setDecoupledEndpoint("http://localhost:8080/decoupled");
-        assertTrue(!calc.equals(p1, p2));
+        assertFalse(calc.equals(p1, p2));
         p2.setDecoupledEndpoint("http://localhost:8080/decoupled");
         assertTrue(calc.equals(p1, p2));
         p1.setReceiveTimeout(10000L);
-        assertTrue(!calc.equals(p1, p2));
+        assertFalse(calc.equals(p1, p2));
     }
-    
+
     @Test
     public void testLongTimeouts() {
         ClientPolicyCalculator calc = new ClientPolicyCalculator();
@@ -87,7 +108,7 @@ public class ClientPolicyCalculatorTest extends Assert {
         HTTPClientPolicy p = calc.intersect(p1, p2);
         assertEquals(120000, p.getReceiveTimeout());
         assertEquals(60000, p.getConnectionTimeout());
-        
+
         p1 = new HTTPClientPolicy();
         p2 = new HTTPClientPolicy();
         p1.setReceiveTimeout(120000);

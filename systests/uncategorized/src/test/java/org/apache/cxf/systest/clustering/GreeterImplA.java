@@ -37,17 +37,17 @@ public class GreeterImplA extends AbstractGreeterImpl {
     private WebServiceContext context;
 
     private String address;
-    
+
     GreeterImplA() {
-        address = FailoverTest.REPLICA_A;    
+        address = FailoverTest.REPLICA_A;
     }
-    
+
     public String greetMe(String s) {
         return super.greetMe(s)
                + " on message: " + getMessageID()
                + " from: " + address;
     }
- 
+
     private String getMessageID() {
         String id = null;
         if (context.getMessageContext() != null) {

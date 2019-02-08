@@ -26,20 +26,24 @@ import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.tika.parser.pdf.PDFParser;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TikaContentExtractorTest extends Assert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class TikaContentExtractorTest {
     private TikaContentExtractor extractor;
     private SearchConditionParser< SearchBean > parser;
-    
+
     @Before
     public void setUp() throws Exception {
-        parser = new FiqlParser<SearchBean>(SearchBean.class);
+        parser = new FiqlParser<>(SearchBean.class);
         extractor = new TikaContentExtractor(new PDFParser());
     }
-    
+
     @Test
     public void testExtractedTextContentMatchesSearchCriteria() throws Exception {
         SearchCondition<SearchBean> sc = parser.parse("Author==Bertrand*");
@@ -58,26 +62,26 @@ public class TikaContentExtractorTest extends Assert {
     }
 
     @Test
-    public void testExtractionFromTextFileUsingPdfParserFails() {        
-        assertNull("Document should be null, it is not a PDF", 
-            extractor.extract(getClass().getResourceAsStream("/files/testTXT.txt")));        
+    public void testExtractionFromTextFileUsingPdfParserFails() {
+        assertNull("Document should be null, it is not a PDF",
+            extractor.extract(getClass().getResourceAsStream("/files/testTXT.txt")));
     }
 
     @Test
     public void testExtractionFromRtfFileUsingPdfParserWithoutMediaTypeValidationFails() {
         final TikaContentExtractor another = new TikaContentExtractor(new PDFParser(), false);
-        assertNull("Document should be null, it is not a PDF", 
-            another.extract(getClass().getResourceAsStream("/files/testRTF.rtf")));        
+        assertNull("Document should be null, it is not a PDF",
+            another.extract(getClass().getResourceAsStream("/files/testRTF.rtf")));
     }
 
     @Test
     public void testExtractionFromEncryptedPdfFails() {
-        assertNull("Document should be null, it is encrypted", 
-            extractor.extract(getClass().getResourceAsStream("/files/testPDF.Encrypted.pdf")));        
+        assertNull("Document should be null, it is encrypted",
+            extractor.extract(getClass().getResourceAsStream("/files/testPDF.Encrypted.pdf")));
     }
-    
+
     @Test
     public void testExtractionFromNullInputStreamFails() {
-        assertNull("Document should be null, it is encrypted", extractor.extract((InputStream)null));        
+        assertNull("Document should be null, it is encrypted", extractor.extract((InputStream)null));
     }
 }

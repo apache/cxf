@@ -29,11 +29,11 @@ import javax.xml.stream.events.XMLEvent;
 public class FixNamespacesXMLEventWriter implements XMLEventWriter, MarshallerAwareXMLWriter {
     private final XMLEventWriter delegate;
     private Marshaller marshaller;
-    
+
     public FixNamespacesXMLEventWriter(XMLEventWriter delegate) {
         this.delegate = delegate;
     }
-    
+
     public void flush() throws XMLStreamException {
         delegate.flush();
     }

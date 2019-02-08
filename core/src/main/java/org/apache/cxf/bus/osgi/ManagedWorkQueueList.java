@@ -40,18 +40,18 @@ import org.osgi.util.tracker.ServiceTracker;
  * List of work queues that can be managed using the OSGi configuration admin service
  */
 public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChangeListener {
-    public static final String FACTORY_PID = "org.apache.cxf.workqueues";    
+    public static final String FACTORY_PID = "org.apache.cxf.workqueues";
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedWorkQueueList.class);
-    
-    private Map<String, AutomaticWorkQueueImpl> queues = 
-        new ConcurrentHashMap<String, AutomaticWorkQueueImpl>(4, 0.75f, 2);
-    private ServiceTracker configAdminTracker;
-    
+
+    private Map<String, AutomaticWorkQueueImpl> queues =
+        new ConcurrentHashMap<>(4, 0.75f, 2);
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
+
     public String getName() {
         return FACTORY_PID;
     }
 
-    public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary props) 
+    public void updated(String pid, Dictionary<String, ?> props)
         throws ConfigurationException {
         if (pid == null) {
             return;
@@ -79,7 +79,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         try {
             AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)evt.getSource();
-            ConfigurationAdmin configurationAdmin = (ConfigurationAdmin)configAdminTracker.getService();
+            ConfigurationAdmin configurationAdmin = configAdminTracker.getService();
             if (configurationAdmin != null) {
                 Configuration selectedConfig = findConfigForQueueName(queue, configurationAdmin);
                 if (selectedConfig != null) {
@@ -98,8 +98,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         String filter = "(service.factoryPid=" + ManagedWorkQueueList.FACTORY_PID + ")";
         Configuration[] configs = configurationAdmin.listConfigurations(filter);
         for (Configuration configuration : configs) {
-            @SuppressWarnings("rawtypes")
-            Dictionary props = configuration.getProperties();
+            Dictionary<String, Object> props = configuration.getProperties();
             String name = (String)props.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
             if (queue.getName().equals(name)) {
                 selectedConfig = configuration;
@@ -107,7 +106,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         }
         return selectedConfig;
     }
-    
+
     public void addAllToWorkQueueManager(WorkQueueManager manager) {
         if (manager != null) {
             for (AutomaticWorkQueueImpl wq : queues.values()) {
@@ -118,7 +117,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         }
     }
 
-    public void setConfigAdminTracker(ServiceTracker configAdminTracker) {
+    public void setConfigAdminTracker(ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker) {
         this.configAdminTracker = configAdminTracker;
     }
 

@@ -25,11 +25,11 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -43,7 +43,6 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SignableSAMLObject;
@@ -56,46 +55,46 @@ import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * Some unit tests for the SAMLProtocolResponseValidator and the SAMLSSOResponseValidator
  */
-public class CombinedValidatorTest extends org.junit.Assert {
-    
-    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-    
+public class CombinedValidatorTest {
+
     static {
         WSSConfig.init();
         OpenSAMLUtil.initSamlEngine();
-        DOC_BUILDER_FACTORY.setNamespaceAware(true);
     }
 
     @org.junit.Test
     public void testSuccessfulValidation() throws Exception {
-        
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
+
+        Document doc = DOMUtils.createDocument();
+
         Response response = createResponse(doc);
-        
+
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(responseElement);
         assertNotNull(responseElement);
-        
+
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(responseElement);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
         validator.validateSamlResponse(
             marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
         );
-        
+
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
@@ -103,115 +102,112 @@ public class CombinedValidatorTest extends org.junit.Assert {
         ssoValidator.setClientAddress("http://apache.org");
         ssoValidator.setRequestId("12345");
         ssoValidator.setSpIdentifier("http://service.apache.org");
-        
+
         // Parse the response
-        SSOValidatorResponse ssoResponse = 
+        SSOValidatorResponse ssoResponse =
             ssoValidator.validateSamlResponse(marshalledResponse, false);
-        SamlAssertionWrapper parsedAssertion = 
+        SamlAssertionWrapper parsedAssertion =
             new SamlAssertionWrapper(ssoResponse.getAssertionElement());
-        
+
         assertEquals("alice", parsedAssertion.getSubjectName());
     }
-    
+
     @org.junit.Test
     public void testWrappingAttack3() throws Exception {
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
-        
+
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(responseElement);
         assertNotNull(responseElement);
-        
+
         // Get Assertion Element
-        Element assertionElement = 
+        Element assertionElement =
             (Element)responseElement.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Assertion").item(0);
         assertNotNull(assertionElement);
-        
+
         // Clone it, strip the Signature, modify the Subject, change Subj Conf
         Element clonedAssertion = (Element)assertionElement.cloneNode(true);
         clonedAssertion.setAttributeNS(null, "ID", "_12345623562");
-        Element sigElement = 
-            (Element)clonedAssertion.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature").item(0);
+        Element sigElement =
+            (Element)clonedAssertion.getElementsByTagNameNS(WSS4JConstants.SIG_NS, "Signature").item(0);
         clonedAssertion.removeChild(sigElement);
-        
-        Element subjElement = 
+
+        Element subjElement =
             (Element)clonedAssertion.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "Subject").item(0);
-        Element subjNameIdElement = 
+        Element subjNameIdElement =
             (Element)subjElement.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "NameID").item(0);
         subjNameIdElement.setTextContent("bob");
-        
-        Element subjConfElement = 
+
+        Element subjConfElement =
             (Element)subjElement.getElementsByTagNameNS(SAMLConstants.SAML20_NS, "SubjectConfirmation").item(0);
         subjConfElement.setAttributeNS(null, "Method", SAML2Constants.CONF_SENDER_VOUCHES);
-        
+
         // Now insert the modified cloned Assertion into the Response before actual assertion
         responseElement.insertBefore(clonedAssertion, assertionElement);
-        
+
         // System.out.println(DOM2Writer.nodeToString(responseElement));
-        
+
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(responseElement);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
         validator.validateSamlResponse(
             marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
         );
-        
+
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
+        ssoValidator.setEnforceAssertionsSigned(false);
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
         ssoValidator.setAssertionConsumerURL("http://recipient.apache.org");
         ssoValidator.setClientAddress("http://apache.org");
         ssoValidator.setRequestId("12345");
         ssoValidator.setSpIdentifier("http://service.apache.org");
-        
+
         // Parse the response
-        SSOValidatorResponse ssoResponse = 
+        SSOValidatorResponse ssoResponse =
             ssoValidator.validateSamlResponse(marshalledResponse, false);
-        SamlAssertionWrapper parsedAssertion = 
+        SamlAssertionWrapper parsedAssertion =
             new SamlAssertionWrapper(ssoResponse.getAssertionElement());
-        
+
         assertEquals("alice", parsedAssertion.getSubjectName());
     }
-    
+
     @org.junit.Test
     public void testSuccessfulSignedValidation() throws Exception {
-        
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
+
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         signResponse(response, "alice", "password", issuerCrypto, true);
-        
+
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(responseElement);
         assertNotNull(responseElement);
-        
+
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(responseElement);
-        
+
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
         validator.validateSamlResponse(
             marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
         );
-        
+
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
@@ -219,43 +215,42 @@ public class CombinedValidatorTest extends org.junit.Assert {
         ssoValidator.setClientAddress("http://apache.org");
         ssoValidator.setRequestId("12345");
         ssoValidator.setSpIdentifier("http://service.apache.org");
-        
+
         // Parse the response
-        SSOValidatorResponse ssoResponse = 
+        SSOValidatorResponse ssoResponse =
             ssoValidator.validateSamlResponse(marshalledResponse, false);
-        SamlAssertionWrapper parsedAssertion = 
+        SamlAssertionWrapper parsedAssertion =
             new SamlAssertionWrapper(ssoResponse.getAssertionElement());
-        
+
         assertEquals("alice", parsedAssertion.getSubjectName());
     }
-    
+
     @org.junit.Test
     public void testEnforceResponseSigned() throws Exception {
-        
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
+
+        Document doc = DOMUtils.createDocument();
+
         Response response = createResponse(doc);
-        
+
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(responseElement);
         assertNotNull(responseElement);
-        
+
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(responseElement);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         // Validate the Response
         SAMLProtocolResponseValidator validator = new SAMLProtocolResponseValidator();
         validator.validateSamlResponse(
             marshalledResponse, issuerCrypto, new KeystorePasswordCallback()
         );
-        
+
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
@@ -264,7 +259,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         ssoValidator.setRequestId("12345");
         ssoValidator.setSpIdentifier("http://service.apache.org");
         ssoValidator.setEnforceResponseSigned(true);
-        
+
         // Parse the response
         try {
             ssoValidator.validateSamlResponse(marshalledResponse, false);
@@ -273,59 +268,59 @@ public class CombinedValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     private Response createResponse(Document doc) throws Exception {
-        Status status = 
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
-        Response response = 
+        Response response =
             SAML2PResponseComponentBuilder.createSAMLResponse(
                 "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
             );
         response.setDestination("http://recipient.apache.org");
-        
+
         // Create an AuthenticationAssertion
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         callbackHandler.setSubjectName("alice");
-        
+
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(5));
-        
+
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         assertion.signAssertion("alice", "password", issuerCrypto, false);
-        
+
         response.getAssertions().add(assertion.getSaml2());
-        
+
         return response;
     }
-    
+
     private void signResponse(
         Response response,
         String issuerKeyName,
@@ -351,7 +346,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         String sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1;
         String pubKeyAlgo = issuerCerts[0].getPublicKey().getAlgorithm();
 
-        if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
+        if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
             sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
         }
 
@@ -359,7 +354,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
 
         signature.setSignatureAlgorithm(sigAlgo);
 
-        BasicX509Credential signingCredential = 
+        BasicX509Credential signingCredential =
             new BasicX509Credential(issuerCerts[0], privateKey);
         signature.setSigningCredential(signingCredential);
 
@@ -376,7 +371,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         }
 
         // add the signature to the assertion
-        SignableSAMLObject signableObject = (SignableSAMLObject) response;
+        SignableSAMLObject signableObject = response;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);

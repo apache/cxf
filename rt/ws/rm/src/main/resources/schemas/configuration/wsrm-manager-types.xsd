@@ -214,6 +214,21 @@
                 </xs:documentation>
             </xs:annotation>      
         </xs:attribute> 
+        <xs:attribute name="interval" type="xs:unsignedLong" use="optional" default="3000">
+            <xs:annotation>
+                <xs:documentation>
+                    The time interval between each retry in milliseconds.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute> 
+        <xs:attribute name="algorithm" type="xs:string" use="optional" default="ExponentialBackoff">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the interval adjustment algorithm.
+                    The default algorithm is ExponentialBackoff.
+                </xs:documentation>
+            </xs:annotation>      
+        </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="DeliveryAssuranceType">

@@ -31,30 +31,30 @@ import javax.ws.rs.client.InvocationCallback;
 
 import org.apache.cxf.endpoint.ClientCallback;
 
-class JaxrsClientCallback<T> extends ClientCallback {
+public class JaxrsClientCallback<T> extends ClientCallback {
     private final InvocationCallback<T> handler;
     private final Type outType;
     private final Class<?> responseClass;
-    
-    JaxrsClientCallback(final InvocationCallback<T> handler, 
-                        Class<?> responseClass, 
+
+    public JaxrsClientCallback(final InvocationCallback<T> handler,
+                        Class<?> responseClass,
                         Type outGenericType) {
         this.handler = handler;
         this.outType = outGenericType;
         this.responseClass = responseClass;
     }
-    
+
     public InvocationCallback<T> getHandler() {
         return handler;
     }
-    
+
     public Type getOutGenericType() {
         return outType;
     }
     public Class<?> getResponseClass() {
         return responseClass;
     }
-    
+
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
         boolean result = super.cancel(mayInterruptIfRunning);
@@ -63,12 +63,11 @@ class JaxrsClientCallback<T> extends ClientCallback {
         }
         return result;
     }
-    
+
     public Future<T> createFuture() {
-        return new JaxrsResponseCallback<T>(this);
+        return new JaxrsResponseFuture<T>(this);
     }
-    
-    
+
     @SuppressWarnings("unchecked")
     public void handleResponse(Map<String, Object> ctx, Object[] res) {
         context = ctx;
@@ -94,15 +93,15 @@ class JaxrsClientCallback<T> extends ClientCallback {
             notifyAll();
         }
     }
-    
-    
-    
-    static class JaxrsResponseCallback<T> implements Future<T> {
+
+
+
+    static class JaxrsResponseFuture<T> implements Future<T> {
         JaxrsClientCallback<T> callback;
-        JaxrsResponseCallback(JaxrsClientCallback<T> cb) {
+        JaxrsResponseFuture(JaxrsClientCallback<T> cb) {
             callback = cb;
         }
-        
+
         public Map<String, Object> getContext() {
             try {
                 return callback.getResponseContext();
@@ -113,13 +112,13 @@ class JaxrsClientCallback<T> extends ClientCallback {
         public boolean cancel(boolean mayInterruptIfRunning) {
             return callback.cancel(mayInterruptIfRunning);
         }
-        
+
         public T get() throws InterruptedException, ExecutionException {
             try {
                 return getObject(callback.get()[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed((InterruptedException)ex);
+                    callback.handler.failed(ex);
                 }
                 throw ex;
             }
@@ -130,17 +129,17 @@ class JaxrsClientCallback<T> extends ClientCallback {
                 return getObject(callback.get(timeout, unit)[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed((InterruptedException)ex);
+                    callback.handler.failed(ex);
                 }
                 throw ex;
             }
         }
-        
+
         @SuppressWarnings("unchecked")
         private T getObject(Object object) {
             return (T)object;
         }
-        
+
         public boolean isCancelled() {
             return callback.isCancelled();
         }

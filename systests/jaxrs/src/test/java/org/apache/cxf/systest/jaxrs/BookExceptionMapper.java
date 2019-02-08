@@ -30,20 +30,20 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 public class BookExceptionMapper implements ContextAware, ExceptionMapper<BookNotFoundFault> {
     private MessageContext mc;
     private boolean toHandle;
-    
+
     public void setMessageContext(MessageContext context) {
         mc = context;
     }
-    
+
     public Response toResponse(BookNotFoundFault ex) {
         // status is 200 just to simplify the test client code
         if (toHandle) {
-            OperationResourceInfo ori = 
+            OperationResourceInfo ori =
                 (OperationResourceInfo)mc.getContextualProperty(OperationResourceInfo.class);
             if (ori == null) {
                 throw new RuntimeException();
             }
-            return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE)     
+            return Response.status(500).type(MediaType.TEXT_PLAIN_TYPE)
                       .entity("No book found at all : " + ex.getFaultInfo().getId()).build();
         }
         return null;

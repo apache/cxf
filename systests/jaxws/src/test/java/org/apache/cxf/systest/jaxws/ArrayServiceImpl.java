@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import javax.jws.WebService;
 
-@WebService(targetNamespace = "org.apache.cxf.systest.jaxws", 
+@WebService(targetNamespace = "org.apache.cxf.systest.jaxws",
             endpointInterface = "org.apache.cxf.systest.jaxws.ArrayService")
 public class ArrayServiceImpl implements ArrayService {
 

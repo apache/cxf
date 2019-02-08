@@ -30,12 +30,12 @@ import org.apache.cxf.transport.Conduit;
  * into the Client via config.
  */
 public interface ConduitSelector {
-        
+
     /**
      * Called prior to the interceptor chain being traversed.
      * This is the point at which an eager strategy would retrieve
      * a Conduit.
-     * 
+     *
      * @param message the current Message
      */
     void prepare(Message message);
@@ -44,17 +44,17 @@ public interface ConduitSelector {
      * Called when a Conduit is actually required.
      * This is the point at which a lazy strategy would retrieve
      * a Conduit.
-     * 
+     *
      * @param message
      * @return the Conduit to use for mediation of the message
      */
     Conduit selectConduit(Message message);
-    
+
     /**
      * Called on completion of the MEP for which the Conduit was required.
      * This is the point at which a one-shot strategy would dispose of
      * the Conduit.
-     * 
+     *
      * @param exchange represents the completed MEP
      */
     void complete(Exchange exchange);

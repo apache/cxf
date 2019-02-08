@@ -33,7 +33,7 @@ public interface CorbaConstants {
     String NU_TM_CORBA = "http://cxf.apache.org/bindings/corba/typemap/corba/";
     String SCHEMA_NS_URI = "http://cxf.apache.org/bindings/corba/idltypes/";
     String WSDL_NS_URI = "http://cxf.apache.org/bindings/corba/idl/";
-    
+
     // CORBA Binding Extensibility Elements
     QName NE_CORBA_ADDRESS = new QName(NU_WSDL_CORBA, "address", NP_WSDL_CORBA);
     QName NE_CORBA_POLICY = new QName(NU_WSDL_CORBA, "policy", NP_WSDL_CORBA);
@@ -98,7 +98,7 @@ public interface CorbaConstants {
     String IDLTYPE = "idltype";
     String MODE = "mode";
     String EXCEPTION = "exception";
-    String SERVICE_ID = "serviceid";    
+    String SERVICE_ID = "serviceid";
     String BASES = "bases";
     String CORBA_ENDPOINT_OBJECT = "endpoint";
     String ORB = "orb";

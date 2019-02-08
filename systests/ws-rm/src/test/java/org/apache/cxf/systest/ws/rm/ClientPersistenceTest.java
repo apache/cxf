@@ -24,7 +24,6 @@ import org.apache.cxf.ws.rm.persistence.jdbc.RMTxStore;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * Tests the addition of WS-RM properties to application messages and the
@@ -32,24 +31,19 @@ import org.junit.Test;
  */
 public class ClientPersistenceTest extends AbstractClientPersistenceTest {
     private static final String PORT = allocatePort(ClientPersistenceTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("cpt-server", true);
         RMTxStore.deleteDatabaseFiles("cpt-client", true);
         startServers(PORT, "cpt");
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cpt-server", false);
         RMTxStore.deleteDatabaseFiles("cpt-client", false);
-    }
-   
-    @Test 
-    public void testRecovery() throws Exception {
-        super.testRecovery();
     }
 
     @Override

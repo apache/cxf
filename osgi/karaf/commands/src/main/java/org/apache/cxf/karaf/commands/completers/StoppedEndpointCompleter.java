@@ -20,10 +20,12 @@ package org.apache.cxf.karaf.commands.completers;
 
 
 import org.apache.cxf.endpoint.Server;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 
+@Service
 public class StoppedEndpointCompleter extends EndpointCompleterSupport {
 
-    
+
     @Override
     protected boolean acceptsFeature(Server server) {
         return !server.isStarted();

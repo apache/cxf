@@ -23,13 +23,13 @@ import org.springframework.security.access.annotation.Secured;
 
 
 public interface CustomerServiceSecured {
-    
+
     @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN" })
     Customer getCustomer(String id);
 
     @Secured("ROLE_ADMIN")
     Response updateCustomer(Long id, Customer customer);
-    
+
     @Secured("ROLE_ADMIN")
     Response addCustomer(Customer customer);
 

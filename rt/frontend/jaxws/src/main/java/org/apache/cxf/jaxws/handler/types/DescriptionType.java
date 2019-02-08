@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
  * Java class for descriptionType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="descriptionType">
  *   &lt;simpleContent>
@@ -54,7 +54,7 @@ public class DescriptionType extends XsdStringType {
 
     /**
      * Gets the value of the lang property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getLang() {
@@ -63,7 +63,7 @@ public class DescriptionType extends XsdStringType {
 
     /**
      * Sets the value of the lang property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setLang(java.lang.String value) {

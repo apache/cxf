@@ -37,7 +37,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -81,7 +80,7 @@ public class Wrapper {
     public WrapperBeanClass getWrapperBeanClass(final Method m) {
         return new WrapperBeanClass();
     }
-    
+
     protected WrapperBeanClass getWrapperBeanClass(final QName wrapperBeanName) {
         WrapperBeanClass jClass = new WrapperBeanClass();
         if (wrapperBeanName == null) {
@@ -89,7 +88,7 @@ public class Wrapper {
         }
         String ns = wrapperBeanName.getNamespaceURI();
         jClass.setNamespace(ns);
-        jClass.setPackageName(URIParserUtil.getPackageName(ns));
+        jClass.setPackageName(PackageUtils.getPackageNameByNameSpaceURI(ns));
         jClass.setName(NameUtil.mangleNameToClassName(wrapperBeanName.getLocalPart()));
         jClass.setElementName(wrapperBeanName);
         return jClass;
@@ -113,10 +112,10 @@ public class Wrapper {
 
         if (StringUtils.isEmpty(c1.getName())) {
             c1.setName(c2.getName());
-        }       
+        }
         return c1;
     }
-    
+
     public WrapperBeanClass getJavaClass() {
         if (javaClass == null) {
             WrapperBeanClass jClass1 = getWrapperBeanClass(this.name);
@@ -185,9 +184,9 @@ public class Wrapper {
         }
         return "java.lang".equals(clz.getPackage().getName());
     }
-    
+
     protected List<JavaField> buildFields() {
-        return new ArrayList<JavaField>();
+        return new ArrayList<>();
     }
 
     public Method getMethod() {
@@ -197,7 +196,7 @@ public class Wrapper {
     public OperationInfo getOperationInfo() {
         return this.operationInfo;
     }
-    
+
     protected String getTypeString(Type t) {
         String type = "Object";
         if (t instanceof Class) {
@@ -228,7 +227,7 @@ public class Wrapper {
         type = type.replace('$', '.');
         return type;
     }
-    
+
     protected WebParam getWebParamAnnotation(final Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation instanceof WebParam) {

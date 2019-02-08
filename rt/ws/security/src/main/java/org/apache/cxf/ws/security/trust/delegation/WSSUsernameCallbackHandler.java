@@ -27,6 +27,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
@@ -34,20 +35,20 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
- * This CallbackHandler implementation obtains a username via the jaxws property 
- * "security.username", as defined in SecurityConstants, and creates a wss UsernameToken 
+ * This CallbackHandler implementation obtains a username via the jaxws property
+ * "security.username", as defined in SecurityConstants, and creates a wss UsernameToken
  * (with no password) to be used as the delegation token.
  */
 public class WSSUsernameCallbackHandler implements CallbackHandler {
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof DelegationCallback) {
                 DelegationCallback callback = (DelegationCallback) callbacks[i];
                 Message message = callback.getCurrentMessage();
-                
-                String username = 
+
+                String username =
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.USERNAME, message);
                 if (username != null) {
                     Node contentNode = message.getContent(Node.class);
@@ -55,7 +56,7 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
                     if (contentNode != null) {
                         doc = contentNode.getOwnerDocument();
                     } else {
-                        doc = DOMUtils.createDocument();
+                        doc = DOMUtils.getEmptyDocument();
                     }
                     UsernameToken usernameToken = createWSSEUsernameToken(username, doc);
                     callback.setToken(usernameToken.getElement());
@@ -65,15 +66,15 @@ public class WSSUsernameCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     private UsernameToken createWSSEUsernameToken(String username, Document doc) {
         UsernameToken usernameToken = new UsernameToken(true, doc, null);
         usernameToken.setName(username);
         usernameToken.addWSUNamespace();
         usernameToken.addWSSENamespace();
         usernameToken.setID("id-" + username);
-        
+
         return usernameToken;
     }
-    
+
 }

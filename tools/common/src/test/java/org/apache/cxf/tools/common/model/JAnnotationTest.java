@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.common.model;
 
 import java.util.Arrays;
+
 import javax.jws.WebParam;
 import javax.jws.WebParam.Mode;
 import javax.jws.WebService;
@@ -28,14 +29,16 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JAnnotationTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JAnnotationTest {
     @Test
     public void testList() throws Exception {
         JAnnotation annotation = new JAnnotation(XmlSeeAlso.class);
-        annotation.addElement(new JAnnotationElement(null, 
+        annotation.addElement(new JAnnotationElement(null,
                                                             Arrays.asList(new Class[]{XmlSeeAlso.class})));
         assertEquals("@XmlSeeAlso({XmlSeeAlso.class})", annotation.toString());
         assertEquals("javax.xml.bind.annotation.XmlSeeAlso", annotation.getImports().iterator().next());
@@ -52,33 +55,33 @@ public class JAnnotationTest extends Assert {
         JAnnotation annotation = new JAnnotation(WebService.class);
         annotation.addElement(new JAnnotationElement("name", "AddNumbersPortType"));
         annotation.addElement(new JAnnotationElement("targetNamespace", "http://example.com/"));
-        assertEquals("@WebService(name = \"AddNumbersPortType\", targetNamespace = \"http://example.com/\")", 
+        assertEquals("@WebService(name = \"AddNumbersPortType\", targetNamespace = \"http://example.com/\")",
                      annotation.toString());
     }
 
     @Test
     public void testEnum() {
         JAnnotation annotation = new JAnnotation(SOAPBinding.class);
-        annotation.addElement(new JAnnotationElement("parameterStyle", 
+        annotation.addElement(new JAnnotationElement("parameterStyle",
                                                             SOAPBinding.ParameterStyle.BARE));
         assertEquals("@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)", annotation.toString());
     }
-    
+
     @Test
     public void testCombination() {
         JAnnotation annotation = new JAnnotation(Action.class);
         annotation.addElement(new JAnnotationElement("input", "3in"));
         annotation.addElement(new JAnnotationElement("output", "3out"));
-        
-        
+
+
         JAnnotation faultAction = new JAnnotation(FaultAction.class);
         faultAction.addElement(new JAnnotationElement("className", A.class));
         faultAction.addElement(new JAnnotationElement("value", "3fault"));
-        
-        annotation.addElement(new JAnnotationElement("fault", 
+
+        annotation.addElement(new JAnnotationElement("fault",
                                                             Arrays.asList(new JAnnotation[]{faultAction})));
 
-        String expected = "@Action(input = \"3in\", output = \"3out\", " 
+        String expected = "@Action(input = \"3in\", output = \"3out\", "
             + "fault = {@FaultAction(className = A.class, value = \"3fault\")})";
         assertEquals(expected, annotation.toString());
 

@@ -55,38 +55,38 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     static final int DEFAULT_MAX_QUEUE_SIZE = 256;
     private static final Logger LOG =
         LogUtils.getL7dLogger(AutomaticWorkQueueImpl.class);
-    
+
 
     String name = "default";
     int maxQueueSize;
     int initialThreads;
     int lowWaterMark;
-    int highWaterMark; 
+    int highWaterMark;
     long dequeueTimeout;
     volatile int approxThreadCount;
 
     ThreadPoolExecutor executor;
     Method addWorkerMethod;
-    Object addWorkerArgs[];
-    
+    Object[] addWorkerArgs;
+
     AWQThreadFactory threadFactory;
     ReentrantLock mainLock;
     final ReentrantLock addThreadLock = new ReentrantLock();
-    
+
     DelayQueue<DelayedTaskWrapper> delayQueue;
     WatchDog watchDog;
-    
+
     boolean shared;
     int sharedCount;
-    
+
     private List<PropertyChangeListener> changeListenerList;
-    
+
     public AutomaticWorkQueueImpl() {
         this(DEFAULT_MAX_QUEUE_SIZE);
-    }    
+    }
     public AutomaticWorkQueueImpl(String name) {
         this(DEFAULT_MAX_QUEUE_SIZE, name);
-    }    
+    }
     public AutomaticWorkQueueImpl(int max) {
         this(max, "default");
     }
@@ -98,16 +98,16 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
              2 * 60 * 1000L,
              name);
     }
-    public AutomaticWorkQueueImpl(int mqs, 
-                                  int initialThreads, 
-                                  int highWaterMark, 
+    public AutomaticWorkQueueImpl(int mqs,
+                                  int initialThreads,
+                                  int highWaterMark,
                                   int lowWaterMark,
                                   long dequeueTimeout) {
         this(mqs, initialThreads, highWaterMark, lowWaterMark, dequeueTimeout, "default");
-    }    
-    public AutomaticWorkQueueImpl(int mqs, 
-                                  int initialThreads, 
-                                  int highWaterMark, 
+    }
+    public AutomaticWorkQueueImpl(int mqs,
+                                  int initialThreads,
+                                  int highWaterMark,
                                   int lowWaterMark,
                                   long dequeueTimeout,
                                   String name) {
@@ -117,23 +117,23 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         this.lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         this.dequeueTimeout = dequeueTimeout;
         this.name = name;
-        this.changeListenerList = new ArrayList<PropertyChangeListener>();
+        this.changeListenerList = new ArrayList<>();
     }
-    
+
     public void addChangeListener(PropertyChangeListener listener) {
         this.changeListenerList.add(listener);
     }
-    
+
     public void removeChangeListener(PropertyChangeListener listener) {
         this.changeListenerList.remove(listener);
     }
-    
+
     public void notifyChangeListeners(PropertyChangeEvent event) {
         for (PropertyChangeListener listener : changeListenerList) {
             listener.propertyChange(event);
         }
     }
-    
+
     public void setShared(boolean shared) {
         this.shared = shared;
     }
@@ -149,14 +149,14 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public int getShareCount() {
         return sharedCount;
     }
-    
+
     protected synchronized ThreadPoolExecutor getExecutor() {
         if (executor == null) {
             threadFactory = createThreadFactory(name);
-            executor = new ThreadPoolExecutor(lowWaterMark, 
+            executor = new ThreadPoolExecutor(lowWaterMark,
                                               highWaterMark,
-                                              TimeUnit.MILLISECONDS.toMillis(dequeueTimeout), 
-                                              TimeUnit.MILLISECONDS, 
+                                              TimeUnit.MILLISECONDS.toMillis(dequeueTimeout),
+                                              TimeUnit.MILLISECONDS,
                                               new LinkedBlockingQueue<Runnable>(maxQueueSize),
                                               threadFactory) {
                 @Override
@@ -170,8 +170,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                     }
                 }
             };
-            
-                    
+
+
             if (LOG.isLoggable(Level.FINE)) {
                 StringBuilder buf = new StringBuilder();
                 buf.append("Constructing automatic work queue with:\n");
@@ -181,15 +181,15 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 buf.append("highWaterMark: " + highWaterMark + "\n");
                 LOG.fine(buf.toString());
             }
-    
+
             if (initialThreads > highWaterMark) {
                 initialThreads = highWaterMark;
             }
-    
+
             // as we cannot prestart more core than corePoolSize initial threads, we temporarily
             // change the corePoolSize to the number of initial threads
-            // this is important as otherwise these threads will be created only when 
-            // the queue has filled up, 
+            // this is important as otherwise these threads will be created only when
+            // the queue has filled up,
             // potentially causing problems with starting up under heavy load
             if (initialThreads < Integer.MAX_VALUE && initialThreads > 0) {
                 executor.setCorePoolSize(initialThreads);
@@ -200,7 +200,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 }
                 executor.setCorePoolSize(lowWaterMark);
             }
-    
+
             ReentrantLock l = null;
             try {
                 Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
@@ -211,64 +211,57 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
             mainLock = l;
 
-            try {
-                //java 5/6
-                addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addIfUnderMaximumPoolSize",
-                                                                             Runnable.class);
-                addWorkerArgs = new Object[] {null};
-            } catch (Throwable t) {
-                try {
-                    //java 7
-                    addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addWorker",
-                                                                                 Runnable.class, Boolean.TYPE);
-                    addWorkerArgs = new Object[] {null, Boolean.FALSE};
-                } catch (Throwable t2) {
-                    //nothing we cando
-                }
-            }
 
+            try {
+                //java 7
+                addWorkerMethod = ThreadPoolExecutor.class.getDeclaredMethod("addWorker",
+                                                                             Runnable.class, Boolean.TYPE);
+                addWorkerArgs = new Object[] {null, Boolean.FALSE};
+            } catch (Throwable t2) {
+                //nothing we cando
+            }
         }
         return executor;
     }
     private AWQThreadFactory createThreadFactory(final String nm) {
         ThreadGroup group;
-        try { 
+        try {
             //Try and find the highest level ThreadGroup that we're allowed to use.
-            //That SHOULD allow the default classloader and thread locals and such 
+            //That SHOULD allow the default classloader and thread locals and such
             //to be the least likely to cause issues down the road.
             group = AccessController.doPrivileged(
-                new PrivilegedAction<ThreadGroup>() { 
-                    public ThreadGroup run() { 
-                        ThreadGroup group = Thread.currentThread().getThreadGroup(); 
+                new PrivilegedAction<ThreadGroup>() {
+                    public ThreadGroup run() {
+                        ThreadGroup group = Thread.currentThread().getThreadGroup();
                         ThreadGroup parent = group;
-                        try { 
-                            while (parent != null) { 
-                                group = parent;  
-                                parent = parent.getParent(); 
-                            } 
+                        try {
+                            while (parent != null) {
+                                group = parent;
+                                parent = parent.getParent();
+                            }
                         } catch (SecurityException se) {
-                            //ignore - if we get here, the "group" is as high as 
+                            //ignore - if we get here, the "group" is as high as
                             //the security manager will allow us to go.   Use that one.
                         }
                         return new ThreadGroup(group, nm + "-workqueue");
-                    } 
+                    }
                 }
             );
-        } catch (SecurityException e) { 
+        } catch (SecurityException e) {
             group = new ThreadGroup(nm + "-workqueue");
         }
         return new AWQThreadFactory(group, nm);
     }
-    
+
     static class DelayedTaskWrapper implements Delayed, Runnable {
         long trigger;
         Runnable work;
-        
+
         DelayedTaskWrapper(Runnable work, long delay) {
             this.work = work;
             trigger = System.currentTimeMillis() + delay;
         }
-        
+
         public long getDelay(TimeUnit unit) {
             long n = trigger - System.currentTimeMillis();
             return unit.convert(n, TimeUnit.MILLISECONDS);
@@ -290,23 +283,23 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         public void run() {
             work.run();
         }
-        
+
     }
-    
+
     class WatchDog extends Thread {
         DelayQueue<DelayedTaskWrapper> delayQueue;
         AtomicBoolean shutdown = new AtomicBoolean(false);
-        
+
         WatchDog(DelayQueue<DelayedTaskWrapper> queue) {
             delayQueue = queue;
         }
-        
+
         public void shutdown() {
             shutdown.set(true);
             // to exit the waiting thread
             interrupt();
         }
-        
+
         public void run() {
             DelayedTaskWrapper task;
             try {
@@ -327,21 +320,21 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
 
         }
-        
+
     }
     class AWQThreadFactory implements ThreadFactory {
         final AtomicInteger threadNumber = new AtomicInteger(1);
         ThreadGroup group;
         String name;
         ClassLoader loader;
-        
+
         AWQThreadFactory(ThreadGroup gp, String nm) {
             group = gp;
             name = nm;
             //force the loader to be the loader of CXF, not the application loader
             loader = AutomaticWorkQueueImpl.class.getClassLoader();
         }
-        
+
         public Thread newThread(final Runnable r) {
             if (group.isDestroyed()) {
                 group = new ThreadGroup(group.getParent(), name + "-workqueue");
@@ -356,8 +349,8 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                     }
                 }
             };
-            final Thread t = new Thread(group, 
-                                  wrapped, 
+            final Thread t = new Thread(group,
+                                  wrapped,
                                   name + "-workqueue-" + threadNumber.getAndIncrement(),
                                   0);
             AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
@@ -383,10 +376,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 } catch (Throwable t) {
                     //ignore
                 }
-            }            
+            }
         }
     }
-    
+
     public void setName(String s) {
         name = s;
         if (threadFactory != null) {
@@ -415,11 +408,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         buf.append("]");
         return buf.toString();
     }
-    
+
     public void execute(final Runnable command) {
-        //Grab the context classloader of this thread.   We'll make sure we use that 
+        //Grab the context classloader of this thread.   We'll make sure we use that
         //on the thread the runnable actually runs on.
-        
+
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Runnable r = new Runnable() {
             public void run() {
@@ -434,14 +427,14 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
         };
         //The ThreadPoolExecutor in the JDK doesn't expand the number
-        //of threads until the queue is full.   However, we would 
-        //prefer the number of threads to expand immediately and 
-        //only uses the queue if we've reached the maximum number 
+        //of threads until the queue is full.   However, we would
+        //prefer the number of threads to expand immediately and
+        //only uses the queue if we've reached the maximum number
         //of threads.
         ThreadPoolExecutor ex = getExecutor();
         ex.execute(r);
-        if (addWorkerMethod != null 
-            && !ex.getQueue().isEmpty() 
+        if (addWorkerMethod != null
+            && !ex.getQueue().isEmpty()
             && this.approxThreadCount < highWaterMark
             && addThreadLock.tryLock()) {
             try {
@@ -450,7 +443,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                     int ps = this.getPoolSize();
                     int sz = executor.getQueue().size();
                     int sz2 = this.getActiveCount();
-                    
+
                     if ((sz + sz2) > ps) {
                         ReflectionUtil.setAccessible(addWorkerMethod).invoke(executor, addWorkerArgs);
                     }
@@ -464,7 +457,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             }
         }
     }
-    
+
     // WorkQueue interface
     public void execute(Runnable work, long timeout) {
         try {
@@ -477,21 +470,21 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             } catch (InterruptedException ie) {
                 throw ree;
             }
-        }    
+        }
     }
 
     public synchronized void schedule(final Runnable work, final long delay) {
         if (delayQueue == null) {
-            delayQueue = new DelayQueue<DelayedTaskWrapper>();
+            delayQueue = new DelayQueue<>();
             watchDog = new WatchDog(delayQueue);
             watchDog.setDaemon(true);
             watchDog.start();
         }
         delayQueue.put(new DelayedTaskWrapper(work, delay));
     }
-    
+
     // AutomaticWorkQueue interface
-    
+
     public void shutdown(boolean processRemainingWorkItems) {
         if (executor != null) {
             if (!processRemainingWorkItems) {
@@ -520,7 +513,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
 
     public boolean isEmpty() {
-        return executor == null ? true : executor.getQueue().size() == 0;
+        return executor == null ? true : executor.getQueue().isEmpty();
     }
 
     public boolean isFull() {
@@ -536,7 +529,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         int lwm = executor == null ? lowWaterMark : executor.getCorePoolSize();
         return lwm == Integer.MAX_VALUE ? -1 : lwm;
     }
-    
+
     public int getInitialSize() {
         return this.initialThreads;
     }
@@ -544,7 +537,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public void setHighWaterMark(int hwm) {
         highWaterMark = hwm < 0 ? Integer.MAX_VALUE : hwm;
         if (executor != null) {
-            notifyChangeListeners(new PropertyChangeEvent(this, "highWaterMark", 
+            notifyChangeListeners(new PropertyChangeEvent(this, "highWaterMark",
                                                           this.executor.getMaximumPoolSize(), hwm));
             executor.setMaximumPoolSize(highWaterMark);
         }
@@ -554,7 +547,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         lowWaterMark = lwm < 0 ? 0 : lwm;
         if (executor != null) {
             notifyChangeListeners(new PropertyChangeEvent(this, "lowWaterMark",
-                                                          this.executor.getCorePoolSize(), lwm)); 
+                                                          this.executor.getCorePoolSize(), lwm));
             executor.setCorePoolSize(lowWaterMark);
         }
     }
@@ -563,17 +556,17 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         notifyChangeListeners(new PropertyChangeEvent(this, "initialSize", this.initialThreads, initialSize));
         this.initialThreads = initialSize;
     }
-    
+
     public void setQueueSize(int size) {
         notifyChangeListeners(new PropertyChangeEvent(this, "queueSize", this.maxQueueSize, size));
         this.maxQueueSize = size;
     }
-    
+
     public void setDequeueTimeout(long l) {
         notifyChangeListeners(new PropertyChangeEvent(this, "dequeueTimeout", this.dequeueTimeout, l));
         this.dequeueTimeout = l;
     }
-    
+
     public boolean isShutdown() {
         if (executor == null) {
             return false;
@@ -618,10 +611,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         s = config.get("queueSize");
         if (s != null) {
             this.maxQueueSize = Integer.parseInt(s);
-        } 
+        }
     }
     public Dictionary<String, String> getProperties() {
-        Dictionary<String, String> properties = new Hashtable<String, String>();
+        Dictionary<String, String> properties = new Hashtable<>();
         NumberFormat nf = NumberFormat.getIntegerInstance();
         properties.put("name", nf.format(getName()));
         properties.put("highWaterMark", nf.format(getHighWaterMark()));

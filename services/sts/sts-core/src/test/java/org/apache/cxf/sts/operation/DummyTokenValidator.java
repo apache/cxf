@@ -31,16 +31,16 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenT
  * dummy BinarySecurityToken by checking the token value.
  */
 public class DummyTokenValidator implements TokenValidator {
-    
-    public static final String TOKEN_TYPE = 
+
+    public static final String TOKEN_TYPE =
         "http://dummy-token-type.com/dummy";
-    
+
     public boolean canHandleToken(ReceivedToken validateTarget) {
         Object token = validateTarget.getToken();
         return (token instanceof BinarySecurityTokenType)
             && TOKEN_TYPE.equals(((BinarySecurityTokenType)token).getValueType());
     }
-    
+
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         return canHandleToken(validateTarget);
     }
@@ -50,17 +50,17 @@ public class DummyTokenValidator implements TokenValidator {
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         if (validateTarget != null && validateTarget.isBinarySecurityToken()) {
-            BinarySecurityTokenType binarySecurity = 
+            BinarySecurityTokenType binarySecurity =
                 (BinarySecurityTokenType)validateTarget.getToken();
             if ("12345678".equals(binarySecurity.getValue())) {
                 validateTarget.setState(STATE.VALID);
             }
         }
-        
+
         return response;
     }
-    
-    
+
+
 }

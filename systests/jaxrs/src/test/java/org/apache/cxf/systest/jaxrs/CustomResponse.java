@@ -45,22 +45,18 @@ public class CustomResponse extends Response {
     }
     @Override
     public void close() {
-        // TODO Auto-generated method stub
-        
+
     }
     @Override
     public Set<String> getAllowedMethods() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Map<String, NewCookie> getCookies() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Date getDate() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
@@ -69,52 +65,42 @@ public class CustomResponse extends Response {
     }
     @Override
     public EntityTag getEntityTag() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public String getHeaderString(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Locale getLanguage() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Date getLastModified() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public int getLength() {
-        // TODO Auto-generated method stub
         return 0;
     }
     @Override
     public Link getLink(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Builder getLinkBuilder(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public Set<Link> getLinks() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public URI getLocation() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public MediaType getMediaType() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
@@ -127,42 +113,34 @@ public class CustomResponse extends Response {
     }
     @Override
     public StatusType getStatusInfo() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public MultivaluedMap<String, String> getStringHeaders() {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public boolean hasEntity() {
-        // TODO Auto-generated method stub
         return false;
     }
     @Override
     public boolean hasLink(String arg0) {
-        // TODO Auto-generated method stub
         return false;
     }
     @Override
     public <T> T readEntity(Class<T> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public <T> T readEntity(GenericType<T> arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public <T> T readEntity(Class<T> arg0, Annotation[] arg1) {
-        // TODO Auto-generated method stub
         return null;
     }
     @Override
     public <T> T readEntity(GenericType<T> arg0, Annotation[] arg1) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

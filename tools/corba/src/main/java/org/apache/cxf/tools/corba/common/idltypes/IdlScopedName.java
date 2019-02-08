@@ -24,11 +24,11 @@ import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 public class IdlScopedName {
     private String fullName;
     private String localName;
-    private String parentNames[];
+    private String[] parentNames;
 
     IdlScopedName(IdlScopeBase parent, String name) {
         if (parent != null) {
-            fullName = new String(parent.fullName() + ToolCorbaConstants.MODULE_SEPARATOR + name);
+            fullName = parent.fullName() + ToolCorbaConstants.MODULE_SEPARATOR + name;
             parentNames = parent.name().parentNames();
         } else {
             fullName = new String(name);

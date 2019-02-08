@@ -38,8 +38,8 @@ public class JaxWsClientEndpointImpl extends JaxWsEndpointImpl {
 
     private static final long serialVersionUID = 3059035442836604053L;
     private ServiceImpl executorProvider;
-    
-    public JaxWsClientEndpointImpl(Bus bus, Service s, EndpointInfo ei, ServiceImpl si, 
+
+    public JaxWsClientEndpointImpl(Bus bus, Service s, EndpointInfo ei, ServiceImpl si,
                                    List<WebServiceFeature> wf)
         throws EndpointException {
         super(bus, s, ei, wf);
@@ -50,8 +50,8 @@ public class JaxWsClientEndpointImpl extends JaxWsEndpointImpl {
     public Executor getExecutor() {
         Executor e = executorProvider.getExecutor();
         if (null == e) {
-            e = super.getExecutor();   
+            e = super.getExecutor();
         }
         return e;
-    }    
+    }
 }

@@ -22,9 +22,9 @@ package org.apache.cxf.systest.dispatch;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -42,7 +42,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         if (type.equals(ResponseInterceptorType.overflow)) {
             throw new StackOverflowError();
-        } else  if (type.equals(ResponseInterceptorType.ElementLevelThreshold)) {
+        } else if (type.equals(ResponseInterceptorType.ElementLevelThreshold)) {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
                 CachedOutputStream bos = new CachedOutputStream();
@@ -59,13 +59,13 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                     throw new Fault(e);
                 }
             }
-        } else  if (type.equals(ResponseInterceptorType.ElementCountThreshold)) {
+        } else if (type.equals(ResponseInterceptorType.ElementCountThreshold)) {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
                 CachedOutputStream bos = new CachedOutputStream();
                 try {
                     is = getClass().getClassLoader().getResourceAsStream(
-                        "org/apache/cxf/systest/dispatch/resources/" 
+                        "org/apache/cxf/systest/dispatch/resources/"
                         + "GreetMeDocLiteralRespBreakElementCountThreshold.xml");
                     IOUtils.copy(is, bos);
                     bos.flush();

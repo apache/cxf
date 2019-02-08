@@ -28,27 +28,27 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaStructHandler extends CorbaObjectHandler {
 
-    List<CorbaObjectHandler> members = new ArrayList<CorbaObjectHandler>();
-    
+    List<CorbaObjectHandler> members = new ArrayList<>();
+
     public CorbaStructHandler(QName structName, QName structIdlType, TypeCode structTC, Object structType) {
         super(structName, structIdlType, structTC, structType);
     }
-    
+
     public void addMember(CorbaObjectHandler member) {
         members.add(member);
     }
-    
+
     public List<CorbaObjectHandler> getMembers() {
         return members;
     }
-    
+
     public CorbaObjectHandler getMember(int index) {
         return members.get(index);
     }
-    
+
     public CorbaObjectHandler getMemberByName(String name) {
         CorbaObjectHandler member = null;
-        
+
         for (Iterator<CorbaObjectHandler> iterator = members.iterator(); iterator.hasNext();) {
             CorbaObjectHandler current = iterator.next();
             if (current.getName().getLocalPart().equals(name)) {
@@ -56,7 +56,7 @@ public class CorbaStructHandler extends CorbaObjectHandler {
                 break;
             }
         }
-        
+
         return member;
     }
 
@@ -64,5 +64,5 @@ public class CorbaStructHandler extends CorbaObjectHandler {
         for (int i = 0; i < members.size(); i++) {
             members.get(i).clear();
         }
-    }  
+    }
 }

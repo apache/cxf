@@ -36,33 +36,33 @@ import org.apache.wss4j.policy.model.RequiredParts;
  * Validate a RequiredParts policy
  */
 public class RequiredPartsPolicyValidator implements SecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.REQUIRED_PARTS.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.REQUIRED_PARTS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         Element header = parameters.getSoapHeader();
-        
+
         for (AssertionInfo ai : ais) {
             RequiredParts rp = (RequiredParts)ai.getAssertion();
             ai.setAsserted(true);
             for (Header h : rp.getHeaders()) {
                 QName qName = new QName(h.getNamespace(), h.getName());
-                if (header == null || DOMUtils.getFirstChildWithName((Element)header, qName) == null) {
+                if (header == null || DOMUtils.getFirstChildWithName(header, qName) == null) {
                     ai.setNotAsserted("No header element of name " + qName + " found.");
                 }
             }
         }
     }
-    
+
 }

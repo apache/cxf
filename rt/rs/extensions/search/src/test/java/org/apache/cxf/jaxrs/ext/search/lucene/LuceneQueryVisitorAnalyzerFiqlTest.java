@@ -22,54 +22,57 @@ import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
 import org.apache.cxf.jaxrs.ext.search.fiql.FiqlParser;
 import org.apache.lucene.search.Query;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
 
 public class LuceneQueryVisitorAnalyzerFiqlTest extends AbstractLuceneQueryVisitorTest {
     @Test
-    public void testTextContentMatchEqual() throws Exception {        
+    public void testTextContentMatchEqual() throws Exception {
         doTestTextContentMatchWithAnalyzer("ct==tEXt");
     }
-    
+
     @Test
-    public void testTextContentMatchStopWord() throws Exception {        
+    public void testTextContentMatchStopWord() throws Exception {
         assertNull("No query should be returned for stop words", createTermQueryWithAnalyzer("ct==the"));
     }
-                   
+
     @Test
     public void testTextAndContentMatch() throws Exception {
         Query query = createTermQueryWithAnalyzer("contents==namE;contents==tExt");
         doTestTextContentMatchWithQuery(query);
-        
+
     }
-    
+
     @Test
     public void testTextOrContentMatch() throws Exception {
         Query query = createTermQueryWithAnalyzer("contents==BAR,contents==TEXT");
         doTestTextContentMatchWithQuery(query);
-        
+
     }
-    
+
     @Test
-    public void testIntAndTextContentMatch() throws Exception {        
+    public void testIntAndTextContentMatch() throws Exception {
         Query query = createTermQueryWithFieldClassWithAnalyzer("intfield==4;contents==teXt", Integer.class);
         doTestIntContentMatchWithQuery(query);
-        doTestTextContentMatchWithQuery(query);        
+        doTestTextContentMatchWithQuery(query);
     }
-        
+
     @Test
     public void testIntOrTextContentMatch() throws Exception {
         Query query = createTermQueryWithAnalyzer("intfield==3,contents==tExt");
         doTestTextContentMatchWithQuery(query);
         doTestIntContentMatchWithQuery(query);
-        
+
     }
-        
+
     @Test
     public void testTextContentMatchEqualPhrase() throws Exception {
         Query query = createPhraseQueryWithAnalyzer("contents", "name==TEXT");
         doTestTextContentMatchWithQuery(query);
     }
-            
+
     @Override
     protected SearchConditionParser<SearchBean> getParser() {
         return new FiqlParser<SearchBean>(SearchBean.class);

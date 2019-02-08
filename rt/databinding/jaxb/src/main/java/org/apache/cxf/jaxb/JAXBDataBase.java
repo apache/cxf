@@ -23,8 +23,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -32,28 +35,32 @@ import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentUnmarshaller;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 /**
- * 
+ *
  */
 public abstract class JAXBDataBase {
-    
-    protected JAXBContext context; 
+    static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBase.class);
+
+    protected JAXBContext context;
     protected Schema schema;
     protected Collection<Attachment> attachments;
     protected Integer mtomThreshold; // null if we should default.
-    
+
     protected JAXBDataBase(JAXBContext ctx) {
         context = ctx;
     }
-    
+
     public void setSchema(Schema s) {
         this.schema = s;
     }
@@ -61,7 +68,7 @@ public abstract class JAXBDataBase {
     public void setJAXBContext(JAXBContext jc) {
         this.context = jc;
     }
-    
+
     public Schema getSchema() {
         return schema;
     }
@@ -84,10 +91,10 @@ public abstract class JAXBDataBase {
     protected AttachmentMarshaller getAttachmentMarshaller() {
         return new JAXBAttachmentMarshaller(attachments, mtomThreshold);
     }
-    
+
     public void setProperty(String prop, Object value) {
     }
-    
+
     protected Annotation[] getJAXBAnnotation(MessagePartInfo mpi) {
         List<Annotation> annoList = null;
         if (mpi != null) {
@@ -96,9 +103,9 @@ public abstract class JAXBDataBase {
                 annoList = extractJAXBAnnotations(getReturnMethodAnnotations(mpi));
             }
         }
-        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);       
+        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[0]);
     }
-    
+
     private List<Annotation> extractJAXBAnnotations(Annotation[] anns) {
         List<Annotation> annoList = null;
         if (anns != null) {
@@ -106,7 +113,7 @@ public abstract class JAXBDataBase {
                 if (ann instanceof XmlList || ann instanceof XmlAttachmentRef
                     || ann instanceof XmlJavaTypeAdapter) {
                     if (annoList == null) {
-                        annoList = new ArrayList<Annotation>();
+                        annoList = new ArrayList<>();
                     }
                     annoList.add(ann);
                 }
@@ -114,7 +121,7 @@ public abstract class JAXBDataBase {
         }
         return annoList;
     }
-    
+
     private Annotation[] getReturnMethodAnnotations(MessagePartInfo mpi) {
         AbstractMessageContainer mi = mpi.getMessageInfo();
         if (mi == null || !isOutputMessage(mi)) {
@@ -123,7 +130,7 @@ public abstract class JAXBDataBase {
         OperationInfo oi = mi != null ? mi.getOperation() : null;
         return oi != null ? (Annotation[])oi.getProperty("method.return.annotations") : null;
     }
-    
+
     protected boolean isOutputMessage(AbstractMessageContainer messageContainer) {
         if (messageContainer instanceof MessageInfo) {
             return MessageInfo.Type.OUTPUT.equals(((MessageInfo)messageContainer).getType());
@@ -138,7 +145,7 @@ public abstract class JAXBDataBase {
     public void setMtomThreshold(Integer threshold) {
         this.mtomThreshold = threshold;
     }
-    
+
     protected final boolean honorJAXBAnnotations(MessagePartInfo part) {
         if (part == null) {
             return false;
@@ -153,5 +160,33 @@ public abstract class JAXBDataBase {
         return b == null ? false : b;
     }
     
+    protected ValidationEventHandler getValidationEventHandler(String cn) {
+        try {
+            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass()).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            LOG.log(Level.INFO, "Could not create validation event handler", e);
+        }
+        return null;
+    }
     
+    protected ValidationEventHandler getValidationEventHandler(Message m, String property) {
+        Object value = m.getContextualProperty(property);
+        ValidationEventHandler veventHandler = null;
+        if (value instanceof String) {
+            veventHandler = getValidationEventHandler((String)value);
+        } else {
+            veventHandler = (ValidationEventHandler)value;
+        }
+        if (veventHandler == null) {
+            value = m.getContextualProperty(JAXBDataBinding.VALIDATION_EVENT_HANDLER);
+            if (value instanceof String) {
+                veventHandler = getValidationEventHandler((String)value);
+            } else {
+                veventHandler = (ValidationEventHandler)value;
+            }
+        }
+        return veventHandler;
+    }
+
+
 }

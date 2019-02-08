@@ -27,10 +27,11 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.databinding.jaxb</cxf.module.name>
         <cxf.osgi.import>
             javax.activation;version="${cxf.osgi.javax.activation.version}",
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
@@ -48,10 +49,15 @@
                         <id>generate-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/misc_test.xsd</xsd>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/form_test.xsd</xsd>
@@ -66,6 +72,9 @@
                                     <xsd>${basedir}/src/test/resources/wsdl/jaxb/rpc_lit.xsd</xsd>
                                 </xsdOption>
                             </xsdOptions>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                         </configuration>
                         <goals>
                             <goal>xsdtojava-tests</goal>
@@ -95,14 +104,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-wsdl</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
         </dependency>
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>

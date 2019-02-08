@@ -33,72 +33,73 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
 import org.apache.cxf.sts.common.RealmSupportClaimsHandler;
 import org.apache.cxf.sts.operation.CustomIdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
 import org.junit.Assert;
 
-public class RealmSupportTest extends org.junit.Assert {
+public class RealmSupportTest {
 
-    
+
     @org.junit.Test
     public void testIdentityMappingRealmA2B() throws Exception {
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
-        
+
         claimsManager.setIdentityMapper(new CustomIdentityMapper());
-        
+
         RealmSupportClaimsHandler realmAHandler = new RealmSupportClaimsHandler();
         realmAHandler.setRealm("A");
-        realmAHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-A")));
-        
+        realmAHandler.setSupportedClaimTypes(Collections.singletonList("Claim-A"));
+
         RealmSupportClaimsHandler realmBHandler = new RealmSupportClaimsHandler();
         realmBHandler.setRealm("B");
-        realmBHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-B")));
-        
+        realmBHandler.setSupportedClaimTypes(Collections.singletonList("Claim-B"));
+
         RealmSupportClaimsHandler realmCHandler = new RealmSupportClaimsHandler();
         realmCHandler.setRealm("B");
-        realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
-        
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        realmCHandler.setSupportedClaimTypes(Collections.singletonList("Claim-C"));
+
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
-        
+
         ClaimCollection requestedClaims = createClaimCollection();
-        
+
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("A");
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 3, claims.size());
     }
-    
+
     @org.junit.Test
     public void testIdentityMappingRealmB2A() throws Exception {
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
-        
+
         claimsManager.setIdentityMapper(new CustomIdentityMapper());
-        
+
         RealmSupportClaimsHandler realmAHandler = new RealmSupportClaimsHandler();
         realmAHandler.setRealm("A");
-        realmAHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-A")));
-        
+        realmAHandler.setSupportedClaimTypes(Collections.singletonList("Claim-A"));
+
         RealmSupportClaimsHandler realmBHandler = new RealmSupportClaimsHandler();
         realmBHandler.setRealm("B");
-        realmBHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-B")));
-        
+        realmBHandler.setSupportedClaimTypes(Collections.singletonList("Claim-B"));
+
         RealmSupportClaimsHandler realmCHandler = new RealmSupportClaimsHandler();
         realmCHandler.setRealm("B");
-        realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
-        
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        realmCHandler.setSupportedClaimTypes(Collections.singletonList("Claim-C"));
+
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
-        
+
         ClaimCollection requestedClaims = createClaimCollection();
-        
+
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("B");
         parameters.setPrincipal(new CustomTokenPrincipal("ALICE"));
@@ -108,81 +109,81 @@ public class RealmSupportTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testFilteredRealmAIdentityMapping() throws Exception {
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
-        
+
         claimsManager.setIdentityMapper(new CustomIdentityMapper());
-        
+
         RealmSupportClaimsHandler realmAHandler = new RealmSupportClaimsHandler();
         realmAHandler.setRealm("A");
-        realmAHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-A")));
-        
+        realmAHandler.setSupportedClaimTypes(Collections.singletonList("Claim-A"));
+
         RealmSupportClaimsHandler realmBHandler = new RealmSupportClaimsHandler();
         realmBHandler.setRealm("B");
-        realmBHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-B")));
-        
+        realmBHandler.setSupportedClaimTypes(Collections.singletonList("Claim-B"));
+
         RealmSupportClaimsHandler realmCHandler = new RealmSupportClaimsHandler();
         realmCHandler.setRealm("A");
         realmCHandler.setSupportedRealms(Collections.singletonList("A"));
-        realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
-        
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        realmCHandler.setSupportedClaimTypes(Collections.singletonList("Claim-C"));
+
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
-        
+
         ClaimCollection requestedClaims = createClaimCollection();
-        
+
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("A");
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 3, claims.size());
-        
+
         //Asserts in RealmSupportClaimsHandler must succeed
-        
+
     }
-    
-    
+
+
     @org.junit.Test
     public void testFilteredRealmBIdentityMapping() throws Exception {
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
-        
+
         claimsManager.setIdentityMapper(new CustomIdentityMapper());
-        
+
         RealmSupportClaimsHandler realmAHandler = new RealmSupportClaimsHandler();
         realmAHandler.setRealm("A");
-        realmAHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-A")));
-        
+        realmAHandler.setSupportedClaimTypes(Collections.singletonList("Claim-A"));
+
         RealmSupportClaimsHandler realmBHandler = new RealmSupportClaimsHandler();
         realmBHandler.setRealm("B");
-        realmBHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-B")));
-        
+        realmBHandler.setSupportedClaimTypes(Collections.singletonList("Claim-B"));
+
         RealmSupportClaimsHandler realmCHandler = new RealmSupportClaimsHandler();
         realmCHandler.setRealm("A");
         realmCHandler.setSupportedRealms(Collections.singletonList("A"));
-        realmCHandler.setSupportedClaimTypes(Collections.singletonList(URI.create("Claim-C")));
-        
-        List<ClaimsHandler> claimHandlers = new ArrayList<ClaimsHandler>();
+        realmCHandler.setSupportedClaimTypes(Collections.singletonList("Claim-C"));
+
+        List<ClaimsHandler> claimHandlers = new ArrayList<>();
         claimHandlers.add(realmAHandler);
         claimHandlers.add(realmBHandler);
         claimHandlers.add(realmCHandler);
         claimsManager.setClaimHandlers(Collections.unmodifiableList(claimHandlers));
-        
+
         ClaimCollection requestedClaims = createClaimCollection();
-        
+
         ClaimsParameters parameters = new ClaimsParameters();
         parameters.setRealm("B");
         parameters.setPrincipal(new CustomTokenPrincipal("ALICE"));
         ProcessedClaimCollection claims = claimsManager.retrieveClaimValues(requestedClaims, parameters);
         Assert.assertEquals("Number of claims incorrect", 2, claims.size());
-        
+
         //Asserts in RealmSupportClaimsHandler must succeed
-        
+
     }
-    
+
     private ClaimCollection createClaimCollection() {
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim requestClaimA = new Claim();
@@ -199,7 +200,7 @@ public class RealmSupportTest extends org.junit.Assert {
         requestedClaims.add(requestClaimC);
         return requestedClaims;
     }
-    
+
 }
 
 

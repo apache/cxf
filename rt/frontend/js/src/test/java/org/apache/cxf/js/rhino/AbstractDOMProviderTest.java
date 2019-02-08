@@ -20,16 +20,18 @@
 
 package org.apache.cxf.js.rhino;
 
-
-import org.easymock.EasyMock;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.mozilla.javascript.Scriptable;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
 
-public class AbstractDOMProviderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+
+
+public class AbstractDOMProviderTest {
 
     private String epAddr = "http://cxf.apache.org/";
 

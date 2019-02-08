@@ -27,15 +27,15 @@ import org.apache.cxf.ws.security.wss4j.AbstractUsernameTokenAuthenticatingInter
 public class SimpleSubjectCreatingInterceptor extends AbstractUsernameTokenAuthenticatingInterceptor {
 
     @Override
-    protected Subject createSubject(String name, 
-                                    String password, 
+    protected Subject createSubject(String name,
+                                    String password,
                                     boolean isDigest,
                                     String nonce,
                                     String created) throws SecurityException {
         Subject subject = new Subject();
-         
+
         // delegate to the external security system if possible
-        String roleName = "Alice".equals(name) ? "developers" : "pms"; 
+        String roleName = "Alice".equals(name) ? "developers" : "pms";
         subject.getPrincipals().add(new SimplePrincipal(name));
         subject.getPrincipals().add(new SimpleGroup(roleName, name));
         subject.setReadOnly();

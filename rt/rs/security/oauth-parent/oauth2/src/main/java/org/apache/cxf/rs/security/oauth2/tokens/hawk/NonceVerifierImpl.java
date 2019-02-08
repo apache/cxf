@@ -25,16 +25,16 @@ public class NonceVerifierImpl implements NonceVerifier {
     private NonceStore nonceStore;
     private long allowedWindow;
 
-    public void verifyNonce(String tokenKey, String clientNonceString, String clientTimestampString) 
+    public void verifyNonce(String tokenKey, String clientNonceString, String clientTimestampString)
         throws OAuthServiceException {
-        
+
         if (StringUtils.isEmpty(clientNonceString)
             || StringUtils.isEmpty(clientTimestampString)) {
             throw new OAuthServiceException("Nonce or timestamp is not available");
         }
-        
+
         long serverClock = System.currentTimeMillis();
-        long clientTimestamp = Long.valueOf(clientTimestampString);
+        long clientTimestamp = Long.parseLong(clientTimestampString);
         NonceHistory nonceHistory = nonceStore.getNonceHistory(tokenKey);
         Nonce nonce = new Nonce(clientNonceString, clientTimestamp);
         if (nonceHistory == null) {

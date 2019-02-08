@@ -26,9 +26,9 @@ import java.util.Map;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +37,7 @@ public class DigestAuthSupplierTest {
 
     /**
      * Tests that parseHeader correctly parses parameters that contain ==
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -56,7 +56,7 @@ public class DigestAuthSupplierTest {
         String origNonce = "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==";
         String fullHeader = "Digest realm=\"MyCompany realm.\", qop=\"auth\"," + "nonce=\"" + origNonce
                             + "\"";
-        
+
         /**
          * Initialize DigestAuthSupplier that always uses the same cnonce so we always
          * get the same response
@@ -67,7 +67,7 @@ public class DigestAuthSupplierTest {
             public String createCnonce() throws UnsupportedEncodingException {
                 return "27db039b76362f3d55da10652baee38c";
             }
-            
+
         };
         IMocksControl control = EasyMock.createControl();
         AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
@@ -76,13 +76,13 @@ public class DigestAuthSupplierTest {
         URI uri = new URI("http://myserver");
         Message message = new MessageImpl();
         control.replay();
-        
+
         String authToken = authSupplier
             .getAuthorization(authorizationPolicy, uri, message, fullHeader);
         HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
         assertEquals("Digest", authHeader.getAuthType());
         Map<String, String> params = authHeader.getParams();
-        Map<String, String> expectedParams = new HashMap<String, String>();
+        Map<String, String> expectedParams = new HashMap<>();
         expectedParams.put("response", "28e616b6868f60aaf9b19bb5b172f076");
         expectedParams.put("cnonce", "27db039b76362f3d55da10652baee38c");
         expectedParams.put("username", "testUser");

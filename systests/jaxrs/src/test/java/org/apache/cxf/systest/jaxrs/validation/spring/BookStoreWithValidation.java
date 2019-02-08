@@ -32,20 +32,20 @@ import org.apache.cxf.validation.BeanValidationProvider;
 @Path("/bookstore/")
 public class BookStoreWithValidation {
     private BeanValidationProvider provider;
-     
+
     public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }
-    
+
     @POST
     @Path("/books")
-    public Response addBook(@Context final UriInfo uriInfo, 
+    public Response addBook(@Context final UriInfo uriInfo,
             @NotNull @FormParam("id") String id,
             @FormParam("name") String name) {
-        
+
         final BookWithValidation book = new BookWithValidation(name, id);
         provider.validateBean(book);
-        
+
         return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).build();
     }
 }

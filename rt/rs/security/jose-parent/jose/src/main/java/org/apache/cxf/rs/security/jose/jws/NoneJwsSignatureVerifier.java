@@ -24,7 +24,7 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
 
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
-        return headers.getSignatureAlgorithm() == getAlgorithm() 
+        return headers.getSignatureAlgorithm() == getAlgorithm()
             && signature.length == 0;
     }
 
@@ -33,4 +33,22 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
         return SignatureAlgorithm.NONE;
     }
 
+    @Override
+    public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
+        return new NoneJwsVerificationSignature();
+    }
+
+    private static class NoneJwsVerificationSignature implements JwsVerificationSignature {
+
+        @Override
+        public void update(byte[] src, int off, int len) {
+            // complete
+        }
+
+        @Override
+        public boolean verify(byte[] signature) {
+            return signature.length == 0;
+        }
+
+    }
 }

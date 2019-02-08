@@ -20,8 +20,10 @@
 package org.apache.cxf.tools.corba.common;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import javax.wsdl.WSDLException;
@@ -87,12 +89,11 @@ public abstract class SchemaFactory {
                 throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Problem instantiating factory "
                                                                            + "implementation.", e);
             }
-        } else {
-            throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Unable to find name of factory "
-                                                                       + "implementation.");
         }
+        throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Unable to find name of factory "
+                                                                   + "implementation.");
     }
-   
+
     /**
      * Create a new instance of a WSDLWriter.
      */
@@ -126,9 +127,8 @@ public abstract class SchemaFactory {
         if (propFileName != null) {
             try {
                 Properties properties = new Properties();
-                File propFile = new File(propFileName);
-                try (FileInputStream fis = new FileInputStream(propFile)) {
-                    properties.load(fis);
+                try (InputStream is = Files.newInputStream(Paths.get(propFileName))) {
+                    properties.load(is);
                 }
 
                 factoryImplName = properties.getProperty(PROPERTY_NAME);

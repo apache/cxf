@@ -45,15 +45,18 @@ import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.InHeaderT;
 import org.apache.headers.coloc.types.OutHeaderT;
 import org.apache.headers.rpc_lit.PingMeFault;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ColocUtilTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+
+public class ColocUtilTest {
     private IMocksControl control = EasyMock.createNiceControl();
     private Bus bus;
 
@@ -103,21 +106,21 @@ public class ColocUtilTest extends Assert {
                      Phase.POST_LOGICAL);
 
     }
-    
+
     @Test
     public void testGetOutInterceptorChain() throws Exception {
         PhaseManagerImpl phaseMgr = new PhaseManagerImpl();
         SortedSet<Phase> list = phaseMgr.getInPhases();
         ColocUtil.setPhases(list, Phase.SETUP, Phase.POST_LOGICAL);
-        
+
         Endpoint ep = control.createMock(Endpoint.class);
         Service srv = control.createMock(Service.class);
         Exchange ex = new ExchangeImpl();
-        
+
         ex.put(Bus.class, bus);
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
-        
+
         EasyMock.expect(ep.getOutInterceptors())
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
@@ -125,7 +128,7 @@ public class ColocUtilTest extends Assert {
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(bus.getOutInterceptors())
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        
+
         control.replay();
         InterceptorChain chain = ColocUtil.getOutInterceptorChain(ex, list);
         control.verify();
@@ -141,15 +144,15 @@ public class ColocUtilTest extends Assert {
         PhaseManagerImpl phaseMgr = new PhaseManagerImpl();
         SortedSet<Phase> list = phaseMgr.getInPhases();
         ColocUtil.setPhases(list, Phase.SETUP, Phase.POST_LOGICAL);
-        
+
         Endpoint ep = control.createMock(Endpoint.class);
         Service srv = control.createMock(Service.class);
         Exchange ex = new ExchangeImpl();
-        
+
         ex.put(Bus.class, bus);
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
-        
+
         EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(phaseMgr);
         EasyMock.expect(ep.getInInterceptors())
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
@@ -158,7 +161,7 @@ public class ColocUtilTest extends Assert {
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(bus.getInInterceptors())
             .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
-        
+
         control.replay();
         InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, list);
         control.verify();
@@ -169,25 +172,25 @@ public class ColocUtilTest extends Assert {
                      iter.hasNext());
         assertNotNull("OutFaultObserver should be set", chain.getFaultObserver());
     }
-    
+
     @Test
     public void testIsSameFaultInfo() {
         OperationInfo oi = control.createMock(OperationInfo.class);
-        
+
         boolean match = ColocUtil.isSameFaultInfo(null, null);
         assertEquals("Should return true", true, match);
-        List<FaultInfo> fil1 = new ArrayList<FaultInfo>();
+        List<FaultInfo> fil1 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, null);
         assertEquals("Should not find a match", false, match);
         match = ColocUtil.isSameFaultInfo(null, fil1);
         assertEquals("Should not find a match", false, match);
-        
-        List<FaultInfo> fil2 = new ArrayList<FaultInfo>();
+
+        List<FaultInfo> fil2 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
-        
+
         QName fn1 = new QName("A", "B");
         QName fn2 = new QName("C", "D");
-        
+
         FaultInfo fi1 = new FaultInfo(fn1, null, oi);
         fi1.setProperty(Class.class.getName(), PingMeFault.class);
         fil1.add(fi1);
@@ -202,7 +205,7 @@ public class ColocUtilTest extends Assert {
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
         assertEquals("Should find a match", true, match);
     }
-    
+
     @Test
     public void testIsSameMessageInfo() {
         OperationInfo oi = control.createMock(OperationInfo.class);
@@ -217,21 +220,21 @@ public class ColocUtilTest extends Assert {
         assertEquals("Should not find a match", false, match);
         match = ColocUtil.isSameMessageInfo(null, mi2);
         assertEquals("Should not find a match", false, match);
-        
+
         MessagePartInfo mpi = new MessagePartInfo(new QName("", "B"), null);
         mpi.setTypeClass(InHeaderT.class);
         mi1.addMessagePart(mpi);
-        
+
         mpi = new MessagePartInfo(new QName("", "D"), null);
         mpi.setTypeClass(OutHeaderT.class);
         mi2.addMessagePart(mpi);
-        
+
         match = ColocUtil.isSameMessageInfo(mi1, mi2);
         assertEquals("Should not find a match", false, match);
-        
+
         mpi.setTypeClass(InHeaderT.class);
         match = ColocUtil.isSameMessageInfo(mi1, mi2);
         assertEquals("Should find a match", true, match);
     }
-    
+
 }

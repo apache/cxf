@@ -19,25 +19,26 @@
 
 package org.apache.cxf.tools.common.model;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class JavaParameterTest extends Assert {
+import static org.junit.Assert.assertEquals;
+
+public class JavaParameterTest {
 
     @Test
     public void testGetHolderDefaultTypeValue() throws Exception {
         JavaParameter holderParameter = new JavaParameter("i", "java.lang.String", null);
         holderParameter.setHolder(true);
         holderParameter.setHolderName("javax.xml.ws.Holder");
-        assertEquals("\"\"", 
+        assertEquals("\"\"",
                      holderParameter.getDefaultTypeValue());
-        
+
         holderParameter = new JavaParameter("org.apache.cxf.tools.common.model.JavaParameter",
                                             "org.apache.cxf.tools.common.model.JavaParameter", null);
         holderParameter.setHolder(true);
         holderParameter.setHolderName("javax.xml.ws.Holder");
         String defaultTypeValue = holderParameter.getDefaultTypeValue();
-        assertEquals("new org.apache.cxf.tools.common.model.JavaParameter()", 
+        assertEquals("new org.apache.cxf.tools.common.model.JavaParameter()",
                      defaultTypeValue);
     }
 }

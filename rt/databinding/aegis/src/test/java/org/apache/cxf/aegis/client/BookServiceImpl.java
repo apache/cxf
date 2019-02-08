@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookServiceImpl implements BookService {
-    private List<Book> allBooks = new ArrayList<Book>();
+    private List<Book> allBooks = new ArrayList<>();
 
     public BookServiceImpl() {
     }
@@ -38,7 +38,7 @@ public class BookServiceImpl implements BookService {
     }
 
     public Book[] getBooks() {
-        return allBooks.toArray(new Book[allBooks.size()]);
+        return allBooks.toArray(new Book[0]);
     }
 
     public Book findBook(String isbn) {

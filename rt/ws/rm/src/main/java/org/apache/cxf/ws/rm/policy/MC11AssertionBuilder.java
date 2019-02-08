@@ -37,18 +37,18 @@ public class MC11AssertionBuilder implements AssertionBuilder<Element> {
     public static final String MCSUPPORTED_NAME = "MCSupported";
     public static final String WSMC_NAMESPACE = "http://docs.oasis-open.org/ws-rx/wsmc/200702";
     public static final QName MCSUPPORTED_QNAME = new QName(WSMC_NAMESPACE, MCSUPPORTED_NAME);
-    
+
     public static final QName[] KNOWN_ELEMENTS = {
         MCSUPPORTED_QNAME
     };
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#getKnownElements()
      */
     public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#build(org.w3c.dom.Element,
      *  org.apache.neethi.AssertionBuilderFactory)

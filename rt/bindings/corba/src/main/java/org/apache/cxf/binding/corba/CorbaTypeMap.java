@@ -38,8 +38,8 @@ public class CorbaTypeMap {
 
     public CorbaTypeMap(String namespace) {
         targetNamespace = namespace;
-        typeMap = new HashMap<String, CorbaType>();
-        typeCodeMap = new HashMap<QName, TypeCode>();
+        typeMap = new HashMap<>();
+        typeCodeMap = new HashMap<>();
     }
 
     public void addType(String name, CorbaType type) {
@@ -64,7 +64,7 @@ public class CorbaTypeMap {
         return typeCodeMap.get(name);
     }
 
-    // This is used by the Any type when trying to re-construct the type stored inside a 
+    // This is used by the Any type when trying to re-construct the type stored inside a
     // CORBA Any.
     public QName getIdlType(TypeCode tc) {
         String repId = null;

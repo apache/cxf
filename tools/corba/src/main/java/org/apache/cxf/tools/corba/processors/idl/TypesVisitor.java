@@ -28,9 +28,9 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 
 public class TypesVisitor extends VisitorBase {
-    
+
     static final int PRIMITIVE = 0;
-    
+
     XmlSchemaObject currentType;
 
     ArgType currentParam;
@@ -52,8 +52,8 @@ public class TypesVisitor extends VisitorBase {
         //               | <constr_type_spec>
 
         Visitor visitor = null;
-        
-        
+
+
         if (ConstrTypeSpecVisitor.accept(node)) {
             // type_spec - constr_type_spec
             visitor = new ConstrTypeSpecVisitor(getScope(), definition, schema, wsdlVisitor, identifierNode);
@@ -63,9 +63,9 @@ public class TypesVisitor extends VisitorBase {
         } else {
             // REVISIT: !!!!!
             // This is ugly. It should be done in the SimpleTypeSpecVisitor.accept(node) method.
-            // More precisely, that accept method should contained an ORed 
+            // More precisely, that accept method should contained an ORed
             // ScopedNameVisitor.accept(schemas, schema, node)
-            // It is not done currently because that would require changing accept method signature 
+            // It is not done currently because that would require changing accept method signature
             // to accept(schemas, schema, node).
             // Perhaps passing a pointer to DefinitionVisitor or some other class (to be designed)
             // would be a better solution.
@@ -80,7 +80,7 @@ public class TypesVisitor extends VisitorBase {
         setSchemaType(visitor.getSchemaType());
         setCorbaType(visitor.getCorbaType());
         setFullyQualifiedName(visitor.getFullyQualifiedName());
-        
+
     }
 
 }

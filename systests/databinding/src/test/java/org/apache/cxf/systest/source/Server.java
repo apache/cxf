@@ -39,12 +39,12 @@ public class Server extends AbstractBusTestServerBase {
         setBus(bus);
         Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                          new GreeterImpl());
-        
-        Endpoint.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort", 
+
+        Endpoint.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort",
                          new PutLastTradePriceImpl());
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             Server s = new Server();
             s.start();

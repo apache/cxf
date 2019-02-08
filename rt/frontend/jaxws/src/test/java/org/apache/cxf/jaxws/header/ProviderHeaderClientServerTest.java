@@ -32,13 +32,14 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.header_test.rpc.SOAPRPCHeaderService;
+
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProviderHeaderClientServerTest extends AbstractJaxWsTest {
 
@@ -48,9 +49,7 @@ public class ProviderHeaderClientServerTest extends AbstractJaxWsTest {
 
         TestRPCHeaderProvider implementor = new TestRPCHeaderProvider();
         String address = "http://localhost:9104/SoapHeaderRPCContext/SoapHeaderRPCPort";
-        EndpointImpl e = (EndpointImpl)Endpoint.publish(address, implementor);
-        e.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        e.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+        Endpoint.publish(address, implementor);
     }
 
     @Test

@@ -19,17 +19,18 @@
 
 package org.apache.cxf.binding.soap.blueprint;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
- * 
+ *
  */
-public class SoapBindingBPHandlerTest extends Assert {
+public class SoapBindingBPHandlerTest {
     @Test
     public void testGetSchemaLocation() {
         SoapBindingBPHandler handler = new SoapBindingBPHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/bindings/soap"));
     }
 }

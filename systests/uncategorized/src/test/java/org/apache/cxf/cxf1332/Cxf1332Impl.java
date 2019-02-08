@@ -25,12 +25,12 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 @WebService(targetNamespace = "urn:org.apache.cxf.1332")
 public class Cxf1332Impl implements Cxf1332 {
     private static String[] lastStrings;
-    
+
     /** {@inheritDoc}*/
     @WebMethod(operationName = "SendData", action = "")
     @WebResult(name = "result", targetNamespace = "urn:org.apache.cxf.1332.result")

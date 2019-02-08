@@ -34,12 +34,12 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -48,7 +48,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractEndpointFactory.class);
     private static final String PRIVATE_ENDPOINT = "org.apache.cxf.endpoint.private";
     private static final String PRIVATE_ENDPOINTS = "org.apache.cxf.private.endpoints";
-    
+
     protected Bus bus;
     protected String address;
     protected String transportId;
@@ -80,14 +80,14 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     public Bus getBus() {
         return getBus(true);
     }
-    
+
     public Bus getBus(boolean createIfNeeded) {
         if (bus == null && createIfNeeded) {
             bus = BusFactory.getThreadDefaultBus();
         }
         return bus;
     }
-    
+
     public void setBus(Bus bus) {
         this.bus = bus;
     }
@@ -139,15 +139,15 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     public void setEndpointName(QName endpointName) {
         this.endpointName = endpointName;
     }
-    
+
     public void setServiceName(QName name) {
         serviceName = name;
     }
-    
+
     public QName getServiceName() {
         return serviceName;
     }
-    
+
     public void setEndpointReference(EndpointReferenceType epr) {
         endpointReference = epr;
     }
@@ -157,7 +157,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
     public Map<String, Object> getProperties(boolean create) {
         if (create && properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         return properties;
     }
@@ -168,7 +168,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
 
     public List<Feature> getFeatures() {
         if (features == null) {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         return features;
     }
@@ -180,9 +180,9 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     public BindingFactory getBindingFactory() {
         return bindingFactory;
     }
-    
+
     public void setBindingFactory(BindingFactory bf) {
-        this.bindingFactory  = bf;
+        this.bindingFactory = bf;
     }
 
     public ConduitSelector getConduitSelector() {
@@ -204,7 +204,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     /**
      * Checks if a given endpoint has been marked as private.
      * If yes then its address will be added to a bus list property
-     * Note that client factories might also check the endpoint, ex, 
+     * Note that client factories might also check the endpoint, ex,
      * if the endpoint if private then it is likely no service contract
      * will be available if requested from the remote address hence it has to
      * be availbale locally or generated from the local source
@@ -212,11 +212,11 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
      */
     @SuppressWarnings("unchecked")
     protected boolean checkPrivateEndpoint(Endpoint ep) {
-        if (MessageUtils.isTrue(ep.get(PRIVATE_ENDPOINT))) {
-            List<String> addresses = 
+        if (PropertyUtils.isTrue(ep.get(PRIVATE_ENDPOINT))) {
+            List<String> addresses =
                 (List<String>)getBus().getProperty(PRIVATE_ENDPOINTS);
             if (addresses == null) {
-                addresses = new LinkedList<String>();
+                addresses = new LinkedList<>();
             }
             addresses.add(getAddress());
             bus.setProperty(PRIVATE_ENDPOINTS, addresses);
@@ -240,8 +240,8 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
         if (initializeAnnotationInterceptors(provider, ep)) {
             LOG.fine("Added annotation based interceptors and features");
         }
-    }    
-    
+    }
+
     protected static void addToBeans(Collection<Object> beans, Object o) {
         if (o instanceof Collection) {
             for (Object o2: (Collection<?>)o) {
@@ -251,7 +251,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
             beans.add(o);
         }
     }
-    
+
     protected boolean initializeAnnotationInterceptors(AnnotationInterceptors provider, Endpoint ep) {
         boolean hasAnnotation = false;
         if (provider.getInFaultInterceptors() != null) {
@@ -274,7 +274,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
             getFeatures().addAll(provider.getFeatures());
             hasAnnotation = true;
         }
-        
+
         return hasAnnotation;
     }
 }

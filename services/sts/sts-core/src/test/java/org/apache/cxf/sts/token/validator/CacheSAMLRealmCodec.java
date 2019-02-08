@@ -27,7 +27,7 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
  * This class returns a realm associated with a SAML Assertion depending on the issuer.
  */
 public class CacheSAMLRealmCodec implements SAMLRealmCodec {
-    
+
     /**
      * Get the realm associated with the SamlAssertionWrapper parameter
      * @param assertion a SAML Assertion wrapper object

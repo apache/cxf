@@ -30,19 +30,19 @@ import org.apache.wss4j.dom.validate.Credential;
 import org.apache.wss4j.dom.validate.SignatureTrustValidator;
 
 public class TrustValidator {
-    public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey) 
+    public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey)
         throws WSSecurityException {
         validateTrust(crypto, cert, publicKey, null);
     }
-    
+
     public void validateTrust(Crypto crypto, X509Certificate cert, PublicKey publicKey,
-                              Collection<Pattern> subjectCertConstraints) 
+                              Collection<Pattern> subjectCertConstraints)
         throws WSSecurityException {
         SignatureTrustValidator validator = new SignatureTrustValidator();
         RequestData data = new RequestData();
         data.setSigVerCrypto(crypto);
         data.setSubjectCertConstraints(subjectCertConstraints);
-        
+
         Credential trustCredential = new Credential();
         trustCredential.setPublicKey(publicKey);
         if (cert != null) {

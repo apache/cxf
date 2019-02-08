@@ -26,25 +26,30 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.BeforeClass;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some tests where the STS address is not hard-coded in the client
  */
 public class IssuerTest extends AbstractBusClientServerTestBase {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     // These tests require port numbers in the WSDLs and so we can't easily do variable substitution
     private static boolean portFree = true;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,11 +58,11 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(Server.class, true)
         );
-        
+
         try {
             ServerSocket sock = new ServerSocket(30101);
             sock.close();
-            
+
             assertTrue(
                        "Server failed to launch",
                        // run the server in the same process
@@ -69,7 +74,7 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
             // portFree is set to false + the test won't run
         }
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -81,22 +86,22 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
     // Policy. Useful if you want a simple way to avoid hardcoding the STS host/port in the client.
     @org.junit.Test
     public void testSAML1Issuer() throws Exception {
-        
+
         if (!portFree) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = IssuerTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
 
@@ -105,26 +110,26 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     // Test getting the STS details via WS-MEX
     @org.junit.Test
     public void testSAML2MEX() throws Exception {
-        
+
         if (!portFree) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = IssuerTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-        DoubleItPortType transportSaml2Port = 
+        DoubleItPortType transportSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, PORT);
 
@@ -133,26 +138,26 @@ public class IssuerTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     // Test getting the STS details via WS-MEX + SOAP 1.2
     @org.junit.Test
     public void testSAML2MEXSoap12() throws Exception {
-        
+
         if (!portFree) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = IssuerTest.class.getResource("cxf-client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = IssuerTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Soap12Port");
-        DoubleItPortType transportSaml2Port = 
+        DoubleItPortType transportSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, PORT);
 

@@ -34,37 +34,38 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
+
 import org.junit.Assert;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @Resource
     WebServiceContext wsc;
 
     public int doubleIt(int numberToDouble) {
         Principal pr = wsc.getUserPrincipal();
-        
+
         Assert.assertNotNull("Principal must not be null", pr);
         Assert.assertNotNull("Principal.getName() must not return null", pr.getName());
-        
+
         URL wsdl = IntermediaryPortTypeImpl.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         try {
             updateAddressPort(transportPort, IntermediaryTransformationTest.PORT2);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         if ("standalone".equals(System.getProperty("sts.deployment"))) {
             Map<String, Object> context = ((BindingProvider)transportPort).getRequestContext();
             STSClient stsClient = (STSClient)context.get(SecurityConstants.STS_CLIENT);
@@ -84,8 +85,8 @@ public class IntermediaryPortTypeImpl extends AbstractBusClientServerTestBase im
                 }
             }
         }
-        
+
         return transportPort.doubleIt(numberToDouble);
     }
-    
+
 }

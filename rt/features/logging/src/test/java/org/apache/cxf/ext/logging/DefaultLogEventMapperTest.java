@@ -18,20 +18,13 @@
  */
 package org.apache.cxf.ext.logging;
 
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.binding.Binding;
-import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.service.model.ServiceInfo;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,7 +41,7 @@ public class DefaultLogEventMapperTest {
         LogEvent event = mapper.map(message);
         Assert.assertEquals("GET[test]", event.getOperationName());
     }
-    
+
     /**
      * Test for NPE described in CXF-6436
      */
@@ -63,23 +56,6 @@ public class DefaultLogEventMapperTest {
         LogEvent event = mapper.map(message);
         Assert.assertEquals("", event.getOperationName());
     }
-    
-    @Test
-    public void testSoap() {
-        DefaultLogEventMapper mapper = new DefaultLogEventMapper();
-        Message message = new MessageImpl();
-        ExchangeImpl exchange = new ExchangeImpl();
-        ServiceInfo service = new ServiceInfo();
-        BindingInfo info = new BindingInfo(service, "bindingId");
-        SoapBinding value = new SoapBinding(info);
-        exchange.put(Binding.class, value);
-        OperationInfo opInfo = new OperationInfo();
-        opInfo.setName(new QName("http://my", "Operation"));
-        BindingOperationInfo boi = new BindingOperationInfo(info, opInfo);
-        exchange.put(BindingOperationInfo.class, boi);
-        message.setExchange(exchange);
-        LogEvent event = mapper.map(message);
-        Assert.assertEquals("{http://my}Operation", event.getOperationName());
-    }
+
 
 }

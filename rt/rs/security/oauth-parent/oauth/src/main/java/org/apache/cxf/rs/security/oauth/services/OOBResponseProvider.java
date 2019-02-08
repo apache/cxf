@@ -36,7 +36,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import net.oauth.OAuth;
-
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
@@ -44,47 +43,47 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthConstants;
 @Produces({"application/x-www-form-urlencoded" })
 @Consumes({"application/x-www-form-urlencoded" })
 @Provider
-public class OOBResponseProvider implements 
+public class OOBResponseProvider implements
     MessageBodyReader<OOBAuthorizationResponse>, MessageBodyWriter<OOBAuthorizationResponse> {
-        
-    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<Form>();
-    
-    public boolean isReadable(Class<?> type, Type genericType, 
+
+    private FormEncodingProvider<Form> formProvider = new FormEncodingProvider<>();
+
+    public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mt) {
         return OOBAuthorizationResponse.class.isAssignableFrom(type);
     }
 
     public OOBAuthorizationResponse readFrom(
-        Class<OOBAuthorizationResponse> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
+        Class<OOBAuthorizationResponse> clazz, Type genericType, Annotation[] annotations, MediaType mt,
         MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         Form form = formProvider.readFrom(Form.class, Form.class, annotations, mt, headers, is);
         MultivaluedMap<String, String> data = form.asMap();
         OOBAuthorizationResponse resp = new OOBAuthorizationResponse();
-        
+
         resp.setRequestToken(data.getFirst(OAuth.OAUTH_TOKEN));
         resp.setVerifier(data.getFirst(OAuth.OAUTH_VERIFIER));
         resp.setState(data.getFirst(OAuthConstants.X_OAUTH_STATE));
-        
+
         return resp;
     }
 
-    
-    public long getSize(OOBAuthorizationResponse t, Class<?> type, 
-                        Type genericType, Annotation[] annotations, 
+
+    public long getSize(OOBAuthorizationResponse t, Class<?> type,
+                        Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                MediaType mt) {
         return OOBAuthorizationResponse.class.isAssignableFrom(type);
     }
-    
-    public void writeTo(OOBAuthorizationResponse obj, Class<?> c, Type t, 
-                        Annotation[] anns, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+
+    public void writeTo(OOBAuthorizationResponse obj, Class<?> c, Type t,
+                        Annotation[] anns,
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
-        
+
         Form form = new Form(new MetadataMap<String, String>());
         form.param(OAuth.OAUTH_VERIFIER, obj.getVerifier());
         form.param(OAuth.OAUTH_TOKEN, obj.getRequestToken());

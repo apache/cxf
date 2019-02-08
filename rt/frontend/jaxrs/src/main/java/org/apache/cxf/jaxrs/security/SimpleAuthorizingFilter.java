@@ -32,7 +32,8 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public class SimpleAuthorizingFilter implements ContainerRequestFilter {
 
     private AbstractAuthorizingInInterceptor interceptor;
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         try {
             interceptor.handleMessage(JAXRSUtils.getCurrentMessage());

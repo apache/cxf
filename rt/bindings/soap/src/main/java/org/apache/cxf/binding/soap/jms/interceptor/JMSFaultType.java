@@ -36,11 +36,11 @@ public class JMSFaultType {
     @XmlAnyElement(lax = true)
     protected List<Object> any;
     @XmlAnyAttribute
-    private Map<QName, String> otherAttributes = new HashMap<QName, String>();
+    private Map<QName, String> otherAttributes = new HashMap<>();
 
     /**
      * Gets the value of the faultCode property.
-     * 
+     *
      * @return possible object is {@link QName }
      */
     public QName getFaultCode() {
@@ -49,7 +49,7 @@ public class JMSFaultType {
 
     /**
      * Sets the value of the faultCode property.
-     * 
+     *
      * @param value allowed object is {@link QName }
      */
     public void setFaultCode(QName value) {
@@ -68,7 +68,7 @@ public class JMSFaultType {
      * <CODE>set</CODE> method for the any property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getAny().add(newItem);
      * </pre>
@@ -77,7 +77,7 @@ public class JMSFaultType {
      */
     public List<Object> getAny() {
         if (any == null) {
-            any = new ArrayList<Object>();
+            any = new ArrayList<>();
         }
         return this.any;
     }
@@ -96,7 +96,7 @@ public class JMSFaultType {
      * the map is keyed by the name of the attribute and the value is the string value of the attribute. the
      * map returned by this method is live, and you can add new attribute by updating the map directly.
      * Because of this design, there's no setter.
-     * 
+     *
      * @return always non-null
      */
     public Map<QName, String> getOtherAttributes() {

@@ -34,11 +34,11 @@ public class LogicalMessageContextImpl extends WrappedMessageContext implements 
     public LogicalMessageContextImpl(Message wrapped) {
         super(wrapped, Scope.HANDLER);
     }
-      
+
     public LogicalMessage getMessage() {
         return new LogicalMessageImpl(this);
     }
-    
+
     public Object get(Object key) {
         Object o = super.get(key);
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)
@@ -47,10 +47,10 @@ public class LogicalMessageContextImpl extends WrappedMessageContext implements 
             if (((Map<?, ?>)o).isEmpty()) {
                 return null;
             }
-            if (!isResponse() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
+            if (!isResponse() && isOutbound() && MessageContext.HTTP_RESPONSE_HEADERS.equals(key)) {
                 return null;
             }
-            if (isRequestor() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
+            if (isRequestor() && !isOutbound() && MessageContext.HTTP_REQUEST_HEADERS.equals(key)) {
                 return null;
             }
         }

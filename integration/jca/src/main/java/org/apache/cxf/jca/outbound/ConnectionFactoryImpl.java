@@ -42,7 +42,7 @@ public class ConnectionFactoryImpl implements CXFConnectionFactory {
     }
 
     public void setReference(Reference reference) {
-        this.reference = reference; 
+        this.reference = reference;
     }
 
     public Reference getReference() throws NamingException {

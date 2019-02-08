@@ -22,6 +22,7 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.wsdl.Definition;
 import javax.wsdl.Operation;
 import javax.wsdl.PortType;
@@ -32,11 +33,14 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class JAXWSDefinitionBuilderTest extends Assert {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class JAXWSDefinitionBuilderTest {
     private ToolContext env;
 
     @Before
@@ -157,8 +161,6 @@ public class JAXWSDefinitionBuilderTest extends Assert {
 
         // this call will fail before CXF-556
         builder.customize();
-
-        assertTrue(true);
     }
 
     @Test
@@ -171,7 +173,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.build();
 
         Definition def = builder.getWSDLModel();
-        assertTrue(def.getServices().keySet().contains(new QName("http://apache.org/hello_world_soap_http", 
+        assertTrue(def.getServices().keySet().contains(new QName("http://apache.org/hello_world_soap_http",
                                                                  "SOAPService")));
     }
 }

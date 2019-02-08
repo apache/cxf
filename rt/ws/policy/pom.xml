@@ -27,14 +27,17 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.1-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
+        <cxf.module.name>org.apache.cxf.ws.policy</cxf.module.name>
         <cxf.bundle.activator>org.apache.cxf.ws.policy.blueprint.Activator</cxf.bundle.activator>
         <cxf.osgi.import>
             org.springframework*;resolution:="optional";version="${cxf.osgi.spring.version}",
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
+            javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
+            javax.annotation*;version="${cxf.osgi.javax.annotation.version}"
         </cxf.osgi.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
@@ -128,6 +131,8 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-policy-200409.xsd</xsd>
@@ -137,6 +142,9 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/src/main/resources/schemas/ws-policy-200607.xsd</xsd>
@@ -146,8 +154,14 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/oasis_open</deleteDir>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/w3</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
+                            <extensions>
+                                <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                            </extensions>
                         </configuration>
                         <goals>
                             <goal>xsdtojava</goal>
@@ -180,6 +194,7 @@
                         <phase>generate-test-sources</phase>
                         <configuration>
                             <fork>${cxf.codegenplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>

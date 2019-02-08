@@ -42,19 +42,20 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
     private static final String SAML2_NS = "urn:oasis:names:tc:SAML:2.0:assertion";
     private static final String SAML1_NS = "urn:oasis:names:tc:SAML:1.0:assertion";
     private static final String SAML_ASSERTION = "Assertion";
-    
+
     private boolean bodyIsRoot;
-    
+
     public SamlEnvelopedInHandler() {
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         if (HttpMethod.GET.equals(method)) {
             return;
         }
-        
+
         Document doc = null;
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
@@ -82,10 +83,10 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
             throwFault("SAML Assertion is not available", null);
         }
         validateToken(message, samlElement);
-        
+
         doc.getDocumentElement().removeChild(samlElement);
         if (bodyIsRoot) {
-            message.setContent(XMLStreamReader.class, 
+            message.setContent(XMLStreamReader.class,
                                new W3CDOMStreamReader(doc));
             message.setContent(InputStream.class, null);
         } else {
@@ -93,13 +94,13 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
             if (actualBody != null) {
                 Document newDoc = DOMUtils.createDocument();
                 newDoc.adoptNode(actualBody);
-                message.setContent(XMLStreamReader.class, 
+                message.setContent(XMLStreamReader.class,
                         new W3CDOMStreamReader(actualBody));
                 message.setContent(InputStream.class, null);
             }
         }
     }
-    
+
     private Element getActualBody(Element root) {
         Element node = DOMUtils.getFirstElement(root);
         if (node != null) {
@@ -107,12 +108,12 @@ public class SamlEnvelopedInHandler extends AbstractSamlInHandler {
         }
         return node;
     }
-    
+
     protected Element getNode(Element parent, String ns, String name) {
         NodeList list = parent.getElementsByTagNameNS(ns, name);
         if (list != null && list.getLength() == 1) {
             return (Element)list.item(0);
-        } 
+        }
         return null;
     }
 

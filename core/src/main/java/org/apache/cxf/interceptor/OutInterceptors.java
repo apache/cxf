@@ -28,16 +28,16 @@ import org.apache.cxf.message.Message;
 
 
 /**
- * Specifies a list of classes that are added to the outbound 
- * interceptor chain. This annotation effects SEI classes and service 
+ * Specifies a list of classes that are added to the outbound
+ * interceptor chain. This annotation effects SEI classes and service
  * implementation classes.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OutInterceptors {
-    
+
     String[] interceptors() default { };
-    
+
     Class<? extends Interceptor<? extends Message>>[] classes() default { };
-    
+
 }

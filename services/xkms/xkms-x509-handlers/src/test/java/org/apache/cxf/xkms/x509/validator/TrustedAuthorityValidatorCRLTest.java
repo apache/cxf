@@ -32,6 +32,7 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.xkms.handlers.Applications;
 import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
 import org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,13 +70,13 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
         subjectDN = certificateWss40Rev.getSubjectX500Principal().getName();
         aliceKey.setIdentifier(subjectDN);
         certificateRepo.saveCACertificate(certificateWss40Rev, aliceKey);
-        
+
         UseKeyWithType bobKey = new UseKeyWithType();
         bobKey.setApplication(Applications.PKIX.getUri());
         subjectDN = certificateWss40.getSubjectX500Principal().getName();
         bobKey.setIdentifier(subjectDN);
         certificateRepo.saveCACertificate(certificateWss40, bobKey);
-        
+
         UseKeyWithType crlKey = new UseKeyWithType();
         crlKey.setApplication(Applications.PKIX.getUri());
         crlKey.setIdentifier(crl.getIssuerX500Principal().getName());
@@ -99,7 +100,7 @@ public class TrustedAuthorityValidatorCRLTest extends BasicValidationTest {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate)cf.generateCertificate(inputStream);
     }
-    
+
     private static X509CRL readCRL(String path) throws CertificateException, CRLException {
         InputStream inputStream = TrustedAuthorityValidatorCRLTest.class.getResourceAsStream(PATH_TO_RESOURCES
                                                                                           + path);

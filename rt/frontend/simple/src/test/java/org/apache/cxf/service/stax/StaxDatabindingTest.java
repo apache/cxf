@@ -33,13 +33,14 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.staxutils.FragmentStreamReader;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 public class StaxDatabindingTest extends AbstractCXFTest {
     @Test
     public void testCallback() throws Exception {
         String address = "local://foo";
-        
+
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceBean(new CallbackService());
         sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
@@ -48,16 +49,16 @@ public class StaxDatabindingTest extends AbstractCXFTest {
         sf.getFeatures().add(new StaxDataBindingFeature());
         sf.setBus(getBus());
         sf.create();
-        
+
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "req.xml");
-        
+
         assertValid("//bleh", res);
     }
-    
+
     @Test
     public void testCopy() throws Exception {
         String address = "local://foo";
-        
+
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceBean(new CopyService());
         sf.setBus(getBus());
@@ -66,14 +67,14 @@ public class StaxDatabindingTest extends AbstractCXFTest {
         sf.setDataBinding(new StaxDataBinding());
         sf.getFeatures().add(new StaxDataBindingFeature());
         sf.create().start();
-        
+
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "req.xml");
-        
+
         //DOMUtils.writeXml(res, System.out);
         addNamespace("a", "http://stax.service.cxf.apache.org/");
         assertValid("//a:bleh", res);
     }
-    
+
     public static class CallbackService {
         public XMLStreamWriterCallback invoke(final XMLStreamReader reader) {
             try {
@@ -81,17 +82,17 @@ public class StaxDatabindingTest extends AbstractCXFTest {
             } catch (XMLStreamException e) {
                 throw new Fault(e);
             }
-            
+
             return new XMLStreamWriterCallback() {
 
                 public void write(XMLStreamWriter writer) throws Fault, XMLStreamException {
                     writer.writeEmptyElement("bleh");
                 }
-                
+
             };
         }
     }
-    
+
     public static class CopyService {
         public XMLStreamReader invoke(final XMLStreamReader reader) {
             return new FragmentStreamReader(reader);

@@ -25,11 +25,12 @@ import javax.ws.rs.ServiceUnavailableException;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class DateHeaderProviderTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+
+public class DateHeaderProviderTest {
+
     @Test
     public void testToFromSimpleString() {
         Date retry = new Date();
@@ -37,7 +38,7 @@ public class DateHeaderProviderTest extends Assert {
         Date retry2 = ex.getRetryTime(new Date());
         assertEquals(HttpUtils.toHttpDate(retry), HttpUtils.toHttpDate(retry2));
     }
-    
-    
-        
+
+
+
 }

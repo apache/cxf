@@ -21,7 +21,7 @@ package demo.jms_greeter.server;
 import java.util.logging.Logger;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 
-@javax.jws.WebService(portName = "GreeterPort", 
+@javax.jws.WebService(portName = "GreeterPort",
                       serviceName = "JMSGreeterService",
                       targetNamespace = "http://cxf.apache.org/jms_greeter",
                       endpointInterface = "org.apache.cxf.jms_greeter.JMSGreeterPortType",
@@ -42,7 +42,7 @@ public class GreeterJMSImpl implements JMSGreeterPortType {
         System.out.println("Executing operation sayHi" + "\n");
         return "Bonjour";
     }
-    
+
     public void greetMeOneWay(String me) {
         LOG.info("Executing operation greetMeOneWay");
         System.out.println("Executing operation greetMeOneWay\n");

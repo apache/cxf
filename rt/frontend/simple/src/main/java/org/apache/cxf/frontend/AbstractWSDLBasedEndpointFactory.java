@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
+import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.common.i18n.Message;
@@ -55,7 +56,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
     private Class<?> serviceClass;
     private ReflectionServiceFactoryBean serviceFactory;
-    
+
     protected AbstractWSDLBasedEndpointFactory(ReflectionServiceFactoryBean sbean) {
         serviceFactory = sbean;
         serviceClass = sbean.getServiceClass();
@@ -66,7 +67,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
     protected AbstractWSDLBasedEndpointFactory() {
     }
 
-    
+
     private class SoapBindingServiceConfiguration extends AbstractServiceConfiguration {
         public String getStyle() {
             if (getBindingConfig() instanceof SoapBindingConfiguration
@@ -84,39 +85,40 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             return null;
         }
     }
-    
-    protected Endpoint createEndpoint() throws BusException, EndpointException {        
+
+    protected Endpoint createEndpoint() throws BusException, EndpointException {
         serviceFactory.setFeatures(getFeatures());
         if (serviceName != null) {
             serviceFactory.setServiceName(serviceName);
         }
-        
+
         if (endpointName != null) {
-            serviceFactory.setEndpointName(endpointName);    
+            serviceFactory.setEndpointName(endpointName);
         }
-        
+
         Service service = serviceFactory.getService();
-        
+
         if (service == null) {
             initializeServiceFactory();
             service = serviceFactory.create();
         }
-        
+
         if (endpointName == null) {
             endpointName = serviceFactory.getEndpointName();
         }
         EndpointInfo ei = service.getEndpointInfo(endpointName);
-        
+
         if (ei != null) {
-            if (transportId != null
-                && !ei.getTransportId().equals(transportId)) {
+            if ((transportId != null
+                && !ei.getTransportId().equals(transportId))
+                || (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId))) {
                 ei = null;
             } else {
                 BindingFactoryManager bfm = getBus().getExtension(BindingFactoryManager.class);
                 bindingFactory = bfm.getBindingFactory(ei.getBinding().getBindingId());
             }
         }
-        
+
         if (ei == null) {
             if (getAddress() == null) {
                 ei = ServiceModelUtil.findBestEndpointInfo(serviceFactory.getInterfaceName(), service
@@ -132,43 +134,50 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 }
 
                 if (ei == null) {
-                    LOG.warning("Could not find endpoint/port for " 
+                    LOG.warning("Could not find endpoint/port for "
                                 + endpointName + " in wsdl. Creating default.");
                 } else if (!ei.getName().equals(endpointName)) {
-                    LOG.warning("Could not find endpoint/port for " 
-                                + endpointName + " in wsdl. Using " 
-                                + ei.getName() + ".");                        
+                    LOG.warning("Could not find endpoint/port for "
+                                + endpointName + " in wsdl. Using "
+                                + ei.getName() + ".");
                 }
             }
             if (ei == null) {
                 ei = createEndpointInfo(null);
             } else if (transportId != null
                     && !ei.getTransportId().equals(transportId)) {
-                LOG.warning("Transport for endpoint/port " 
+                LOG.warning("Transport for endpoint/port "
                     + endpointName + " in wsdl doesn't match " + transportId + ".");
                 BindingInfo bi = ei.getBinding();
                 ei = createEndpointInfo(bi);
+            } else if (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId)
+                //consider SoapBinding has multiple default namespace
+                && !(SoapBindingFactory.DEFAULT_NAMESPACES.contains(bindingId)
+                    && SoapBindingFactory.DEFAULT_NAMESPACES.contains(ei.getBinding().getBindingId()))) {
+                LOG.warning("Binding for endpoint/port "
+                    + endpointName + " in wsdl doesn't match " + bindingId + ".");
+                ei = createEndpointInfo(null);
             } else if (getAddress() != null) {
                 ei.setAddress(getAddress());
                 if (ei.getAddress().startsWith("camel")
                         || ei.getAddress().startsWith("local")) {
                     modifyTransportIdPerAddress(ei);
                 }
-                
+
             }
         } else if (getAddress() != null) {
-            ei.setAddress(getAddress()); 
+            ei.setAddress(getAddress());
         }
 
         if (publishedEndpointUrl != null && !"".equals(publishedEndpointUrl)) {
             ei.setProperty("publishedEndpointUrl", publishedEndpointUrl);
         }
-        
+
         if (endpointReference != null) {
             ei.setAddress(endpointReference);
         }
         Endpoint ep = service.getEndpoints().get(ei.getName());
-        
+
         if (ep == null) {
             ep = serviceFactory.createEndpoint(ei);
             ((EndpointImpl)ep).initializeActiveFeatures(getFeatures());
@@ -178,13 +187,13 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                 ((EndpointImpl)ep).initializeActiveFeatures(getFeatures());
             }
         }
-        
+
         if (properties != null) {
             ep.putAll(properties);
         }
-        
+
         service.getEndpoints().put(ep.getEndpointInfo().getName(), ep);
-        
+
         if (getInInterceptors() != null) {
             ep.getInInterceptors().addAll(getInInterceptors());
             ep.getInInterceptors().add(WSDLGetInterceptor.INSTANCE);
@@ -244,10 +253,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
     protected abstract String detectTransportIdFromAddress(String ad);
     protected abstract WSDLEndpointFactory getWSDLEndpointFactory();
-    
+
     protected EndpointInfo createEndpointInfo(BindingInfo bindingInfo) throws BusException {
         // setup the transport ID for the soap over jms if there is only address information
-        if (transportId == null && getAddress() != null 
+        if (transportId == null && getAddress() != null
             && getAddress().startsWith("jms:") && !"jms://".equals(getAddress())) {
             // Set the transportId to be soap over jms transport
             transportId = SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID;
@@ -269,7 +278,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             if (bindingInfo instanceof SoapBindingInfo) {
                 transportId = ((SoapBindingInfo)bindingInfo).getTransportURI();
             }
-            if (transportId == null 
+            if (transportId == null
                 && getAddress() != null
                 && getAddress().contains("://")) {
                 transportId = detectTransportIdFromAddress(getAddress());
@@ -280,7 +289,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         }
 
         setTransportId(transportId);
-        
+
         WSDLEndpointFactory wsdlEndpointFactory = getWSDLEndpointFactory();
         EndpointInfo ei;
         if (wsdlEndpointFactory != null) {
@@ -291,40 +300,40 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         }
         int count = 1;
         while (service.getEndpointInfo(endpointName) != null) {
-            endpointName = new QName(endpointName.getNamespaceURI(), 
+            endpointName = new QName(endpointName.getNamespaceURI(),
                                      endpointName.getLocalPart() + count);
             count++;
         }
         ei.setName(endpointName);
         ei.setAddress(getAddress());
         ei.setBinding(bindingInfo);
-        
+
         if (wsdlEndpointFactory != null) {
             wsdlEndpointFactory.createPortExtensors(bus, ei, service);
         }
         service.getServiceInfos().get(0).addEndpoint(ei);
-        
+
         serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINTINFO_CREATED, ei);
         return ei;
     }
 
-    
+
     protected SoapBindingConfiguration createSoapBindingConfig() {
         return new SoapBindingConfiguration();
     }
     protected BindingInfo createBindingInfo() {
         BindingFactoryManager mgr = bus.getExtension(BindingFactoryManager.class);
         String binding = bindingId;
-        
+
         if (binding == null && bindingConfig != null) {
             binding = bindingConfig.getBindingId();
         }
-        
+
         if (binding == null) {
             // default to soap binding
             binding = "http://schemas.xmlsoap.org/soap/";
         }
-        
+
         try {
             if (binding.contains("/soap")) {
                 if (bindingConfig == null) {
@@ -337,10 +346,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             }
 
             bindingFactory = mgr.getBindingFactory(binding);
-            
+
             BindingInfo inf = bindingFactory.createBindingInfo(serviceFactory.getService(),
                                                     binding, bindingConfig);
-            
+
             for (BindingOperationInfo boi : inf.getOperations()) {
                 serviceFactory.updateBindingOperation(boi);
                 Method m = serviceFactory.getMethodDispatcher().getMethod(boi);

@@ -31,21 +31,21 @@ import org.apache.cxf.staxutils.transform.OutTransformWriter;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 
-public class MappingBeanDefinitionParser 
+public class MappingBeanDefinitionParser
     extends org.springframework.beans.factory.xml.AbstractBeanDefinitionParser {
-    
+
     private final Map<String, String> transformMap;
     public MappingBeanDefinitionParser(String oldns, String newns) {
         transformMap = Collections.singletonMap("{" + oldns + "}*", "{" + newns + "}*");
     }
-    
+
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
         element = transformElement(element);
         return (AbstractBeanDefinition)parserContext.getDelegate().parseCustomElement(element);
     }
     private Element transformElement(Element element) {
-        
+
         W3CDOMStreamWriter domWriter = new W3CDOMStreamWriter();
         OutTransformWriter transformWriter = new OutTransformWriter(domWriter, transformMap);
         try {

@@ -19,13 +19,14 @@
 
 package org.apache.cxf.common.util;
 
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Test;
 
-public class StringUtilsTest extends Assert {
-    
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class StringUtilsTest {
+
     @Test
     public void testDiff() throws Exception {
         String str1 = "http://local/SoapContext/SoapPort/greetMe/me/CXF";
@@ -35,40 +36,14 @@ public class StringUtilsTest extends Assert {
         assertEquals("greetMe/me/CXF", StringUtils.diff(str1, str3));
         assertEquals("http://local/SoapContext/SoapPort/", StringUtils.diff(str3, str1));
     }
-    
+
     @Test
-    public void testGetFirstNotEmpty() throws Exception {        
-        assertEquals("greetMe", StringUtils.getFirstNotEmpty("/greetMe/me/CXF", "/"));
-        assertEquals("greetMe", StringUtils.getFirstNotEmpty("greetMe/me/CXF", "/"));
-    }
-    
-    @Test
-    public void testGetParts() throws Exception {
-        String str = "/greetMe/me/CXF";
-        List<String> parts = StringUtils.getParts(str, "/");
-        assertEquals(3, parts.size());
-        assertEquals("greetMe", parts.get(0));
-        assertEquals("me", parts.get(1));
-        assertEquals("CXF", parts.get(2));
-    }
-    
-    @Test
-    public void testSplitWithDot() throws Exception {
-        String str = "a.b.c";
-        String[] parts = StringUtils.split(str, "\\.", -1);
-        assertEquals(3, parts.length);
-        assertEquals("a", parts[0]);
-        assertEquals("b", parts[1]);
-        assertEquals("c", parts[2]);
-    }
-    
-    @Test
-    public void testGetFound() throws Exception {
+    public void testGetFirstFound() throws Exception {
         String regex = "velocity-\\d+\\.\\d+\\.jar";
-        
-        assertTrue(StringUtils.isEmpty(StringUtils.getFound("velocity-dep-1.4.jar", regex)));
-        assertFalse(StringUtils.isEmpty(StringUtils.getFound("velocity-1.4.jar", regex)));
-        assertTrue(StringUtils.isEmpty(StringUtils.getFound(null, regex)));
+
+        assertTrue(StringUtils.isEmpty(StringUtils.getFirstFound("velocity-dep-1.4.jar", regex)));
+        assertFalse(StringUtils.isEmpty(StringUtils.getFirstFound("velocity-1.4.jar", regex)));
+        assertTrue(StringUtils.isEmpty(StringUtils.getFirstFound(null, regex)));
     }
 
     @Test
@@ -77,8 +52,8 @@ public class StringUtilsTest extends Assert {
         assertEquals("http://localhost:80/", StringUtils.addDefaultPortIfMissing("http://localhost/"));
         assertEquals("http://localhost:80/abc", StringUtils.addDefaultPortIfMissing("http://localhost/abc"));
         assertEquals("http://localhost:80", StringUtils.addDefaultPortIfMissing("http://localhost:80"));
-        
-        assertEquals("http://localhost:9090", 
+
+        assertEquals("http://localhost:9090",
                      StringUtils.addDefaultPortIfMissing("http://localhost", "9090"));
     }
 }

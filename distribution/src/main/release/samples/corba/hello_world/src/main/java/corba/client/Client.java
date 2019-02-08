@@ -31,7 +31,7 @@ public final class Client {
     private Client() {
         //not consructed
     }
-    
+
     static int run(ORB orb, String[] args) throws UserException {
 
         // Get "hello" object
@@ -62,7 +62,7 @@ public final class Client {
     }
 
     // Standalone program initialization
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         int status = 0;
         ORB orb = null;
 

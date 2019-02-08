@@ -37,6 +37,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.transport.jms.ConnectionFactoryFeature;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -82,7 +83,7 @@ public class ClientMtomXopWithJMSTest {
         for (int i = pre.read(); i != -1; i = pre.read()) {
             fileSize++;
         }
-        Holder<DataHandler> param = new Holder<DataHandler>();
+        Holder<DataHandler> param = new Holder<>();
 
         int count = 50;
         byte[] data = new byte[fileSize * count];
@@ -91,7 +92,7 @@ public class ClientMtomXopWithJMSTest {
         }
 
         param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
-        Holder<String> name = new Holder<String>("call detail");
+        Holder<String> name = new Holder<>("call detail");
         mtomPort.testXop(name, param);
 
         // TODO Why should it fail here?

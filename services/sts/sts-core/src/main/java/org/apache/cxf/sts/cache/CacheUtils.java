@@ -20,12 +20,13 @@
 package org.apache.cxf.sts.cache;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.w3c.dom.Element;
+
 import org.apache.cxf.sts.STSConstants;
 import org.apache.cxf.sts.request.Renewing;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
@@ -36,11 +37,11 @@ public final class CacheUtils {
     private CacheUtils() {
         // complete
     }
-    
+
     public static SecurityToken createSecurityTokenForStorage(
-        Element token, 
+        Element token,
         String tokenIdentifier,
-        Date expiry,
+        Instant expiry,
         Principal principal,
         String realm,
         Renewing renewing
@@ -58,21 +59,21 @@ public final class CacheUtils {
         // Handle Renewing logic
         if (renewing != null) {
             props.put(
-                STSConstants.TOKEN_RENEWING_ALLOW, 
+                STSConstants.TOKEN_RENEWING_ALLOW,
                 String.valueOf(renewing.isAllowRenewing())
             );
             props.put(
-                STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
+                STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY,
                 String.valueOf(renewing.isAllowRenewingAfterExpiry())
             );
         } else {
             props.put(STSConstants.TOKEN_RENEWING_ALLOW, "true");
             props.put(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
         }
-        
+
         return securityToken;
     }
-    
+
     public static void storeTokenInCache(
         SecurityToken securityToken,
         TokenStore cache,

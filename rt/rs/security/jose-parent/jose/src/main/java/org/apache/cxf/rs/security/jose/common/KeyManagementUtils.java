@@ -51,6 +51,7 @@ import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.jwk.JwkException;
 import org.apache.cxf.rs.security.jose.jwk.KeyOperation;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
@@ -60,35 +61,31 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
  */
 public final class KeyManagementUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(KeyManagementUtils.class);
-    
+
     private KeyManagementUtils() {
     }
-    
+
     public static List<String> loadAndEncodeX509CertificateOrChain(Message m, Properties props) {
         X509Certificate[] chain = loadX509CertificateOrChain(m, props);
         return encodeX509CertificateChain(chain);
     }
-    
-    public static String loadDigestAndEncodeX509Certificate(Message m, Properties props) {
+
+    public static String loadDigestAndEncodeX509Certificate(Message m, Properties props, String digestAlgo) {
         X509Certificate[] certs = loadX509CertificateOrChain(m, props);
         if (certs != null && certs.length > 0) {
             try {
-                byte[] digest = 
-                    MessageDigestUtils.createDigest(certs[0].getEncoded(), 
-                                                MessageDigestUtils.ALGO_SHA_1);
+                byte[] digest =
+                    MessageDigestUtils.createDigest(certs[0].getEncoded(), digestAlgo);
                 return Base64UrlUtility.encode(digest);
-            } catch (NoSuchAlgorithmException ex) {
-                LOG.log(Level.FINE, "Error creating digest", ex);
-                throw new JoseException(ex);
-            } catch (CertificateEncodingException ex) {
+            } catch (NoSuchAlgorithmException | CertificateEncodingException ex) {
                 LOG.log(Level.FINE, "Error creating digest", ex);
                 throw new JoseException(ex);
             }
         }
-        
+
         return null;
     }
-    
+
     public static X509Certificate[] loadX509CertificateOrChain(Message m, Properties props) {
         KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
         String alias = props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS);
@@ -102,15 +99,14 @@ public final class KeyManagementUtils {
             Certificate[] certs = keyStore.getCertificateChain(alias);
             if (certs != null) {
                 return Arrays.copyOf(certs, certs.length, X509Certificate[].class);
-            } else {
-                return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
             }
+            return new X509Certificate[]{(X509Certificate)CryptoUtils.loadCertificate(keyStore, alias)};
         } catch (Exception ex) {
             LOG.warning("X509 Certificates can not be created");
             throw new JoseException(ex);
-        }    
+        }
     }
-    
+
     public static PublicKey loadPublicKey(Message m, Properties props) {
         KeyStore keyStore = KeyManagementUtils.loadPersistKeyStore(m, props);
         return CryptoUtils.loadPublicKey(keyStore, props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS));
@@ -129,9 +125,31 @@ public final class KeyManagementUtils {
             throw new JoseException(ex);
         }
     }
-    private static String getMessageProperty(Message m, String keyStoreLocPropPreferred, 
+    public static PublicKey loadPublicKey(String keyStorePropLoc, Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            return KeyManagementUtils.loadPublicKey(null, props);
+        } catch (Exception ex) {
+            LOG.warning("Public key can not be loaded");
+            throw new JoseException(ex);
+        }
+    }
+
+    public static PublicKey loadPublicKey(String keyStoreLoc,
+                                          String keyStorePassword,
+                                          String keyAlias,
+                                          Bus bus) {
+        try {
+            KeyStore keyStore = loadKeyStore(keyStoreLoc, null, keyStorePassword, bus);
+            return CryptoUtils.loadPublicKey(keyStore, keyAlias);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+
+    private static String getMessageProperty(Message m, String keyStoreLocPropPreferred,
                                              String keyStoreLocPropDefault) {
-        String propLoc = 
+        String propLoc =
             (String)MessageUtils.getContextualProperty(m, keyStoreLocPropPreferred, keyStoreLocPropDefault);
         if (propLoc == null) {
             LOG.warning("Properties resource is not identified");
@@ -139,12 +157,12 @@ public final class KeyManagementUtils {
         }
         return propLoc;
     }
-    private static PrivateKey loadPrivateKey(KeyStore keyStore, 
+    private static PrivateKey loadPrivateKey(KeyStore keyStore,
                                             Message m,
-                                            Properties props, 
+                                            Properties props,
                                             KeyOperation keyOper,
                                             String alias) {
-        
+
         String keyPswd = props.getProperty(JoseConstants.RSSEC_KEY_PSWD);
         String theAlias = alias != null ? alias : getKeyId(m, props, JoseConstants.RSSEC_KEY_STORE_ALIAS, keyOper);
         if (theAlias != null) {
@@ -157,7 +175,7 @@ public final class KeyManagementUtils {
         }
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, theAlias);
     }
-    
+
     public static PrivateKey loadPrivateKey(Message m, String keyStoreLocProp, KeyOperation keyOper) {
         return loadPrivateKey(m, keyStoreLocProp, null, keyOper);
     }
@@ -172,9 +190,33 @@ public final class KeyManagementUtils {
             throw new SecurityException(ex);
         }
     }
-    
-    public static String getKeyId(Message m, Properties props, 
-                                  String preferredPropertyName, 
+    public static PrivateKey loadPrivateKey(String keyStoreLoc,
+                                            String keyStorePassword,
+                                            String keyAlias,
+                                            String keyPassword,
+                                            Bus bus) {
+        try {
+            KeyStore keyStore = loadKeyStore(keyStoreLoc, null, keyStorePassword, bus);
+            return CryptoUtils.loadPrivateKey(keyStore,
+                                              keyPassword == null ? new char[]{} : keyPassword.toCharArray(),
+                                              keyAlias);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+
+    public static PrivateKey loadPrivateKey(String keyStorePropLoc,
+                                            Bus bus) {
+        try {
+            Properties props = JoseUtils.loadProperties(keyStorePropLoc, bus);
+            return loadPrivateKey(null, props, null);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+
+    public static String getKeyId(Message m, Properties props,
+                                  String preferredPropertyName,
                                   KeyOperation keyOper) {
         String kid = null;
         String altPropertyName = null;
@@ -191,7 +233,7 @@ public final class KeyManagementUtils {
                 kid = (String)m.getContextualProperty(altPropertyName);
             }
         }
-        
+
         if (kid == null) {
             kid = props.getProperty(preferredPropertyName);
         }
@@ -204,7 +246,7 @@ public final class KeyManagementUtils {
         PrivateKeyPasswordProvider cb = null;
         if (keyOper != null) {
             String propName = keyOper == KeyOperation.SIGN ? JoseConstants.RSSEC_SIGNATURE_KEY_PSWD_PROVIDER
-                : keyOper == KeyOperation.DECRYPT 
+                : keyOper == KeyOperation.DECRYPT
                 ? JoseConstants.RSSEC_DECRYPTION_KEY_PSWD_PROVIDER : null;
             if (propName != null) {
                 if (props.containsKey(propName)) {
@@ -223,7 +265,7 @@ public final class KeyManagementUtils {
         }
         return cb;
     }
-    
+
     public static PrivateKey loadPrivateKey(Message m, Properties props, KeyOperation keyOper) {
         KeyStore keyStore = loadPersistKeyStore(m, props);
         return loadPrivateKey(keyStore, m, props, keyOper, null);
@@ -233,17 +275,22 @@ public final class KeyManagementUtils {
         if (props.containsKey(JoseConstants.RSSEC_KEY_STORE)) {
             keyStore = (KeyStore)props.get(JoseConstants.RSSEC_KEY_STORE);
         }
-        
+
         if (keyStore == null) {
             if (!props.containsKey(JoseConstants.RSSEC_KEY_STORE_FILE)) {
                 LOG.warning("No keystore file has been configured");
                 throw new JoseException("No keystore file has been configured");
             }
             if (m != null) {
-                keyStore = (KeyStore)m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                Object keyStoreProp = m.getExchange().get(props.get(JoseConstants.RSSEC_KEY_STORE_FILE));
+                if (keyStoreProp != null && !(keyStoreProp instanceof KeyStore)) {
+                    throw new JwkException("Unexpected key store class: " + keyStoreProp.getClass().getName());
+                } else {
+                    keyStore = (KeyStore)keyStoreProp;
+                }
             }
         }
-        
+
         if (keyStore == null) {
             Bus bus = m != null ? m.getExchange().getBus() : null;
             keyStore = loadKeyStore(props, bus);
@@ -254,10 +301,16 @@ public final class KeyManagementUtils {
         return keyStore;
     }
     public static KeyStore loadKeyStore(Properties props, Bus bus) {
-        String keyStoreType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
+        String keyStoreType = props.getProperty(JoseConstants.RSSEC_KEY_STORE_TYPE);
         String keyStorePswd = props.getProperty(JoseConstants.RSSEC_KEY_STORE_PSWD);
-        
+
+        return loadKeyStore(keyStoreLoc, keyStoreType, keyStorePswd, bus);
+    }
+    public static KeyStore loadKeyStore(String keyStoreLoc,
+                                        String keyStoreType,
+                                        String keyStorePswd,
+                                        Bus bus) {
         if (keyStorePswd == null) {
             throw new JoseException("No keystore password was defined");
         }
@@ -273,20 +326,20 @@ public final class KeyManagementUtils {
         return encodeX509CertificateChain(Arrays.asList(chain));
     }
     public static List<String> encodeX509CertificateChain(List<X509Certificate> chain) {
-        List<String> encodedChain = new ArrayList<String>(chain.size());
+        List<String> encodedChain = new ArrayList<>(chain.size());
         for (X509Certificate cert : chain) {
             try {
                 encodedChain.add(CryptoUtils.encodeCertificate(cert));
             } catch (Exception ex) {
                 LOG.warning("X509 Certificate can not be encoded");
                 throw new JoseException(ex);
-            }    
+            }
         }
         return encodedChain;
     }
     public static List<X509Certificate> toX509CertificateChain(List<String> base64EncodedChain) {
         if (base64EncodedChain != null) {
-            List<X509Certificate> certs = new ArrayList<X509Certificate>(base64EncodedChain.size());
+            List<X509Certificate> certs = new ArrayList<>(base64EncodedChain.size());
             for (String encodedCert : base64EncodedChain) {
                 try {
                     certs.add((X509Certificate)CryptoUtils.decodeCertificate(encodedCert));
@@ -296,9 +349,8 @@ public final class KeyManagementUtils {
                 }
             }
             return certs;
-        } else {
-            return null;
         }
+        return null;
     }
     //TODO: enhance the certificate validation code
     public static void validateCertificateChain(Properties storeProperties, List<X509Certificate> inCerts) {
@@ -310,13 +362,13 @@ public final class KeyManagementUtils {
         // Initial chain validation, to be enhanced as needed
         try {
             X509CertSelector certSelect = new X509CertSelector();
-            certSelect.setCertificate((X509Certificate) inCerts.get(0));
+            certSelect.setCertificate(inCerts.get(0));
             PKIXBuilderParameters pbParams = new PKIXBuilderParameters(ks, certSelect);
-            pbParams.addCertStore(CertStore.getInstance("Collection", 
+            pbParams.addCertStore(CertStore.getInstance("Collection",
                                                         new CollectionCertStoreParameters(inCerts)));
             pbParams.setMaxPathLength(-1);
             pbParams.setRevocationEnabled(false);
-            CertPathBuilderResult buildResult = CertPathBuilder.getInstance("PKIX").build(pbParams);               
+            CertPathBuilderResult buildResult = CertPathBuilder.getInstance("PKIX").build(pbParams);
             CertPath certPath = buildResult.getCertPath();
             CertPathValidator.getInstance("PKIX").validate(certPath, pbParams);
         } catch (Exception ex) {
@@ -339,7 +391,7 @@ public final class KeyManagementUtils {
         return algo;
     }
 
-    public static Properties loadStoreProperties(Message m, boolean required, 
+    public static Properties loadStoreProperties(Message m, boolean required,
                                                  String storeProp1, String storeProp2) {
         if (m == null) {
             if (required) {
@@ -348,7 +400,7 @@ public final class KeyManagementUtils {
             return null;
         }
         Properties props = null;
-        String propLoc = 
+        String propLoc =
             (String)MessageUtils.getContextualProperty(m, storeProp1, storeProp2);
         if (propLoc != null) {
             try {
@@ -384,39 +436,39 @@ public final class KeyManagementUtils {
         if (props == null) {
             if (required) {
                 LOG.warning("Properties resource is not identified");
-                throw new JoseException();
+                throw new JoseException("Properties resource is not identified");
             }
             props = new Properties();
         }
-        return props; 
+        return props;
     }
-    public static PrivateKey loadPrivateKey(Message m, Properties props, 
-                                            X509Certificate inCert, 
+    public static PrivateKey loadPrivateKey(Message m, Properties props,
+                                            X509Certificate inCert,
                                             KeyOperation keyOper) {
         KeyStore ks = loadPersistKeyStore(m, props);
-        
+
         try {
             String alias = ks.getCertificateAlias(inCert);
             return loadPrivateKey(ks, m, props, keyOper, alias);
-            
+
         } catch (Exception ex) {
             LOG.warning("Private key can not be loaded");
             throw new JoseException(ex);
         }
     }
-    
+
     public static X509Certificate getCertificateFromThumbprint(String thumbprint,
                                                                String digestAlgorithm,
-                                                               Message m, 
+                                                               Message m,
                                                                Properties props) {
         KeyStore ks = loadPersistKeyStore(m, props);
         if (ks == null || thumbprint == null) {
             return null;
         }
-        
+
         try {
             byte[] decodedThumbprint = Base64UrlUtility.decode(thumbprint);
-            
+
             for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
                 Certificate[] certs = ks.getCertificateChain(alias);
@@ -427,10 +479,10 @@ public final class KeyManagementUtils {
                         certs = new Certificate[]{cert};
                     }
                 }
-                
+
                 if (certs != null && certs.length > 0 && certs[0] instanceof X509Certificate) {
                     X509Certificate x509cert = (X509Certificate) certs[0];
-                    byte[] data = 
+                    byte[] data =
                         MessageDigestUtils.createDigest(x509cert.getEncoded(), digestAlgorithm);
 
                     if (Arrays.equals(data, decodedThumbprint)) {
@@ -438,20 +490,24 @@ public final class KeyManagementUtils {
                     }
                 }
             }
-        } catch (KeyStoreException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (CertificateEncodingException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (NoSuchAlgorithmException e) {
-            LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
-            throw new JoseException(e);
-        } catch (Base64Exception e) {
+        } catch (KeyStoreException | CertificateEncodingException | NoSuchAlgorithmException | Base64Exception e) {
             LOG.log(Level.WARNING, "X509Certificate can not be loaded: ", e);
             throw new JoseException(e);
         }
-        
+
         return null;
+    }
+
+    public static void setSha1DigestHeader(JoseHeaders headers, Message m, Properties props) {
+        String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_1);
+        if (digest != null) {
+            headers.setX509Thumbprint(digest);
+        }
+    }
+    public static void setSha256DigestHeader(JoseHeaders headers, Message m, Properties props) {
+        String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_256);
+        if (digest != null) {
+            headers.setX509ThumbprintSHA256(digest);
+        }
     }
 }

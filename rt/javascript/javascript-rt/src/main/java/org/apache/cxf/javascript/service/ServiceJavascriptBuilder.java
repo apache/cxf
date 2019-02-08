@@ -94,7 +94,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
     // Javascript parameter names for the input parameters,
     // derived from the parts.
-    private List<String> inputParameterNames = new ArrayList<String>();
+    private List<String> inputParameterNames = new ArrayList<>();
     // when not wrapped, we use this to keep track of the bits.
     private List<ParticleInfo> unwrappedElementsAndNames;
 
@@ -144,12 +144,12 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         code.append("\n// Javascript for " + intf.getName() + "\n\n");
 
         currentInterfaceClassName = nameManager.getJavascriptName(intf.getName());
-        operationsWithNameConflicts = new HashSet<OperationInfo>();
-        inputMessagesWithNameConflicts = new HashSet<MessageInfo>();
-        outputMessagesWithNameConflicts = new HashSet<MessageInfo>();
-        localOperationsNameMap = new HashMap<String, OperationInfo>();
-        localInputMessagesNameMap = new HashMap<String, MessageInfo>();
-        localOutputMessagesNameMap = new HashMap<String, MessageInfo>();
+        operationsWithNameConflicts = new HashSet<>();
+        inputMessagesWithNameConflicts = new HashSet<>();
+        outputMessagesWithNameConflicts = new HashSet<>();
+        localOperationsNameMap = new HashMap<>();
+        localInputMessagesNameMap = new HashMap<>();
+        localOutputMessagesNameMap = new HashMap<>();
 
         code.append("function " + currentInterfaceClassName + " () {\n");
         utils.appendLine("this.jsutils = new CxfApacheOrgUtil();");
@@ -240,7 +240,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
 
         StringBuilder parameterList = new StringBuilder();
 
-        inputParameterNames = new ArrayList<String>();
+        inputParameterNames = new ArrayList<>();
 
         if (isWrapped) {
             collectWrapperElementInfo();
@@ -271,7 +271,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
      * visit the input message parts and collect relevant data.
      */
     private void collectUnwrappedInputInfo() {
-        unwrappedElementsAndNames = new ArrayList<ParticleInfo>();
+        unwrappedElementsAndNames = new ArrayList<>();
         if (currentOperation.getInput() != null) {
             getElementsForParts(currentOperation.getInput(), unwrappedElementsAndNames);
         }
@@ -511,7 +511,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         if (parts.size() != 1) {
             unsupportedConstruct("MULTIPLE_OUTPUTS", outputMessage.getName().toString());
         }
-        List<ParticleInfo> elements = new ArrayList<ParticleInfo>();
+        List<ParticleInfo> elements = new ArrayList<>();
         String functionName = outputDeserializerFunctionName(outputMessage);
         code.append("function " + functionName + "(cxfjsutils, partElement) {\n");
         getElementsForParts(outputMessage, elements);
@@ -555,12 +555,10 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         if (!element.isEmpty()) {
             if (type instanceof XmlSchemaComplexType) {
                 return nameManager.getJavascriptName(element.getControllingName());
-            } else {
-                return "type " + type.getQName(); // could it be anonymous?
             }
-        } else {
-            return "empty element?";
+            return "type " + type.getQName(); // could it be anonymous?
         }
+        return "empty element?";
     }
 
     private void createInputSerializer() {
@@ -679,7 +677,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 return true;
             }
             XmlSchemaSequence sequence = getTypeSequence(complexType, parentName);
-            if (sequence.getItems().size() == 0) {
+            if (sequence.getItems().isEmpty()) {
                 return true;
             }
         }
@@ -937,7 +935,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         code.append(portClassName + ".prototype = new " + currentInterfaceClassName + ";\n");
     }
 
-    
+
     /**
      * Follow a chain of references from element to element until we can obtain
      * a type.
@@ -986,7 +984,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         }
         return element.getSchemaType();
     }
-    
+
     public static void unsupportedConstruct(String messageKey,
                                             String what,
                                             QName subjectName,
@@ -1009,9 +1007,8 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
     public static String cleanedUpSchemaSource(XmlSchemaObject subject) {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
-        } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
-    }    
+        return subject.getSourceURI() + ":" + subject.getLineNumber();
+    }
 
 }

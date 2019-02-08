@@ -45,9 +45,16 @@ import org.apache.hello_world_soap_http.HelloWrongAnnotation;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class EndpointImplTest extends AbstractJaxWsTest {
 
-    
+
     @Override
     protected Bus createBus() throws BusException {
         return BusFactory.getDefaultBus();
@@ -57,10 +64,10 @@ public class EndpointImplTest extends AbstractJaxWsTest {
     @Test
     public void testEndpoint() throws Exception {
         String address = "http://localhost:8080/test";
-        
+
         GreeterImpl greeter = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
- 
+
             WebServiceContext ctx = greeter.getContext();
             assertNull(ctx);
             try {
@@ -70,18 +77,18 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
             }
             ctx = greeter.getContext();
-            
+
             assertNotNull(ctx);
-            
+
             // Test that we can't change settings through the JAX-WS API after publishing
-            
+
             try {
                 endpoint.publish(address);
                 fail("republished an already published endpoint.");
             } catch (IllegalStateException e) {
                 // expected
             }
-            
+
             try {
                 endpoint.setMetadata(new ArrayList<Source>(0));
                 fail("set metadata on an already published endpoint.");
@@ -90,14 +97,14 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             }
         }
     }
-    
+
     @Test
-    public void testEndpointStop() throws Exception {   
+    public void testEndpointStop() throws Exception {
         String address = "http://localhost:8080/test";
-        
+
         GreeterImpl greeter = new GreeterImpl();
         try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null)) {
-     
+
             WebServiceContext ctx = greeter.getContext();
             assertNull(ctx);
             try {
@@ -107,14 +114,14 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
             }
             ctx = greeter.getContext();
-            
+
             assertNotNull(ctx);
-            
+
             // Test that calling stop on the Endpoint works
             assertTrue(endpoint.isPublished());
             endpoint.stop();
             assertFalse(endpoint.isPublished());
-            
+
             // Test that the Endpoint cannot be restarted.
             try {
                 endpoint.publish(address);
@@ -124,19 +131,19 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             }
         }
     }
-    
+
 
     @Test
-    public void testEndpointServiceConstructor() throws Exception {   
+    public void testEndpointServiceConstructor() throws Exception {
         GreeterImpl greeter = new GreeterImpl();
         JaxWsServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
         serviceFactory.setBus(getBus());
         serviceFactory.setInvoker(new BeanInvoker(greeter));
         serviceFactory.setServiceClass(GreeterImpl.class);
-        
-        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, 
+
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter,
                                                  new JaxWsServerFactoryBean(serviceFactory))) {
- 
+
             WebServiceContext ctx = greeter.getContext();
             assertNull(ctx);
             try {
@@ -147,11 +154,11 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
             }
             ctx = greeter.getContext();
-            
+
             assertNotNull(ctx);
         }
     }
-    
+
     @Test
     public void testWSAnnoWithoutWSDLLocationInSEI() throws Exception {
         HelloImpl hello = new HelloImpl();
@@ -159,8 +166,8 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         serviceFactory.setBus(getBus());
         serviceFactory.setInvoker(new BeanInvoker(hello));
         serviceFactory.setServiceClass(HelloImpl.class);
-        
-        try (EndpointImpl endpoint = new EndpointImpl(getBus(), hello, 
+
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), hello,
                                                  new JaxWsServerFactoryBean(serviceFactory))) {
 
             try {
@@ -172,7 +179,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             }
         }
     }
-    
+
     @Test
     public void testSOAPBindingOnMethodWithRPC() {
         HelloWrongAnnotation hello = new HelloWrongAnnotation();
@@ -180,7 +187,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         serviceFactory.setBus(getBus());
         serviceFactory.setInvoker(new BeanInvoker(hello));
         serviceFactory.setServiceClass(HelloWrongAnnotation.class);
-        
+
         try {
             new EndpointImpl(getBus(), hello, new JaxWsServerFactoryBean(serviceFactory)).close();
         } catch (Exception e) {
@@ -188,14 +195,14 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             assertEquals(expeced, e.getMessage());
         }
     }
-    
+
     @Test
     public void testPublishEndpointPermission() throws Exception {
         Hello service = new Hello();
         try (EndpointImpl ep = new EndpointImpl(getBus(), service, (String) null)) {
 
             System.setProperty(EndpointImpl.CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY, "true");
-    
+
             try {
                 ep.publish("local://localhost:9090/hello");
                 fail("Did not throw exception as expected");
@@ -204,7 +211,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
             } finally {
                 System.setProperty(EndpointImpl.CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY, "false");
             }
-            
+
             ep.publish("local://localhost:9090/hello");
         }
     }
@@ -216,8 +223,8 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         serviceFactory.setBus(getBus());
         serviceFactory.setInvoker(new BeanInvoker(greeter));
         serviceFactory.setServiceClass(GreeterImpl.class);
-        
-        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, 
+
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter,
                                                  new JaxWsServerFactoryBean(serviceFactory))) {
 
             endpoint.getFeatures().add(new WSAddressingFeature());
@@ -228,7 +235,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertTrue(ex.getCause() instanceof BusException);
                 assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
             }
-     
+
             assertTrue(serviceFactory.getFeatures().size() == 1);
             assertTrue(serviceFactory.getFeatures().get(0) instanceof WSAddressingFeature);
         }
@@ -242,7 +249,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         serviceFactory.setInvoker(new BeanInvoker(greeter));
         serviceFactory.setServiceClass(HelloWsa.class);
 
-        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, 
+        try (EndpointImpl endpoint = new EndpointImpl(getBus(), greeter,
                                                  new JaxWsServerFactoryBean(serviceFactory))) {
             try {
                 String address = "http://localhost:8080/test";
@@ -251,7 +258,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertTrue(ex.getCause() instanceof BusException);
                 assertEquals("BINDING_INCOMPATIBLE_ADDRESS_EXC", ((BusException)ex.getCause()).getCode());
             }
-     
+
             assertEquals(1, serviceFactory.getFeatures().size());
             assertTrue(serviceFactory.getFeatures().get(0) instanceof WSAddressingFeature);
         }
@@ -263,7 +270,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
 
         Binding binding = endpoint.getBinding();
         assertNotNull(binding);
-        
+
         // CXF-6257
         endpoint.publish("http://localhost:8080/test");
         endpoint.stop();
@@ -281,7 +288,7 @@ public class EndpointImplTest extends AbstractJaxWsTest {
                 assertNotNull(out);
                 InputStream in = message.getContent(InputStream.class);
                 assertNotNull(in);
-                
+
                 copy(in, out, 2045);
 
                 out.close();

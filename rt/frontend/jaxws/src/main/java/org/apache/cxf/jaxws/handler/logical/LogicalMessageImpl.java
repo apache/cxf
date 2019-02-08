@@ -39,7 +39,6 @@ import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -64,7 +63,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 public class LogicalMessageImpl implements LogicalMessage {
     private static final Logger LOG = LogUtils.getL7dLogger(LogicalMessageImpl.class);
     private final LogicalMessageContextImpl msgContext;
-    
+
     public LogicalMessageImpl(LogicalMessageContextImpl lmctx) {
         msgContext = lmctx;
     }
@@ -73,7 +72,7 @@ public class LogicalMessageImpl implements LogicalMessage {
         Source source = null;
 
         Service.Mode mode = msgContext.getWrappedMessage().getExchange().get(Service.Mode.class);
-        
+
         if (mode != null) {
             //Dispatch/Provider case
             source = handleDispatchProviderCase(mode);
@@ -99,15 +98,15 @@ public class LogicalMessageImpl implements LogicalMessage {
 
                 if (source == null) {
                     try {
-                        Document doc = DOMUtils.newDocument();
-                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc.createDocumentFragment());
+                        DocumentFragment doc = DOMUtils.getEmptyDocument().createDocumentFragment();
+                        W3CDOMStreamWriter writer = new W3CDOMStreamWriter(doc);
                         reader = message.getContent(XMLStreamReader.class);
                         //content must be an element thing, skip over any whitespace
                         StaxUtils.toNextTag(reader);
                         StaxUtils.copy(reader, writer, true);
                         doc.appendChild(DOMUtils.getFirstElement(writer.getCurrentFragment()));
-                        source = new DOMSource(doc.getDocumentElement());
-                        reader = StaxUtils.createXMLStreamReader(doc.getDocumentElement());
+                        source = new DOMSource(DOMUtils.getFirstElement(doc));
+                        reader = StaxUtils.createXMLStreamReader(DOMUtils.getFirstElement(doc));
                     } catch (XMLStreamException e) {
                         throw new Fault(e);
                     }
@@ -144,13 +143,11 @@ public class LogicalMessageImpl implements LogicalMessage {
         if (message instanceof SoapMessage) {
             // StreamSource may only be used once, need to make a copy
             if (obj instanceof StreamSource) {
-                try {
-                    CachedOutputStream cos = new CachedOutputStream();
+                try (CachedOutputStream cos = new CachedOutputStream()) {
                     StaxUtils.copy(obj, cos);
 
                     obj = new StreamSource(cos.getInputStream());
                     message.setContent(Source.class, new StreamSource(cos.getInputStream()));
-                    cos.close();
                 } catch (Exception e) {
                     throw new Fault(e);
                 }
@@ -159,14 +156,12 @@ public class LogicalMessageImpl implements LogicalMessage {
             if (mode == Service.Mode.PAYLOAD) {
                 source = obj;
             } else {
-                try {
-                    CachedOutputStream cos = new CachedOutputStream();
+                try (CachedOutputStream cos = new CachedOutputStream()) {
                     StaxUtils.copy(obj, cos);
                     InputStream in = cos.getInputStream();
                     SOAPMessage msg = initSOAPMessage(in);
                     source = new DOMSource(SAAJUtils.getBody(msg).getFirstChild());
                     in.close();
-                    cos.close();
                 } catch (Exception e) {
                     throw new Fault(e);
                 }
@@ -178,7 +173,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                 throw new Fault(new org.apache.cxf.common.i18n.Message(
                                     "GETPAYLOAD_OF_DATASOURCE_NOT_VALID_XMLHTTPBINDING",
                                     LOG));
-            }          
+            }
         }
         return source;
     }
@@ -228,7 +223,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(s);
             msgContext.getWrappedMessage().setContent(XMLStreamReader.class, reader);
         }
-        msgContext.getWrappedMessage().setContent(Source.class, s);          
+        msgContext.getWrappedMessage().setContent(Source.class, s);
     }
 
     public Object getPayload(JAXBContext arg0) {
@@ -236,6 +231,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             Source s = getPayload();
             if (s instanceof DOMSource) {
                 DOMSource ds = (DOMSource)s;
+                ds.setNode(org.apache.cxf.helpers.DOMUtils.getDomElement(ds.getNode()));
                 Node parent = ds.getNode().getParentNode();
                 Node next = ds.getNode().getNextSibling();
                 if (parent instanceof DocumentFragment) {
@@ -248,7 +244,7 @@ public class LogicalMessageImpl implements LogicalMessage {
                         parent.insertBefore(ds.getNode(), next);
                     }
                 }
-            } 
+            }
             return JAXBUtils.unmarshall(arg0, getPayload());
         } catch (JAXBException e) {
             throw new WebServiceException(e);
@@ -259,14 +255,14 @@ public class LogicalMessageImpl implements LogicalMessage {
         try {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             arg1.createMarshaller().marshal(arg0, writer);
-            Source source = new DOMSource(writer.getDocument().getDocumentElement());            
-            
+            Source source = new DOMSource(writer.getDocument().getDocumentElement());
+
             setPayload(source);
         } catch (JAXBException e) {
             throw new WebServiceException(e);
         }
     }
-   
+
     private void write(Source source, Node n) {
         try {
             if (source instanceof DOMSource && ((DOMSource)source).getNode() == null) {
@@ -278,7 +274,7 @@ public class LogicalMessageImpl implements LogicalMessage {
         } catch (XMLStreamException e) {
             throw new Fault(e);
         }
-    }   
+    }
 
     private SOAPMessage initSOAPMessage(InputStream is) throws SOAPException, IOException {
         SOAPMessage msg = null;
@@ -294,5 +290,5 @@ public class LogicalMessageImpl implements LogicalMessage {
                                                                 WSDLConstants.NS_SCHEMA_XSI);
 
         return msg;
-    }  
+    }
 }

@@ -33,14 +33,14 @@ import org.apache.cxf.wsdl.WSDLConstants;
  * The prefix MUST ends with _PREFIX
  * Namespace MUST starts with NS_
  * The value of the _PREFIX is the suffix of NS_
- 
+
  e.g
     public static final String WSAW_PREFIX = "wsaw";
-    public static final String NS_WSAW = "http://www.w3.org/2006/05/addressing/wsdl"; 
+    public static final String NS_WSAW = "http://www.w3.org/2006/05/addressing/wsdl";
 ***/
 
 final class NSManager {
-    private final Map<String, String> cache = new HashMap<String, String>();
+    private final Map<String, String> cache = new HashMap<>();
 
 
     NSManager() {

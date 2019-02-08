@@ -67,16 +67,15 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
                 if (member.getName().equals(name.getLocalPart())
                     || (member.isSetAnonschematype() && member.isAnonschematype())) {
                     break;
-                } else {
-                    currentTypeListener =
-                        CorbaHandlerUtils.getTypeListener(elName,
-                                                          member.getIdltype(),
-                                                          typeMap,
-                                                          orb,
-                                                          serviceInfo);
-                    currentTypeListener.setNamespaceContext(ctx);
-                    ((CorbaStructHandler)handler).addMember(currentTypeListener.getCorbaObject());
                 }
+                currentTypeListener =
+                    CorbaHandlerUtils.getTypeListener(elName,
+                                                      member.getIdltype(),
+                                                      typeMap,
+                                                      orb,
+                                                      serviceInfo);
+                currentTypeListener.setNamespaceContext(ctx);
+                ((CorbaStructHandler)handler).addMember(currentTypeListener.getCorbaObject());
             }
             boolean anonType = false;
             if (member.isSetAnonschematype() && member.isAnonschematype()) {
@@ -153,10 +152,10 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
         } else {
             if ("type".equals(localName)
                 && "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceURI)) {
-                
+
                 String pfx = value.substring(0, value.indexOf(":"));
                 String ns = ctx.getNamespaceURI(pfx);
-                QName qn = new QName(ns, 
+                QName qn = new QName(ns,
                                      value.substring(value.indexOf(":") + 1));
                 CorbaTypeListener l = CorbaHandlerUtils.getTypeListener(qn,
                                                   qn,

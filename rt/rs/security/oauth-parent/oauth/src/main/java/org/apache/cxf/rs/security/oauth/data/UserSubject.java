@@ -26,15 +26,15 @@ import java.util.List;
  * may capture after the end user approved a given third party request
  */
 public class UserSubject {
-    
+
     private String login;
     private List<String> roles;
-    
+
     public UserSubject(String login, List<String> roles) {
         this.login = login;
         this.roles = roles;
     }
-    
+
     public String getLogin() {
         return login;
     }
@@ -45,6 +45,6 @@ public class UserSubject {
         }
         return Collections.unmodifiableList(roles);
     }
-    
+
 
 }

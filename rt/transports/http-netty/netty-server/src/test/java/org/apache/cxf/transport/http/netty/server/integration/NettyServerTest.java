@@ -22,16 +22,23 @@ package org.apache.cxf.transport.http.netty.server.integration;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+
 import javax.xml.ws.Endpoint;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class NettyServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(NettyServerTest.class);
@@ -46,7 +53,7 @@ public class NettyServerTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(b);
         ep = Endpoint.publish("netty://http://localhost:" + PORT + "/SoapContext/SoapPort",
                 new org.apache.hello_world_soap_http.GreeterImpl());
-        
+
         URL wsdl = NettyServerTest.class.getResource("/wsdl/hello_world.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -70,12 +77,12 @@ public class NettyServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testInvocation() throws Exception {
-        
+
         updateAddressPort(g, PORT);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testGetWsdl() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/SoapContext/SoapPort?wsdl");

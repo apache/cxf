@@ -26,6 +26,6 @@ import java.security.Principal;
 public interface SecurityContext {
 
     Principal getUserPrincipal();
-    
+
     boolean isUserInRole(String role);
 }

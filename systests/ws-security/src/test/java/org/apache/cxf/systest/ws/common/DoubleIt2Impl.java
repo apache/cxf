@@ -24,16 +24,16 @@ import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType2;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType2")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleIt2Impl implements DoubleItPortType2 {
-    
+
     public int doubleIt(int numberToDouble) throws DoubleItFault {
         return numberToDouble * 2;
     }
-    
+
     public int doubleIt2(int numberToDouble) {
         return numberToDouble * 2;
     }

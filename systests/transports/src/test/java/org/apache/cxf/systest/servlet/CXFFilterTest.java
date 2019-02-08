@@ -35,6 +35,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class CXFFilterTest extends AbstractServletTest {
 
 
@@ -42,19 +45,19 @@ public class CXFFilterTest extends AbstractServletTest {
     protected String getConfiguration() {
         return "/org/apache/cxf/systest/servlet/web-filter.xml";
     }
-    
+
     @Test
     public void testGetServiceList() throws Exception {
-        
+
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(false);
 
         //test the '/' context get service list
-        WebResponse  res = client.getResponse(CONTEXT_URL + "/");
+        WebResponse res = client.getResponse(CONTEXT_URL + "/");
         WebLink[] links = res.getLinks();
         assertEquals("Wrong number of service links", 3, links.length);
-        
-        Set<String> links2 = new HashSet<String>();
+
+        Set<String> links2 = new HashSet<>();
         for (WebLink l : links) {
             links2.add(l.getURLString());
         }
@@ -65,11 +68,11 @@ public class CXFFilterTest extends AbstractServletTest {
     @Test
     public void testPostInvokeServices() throws Exception {
         newClient();
-        
+
         WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter",
                 getClass().getResourceAsStream("GreeterMessage.xml"),
                 "text/xml; charset=UTF-8");
-        
+
         WebResponse response = newClient().getResponse(req);
 
         assertEquals("text/xml", response.getContentType());
@@ -77,9 +80,9 @@ public class CXFFilterTest extends AbstractServletTest {
 
         Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
-        
+
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        
+
         assertValid("/s:Envelope/s:Body", doc);
         assertValid("//h:sayHiResponse", doc);
     }

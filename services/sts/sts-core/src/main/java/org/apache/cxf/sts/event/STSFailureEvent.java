@@ -21,7 +21,7 @@ package org.apache.cxf.sts.event;
 
 @Deprecated
 public interface STSFailureEvent {
-    
+
     Exception getException();
 
 }

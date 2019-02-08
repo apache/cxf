@@ -32,26 +32,29 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-public class JAXWSHttpSpiDestinationTest extends Assert {
-    
+public class JAXWSHttpSpiDestinationTest {
+
     private static final String ADDRESS = "http://localhost:80/foo/bar";
     private static final String CONTEXT_PATH = "/foo";
-    private IMocksControl control; 
+    private IMocksControl control;
     private Bus bus;
     private HttpContext context;
     private MessageObserver observer;
     private EndpointInfo endpoint;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -63,33 +66,33 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }
-    
+
     @After
     public void tearDown() {
         context = null;
         bus = null;
         observer = null;
     }
-    
+
     @Test
     public void testCtor() throws Exception {
         control.replay();
-        JAXWSHttpSpiDestination destination = 
+        JAXWSHttpSpiDestination destination =
             new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
 
         assertNull(destination.getMessageObserver());
         assertNotNull(destination.getAddress());
         assertNotNull(destination.getAddress().getAddress());
-        assertEquals(ADDRESS, 
+        assertEquals(ADDRESS,
                      destination.getAddress().getAddress().getValue());
     }
-    
+
     @Test
     public void testMessage() throws Exception {
         HttpExchange exchange = setUpExchange();
         control.replay();
 
-        JAXWSHttpSpiDestination destination = 
+        JAXWSHttpSpiDestination destination =
             new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
         destination.setMessageObserver(observer);
 
@@ -98,7 +101,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
 
         control.verify();
     }
-    
+
 
     private HttpExchange setUpExchange() throws Exception {
         HttpExchange exchange = control.createMock(HttpExchange.class);
@@ -107,7 +110,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         expect(exchange.getPathInfo()).andReturn(null);
         expect(exchange.getRequestURI()).andReturn(CONTEXT_PATH);
         expect(exchange.getContextPath()).andReturn(CONTEXT_PATH);
-        Map<String, List<String>> reqHeaders = new HashMap<String, List<String>>();
+        Map<String, List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type", Collections.singletonList("text/xml"));
         expect(exchange.getRequestHeaders()).andReturn(reqHeaders).anyTimes();
         OutputStream responseBody = control.createMock(OutputStream.class);
@@ -116,9 +119,9 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         expect(exchange.getResponseBody()).andReturn(responseBody).anyTimes();
         observer.onMessage(isA(Message.class));
         EasyMock.expectLastCall();
-        
+
         return exchange;
     }
-    
-    
+
+
 }

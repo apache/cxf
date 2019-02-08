@@ -39,7 +39,7 @@ import org.apache.cxf.testsuite.testcase.TestCasesType;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 /**
- * 
+ *
  */
 public final class JMSTestUtil {
 
@@ -47,16 +47,15 @@ public final class JMSTestUtil {
 
     private JMSTestUtil() {
     }
-    
+
     public static String getFullAddress(String partAddress, String jndiUrl) {
         String separator = partAddress.contains("?") ? "&" : "?";
-        String address = partAddress + separator
+        return partAddress + separator
             + "&jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory" 
+            + "&jndiConnectionFactoryName=ConnectionFactory"
             + "&jndiURL=" + jndiUrl;
-        return address;
     }
-    
+
     public static List<TestCaseType> getTestCases() {
         try {
             if (testcases == null) {
@@ -66,7 +65,7 @@ public final class JMSTestUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ArrayList<TestCaseType>();
+        return new ArrayList<>();
     }
 
     public static TestCaseType getTestCase(String testId) {
@@ -96,7 +95,7 @@ public final class JMSTestUtil {
      * @param session
      * @param rtd
      * @return
-     * @throws JMSException 
+     * @throws JMSException
      */
     public static Message buildJMSMessageFromTestCase(TestCaseType testcase, Session session,
                                                       Destination rtd) throws JMSException {
@@ -132,7 +131,7 @@ public final class JMSTestUtil {
         if (messageProperties.isSetCorrelationID()) {
             jmsMessage.setJMSCorrelationID(messageProperties.getCorrelationID());
         }
-        
+
         if (messageProperties.isSetTargetService()
             && !"".equals(messageProperties.getTargetService().trim())) {
             jmsMessage.setStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD, messageProperties

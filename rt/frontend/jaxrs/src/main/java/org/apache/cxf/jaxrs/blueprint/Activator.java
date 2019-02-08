@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.blueprint;
 
+import javax.ws.rs.ext.RuntimeDelegate;
+
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.osgi.framework.BundleActivator;
@@ -27,20 +29,24 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext context) throws Exception {
-        BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-            @Override
-            public Object createNamespaceHandler() {
-                return new JAXRSBPNamespaceHandler();
-            }
-        };
-        NamespaceHandlerRegisterer.register(context, factory,
-                                            "http://cxf.apache.org/blueprint/jaxrs");
+        try {
+            BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
+                @Override
+                public Object createNamespaceHandler() {
+                    return new JAXRSBPNamespaceHandler();
+                }
+            };
+            NamespaceHandlerRegisterer.register(context, factory,
+                                                "http://cxf.apache.org/blueprint/jaxrs");
+        } catch (NoClassDefFoundError error) {
+            // No Blueprint is available
+        }
 
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
-
+        RuntimeDelegate.setInstance(null);
     }
 
 }

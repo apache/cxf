@@ -20,6 +20,7 @@
 package org.apache.cxf.attachment;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -33,28 +34,36 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.apache.cxf.common.util.Base64Utility;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+
+
+
 
 public class AttachmentSerializer {
     // http://tools.ietf.org/html/rfc2387
     private static final String DEFAULT_MULTIPART_TYPE = "multipart/related";
-    
+
+    private String contentTransferEncoding = "binary";
+
     private Message message;
     private String bodyBoundary;
     private OutputStream out;
     private String encoding;
-    
+
     private String multipartType;
     private Map<String, List<String>> rootHeaders = Collections.emptyMap();
     private boolean xop = true;
     private boolean writeOptionalTypeParameters = true;
-    
+
+
     public AttachmentSerializer(Message messageParam) {
         message = messageParam;
     }
 
-    public AttachmentSerializer(Message messageParam, 
+    public AttachmentSerializer(Message messageParam,
                                 String multipartType,
                                 boolean writeOptionalTypeParameters,
                                 Map<String, List<String>> headers) {
@@ -63,9 +72,9 @@ public class AttachmentSerializer {
         this.writeOptionalTypeParameters = writeOptionalTypeParameters;
         this.rootHeaders = headers;
     }
-    
+
     /**
-     * Serialize the beginning of the attachment which includes the MIME 
+     * Serialize the beginning of the attachment which includes the MIME
      * beginning and headers for the root message.
      */
     public void writeProlog() throws IOException {
@@ -84,21 +93,21 @@ public class AttachmentSerializer {
             int pos = bodyCt.indexOf(';');
             // get everything from the semi-colon
             bodyCtParams = bodyCt.substring(pos);
-            bodyCtParamsEscaped = escapeQuotes(bodyCtParams); 
+            bodyCtParamsEscaped = escapeQuotes(bodyCtParams);
             // keep the type/subtype part in bodyCt
             bodyCt = bodyCt.substring(0, pos);
         }
         // Set transport mime type
         String requestMimeType = multipartType == null ? DEFAULT_MULTIPART_TYPE : multipartType;
-        
+
         StringBuilder ct = new StringBuilder();
         ct.append(requestMimeType);
-        
+
         // having xop set to true implies multipart/related, but just in case...
-        boolean xopOrMultipartRelated = xop 
+        boolean xopOrMultipartRelated = xop
             || DEFAULT_MULTIPART_TYPE.equalsIgnoreCase(requestMimeType)
             || DEFAULT_MULTIPART_TYPE.startsWith(requestMimeType);
-        
+
         // type is a required parameter for multipart/related only
         if (xopOrMultipartRelated
             && requestMimeType.indexOf("type=") == -1) {
@@ -106,16 +115,16 @@ public class AttachmentSerializer {
                 ct.append("; type=\"application/xop+xml\"");
             } else {
                 ct.append("; type=\"").append(bodyCt).append("\"");
-            }    
+            }
         }
-        
+
         // boundary
         ct.append("; boundary=\"")
             .append(bodyBoundary)
             .append("\"");
-            
+
         String rootContentId = getHeaderValue("Content-ID", AttachmentUtil.BODY_ATTACHMENT_ID);
-        
+
         // 'start' is a required parameter for XOP/MTOM, clearly defined
         // for simpler multipart/related payloads but is not needed for
         // multipart/mixed, multipart/form-data
@@ -124,7 +133,7 @@ public class AttachmentSerializer {
                 .append(checkAngleBrackets(rootContentId))
                 .append(">\"");
         }
-        
+
         // start-info is a required parameter for XOP/MTOM, may be needed for
         // other WS cases but is redundant in simpler multipart/related cases
         // the parameters need to be included within the start-info's value in the escaped form
@@ -136,11 +145,11 @@ public class AttachmentSerializer {
             }
             ct.append("\"");
         }
-        
-        
+
+
         message.put(Message.CONTENT_TYPE, ct.toString());
 
-        
+
         // 2. write headers
         out = message.getContent(OutputStream.class);
         encoding = (String) message.get(Message.ENCODING);
@@ -148,9 +157,10 @@ public class AttachmentSerializer {
             encoding = StandardCharsets.UTF_8.name();
         }
         StringWriter writer = new StringWriter();
+        writer.write("\r\n");
         writer.write("--");
         writer.write(bodyBoundary);
-        
+
         StringBuilder mimeBodyCt = new StringBuilder();
         String bodyType = getHeaderValue("Content-Type", null);
         if (bodyType == null) {
@@ -168,13 +178,17 @@ public class AttachmentSerializer {
         } else {
             mimeBodyCt.append(bodyType);
         }
-        
+
         writeHeaders(mimeBodyCt.toString(), rootContentId, rootHeaders, writer);
         out.write(writer.getBuffer().toString().getBytes(encoding));
     }
 
     private static String escapeQuotes(String s) {
-        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;    
+        return s.indexOf('"') != 0 ? s.replace("\"", "\\\"") : s;
+    }
+
+    public void setContentTransferEncoding(String cte) {
+        contentTransferEncoding = cte;
     }
 
     private String getHeaderValue(String name, String defaultValue) {
@@ -191,12 +205,12 @@ public class AttachmentSerializer {
         }
         return sb.toString();
     }
-    
-    private static void writeHeaders(String contentType, String attachmentId, 
+
+    private void writeHeaders(String contentType, String attachmentId,
                                      Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\nContent-Type: ");
         writer.write(contentType);
-        writer.write("\r\nContent-Transfer-Encoding: binary\r\n");
+        writer.write("\r\nContent-Transfer-Encoding: " + contentTransferEncoding + "\r\n");
 
         if (attachmentId != null) {
             attachmentId = checkAngleBrackets(attachmentId);
@@ -222,17 +236,17 @@ public class AttachmentSerializer {
             }
             writer.write("\r\n");
         }
-        
+
         writer.write("\r\n");
     }
 
-    private static String checkAngleBrackets(String value) { 
+    private static String checkAngleBrackets(String value) {
         if (value.charAt(0) == '<' && value.charAt(value.length() - 1) == '>') {
             return value.substring(1, value.length() - 1);
-        }    
+        }
         return value;
     }
-    
+
     /**
      * Write the end of the body boundary and any attachments included.
      * @throws IOException
@@ -240,14 +254,14 @@ public class AttachmentSerializer {
     public void writeAttachments() throws IOException {
         if (message.getAttachments() != null) {
             for (Attachment a : message.getAttachments()) {
-                StringWriter writer = new StringWriter();                
+                StringWriter writer = new StringWriter();
                 writer.write("\r\n--");
                 writer.write(bodyBoundary);
-                
+
                 Map<String, List<String>> headers = null;
                 Iterator<String> it = a.getHeaderNames();
                 if (it.hasNext()) {
-                    headers = new LinkedHashMap<String, List<String>>();
+                    headers = new LinkedHashMap<>();
                     while (it.hasNext()) {
                         String key = it.next();
                         headers.put(key, Collections.singletonList(a.getHeader(key)));
@@ -255,23 +269,71 @@ public class AttachmentSerializer {
                 } else {
                     headers = Collections.emptyMap();
                 }
-                
-                
+
+
                 DataHandler handler = a.getDataHandler();
                 handler.setCommandMap(AttachmentUtil.getCommandMap());
-                
+
                 writeHeaders(handler.getContentType(), a.getId(),
                              headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
-                handler.writeTo(out);
+                if ("base64".equals(contentTransferEncoding)) {
+                    try (InputStream inputStream = handler.getInputStream()) {
+                        encodeBase64(inputStream, out, IOUtils.DEFAULT_BUFFER_SIZE);
+                    }
+                } else {
+                    handler.writeTo(out);
+                }
             }
         }
-        StringWriter writer = new StringWriter();                
+        StringWriter writer = new StringWriter();
         writer.write("\r\n--");
         writer.write(bodyBoundary);
         writer.write("--");
         out.write(writer.getBuffer().toString().getBytes(encoding));
         out.flush();
+    }
+
+    private int encodeBase64(InputStream input, OutputStream output, int bufferSize) throws IOException {
+        int avail = input.available();
+        if (avail > 262143) {
+            //must be divisible by 3
+            avail = 262143;
+        }
+        if (avail > bufferSize) {
+            bufferSize = avail;
+        }
+        final byte[] buffer = new byte[bufferSize];
+        int n = 0;
+        n = input.read(buffer);
+        int total = 0;
+        int left = 0;
+        while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
+            //make sure n is divisible by 3
+            left = n % 3;
+            n -= left;
+            if (n > 0) {
+                Base64Utility.encodeAndStream(buffer, 0, n, output);
+                total += n;
+            }
+            if (left != 0) {
+                for (int x = 0; x < left; ++x) {
+                    buffer[x] = buffer[n + x];
+                }
+                n = input.read(buffer, left, buffer.length - left);
+                if (n == -1) {
+                    // we've hit the end, but still have stuff left, write it out
+                    Base64Utility.encodeAndStream(buffer, 0, left, output);
+                    total += left;
+                }
+            } else {
+                n = input.read(buffer);
+            }
+        }
+        return total;
     }
 
     public boolean isXop() {

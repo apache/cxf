@@ -35,17 +35,17 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public final class TransformUtils {
     private TransformUtils() {
-        
+
     }
-    
+
     public static XMLStreamReader createNewReaderIfNeeded(XMLStreamReader reader, InputStream is) {
         return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
     }
-    
+
     public static XMLStreamWriter createNewWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
         return writer == null ? StaxUtils.createXMLStreamWriter(os) : writer;
     }
-    
+
     public static XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
                                                                 OutputStream os,
                                                                 Map<String, String> outElementsMap,
@@ -53,7 +53,7 @@ public final class TransformUtils {
                                                                 Map<String, String> outAppendMap,
                                                                 boolean attributesToElements,
                                                                 String defaultNamespace) {
-        if (outElementsMap != null || outDropElements != null 
+        if (outElementsMap != null || outDropElements != null
             || outAppendMap != null || attributesToElements) {
             writer = createNewWriterIfNeeded(writer, os);
             writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
@@ -71,7 +71,7 @@ public final class TransformUtils {
                                                                 Map<String, String> outAttributesMap,
                                                                 boolean attributesToElements,
                                                                 String defaultNamespace) {
-        if (outElementsMap != null || outDropElements != null 
+        if (outElementsMap != null || outDropElements != null
             || outAppendMap != null || attributesToElements) {
             writer = createNewWriterIfNeeded(writer, os);
             writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
@@ -81,33 +81,33 @@ public final class TransformUtils {
     }
     //CHECKSTYLE:ON
 
-    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
                                                                 List<String> inDropElements,
                                                                 Map<String, String> inElementsMap,
                                                                 Map<String, String> inAppendMap,
                                                                 boolean blockOriginalReader) {
-        return createTransformReaderIfNeeded(reader, is, 
+        return createTransformReaderIfNeeded(reader, is,
                           inDropElements, inElementsMap, inAppendMap, null, blockOriginalReader);
     }
-    
-    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, 
+
+    public static XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader,
                                                                 InputStream is,
                                                                 List<String> inDropElements,
                                                                 Map<String, String> inElementsMap,
                                                                 Map<String, String> inAppendMap,
                                                                 Map<String, String> inAttributesMap,
                                                                 boolean blockOriginalReader) {
-        if (inElementsMap != null || inAppendMap != null || inDropElements != null 
+        if (inElementsMap != null || inAppendMap != null || inDropElements != null
             || inAttributesMap != null) {
             reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
-                                           inElementsMap, inAppendMap, inDropElements, 
+                                           inElementsMap, inAppendMap, inDropElements,
                                            inAttributesMap, blockOriginalReader);
         }
 
         return reader;
     }
-    
+
     protected static void convertToQNamesMap(Map<String, String> map,
                                              QNamesMap elementsMap,
                                              Map<String, String> nsMap) {
@@ -123,7 +123,7 @@ public final class TransformUtils {
             }
         }
     }
-    
+
     static void convertToMapOfElementProperties(Map<String, String> map,
                                                 Map<QName, ElementProperty> elementsMap) {
         if (map != null) {
@@ -132,7 +132,7 @@ public final class TransformUtils {
                 String value = entry.getValue();
                 String text = null;
                 boolean child = false;
-                
+
                 // if the content delimiter is present in the value, extract the content
                 int d = value.indexOf('}');
                 d = value.indexOf('=', d < 0 ? 0 : d);
@@ -140,7 +140,7 @@ public final class TransformUtils {
                     text = value.substring(d + 1);
                     value = value.substring(0, d);
                 }
-                
+
                 // if the trailer delimiter is present in the key, remove it
                 if (key.endsWith("/")) {
                     key = key.substring(0, key.length() - 1);
@@ -148,13 +148,13 @@ public final class TransformUtils {
                 }
                 QName lname = DOMUtils.convertStringToQName(key);
                 QName rname = DOMUtils.convertStringToQName(value);
-                
-                ElementProperty desc = new ElementProperty(rname, text, child); 
+
+                ElementProperty desc = new ElementProperty(rname, text, child);
                 elementsMap.put(lname, desc);
             }
         }
     }
-    
+
     protected static void convertToSetOfQNames(List<String> set,
                                                Set<QName> elementsSet) {
         if (set != null) {
@@ -164,7 +164,7 @@ public final class TransformUtils {
             }
         }
     }
-    
+
     static boolean isEmptyQName(QName qname) {
         return XMLConstants.NULL_NS_URI.equals(qname.getNamespaceURI()) && "".equals(qname.getLocalPart());
     }

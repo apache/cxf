@@ -38,17 +38,18 @@ import org.apache.wss4j.common.ext.WSSecurityException;
  * This class defines some properties that are associated with a realm for issuing or validating a particular token.
  */
 public class RealmProperties {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RealmProperties.class);
-    
+
+    private String name;
     private String issuer;
     private String signatureAlias;
     private Crypto signatureCrypto;
     private SignatureProperties signatureProperties;
-    private String signaturePropertiesFile;
+    private Object signatureCryptoProperties;
     private String callbackHandlerClass;
     private CallbackHandler callbackHandler;
-    
+
     /**
      * Get the issuer of this realm
      * @return the issuer of this realm
@@ -56,7 +57,23 @@ public class RealmProperties {
     public String getIssuer() {
         return issuer;
     }
-    
+
+    /**
+     * Get the name of this realm
+     * @return realmA
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the name of this realm
+     * @param name the name of this realm
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Set the issuer of this realm
      * @param issuer the issuer of this realm
@@ -64,7 +81,7 @@ public class RealmProperties {
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
     /**
      * Get the signature alias to use for this realm
      * @return the signature alias to use for this realm
@@ -72,7 +89,7 @@ public class RealmProperties {
     public String getSignatureAlias() {
         return signatureAlias;
     }
-    
+
     /**
      * Set the signature alias to use for this realm
      * @param signatureAlias the signature alias to use for this realm
@@ -80,7 +97,7 @@ public class RealmProperties {
     public void setSignatureAlias(String signatureAlias) {
         this.signatureAlias = signatureAlias;
     }
-    
+
     /**
      * Set the signature Crypto object
      * @param signatureCrypto the signature Crypto object
@@ -88,18 +105,28 @@ public class RealmProperties {
     public void setSignatureCrypto(Crypto signatureCrypto) {
         this.signatureCrypto = signatureCrypto;
     }
-    
+
     /**
      * Set the String corresponding to the signature Properties class
      * @param signaturePropertiesFile the String corresponding to the signature properties file
      */
+    @Deprecated
     public void setSignaturePropertiesFile(String signaturePropertiesFile) {
-        this.signaturePropertiesFile = signaturePropertiesFile;
+        setSignatureCryptoProperties(signaturePropertiesFile);
+    }
+
+    /**
+     * Set the Object corresponding to the signature Properties class. It can be a String
+     * corresponding to a filename, a Properties object, or a URL.
+     * @param signatureCryptoProperties the object corresponding to the signature properties
+     */
+    public void setSignatureCryptoProperties(Object signatureCryptoProperties) {
+        this.signatureCryptoProperties = signatureCryptoProperties;
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Setting signature properties: " + signaturePropertiesFile);
+            LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
         }
     }
-    
+
     /**
      * Set the SignatureProperties to use.
      * @param signatureProperties the SignatureProperties to use.
@@ -107,7 +134,7 @@ public class RealmProperties {
     public void setSignatureProperties(SignatureProperties signatureProperties) {
         this.signatureProperties = signatureProperties;
     }
-    
+
     /**
      * Get the SignatureProperties to use.
      * @return the SignatureProperties to use.
@@ -115,17 +142,17 @@ public class RealmProperties {
     public SignatureProperties getSignatureProperties() {
         return signatureProperties;
     }
-    
-    
+
+
     /**
      * Get the signature Crypto object
      * @return the signature Crypto object
      */
     public Crypto getSignatureCrypto() {
-        if (signatureCrypto == null && signaturePropertiesFile != null) {
-            Properties sigProperties = SecurityUtils.loadProperties(signaturePropertiesFile);
+        if (signatureCrypto == null && signatureCryptoProperties != null) {
+            Properties sigProperties = SecurityUtils.loadProperties(signatureCryptoProperties);
             if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
+                LOG.fine("Cannot load signature properties using: " + signatureCryptoProperties);
                 throw new STSException("Configuration error: cannot load signature properties");
             }
             try {
@@ -135,14 +162,14 @@ public class RealmProperties {
                 throw new STSException(ex.getMessage());
             }
         }
-        
+
         return signatureCrypto;
     }
-    
-    
+
+
     /**
-     * Set the CallbackHandler object. 
-     * @param callbackHandler the CallbackHandler object. 
+     * Set the CallbackHandler object.
+     * @param callbackHandler the CallbackHandler object.
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
@@ -150,10 +177,10 @@ public class RealmProperties {
             LOG.fine("Setting callbackHandler: " + callbackHandler);
         }
     }
-    
+
     /**
-     * Set the String corresponding to the CallbackHandler class. 
-     * @param callbackHandlerClass the String corresponding to the CallbackHandler class. 
+     * Set the String corresponding to the CallbackHandler class.
+     * @param callbackHandlerClass the String corresponding to the CallbackHandler class.
      */
     public void setCallbackHandlerClass(String callbackHandlerClass) {
         this.callbackHandlerClass = callbackHandlerClass;
@@ -161,7 +188,7 @@ public class RealmProperties {
             LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
         }
     }
-    
+
     /**
      * Get the CallbackHandler object.
      * @return the CallbackHandler object.
@@ -181,5 +208,5 @@ public class RealmProperties {
         }
         return callbackHandler;
     }
-    
+
 }

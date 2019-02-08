@@ -25,10 +25,13 @@ import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.servlet.AbstractSciTest;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettyEmptyPathApplicationTest extends AbstractSciTest {  
+import static org.junit.Assert.assertTrue;
+
+public class JettyEmptyPathApplicationTest extends AbstractSciTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
@@ -43,22 +46,22 @@ public class JettyEmptyPathApplicationTest extends AbstractSciTest {
                     // Include Jackson @Providers into classpath scanning
                     Resource.newResource(JacksonJsonProvider.class.getProtectionDomain().getCodeSource().getLocation())
                 }, PORT);
-        }        
-        
+        }
+
         @Override
-        protected void configureContext(final WebAppContext context) throws Exception {     
+        protected void configureContext(final WebAppContext context) throws Exception {
             context.setDescriptor(Resource
                 .newClassPathResource("/WEB-INF/web-subclass.xml").getFile().toURI().getPath());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

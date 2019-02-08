@@ -25,7 +25,7 @@ import javax.xml.ws.Holder;
 public class WebParamService {
     @WebMethod(operationName = "helloString", action = "urn:HelloString")
     public String hello(
-                        @WebParam(name = "Name", targetNamespace = "helloString/Name", 
+                        @WebParam(name = "Name", targetNamespace = "helloString/Name",
                                   mode = WebParam.Mode.INOUT) Holder<Name> name,
                         @WebParam(name = "Employee", mode = WebParam.Mode.OUT) Holder<Employee> employee) {
         return "Hello " + name;

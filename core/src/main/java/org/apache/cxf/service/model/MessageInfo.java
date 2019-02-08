@@ -33,37 +33,37 @@ import org.apache.cxf.common.util.StringUtils;
  * A message for an operation.
  */
 public class MessageInfo extends AbstractMessageContainer {
-    
+
     public enum Type {
         INPUT,
         OUTPUT;
     }
-    
+
     private Type type;
-    
+
     public MessageInfo(OperationInfo op, Type type, QName nm) {
         super(op, nm);
         this.type = type;
     }
-    
+
     public void setName(QName qn) {
         mName = qn;
     }
-    
+
     public Map<QName, MessagePartInfo> getMessagePartsMap() {
-        Map<QName, MessagePartInfo> partsMap = new HashMap<QName, MessagePartInfo>();
+        Map<QName, MessagePartInfo> partsMap = new HashMap<>();
         for (MessagePartInfo part : getMessageParts()) {
             partsMap.put(part.getName(), part);
         }
         return partsMap;
     }
 
-    public List<MessagePartInfo> getOrderedParts(List<String> order) {  
+    public List<MessagePartInfo> getOrderedParts(List<String> order) {
         if (StringUtils.isEmpty(order)) {
             return getMessageParts();
         }
-        
-        List<MessagePartInfo> orderedParts = new ArrayList<MessagePartInfo>();
+
+        List<MessagePartInfo> orderedParts = new ArrayList<>();
         Map<QName, MessagePartInfo> partsMap = getMessagePartsMap();
         for (String part : order) {
             QName qname = getMessagePartQName(part);
@@ -84,6 +84,6 @@ public class MessageInfo extends AbstractMessageContainer {
     public void setType(Type type) {
         this.type = type;
     }
-    
-    
+
+
 }
