@@ -111,9 +111,9 @@ public class BeanspectorTest {
     @Ignore 
     static class OverriddenSimpleBean extends SimpleBean {
         
-        public OverriddenSimpleBean() { }
+        OverriddenSimpleBean() { }
         
-        public OverriddenSimpleBean(SimpleBean arg) { }
+        OverriddenSimpleBean(SimpleBean arg) { }
     }
     
     @Ignore 
