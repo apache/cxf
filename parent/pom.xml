@@ -247,7 +247,7 @@
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
         <cxf.rhino.bundle.version>1.7R2_3</cxf.rhino.bundle.version>
-        <cxf.saaj-impl.bundle.version>1.4.0_1</cxf.saaj-impl.bundle.version>
+        <cxf.saaj-impl.bundle.version>1.5.1_1</cxf.saaj-impl.bundle.version>
         <cxf.servicemix.aspectj.version>1.9.1_1</cxf.servicemix.aspectj.version>
         <cxf.servicemix.cglib.version>3.2.12_1</cxf.servicemix.cglib.version>
         <cxf.servicemix.javax.el.version>3.0.0_1</cxf.servicemix.javax.el.version>
