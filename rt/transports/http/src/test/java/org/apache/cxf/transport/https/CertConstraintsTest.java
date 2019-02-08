@@ -33,6 +33,7 @@ import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.staxutils.StaxUtils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CertConstraintsTest {
@@ -72,7 +73,7 @@ public class CertConstraintsTest {
         // neither are O=BadApacheTest
         //
         tmp = loadCertConstraints("subject-CN-bethal-O-badapache");
-        assertTrue(!tmp.matches(bethalCert) && !tmp.matches(gordyCert));
+        assertFalse(tmp.matches(bethalCert) || tmp.matches(gordyCert));
 
         //
         // both satisfy either CN=Bethal or O=ApacheTest

@@ -23,6 +23,7 @@ import org.apache.cxf.ws.rm.v200702.ObjectFactory;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AbstractSequenceTest {
@@ -36,11 +37,11 @@ public class AbstractSequenceTest {
         ObjectFactory factory = new ObjectFactory();
         id1 = factory.createIdentifier();
         id1.setValue("seq1");
-        assertTrue(!AbstractSequence.identifierEquals(id1, id2));
+        assertFalse(AbstractSequence.identifierEquals(id1, id2));
 
         id2 = factory.createIdentifier();
         id2.setValue("seq2");
-        assertTrue(!AbstractSequence.identifierEquals(id1, id2));
+        assertFalse(AbstractSequence.identifierEquals(id1, id2));
 
         id2.setValue("seq1");
         assertTrue(AbstractSequence.identifierEquals(id1, id2));

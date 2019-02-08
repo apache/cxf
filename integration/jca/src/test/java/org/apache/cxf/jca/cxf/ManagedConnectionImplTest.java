@@ -203,7 +203,7 @@ public class ManagedConnectionImplTest extends ManagedConnectionTestBase {
             mci.associateConnection(dodgyHandle);
             fail("Except exception on call with ClassCast Exception");
         } catch (ResourceAdapterInternalException raie) {
-            assertTrue(true);
+            // expected
         }
 
     }

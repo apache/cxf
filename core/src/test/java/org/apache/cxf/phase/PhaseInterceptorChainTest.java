@@ -42,8 +42,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class PhaseInterceptorChainTest {
@@ -130,7 +130,7 @@ public class PhaseInterceptorChainTest {
         chain.add(p);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -142,12 +142,12 @@ public class PhaseInterceptorChainTest {
         chain.add(p, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p, true);
         it = chain.iterator();
         assertSame(p, it.next());
         assertSame(p, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -160,12 +160,12 @@ public class PhaseInterceptorChainTest {
         chain.add(p2, false);
         Iterator<Interceptor<? extends Message>> it = chain.iterator();
         assertSame(p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
         chain.add(p2, true);
         it = chain.iterator();
         assertSame(p1, it.next());
         assertSame(p2, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class PhaseInterceptorChainTest {
 
         assertSame("Unexpected interceptor at this position.", p1, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test
@@ -202,7 +202,7 @@ public class PhaseInterceptorChainTest {
         assertSame("Unexpected interceptor at this position.", p3, it.next());
         assertSame("Unexpected interceptor at this position.", p2, it.next());
         assertSame("Unexpected interceptor at this position.", p1, it.next());
-        assertTrue(!it.hasNext());
+        assertFalse(it.hasNext());
     }
 
     @Test

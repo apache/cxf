@@ -50,8 +50,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class ConfiguredEndpointTest {
     private static final QName SERVICE_NAME =
@@ -98,8 +98,8 @@ public class ConfiguredEndpointTest {
         Client client = eih.getClient();
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)client.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertTrue("Unexpected value for property validating",
-                   !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
+        assertFalse("Unexpected value for property validating",
+                   Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
 
         // System.out.println("endpoint interceptors");
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
@@ -199,8 +199,8 @@ public class ConfiguredEndpointTest {
 
         JaxWsEndpointImpl endpoint = (JaxWsEndpointImpl)ei.getEndpoint();
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
-        assertTrue("Unexpected value for property validating",
-                   !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
+        assertFalse("Unexpected value for property validating",
+                   Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
 
         List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));

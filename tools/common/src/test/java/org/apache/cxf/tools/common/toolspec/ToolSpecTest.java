@@ -24,6 +24,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -79,7 +80,7 @@ public class ToolSpecTest {
         String tsSource = "parser/resources/testtool1.xml";
         toolSpec = new ToolSpec(getClass().getResourceAsStream(tsSource), false);
         assertTrue(toolSpec.isValidInputStream("testID"));
-        assertTrue(!toolSpec.isValidInputStream("dummyID"));
+        assertFalse(toolSpec.isValidInputStream("dummyID"));
         assertTrue(toolSpec.getInstreamIds().size() == 1);
     }
 

@@ -41,6 +41,7 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -99,7 +100,7 @@ public class ManagedBusTest {
         InstrumentationManagerImpl imi = (InstrumentationManagerImpl)im;
         assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi",
                      imi.getJMXServiceURL());
-        assertTrue(!imi.isEnabled());
+        assertFalse(imi.isEnabled());
         assertNull(imi.getMBeanServer());
 
         //Test that registering without an MBeanServer is a no-op

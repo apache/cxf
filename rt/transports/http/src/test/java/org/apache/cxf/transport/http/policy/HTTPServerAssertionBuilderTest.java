@@ -27,6 +27,7 @@ import org.apache.neethi.Assertion;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -42,7 +43,7 @@ public class HTTPServerAssertionBuilderTest {
         assertTrue(a instanceof JaxbAssertion);
         assertTrue(a instanceof HTTPServerAssertionBuilder.HTTPServerPolicyAssertion);
         assertEquals(new ServerPolicyCalculator().getDataClassName(), a.getName());
-        assertTrue(!a.isOptional());
+        assertFalse(a.isOptional());
     }
 
     @Test
@@ -61,7 +62,7 @@ public class HTTPServerAssertionBuilderTest {
         b.setData(pb);
         assertTrue(a.equal(b));
         pa.setSuppressClientSendErrors(true);
-        assertTrue(!a.equal(b));
+        assertFalse(a.equal(b));
     }
 
 }

@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -79,7 +80,7 @@ public class AssertionBuilderRegistryImplTest {
         control.replay();
         reg.setBus(bus);
 
-        assertTrue(!reg.isIgnoreUnknownAssertions());
+        assertFalse(reg.isIgnoreUnknownAssertions());
         try {
             reg.build(elems[0]);
             fail("Expected PolicyException not thrown.");

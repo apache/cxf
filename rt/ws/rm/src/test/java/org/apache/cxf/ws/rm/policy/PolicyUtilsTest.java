@@ -68,13 +68,13 @@ public class PolicyUtilsTest {
         InactivityTimeout iat = new RMAssertion.InactivityTimeout();
         iat.setMilliseconds(Long.valueOf(10));
         a.setInactivityTimeout(iat);
-        assertTrue(!RMPolicyUtilities.equals(a, b));
+        assertFalse(RMPolicyUtilities.equals(a, b));
         b.setInactivityTimeout(iat);
         assertTrue(RMPolicyUtilities.equals(a, b));
 
         ExponentialBackoff eb = new RMAssertion.ExponentialBackoff();
         a.setExponentialBackoff(eb);
-        assertTrue(!RMPolicyUtilities.equals(a, b));
+        assertFalse(RMPolicyUtilities.equals(a, b));
         b.setExponentialBackoff(eb);
         assertTrue(RMPolicyUtilities.equals(a, b));
     }

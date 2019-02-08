@@ -50,6 +50,7 @@ import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.util.DateUtil;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -97,7 +98,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
     /**
@@ -209,7 +210,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
 
@@ -264,7 +265,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
     /**
@@ -305,7 +306,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
 
@@ -350,7 +351,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
         assertTrue("AuthenticationContext".equals(securityTokenResponse.get(0).getContext()));
     }
 
@@ -398,7 +399,7 @@ public class IssueUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
     /**
@@ -438,7 +439,7 @@ public class IssueUnitTest {
         // Issue a token
         RequestSecurityTokenResponseType response =
             issueOperation.issueSingle(request, null, msgCtx);
-        assertTrue(!response.getAny().isEmpty());
+        assertFalse(response.getAny().isEmpty());
     }
 
 

@@ -27,6 +27,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ResponseTimeMessageInInterceptorTest extends AbstractMessageResponseTestBase {
@@ -172,8 +173,8 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         Message message2 = new MessageImpl();
         Message message3 = new MessageImpl();
         message3.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-        assertTrue("the message should not be client", !rtmii.isClient(message1));
-        assertTrue("the message should not be client", !rtmii.isClient(message2));
+        assertFalse("the message should not be client", rtmii.isClient(message1));
+        assertFalse("the message should not be client", rtmii.isClient(message2));
         assertTrue("the message should be client", rtmii.isClient(message3));
     }
 

@@ -40,9 +40,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -156,10 +156,10 @@ public class AbstractRMInterceptorTest {
         EasyMock.expectLastCall();
         control.replay();
         interceptor.assertReliability(message);
-        assertTrue(!ai.isAsserted());
+        assertFalse(ai.isAsserted());
         aim.put(RM10Constants.RMASSERTION_QNAME, ais);
         interceptor.assertReliability(message);
-        assertTrue(!ai.isAsserted());
+        assertFalse(ai.isAsserted());
         ais.add(ai);
         interceptor.assertReliability(message);
 

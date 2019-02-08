@@ -86,7 +86,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("callerID", parm.partName());
@@ -107,7 +107,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("callerID", parm.partName());
@@ -146,7 +146,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         fail("If the exsh turned off, should not generate this parameter");
                     } else {
@@ -180,7 +180,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     if ("OrderPizza".equals(parm.name())) {
                         assertEquals("http://mypizzaco.com/pizza/types", parm.targetNamespace());
                         assertEquals("OrderPizza", parm.name());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         fail("If the exsh turned off, should not generate this parameter");
                     } else {
@@ -214,7 +214,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
                     WebParam parm = (WebParam)annotations[i][0];
                     if ("Toppings".equals(parm.name())) {
                         assertEquals("http://cxf.apache.org/pizza_wrapped/types", parm.targetNamespace());
-                        assertTrue(!parm.header());
+                        assertFalse(parm.header());
                     } else if ("CallerIDHeader".equals(parm.name())) {
                         assertEquals("http://cxf.apache.org/pizza_wrapped/types", parm.targetNamespace());
                         assertTrue(parm.header());

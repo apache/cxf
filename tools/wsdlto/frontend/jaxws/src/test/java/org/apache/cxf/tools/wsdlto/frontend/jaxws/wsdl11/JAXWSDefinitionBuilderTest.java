@@ -161,8 +161,6 @@ public class JAXWSDefinitionBuilderTest {
 
         // this call will fail before CXF-556
         builder.customize();
-
-        assertTrue(true);
     }
 
     @Test

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
@@ -115,7 +116,7 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
             (TestInterface)Proxy.newProxyInstance(TestInterface.class.getClassLoader(), interfaces, handler2);
 
         assertEquals(proxy1, proxy1);
-        assertTrue(!proxy1.equals(proxy2));
+        assertFalse(proxy1.equals(proxy2));
     }
 
 

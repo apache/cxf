@@ -26,7 +26,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class AbstractToolContainerTest {
     private DummyToolContainer dummyTool;
@@ -59,7 +58,6 @@ public class AbstractToolContainerTest {
             assertEquals("Tool specification has to be set before initializing", e.getMessage());
             return;
         }
-        assertTrue(true);
     }
 
     @Test

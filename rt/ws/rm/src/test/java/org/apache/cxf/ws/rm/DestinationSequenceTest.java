@@ -116,14 +116,14 @@ public class DestinationSequenceTest {
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
         DestinationSequence otherSeq = null;
-        assertTrue(!seq.equals(otherSeq));
+        assertFalse(seq.equals(otherSeq));
         otherSeq = new DestinationSequence(id, ref, destination, ProtocolVariation.RM10WSA200408);
         assertEquals(seq, otherSeq);
         assertEquals(seq.hashCode(), otherSeq.hashCode());
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
         otherSeq = new DestinationSequence(otherId, ref, destination, ProtocolVariation.RM10WSA200408);
-        assertTrue(!seq.equals(otherSeq));
+        assertFalse(seq.equals(otherSeq));
         assertTrue(seq.hashCode() != otherSeq.hashCode());
     }
 
@@ -397,7 +397,7 @@ public class DestinationSequenceTest {
 
         DestinationSequence seq = new DestinationSequence(id, ref, destination,
             ProtocolVariation.RM10WSA200408);
-        assertTrue(!seq.sendAcknowledgement());
+        assertFalse(seq.sendAcknowledgement());
 
         seq.acknowledge(message);
 
@@ -431,7 +431,7 @@ public class DestinationSequenceTest {
         ap.setIntraMessageThreshold(0);
         config.setAcknowledgementInterval(Long.valueOf(200));
 
-        assertTrue(!seq.sendAcknowledgement());
+        assertFalse(seq.sendAcknowledgement());
 
         for (int i = 0; i < messages.length; i++) {
             seq.acknowledge(messages[i]);
@@ -644,7 +644,7 @@ public class DestinationSequenceTest {
         String addr = "http://localhost:9999/reponses";
         EasyMock.expect(uri.getValue()).andReturn(addr);
         control.replay();
-        assertTrue(!seq.canPiggybackAckOnPartialResponse());
+        assertFalse(seq.canPiggybackAckOnPartialResponse());
         control.verify();
         control.reset();
         EasyMock.expect(ref.getAddress()).andReturn(uri);

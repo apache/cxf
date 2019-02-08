@@ -49,7 +49,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.dom.WSConstants;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
@@ -112,7 +112,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
     /**
@@ -163,7 +163,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         encryptionProperties.setEncryptionName("myservicekey");
         service.setEncryptionProperties(encryptionProperties);
@@ -171,7 +171,7 @@ public class IssueEncryptedUnitTest {
         // Issue a (encrypted) token
         response = issueOperation.issue(request, null, msgCtx);
         securityTokenResponse = response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
     }
 
 
@@ -222,7 +222,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         encryptionProperties.setEncryptionAlgorithm(WSS4JConstants.KEYTRANSPORT_RSA15);
         try {
@@ -284,7 +284,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Now specify a non-supported algorithm
         List<String> acceptedAlgorithms = Collections.singletonList(WSS4JConstants.KEYTRANSPORT_RSA15);
@@ -362,7 +362,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         encryptionProperties.setKeyWrapAlgorithm(WSS4JConstants.AES_128);
         try {
@@ -435,7 +435,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         // Now specify a non-supported algorithm
         String aesKw = "http://www.w3.org/2001/04/xmlenc#kw-aes128";
@@ -505,7 +505,7 @@ public class IssueEncryptedUnitTest {
             issueOperation.issue(request, null, msgCtx);
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
 
         encryptionProperties.setKeyIdentifierType(WSConstants.SKI_KEY_IDENTIFIER);
         issueOperation.issue(request, null, msgCtx);

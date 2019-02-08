@@ -75,7 +75,6 @@ public class JavaDocProviderTest {
         assertTrue(getStatus2Tested);
         assertTrue(getStatus3Tested);
         assertTrue(noDocsTested);
-        assertTrue(true);
     }
 
     private void testOperWithNoJavaDocs(JavaDocProvider p, OperationResourceInfo ori) {

@@ -87,6 +87,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -771,7 +772,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(200, wc.getResponse().getStatus());
         assertEquals(123L, book.getId());
         MultivaluedMap<String, Object> headers = wc.getResponse().getMetadata();
-        assertTrue(!headers.isEmpty());
+        assertFalse(headers.isEmpty());
         Object etag = headers.getFirst("ETag");
         assertNotNull(etag);
         assertTrue(etag.toString().startsWith("\""));
@@ -1932,7 +1933,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue(response.startsWith("{"));
         assertTrue(response.endsWith("}"));
         assertTrue(response.contains("\"Book\":{"));
-        assertFalse(response.indexOf("\"Book\":{") == 1);
+        assertNotEquals(1, response.indexOf("\"Book\":{"));
 
     }
 

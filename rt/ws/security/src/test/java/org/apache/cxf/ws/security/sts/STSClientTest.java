@@ -53,8 +53,8 @@ import org.apache.cxf.wsdl11.WSDLServiceFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class STSClientTest {
 
@@ -112,7 +112,7 @@ public class STSClientTest {
         }
 
         assertNotNull(wsdlDefinition);
-        assertTrue(!schemas.isEmpty());
+        assertFalse(schemas.isEmpty());
 
         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
         Definition definition = wsdlManager.getDefinition(wsdlDefinition);

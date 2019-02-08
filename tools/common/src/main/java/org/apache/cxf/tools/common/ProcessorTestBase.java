@@ -56,6 +56,7 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ProcessorTestBase {
@@ -203,8 +204,8 @@ public class ProcessorTestBase {
                          + " != " + location2.getAbsolutePath(), tok1, tok2);
         }
 
-        assertTrue(!st1.hasMoreTokens());
-        assertTrue(!st2.hasMoreTokens());
+        assertFalse(st1.hasMoreTokens());
+        assertFalse(st2.hasMoreTokens());
         assertTrue("Files did not match: " + unmatched, unmatched.isEmpty());
     }
 

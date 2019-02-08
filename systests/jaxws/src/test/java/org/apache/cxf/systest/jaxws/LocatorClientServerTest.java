@@ -110,7 +110,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
             builder.build();
             fail("Address in an EPR cannot be null, when serviceName or portName is null");
         } catch (IllegalStateException ie) {
-            assertTrue(true);
+            // expected
         } catch (Exception e) {
             fail("Unexpected Exception " + e.getClass() + " raised: " + e.getMessage());
         }

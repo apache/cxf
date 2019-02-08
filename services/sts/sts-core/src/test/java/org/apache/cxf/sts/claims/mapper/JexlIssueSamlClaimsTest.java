@@ -109,7 +109,7 @@ public class JexlIssueSamlClaimsTest {
         RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, messageContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = response.getRequestSecurityTokenResponse();
-        assertTrue(!securityTokenResponse.isEmpty());
+        assertFalse(securityTokenResponse.isEmpty());
         return securityTokenResponse;
     }
 

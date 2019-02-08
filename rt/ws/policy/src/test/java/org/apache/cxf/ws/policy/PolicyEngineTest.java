@@ -58,6 +58,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -98,7 +99,7 @@ public class PolicyEngineTest {
         assertNull(engine.getBus());
         assertNotNull(engine.getPolicyProviders());
         assertNull(engine.getAlternativeSelector());
-        assertTrue(!engine.isEnabled());
+        assertFalse(engine.isEnabled());
         Bus bus = new ExtensionManagerBus();
 
         engine.setBus(bus);

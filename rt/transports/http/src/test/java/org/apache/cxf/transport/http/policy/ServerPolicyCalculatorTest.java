@@ -24,6 +24,7 @@ import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ServerPolicyCalculatorTest {
@@ -42,7 +43,7 @@ public class ServerPolicyCalculatorTest {
         p1.setSuppressClientSendErrors(false);
         assertTrue("Policies are compatible.", spc.compatible(p1, p2));
         p1.setSuppressClientSendErrors(true);
-        assertTrue("Policies are compatible.", !spc.compatible(p1, p2));
+        assertFalse("Policies are compatible.", spc.compatible(p1, p2));
         p2.setSuppressClientSendErrors(true);
         assertTrue("Policies are compatible.", spc.compatible(p1, p2));
     }
@@ -76,10 +77,10 @@ public class ServerPolicyCalculatorTest {
         HTTPServerPolicy p2 = new HTTPServerPolicy();
         assertTrue(spc.equals(p1, p2));
         p1.setContentEncoding("encoding");
-        assertTrue(!spc.equals(p1, p2));
+        assertFalse(spc.equals(p1, p2));
         p2.setContentEncoding("encoding");
         assertTrue(spc.equals(p1, p2));
         p1.setSuppressClientSendErrors(true);
-        assertTrue(!spc.equals(p1, p2));
+        assertFalse(spc.equals(p1, p2));
     }
 }

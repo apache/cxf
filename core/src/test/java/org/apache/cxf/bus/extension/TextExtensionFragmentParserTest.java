@@ -26,6 +26,7 @@ import java.util.List;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +39,7 @@ public class TextExtensionFragmentParserTest {
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
 
         Extension e = extensions.get(0);
-        assertTrue("Extension is deferred.", !e.isDeferred());
+        assertFalse("Extension is deferred.", e.isDeferred());
         assertEquals("Unexpected class name.",
                      "org.apache.cxf.foo.FooImpl", e.getClassname());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());

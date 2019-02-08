@@ -121,10 +121,10 @@ public class RetransmissionQueueImplTest {
         assertSame(message, candidate.getMessage());
         assertEquals(0, candidate.getRetries());
         Date refDate = new Date(now + 5000);
-        assertTrue(!candidate.getNext().before(refDate));
+        assertFalse(candidate.getNext().before(refDate));
         refDate = new Date(now + 7000);
-        assertTrue(!candidate.getNext().after(refDate));
-        assertTrue(!candidate.isPending());
+        assertFalse(candidate.getNext().after(refDate));
+        assertFalse(candidate.isPending());
     }
 
     @Test
@@ -137,10 +137,10 @@ public class RetransmissionQueueImplTest {
         candidate.attempted();
         assertEquals(1, candidate.getRetries());
         Date refDate = new Date(now + 15000);
-        assertTrue(!candidate.getNext().before(refDate));
+        assertFalse(candidate.getNext().before(refDate));
         refDate = new Date(now + 17000);
-        assertTrue(!candidate.getNext().after(refDate));
-        assertTrue(!candidate.isPending());
+        assertFalse(candidate.getNext().after(refDate));
+        assertFalse(candidate.isPending());
     }
 
     @Test

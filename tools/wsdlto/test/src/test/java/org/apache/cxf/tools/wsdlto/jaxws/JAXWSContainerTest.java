@@ -49,6 +49,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -232,7 +233,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
         JAXWSContainer container = new JAXWSContainer(null);
         List<ServiceValidator> validators = container.getServiceValidators();
         assertNotNull(validators);
-        assertTrue(!validators.isEmpty());
+        assertFalse(validators.isEmpty());
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {

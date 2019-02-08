@@ -185,7 +185,7 @@ public class ConnectionFactoryImplTest {
             cf.getConnection(param);
             fail("Expect exception on using of none interface class");
         } catch (ResourceException re) {
-            assertTrue(true);
+            // expected
         }
     }
 
@@ -196,7 +196,7 @@ public class ConnectionFactoryImplTest {
             cf.getConnection(param);
             fail("Expect exception of no interface here");
         } catch (ResourceException re) {
-            assertTrue(true);
+            // expected
         }
     }
 

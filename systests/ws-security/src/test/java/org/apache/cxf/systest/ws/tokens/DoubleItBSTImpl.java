@@ -53,12 +53,12 @@ public class DoubleItBSTImpl implements DoubleItPortType {
         List<WSHandlerResult> results =
             CastUtils.cast((List<?>)wsContext.getMessageContext().get(WSHandlerConstants.RECV_RESULTS));
         Assert.assertNotNull("Security Results cannot be null", results);
-        Assert.assertTrue(!results.isEmpty());
+        Assert.assertFalse(results.isEmpty());
 
         WSHandlerResult result = results.get(0);
         List<WSSecurityEngineResult> securityResults = result.getResults();
         Assert.assertNotNull("Security Results cannot be null", securityResults);
-        Assert.assertTrue(!securityResults.isEmpty());
+        Assert.assertFalse(securityResults.isEmpty());
 
         WSSecurityEngineResult securityResult = securityResults.get(0);
         BinarySecurity binarySecurityToken =

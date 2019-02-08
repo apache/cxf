@@ -418,7 +418,7 @@ public class WadlGeneratorTest {
     }
 
     private void checkGrammarsWithLinks(Element appElement, List<String> links) {
-        assertTrue(!links.isEmpty());
+        assertFalse(links.isEmpty());
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS,
                                                                 "grammars");
         assertEquals(1, grammarEls.size());

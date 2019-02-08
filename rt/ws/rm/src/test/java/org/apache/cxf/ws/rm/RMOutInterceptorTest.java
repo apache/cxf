@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class RMOutInterceptorTest {
@@ -162,7 +163,7 @@ public class RMOutInterceptorTest {
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
         control.replay();
-        assertTrue(!rmi.isRuntimeFault(message));
+        assertFalse(rmi.isRuntimeFault(message));
         control.verify();
     }
 

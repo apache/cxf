@@ -37,6 +37,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -140,8 +141,8 @@ public class ConfigurerImplTest {
         configurer.configureBean(sb);
         assertEquals("Unexpected value for attribute stringAttr",
                      "hallo", sb.getStringAttr());
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute intAttr",
@@ -177,8 +178,8 @@ public class ConfigurerImplTest {
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute stringAttr",
@@ -195,8 +196,8 @@ public class ConfigurerImplTest {
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr",
-                   !sb.getBooleanAttr());
+        assertFalse("Unexpected value for attribute booleanAttr",
+                   sb.getBooleanAttr());
         assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
         assertEquals("Unexpected value for attribute stringAttr",

@@ -35,6 +35,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -79,7 +80,7 @@ public class PolicyAttachmentTest {
         EasyMock.expect(de.appliesTo(si1)).andReturn(false);
         EasyMock.expect(de.appliesTo(si2)).andReturn(true);
         control.replay();
-        assertTrue(!pa.appliesTo(si1));
+        assertFalse(pa.appliesTo(si1));
         assertTrue(pa.appliesTo(si2));
         control.verify();
     }
@@ -96,7 +97,7 @@ public class PolicyAttachmentTest {
         EasyMock.expect(de.appliesTo(ei1)).andReturn(false);
         EasyMock.expect(de.appliesTo(ei2)).andReturn(true);
         control.replay();
-        assertTrue(!pa.appliesTo(ei1));
+        assertFalse(pa.appliesTo(ei1));
         assertTrue(pa.appliesTo(ei2));
         control.verify();
     }
@@ -113,7 +114,7 @@ public class PolicyAttachmentTest {
         EasyMock.expect(de.appliesTo(boi1)).andReturn(false);
         EasyMock.expect(de.appliesTo(boi2)).andReturn(true);
         control.replay();
-        assertTrue(!pa.appliesTo(boi1));
+        assertFalse(pa.appliesTo(boi1));
         assertTrue(pa.appliesTo(boi2));
         control.verify();
     }
@@ -130,7 +131,7 @@ public class PolicyAttachmentTest {
         EasyMock.expect(de.appliesTo(bmi1)).andReturn(false);
         EasyMock.expect(de.appliesTo(bmi2)).andReturn(true);
         control.replay();
-        assertTrue(!pa.appliesTo(bmi1));
+        assertFalse(pa.appliesTo(bmi1));
         assertTrue(pa.appliesTo(bmi2));
         control.verify();
     }
@@ -147,7 +148,7 @@ public class PolicyAttachmentTest {
         EasyMock.expect(de.appliesTo(bfi1)).andReturn(false);
         EasyMock.expect(de.appliesTo(bfi2)).andReturn(true);
         control.replay();
-        assertTrue(!pa.appliesTo(bfi1));
+        assertFalse(pa.appliesTo(bfi1));
         assertTrue(pa.appliesTo(bfi2));
         control.verify();
     }

@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +44,7 @@ public class ExtensionTest {
         e.setInterfaceName(interfaceName);
         assertEquals("Unexpected interface name.", interfaceName, e.getInterfaceName());
 
-        assertTrue("Extension is deferred.", !e.isDeferred());
+        assertFalse("Extension is deferred.", e.isDeferred());
         e.setDeferred(true);
         assertTrue("Extension is not deferred.", e.isDeferred());
 

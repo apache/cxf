@@ -454,7 +454,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
 
         List<WSSecurityEngineResult> signatureResults =
             results.get(0).getActionResults().get(WSConstants.SIGN);
-        assertTrue(!(signatureResults == null || signatureResults.isEmpty()));
+        assertFalse(signatureResults == null || signatureResults.isEmpty());
     }
 
     protected void verifyWss4jEncResults(SoapMessage inmsg) {

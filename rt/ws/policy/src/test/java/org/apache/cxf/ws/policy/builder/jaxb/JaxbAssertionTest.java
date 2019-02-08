@@ -38,6 +38,7 @@ import org.easymock.IMocksControl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -52,7 +53,7 @@ public class JaxbAssertionTest {
         JaxbAssertion<FooType> assertion = new JaxbAssertion<>();
         assertNull(assertion.getName());
         assertNull(assertion.getData());
-        assertTrue(!assertion.isOptional());
+        assertFalse(assertion.isOptional());
         assertEquals(Constants.TYPE_ASSERTION, assertion.getType());
         FooType data = new FooType();
         data.setName("CXF");
@@ -78,11 +79,11 @@ public class JaxbAssertionTest {
         assertion.setData(data);
 
         PolicyComponent pc = new Policy();
-        assertTrue(!assertion.equal(pc));
+        assertFalse(assertion.equal(pc));
         pc = new All();
-        assertTrue(!assertion.equal(pc));
+        assertFalse(assertion.equal(pc));
         pc = new ExactlyOne();
-        assertTrue(!assertion.equal(pc));
+        assertFalse(assertion.equal(pc));
 
         IMocksControl ctrl = EasyMock.createNiceControl();
         PrimitiveAssertion xpa = ctrl.createMock(PrimitiveAssertion.class);
@@ -91,7 +92,7 @@ public class JaxbAssertionTest {
         EasyMock.expect(xpa.getType()).andReturn(Constants.TYPE_ASSERTION);
 
         ctrl.replay();
-        assertTrue(!assertion.equal(xpa));
+        assertFalse(assertion.equal(xpa));
         ctrl.verify();
 
         FooType odata = new FooType();
@@ -100,7 +101,7 @@ public class JaxbAssertionTest {
         JaxbAssertion<FooType> oassertion = new JaxbAssertion<>();
         oassertion.setData(odata);
         oassertion.setName(qn);
-        assertTrue(!assertion.equal(oassertion));
+        assertFalse(assertion.equal(oassertion));
         oassertion.setData(data);
         assertTrue(assertion.equal(oassertion));
         assertTrue(assertion.equal(assertion));
@@ -134,7 +135,7 @@ public class JaxbAssertionTest {
                 total += pcs.size();
             }
         }
-        assertTrue(!alternatives.hasNext());
+        assertFalse(alternatives.hasNext());
         assertEquals(1, total);
     }
 }

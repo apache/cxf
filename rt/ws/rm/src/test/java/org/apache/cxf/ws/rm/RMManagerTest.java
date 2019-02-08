@@ -776,7 +776,7 @@ public class RMManagerTest {
         assertNotNull(id1.getValue());
         Identifier id2 = generator.generateSequenceIdentifier();
         assertTrue(id1 != id2);
-        assertTrue(!id1.getValue().equals(id2.getValue()));
+        assertFalse(id1.getValue().equals(id2.getValue()));
         control.replay();
     }
 

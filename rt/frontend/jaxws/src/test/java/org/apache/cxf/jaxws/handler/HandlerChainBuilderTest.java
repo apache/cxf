@@ -40,6 +40,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -80,7 +81,7 @@ public class HandlerChainBuilderTest {
         assertEquals(TestProtocolHandler.class, chain.get(3).getClass());
 
         TestLogicalHandler tlh = (TestLogicalHandler)chain.get(0);
-        assertTrue(!tlh.initCalled);
+        assertFalse(tlh.initCalled);
         assertNull(tlh.config);
     }
 

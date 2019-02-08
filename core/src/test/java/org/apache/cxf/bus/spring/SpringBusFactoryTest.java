@@ -54,6 +54,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -179,7 +180,7 @@ public class SpringBusFactoryTest {
         Bus bus = new SpringBusFactory().createBus("org/apache/cxf/bus/spring/testjsr250.xml");
         TestExtension te = bus.getExtension(TestExtension.class);
         assertTrue("@PostConstruct annotated method has not been called.", te.postConstructMethodCalled);
-        assertTrue("@PreDestroy annoated method has been called already.", !te.preDestroyMethodCalled);
+        assertFalse("@PreDestroy annoated method has been called already.", te.preDestroyMethodCalled);
         bus.shutdown(true);
         assertTrue("@PreDestroy annotated method has not been called.", te.preDestroyMethodCalled);
 
