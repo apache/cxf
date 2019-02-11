@@ -30,6 +30,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WSRMOptionalPolicyTest extends AbstractBusClientServerTestBase {
@@ -46,8 +47,8 @@ public class WSRMOptionalPolicyTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBasicConnection() throws Exception {
         Greeting service = createService();
-        assertTrue("Hello, cxf!".equals(service.hello("cxf")));
-        assertTrue("Goodbye, cxf!".equals(service.goodbye("cxf")));
+        assertEquals("Hello, cxf!", service.hello("cxf"));
+        assertEquals("Goodbye, cxf!", service.goodbye("cxf"));
     }
 
     private static Greeting createService() {

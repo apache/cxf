@@ -549,7 +549,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 utPort.doubleIt(25);
                 fail("Failure expected on a replayed UsernameToken");
             } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-                assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
+                assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
             }
         }
 

@@ -51,7 +51,6 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -352,7 +351,7 @@ public class IssueUnitTest {
         List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertFalse(securityTokenResponse.isEmpty());
-        assertTrue("AuthenticationContext".equals(securityTokenResponse.get(0).getContext()));
+        assertEquals("AuthenticationContext", securityTokenResponse.get(0).getContext());
     }
 
     /**

@@ -604,7 +604,7 @@ public class JAXRSUtilsTest {
                                                  MediaType.valueOf("application/json"));
 
         assertEquals(1, candidateList.size());
-        assertTrue("application/json".equals(candidateList.get(0).toString()));
+        assertEquals("application/json", candidateList.get(0).toString());
 
         //test basic
         methodMimeTypes = JAXRSUtils.parseMediaTypes(
@@ -613,7 +613,7 @@ public class JAXRSUtilsTest {
                                                       MediaType.valueOf("application/json"));
 
         assertEquals(1, candidateList.size());
-        assertTrue("application/json".equals(candidateList.get(0).toString()));
+        assertEquals("application/json", candidateList.get(0).toString());
 
         //test accept wild card */*
         candidateList = JAXRSUtils.intersectMimeTypes(
@@ -636,19 +636,19 @@ public class JAXRSUtilsTest {
         candidateList = JAXRSUtils.intersectMimeTypes("*/*", "application/json");
 
         assertEquals(1, candidateList.size());
-        assertTrue("application/json".equals(candidateList.get(0).toString()));
+        assertEquals("application/json", candidateList.get(0).toString());
 
         //test produce wild card application/*
         candidateList = JAXRSUtils.intersectMimeTypes("application/*", "application/json");
 
         assertEquals(1, candidateList.size());
-        assertTrue("application/json".equals(candidateList.get(0).toString()));
+        assertEquals("application/json", candidateList.get(0).toString());
 
         //test produce wild card */*, accept wild card */*
         candidateList = JAXRSUtils.intersectMimeTypes("*/*", "*/*");
 
         assertEquals(1, candidateList.size());
-        assertTrue("*/*".equals(candidateList.get(0).toString()));
+        assertEquals("*/*", candidateList.get(0).toString());
     }
 
     @Test

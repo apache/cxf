@@ -47,6 +47,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -130,7 +131,7 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
                                    NUMBER_SERVANT_ADDRESS_ROOT + "103");
 
         IsEvenResponse numResp = num.isEven();
-        assertTrue("103 is not even", Boolean.FALSE.equals(numResp.isEven()));
+        assertEquals("103 is not even", Boolean.FALSE, numResp.isEven());
     }
 
     @Test

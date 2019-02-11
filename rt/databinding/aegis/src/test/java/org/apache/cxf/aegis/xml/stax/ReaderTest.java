@@ -61,7 +61,7 @@ public class ReaderTest extends AbstractCXFTest {
     }
 
     public void testReading(MessageReader reader) {
-        assertTrue("Envelope".equals(reader.getLocalName()));
+        assertEquals("Envelope", reader.getLocalName());
 
         // make sure we can repeat this
         assertTrue(reader.hasMoreElementReaders());

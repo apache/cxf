@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -149,7 +150,7 @@ public class ManagedConnectionFactoryImplTest {
         assertTrue("not Object's hashCode method", hashCodeMethod != Object.class
             .getDeclaredMethod("hashCode", (Class[])null));
         assertEquals("equal with its self", mci, mci);
-        assertTrue("not equal with another", !mci.equals(new ManagedConnectionFactoryImpl()));
+        assertNotEquals("not equal with another", mci, new ManagedConnectionFactoryImpl());
     }
 
     @Test

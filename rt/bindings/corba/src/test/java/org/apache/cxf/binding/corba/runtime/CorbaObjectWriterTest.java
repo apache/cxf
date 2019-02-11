@@ -48,6 +48,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -229,7 +230,7 @@ public class CorbaObjectWriterTest {
 
         InputStream iStream = oStream.create_input_stream();
         String s = iStream.read_string();
-        assertTrue(s.equals(stringValue));
+        assertEquals(s, stringValue);
     }
 
     @Test
@@ -242,7 +243,7 @@ public class CorbaObjectWriterTest {
 
         InputStream iStream = oStream.create_input_stream();
         String s = iStream.read_wstring();
-        assertTrue(s.equals(wstringValue));
+        assertEquals(s, wstringValue);
     }
 
     @Test
@@ -311,7 +312,7 @@ public class CorbaObjectWriterTest {
         int length = iStream.read_long();
         for (int i = 0; i < length; ++i) {
             String val = iStream.read_string();
-            assertTrue(val.equals(data[i]));
+            assertEquals(val, data[i]);
         }
     }
 
@@ -379,7 +380,7 @@ public class CorbaObjectWriterTest {
         int readMember1 = iStream.read_long();
         assertTrue(readMember1 == member1);
         String readMember2 = iStream.read_string();
-        assertTrue(readMember2.equals(member2));
+        assertEquals(readMember2, member2);
         boolean readMember3 = iStream.read_boolean();
         assertTrue(readMember3 == member3);
     }
@@ -438,11 +439,11 @@ public class CorbaObjectWriterTest {
         InputStream iStream = oStream.create_input_stream();
 
         String readId = iStream.read_string();
-        assertTrue(readId.equals(reposID));
+        assertEquals(readId, reposID);
         short readCode = iStream.read_short();
         assertTrue(readCode == code);
         String readMessage = iStream.read_string();
-        assertTrue(readMessage.equals(message));
+        assertEquals(readMessage, message);
     }
 
     @Test

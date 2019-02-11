@@ -27,6 +27,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -55,7 +56,7 @@ public class EndpointImplTest {
         assertTrue("hashcodes must be equal", hashcode == hashcode1);
         assertTrue("hashcodes must not be equal", hashcode != hashcode2);
 
-        assertTrue("reflexivity violated", ep.equals(ep));
+        assertEquals("reflexivity violated", ep, ep);
         assertFalse("two objects must not be equal", ep.equals(ep1));
         assertFalse("two objects must not be equal", ep.equals(ep2));
 

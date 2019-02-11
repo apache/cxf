@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -65,7 +66,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -137,7 +138,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -159,7 +160,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -181,7 +182,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -203,7 +204,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -225,7 +226,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -247,7 +248,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -269,7 +270,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -291,7 +292,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -313,7 +314,7 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.toString().equals(result));
+        assertEquals(val.toString(), result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
@@ -335,14 +336,14 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.equals(result));
+        assertEquals(val, result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
         assertNotNull(resultObj);
         assertTrue(resultObj instanceof String);
         String stringResult = (String)resultObj;
-        assertTrue(stringResult.equals(val));
+        assertEquals(stringResult, val);
     }
 
     @Test
@@ -357,13 +358,13 @@ public class CorbaPrimitiveHandlerTest {
 
         obj.setValueFromData(val.toString());
         String result = obj.getDataFromValue();
-        assertTrue(val.equals(result));
+        assertEquals(val, result);
 
         obj.setValue(val);
         Object resultObj = obj.getValue();
         assertNotNull(resultObj);
         assertTrue(resultObj instanceof String);
         String stringResult = (String)resultObj;
-        assertTrue(stringResult.equals(val));
+        assertEquals(stringResult, val);
     }
 }

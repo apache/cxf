@@ -50,6 +50,7 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -96,7 +97,7 @@ public class SAMLTokenValidatorRealmTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue("A".equals(validatorResponse.getTokenRealm()));
+        assertEquals("A", validatorResponse.getTokenRealm());
 
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
@@ -139,7 +140,7 @@ public class SAMLTokenValidatorRealmTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue("B".equals(validatorResponse.getTokenRealm()));
+        assertEquals("B", validatorResponse.getTokenRealm());
 
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);

@@ -62,7 +62,7 @@ public class StandaloneReadTest {
         XMLStreamReader streamReader = testUtilities.getResourceAsXMLStreamReader("stringElement.xml");
         AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
         Object something = reader.read(streamReader);
-        assertTrue("ball-of-yarn".equals(something));
+        assertEquals("ball-of-yarn", something);
     }
 
     @Test

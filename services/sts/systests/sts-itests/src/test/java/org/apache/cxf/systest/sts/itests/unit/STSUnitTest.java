@@ -82,7 +82,7 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         // Get a token
         SecurityToken token =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, stsEndpoint);
-        Assert.assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        Assert.assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         Assert.assertNotNull(token.getToken());
 
         // Process the token

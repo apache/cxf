@@ -294,7 +294,7 @@ public class ValidateUnitTest {
         RequestSecurityTokenResponseType response =
             validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
-        assertTrue("AuthenticationContext".equals(response.getContext()));
+        assertEquals("AuthenticationContext", response.getContext());
     }
 
     /**

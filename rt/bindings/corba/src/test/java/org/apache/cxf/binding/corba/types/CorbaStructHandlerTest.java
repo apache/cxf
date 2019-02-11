@@ -34,6 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -109,17 +110,17 @@ public class CorbaStructHandlerTest {
         assertTrue(memberSize == 2);
 
         QName nameResult = obj.getName();
-        assertTrue(structName.equals(nameResult));
+        assertEquals(structName, nameResult);
 
         QName idlTypeResult = obj.getIdlType();
-        assertTrue(structIdlType.equals(idlTypeResult));
+        assertEquals(structIdlType, idlTypeResult);
 
         CorbaObjectHandler member0Result = obj.getMemberByName("member0");
         assertNotNull(member0Result);
-        assertTrue(member0Result.getName().equals(objMember0.getName()));
+        assertEquals(member0Result.getName(), objMember0.getName());
 
         CorbaObjectHandler member1Result = obj.getMember(1);
         assertNotNull(member1Result);
-        assertTrue(member1Result.getName().equals(objMember1.getName()));
+        assertEquals(member1Result.getName(), objMember1.getName());
     }
 }

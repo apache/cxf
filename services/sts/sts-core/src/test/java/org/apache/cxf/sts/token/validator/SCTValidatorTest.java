@@ -46,6 +46,7 @@ import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -82,7 +83,7 @@ public class SCTValidatorTest {
         assertTrue(
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
         );
-        assertTrue("alice".equals(validatorResponse.getPrincipal().getName()));
+        assertEquals("alice", validatorResponse.getPrincipal().getName());
 
         // Now remove the SCT from the cache
         tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());

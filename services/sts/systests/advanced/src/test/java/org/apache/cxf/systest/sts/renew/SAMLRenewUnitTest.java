@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -214,7 +215,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         // Validate the token
         List<SecurityToken> validatedTokens = validateSecurityToken(bus, wsdlLocation, token);
         assertFalse(validatedTokens.isEmpty());
-        assertTrue(validatedTokens.get(0).equals(token));
+        assertEquals(validatedTokens.get(0), token);
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
@@ -277,7 +278,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         // Validate the token
         List<SecurityToken> validatedTokens = validateSecurityToken(bus, wsdlLocation, token);
         assertFalse(validatedTokens.isEmpty());
-        assertTrue(validatedTokens.get(0).equals(token));
+        assertEquals(validatedTokens.get(0), token);
 
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);

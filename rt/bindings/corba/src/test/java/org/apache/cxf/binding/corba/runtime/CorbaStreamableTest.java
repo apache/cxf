@@ -91,7 +91,7 @@ public class CorbaStreamableTest {
         assertTrue(mode == org.omg.CORBA.ARG_OUT.value);
 
         String name = streamable.getName();
-        assertTrue(name.equals(objName.getLocalPart()));
+        assertEquals(name, objName.getLocalPart());
     }
 
     @Test

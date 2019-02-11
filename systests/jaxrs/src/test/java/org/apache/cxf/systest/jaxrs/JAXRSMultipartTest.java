@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -73,6 +72,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
@@ -617,7 +617,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
     }
 
     @Test
@@ -660,7 +660,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
     }
 
     private Map<String, String> doTestAddBookJaxbJsonImageWebClient(String multipartType) throws Exception {
@@ -689,7 +689,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
 
         String ctString =
             client.getResponse().getMetadata().getFirst("Content-Type").toString();
@@ -775,7 +775,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
     }
 
     @Test
@@ -813,7 +813,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
 
     }
 
@@ -842,7 +842,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
         ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
         assertEquals("attachment;filename=java.jpg", cd2.toString());
         assertEquals("java.jpg", cd2.getParameter("filename"));
@@ -881,7 +881,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
         ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
         assertEquals("form-data;name=file;filename=java.jpg", cd2.toString());
         assertEquals("java.jpg", cd2.getParameter("filename"));

@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.ext.search.visitor.SBThreadLocalVisitorState;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -138,7 +139,7 @@ public class SQLPrinterVisitorTest {
         SQLPrinterVisitor<Condition> visitor = new SQLPrinterVisitor<>("table");
         filter.accept(visitor);
         String sql = visitor.getQuery();
-        assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
+        assertEquals("SELECT * FROM table WHERE name = 'test'", sql);
     }
 
     @Test
@@ -148,7 +149,7 @@ public class SQLPrinterVisitorTest {
             new SQLPrinterVisitor<>("table", "NAMES");
         filter.accept(visitor);
         String sql = visitor.getQuery();
-        assertTrue("SELECT NAMES FROM table WHERE name = 'test'".equals(sql));
+        assertEquals("SELECT NAMES FROM table WHERE name = 'test'", sql);
     }
 
     @Test
@@ -160,7 +161,7 @@ public class SQLPrinterVisitorTest {
                 "table", Collections.singletonList("NAMES"));
         filter.accept(visitor);
         String sql = visitor.getQuery();
-        assertTrue("SELECT NAMES FROM table WHERE NAMES = 'test'".equals(sql));
+        assertEquals("SELECT NAMES FROM table WHERE NAMES = 'test'", sql);
     }
 
     @Ignore

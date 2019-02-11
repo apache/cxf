@@ -150,7 +150,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
+            assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
         // Here the Server is adding the WSS4JInInterceptor in code
@@ -192,7 +192,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
+            assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
         ((java.io.Closeable)port).close();
@@ -253,7 +253,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
             port.doubleIt(25);
             fail("Failure expected on a replayed Timestamp");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
+            assertEquals(ex.getMessage(), WSSecurityException.UNIFIED_SECURITY_ERR);
         }
 
         ((java.io.Closeable)port).close();

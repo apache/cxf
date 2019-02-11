@@ -393,7 +393,7 @@ public class SAMLTokenValidatorTest {
         assertTrue(principal != null && principal.getName() != null);
         Set<Principal> roles = validatorResponse.getRoles();
         assertTrue(roles != null && !roles.isEmpty());
-        assertTrue("manager".equals(roles.iterator().next().getName()));
+        assertEquals("manager", roles.iterator().next().getName());
     }
 
     @org.junit.Test
@@ -427,7 +427,7 @@ public class SAMLTokenValidatorTest {
         assertTrue(principal != null && principal.getName() != null);
         Set<Principal> roles = validatorResponse.getRoles();
         assertTrue(roles != null && !roles.isEmpty());
-        assertTrue("employee".equals(roles.iterator().next().getName()));
+        assertEquals("employee", roles.iterator().next().getName());
     }
 
     /**

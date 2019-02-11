@@ -41,6 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -124,10 +125,10 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
             requestSecurityTokens(bus, wsdlLocation, requestList, action, requestType, port);
         assertTrue(tokens != null && tokens.size() == 2);
 
-        assertTrue("Assertion".equals(tokens.get(0).getToken().getLocalName()));
-        assertTrue(tokens.get(0).getToken().getNamespaceURI().equals(SAMLConstants.SAML1_NS));
-        assertTrue("Assertion".equals(tokens.get(1).getToken().getLocalName()));
-        assertTrue(tokens.get(1).getToken().getNamespaceURI().equals(SAMLConstants.SAML20_NS));
+        assertEquals("Assertion", tokens.get(0).getToken().getLocalName());
+        assertEquals(tokens.get(0).getToken().getNamespaceURI(), SAMLConstants.SAML1_NS);
+        assertEquals("Assertion", tokens.get(1).getToken().getLocalName());
+        assertEquals(tokens.get(1).getToken().getNamespaceURI(), SAMLConstants.SAML20_NS);
 
         // Now validate the tokens
         requestList.get(0).setValidateTarget(tokens.get(0).getToken());

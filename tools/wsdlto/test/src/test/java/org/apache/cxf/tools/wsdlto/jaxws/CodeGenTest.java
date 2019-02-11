@@ -641,7 +641,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.types.SayHi");
         Method method = clz.getMethod("dummy", new Class[] {});
-        assertTrue("method declared on SayHi", method.getDeclaringClass().equals(clz));
+        assertEquals("method declared on SayHi", method.getDeclaringClass(), clz);
     }
 
     @Test

@@ -236,7 +236,7 @@ public class CorbaObjectReaderTest {
         CorbaObjectReader reader = new CorbaObjectReader(iStream);
 
         String stringValue = reader.readString();
-        assertTrue("String".equals(stringValue));
+        assertEquals("String", stringValue);
     }
 
     @Test
@@ -248,7 +248,7 @@ public class CorbaObjectReaderTest {
         CorbaObjectReader reader = new CorbaObjectReader(iStream);
 
         String wstringValue = reader.readWString();
-        assertTrue("WString".equals(wstringValue));
+        assertEquals("WString", wstringValue);
     }
 
     // need to add tests for arrays, sequences, struct, exceptions
@@ -324,7 +324,7 @@ public class CorbaObjectReaderTest {
         reader.readSequence(obj);
         int length = obj.getElements().size();
         for (int i = 0; i < length; ++i) {
-            assertTrue(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue().equals(data[i]));
+            assertEquals(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue(), data[i]);
         }
     }
 
@@ -390,7 +390,7 @@ public class CorbaObjectReaderTest {
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
         assertTrue(Integer.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0)).getDataFromValue()).intValue()
                    == member1);
-        assertTrue(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue().equals(member2));
+        assertEquals(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue(), member2);
         assertTrue(Boolean.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(2))
                                    .getDataFromValue()).booleanValue()
                    == member3);
@@ -451,7 +451,7 @@ public class CorbaObjectReaderTest {
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
         assertTrue(Short.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0))
                                  .getDataFromValue()).shortValue() == code);
-        assertTrue(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue().equals(message));
+        assertEquals(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue(), message);
     }
 
     @Test
@@ -483,7 +483,7 @@ public class CorbaObjectReaderTest {
         CorbaEnumHandler obj = new CorbaEnumHandler(enumName, enumIdlType, enumTC, enumType);
 
         reader.readEnum(obj);
-        assertTrue(obj.getValue().equals(enums[1]));
+        assertEquals(obj.getValue(), enums[1]);
     }
 
     @Test
@@ -513,7 +513,7 @@ public class CorbaObjectReaderTest {
 
         reader.readFixed(obj);
 
-        assertTrue(obj.getValue().equals(new java.math.BigDecimal("12345.67")));
+        assertEquals(obj.getValue(), new java.math.BigDecimal("12345.67"));
     }
 
     @Test

@@ -168,11 +168,11 @@ public class SpringBusFactoryTest {
         SortedSet<Phase> cxfPhases = cxfPM.getInPhases();
         SortedSet<Phase> defaultPhases = defaultPM.getInPhases();
         assertEquals(defaultPhases.size(), cxfPhases.size());
-        assertTrue(cxfPhases.equals(defaultPhases));
+        assertEquals(cxfPhases, defaultPhases);
         cxfPhases = cxfPM.getOutPhases();
         defaultPhases = defaultPM.getOutPhases();
         assertEquals(defaultPhases.size(), cxfPhases.size());
-        assertTrue(cxfPhases.equals(defaultPhases));
+        assertEquals(cxfPhases, defaultPhases);
     }
 
     @Test

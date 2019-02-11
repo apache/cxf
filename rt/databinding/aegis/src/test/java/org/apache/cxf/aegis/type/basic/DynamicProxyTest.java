@@ -61,7 +61,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
         assertEquals(false, data.isUseless());
 
         assertTrue(data.hashCode() != 0);
-        assertTrue(data.equals(data));
+        assertEquals(data, data);
         // checkstyle isn't smart enough to know we're testing equals....
 //        assertFalse(data.equals(null));
 //        assertFalse("bigjunk".equals(data));

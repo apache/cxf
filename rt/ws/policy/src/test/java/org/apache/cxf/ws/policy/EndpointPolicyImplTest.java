@@ -302,7 +302,7 @@ public class EndpointPolicyImplTest {
         assertEquals("1 assertion should be available", 1, assertions1.size());
 
         QName n1 = assertions1.get(0).getName();
-        assertTrue("Policy was not merged", n1.equals(aqn1));
+        assertEquals("Policy was not merged", n1, aqn1);
     }
 
     private PolicyAssertion mockAssertion(QName name, int howMany, boolean normalize) {

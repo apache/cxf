@@ -34,7 +34,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 
 public class CorbaAnyHandlerTest {
@@ -85,6 +84,6 @@ public class CorbaAnyHandlerTest {
 
         // Test get/set CorbaTypeMap methods
         CorbaTypeMap resultTM = anyHandler.getTypeMap();
-        assertTrue(resultTM.getTargetNamespace().equals(CorbaConstants.NU_WSDL_CORBA));
+        assertEquals(resultTM.getTargetNamespace(), CorbaConstants.NU_WSDL_CORBA);
     }
 }

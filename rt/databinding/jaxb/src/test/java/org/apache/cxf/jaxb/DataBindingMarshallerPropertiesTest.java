@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class DataBindingMarshallerPropertiesTest extends TestBase {
     @Test
@@ -36,6 +36,6 @@ public class DataBindingMarshallerPropertiesTest extends TestBase {
 
         db.initialize(service);
 
-        assertTrue("somevalue".equals(db.getUnmarshallerProperties().get("someproperty")));
+        assertEquals("somevalue", db.getUnmarshallerProperties().get("someproperty"));
     }
 }

@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -35,6 +34,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -172,13 +172,13 @@ public class PrimitiveTextProviderTest {
         MessageBodyWriter p = new PrimitiveTextProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(Boolean.TRUE, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
-        assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
+        assertArrayEquals(new String("true").getBytes(), os.toByteArray());
 
         os = new ByteArrayOutputStream();
 
         final boolean value = true;
         p.writeTo(value, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
-        assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
+        assertArrayEquals(new String("true").getBytes(), os.toByteArray());
     }
 
 
@@ -239,7 +239,7 @@ public class PrimitiveTextProviderTest {
         assertTrue(p.isWriteable(value.getClass(), null, null, MediaType.TEXT_PLAIN_TYPE));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(value, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
-        assertTrue(Arrays.equals(value.toString().getBytes(), os.toByteArray()));
+        assertArrayEquals(value.toString().getBytes(), os.toByteArray());
 
         assertTrue(p.isReadable(value.getClass(), null, null, MediaType.TEXT_PLAIN_TYPE));
         @SuppressWarnings("unchecked")

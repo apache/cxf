@@ -45,6 +45,7 @@ import org.apache.type_test.types1.StringEnum;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -788,9 +789,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testGYear(x, y, z);
         }
-        assertTrue("testGYear(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testGYear(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testGYear(): Incorrect return value", x.equals(ret));
+        assertEquals("testGYear(): Incorrect value for inout param", x, y.value);
+        assertEquals("testGYear(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testGYear(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -814,9 +815,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testGYearMonth(x, y, z);
         }
-        assertTrue("testGYearMonth(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testGYearMonth(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testGYearMonth(): Incorrect return value", x.equals(ret));
+        assertEquals("testGYearMonth(): Incorrect value for inout param", x, y.value);
+        assertEquals("testGYearMonth(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testGYearMonth(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -849,9 +850,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testGMonth(x, y, z);
         }
-        assertTrue("testGMonth(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testGMonth(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testGMonth(): Incorrect return value", x.equals(ret));
+        assertEquals("testGMonth(): Incorrect value for inout param", x, y.value);
+        assertEquals("testGMonth(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testGMonth(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -875,9 +876,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testGMonthDay(x, y, z);
         }
-        assertTrue("testGMonthDay(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testGMonthDay(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testGMonthDay(): Incorrect return value", x.equals(ret));
+        assertEquals("testGMonthDay(): Incorrect value for inout param", x, y.value);
+        assertEquals("testGMonthDay(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testGMonthDay(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -901,9 +902,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testGDay(x, y, z);
         }
-        assertTrue("testGDay(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testGDay(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testGDay(): Incorrect return value", x.equals(ret));
+        assertEquals("testGDay(): Incorrect value for inout param", x, y.value);
+        assertEquals("testGDay(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testGDay(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -927,9 +928,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testDuration(x, y, z);
         }
-        assertTrue("testDuration(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testDuration(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testDuration(): Incorrect return value", x.equals(ret));
+        assertEquals("testDuration(): Incorrect value for inout param", x, y.value);
+        assertEquals("testDuration(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testDuration(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -951,9 +952,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testNormalizedString(x, y, z);
         }
-        assertTrue("testNormalizedString(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testNormalizedString(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testNormalizedString(): Incorrect return value", x.equals(ret));
+        assertEquals("testNormalizedString(): Incorrect value for inout param", x, y.value);
+        assertEquals("testNormalizedString(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testNormalizedString(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -975,9 +976,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testToken(x, y, z);
         }
-        assertTrue("testToken(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testToken(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testToken(): Incorrect return value", x.equals(ret));
+        assertEquals("testToken(): Incorrect value for inout param", x, y.value);
+        assertEquals("testToken(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testToken(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -999,9 +1000,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testLanguage(x, y, z);
         }
-        assertTrue("testLanguage(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testLanguage(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testLanguage(): Incorrect return value", x.equals(ret));
+        assertEquals("testLanguage(): Incorrect value for inout param", x, y.value);
+        assertEquals("testLanguage(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testLanguage(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -1023,9 +1024,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testNMTOKEN(x, y, z);
         }
-        assertTrue("testNMTOKEN(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testNMTOKEN(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testNMTOKEN(): Incorrect return value", x.equals(ret));
+        assertEquals("testNMTOKEN(): Incorrect value for inout param", x, y.value);
+        assertEquals("testNMTOKEN(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testNMTOKEN(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -1043,9 +1044,9 @@ public abstract class AbstractTypeTestClient
             Holder<List<String>> y = new Holder<>(yOrig);
             Holder<List<String>> z = new Holder<>();
             List<String> ret = testXMLBinding ? xmlClient.testNMTOKENS(x, y, z) : docClient.testNMTOKENS(x, y, z);
-            assertTrue("testNMTOKENS(): Incorrect value for inout param", x.equals(y.value));
-            assertTrue("testNMTOKENS(): Incorrect value for out param", yOrig.equals(z.value));
-            assertTrue("testNMTOKENS(): Incorrect return value", x.equals(ret));
+            assertEquals("testNMTOKENS(): Incorrect value for inout param", x, y.value);
+            assertEquals("testNMTOKENS(): Incorrect value for out param", yOrig, z.value);
+            assertEquals("testNMTOKENS(): Incorrect return value", x, ret);
         } else {
             String[] x = new String[1];
             x[0] = "123:abc";
@@ -1057,9 +1058,9 @@ public abstract class AbstractTypeTestClient
             Holder<String[]> z = new Holder<>();
 
             String[] ret = rpcClient.testNMTOKENS(x, y, z);
-            assertTrue("testNMTOKENS(): Incorrect value for inout param", Arrays.equals(x, y.value));
-            assertTrue("testNMTOKENS(): Incorrect value for out param", Arrays.equals(yOrig, z.value));
-            assertTrue("testNMTOKENS(): Incorrect return value", Arrays.equals(x, ret));
+            assertArrayEquals("testNMTOKENS(): Incorrect value for inout param", x, y.value);
+            assertArrayEquals("testNMTOKENS(): Incorrect value for out param", yOrig, z.value);
+            assertArrayEquals("testNMTOKENS(): Incorrect return value", x, ret);
         }
     }
 
@@ -1082,9 +1083,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testName(x, y, z);
         }
-        assertTrue("testName(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testName(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testName(): Incorrect return value", x.equals(ret));
+        assertEquals("testName(): Incorrect value for inout param", x, y.value);
+        assertEquals("testName(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testName(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -1106,9 +1107,9 @@ public abstract class AbstractTypeTestClient
         } else {
             ret = rpcClient.testNCName(x, y, z);
         }
-        assertTrue("testNCName(): Incorrect value for inout param", x.equals(y.value));
-        assertTrue("testNCName(): Incorrect value for out param", yOrig.equals(z.value));
-        assertTrue("testNCName(): Incorrect return value", x.equals(ret));
+        assertEquals("testNCName(): Incorrect value for inout param", x, y.value);
+        assertEquals("testNCName(): Incorrect value for out param", yOrig, z.value);
+        assertEquals("testNCName(): Incorrect return value", x, ret);
     }
 
     @Test
@@ -1321,10 +1322,9 @@ public abstract class AbstractTypeTestClient
             ret = rpcClient.testHexBinary(x, y, z);
         }
         if (!perfTestOnly) {
-            assertTrue("testHexBinary(): Incorrect value for inout param", Arrays.equals(x, y.value));
-            assertTrue("testHexBinary(): Incorrect value for out param", Arrays.equals(yOriginal.value,
-                                                                                       z.value));
-            assertTrue("testHexBinary(): Incorrect return value", Arrays.equals(x, ret));
+            assertArrayEquals("testHexBinary(): Incorrect value for inout param", x, y.value);
+            assertArrayEquals("testHexBinary(): Incorrect value for out param", yOriginal.value, z.value);
+            assertArrayEquals("testHexBinary(): Incorrect return value", x, ret);
         }
     }
 
@@ -1346,10 +1346,9 @@ public abstract class AbstractTypeTestClient
             ret = rpcClient.testBase64Binary(x, y, z);
         }
         if (!perfTestOnly) {
-            assertTrue("testBase64Binary(): Incorrect value for inout param", Arrays.equals(x, y.value));
-            assertTrue("testBase64Binary(): Incorrect value for out param", Arrays.equals(yOriginal.value,
-                                                                                          z.value));
-            assertTrue("testBase64Binary(): Incorrect return value", Arrays.equals(x, ret));
+            assertArrayEquals("testBase64Binary(): Incorrect value for inout param", x, y.value);
+            assertArrayEquals("testBase64Binary(): Incorrect value for out param", yOriginal.value, z.value);
+            assertArrayEquals("testBase64Binary(): Incorrect return value", x, ret);
         }
 
         // Test uninitialized holder value
@@ -1988,9 +1987,9 @@ public abstract class AbstractTypeTestClient
             List<String> ret = testDocLiteral ? docClient.testSimpleListRestriction2(x, y, z) : xmlClient
                 .testSimpleListRestriction2(x, y, z);
             if (!perfTestOnly) {
-                assertTrue("testStringList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testStringList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testStringList(): Incorrect return value", x.equals(ret));
+                assertEquals("testStringList(): Incorrect value for inout param", x, y.value);
+                assertEquals("testStringList(): Incorrect value for out param", yOrig, z.value);
+                assertEquals("testStringList(): Incorrect return value", x, ret);
             }
             x = new ArrayList<>();
             y = new Holder<>(yOrig);
@@ -2038,9 +2037,9 @@ public abstract class AbstractTypeTestClient
             List<String> ret = testDocLiteral ? docClient.testStringList(x, y, z) : xmlClient
                 .testStringList(x, y, z);
             if (!perfTestOnly) {
-                assertTrue("testStringList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testStringList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testStringList(): Incorrect return value", x.equals(ret));
+                assertEquals("testStringList(): Incorrect value for inout param", x, y.value);
+                assertEquals("testStringList(): Incorrect value for out param", yOrig, z.value);
+                assertEquals("testStringList(): Incorrect return value", x, ret);
             }
             if (testDocLiteral) {
                 try {
@@ -2084,9 +2083,9 @@ public abstract class AbstractTypeTestClient
             List<Integer> ret = testDocLiteral ? docClient.testNumberList(x, y, z) : xmlClient
                 .testNumberList(x, y, z);
             if (!perfTestOnly) {
-                assertTrue("testNumberList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testNumberList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testNumberList(): Incorrect return value", x.equals(ret));
+                assertEquals("testNumberList(): Incorrect value for inout param", x, y.value);
+                assertEquals("testNumberList(): Incorrect value for out param", yOrig, z.value);
+                assertEquals("testNumberList(): Incorrect return value", x, ret);
             }
         } else {
             Integer[] x = {1, 2, 3};
@@ -2128,9 +2127,9 @@ public abstract class AbstractTypeTestClient
                                                                                                           y,
                                                                                                           z);
             if (!perfTestOnly) {
-                assertTrue("testQNameList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testQNameList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testQNameList(): Incorrect return value", x.equals(ret));
+                assertEquals("testQNameList(): Incorrect value for inout param", x, y.value);
+                assertEquals("testQNameList(): Incorrect value for out param", yOrig, z.value);
+                assertEquals("testQNameList(): Incorrect return value", x, ret);
             }
         } else {
             QName[] x = {new QName("http://schemas.iona.com/type_test", "testqname1"),
@@ -2172,9 +2171,9 @@ public abstract class AbstractTypeTestClient
             List<String> ret = testDocLiteral ? docClient.testSimpleUnionList(x, y, z) : xmlClient
                 .testSimpleUnionList(x, y, z);
             if (!perfTestOnly) {
-                assertTrue("testSimpleUnionList(): Incorrect value for inout param", x.equals(y.value));
-                assertTrue("testSimpleUnionList(): Incorrect value for out param", yOrig.equals(z.value));
-                assertTrue("testSimpleUnionList(): Incorrect return value", x.equals(ret));
+                assertEquals("testSimpleUnionList(): Incorrect value for inout param", x, y.value);
+                assertEquals("testSimpleUnionList(): Incorrect value for out param", yOrig, z.value);
+                assertEquals("testSimpleUnionList(): Incorrect return value", x, ret);
             }
         } else {
             String[] x = {"5", "-7"};

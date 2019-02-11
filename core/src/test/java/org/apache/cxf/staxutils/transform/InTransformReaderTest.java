@@ -36,7 +36,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class InTransformReaderTest {
 
@@ -51,7 +50,7 @@ public class InTransformReaderTest {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(reader, bos);
         String value = bos.toString();
-        assertTrue("<test2 xmlns=\"\"/>".equals(value));
+        assertEquals("<test2 xmlns=\"\"/>", value);
     }
 
     @Test

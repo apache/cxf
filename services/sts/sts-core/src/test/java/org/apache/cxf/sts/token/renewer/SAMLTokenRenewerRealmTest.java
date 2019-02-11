@@ -64,6 +64,7 @@ import org.apache.wss4j.common.util.DateUtil;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -116,7 +117,7 @@ public class SAMLTokenRenewerRealmTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        assertTrue("A".equals(validatorResponse.getTokenRealm()));
+        assertEquals("A", validatorResponse.getTokenRealm());
 
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
@@ -189,7 +190,7 @@ public class SAMLTokenRenewerRealmTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        assertTrue("B".equals(validatorResponse.getTokenRealm()));
+        assertEquals("B", validatorResponse.getTokenRealm());
 
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();

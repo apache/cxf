@@ -590,7 +590,7 @@ public class JAXBEncoderDecoderTest {
         int idx = 0;
         for (Type t : genericParameterTypes) {
             Class<?> cls = JAXBEncoderDecoder.getClassFromType(t);
-            assertTrue(cls.equals(paramTypes[idx]));
+            assertEquals(cls, paramTypes[idx]);
             idx++;
         }
 
@@ -601,7 +601,7 @@ public class JAXBEncoderDecoderTest {
         idx = 0;
         for (Type t : genericParameterTypes) {
             Class<?> cls = JAXBEncoderDecoder.getClassFromType(t);
-            assertTrue(cls.equals(paramTypes[idx]));
+            assertEquals(cls, paramTypes[idx]);
             idx++;
         }
     }

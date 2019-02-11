@@ -168,7 +168,7 @@ public class ServiceWSDLBuilderTest {
         assertEquals(1, newDef.getPortTypes().size());
         PortType portType = (PortType)newDef.getPortTypes().values().iterator().next();
         assertNotNull(portType);
-        assertTrue(portType.getQName().equals(new QName(newDef.getTargetNamespace(), "Greeter")));
+        assertEquals(portType.getQName(), new QName(newDef.getTargetNamespace(), "Greeter"));
 
     }
 
@@ -311,7 +311,7 @@ public class ServiceWSDLBuilderTest {
     public void testBindingWithDifferentNamespaceImport() throws Exception {
         setupWSDL("wsdl2/person.wsdl");
         assertEquals(newDef.getBindings().size(), 1);
-        assertTrue("http://cxf.apache.org/samples/wsdl-first".equals(newDef.getNamespace("ns3")));
+        assertEquals("http://cxf.apache.org/samples/wsdl-first", newDef.getNamespace("ns3"));
     }
 
     @Test

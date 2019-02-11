@@ -159,7 +159,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         String sseqId = getSingleSourceSequenceId(mbs, clientEndpointName);
 
         o = mbs.invoke(clientEndpointName, "getCurrentSourceSequenceId", null, null);
-        assertTrue("Expected sequence identifier", o instanceof String && sseqId.equals(o));
+        assertEquals("Expected sequence identifier", sseqId, o);
 
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
         verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false);
@@ -220,7 +220,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
         String sseqId = getSingleSourceSequenceId(mbs, clientEndpointName);
 
         o = mbs.invoke(clientEndpointName, "getCurrentSourceSequenceId", null, null);
-        assertTrue("Expected sequence identifier", o instanceof String && sseqId.equals(o));
+        assertEquals("Expected sequence identifier", sseqId, o);
 
         o = mbs.invoke(serverEndpointName, "getDestinationSequenceIds", null, null);
         verifyArray("Expected sequence identifier", o, new String[]{sseqId}, false);

@@ -34,6 +34,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -76,7 +77,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
 
 
         String output = port.greetMe("Betty");
-        assertTrue("Unexpected returned string: " + output, "Hello Betty".equals(output));
+        assertEquals("Unexpected returned string: " + output, "Hello Betty", output);
     }
 
     @Test

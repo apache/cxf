@@ -54,6 +54,7 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -99,7 +100,7 @@ public class SAMLTokenValidatorCachedRealmTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue("A".equals(validatorResponse.getTokenRealm()));
+        assertEquals("A", validatorResponse.getTokenRealm());
 
     }
 

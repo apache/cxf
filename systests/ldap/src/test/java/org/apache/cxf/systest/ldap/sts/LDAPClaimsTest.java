@@ -419,7 +419,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             claimsManager.retrieveClaimValues(requestedClaims, params);
 
         Assert.assertTrue(retrievedClaims.size() == 1);
-        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertEquals(retrievedClaims.get(0).getClaimType(), roleURI);
         Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
@@ -442,7 +442,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             claimsManager.retrieveClaimValues(requestedClaims, params);
 
         Assert.assertTrue(retrievedClaims.size() == 1);
-        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertEquals(retrievedClaims.get(0).getClaimType(), roleURI);
         Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
@@ -468,7 +468,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             claimsManager.retrieveClaimValues(requestedClaims, params);
 
         Assert.assertTrue(retrievedClaims.size() == 1);
-        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertEquals(retrievedClaims.get(0).getClaimType(), roleURI);
         Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
@@ -494,7 +494,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             claimsManager.retrieveClaimValues(requestedClaims, params);
 
         Assert.assertTrue(retrievedClaims.size() == 1);
-        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertEquals(retrievedClaims.get(0).getClaimType(), roleURI);
         Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 1);
     }
 

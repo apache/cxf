@@ -22,7 +22,6 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -111,7 +111,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         byte[] image1 = IOUtils.readBytesFromStream(
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
+        assertArrayEquals(image1, image2);
     }
 
     @Test

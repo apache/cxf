@@ -294,7 +294,7 @@ public class FiqlParserTest {
     public void testSQL5() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==test");
         String sql = SearchUtils.toSQL(filter, "table");
-        assertTrue("SELECT * FROM table WHERE name = 'test'".equals(sql));
+        assertEquals("SELECT * FROM table WHERE name = 'test'", sql);
     }
 
     @Test

@@ -24,7 +24,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class NameSpaceTest {
 
@@ -66,7 +65,7 @@ public class NameSpaceTest {
         NSDecl nsDecl3 = new NSDecl(MY_OWN_PREFIX, MY_CUSTOM_URL);
 
         assertFalse(nsDecl2.equals(nsDecl1));
-        assertTrue(nsDecl3.equals(nsDecl1));
+        assertEquals(nsDecl3, nsDecl1);
 
     }
 }

@@ -21,7 +21,6 @@ package org.apache.cxf.sts.operation;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -79,6 +78,7 @@ import org.apache.wss4j.dom.message.WSSecEncryptedKey;
 import org.apache.wss4j.dom.saml.WSSSAMLKeyInfoProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -894,7 +894,7 @@ public class IssueSamlUnitTest {
         );
 
         SAMLKeyInfo samlKeyInfo = assertionWrapper.getSubjectKeyInfo();
-        assertTrue(Arrays.equals(secret, samlKeyInfo.getSecret()));
+        assertArrayEquals(secret, samlKeyInfo.getSecret());
     }
 
 

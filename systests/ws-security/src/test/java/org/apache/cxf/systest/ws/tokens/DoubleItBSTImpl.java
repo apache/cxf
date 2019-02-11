@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.ws.tokens;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -65,7 +64,7 @@ public class DoubleItBSTImpl implements DoubleItPortType {
             (BinarySecurity)securityResult.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
         Assert.assertNotNull(binarySecurityToken);
 
-        Assert.assertTrue(Arrays.equals(binarySecurityToken.getToken(), "This is a token".getBytes()));
+        Assert.assertArrayEquals(binarySecurityToken.getToken(), "This is a token".getBytes());
 
         return numberToDouble * 2;
     }

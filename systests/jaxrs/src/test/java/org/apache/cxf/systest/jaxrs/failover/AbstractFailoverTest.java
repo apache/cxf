@@ -256,7 +256,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             } catch (Exception error) {
                 if (!expectServerException) {
                     //String currEndpoint = getCurrentEndpointAddress(bookStore);
-                    //assertTrue(currEndpoint.equals(inactiveReplica));
+                    //assertEquals(currEndpoint, inactiveReplica);
                     throw error;
                 }
                 ex = error;
@@ -317,7 +317,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             if (expectRandom) {
                 assertTrue(currEndpoint.equals(activeReplica1) || currEndpoint.equals(activeReplica2));
             } else {
-                assertTrue(currEndpoint.equals(activeReplica1));
+                assertEquals(currEndpoint, activeReplica1);
             }
             if (expectServerException) {
                 assertNotNull(ex);
@@ -345,9 +345,9 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
         assertEquals(406, r.getStatus());
         String currEndpoint = getCurrentEndpointAddress(bookStore);
         if (notAvailableOnly) {
-            assertTrue(currEndpoint.equals(currentReplica));
+            assertEquals(currEndpoint, currentReplica);
         } else {
-            assertTrue(currEndpoint.equals(newReplica));
+            assertEquals(currEndpoint, newReplica);
         }
     }
 

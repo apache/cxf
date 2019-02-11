@@ -59,6 +59,7 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -321,7 +322,7 @@ public class JWTTokenValidatorTest {
         assertTrue(principal != null && principal.getName() != null);
         Set<Principal> roles = validatorResponse.getRoles();
         assertTrue(roles != null && !roles.isEmpty());
-        assertTrue("manager".equals(roles.iterator().next().getName()));
+        assertEquals("manager", roles.iterator().next().getName());
     }
 
     private TokenProviderParameters createProviderParameters() throws WSSecurityException {

@@ -54,6 +54,7 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -106,7 +107,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         SecurityToken token =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
-        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Use the first token as OnBehalfOf to get another token
@@ -124,7 +125,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         SecurityToken token2 =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, true, "Transport_Port");
-        assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token2.getTokenType());
         assertNotNull(token2.getToken());
 
         bus.shutdown(true);
@@ -143,7 +144,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         SecurityToken token =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus,
                                  DEFAULT_ADDRESS, "Transport_UT_Port");
-        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Use the first token as ActAs to get another token
@@ -161,7 +162,7 @@ public class SAMLDelegationTest extends AbstractBusClientServerTestBase {
         SecurityToken token2 =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, token.getToken(), bus,
                                  DEFAULT_ADDRESS, false, "Transport_Port");
-        assertTrue(SAML2_TOKEN_TYPE.equals(token2.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token2.getTokenType());
         assertNotNull(token2.getToken());
 
         bus.shutdown(true);

@@ -312,7 +312,7 @@ public class CommandLineParserTest {
 
     @Test
     public void testGetDetailedUsage() {
-        assertTrue("Namespace".equals(parser.getDetailedUsage("namespace")));
+        assertEquals("Namespace", parser.getDetailedUsage("namespace"));
     }
 
 

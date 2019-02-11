@@ -74,6 +74,7 @@ import org.apache.wss4j.dom.processor.SAMLTokenProcessor;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -156,7 +157,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         SecurityToken token =
             requestSecurityToken(SAML1_TOKEN_TYPE, SYMMETRIC_KEY_KEYTYPE, bus, DEFAULT_ADDRESS);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        assertTrue(SAML1_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML1_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -197,7 +198,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         SecurityToken token =
             requestSecurityToken(SAML2_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, bus, DEFAULT_ADDRESS);
         assertTrue(token.getSecret() == null && token.getX509Certificate() != null);
-        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -236,7 +237,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Get a token
         SecurityToken token =
             requestSecurityToken(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, DEFAULT_ADDRESS);
-        assertTrue(SAML1_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML1_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -275,7 +276,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
             requestSecurityToken(
                 SAML2_TOKEN_TYPE, BEARER_KEYTYPE, null, bus, DEFAULT_ADDRESS, null, null, null, null
             );
-        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -335,7 +336,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         String context = "AuthenticationContext";
         SecurityToken token =
             requestSecurityToken(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, DEFAULT_ADDRESS, context);
-        assertTrue(SAML1_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML1_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -372,7 +373,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         // Get a token
         SecurityToken token =
             requestSecurityTokenTTL(SAML1_TOKEN_TYPE, BEARER_KEYTYPE, bus, DEFAULT_ADDRESS);
-        assertTrue(SAML1_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML1_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         // Process the token
@@ -440,7 +441,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
                 requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, null,
                         bus, DEFAULT_ADDRESS, null, properties, "b-issuer", null);
                         */
-        assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
+        assertEquals(SAML2_TOKEN_TYPE, token.getTokenType());
         assertNotNull(token.getToken());
 
         List<WSSecurityEngineResult> results = processToken(token);
@@ -457,9 +458,9 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
 
-        assertTrue("b-issuer".equals(assertion.getIssuerString()));
+        assertEquals("b-issuer", assertion.getIssuerString());
         String subjectName = assertion.getSaml2().getSubject().getNameID().getValue();
-        assertTrue("Subject must be ALICE instead of " + subjectName, "ALICE".equals(subjectName));
+        assertEquals("Subject must be ALICE instead of " + subjectName, "ALICE", subjectName);
 
     }
 

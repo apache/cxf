@@ -142,6 +142,6 @@ public class CorbaMessageTest {
         msg.s.setException(ex);
         Exception msgEx = msg.getException();
         assertNotNull(msgEx);
-        assertTrue(msgEx.getMessage().equals(ex.getMessage()));*/
+        assertEquals(msgEx.getMessage(), ex.getMessage());*/
     }
 }
