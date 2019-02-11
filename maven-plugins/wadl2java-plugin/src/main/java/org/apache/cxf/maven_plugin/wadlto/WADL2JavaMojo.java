@@ -52,6 +52,9 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     @Parameter(property = "cxf.testWadlRoot", defaultValue = "${basedir}/src/test/resources/wadl")
     File testWadlRoot;
 
+    @Parameter(property = "cxf.skipGarbageCollection", defaultValue = "false")
+    boolean skipGarbageCollection;
+
 
     @Component
     BuildContext buildContext;
@@ -142,7 +145,9 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             classLoaderSwitcher.restoreClassLoader();
         }
 
-        System.gc();
+        if (!skipGarbageCollection) {
+            System.gc();
+        }
     }
 
     /**

@@ -223,6 +223,15 @@ public class Java2WSMojo extends AbstractMojo {
      */
     private Boolean classpathAsEnvVar;
 
+    /**
+     * Disable garbage collection at the end of the execution.
+     *
+     * @parameter expression="${cxf.skipGarbageCollection}" default-value="false"
+     * @since 3.3.1
+     */
+    private boolean skipGarbageCollection;
+
+
     public void execute() throws MojoExecutionException {
         boolean requiresModules = JavaUtils.isJava9Compatible();
         if (requiresModules) {
@@ -275,7 +284,9 @@ public class Java2WSMojo extends AbstractMojo {
             classLoaderSwitcher.restoreClassLoader();
         }
 
-        System.gc();
+        if (!skipGarbageCollection) {
+            System.gc();
+        }
     }
 
     private List<String> initArgs(String cp) {
