@@ -93,12 +93,75 @@ public abstract class ProviderFactory {
     private static final String BUS_PROVIDERS_ALL = "org.apache.cxf.jaxrs.bus.providers";
     private static final String PROVIDER_CACHE_ALLOWED = "org.apache.cxf.jaxrs.provider.cache.allowed";
     private static final String PROVIDER_CACHE_CHECK_ALL = "org.apache.cxf.jaxrs.provider.cache.checkAllCandidates";
-
+    
+    
+    static class LazyProviderClass {
+        // class to Lazily call the ClassLoaderUtil.loadClass, but do it once
+        // and cache the result.  Then use the class to create instances as needed.
+        // This avoids calling loadClass every time a factory is initialized as
+        // calling loadClass is super expensive, particularly if the class
+        // cannot be found and particularly in osgi where the search is very complex.
+        // This would record that the class is not found and prevent future
+        // searches.
+        final String className;
+        volatile boolean initialized;
+        Class<?> cls;
+        
+        LazyProviderClass(String cn) {
+            className = cn;
+        }
+        
+        synchronized void loadClass() {
+            if (!initialized) {
+                try {
+                    cls = ClassLoaderUtils.loadClass(className, ProviderFactory.class);
+                } catch (final Throwable ex) {
+                    LOG.fine(className + " not available, skipping");
+                }
+                initialized = true;
+            }
+        }
+        
+        public Object tryCreateInstance(Bus bus) {
+            if (!initialized) {
+                loadClass();
+            }
+            if (cls != null) {
+                try {
+                    for (Constructor<?> c : cls.getConstructors()) {
+                        if (c.getParameterTypes().length == 1 && c.getParameterTypes()[0] == Bus.class) {
+                            return c.newInstance(bus);
+                        }
+                    }
+                    return cls.newInstance();
+                } catch (Throwable ex) {
+                    String message = "Problem with creating the provider " + className;
+                    if (ex.getMessage() != null) {
+                        message += ": " + ex.getMessage();
+                    } else {
+                        message += ", exception class : " + ex.getClass().getName();
+                    }
+                    LOG.fine(message);
+                }
+            }
+            return null;
+        }
+    };
+    
+    private static final LazyProviderClass DATA_SOURCE_PROVIDER_CLASS = 
+        new LazyProviderClass("org.apache.cxf.jaxrs.provider.DataSourceProvider");
+    private static final LazyProviderClass JAXB_PROVIDER_CLASS = 
+        new LazyProviderClass(JAXB_PROVIDER_NAME);
+    private static final LazyProviderClass JAXB_ELEMENT_PROVIDER_CLASS = 
+        new LazyProviderClass("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider");
+    private static final LazyProviderClass MULTIPART_PROVIDER_CLASS = 
+        new LazyProviderClass("org.apache.cxf.jaxrs.provider.MultipartProvider");
+    
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors =
         new NameKeyMap<>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors =
         new NameKeyMap<>(true);
-
+    
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders =
         new ArrayList<>();
     private List<ProviderInfo<MessageBodyWriter<?>>> messageWriters =
@@ -120,6 +183,7 @@ public abstract class ProviderFactory {
     private Comparator<?> providerComparator;
 
     private ProviderCache providerCache;
+    
 
     protected ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -144,28 +208,17 @@ public abstract class ProviderFactory {
                              false,
                      new BinaryDataProvider<Object>(),
                      new SourceProvider<Object>(),
-                     tryCreateInstance("org.apache.cxf.jaxrs.provider.DataSourceProvider"),
+                     DATA_SOURCE_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
                      new FormEncodingProvider<Object>(),
                      new StringTextProvider(),
                      new PrimitiveTextProvider<Object>(),
-                     tryCreateInstance(JAXB_PROVIDER_NAME),
-                     tryCreateInstance("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider"),
-                     tryCreateInstance("org.apache.cxf.jaxrs.provider.MultipartProvider"));
+                     JAXB_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                     JAXB_ELEMENT_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                     MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory.getBus()));
         Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
         if (!PropertyUtils.isTrue(prop)) {
             factory.setProviders(false, false, createProvider(JSON_PROVIDER_NAME, factory.getBus()));
         }
-
-    }
-
-    protected static Object tryCreateInstance(final String className) {
-        try {
-            final Class<?> cls = ClassLoaderUtils.loadClass(className, ProviderFactory.class);
-            return cls.getConstructor().newInstance();
-        } catch (final Throwable ex) {
-            LOG.fine(className + " not available, skipping");
-        }
-        return null;
     }
 
     protected static Object createProvider(String className, Bus bus) {
