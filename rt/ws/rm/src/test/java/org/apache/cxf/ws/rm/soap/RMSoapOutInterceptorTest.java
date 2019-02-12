@@ -291,8 +291,6 @@ public class RMSoapOutInterceptorTest {
         }
 
         // no other headers should be present
-        if (!headers.isEmpty()) {
-            assertTrue("Unexpected header element " + headers.get(0).getName(), false);
-        }
+        assertTrue(headers.isEmpty());
     }
 }

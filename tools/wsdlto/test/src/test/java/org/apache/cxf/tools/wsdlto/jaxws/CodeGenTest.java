@@ -876,7 +876,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "SOAPHeaderInfo");
         assertEquals("INOUT", webParamAnno.mode().name());
-        assertEquals(true, webParamAnno.header());
+        assertTrue(webParamAnno.header());
         assertEquals("header_info", webParamAnno.partName());
 
     }
@@ -906,7 +906,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "greetMe");
-        assertEquals(true, webParamAnno.header());
+        assertTrue(webParamAnno.header());
 
         webParamAnno = AnnotationUtil.getWebParam(method, "sayHi");
         assertEquals("INOUT", webParamAnno.mode().name());

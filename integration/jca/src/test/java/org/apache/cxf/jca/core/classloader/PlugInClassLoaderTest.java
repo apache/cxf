@@ -32,11 +32,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 
 
 public class PlugInClassLoaderTest {
@@ -83,8 +83,8 @@ public class PlugInClassLoaderTest {
     public void testLoadClassWithParentClassLoader() throws Exception {
         Class<?> resultClass = plugInClassLoader.loadClass("org.omg.CORBA.ORB");
         assertEquals("wrong class", "org.omg.CORBA.ORB", resultClass.getName());
-        assertTrue("class loader must NOT be the plugInClassLoader",
-            !(plugInClassLoader.equals(resultClass.getClassLoader())));
+        assertFalse("class loader must NOT be the plugInClassLoader",
+            plugInClassLoader.equals(resultClass.getClassLoader()));
     }
 
     @Test

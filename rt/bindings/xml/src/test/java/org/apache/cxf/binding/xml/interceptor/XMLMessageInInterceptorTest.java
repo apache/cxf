@@ -36,6 +36,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XMLMessageInInterceptorTest extends TestBase {
 
@@ -66,7 +67,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         assertEquals("expect 2 param", 2, list.size());
         assertEquals("method input in2 is MyComplexStructType", true,
                         list.get(1) instanceof MyComplexStructType);
-        assertEquals("method input in1 is String tli", true, ((String) list.get(0)).indexOf("tli") >= 0);
+        assertTrue("method input in1 is String tli", ((String) list.get(0)).indexOf("tli") >= 0);
     }
 
     @Test
@@ -83,7 +84,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 1 param", 1, list.size());
-        assertEquals("method input me is String tli", true, ((String) list.get(0)).indexOf("tli") >= 0);
+        assertTrue("method input me is String tli", ((String) list.get(0)).indexOf("tli") >= 0);
     }
 
     @Test
@@ -101,7 +102,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 1 param", 1, list.size());
-        assertEquals("method input me is String tli", true, list.get(0) instanceof GreetMe);
+        assertTrue("method input me is String tli", list.get(0) instanceof GreetMe);
     }
 
     private void prepareMessage(String messageFileName) throws Exception {

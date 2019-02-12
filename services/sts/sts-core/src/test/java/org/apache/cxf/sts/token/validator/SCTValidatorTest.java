@@ -80,8 +80,8 @@ public class SCTValidatorTest {
         assertNotNull(validatorResponse);
         assertNotNull(validatorResponse.getToken());
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        assertTrue(
-            validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
+        assertNotNull(
+            validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET)
         );
         assertEquals("alice", validatorResponse.getPrincipal().getName());
 

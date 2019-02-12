@@ -32,7 +32,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-
 public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandlerTest {
 
     ObjectMethodInvocationHandler handler;
@@ -62,8 +61,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
         Method toString = Object.class.getMethod("toString", new Class[0]);
 
         Object result = handler.invoke(testTarget, toString, null);
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
         assertTrue("object must be a String", result instanceof String);
         assertTrue("checking toString method ", ((String)result).startsWith("ConnectionHandle"));
     }
@@ -80,8 +79,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
 
         Method equals = Object.class.getMethod("equals", new Class[] {Object.class});
         handler.invoke(testTarget, equals, new Object[] {this});
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
     }
 
     @Test
@@ -128,8 +127,8 @@ public class ObjectMethodInvocationHandlerTest extends AbstractInvocationHandler
 
         handler.invoke(testTarget, method, args);
 
-        assertTrue("object method must not be passed to next handler in chain",
-                   !dummyHandler.invokeCalled);
+        assertFalse("object method must not be passed to next handler in chain",
+                   dummyHandler.invokeCalled);
         assertEquals(method + " must be invoked directly on target object",
                      method.getName(), target.lastMethod.getName());
     }

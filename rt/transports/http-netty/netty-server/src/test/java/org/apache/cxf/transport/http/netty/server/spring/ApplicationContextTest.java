@@ -142,8 +142,8 @@ public class ApplicationContextTest {
                 getEndpointInfo("sna", "foo", "https://localhost:9002"), bus);
 
         engine = (NettyHttpServerEngine)jd3.getEngine();
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         NettyHttpDestination jd4 =
             (NettyHttpDestination)factory.getDestination(

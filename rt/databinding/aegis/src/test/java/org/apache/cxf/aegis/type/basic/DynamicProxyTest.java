@@ -54,7 +54,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
         ElementReader reader = new ElementReader(getResourceAsStream("MyInterface.xml"));
         IMyInterface data = (IMyInterface)type.readObject(reader, getContext());
         assertEquals("junk", data.getName());
-        assertEquals(true, data.isUseless());
+        assertTrue(data.isUseless());
         data.setName("bigjunk");
         data.setUseless(false);
         assertEquals("bigjunk", data.getName());
@@ -171,7 +171,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
 
         assertNotNull(data.getMyInterface());
         assertEquals("junk", data.getMyInterface().getName());
-        assertEquals(true, data.getMyInterface().isUseless());
+        assertTrue(data.getMyInterface().isUseless());
     }
 
     public interface IMyInterface {

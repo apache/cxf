@@ -132,7 +132,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
@@ -188,7 +188,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id-aud");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());
@@ -287,7 +287,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
 
         // Original token should not be ok
         form = new Form();
@@ -334,7 +334,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), true);
+        assertTrue(tokenIntrospection.isActive());
         assertEquals(tokenIntrospection.getUsername(), "alice");
         assertEquals(tokenIntrospection.getClientId(), "consumer-id");
         assertEquals(tokenIntrospection.getScope(), accessToken.getApprovedScope());

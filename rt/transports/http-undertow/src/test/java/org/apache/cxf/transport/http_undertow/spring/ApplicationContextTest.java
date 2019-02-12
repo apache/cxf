@@ -149,8 +149,8 @@ public class ApplicationContextTest {
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
 
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         UndertowHTTPDestination jd4 =
             (UndertowHTTPDestination)factory.getDestination(

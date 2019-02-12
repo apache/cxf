@@ -84,7 +84,7 @@ public class GenericExceptionTest extends AbstractBusClientServerTestBase {
             fail("Exception is expected");
         } catch (GenericsException e) {
             ObjectWithGenerics<Boolean, Integer> genericObj = e.getObj();
-            assertEquals(true, genericObj.getA());
+            assertTrue(genericObj.getA());
             assertEquals(100, genericObj.getB().intValue());
         }
 

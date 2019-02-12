@@ -66,7 +66,7 @@ public class JAXWSDefinitionBuilderTest {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
             JAXWSBinding binding = (JAXWSBinding)extElement;
             assertEquals("Customized package name does not been parsered", "com.foo", binding.getPackage());
-            assertEquals("Customized enableAsync does not parsered", true, binding.isEnableAsyncMapping());
+            assertTrue("Customized enableAsync does not parsered", binding.isEnableAsyncMapping());
         }
 
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",
@@ -114,7 +114,7 @@ public class JAXWSDefinitionBuilderTest {
             ExtensibilityElement extElement = (ExtensibilityElement)ite.next();
             JAXWSBinding binding = (JAXWSBinding)extElement;
             assertEquals("Customized package name does not been parsered", "com.foo", binding.getPackage());
-            assertEquals("Customized enableAsync does not parsered", true, binding.isEnableAsyncMapping());
+            assertTrue("Customized enableAsync does not parsered", binding.isEnableAsyncMapping());
         }
 
         PortType portType = customizedDef.getPortType(new QName("http://apache.org/hello_world_soap_http",

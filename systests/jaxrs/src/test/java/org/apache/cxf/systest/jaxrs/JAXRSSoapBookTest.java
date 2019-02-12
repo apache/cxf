@@ -1018,7 +1018,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                 message.setContent(InputStream.class, new ByteArrayInputStream(payload));
             } catch (Exception e) {
                 String error = "Failed to read the stream properly due to " + e.getMessage();
-                assertFalse(error, e != null);
+                assertNotNull(error, e);
             }
         }
 

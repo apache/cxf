@@ -154,8 +154,8 @@ public class ApplicationContextTest {
         assertEquals(111, engine.getThreadingParameters().getMinThreads());
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
         assertEquals("TestPrefix", engine.getThreadingParameters().getThreadNamePrefix());
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertTrue(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         JettyHTTPDestination jd4 =
             (JettyHTTPDestination)factory.getDestination(

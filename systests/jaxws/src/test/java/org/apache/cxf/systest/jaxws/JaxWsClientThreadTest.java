@@ -41,6 +41,8 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class JaxWsClientThreadTest extends AbstractCXFTest {
@@ -91,8 +93,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                         }
 
                         requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
-                        assertTrue("property is null", requestContext
-                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+                        assertNull("property is null", requestContext
+                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 
                     }
                 } catch (Throwable t) {
@@ -124,11 +126,11 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         // get the latest values
 
         ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
-        assertTrue("address is different", !address.equals(requestContext
-            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+        assertNotEquals("address is different", address, requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
         // verify value reflects what other threads were doing
-        assertTrue("property is null from last thread execution", requestContext
-                   .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+        assertNull("property is null from last thread execution", requestContext
+                   .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
     }
 
 
@@ -178,8 +180,8 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                         }
 
                         requestContext.remove(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
-                        assertTrue("property is null", requestContext
-                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+                        assertNull("property is null", requestContext
+                                     .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
 
                     }
                 } catch (Throwable t) {
@@ -211,11 +213,11 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
         // get the latest values
 
         ((ClientImpl.EchoContext)((WrappedMessageContext)requestContext).getWrappedMap()).reload();
-        assertTrue("address is different", !address.equals(requestContext
-            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY)));
+        assertNotEquals("address is different", address, requestContext
+            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
         // verify value reflects what other threads were doing
-        assertTrue("property is null from last thread execution", requestContext
-                   .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY) == null);
+        assertNull("property is null from last thread execution", requestContext
+                   .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
     }
 
 }
