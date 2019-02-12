@@ -55,6 +55,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -319,9 +320,9 @@ public class RMEndpointTest {
         String ns = RM10Constants.NAMESPACE_URI;
         OperationInfo oi = intf.getOperation(new QName(ns, "CreateSequence"));
         assertNotNull("No operation info.", oi);
-        assertTrue("Operation is oneway.", !oi.isOneWay());
-        assertTrue("Operation is unwrapped.", !oi.isUnwrapped());
-        assertTrue("Operation is unwrappedCapable.", !oi.isUnwrappedCapable());
+        assertFalse("Operation is oneway.", oi.isOneWay());
+        assertFalse("Operation is unwrapped.", oi.isUnwrapped());
+        assertFalse("Operation is unwrappedCapable.", oi.isUnwrappedCapable());
         assertNull("Unexpected unwrapped operation.", oi.getUnwrappedOperation());
 
         oi = intf.getOperation(new QName(ns, "TerminateSequence"));
@@ -330,7 +331,7 @@ public class RMEndpointTest {
 
         oi = intf.getOperation(new QName(ns, "TerminateSequenceAnonymous"));
         assertNotNull("No operation info.", oi);
-        assertTrue("Operation is oneway.", !oi.isOneWay());
+        assertFalse("Operation is oneway.", oi.isOneWay());
 
         oi = intf.getOperation(new QName(ns, "SequenceAcknowledgement"));
         assertNotNull("No operation info.", oi);

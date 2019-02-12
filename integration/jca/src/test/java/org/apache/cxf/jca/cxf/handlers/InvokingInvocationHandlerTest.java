@@ -27,6 +27,7 @@ import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class InvokingInvocationHandlerTest
@@ -67,7 +68,7 @@ public class InvokingInvocationHandlerTest
      */
     @Test
     public void testHandlerInvokesNext() throws Throwable {
-        assertTrue("target method  must not have be called", !target.methodInvoked);
+        assertFalse("target method must not have be called", target.methodInvoked);
         handler.invoke(target, testMethod, new Object[0]);
         assertTrue("target method must be called", target.methodInvoked);
     }
@@ -75,7 +76,7 @@ public class InvokingInvocationHandlerTest
     @Test
     public void testInvocationThroughProxy() throws IllegalArgumentException {
 
-        assertTrue("target object must no have been invoked", !target.methodInvoked);
+        assertFalse("target object must not have been invoked", target.methodInvoked);
         test.testMethod();
         assertTrue("target object must be invoked", target.methodInvoked);
     }

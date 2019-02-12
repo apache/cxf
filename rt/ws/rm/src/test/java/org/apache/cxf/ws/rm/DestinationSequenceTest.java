@@ -555,7 +555,7 @@ public class DestinationSequenceTest {
                 timedOut = true;
             }
         }
-        assertTrue("timed out waiting for messages to be processed in order", !timedOut);
+        assertFalse("timed out waiting for messages to be processed in order", timedOut);
 
         control.verify();
 

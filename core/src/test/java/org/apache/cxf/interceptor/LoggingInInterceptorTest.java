@@ -35,7 +35,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("deprecation")
 public class LoggingInInterceptorTest {
@@ -89,8 +90,7 @@ public class LoggingInInterceptorTest {
         //act
         classUnderTest.testLogInputStream(message, inputStream, loggingMessage, encoding, contentType);
         //assert
-        assertEquals("The truncated status should be set to false",
-                false,
+        assertFalse("The truncated status should be set to false",
                 classUnderTest.isTruncated());
     }
 
@@ -101,8 +101,7 @@ public class LoggingInInterceptorTest {
         //act
         classUnderTest.testLogInputStream(message, inputStream, loggingMessage, encoding, contentType);
         //assert
-        assertEquals("The truncated status should be set to true",
-                true,
+        assertTrue("The truncated status should be set to true",
                 classUnderTest.isTruncated());
     }
 

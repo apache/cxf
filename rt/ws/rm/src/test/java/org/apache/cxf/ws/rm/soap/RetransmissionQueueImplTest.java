@@ -341,7 +341,7 @@ public class RetransmissionQueueImplTest {
         assertEquals("unexpected unacked count",
                      2,
                      queue.countUnacknowledged(sequence));
-        assertTrue("queue is empty", !queue.isEmpty());
+        assertFalse("queue is empty", queue.isEmpty());
     }
 
     @Test

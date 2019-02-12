@@ -28,8 +28,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-
+import static org.junit.Assert.fail;
 
 
 public class MBServerConnectorTest {
@@ -51,7 +50,7 @@ public class MBServerConnectorTest {
             mcf.destroy();
         } catch (Exception ex) {
             ex.printStackTrace();
-            assertFalse("Some Exception happen to MBServerConnectorTest", true);
+            fail("Some Exception happened to MBServerConnectorTest");
         }
     }
 

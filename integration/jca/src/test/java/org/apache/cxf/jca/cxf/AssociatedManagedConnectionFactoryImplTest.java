@@ -29,6 +29,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -108,7 +109,7 @@ public class AssociatedManagedConnectionFactoryImplTest extends ManagedConnectio
 
 
         assertEquals("before associate, one props", 0, mci.getPluginProps().size());
-        assertTrue("before associate, key1 not set", !mci.getPluginProps().containsKey("key1"));
+        assertFalse("before associate, key1 not set", mci.getPluginProps().containsKey("key1"));
 
         mci.setResourceAdapter(rai);
         assertEquals("after associate, two props", 1, mci.getPluginProps().size());

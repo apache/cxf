@@ -38,6 +38,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -93,7 +94,7 @@ public class ResourceAdapterImplTest {
         bais.close();
 
         assertNotNull("deserialized is not null", rai2);
-        assertTrue("props not empty", !rai2.getPluginProps().isEmpty());
+        assertFalse("props not empty", rai2.getPluginProps().isEmpty());
         assertTrue("props contains key", rai2.getPluginProps().containsKey(key));
         assertEquals("no change after serialized and reconstitued ", value, rai2.getPluginProps()
             .getProperty(key));

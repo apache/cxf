@@ -48,6 +48,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -155,7 +156,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         w3cEpr = factory.create("23");
         EndpointReferenceType numberTwentyThreeRef = ProviderImpl.convertToInternal(w3cEpr);
         num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
-        assertTrue("23 is not even", !num.isEven().isEven());
+        assertFalse("23 is not even", num.isEven().isEven());
     }
 
     private void setupContextWithEprAddress(EndpointReferenceType epr, Number num) {
