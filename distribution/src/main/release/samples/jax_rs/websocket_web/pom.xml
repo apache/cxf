@@ -31,7 +31,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty.version>9.4.12.v20180830</cxf.jetty.version>
+        <cxf.jetty.version>9.4.14.v20181114</cxf.jetty.version>
         <cxf.tomcat.version>7.0.92</cxf.tomcat.version>
     </properties>
     <build>
