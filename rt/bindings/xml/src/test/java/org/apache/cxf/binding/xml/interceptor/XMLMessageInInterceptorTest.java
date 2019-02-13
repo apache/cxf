@@ -65,8 +65,7 @@ public class XMLMessageInInterceptorTest extends TestBase {
         List<?> list = xmlMessage.getContent(List.class);
         assertNotNull(list);
         assertEquals("expect 2 param", 2, list.size());
-        assertEquals("method input in2 is MyComplexStructType", true,
-                        list.get(1) instanceof MyComplexStructType);
+        assertTrue("method input in2 is MyComplexStructType", list.get(1) instanceof MyComplexStructType);
         assertTrue("method input in1 is String tli", ((String) list.get(0)).indexOf("tli") >= 0);
     }
 

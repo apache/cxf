@@ -75,7 +75,7 @@ public class JAXWSDefinitionBuilderTest {
         List<?> portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
-        assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
+        assertTrue("Customized enable EnableWrapperStyle name does not been parsered", binding
             .isEnableWrapperStyle());
 
         List<?> opList = portType.getOperations();
@@ -123,7 +123,7 @@ public class JAXWSDefinitionBuilderTest {
         List<?> portTypeList = portType.getExtensibilityElements();
         JAXWSBinding binding = (JAXWSBinding)portTypeList.get(0);
 
-        assertEquals("Customized enable EnableWrapperStyle name does not been parsered", true, binding
+        assertTrue("Customized enable EnableWrapperStyle name does not been parsered", binding
             .isEnableWrapperStyle());
 
         List<?> opList = portType.getOperations();

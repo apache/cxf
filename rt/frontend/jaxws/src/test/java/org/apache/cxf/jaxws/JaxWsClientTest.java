@@ -302,7 +302,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
         public void handleMessage(Message message) throws Fault {
             boolean result = message.getInterceptorChain().doIntercept(message);
-            assertEquals("doIntercept not return false", result, false);
+            assertFalse("doIntercept not return false", result);
             assertNotNull(message.getContent(Exception.class));
             throw new Fault(message.getContent(Exception.class));
         }

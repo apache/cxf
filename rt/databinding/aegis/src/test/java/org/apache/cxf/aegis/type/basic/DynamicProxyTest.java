@@ -28,6 +28,7 @@ import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -58,7 +59,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
         data.setName("bigjunk");
         data.setUseless(false);
         assertEquals("bigjunk", data.getName());
-        assertEquals(false, data.isUseless());
+        assertFalse(data.isUseless());
 
         assertTrue(data.hashCode() != 0);
         assertEquals(data, data);

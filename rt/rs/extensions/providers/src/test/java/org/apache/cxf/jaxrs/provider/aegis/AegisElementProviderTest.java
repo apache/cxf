@@ -83,7 +83,7 @@ public class AegisElementProviderTest {
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(simpleBytes));
         assertEquals("hovercraft", bean.getStrValue());
-        assertEquals(Boolean.TRUE, bean.getBoolValue());
+        assertTrue(bean.getBoolValue());
     }
 
 
@@ -94,7 +94,7 @@ public class AegisElementProviderTest {
         AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(bytes));
         assertEquals("hovercraft", bean.getStrValue());
-        assertEquals(Boolean.TRUE, bean.getBoolValue());
+        assertTrue(bean.getBoolValue());
     }
 
     @Test
@@ -165,10 +165,10 @@ public class AegisElementProviderTest {
         Map.Entry<AegisTestBean, AegisSuperBean> entry = map2.entrySet().iterator().next();
         AegisTestBean bean1 = entry.getKey();
         assertEquals("hovercraft", bean1.getStrValue());
-        assertEquals(Boolean.TRUE, bean1.getBoolValue());
+        assertTrue(bean1.getBoolValue());
         AegisTestBean bean22 = entry.getValue();
         assertEquals("hovercraft2", bean22.getStrValue());
-        assertEquals(Boolean.TRUE, bean22.getBoolValue());
+        assertTrue(bean22.getBoolValue());
 
     }
 

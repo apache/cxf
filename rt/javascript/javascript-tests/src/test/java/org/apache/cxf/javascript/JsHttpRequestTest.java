@@ -96,12 +96,9 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("testAsyncHttpFetch2");
         boolean notified = notifier.waitForJavascript(2 * 10000);
         assertTrue(notified);
-        assertEquals("HEADERS_RECEIVED", Boolean.TRUE,
-                     testUtilities.rhinoEvaluateConvert("asyncGotHeadersReceived", Boolean.class));
-        assertEquals("LOADING", Boolean.TRUE,
-                     testUtilities.rhinoEvaluateConvert("asyncGotLoading", Boolean.class));
-        assertEquals("DONE", Boolean.TRUE,
-                     testUtilities.rhinoEvaluateConvert("asyncGotDone", Boolean.class));
+        assertTrue("HEADERS_RECEIVED", testUtilities.rhinoEvaluateConvert("asyncGotHeadersReceived", Boolean.class));
+        assertTrue("LOADING", testUtilities.rhinoEvaluateConvert("asyncGotLoading", Boolean.class));
+        assertTrue("DONE", testUtilities.rhinoEvaluateConvert("asyncGotDone", Boolean.class));
         String outOfOrder = testUtilities.rhinoEvaluateConvert("outOfOrderError", String.class);
         assertEquals("OutOfOrder", null, outOfOrder);
         assertEquals("status 200", Integer.valueOf(200),

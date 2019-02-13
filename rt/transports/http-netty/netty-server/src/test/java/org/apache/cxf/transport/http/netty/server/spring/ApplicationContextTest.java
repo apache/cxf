@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -150,8 +151,8 @@ public class ApplicationContextTest {
                 getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
 
         engine = (NettyHttpServerEngine)jd4.getEngine();
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         /*NettyHttpDestination jd5 =
             (NettyHttpDestination)factory.getDestination(

@@ -43,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -232,7 +233,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(form);
 
         TokenIntrospection tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), false);
+        assertFalse(tokenIntrospection.isActive());
     }
 
     @org.junit.Test
@@ -295,7 +296,7 @@ public class IntrospectionServiceTest extends AbstractBusClientServerTestBase {
         response = client.post(form);
 
         tokenIntrospection = response.readEntity(TokenIntrospection.class);
-        assertEquals(tokenIntrospection.isActive(), false);
+        assertFalse(tokenIntrospection.isActive());
     }
 
     @org.junit.Test

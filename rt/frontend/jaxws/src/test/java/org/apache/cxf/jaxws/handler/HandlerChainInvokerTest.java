@@ -160,7 +160,7 @@ public class HandlerChainInvokerTest {
 
         boolean ret = invoker.invokeLogicalHandlers(false, lmc);
 
-        assertEquals(false, ret);
+        assertFalse(ret);
         assertFalse(invoker.isClosed());
         assertEquals(1, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
@@ -193,7 +193,7 @@ public class HandlerChainInvokerTest {
         boolean ret = invoker.invokeLogicalHandlers(false, lmc);
         assertFalse(invoker.isClosed());
 
-        assertEquals(false, ret);
+        assertFalse(ret);
         assertEquals(0, logicalHandlers[0].getHandleMessageCount());
         assertEquals(1, logicalHandlers[1].getHandleMessageCount());
         assertTrue(invoker.isOutbound());

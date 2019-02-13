@@ -231,7 +231,7 @@ public class JwsCompactReaderWriterTest {
     private void validateSpecClaim(JwtClaims claims) {
         assertEquals("joe", claims.getIssuer());
         assertEquals(Long.valueOf(1300819380), claims.getExpiryTime());
-        assertEquals(Boolean.TRUE, claims.getClaim("http://example.com/is_root"));
+        assertTrue((Boolean)claims.getClaim("http://example.com/is_root"));
     }
 
     @Test

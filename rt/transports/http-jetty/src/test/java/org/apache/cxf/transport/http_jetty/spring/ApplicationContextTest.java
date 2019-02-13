@@ -162,8 +162,8 @@ public class ApplicationContextTest {
                 getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
 
         engine = (JettyHTTPServerEngine)jd4.getEngine();
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
-        assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isWant());
+        assertFalse(engine.getTlsServerParameters().getClientAuthentication().isRequired());
 
         JettyHTTPDestination jd5 =
             (JettyHTTPDestination)factory.getDestination(

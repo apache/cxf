@@ -416,7 +416,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         DocLitWrappedCodeFirstService port = service.getPort(portName, DocLitWrappedCodeFirstService.class);
         Holder<Boolean> created = new Holder<>();
         port.singleInOut(created);
-        assertEquals(created.value, Boolean.FALSE);
+        assertFalse(created.value);
     }
 
     private void setASM(boolean b) throws Exception {

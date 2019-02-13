@@ -60,6 +60,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ColocOutInterceptorTest {
@@ -227,8 +228,7 @@ public class ColocOutInterceptorTest {
 
         control.replay();
         colocOut.handleMessage(msg);
-        assertEquals("COLOCATED property should be set",
-                     Boolean.TRUE, msg.get(COLOCATED));
+        assertTrue("COLOCATED property should be set", (Boolean)msg.get(COLOCATED));
         assertEquals("Message.WSDL_OPERATION property should be set",
                      op, msg.get(Message.WSDL_OPERATION));
         assertEquals("Message.WSDL_INTERFACE property should be set",
@@ -268,14 +268,13 @@ public class ColocOutInterceptorTest {
         colocOut.invokeInboundChain(ex, ep);
         Message inMsg = ex.getInMessage();
         assertNotSame(msg, inMsg);
-        assertEquals("Requestor role should be set to true.",
-                     Boolean.TRUE, inMsg.get(Message.REQUESTOR_ROLE));
-        assertEquals("Inbound Message should be set to true.",
-                     Boolean.TRUE, inMsg.get(Message.INBOUND_MESSAGE));
+        assertTrue("Requestor role should be set to true.",
+                   (Boolean)inMsg.get(Message.REQUESTOR_ROLE));
+        assertTrue("Inbound Message should be set to true.",
+                   (Boolean)inMsg.get(Message.INBOUND_MESSAGE));
         assertNotNull("Inbound Message should have interceptor chain set.",
                       inMsg.getInterceptorChain());
-        assertEquals("Client Invoke state should be FINISHED",
-                      Boolean.TRUE, ex.get(ClientImpl.FINISHED));
+        assertTrue("Client Invoke state should be FINISHED", (Boolean)ex.get(ClientImpl.FINISHED));
         control.verify();
     }
 

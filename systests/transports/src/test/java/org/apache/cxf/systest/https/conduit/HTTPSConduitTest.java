@@ -324,8 +324,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             (HTTPConduit) client.getConduit();
 
         HTTPClientPolicy httpClientPolicy = http.getClient();
-        assertEquals("the httpClientPolicy's autoRedirect should be true",
-                     true, httpClientPolicy.isAutoRedirect());
+        assertTrue("the httpClientPolicy's autoRedirect should be true",
+                     httpClientPolicy.isAutoRedirect());
         TLSClientParameters tlsParameters = http.getTlsClientParameters();
         assertNotNull("the http conduit's tlsParameters should not be null", tlsParameters);
 

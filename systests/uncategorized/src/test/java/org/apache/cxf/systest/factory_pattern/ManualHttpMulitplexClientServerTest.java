@@ -47,7 +47,6 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -118,21 +117,21 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         setupContextWithEprAddress(epr, num);
 
         IsEvenResponse numResp = num.isEven();
-        assertEquals("2 is even", Boolean.TRUE, numResp.isEven());
+        assertTrue("2 is even", numResp.isEven());
 
         // try again with the address from another epr
         w3cEpr = nfact.create("3");
         epr = ProviderImpl.convertToInternal(w3cEpr);
         setupContextWithEprAddress(epr, num);
         numResp = num.isEven();
-        assertEquals("3 is not even", Boolean.FALSE, numResp.isEven());
+        assertFalse("3 is not even", numResp.isEven());
 
         // try again with the address from another epr
         w3cEpr = nfact.create("6");
         epr = ProviderImpl.convertToInternal(w3cEpr);
         setupContextWithEprAddress(epr, num);
         numResp = num.isEven();
-        assertEquals("6 is even", Boolean.TRUE, numResp.isEven());
+        assertTrue("6 is even", numResp.isEven());
     }
 
     @Test

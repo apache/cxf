@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -135,9 +136,7 @@ public class ColocUtilTest {
         control.verify();
         assertNotNull("Should have chain instance", chain);
         Iterator<Interceptor<? extends Message>> iter = chain.iterator();
-        assertEquals("Should not have interceptors in chain",
-                     false,
-                     iter.hasNext());
+        assertFalse("Should not have interceptors in chain", iter.hasNext());
     }
 
     @Test
@@ -168,9 +167,7 @@ public class ColocUtilTest {
         control.verify();
         assertNotNull("Should have chain instance", chain);
         Iterator<Interceptor<? extends Message>> iter = chain.iterator();
-        assertEquals("Should not have interceptors in chain",
-                     false,
-                     iter.hasNext());
+        assertFalse("Should not have interceptors in chain", iter.hasNext());
         assertNotNull("OutFaultObserver should be set", chain.getFaultObserver());
     }
 
@@ -182,9 +179,9 @@ public class ColocUtilTest {
         assertTrue("Should return true", match);
         List<FaultInfo> fil1 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, null);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
         match = ColocUtil.isSameFaultInfo(null, fil1);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
 
         List<FaultInfo> fil2 = new ArrayList<>();
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
@@ -198,7 +195,7 @@ public class ColocUtilTest {
         FaultInfo fi2 = new FaultInfo(fn2, null, oi);
         fi2.setProperty(Class.class.getName(), FaultDetailT.class);
         match = ColocUtil.isSameFaultInfo(fil1, fil2);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
 
         FaultInfo fi3 = new FaultInfo(fn2, null, oi);
         fi3.setProperty(Class.class.getName(), PingMeFault.class);
@@ -218,9 +215,9 @@ public class ColocUtilTest {
         MessageInfo mi1 = new MessageInfo(oi, MessageInfo.Type.INPUT, mn1);
         MessageInfo mi2 = new MessageInfo(oi, MessageInfo.Type.INPUT, mn2);
         match = ColocUtil.isSameMessageInfo(mi1, null);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
         match = ColocUtil.isSameMessageInfo(null, mi2);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
 
         MessagePartInfo mpi = new MessagePartInfo(new QName("", "B"), null);
         mpi.setTypeClass(InHeaderT.class);
@@ -231,7 +228,7 @@ public class ColocUtilTest {
         mi2.addMessagePart(mpi);
 
         match = ColocUtil.isSameMessageInfo(mi1, mi2);
-        assertEquals("Should not find a match", false, match);
+        assertFalse("Should not find a match", match);
 
         mpi.setTypeClass(InHeaderT.class);
         match = ColocUtil.isSameMessageInfo(mi1, mi2);

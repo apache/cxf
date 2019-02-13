@@ -51,7 +51,7 @@ public class JMSEndpointTest {
         assertEquals(JMSEndpoint.QUEUE, endpoint.getJmsVariant());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJmsVariant(), JMSEndpoint.QUEUE);
-        assertEquals(false, endpoint.isUseConduitIdSelector());
+        assertFalse(endpoint.isUseConduitIdSelector());
         assertEquals(endpoint.getParameters().size(), 2);
         assertEquals(endpoint.getParameter("foo"), "bar");
         assertEquals(endpoint.getParameter("foo2"), "bar2");

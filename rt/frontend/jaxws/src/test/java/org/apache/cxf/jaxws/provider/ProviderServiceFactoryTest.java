@@ -42,6 +42,7 @@ import org.apache.hello_world_soap_http.HWSoapMessageProvider;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -149,7 +150,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
 
         SoapBindingInfo sb = (SoapBindingInfo)endpoint.getEndpointInfo().getBinding();
         assertEquals("document", sb.getStyle());
-        assertEquals(false, bean.isWrapped());
+        assertFalse(bean.isWrapped());
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
@@ -187,7 +188,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
 
         SoapBindingInfo sb = (SoapBindingInfo)endpoint.getEndpointInfo().getBinding();
         assertEquals("document", sb.getStyle());
-        assertEquals(false, bean.isWrapped());
+        assertFalse(bean.isWrapped());
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
