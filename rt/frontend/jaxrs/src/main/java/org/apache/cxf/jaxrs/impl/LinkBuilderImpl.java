@@ -220,23 +220,23 @@ public class LinkBuilderImpl implements Builder {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("<").append(uri.toString()).append(">");
+            sb.append('<').append(uri.toString()).append(">");
             String rel = getRel();
             if (rel != null) {
-                sb.append(";").append(Link.REL).append("=\"").append(rel).append("\"");
+                sb.append(';').append(Link.REL).append("=\"").append(rel).append('"');
             }
             String title = getTitle();
             if (title != null) {
-                sb.append(";").append(Link.TITLE).append("=\"").append(title).append("\"");
+                sb.append(';').append(Link.TITLE).append("=\"").append(title).append('"');
             }
             String type = getType();
             if (type != null) {
-                sb.append(";").append(Link.TYPE).append("=\"").append(type).append("\"");
+                sb.append(';').append(Link.TYPE).append("=\"").append(type).append('"');
             }
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 if (!MAIN_PARAMETERS.contains(entry.getKey())) {
-                    sb.append(";").append(entry.getKey()).append("=\"")
-                        .append(entry.getValue()).append("\"");
+                    sb.append(';').append(entry.getKey()).append("=\"")
+                        .append(entry.getValue()).append('"');
                 }
             }
             return sb.toString();

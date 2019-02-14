@@ -387,13 +387,13 @@ public class OperationProcessor  extends AbstractProcessor {
         }
         StringBuilder sb = new StringBuilder();
         sb.append(clzName);
-        sb.append("<");
+        sb.append('<');
         if ("void".equals(response)) {
             sb.append('?');
         } else {
             sb.append(response);
         }
-        sb.append(">");
+        sb.append('>');
         return sb.toString();
     }
 

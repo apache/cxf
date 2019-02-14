@@ -120,7 +120,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                     for (int i = 0; i < roles.length; i++) {
                         sb.append(roles[i]);
                         if (i + 1 < roles.length) {
-                            sb.append(" ");
+                            sb.append(' ');
                         }
                     }
                     return sb.toString();

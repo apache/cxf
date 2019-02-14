@@ -167,14 +167,14 @@ public final class PolicyUtils {
         buf.append("type: ");
         buf.append(typeToString(pc.getType()));
         if (Constants.TYPE_ASSERTION == pc.getType()) {
-            buf.append(" ");
+            buf.append(' ');
             buf.append(((Assertion)pc).getName());
             if (((Assertion)pc).isOptional()) {
                 buf.append(" (optional)");
             }
             buf.append(" (");
             buf.append(pc);
-            buf.append(")");
+            buf.append(')');
             nl(buf);
             if (pc instanceof PolicyContainingAssertion) {
                 PolicyComponent nested = ((PolicyContainingAssertion)pc).getPolicy();

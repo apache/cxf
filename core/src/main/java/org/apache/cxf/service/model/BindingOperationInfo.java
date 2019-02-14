@@ -137,7 +137,7 @@ public class BindingOperationInfo extends AbstractPropertiesHolder {
     public String toString() {
         return new StringBuilder().append("[BindingOperationInfo: ")
             .append(getName() == null ? "" : getName())
-            .append("]").toString();
+            .append(']').toString();
     }
 
 

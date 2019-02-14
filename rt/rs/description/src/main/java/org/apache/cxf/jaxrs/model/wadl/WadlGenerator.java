@@ -307,7 +307,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         sbMain.append("<application");
         if (!isJson) {
             sbMain.append(" xmlns=\"").append(getNamespace()).append("\" xmlns:xs=\"")
-                .append(Constants.URI_2001_SCHEMA_XSD).append("\"");
+                .append(Constants.URI_2001_SCHEMA_XSD).append('"');
         }
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
@@ -360,7 +360,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         handleGrammars(sbMain, sbGrammars, schemaWriter, clsMap);
 
         sbGrammars.append("</grammars>");
-        sbMain.append(">");
+        sbMain.append('>');
         handleApplicationDocs(sbMain);
         sbMain.append(sbGrammars.toString());
         sbMain.append(sbResources.toString());
@@ -403,14 +403,14 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         for (Map.Entry<String, String> entry : map.entrySet()) {
             sbApp.append(" xmlns:").append(entry.getKey()).append("=\"").append(entry.getValue())
-                .append("\"");
+                .append('"');
         }
 
         if (wadlSchemaLocation != null) {
-            sbApp.append(" xmlns:xsi=\"").append(Constants.URI_2001_SCHEMA_XSI).append("\"");
+            sbApp.append(" xmlns:xsi=\"").append(Constants.URI_2001_SCHEMA_XSI).append('"');
             sbApp.append(" xsi:schemaLocation=\"")
-                 .append(getNamespace()).append(" ").append(wadlSchemaLocation)
-                 .append("\"");
+                 .append(getNamespace()).append(' ').append(wadlSchemaLocation)
+                 .append('"');
         }
 
         writer.write(sbGrammars);
@@ -468,12 +468,12 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     protected void startResourceTag(StringBuilder sb, ClassResourceInfo cri, String path) {
-        sb.append("<resource path=\"").append(getPath(path)).append("\"");
+        sb.append("<resource path=\"").append(getPath(path)).append('"');
         if (idGenerator != null) {
             String id = idGenerator.getClassResourceId(cri);
-            sb.append(" id=\"").append(id).append("\"");
+            sb.append(" id=\"").append(id).append('"');
         }
-        sb.append(">");
+        sb.append('>');
     }
 
     protected String getPath(String path) {
@@ -548,12 +548,12 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     protected void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
-        sb.append("<method name=\"").append(ori.getHttpMethod()).append("\"");
+        sb.append("<method name=\"").append(ori.getHttpMethod()).append('"');
         if (idGenerator != null) {
             String id = idGenerator.getMethodResourceId(ori);
-            sb.append(" id=\"").append(id).append("\"");
+            sb.append(" id=\"").append(id).append('"');
         }
-        sb.append(">");
+        sb.append('>');
     }
     protected void endMethodTag(StringBuilder sb, OperationResourceInfo ori) {
         sb.append("</method>");
@@ -642,7 +642,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             boolean oneway = getMethod(ori).getAnnotation(Oneway.class) != null;
             setResponseStatus(sb, oneway ? Response.Status.ACCEPTED : Response.Status.NO_CONTENT);
         }
-        sb.append(">");
+        sb.append('>');
         handleDocs(anns, sb, DocTarget.RESPONSE, false, isJson);
         if (!isVoid) {
             handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, returnType, isJson, false);
@@ -662,11 +662,11 @@ public class WadlGenerator implements ContainerRequestFilter {
         sb.append(" status=\"");
         for (int i = 0; i < statuses.length; i++) {
             if (i > 0) {
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append(statuses[i].getStatusCode());
         }
-        sb.append("\"");
+        sb.append('"');
 
     }
 
@@ -963,10 +963,10 @@ public class WadlGenerator implements ContainerRequestFilter {
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pType ? "template" : isForm
             ? "query" : ParameterType.REQUEST_BODY == pType ? "plain" : pType.toString().toLowerCase();
-        sb.append("style=\"").append(style).append("\"");
+        sb.append("style=\"").append(style).append('"');
         if (pm.getDefaultValue() != null) {
             sb.append(" default=\"").append(xmlEncodeIfNeeded(pm.getDefaultValue()))
-                .append("\"");
+                .append('"');
         }
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             type = InjectionUtils.getActualType(genericType);
@@ -985,10 +985,10 @@ public class WadlGenerator implements ContainerRequestFilter {
             if (isJson) {
                 value = value.substring(3);
             }
-            sb.append(" type=\"").append(value).append("\"");
+            sb.append(" type=\"").append(value).append('"');
         }
         if (type.isEnum()) {
-            sb.append(">");
+            sb.append('>');
             handleDocs(anns, sb, DocTarget.PARAM, true, isJson);
             setEnumOptions(sb, type);
             sb.append("</param>");
@@ -1023,7 +1023,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     //CHECKSTYLE:ON
         boolean docAnnAvailable = isDocAvailable(anns);
         if (docAnnAvailable || (ori != null && !docProviders.isEmpty())) {
-            sb.append(">");
+            sb.append('>');
             if (docAnnAvailable) {
                 handleDocs(anns, sb, category, allowDefault, isJson);
             } else if (DocTarget.RETURN.equals(category)) {
@@ -1031,7 +1031,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             } else if (DocTarget.PARAM.equals(category)) {
                 handleOperParamJavaDocs(ori, paramIndex, sb);
             }
-            sb.append("</").append(elementName).append(">");
+            sb.append("</").append(elementName).append('>');
         } else {
             sb.append("/>");
         }
@@ -1061,7 +1061,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         for (MediaType mt : types) {
 
             sb.append("<representation");
-            sb.append(" mediaType=\"").append(JAXRSUtils.mediaTypeToString(mt)).append("\"");
+            sb.append(" mediaType=\"").append(JAXRSUtils.mediaTypeToString(mt)).append('"');
             if (isJson && !mt.getSubtype().contains("json")) {
                 sb.append("/>");
                 continue;
@@ -1087,7 +1087,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                 genericType = opMethod.getGenericReturnType();
             }
             if (isPrimitive) {
-                sb.append(">");
+                sb.append('>');
                 Parameter p = inbound ? getRequestBodyParam(ori) : new Parameter(ParameterType.REQUEST_BODY,
                                                                                  0, "result");
                 doWriteParam(ori, sb, p, type, type, p.getName() == null ? "request" : p.getName(), anns, isJson);
@@ -1107,7 +1107,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                     theActualType = InjectionUtils.getActualType(theType);
                 }
                 if (isJson) {
-                    sb.append(" element=\"").append(theActualType.getSimpleName()).append("\"");
+                    sb.append(" element=\"").append(theActualType.getSimpleName()).append('"');
                 } else if (qnameResolver != null
                            && (linkAnyMediaTypeToXmlSchema || mt.getSubtype().contains("xml"))
                            && jaxbTypes.contains(theActualType)) {
@@ -1144,11 +1144,11 @@ public class WadlGenerator implements ContainerRequestFilter {
             MediaType formType = isWildcard(types) ? MediaType.APPLICATION_FORM_URLENCODED_TYPE : types
                 .get(0);
             sb.append("<representation");
-            sb.append(" mediaType=\"").append(formType).append("\"");
+            sb.append(" mediaType=\"").append(formType).append('"');
             if (isJson) {
                 sb.append("/>");
             } else {
-                sb.append(">");
+                sb.append('>');
                 List<Parameter> params = ori.getParameters();
                 for (int i = 0; i < params.size(); i++) {
                     if (isFormParameter(params.get(i), getMethod(ori).getParameterTypes()[i], getMethod(ori)
@@ -1418,7 +1418,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     private void writeQName(StringBuilder sb, QName qname) {
-        sb.append(" element=\"").append(qname.getPrefix()).append(':').append(qname.getLocalPart()).append("\"");
+        sb.append(" element=\"").append(qname.getPrefix()).append(':').append(qname.getLocalPart()).append('"');
     }
 
     private boolean isXmlRoot(Class<?> cls) {
@@ -1794,12 +1794,12 @@ public class WadlGenerator implements ContainerRequestFilter {
 
                 sb.append("<doc");
                 if (!isJson && d.lang().length() > 0) {
-                    sb.append(" xml:lang=\"").append(d.lang()).append("\"");
+                    sb.append(" xml:lang=\"").append(d.lang()).append('"');
                 }
                 if (d.title().length() > 0) {
-                    sb.append(" title=\"").append(xmlEncodeIfNeeded(d.title())).append("\"");
+                    sb.append(" title=\"").append(xmlEncodeIfNeeded(d.title())).append('"');
                 }
-                sb.append(">");
+                sb.append('>');
                 if (d.value().length() > 0) {
                     sb.append(xmlEncodeIfNeeded(d.value()));
                 } else if (d.docuri().length() > 0) {

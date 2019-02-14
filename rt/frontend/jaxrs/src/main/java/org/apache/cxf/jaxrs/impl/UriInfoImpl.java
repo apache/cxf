@@ -192,7 +192,7 @@ public class UriInfoImpl implements UriInfo {
                 if (paths[1] != null && paths[1].getValue().length() > 1) {
                     for (URITemplate t : paths) {
                         if (t != null) {
-                            sumPath.append("/").append(t.getValue());
+                            sumPath.append('/').append(t.getValue());
                         }
                     }
                     objects.addAll(templateObjects);

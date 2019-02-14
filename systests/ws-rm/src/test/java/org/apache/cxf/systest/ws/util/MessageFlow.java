@@ -530,7 +530,7 @@ public class MessageFlow {
         try {
             buf.append(System.getProperty("line.separator"));
             for (int i = 0; i < streams.size(); i++) {
-                buf.append("[");
+                buf.append('[');
                 buf.append(i);
                 buf.append("] : ");
                 buf.append(new String(streams.get(i)));

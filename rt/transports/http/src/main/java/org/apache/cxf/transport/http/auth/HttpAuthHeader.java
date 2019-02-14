@@ -122,7 +122,7 @@ public final class HttpAuthHeader {
                     StringBuilder pad = new StringBuilder();
                     pad.append("");
                     for (int i = 0; i < 8 - value.length(); i++) {
-                        pad.append("0");
+                        pad.append('0');
                     }
                     value = pad.toString() + value;
                 } else {

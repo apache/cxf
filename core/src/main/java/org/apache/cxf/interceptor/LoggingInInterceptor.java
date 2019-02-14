@@ -141,7 +141,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             buffer.getAddress().append(uri);
             String query = (String)message.get(Message.QUERY_STRING);
             if (query != null) {
-                buffer.getAddress().append("?").append(query);
+                buffer.getAddress().append('?').append(query);
             }
         }
 

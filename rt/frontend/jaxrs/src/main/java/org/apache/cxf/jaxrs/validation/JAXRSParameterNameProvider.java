@@ -48,17 +48,17 @@ public class JAXRSParameterNameProvider implements ParameterNameProvider {
         for (int i = 0; i < parameters.size(); ++i) {
             final StringBuilder sb = new StringBuilder();
             sb.append("arg" + i);
-            sb.append("(");
+            sb.append('(');
 
             Parameter parameter = parameters.get(i);
             if (parameter.getName() != null) {
                 sb.append(parameter.getType().toString());
                 sb.append("(\"" + parameter.getName() + "\")");
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append(method.getParameterTypes()[i].getSimpleName());
 
-            sb.append(")");
+            sb.append(')');
             parameterNames.add(sb.toString());
         }
 

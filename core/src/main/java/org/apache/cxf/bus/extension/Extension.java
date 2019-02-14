@@ -118,7 +118,7 @@ public class Extension {
             buf.append(ns);
             n++;
         }
-        buf.append(")");
+        buf.append(')');
         return buf.toString();
     }
 

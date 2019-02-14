@@ -128,7 +128,7 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         while (iterator.hasNext()) {
             builder.append(iterator.next().toString());
             if (iterator.hasNext()) {
-                builder.append(",");
+                builder.append(',');
             }
         }
         return builder.toString();

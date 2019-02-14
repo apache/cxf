@@ -190,7 +190,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
             for (int i = 0; i < params.length; i++) {
                 builder.append(" {");
                 builder.append(Integer.toString(i));
-                builder.append("}");
+                builder.append('}');
             }
             logp(Level.FINER, sourceClass, sourceMethod, builder.toString(), params);
         }

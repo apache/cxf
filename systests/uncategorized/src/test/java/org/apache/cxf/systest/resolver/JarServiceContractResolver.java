@@ -48,10 +48,10 @@ public class JarServiceContractResolver implements ServiceContractResolver {
         String local = qname.getLocalPart();
         StringBuilder path = new StringBuilder();
         for (int i = hostStrings.length - 1; i >= 0; i--) {
-            path.append(hostStrings[i]).append("/");
+            path.append(hostStrings[i]).append('/');
         }
         for (int i = 1; i < pathStrings.length; i++) {
-            path.append(pathStrings[i]).append("/");
+            path.append(pathStrings[i]).append('/');
         }
         path.append(local).append(".wsdl");
         try {

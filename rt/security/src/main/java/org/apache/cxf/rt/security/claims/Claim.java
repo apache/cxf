@@ -182,7 +182,7 @@ public class Claim implements Serializable, Cloneable {
         builder.append(claimType);
         builder.append(", optional=");
         builder.append(optional);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 }

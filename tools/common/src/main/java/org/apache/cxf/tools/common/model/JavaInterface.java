@@ -299,7 +299,7 @@ public class JavaInterface implements JavaAnnotatable {
     public String getFullClassName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getPackageName());
-        sb.append(".");
+        sb.append('.');
         sb.append(getName());
         return sb.toString();
     }

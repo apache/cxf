@@ -359,7 +359,7 @@ public class WSDLGetUtils {
                     sb.append("://").append(baseUrl.getHost());
                     int port = baseUrl.getPort();
                     if (port > 0) {
-                        sb.append(":").append(port);
+                        sb.append(':').append(port);
                     }
                     sb.append(locUri.getPath());
                     soapAddress.setAttribute("location", sb.toString());

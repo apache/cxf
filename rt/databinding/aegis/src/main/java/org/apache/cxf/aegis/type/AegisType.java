@@ -265,7 +265,7 @@ public abstract class AegisType {
         sb.append(",\nQName=");
         QName q = getSchemaType();
         sb.append((q == null) ? "<null>" : q.toString());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

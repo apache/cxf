@@ -159,7 +159,7 @@ public class OpenApiCustomizer {
         String[] segments = (classResourcePath + operationResourcePath).split("/");
         for (String segment : segments) {
             if (!StringUtils.isEmpty(segment)) {
-                normalizedPath.append("/").append(segment);
+                normalizedPath.append('/').append(segment);
             }
         }
         // Adapt to Swagger's path expression

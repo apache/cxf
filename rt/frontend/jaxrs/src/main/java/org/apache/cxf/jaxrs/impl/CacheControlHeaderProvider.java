@@ -170,7 +170,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             sb.append(entry.getKey());
             String v = entry.getValue();
             if (v != null) {
-                sb.append("=");
+                sb.append('=');
                 if (v.indexOf(' ') != -1) {
                     sb.append('\"').append(v).append('\"');
                 } else {

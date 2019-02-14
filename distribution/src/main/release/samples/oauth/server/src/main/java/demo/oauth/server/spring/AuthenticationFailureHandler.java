@@ -41,11 +41,11 @@ public class AuthenticationFailureHandler extends SimpleUrlAuthenticationFailure
         String oauthToken = request.getParameter(OAuth.OAUTH_TOKEN);
         String xScope = request.getParameter(OAuthConstants.X_OAUTH_SCOPE);
 
-        StringBuilder url = new StringBuilder(authorizeUrl).append("?").append(OAuth.OAUTH_TOKEN).append("=")
+        StringBuilder url = new StringBuilder(authorizeUrl).append('?').append(OAuth.OAUTH_TOKEN).append("=")
             .append(oauthToken);
 
         if (!StringUtils.isEmpty(xScope)) {
-            url.append("&").append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
+            url.append('&').append(OAuthConstants.X_OAUTH_SCOPE).append("=").append(xScope);
         }
 
         setDefaultFailureUrl(url.toString());

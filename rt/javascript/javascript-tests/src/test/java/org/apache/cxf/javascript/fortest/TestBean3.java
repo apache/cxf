@@ -134,7 +134,7 @@ public class TestBean3 {
             builder.append("Null");
         } else {
             for (byte b : base64Item) {
-                builder.append(" ");
+                builder.append(' ');
                 builder.append(Integer.toHexString(b));
             }
         }
@@ -146,7 +146,7 @@ public class TestBean3 {
             builder.append("Null");
         } else {
             for (int i : optionalIntArrayItem) {
-                builder.append(" ");
+                builder.append(' ');
                 builder.append(i);
             }
         }

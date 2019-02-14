@@ -105,11 +105,11 @@ public class XNode {
 
     public String getText() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append('[');
         sb.append(name.getLocalPart());
-        sb.append(":");
+        sb.append(':');
         sb.append(getAttributeValue());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 
@@ -126,23 +126,23 @@ public class XNode {
 
     public String getXPath() {
         StringBuilder sb = new StringBuilder();
-        sb.append("/");
+        sb.append('/');
         sb.append(prefix);
-        sb.append(":");
+        sb.append(':');
         sb.append(name.getLocalPart());
         if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
-            sb.append("[");
+            sb.append('[');
             if (isDefaultAttributeValue) {
                 sb.append("not(@");
                 sb.append(attributeName);
                 sb.append(") or ");
             }
-            sb.append("@");
+            sb.append('@');
             sb.append(attributeName);
             sb.append("='");
             sb.append(attributeValue);
-            sb.append("'");
-            sb.append("]");
+            sb.append('\'');
+            sb.append(']');
         }
         return sb.toString();
     }

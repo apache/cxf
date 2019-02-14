@@ -160,7 +160,7 @@ public class ProviderFactory {
             String base = isBase ? "base " : "";
             StringBuilder msg = new StringBuilder("creating a ");
             msg.append(modestr)
-                .append(" ")
+                .append(' ')
                 .append(type)
                 .append(" provider for ")
                 .append(base)

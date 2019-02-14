@@ -121,7 +121,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             String uri = (String)message.get(Message.REQUEST_URI);
             if (uri != null && !address.startsWith(uri)) {
                 if (!address.endsWith("/") && !uri.startsWith("/")) {
-                    buffer.getAddress().append("/");
+                    buffer.getAddress().append('/');
                 }
                 buffer.getAddress().append(uri);
             }

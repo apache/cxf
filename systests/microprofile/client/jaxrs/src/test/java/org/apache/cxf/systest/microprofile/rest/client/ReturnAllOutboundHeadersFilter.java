@@ -31,7 +31,7 @@ public class ReturnAllOutboundHeadersFilter implements ClientRequestFilter {
     public void filter(ClientRequestContext requestContext) throws IOException {
         StringBuilder sb = new StringBuilder();
         requestContext.getStringHeaders().forEach((k, v) -> {
-            sb.append(k).append("=").append(v.stream().collect(Collectors.joining(",")))
+            sb.append(k).append('=').append(v.stream().collect(Collectors.joining(",")))
                 .append(System.lineSeparator());
         });
         requestContext.abortWith(Response.ok(sb.toString()).build());

@@ -190,7 +190,7 @@ public class ASMHelper {
         for (Class<?> cl : m.getParameterTypes()) {
             buf.append(getClassCode(cl));
         }
-        buf.append(")");
+        buf.append(')');
         buf.append(getClassCode(m.getReturnType()));
 
         return buf.toString();
@@ -251,11 +251,11 @@ public class ASMHelper {
             java.lang.reflect.Type[] lowBounds = wt.getLowerBounds();
             java.lang.reflect.Type[] upBounds = wt.getUpperBounds();
             for (java.lang.reflect.Type t : upBounds) {
-                a.append("+");
+                a.append('+');
                 a.append(getClassCode(t));
             }
             for (java.lang.reflect.Type t : lowBounds) {
-                a.append("-");
+                a.append('-');
                 a.append(getClassCode(t));
             }
             return a.toString();

@@ -258,7 +258,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
         //warmup
         for (int x = 0; x < 10000; x++) {
-            //builder.append("a");
+            //builder.append('a');
             //long s1 = System.nanoTime();
             //System.out.println("aa1: " + s1);
             String value = g.greetMe(request);
@@ -270,7 +270,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
         long start = System.currentTimeMillis();
         for (int x = 0; x < 10000; x++) {
-            //builder.append("a");
+            //builder.append('a');
             //long s1 = System.nanoTime();
             //System.out.println("aa1: " + s1);
             g.greetMe(request);
@@ -321,7 +321,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         //warmup
         long start = System.currentTimeMillis();
         for (int x = 0; x < warmupIter; x++) {
-            //builder.append("a");
+            //builder.append('a');
             //long s1 = System.nanoTime();
             //System.out.println("aa1: " + s1);
             g.greetMeLaterAsync(x, whandler[x]);
@@ -351,7 +351,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
         start = System.currentTimeMillis();
         for (int x = 0; x < runIter; x++) {
-            //builder.append("a");
+            //builder.append('a');
             //long s1 = System.nanoTime();
             //System.out.println("aa1: " + s1);
             g.greetMeLaterAsync(x, rhandler);

@@ -620,7 +620,7 @@ public class DoMerges {
             if (b.length() == 0) {
                 b.append("Running \"");
             } else {
-                b.append(" ");
+                b.append(' ');
             }
             b.append(s);
         }

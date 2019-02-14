@@ -81,8 +81,8 @@ public class OidcHybridService extends OidcImplicitService {
                                                           approvedScope, userSubject, preAuthorizedToken);
 
         if (codeGrant != null) {
-            sb.append("&");
-            sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(codeGrant.getCode());
+            sb.append('&');
+            sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append('=').append(codeGrant.getCode());
         }
         return sb;
     }

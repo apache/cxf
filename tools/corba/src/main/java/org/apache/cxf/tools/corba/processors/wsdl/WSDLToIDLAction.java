@@ -452,7 +452,7 @@ public class WSDLToIDLAction {
                 }
             }
 
-            dotScopedName.append(".");
+            dotScopedName.append('.');
             scope = (IdlScopeBase)idlDef;
         }
 

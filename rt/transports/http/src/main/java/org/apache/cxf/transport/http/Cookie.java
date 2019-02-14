@@ -149,7 +149,7 @@ public class Cookie {
         StringBuilder b = new StringBuilder();
         b.append("$Version=\"1\"");
         b.append("; ").append(getName())
-            .append("=").append(getValue());
+            .append('=').append(getValue());
         if (getPath() != null && getPath().length() > 0) {
             b.append("; $Path=").append(getPath());
         }

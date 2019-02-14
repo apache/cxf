@@ -73,7 +73,7 @@ public final class URIParserUtil {
             if (isExcluded(ch)) {
                 byte[] bytes = Character.toString(ch).getBytes(StandardCharsets.UTF_8);
                 for (int y = 0; y < bytes.length; y++) {
-                    b.append("%");
+                    b.append('%');
                     b.append(HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
                     b.append(HEX_DIGITS.charAt(bytes[y] & 0x0F));
                 }

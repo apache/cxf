@@ -106,24 +106,24 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                     name = tableAlias + "." + name;
                 }
 
-                sb.append(name).append(" ").append(
+                sb.append(name).append(' ').append(
                             SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value,
                                                                    originalValue))
-                            .append(" ").append("'").append(value).append("'");
+                            .append(' ').append("'").append(value).append("'");
             }
         } else {
             boolean first = true;
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 if (!first) {
-                    sb.append(" ").append(sc.getConditionType().toString()).append(" ");
+                    sb.append(' ').append(sc.getConditionType().toString()).append(' ');
                 } else {
                     first = false;
                 }
-                sb.append("(");
+                sb.append('(');
                 saveStringBuilder(sb);
                 condition.accept(this);
                 sb = getStringBuilder();
-                sb.append(")");
+                sb.append(')');
             }
         }
 

@@ -232,7 +232,7 @@ public final class OAuthUtils {
                 continue;
             }
             if (sb.length() > 0) {
-                sb.append(" ");
+                sb.append(' ');
             }
             sb.append(perm.getPermission());
         }

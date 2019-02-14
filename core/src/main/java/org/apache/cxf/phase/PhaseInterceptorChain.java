@@ -386,7 +386,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
                 BindingOperationInfo boi = exchange.getBindingOperationInfo();
                 OperationInfo opInfo = boi != null ? boi.getOperationInfo() : null;
                 if (opInfo != null) {
-                    description.append("#").append(opInfo.getName());
+                    description.append('#').append(opInfo.getName());
                 }
                 description.append("\' ");
             }

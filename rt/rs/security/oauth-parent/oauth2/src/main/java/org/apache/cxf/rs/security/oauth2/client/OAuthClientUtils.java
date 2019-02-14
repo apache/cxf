@@ -413,7 +413,7 @@ public final class OAuthClientUtils {
         String tokenType = token.getTokenType().toLowerCase();
         if (OAuthConstants.BEARER_TOKEN_TYPE.equalsIgnoreCase(tokenType)) {
             sb.append(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
-            sb.append(" ");
+            sb.append(' ');
             sb.append(token.getTokenKey());
         } else if (OAuthConstants.HAWK_TOKEN_TYPE.equalsIgnoreCase(tokenType)) {
             if (httpProps == null) {

@@ -51,7 +51,7 @@ public final class AddressFactory {
 
         StringBuilder sb = new StringBuilder();
         sb.append(PREFIX);
-        sb.append(".");
+        sb.append('.');
         sb.append(NameUtil.capitalize(name));
         sb.append("Address");
         try {

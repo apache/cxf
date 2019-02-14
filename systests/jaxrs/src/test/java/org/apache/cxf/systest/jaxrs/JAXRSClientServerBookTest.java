@@ -1917,7 +1917,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String response = wc.get(String.class);
         // {"Book":{"id":123,"name":"CXF in Action"}}
 
-        assertTrue(response.startsWith("{"));
+        assertTrue(response.charAt(0) == '{');
         assertTrue(response.endsWith("}"));
         assertTrue(response.contains("\"Book\":{"));
         assertTrue(response.indexOf("\"Book\":{") == 1);
@@ -1930,7 +1930,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         //      "name":"CXF in Action"
         //    }
         //}
-        assertTrue(response.startsWith("{"));
+        assertTrue(response.charAt(0) == '{');
         assertTrue(response.endsWith("}"));
         assertTrue(response.contains("\"Book\":{"));
         assertNotEquals(1, response.indexOf("\"Book\":{"));

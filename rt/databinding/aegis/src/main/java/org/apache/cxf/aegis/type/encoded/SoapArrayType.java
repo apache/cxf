@@ -235,7 +235,7 @@ public class SoapArrayType extends AegisType {
         for (int i = 1; i < dimensions.size(); i++) {
             expectedFormat.append(",x");
         }
-        expectedFormat.append("]");
+        expectedFormat.append(']');
         throw new DatabindingException("Expected sparse array position value in format " + expectedFormat
                 + ", but was " + positionString);
     }

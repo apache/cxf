@@ -101,20 +101,20 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
 
         String rels = link.getRel();
         if (!rels.isEmpty()) {
-            sb.append(";").append(REL).append('=');
+            sb.append(';').append(REL).append('=');
             writeListParamValues(sb, rels);
         }
         if (link.getTitle() != null) {
-            sb.append(";").append(TITLE).append("=\"").append(link.getTitle()).append('"');
+            sb.append(';').append(TITLE).append("=\"").append(link.getTitle()).append('"');
         }
         if (link.getType() != null) {
-            sb.append(";").append(TYPE).append('=').append(link.getType());
+            sb.append(';').append(TYPE).append('=').append(link.getType());
         }
         for (Map.Entry<String, String> entry : link.getParams().entrySet()) {
             if (KNOWN_PARAMETERS.contains(entry.getKey())) {
                 continue;
             }
-            sb.append(";").append(entry.getKey()).append('=');
+            sb.append(';').append(entry.getKey()).append('=');
             writeListParamValues(sb, entry.getValue());
         }
 

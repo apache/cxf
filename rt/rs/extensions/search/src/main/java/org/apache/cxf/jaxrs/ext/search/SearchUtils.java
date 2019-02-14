@@ -148,11 +148,11 @@ public final class SearchUtils {
             for (int i = 0; i < columns.size(); i++) {
                 sb.append(columns.get(i));
                 if (i + 1 < columns.size()) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
         } else {
-            sb.append("*");
+            sb.append('*');
         }
         sb.append(" FROM ").append(table);
         if (tableAlias != null) {

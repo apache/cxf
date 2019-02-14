@@ -99,7 +99,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
             StringBuilder ob = new StringBuilder();
             for (String requestOrigin : requestOrigins) {
                 ob.append(requestOrigin);
-                ob.append(" "); // extra trailing space won't hurt.
+                ob.append(' '); // extra trailing space won't hurt.
             }
             httpget.addHeader("Origin", ob.toString());
         }

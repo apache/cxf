@@ -75,23 +75,23 @@ public final class JAnnotationElement {
             }
             if (value instanceof List) {
                 List<?> list = (List<?>) value;
-                sb.append("{");
+                sb.append('{');
                 for (int i = 0; i < list.size(); i++) {
                     appendValue(sb, list.get(i));
                     if (i < list.size() - 1) {
                         sb.append(", ");
                     }
                 }
-                sb.append("}");
+                sb.append('}');
             } else if (value instanceof String[]) {
-                sb.append("{");
+                sb.append('{');
                 for (int i = 0; i < Array.getLength(value); i++) {
                     appendValue(sb, Array.get(value, i));
                     if (i < Array.getLength(value) - 1) {
                         sb.append(", ");
                     }
                 }
-                sb.append("}");
+                sb.append('}');
             } else {
                 appendValue(sb, value);
             }
@@ -139,7 +139,7 @@ public final class JAnnotationElement {
             imports.add(obj.getClass().getName());
         }
         sb.append(clzName.substring(clzName.lastIndexOf(".") + 1).replace("$", "."));
-        sb.append(".");
+        sb.append('.');
         sb.append(e.name());
     }
 

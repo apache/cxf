@@ -230,27 +230,27 @@ public class ArrayTypeInfo {
 
         // typeName: foo:bar
         if (typeName.getPrefix() != null && typeName.getPrefix().length() > 0) {
-            string.append(typeName.getPrefix()).append(":");
+            string.append(typeName.getPrefix()).append(':');
         }
         string.append(typeName.getLocalPart());
 
         // ranks: [,,,,]
         if (ranks > 0) {
-            string.append("[");
+            string.append('[');
             for (int i = 1; i < ranks; i++) {
-                string.append(",");
+                string.append(',');
             }
-            string.append("]");
+            string.append(']');
         }
 
         // dimensions: [2,3,4]
-        string.append("[");
+        string.append('[');
         string.append(dimensions.get(0));
         for (int dimension : dimensions.subList(1, dimensions.size())) {
-            string.append(",").append(dimension);
+            string.append(',').append(dimension);
 
         }
-        string.append("]");
+        string.append(']');
 
         return string.toString();
     }

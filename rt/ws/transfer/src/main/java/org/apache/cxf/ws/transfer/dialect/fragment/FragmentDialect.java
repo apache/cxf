@@ -77,14 +77,14 @@ public class FragmentDialect implements Dialect {
             StringBuilder sb = new StringBuilder();
             sb.append("//@?");
             sb.append(FragmentDialectLanguageQName.getQNamePatternString());
-            sb.append("$");
+            sb.append('$');
             badXPathPattern = Pattern.compile(sb.toString());
         }
         if (goodXPathPattern == null) {
             StringBuilder sb = new StringBuilder();
             sb.append("/@?");
             sb.append(FragmentDialectLanguageQName.getQNamePatternString());
-            sb.append("$");
+            sb.append('$');
             goodXPathPattern = Pattern.compile(sb.toString());
         }
     }

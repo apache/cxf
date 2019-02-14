@@ -470,7 +470,7 @@ public final class EndpointReferenceUtils {
         StringBuilder strBuf = new StringBuilder();
         for (String str : wsdlLocation) {
             strBuf.append(str);
-            strBuf.append(" ");
+            strBuf.append(' ');
         }
 
         metadata.getOtherAttributes().put(WSDL_LOCATION, strBuf.toString().trim());

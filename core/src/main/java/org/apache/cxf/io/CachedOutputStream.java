@@ -414,7 +414,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder().append("[")
+        StringBuilder builder = new StringBuilder().append('[')
             .append(CachedOutputStream.class.getName())
             .append(" Content: ");
         try {
@@ -422,7 +422,7 @@ public class CachedOutputStream extends OutputStream {
         } catch (IOException e) {
             //ignore
         }
-        return builder.append("]").toString();
+        return builder.append(']').toString();
     }
 
     protected void onWrite() throws IOException {

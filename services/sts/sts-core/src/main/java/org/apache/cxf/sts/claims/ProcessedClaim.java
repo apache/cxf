@@ -81,7 +81,7 @@ public class ProcessedClaim extends Claim {
         builder.append(originalIssuer);
         builder.append(", principal=");
         builder.append(principal);
-        builder.append("]");
+        builder.append(']');
         return builder.toString();
     }
 

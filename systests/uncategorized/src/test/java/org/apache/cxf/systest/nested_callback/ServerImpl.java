@@ -73,7 +73,7 @@ public class ServerImpl implements ServerPortType  {
 
             StringBuilder seiName = new StringBuilder();
             seiName.append(JAXBUtils.namespaceURIToPackage(interfaceName.getNamespaceURI()));
-            seiName.append(".");
+            seiName.append('.');
             seiName.append(JAXBUtils.nameToIdentifier(interfaceName.getLocalPart(),
                                                       JAXBUtils.IdentifierType.INTERFACE));
 

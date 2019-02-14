@@ -414,7 +414,7 @@ public class ServerLauncher {
         ClassLoader loader = this.getClass().getClassLoader();
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (classpath.indexOf("/.compatibility/") != -1) {
-            classpath.append(":");
+            classpath.append(':');
             //on OSX, the compatibility lib brclasspath.indexOf("/.compatibility/")
             int idx = classpath.indexOf("/.compatibility/");
             int idx1 = classpath.lastIndexOf(":", idx);

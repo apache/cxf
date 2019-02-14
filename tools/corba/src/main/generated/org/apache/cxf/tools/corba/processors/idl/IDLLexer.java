@@ -977,19 +977,19 @@ tryAgain:
 		case '?':
 		{
 			match('?');
-			text.setLength(_begin); text.append("?");
+			text.setLength(_begin); text.append('?');
 			break;
 		}
 		case '\'':
 		{
 			match('\'');
-			text.setLength(_begin); text.append("'");
+			text.setLength(_begin); text.append('\'');
 			break;
 		}
 		case '"':
 		{
 			match('"');
-			text.setLength(_begin); text.append("\"");
+			text.setLength(_begin); text.append('"');
 			break;
 		}
 		case '0':  case '1':  case '2':  case '3':

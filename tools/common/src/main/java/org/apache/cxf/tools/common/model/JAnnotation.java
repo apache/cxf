@@ -87,20 +87,20 @@ public final class JAnnotation {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("@");
+        sb.append('@');
         sb.append(type.getSimpleName());
         if (getElements().isEmpty()) {
             return sb.toString();
         }
 
-        sb.append("(");
+        sb.append('(');
         for (int i = 0; i < elements.size(); i++) {
             sb.append(elements.get(i));
             if (i < elements.size() - 1) {
                 sb.append(", ");
             }
         }
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 }

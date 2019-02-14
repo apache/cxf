@@ -1245,7 +1245,7 @@ public class RMTxStore implements RMStore {
         StringBuilder buf = new StringBuilder();
         buf.append("CREATE TABLE ").append(name).append(" (");
         for (String[] col : cols) {
-            buf.append(col[0]).append(" ").append(col[1]).append(", ");
+            buf.append(col[0]).append(' ').append(col[1]).append(", ");
         }
         buf.append("PRIMARY KEY (");
         for (int i = 0; i < keys.length; i++) {

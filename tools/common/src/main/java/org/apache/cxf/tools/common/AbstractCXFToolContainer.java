@@ -203,7 +203,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         while (strToken.hasMoreTokens()) {
             strBuf.append(strToken.nextToken());
             if (strToken.countTokens() != 0) {
-                strBuf.append("_");
+                strBuf.append('_');
             }
         }
 

@@ -54,23 +54,23 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
                 String rvalStr = getPropertyValue(name, statement.getValue());
                 validatePropertyValue(name, rvalStr);
 
-                sb.append("(");
+                sb.append('(');
                 if (sc.getConditionType() == ConditionType.NOT_EQUALS) {
-                    sb.append("!");
+                    sb.append('!');
                 }
 
                 String ldapOperator = conditionTypeToLdapOperator(sc.getConditionType());
                 String encodedRValStr = encodeQueryValues ? Util.doRFC2254Encoding(rvalStr) : rvalStr;
                 sb.append(name).append(ldapOperator).append(encodedRValStr);
 
-                sb.append(")");
+                sb.append(')');
             }
         } else {
-            sb.append("(");
+            sb.append('(');
             if (sc.getConditionType() == ConditionType.AND) {
-                sb.append("&");
+                sb.append('&');
             } else {
-                sb.append("|");
+                sb.append('|');
             }
 
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
@@ -78,7 +78,7 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
                 condition.accept(this);
                 sb = getStringBuilder();
             }
-            sb.append(")");
+            sb.append(')');
         }
         saveStringBuilder(sb);
     }

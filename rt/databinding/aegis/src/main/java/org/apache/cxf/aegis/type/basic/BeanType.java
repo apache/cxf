@@ -656,7 +656,7 @@ public class BeanType extends AegisType {
         sb.append((q == null) ? "<null>" : q.toString());
         sb.append(",\ninfo=");
         sb.append(getTypeInfo().toString());
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

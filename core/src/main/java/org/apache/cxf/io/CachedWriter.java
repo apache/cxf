@@ -427,7 +427,7 @@ public class CachedWriter extends Writer {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder().append("[")
+        StringBuilder builder = new StringBuilder().append('[')
             .append(CachedWriter.class.getName())
             .append(" Content: ");
         try {
@@ -435,7 +435,7 @@ public class CachedWriter extends Writer {
         } catch (IOException e) {
             //ignore
         }
-        return builder.append("]").toString();
+        return builder.append(']').toString();
     }
 
     protected void onWrite() throws IOException {

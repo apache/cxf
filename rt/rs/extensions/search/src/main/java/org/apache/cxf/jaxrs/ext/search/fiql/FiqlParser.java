@@ -323,7 +323,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
                     builder.append(", ");
                 }
             }
-            builder.append("]");
+            builder.append(']');
             return builder.toString();
         }
 

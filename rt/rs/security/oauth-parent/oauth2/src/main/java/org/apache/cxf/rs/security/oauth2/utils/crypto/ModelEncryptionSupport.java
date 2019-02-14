@@ -336,21 +336,21 @@ public final class ModelEncryptionSupport {
         // 9: permissions
         state.append(SEP);
         if (token.getScopes().isEmpty()) {
-            state.append(" ");
+            state.append(' ');
         } else {
             for (OAuthPermission p : token.getScopes()) {
                 // 9.1
                 state.append(tokenizeString(p.getPermission()));
-                state.append(".");
+                state.append('.');
                 // 9.2
                 state.append(tokenizeString(p.getDescription()));
-                state.append(".");
+                state.append('.');
                 // 9.3
                 state.append(p.isDefaultPermission());
-                state.append(".");
+                state.append('.');
                 // 9.4
                 state.append(p.getHttpVerbs().toString());
-                state.append(".");
+                state.append('.');
                 // 9.5
                 state.append(p.getUris().toString());
             }
@@ -529,17 +529,17 @@ public final class ModelEncryptionSupport {
         if (subject != null) {
             // 1
             state.append(tokenizeString(subject.getLogin()));
-            state.append(".");
+            state.append('.');
             // 2
             state.append(tokenizeString(subject.getId()));
-            state.append(".");
+            state.append('.');
             // 3
             state.append(subject.getRoles().toString());
-            state.append(".");
+            state.append('.');
             // 4
             state.append(subject.getProperties().toString());
         } else {
-            state.append(" ");
+            state.append(' ');
         }
     }
 

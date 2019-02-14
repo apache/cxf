@@ -61,7 +61,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         buffer.append(namespaceUri);
         buffer.append("] [systemId: ");
         buffer.append(systemId);
-        buffer.append("]");
+        buffer.append(']');
 
         return buffer.toString();
     }

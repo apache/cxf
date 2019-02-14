@@ -102,7 +102,7 @@ public final class AuthorizationUtils {
                 continue;
             }
             if (sb.length() > 0) {
-                sb.append(",");
+                sb.append(',');
             }
             sb.append(challenge);
         }

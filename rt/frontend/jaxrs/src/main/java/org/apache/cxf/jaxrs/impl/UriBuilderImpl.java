@@ -190,7 +190,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     private String buildUriString(String thePath, String theQuery, String theFragment) {
         StringBuilder b = new StringBuilder();
         if (scheme != null) {
-            b.append(scheme).append(":");
+            b.append(scheme).append(':');
         }
         if (!isSchemeOpaque()) {
             if (scheme != null) {
@@ -398,7 +398,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                 for (int i = 0; i < values.length; i++) {
                     buf.append(HttpUtils.encodePartiallyEncoded(values[i], false));
                     if (i + 1 < values.length) {
-                        buf.append("/");
+                        buf.append('/');
                     }
                 }
                 decodedMap.put(entry.getKey(), buf.toString());

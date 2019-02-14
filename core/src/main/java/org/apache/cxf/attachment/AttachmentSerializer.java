@@ -114,14 +114,14 @@ public class AttachmentSerializer {
             if (xop) {
                 ct.append("; type=\"application/xop+xml\"");
             } else {
-                ct.append("; type=\"").append(bodyCt).append("\"");
+                ct.append("; type=\"").append(bodyCt).append('"');
             }
         }
 
         // boundary
         ct.append("; boundary=\"")
             .append(bodyBoundary)
-            .append("\"");
+            .append('"');
 
         String rootContentId = getHeaderValue("Content-ID", AttachmentUtil.BODY_ATTACHMENT_ID);
 
@@ -143,7 +143,7 @@ public class AttachmentSerializer {
             if (bodyCtParamsEscaped != null) {
                 ct.append(bodyCtParamsEscaped);
             }
-            ct.append("\"");
+            ct.append('"');
         }
 
 
@@ -171,7 +171,7 @@ public class AttachmentSerializer {
                 if (bodyCtParamsEscaped != null) {
                     mimeBodyCt.append(bodyCtParamsEscaped);
                 }
-                mimeBodyCt.append("\"");
+                mimeBodyCt.append('"');
             } else if (bodyCtParams != null) {
                 mimeBodyCt.append(bodyCtParams);
             }

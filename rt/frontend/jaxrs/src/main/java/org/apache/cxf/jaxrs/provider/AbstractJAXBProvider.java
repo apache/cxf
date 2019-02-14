@@ -545,7 +545,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                             for (Class<?> extra : extraClass) {
                                 String extraPackage = PackageUtils.getPackageName(extra);
                                 if (!extraPackage.equals(packageName)) {
-                                    sb.append(":").append(extraPackage);
+                                    sb.append(':').append(extraPackage);
                                 }
                             }
                             contextName = sb.toString();

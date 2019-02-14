@@ -165,7 +165,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
             String ct = (String) mpi.getProperty(Message.CONTENT_TYPE);
 
             String id = new StringBuilder().append(partName)
-                .append("=")
+                .append('=')
                 .append(UUID.randomUUID())
                 .append("@apache.org").toString();
 

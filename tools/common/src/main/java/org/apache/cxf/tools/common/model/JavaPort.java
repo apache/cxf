@@ -167,7 +167,7 @@ public class JavaPort {
         StringBuilder sb = new StringBuilder();
         if (!StringUtils.isEmpty(getPackageName())) {
             sb.append(getPackageName());
-            sb.append(".");
+            sb.append('.');
         }
         sb.append(getInterfaceClass());
         return sb.toString();

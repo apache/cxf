@@ -84,7 +84,7 @@ public class DatabindingException extends RuntimeException {
         for (String s : extraMessages) {
             buf.append(s);
         }
-        buf.append(" ");
+        buf.append(' ');
         buf.append(super.getMessage());
         return buf.toString();
     }

@@ -223,7 +223,7 @@ public class AddressingProperties  {
 
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("[");
+        buf.append('[');
         if (null != messageID) {
             if (buf.length() > 1) {
                 buf.append(", ");
@@ -272,7 +272,7 @@ public class AddressingProperties  {
             buf.append("RelatesTo: ");
             buf.append(relatesTo.getValue());
         }
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
 
     }

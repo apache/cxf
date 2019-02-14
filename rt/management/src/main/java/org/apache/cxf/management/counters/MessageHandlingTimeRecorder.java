@@ -74,10 +74,10 @@ public class MessageHandlingTimeRecorder {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("MessageHandlingTimeRecorder@").append(Integer.toHexString(hashCode())).append("[");
+        sb.append("MessageHandlingTimeRecorder@").append(Integer.toHexString(hashCode())).append('[');
         sb.append("beginTime: ").append(beginTime).append(", ");
         sb.append("endTime: ").append(endTime).append(", ");
-        sb.append("faultMode: ").append(faultMode).append("]");
+        sb.append("faultMode: ").append(faultMode).append(']');
         return sb.toString();
     }
 }

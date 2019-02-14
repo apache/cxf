@@ -112,7 +112,7 @@ public class DefaultLogEventMapper {
         while (principalIt.hasNext()) {
             principals.append(principalIt.next());
             if (principalIt.hasNext()) {
-                principals.append(",");
+                principals.append(',');
             }
         }
         if (principals.length() == 0) {

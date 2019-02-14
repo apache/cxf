@@ -165,7 +165,7 @@ public final class RMUtils {
 
     private static void writeEndpointProperty(StringBuilder buffer, Endpoint ep) {
         String serviceName = ObjectName.quote(ep.getService().getName().toString());
-        buffer.append(",");
+        buffer.append(',');
         buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
         String endpointName = ObjectName.quote(ep.getEndpointInfo().getName().toString());
         buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(endpointName).append(',');

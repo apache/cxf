@@ -2043,7 +2043,7 @@ public class BookStore {
             for (int i = 0; i < arg0.length; i++) {
                 sb.append(Integer.toString(arg0[i]));
                 if (i + 1 < arg0.length) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
             arg6.write(sb.toString().getBytes());
@@ -2085,7 +2085,7 @@ public class BookStore {
             for (int i = 0; i < arr.length; i++) {
                 sb.append(Double.toString(arr[i]));
                 if (i + 1 < arr.length) {
-                    sb.append(",");
+                    sb.append(',');
                 }
             }
             arg6.write(sb.toString().getBytes());

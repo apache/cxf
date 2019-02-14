@@ -83,7 +83,7 @@ public class RegexLoggingFilter {
         StringBuilder pattern = new StringBuilder("(");
         for (String command : commands) {
             if (pattern.length() > 1) {
-                pattern.append("|");
+                pattern.append('|');
             }
             pattern.append(Pattern.quote(command));
         }

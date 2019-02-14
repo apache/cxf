@@ -216,7 +216,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public String toString() {
         return new StringBuilder().append("[OperationInfo: ")
             .append(opName)
-            .append("]").toString();
+            .append(']').toString();
     }
 
     public int hashCode() {

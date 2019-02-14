@@ -348,7 +348,7 @@ public final class HttpUtils {
             }
             sb.append(value);
             if (i + 1 < values.size()) {
-                sb.append(",");
+                sb.append(',');
             }
         }
         return sb.toString();

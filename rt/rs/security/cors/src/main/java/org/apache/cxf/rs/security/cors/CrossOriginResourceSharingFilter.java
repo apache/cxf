@@ -515,7 +515,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             sb.append(values.get(x));
             if (x != values.size() - 1) {
                 if (spaceSeparated) {
-                    sb.append(" ");
+                    sb.append(' ');
                 } else {
                     sb.append(", ");
                 }

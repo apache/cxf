@@ -405,7 +405,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         buf.append(getLowWaterMark());
         buf.append(", high water mark: ");
         buf.append(getHighWaterMark());
-        buf.append("]");
+        buf.append(']');
         return buf.toString();
     }
 
