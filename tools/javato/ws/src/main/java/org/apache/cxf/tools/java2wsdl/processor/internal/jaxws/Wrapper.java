@@ -182,7 +182,7 @@ public class Wrapper {
         if (clz == null || clz.isPrimitive()) {
             return true;
         }
-        return "java.lang".equals(clz.getPackage().getName());
+        return clz.getPackage() != null && "java.lang".equals(clz.getPackage().getName());
     }
 
     protected List<JavaField> buildFields() {
