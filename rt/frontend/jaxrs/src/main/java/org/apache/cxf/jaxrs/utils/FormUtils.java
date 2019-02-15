@@ -135,7 +135,7 @@ public final class FormUtils {
         checkNumberOfParts(m, parts.length);
         for (String part : parts) {
             String[] keyValue = new String[2];
-            int index = part.indexOf("=");
+            int index = part.indexOf('=');
             if (index != -1) {
                 keyValue[0] = part.substring(0, index);
                 keyValue[1] = index + 1 < part.length() ? part.substring(index + 1) : "";

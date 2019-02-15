@@ -383,7 +383,7 @@ public final class CorbaUtils {
     }
 
     public static String getTypeCodeName(String name) {
-        int pos = name.lastIndexOf(".");
+        int pos = name.lastIndexOf('.');
         if (pos != -1) {
             name = name.substring(pos + 1);
         }
@@ -436,7 +436,7 @@ public final class CorbaUtils {
                 // There can be some instances where a prefix is added to the name by the tool
                 // (e.g. Object Reference Names).  Since the name is read as a string, this
                 // prefix is added to the types name.  Remove this as it is not needed.
-                int pos = name.lastIndexOf(":");
+                int pos = name.lastIndexOf(':');
                 if (pos != -1) {
                     name = name.substring(pos + 1);
                     corbaType.setName(name);

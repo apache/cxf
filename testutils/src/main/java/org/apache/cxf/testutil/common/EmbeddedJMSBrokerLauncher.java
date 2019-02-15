@@ -124,7 +124,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                 String add = ((SOAPAddress)e).getLocationURI();
                 int idx = add.indexOf("jndiURL=");
                 if (idx != -1) {
-                    int idx2 = add.indexOf("&", idx);
+                    int idx2 = add.indexOf('&', idx);
                     add = add.substring(0, idx)
                         + "jndiURL=" + encodedUrl
                         + (idx2 == -1 ? "" : add.substring(idx2));

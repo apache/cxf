@@ -458,7 +458,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             MultivaluedMap<String, String> params = ui.getPathParameters();
             for (Map.Entry<String, List<String>> entry : params.entrySet()) {
                 String value = entry.getValue().get(0);
-                int ind = value.indexOf(";");
+                int ind = value.indexOf(';');
                 if (ind > 0) {
                     value = value.substring(0, ind);
                 }

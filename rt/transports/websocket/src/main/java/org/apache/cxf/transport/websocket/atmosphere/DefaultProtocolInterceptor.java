@@ -270,7 +270,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         }
 
         String queryString = "";
-        int index = path.indexOf("?");
+        int index = path.indexOf('?');
         if (index != -1) {
             queryString = path.substring(index + 1);
             path = path.substring(0, index);

@@ -40,7 +40,7 @@ public class VelocityWriter extends BufferedWriter {
         if (str.indexOf("\r\n") >= 0 && newLine != null) {
             super.write(str.replaceAll("\r\n", newLine));
             return;
-        } else if (str.indexOf("\n") >= 0 && newLine != null) {
+        } else if (str.indexOf('\n') >= 0 && newLine != null) {
             super.write(str.replaceAll("\n", newLine));
             return;
         } else {
@@ -56,7 +56,7 @@ public class VelocityWriter extends BufferedWriter {
         if (str.indexOf("\r\n") >= 0  && newLine != null) {
             super.write(str.replaceAll("\r\n", newLine));
             return;
-        } else if (str.indexOf("\n") >= 0  && newLine != null) {
+        } else if (str.indexOf('\n') >= 0  && newLine != null) {
             super.write(str.replaceAll("\n", newLine));
             return;
         } else {

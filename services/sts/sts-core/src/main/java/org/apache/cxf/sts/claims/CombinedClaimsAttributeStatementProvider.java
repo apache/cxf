@@ -89,10 +89,10 @@ public class CombinedClaimsAttributeStatementProvider implements AttributeStatem
             return new AttributeKey(claimType, nameFormat, null);
         } else {
             String uri = claimType;
-            int lastSlash = uri.lastIndexOf("/");
+            int lastSlash = uri.lastIndexOf('/');
             if (lastSlash == (uri.length() - 1)) {
                 uri = uri.substring(0, lastSlash);
-                lastSlash = uri.lastIndexOf("/");
+                lastSlash = uri.lastIndexOf('/');
             }
 
             String namespace = uri.substring(0, lastSlash);

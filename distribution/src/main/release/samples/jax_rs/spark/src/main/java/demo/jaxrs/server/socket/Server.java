@@ -112,7 +112,7 @@ public class Server {
                 for (Map.Entry<String, Integer> entry : rdd.collectAsMap().entrySet()) {
                     String value = entry.getKey() + " : " + entry.getValue();
                     if (jobId == null) {
-                        int index = value.indexOf(":");
+                        int index = value.indexOf(':');
                         jobId = value.substring(0, index);
                         printStream = "oneway".equals(jobId) ? System.out : streamOut;
 

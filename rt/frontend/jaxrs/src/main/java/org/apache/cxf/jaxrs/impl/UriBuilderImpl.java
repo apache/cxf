@@ -535,7 +535,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                     int pathComponentStart = pathEncoded.indexOf("/", schemeIndex + 2);
                     if (pathComponentStart == -1) {
                         this.originalPathEmpty = true;
-                        pathComponentStart = pathEncoded.indexOf(";");
+                        pathComponentStart = pathEncoded.indexOf(';');
                         if (pathComponentStart != -1) {
                             pathEncoded = pathEncoded.substring(0, pathComponentStart)
                                 + "/" + pathEncoded.substring(pathComponentStart);
@@ -908,13 +908,13 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
         // This can be a start of replacing URI class Parser completely
         // but it can be too complicated, the following code is needed for now
         // to deal with URIs containing template variables.
-        int index = uri.indexOf(":");
+        int index = uri.indexOf(':');
         if (index != -1) {
             this.scheme = uri.substring(0, index);
             uri = uri.substring(index + 1);
             if (uri.indexOf("//") == 0) {
                 uri = uri.substring(2);
-                index = uri.indexOf("/");
+                index = uri.indexOf('/');
                 if (index != -1) {
                     String[] schemePair = uri.substring(0, index).split(":");
                     this.host = schemePair[0];
@@ -926,7 +926,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
         }
         String rawQuery = null;
-        index = uri.indexOf("?");
+        index = uri.indexOf('?');
         if (index != -1) {
             rawQuery = uri.substring(index + 1);
             uri = uri.substring(0, index);

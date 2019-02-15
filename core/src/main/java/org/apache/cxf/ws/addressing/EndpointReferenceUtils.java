@@ -836,13 +836,13 @@ public final class EndpointReferenceUtils {
     private static String getNameSpaceUri(Node node, String content, String namespaceURI) {
         if (namespaceURI == null) {
             namespaceURI = node.lookupNamespaceURI(content.substring(0,
-                                                                  content.indexOf(":")));
+                                                                  content.indexOf(':')));
         }
         return namespaceURI;
     }
 
     private static String getService(String content) {
-        return content.substring(content.indexOf(":") + 1, content.length());
+        return content.substring(content.indexOf(':') + 1, content.length());
     }
 
     /**

@@ -430,7 +430,7 @@ public final class DOMUtils {
             return null;
         }
 
-        int index = qualifiedName.indexOf(":");
+        int index = qualifiedName.indexOf(':');
 
         if (index == -1) {
             return new QName(qualifiedName);

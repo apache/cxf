@@ -109,7 +109,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         if (sa != null && !sa.isEmpty()) {
             soapAction = sa.get(0);
             if (soapAction != null && soapAction.startsWith("\"")) {
-                soapAction = soapAction.substring(1, soapAction.lastIndexOf("\""));
+                soapAction = soapAction.substring(1, soapAction.lastIndexOf('"'));
             }
         }
         if (ct != null && !ct.isEmpty()) {
@@ -117,11 +117,11 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         }
         if (contentType != null && contentType.indexOf("action=") != -1) {
             contentTypeAction = contentType.substring(contentType.indexOf("action=") + 7);
-            if (contentTypeAction.indexOf(";") != -1) {
-                contentTypeAction = contentTypeAction.substring(0, contentTypeAction.indexOf(";"));
+            if (contentTypeAction.indexOf(';') != -1) {
+                contentTypeAction = contentTypeAction.substring(0, contentTypeAction.indexOf(';'));
             }
             if (contentTypeAction.startsWith("\"")) {
-                contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf("\""));
+                contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf('"'));
             }
         }
         if (contentTypeAction != null) {

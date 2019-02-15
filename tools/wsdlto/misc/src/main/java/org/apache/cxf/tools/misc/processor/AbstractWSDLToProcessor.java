@@ -72,9 +72,9 @@ public class AbstractWSDLToProcessor implements Processor {
             newName = (String)env.get(ToolConstants.CFG_OUTPUTFILE);
         } else {
             String oldName = (String)env.get(ToolConstants.CFG_WSDLURL);
-            int position = oldName.lastIndexOf("/");
+            int position = oldName.lastIndexOf('/');
             if (position < 0) {
-                position = oldName.lastIndexOf("\\");
+                position = oldName.lastIndexOf('\\');
             }
             if (position >= 0) {
                 oldName = oldName.substring(position + 1, oldName.length());

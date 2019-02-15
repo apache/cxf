@@ -133,8 +133,8 @@ public class EJBEndpoint {
     }
 
     public int getAddressPort(String address) {
-        int index = address.lastIndexOf(":");
-        int end = address.lastIndexOf("/");
+        int index = address.lastIndexOf(':');
+        int end = address.lastIndexOf('/');
         if (index == 4) {
             return DEFAULT_HTTP_PORT;
         }

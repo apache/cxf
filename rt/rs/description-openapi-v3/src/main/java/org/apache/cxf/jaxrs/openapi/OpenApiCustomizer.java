@@ -244,7 +244,7 @@ public class OpenApiCustomizer {
                 }
 
                 if (applicationPath.endsWith("/")) {
-                    applicationPath = applicationPath.substring(0, applicationPath.lastIndexOf("/"));
+                    applicationPath = applicationPath.substring(0, applicationPath.lastIndexOf('/'));
                 }
             }
         }

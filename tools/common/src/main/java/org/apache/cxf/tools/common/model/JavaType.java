@@ -96,11 +96,11 @@ public class JavaType {
     }
 
     private void resolvePackage(String clzName) {
-        if (clzName == null || clzName.lastIndexOf(".") == -1) {
+        if (clzName == null || clzName.lastIndexOf('.') == -1) {
             this.packageName = "";
             this.simpleName = clzName;
         } else {
-            int index = clzName.lastIndexOf(".");
+            int index = clzName.lastIndexOf('.');
             this.packageName = clzName.substring(0, index);
             this.simpleName = clzName.substring(index + 1);
         }

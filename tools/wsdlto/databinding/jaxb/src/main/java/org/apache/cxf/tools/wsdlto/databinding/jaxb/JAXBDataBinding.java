@@ -798,7 +798,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         ClassCollector classCollector = context.get(ClassCollector.class);
         Collection<String> files = classCollector.getGeneratedFileInfo();
         for (String file : files) {
-            int dotIndex = file.lastIndexOf(".");
+            int dotIndex = file.lastIndexOf('.');
             String sub = dotIndex <= 0 ? "" : file.substring(0, dotIndex - 1);
             if (sub.equals(packageName)) {
                 return true;

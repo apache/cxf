@@ -87,7 +87,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
         String type = mType.substring(0, i);
         String subtype = mType.substring(i + 1, end);
-        if (subtype.indexOf("/") != -1) {
+        if (subtype.indexOf('/') != -1) {
             throw new IllegalArgumentException("Invalid media type string: " + mType);
         }
 

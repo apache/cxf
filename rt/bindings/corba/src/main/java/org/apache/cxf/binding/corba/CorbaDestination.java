@@ -239,7 +239,7 @@ public class CorbaDestination implements MultiplexDestination {
             }
             setCorbaLocArgs(addressURI, orbArgs);
         } else if ("corbaname".equals(scheme)) {
-            int idx = location.indexOf("#");
+            int idx = location.indexOf('#');
             if (idx != -1) {
                 serviceId = location.substring(idx + 1);
             }

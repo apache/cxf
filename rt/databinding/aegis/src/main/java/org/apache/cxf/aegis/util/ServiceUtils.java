@@ -39,12 +39,12 @@ public final class ServiceUtils {
      */
     public static String makeServiceNameFromClassName(Class<?> clazz) {
         String name = clazz.getName();
-        int last = name.lastIndexOf(".");
+        int last = name.lastIndexOf('.');
         if (last != -1) {
             name = name.substring(last + 1);
         }
 
-        int inner = name.lastIndexOf("$");
+        int inner = name.lastIndexOf('$');
         if (inner != -1) {
             name = name.substring(inner + 1);
         }

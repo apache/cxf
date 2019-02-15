@@ -444,7 +444,7 @@ public class SourceGenerator {
         Element includeEl = DOMUtils.getFirstChildWithName(schemaEl,
                                                            Constants.URI_2001_SCHEMA_XSD, "include");
         if (includeEl != null) {
-            int ind = systemId.lastIndexOf("/");
+            int ind = systemId.lastIndexOf('/');
             if (ind != -1) {
                 String schemaURI = systemId.substring(0, ind + 1) + includeEl.getAttribute("schemaLocation");
                 populateElementTypeMap(app, readIncludedDocument(schemaURI), schemaURI, elementTypeMap);
@@ -550,7 +550,7 @@ public class SourceGenerator {
         if (expandedQName) {
             qname = JAXRSUtils.convertStringToQName(resourceId);
         } else {
-            int lastIndex = resourceId.lastIndexOf(".");
+            int lastIndex = resourceId.lastIndexOf('.');
             qname = lastIndex == -1 ? new QName(resourceId)
                                     : new QName(resourceId.substring(0, lastIndex),
                                                 resourceId.substring(lastIndex + 1));
@@ -682,7 +682,7 @@ public class SourceGenerator {
 
     private void writeImports(StringBuilder sbImports, Set<String> imports, String classPackage) {
         for (String clsName : imports) {
-            int index = clsName.lastIndexOf(".");
+            int index = clsName.lastIndexOf('.');
             if (index != -1 && clsName.substring(0, index).equals(classPackage)) {
                 continue;
             }
@@ -744,7 +744,7 @@ public class SourceGenerator {
             if (supportMultipleRepsWithElements && requestRepWithElement != null
                 && requestRepsWithElements.size() > 1) {
                 String elementRef = requestRepWithElement.getAttribute("element");
-                int index = elementRef.indexOf(":");
+                int index = elementRef.indexOf(':');
                 suffixName = elementRef.substring(index + 1).replace("-", "");
                 if (duplicatesAvailable) {
                     String mediaType = requestRepWithElement.getAttribute("mediaType");
@@ -812,7 +812,7 @@ public class SourceGenerator {
                     StringBuilder sb = new StringBuilder();
                     for (PathSegment ps : segments) {
                         String pathSeg = ps.getPath().replaceAll("\\{", "").replaceAll("\\}", "");
-                        int index = pathSeg.indexOf(":");
+                        int index = pathSeg.indexOf(':');
                         if (index > 0) {
                             pathSeg = pathSeg.substring(0, index);
                         }
@@ -989,7 +989,7 @@ public class SourceGenerator {
 
         String clsFullName = getSchemaClassName(packageName, info.getGrammarInfo(),
                 qname.getLocalPart(), info.getTypeClassNames());
-        int lastDotIndex = clsFullName == null ? -1 : clsFullName.lastIndexOf(".");
+        int lastDotIndex = clsFullName == null ? -1 : clsFullName.lastIndexOf('.');
         String localName = clsFullName == null
             ? getClassName(qname.getLocalPart(), true, info.getTypeClassNames())
             : clsFullName.substring(lastDotIndex + 1);
@@ -1582,7 +1582,7 @@ public class SourceGenerator {
             clsName = clsName.substring(0, typeIndex);
         }
         addImport(imports, clsName);
-        int index = clsName.lastIndexOf(".");
+        int index = clsName.lastIndexOf('.');
 
         if (index != -1) {
             clsName = clsName.substring(index + 1);
@@ -1885,7 +1885,7 @@ public class SourceGenerator {
     }
 
     private static String getBaseWadlPath(String docPath) {
-        int lastSep = docPath.lastIndexOf("/");
+        int lastSep = docPath.lastIndexOf('/');
         return lastSep != -1 ? docPath.substring(0, lastSep + 1) : docPath;
     }
 

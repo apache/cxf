@@ -255,7 +255,7 @@ public class Compiler {
                 tmpFile = FileUtils.createTempFile("cxf-compiler", null);
                 out = new PrintWriter(new FileWriter(tmpFile));
                 for (int i = sourceFileIndex; i < args.length; i++) {
-                    if (args[i].indexOf(" ") > -1) {
+                    if (args[i].indexOf(' ') > -1) {
                         args[i] = args[i].replace(File.separatorChar, '/');
                         //
                         // javac gives an error if you use forward slashes

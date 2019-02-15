@@ -107,7 +107,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
 
     private Object getValue(String getter, T pojo) {
         String thePropertyName;
-        int index = getter.indexOf(".");
+        int index = getter.indexOf('.');
         if (index != -1) {
             thePropertyName = getter.substring(0, index);
         } else {
@@ -211,7 +211,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
 
     protected static Object getPrimitiveValue(String name, Object value) {
 
-        int index = name.indexOf(".");
+        int index = name.indexOf('.');
         if (index != -1) {
             String[] names = name.split("\\.");
             name = name.substring(index + 1);

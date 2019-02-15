@@ -1849,7 +1849,7 @@ public final class StaxUtils {
         }
         value = value.trim();
 
-        int index = value.indexOf(":");
+        int index = value.indexOf(':');
 
         if (index == -1) {
             return new QName(value);

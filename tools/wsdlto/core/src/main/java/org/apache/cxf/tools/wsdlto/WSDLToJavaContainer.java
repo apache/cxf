@@ -319,8 +319,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
         @SuppressWarnings("unchecked")
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
-        int slashIndex = wsdlURL.lastIndexOf("/");
-        int dotIndex = wsdlURL.indexOf(".", slashIndex);
+        int slashIndex = wsdlURL.lastIndexOf('/');
+        int dotIndex = wsdlURL.indexOf('.', slashIndex);
         String wsdlLocation = null;
         if (slashIndex > -1 && dotIndex > -1) {
             wsdlLocation = wsdlURL.substring(slashIndex + 1, dotIndex) + ".wsdl";
@@ -473,7 +473,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
 
             for (int j = 0; j < pns.length; j++) {
-                int pos = pns[j].indexOf("=");
+                int pos = pns[j].indexOf('=');
                 if (pos != -1) {
                     String ns = pns[j].substring(0, pos);
                     if (ns.equals(ToolConstants.WSA_NAMESPACE_URI)) {
@@ -499,7 +499,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 pns[0] = (String)env.get(ToolConstants.CFG_PACKAGENAME);
             }
             for (int j = 0; j < pns.length; j++) {
-                int pos = pns[j].indexOf("=");
+                int pos = pns[j].indexOf('=');
                 String packagename = pns[j];
                 if (pos != -1) {
                     String ns = pns[j].substring(0, pos);
@@ -569,7 +569,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
 
             if (assumeFileURI) {
-                if (wsdl.indexOf(":") != -1 && !wsdl.startsWith("/")) {
+                if (wsdl.indexOf(':') != -1 && !wsdl.startsWith("/")) {
                     wsdl = "file:/" + wsdl;
                 } else {
                     wsdl = "file:" + wsdl;

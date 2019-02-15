@@ -367,7 +367,7 @@ public class DoMerges {
         id = r2.readLine();
         p2.waitFor();
 
-        id = id.substring(0, id.indexOf(" "));
+        id = id.substring(0, id.indexOf(' '));
         return id;
     }
 

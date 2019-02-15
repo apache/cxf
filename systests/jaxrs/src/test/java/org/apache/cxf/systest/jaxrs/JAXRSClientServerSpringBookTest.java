@@ -342,7 +342,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
 
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("\"name\":\"") + "\"name\":\"".length(),
-            helloStringISO88591.lastIndexOf("\""));
+            helloStringISO88591.lastIndexOf('"'));
 
         compareNames(name);
     }

@@ -72,7 +72,7 @@ public class TransportFinder<T> {
             return null;
         }
         //If the uri is related path or has no protocol prefix , we will set it to be http
-        if (uri.startsWith("/") || uri.indexOf(":") < 0) {
+        if (uri.startsWith("/") || uri.indexOf(':') < 0) {
             uri = "http://" + uri;
         }
         T factory = checkForURI(uri);

@@ -195,7 +195,7 @@ public final class ProcessorUtil {
 
     public static String classNameToFilePath(String className) {
         String str;
-        if (className.indexOf(".") < 0) {
+        if (className.indexOf('.') < 0) {
             return className;
         }
         str = className.replaceAll("\\.", "/");

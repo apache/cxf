@@ -253,8 +253,8 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public void addImport(String i) {
-        if (i != null && i.lastIndexOf(".") != -1 && getPackageName() != null
-            && getPackageName().equals(i.substring(0, i.lastIndexOf(".")))) {
+        if (i != null && i.lastIndexOf('.') != -1 && getPackageName() != null
+            && getPackageName().equals(i.substring(0, i.lastIndexOf('.')))) {
             return;
         }
         // replace "$" with "." to correctly deal with member classes
@@ -291,7 +291,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public void setFullClassName(String fullName) {
-        int index = fullName.lastIndexOf(".");
+        int index = fullName.lastIndexOf('.');
         setPackageName(fullName.substring(0, index));
         setName(fullName.substring(index + 1, fullName.length()));
     }

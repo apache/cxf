@@ -111,10 +111,10 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
                     attributeBean.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
                 } else {
                     String uri = ROLE_URI.toString();
-                    int lastSlash = uri.lastIndexOf("/");
+                    int lastSlash = uri.lastIndexOf('/');
                     if (lastSlash == (uri.length() - 1)) {
                         uri = uri.substring(0, lastSlash);
-                        lastSlash = uri.lastIndexOf("/");
+                        lastSlash = uri.lastIndexOf('/');
                     }
 
                     String namespace = uri.substring(0, lastSlash);

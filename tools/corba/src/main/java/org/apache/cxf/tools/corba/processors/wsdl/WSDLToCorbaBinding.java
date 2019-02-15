@@ -762,8 +762,8 @@ public class WSDLToCorbaBinding {
         String nametype = null;
         String pfx = "";
 
-        int i = name.lastIndexOf("}");
-        int i2 = name.indexOf("}");
+        int i = name.lastIndexOf('}');
+        int i2 = name.indexOf('}');
 
         if (i >= 1) {
             if (i == i2) {

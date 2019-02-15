@@ -340,6 +340,6 @@ public abstract class AbstractSearchConditionParser<T> implements SearchConditio
     }
 
     private int getDotIndex(String setter) {
-        return this.conditionClass == SearchBean.class ? -1 : setter.indexOf(".");
+        return this.conditionClass == SearchBean.class ? -1 : setter.indexOf('.');
     }
 }

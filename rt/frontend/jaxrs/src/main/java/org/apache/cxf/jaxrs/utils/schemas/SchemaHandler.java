@@ -89,7 +89,7 @@ public class SchemaHandler {
             for (String loc : locations) {
                 List<URL> schemaURLs = new LinkedList<>();
 
-                if (loc.lastIndexOf(".") == -1 || loc.lastIndexOf('*') != -1) {
+                if (loc.lastIndexOf('.') == -1 || loc.lastIndexOf('*') != -1) {
                     schemaURLs = ClasspathScanner.findResources(loc, "xsd");
                 } else {
                     URL url = ResourceUtils.getResourceURL(loc, bus);

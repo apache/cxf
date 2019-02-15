@@ -134,11 +134,11 @@ public final class JAnnotationElement {
 
         String clzName = e.getClass().getName();
         if (clzName.contains("$")) {
-            imports.add(obj.getClass().getName().substring(0, clzName.lastIndexOf("$")));
+            imports.add(obj.getClass().getName().substring(0, clzName.lastIndexOf('$')));
         } else {
             imports.add(obj.getClass().getName());
         }
-        sb.append(clzName.substring(clzName.lastIndexOf(".") + 1).replace("$", "."));
+        sb.append(clzName.substring(clzName.lastIndexOf('.') + 1).replace("$", "."));
         sb.append('.');
         sb.append(e.name());
     }

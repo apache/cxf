@@ -100,7 +100,7 @@ public final class URIParserUtil {
                     return file.toURI().normalize().toString();
                 }
                 String f = null;
-                if (uri.indexOf(":") != -1 && !uri.startsWith("/")) {
+                if (uri.indexOf(':') != -1 && !uri.startsWith("/")) {
                     f = "file:/" + uri;
                 } else {
                     f = "file:" + uri;

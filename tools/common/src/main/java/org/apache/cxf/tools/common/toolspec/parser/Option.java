@@ -220,10 +220,10 @@ public class Option implements TokenConsumer {
     }
 
     private boolean isNamingSpacePackageString(String value) {
-        if (value.indexOf("=") < 0) {
+        if (value.indexOf('=') < 0) {
             return isIdentifyString(value);
         }
-        String packageName = value.substring(value.indexOf("=") + 1, value.length());
+        String packageName = value.substring(value.indexOf('=') + 1, value.length());
         return isIdentifyString(packageName);
     }
 

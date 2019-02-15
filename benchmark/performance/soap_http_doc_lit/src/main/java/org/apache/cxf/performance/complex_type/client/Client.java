@@ -123,9 +123,9 @@ public final class Client extends TestCaseBase<DocPortType> {
         if (threadIdx != -1) {
             String[] threads = args[threadIdx].split(",");
             for (String s : threads) {
-                if (s.indexOf("-") != -1) {
-                    String s1 = s.substring(0, s.indexOf("-"));
-                    String s2 = s.substring(s.indexOf("-") + 1);
+                if (s.indexOf('-') != -1) {
+                    String s1 = s.substring(0, s.indexOf('-'));
+                    String s2 = s.substring(s.indexOf('-') + 1);
                     int i1 = Integer.parseInt(s1);
                     int i2 = Integer.parseInt(s2);
                     for (int x = i1; x <= i2; x++) {

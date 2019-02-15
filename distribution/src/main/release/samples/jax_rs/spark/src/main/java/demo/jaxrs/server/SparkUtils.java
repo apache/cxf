@@ -70,7 +70,7 @@ public final class SparkUtils {
         return list.iterator();
     }
     public static Iterator<String> splitInputStringWithId(String x) {
-        int index = x.indexOf(":");
+        int index = x.indexOf(':');
         String jobId = x.substring(0, index);
         x = x.substring(index + 1);
 

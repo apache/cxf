@@ -153,10 +153,10 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
             if ("type".equals(localName)
                 && "http://www.w3.org/2001/XMLSchema-instance".equals(namespaceURI)) {
 
-                String pfx = value.substring(0, value.indexOf(":"));
+                String pfx = value.substring(0, value.indexOf(':'));
                 String ns = ctx.getNamespaceURI(pfx);
                 QName qn = new QName(ns,
-                                     value.substring(value.indexOf(":") + 1));
+                                     value.substring(value.indexOf(':') + 1));
                 CorbaTypeListener l = CorbaHandlerUtils.getTypeListener(qn,
                                                   qn,
                                                   typeMap,

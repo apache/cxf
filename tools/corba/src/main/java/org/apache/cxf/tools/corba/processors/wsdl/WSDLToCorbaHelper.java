@@ -420,7 +420,7 @@ public class WSDLToCorbaHelper {
 
     private String getModulePrefix(CorbaType type) {
         String name = type.getQName().getLocalPart();
-        int dotPos = name.lastIndexOf(".");
+        int dotPos = name.lastIndexOf('.');
         return dotPos == -1 ? "" : name.substring(0, dotPos + 1);
     }
 

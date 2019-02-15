@@ -188,7 +188,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             ClassCollector collector = createClassCollector();
             List<String> generatedServiceClasses = sg.getGeneratedServiceClasses();
             for (String className : generatedServiceClasses) {
-                int index = className.lastIndexOf(".");
+                int index = className.lastIndexOf('.');
                 collector.addServiceClassName(className.substring(0, index),
                                               className.substring(index + 1),
                                               className);
@@ -196,7 +196,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
 
             List<String> generatedTypeClasses = sg.getGeneratedTypeClasses();
             for (String className : generatedTypeClasses) {
-                int index = className.lastIndexOf(".");
+                int index = className.lastIndexOf('.');
                 collector.addTypesClassName(className.substring(0, index),
                                               className.substring(index + 1),
                                               className);
@@ -279,7 +279,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                                                    : (String[])value;
         }
         for (int i = 0; i < schemaPackageNamespaces.length; i++) {
-            int pos = schemaPackageNamespaces[i].indexOf("=");
+            int pos = schemaPackageNamespaces[i].indexOf('=');
             String packagename = schemaPackageNamespaces[i];
             if (pos != -1) {
                 String ns = schemaPackageNamespaces[i].substring(0, pos);
@@ -312,7 +312,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
         }
         Map<String, String> typeMap = new HashMap<>();
         for (int i = 0; i < typeToClasses.length; i++) {
-            int pos = typeToClasses[i].indexOf("=");
+            int pos = typeToClasses[i].indexOf('=');
             if (pos != -1) {
                 String type = typeToClasses[i].substring(0, pos);
                 if (type.contains("%3D")) {

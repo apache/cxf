@@ -183,7 +183,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
                 throw new ToolException(msg);
             }
             for (String jsprefix : pns) {
-                int pos = jsprefix.indexOf("=");
+                int pos = jsprefix.indexOf('=');
                 if (pos != -1) {
                     String ns = jsprefix.substring(0, pos);
                     jsprefix = jsprefix.substring(pos + 1);

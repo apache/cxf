@@ -123,7 +123,7 @@ public class ModuleToNSMapper {
     }
 
     public String mapNSToPrefix(String nsURI) {
-        int pos = nsURI.indexOf(":");
+        int pos = nsURI.indexOf(':');
         if (pos != -1) {
             nsURI = nsURI.substring(pos + 1);
         }

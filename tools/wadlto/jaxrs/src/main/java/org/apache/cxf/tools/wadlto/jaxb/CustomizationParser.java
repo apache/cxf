@@ -146,7 +146,7 @@ public final class CustomizationParser {
     }
 
     private String getBaseWadlPath() {
-        int lastSep = wadlPath.lastIndexOf("/");
+        int lastSep = wadlPath.lastIndexOf('/');
         return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
     }
 

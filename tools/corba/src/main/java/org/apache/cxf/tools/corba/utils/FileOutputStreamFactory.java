@@ -95,13 +95,13 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
     private String convertPackageNameToDirectory(String packageName) {
         int pos1 = 0;
-        int pos2 = packageName.indexOf(".", pos1);
+        int pos2 = packageName.indexOf('.', pos1);
 
         StringBuilder result = new StringBuilder("");
         while (pos2 != -1) {
             result.append(packageName.substring(pos1, pos2) + File.separator);
             pos1 = pos2 + 1;
-            pos2 = packageName.indexOf(".", pos1);
+            pos2 = packageName.indexOf('.', pos1);
         }
 
         result.append(packageName.substring(pos1));

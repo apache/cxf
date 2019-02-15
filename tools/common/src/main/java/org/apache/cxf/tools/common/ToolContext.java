@@ -261,7 +261,7 @@ public class ToolContext {
     public QName getQName(String key, String defaultNamespace) {
         if (optionSet(key)) {
             String pns = (String)get(key);
-            int pos = pns.indexOf("=");
+            int pos = pns.indexOf('=');
             String localname = pns;
             if (pos != -1) {
                 String ns = pns.substring(0, pos);

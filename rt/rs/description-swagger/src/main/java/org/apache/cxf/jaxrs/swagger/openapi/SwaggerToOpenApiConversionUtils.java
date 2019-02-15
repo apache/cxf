@@ -360,7 +360,7 @@ public final class SwaggerToOpenApiConversionUtils {
                 ref = schema.getStringProperty("$ref");
             }
             if (ref != null) {
-                int index = ref.lastIndexOf("/");
+                int index = ref.lastIndexOf('/');
                 modelName = ref.substring(index + 1);
                 if (items == null) {
                     schema.setProperty("$ref", "#components/schemas/" + modelName);

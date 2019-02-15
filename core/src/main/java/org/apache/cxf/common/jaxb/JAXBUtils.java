@@ -920,8 +920,8 @@ public final class JAXBUtils {
                     String line = reader.readLine();
                     while (line != null) {
                         line = line.trim();
-                        if (line.indexOf("#") != -1) {
-                            line = line.substring(0, line.indexOf("#"));
+                        if (line.indexOf('#') != -1) {
+                            line = line.substring(0, line.indexOf('#'));
                         }
                         if (!StringUtils.isEmpty(line)) {
                             try {

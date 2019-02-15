@@ -352,7 +352,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     private String getClassNameAndProperties(String cName, Map<String, List<String>> props) {
         String theName = cName.trim();
-        int ind = theName.indexOf("(");
+        int ind = theName.indexOf('(');
         if (ind != -1 && theName.endsWith(")")) {
             props.putAll(parseMapListSequence(theName.substring(ind + 1, theName.length() - 1)));
             theName = theName.substring(0, ind).trim();

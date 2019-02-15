@@ -352,7 +352,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
             throw new ServletException("Static resource " + pathInfo + " is not available");
         }
         try {
-            int ind = pathInfo.lastIndexOf(".");
+            int ind = pathInfo.lastIndexOf('.');
             if (ind != -1 && ind < pathInfo.length()) {
                 String type = getStaticResourceContentType(pathInfo.substring(ind + 1));
                 if (type != null) {

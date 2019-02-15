@@ -104,9 +104,9 @@ public class CorbaUtils {
 
         if (cname.indexOf("..") != -1) {
             cname = cname.replace('.', '_');
-        } else if (cname.indexOf("$") != -1) {
+        } else if (cname.indexOf('$') != -1) {
             cname = cname.replace('$', '_');
-        } else if (cname.indexOf("?") != -1) {
+        } else if (cname.indexOf('?') != -1) {
             if (cname.length() == 1) {
                 cname = "u0063";
             } else {
@@ -119,9 +119,9 @@ public class CorbaUtils {
                 }
                 cname = str;
             }
-        } else if (cname.indexOf("-") != -1) {
+        } else if (cname.indexOf('-') != -1) {
             cname = cname.replace('-', '_');
-        } else if (cname.indexOf("/") != -1) {
+        } else if (cname.indexOf('/') != -1) {
             cname = cname.replace('/', '_');
         }
 
@@ -135,8 +135,8 @@ public class CorbaUtils {
         value = value.replace(' ', '_');
         value = value.replace('.', '_');
 
-        if (value.indexOf(":") != -1) {
-            value = value.substring(value.lastIndexOf(":") + 1);
+        if (value.indexOf(':') != -1) {
+            value = value.substring(value.lastIndexOf(':') + 1);
         }
         String fletter = value.substring(0, 1);
 

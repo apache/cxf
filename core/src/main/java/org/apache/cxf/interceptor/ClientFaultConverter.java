@@ -279,14 +279,14 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     private Throwable getCause(Iterator<String> linesIterator, String firstLine) {
         // The actual exception class of the cause might be unavailable at the
         // client -> use a standard throwable to represent the cause.
-        firstLine = firstLine.substring(firstLine.indexOf(":") + 1).trim();
+        firstLine = firstLine.substring(firstLine.indexOf(':') + 1).trim();
         Throwable res = null;
-        if (firstLine.indexOf(":") != -1) {
-            String cn = firstLine.substring(0, firstLine.indexOf(":")).trim();
+        if (firstLine.indexOf(':') != -1) {
+            String cn = firstLine.substring(0, firstLine.indexOf(':')).trim();
             if (cn.startsWith("java.lang")) {
                 try {
                     res = (Throwable)Class.forName(cn).getConstructor(String.class)
-                            .newInstance(firstLine.substring(firstLine.indexOf(":") + 2));
+                            .newInstance(firstLine.substring(firstLine.indexOf(':') + 2));
                 } catch (Throwable t) {
                     //ignore, use the default
                 }

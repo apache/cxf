@@ -77,7 +77,7 @@ final class JMSURIParser {
         if (query != null) {
             String[] parameters = query.split("&");
             for (String parameter : parameters) {
-                int p = parameter.indexOf("=");
+                int p = parameter.indexOf('=');
                 if (p >= 0) {
                     String name = urldecode(parameter.substring(0, p));
                     String value = urldecode(parameter.substring(p + 1));

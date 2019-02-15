@@ -178,17 +178,17 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     }
 
     public String getFileName(String loc) {
-        int idx = loc.lastIndexOf("/");
+        int idx = loc.lastIndexOf('/');
 
         if (idx != -1) {
             loc = loc.substring(idx + 1);
         }
-        idx = loc.lastIndexOf("\\");
+        idx = loc.lastIndexOf('\\');
         if (idx != -1) {
             loc = loc.substring(idx + 1);
         }
 
-        idx = loc.lastIndexOf(".");
+        idx = loc.lastIndexOf('.');
         if (idx != -1) {
             loc = loc.substring(0, idx);
         }

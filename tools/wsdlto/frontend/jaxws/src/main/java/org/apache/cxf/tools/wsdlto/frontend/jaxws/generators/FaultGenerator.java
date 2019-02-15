@@ -109,7 +109,7 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                 String exceptionSuperclassString = simpleName;
                 for (JavaField jf : expClz.getFields()) {
                     String jfClassName = jf.getClassName();
-                    if (jfClassName.substring(jfClassName.lastIndexOf(".") + 1)
+                    if (jfClassName.substring(jfClassName.lastIndexOf('.') + 1)
                         .equals(simpleName)) {
                         exceptionSuperclassString = exceptionSuperclass;
                     }

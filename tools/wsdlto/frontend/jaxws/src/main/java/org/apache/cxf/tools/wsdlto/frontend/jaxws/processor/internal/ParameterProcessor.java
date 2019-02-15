@@ -563,7 +563,7 @@ public class ParameterProcessor extends AbstractProcessor {
         fullJavaName = this.dataBinding.getWrappedElementType(part.getElementQName(), element);
         simpleJavaName = fullJavaName;
 
-        int index = fullJavaName.lastIndexOf(".");
+        int index = fullJavaName.lastIndexOf('.');
 
         if (index > -1) {
             simpleJavaName = fullJavaName.substring(index);

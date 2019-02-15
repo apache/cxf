@@ -70,7 +70,7 @@ public class WrapperClassGeneratorTest {
         List<Class<?>> partClasses = Arrays.asList(new Class<?>[] {List.class});
 
         String className = requestClass.getName();
-        className = className.substring(0, className.lastIndexOf(".") + 1);
+        className = className.substring(0, className.lastIndexOf('.') + 1);
 
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                                                              partNames, elTypeNames, partClasses);
@@ -89,7 +89,7 @@ public class WrapperClassGeneratorTest {
         partClasses = Arrays.asList(new Class<?>[] {List.class});
 
         className = responseClass.getName();
-        className = className.substring(0, className.lastIndexOf(".") + 1);
+        className = className.substring(0, className.lastIndexOf('.') + 1);
 
         wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
                                                              partNames, elTypeNames, partClasses);

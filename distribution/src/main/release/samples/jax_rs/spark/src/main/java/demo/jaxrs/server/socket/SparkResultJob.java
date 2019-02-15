@@ -39,7 +39,7 @@ public class SparkResultJob implements Runnable {
         try {
             String s = null;
             while ((s = sparkInputStream.readLine()) != null) {
-                int index = s.indexOf(":");
+                int index = s.indexOf(':');
                 String jobId = s.substring(0, index);
                 String value = s.substring(index + 1);
                 sparkResponses.get(jobId).offer(value);

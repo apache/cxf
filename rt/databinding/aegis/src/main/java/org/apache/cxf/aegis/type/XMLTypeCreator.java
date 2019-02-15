@@ -748,7 +748,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             return null;
         }
 
-        int index = value.indexOf(":");
+        int index = value.indexOf(':');
 
         if (index == -1) {
             return new QName(getTypeMapping().getMappingIdentifierURI(), value);

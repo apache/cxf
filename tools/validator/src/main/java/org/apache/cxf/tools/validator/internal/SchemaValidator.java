@@ -381,7 +381,7 @@ class SchemaResourceResolver implements LSResourceResolver {
         if (systemId != null) {
             String schemaLocation = "";
             if (baseURI != null) {
-                schemaLocation = baseURI.substring(0, baseURI.lastIndexOf("/") + 1);
+                schemaLocation = baseURI.substring(0, baseURI.lastIndexOf('/') + 1);
             }
             if (systemId.indexOf("http://") < 0) {
                 resURL = schemaLocation + systemId;

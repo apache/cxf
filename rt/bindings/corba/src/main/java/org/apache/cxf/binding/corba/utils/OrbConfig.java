@@ -134,7 +134,7 @@ public class OrbConfig {
     public void exportObjectReferenceToNamingService(ORB orb,
                                                      org.omg.CORBA.Object ref,
                                                      String location) {
-        int idx = location.indexOf("#");
+        int idx = location.indexOf('#');
         String name = location.substring(idx + 1);
 
         //Register in NameService
