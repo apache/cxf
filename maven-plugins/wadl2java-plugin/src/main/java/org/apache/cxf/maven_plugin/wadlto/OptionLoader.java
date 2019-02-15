@@ -187,7 +187,7 @@ public final class OptionLoader {
     private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
         String[] noOptions = new String[] {};
         List<File> files = FileUtils.getFiles(dir, wsdlName + WADL_OPTIONS);
-        if (files.size() <= 0) {
+        if (files.isEmpty()) {
             return noOptions;
         }
         File optionsFile = files.iterator().next();
@@ -196,7 +196,7 @@ public final class OptionLoader {
         }
         try {
             List<String> lines = FileUtils.readLines(optionsFile);
-            if (lines.size() <= 0) {
+            if (lines.isEmpty()) {
                 return noOptions;
             }
             return lines.iterator().next().split(" ");

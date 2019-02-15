@@ -74,7 +74,7 @@ public final class IdlOperation extends IdlScopeBase {
 
         Collection<IdlDefn> defns = definitions();
 
-        if (defns.size() != 0) {
+        if (!defns.isEmpty()) {
             pw.println();
             indentMore();
 

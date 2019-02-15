@@ -151,7 +151,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
      * @return true if there are no unacknowledged messages in the queue
      */
     public boolean isEmpty() {
-        return 0 == getUnacknowledged().size();
+        return getUnacknowledged().isEmpty();
     }
 
     /**

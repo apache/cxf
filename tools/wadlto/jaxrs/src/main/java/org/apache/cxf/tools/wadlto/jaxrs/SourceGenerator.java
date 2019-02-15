@@ -716,7 +716,7 @@ public class SourceGenerator {
 
         List<Element> responseEls = getWadlElements(methodEl, "response");
         List<Element> requestEls = getWadlElements(methodEl, "request");
-        Element firstRequestEl = requestEls.size() >= 1 ? requestEls.get(0) : null;
+        Element firstRequestEl = !requestEls.isEmpty() ? requestEls.get(0) : null;
         List<Element> allRequestReps = getWadlElements(firstRequestEl, "representation");
         List<Element> requestRepsWithElements = new LinkedList<>();
         boolean duplicatesAvailable =

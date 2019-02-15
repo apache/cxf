@@ -114,7 +114,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     }
 
     public boolean isEmpty() {
-        return 0 == getUndelivered().size();
+        return getUndelivered().isEmpty();
     }
     public void purgeAll(DestinationSequence seq) {
         Collection<Long> purged = new ArrayList<>();

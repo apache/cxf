@@ -73,7 +73,7 @@ public class FileUtilsTest {
         assertTrue(directory.exists());
 
         List<File> foundFiles = FileUtils.getFilesUsingSuffix(directory, ".class");
-        assertTrue(foundFiles.size() > 0);
+        assertTrue(!foundFiles.isEmpty());
 
         List<File> foundFiles2 = FileUtils.getFiles(directory, ".*\\.class$");
 

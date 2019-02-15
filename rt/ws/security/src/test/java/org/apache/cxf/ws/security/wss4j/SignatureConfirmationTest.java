@@ -91,7 +91,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
-        assertTrue(sigv.size() != 0);
+        assertTrue(!sigv.isEmpty());
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
@@ -125,7 +125,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         List<WSHandlerResult> sigReceived =
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
-        assertTrue(sigReceived.size() != 0);
+        assertTrue(!sigReceived.isEmpty());
 
         testSignatureConfirmationResponse(sigv, sigReceived);
     }

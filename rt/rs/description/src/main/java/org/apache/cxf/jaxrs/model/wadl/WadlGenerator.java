@@ -242,7 +242,7 @@ public class WadlGenerator implements ContainerRequestFilter {
             return;
         }
 
-        if (whiteList != null && whiteList.size() > 0) {
+        if (whiteList != null && !whiteList.isEmpty()) {
             ServletRequest servletRequest = (ServletRequest)m.getContextualProperty(
                 "HTTP.REQUEST");
             String remoteAddress = null;

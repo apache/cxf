@@ -1554,7 +1554,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 initializeParameter(part, paramClasses[j], genParTypes[j]);
                 part.setProperty(METHOD_PARAM_ANNOTATIONS, parAnnotations);
                 part.setProperty(PARAM_ANNOTATION, parAnnotations[j]);
-                if (getJaxbAnnoMap(part).size() > 0) {
+                if (!getJaxbAnnoMap(part).isEmpty()) {
                     op.setProperty(WRAPPERGEN_NEEDED, true);
                 }
                 if (!isWrapped(method) && !isRPC(method)) {

@@ -249,7 +249,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         }
 
         String scope = null;
-        if (getAppliesToScopeMapping() != null && getAppliesToScopeMapping().size() > 0
+        if (getAppliesToScopeMapping() != null && !getAppliesToScopeMapping().isEmpty()
             && parameters.getAppliesToAddress() != null) {
             scope = getAppliesToScopeMapping().get(parameters.getAppliesToAddress());
             if (LOG.isLoggable(Level.FINE)) {

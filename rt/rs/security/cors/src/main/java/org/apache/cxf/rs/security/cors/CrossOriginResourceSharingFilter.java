@@ -150,7 +150,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
         // 5.1.4
         List<String> effectiveExposeHeaders = effectiveExposeHeaders(ann);
-        if (effectiveExposeHeaders != null && effectiveExposeHeaders.size() != 0) {
+        if (effectiveExposeHeaders != null && !effectiveExposeHeaders.isEmpty()) {
             m.getExchange().put(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, effectiveExposeHeaders);
         }
 

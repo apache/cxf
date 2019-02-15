@@ -113,7 +113,7 @@ class CDIInterceptorWrapperImpl implements CDIInterceptorWrapper {
     }
 
     private static List<Annotation> getBindings(Set<Annotation> annotations, BeanManager beanManager) {
-        if (annotations == null || annotations.size() == 0) {
+        if (annotations == null || annotations.isEmpty()) {
             return Collections.emptyList();
         }
         List<Annotation> bindings = new ArrayList<>();

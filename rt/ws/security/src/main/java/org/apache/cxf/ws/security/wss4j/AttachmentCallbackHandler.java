@@ -95,8 +95,8 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 if (attachmentId != null) {
                     final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
                     // Calling LazyAttachmentCollection.size() here to force it to load the attachments
-                    if (attachments != null && attachments.size() > 0) {
-                        for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+                    if (attachments != null && attachments.size() > 0) {  // NOPMD
+                        for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
                             iterator.hasNext();) {
                             org.apache.cxf.message.Attachment attachment = iterator.next();
 
@@ -120,7 +120,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
     ) throws IOException {
         final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
-        if (attachments != null && attachments.size() > 0) {
+        if (attachments != null && attachments.size() > 0) { // NOPMD
             for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
                 iterator.hasNext();) {
                 org.apache.cxf.message.Attachment attachment = iterator.next();

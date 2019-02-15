@@ -250,7 +250,7 @@ public final class ColocUtil {
 
     public static void convertSourceToObject(Message message) {
         List<Object> content = CastUtils.cast(message.getContent(List.class));
-        if (content == null || content.size() < 1) {
+        if (content == null || content.isEmpty()) {
             // nothing to convert
             return;
         }
@@ -279,7 +279,7 @@ public final class ColocUtil {
 
     public static void convertObjectToSource(Message message) {
         List<Object> content = CastUtils.cast(message.getContent(List.class));
-        if (content == null || content.size() < 1) {
+        if (content == null || content.isEmpty()) {
             // nothing to convert
             return;
         }

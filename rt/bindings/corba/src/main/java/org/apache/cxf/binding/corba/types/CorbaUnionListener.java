@@ -134,7 +134,7 @@ public class CorbaUnionListener extends AbstractCorbaTypeListener {
         String descriminatorValue;
         // Determine the value of the discriminator.
         List<CaseType> branchCases = branch.getCase();
-        if (branchCases.size() != 0) {
+        if (!branchCases.isEmpty()) {
             CaseType caseLabel = branchCases.get(0);
             descriminatorValue = caseLabel.getLabel();
         } else {

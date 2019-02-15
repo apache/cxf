@@ -560,7 +560,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                 CastUtils.cast((List<?>)signedResult.get(
                     WSSecurityEngineResult.TAG_DATA_REF_URIS
                 ));
-            if (sl != null && sl.size() >= 1) {
+            if (sl != null && !sl.isEmpty()) {
                 for (WSDataRef dataRef : sl) {
                     QName signedQName = dataRef.getName();
                     if (WSConstants.SIGNATURE.equals(signedQName)

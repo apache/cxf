@@ -107,7 +107,7 @@ public class RequestImpl implements Request {
         List<Variant> requestVars = new LinkedList<>();
         for (MediaType mt : mediaTypes) {
             for (Locale lang : langs) {
-                if (encs.size() < 1) {
+                if (encs.isEmpty()) {
                     requestVars.add(new Variant(mt, lang, null));
                 } else {
                     for (String enc : encs) {
