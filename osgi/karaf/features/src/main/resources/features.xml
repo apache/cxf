@@ -230,7 +230,6 @@
         <feature version="${project.version}">cxf-http</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-frontend-simple/${project.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-frontend-jaxws/${project.version}</bundle>
-        <library type="endorsed" export="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${cxf.servicemix.specs.version}</library>
     </feature>
     <feature name="cxf-jaxrs" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
