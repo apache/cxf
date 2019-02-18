@@ -583,7 +583,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
     }
 
     protected boolean isRootArray(List<String> theArrayKeys) {
-        return theArrayKeys != null ? true : getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
+        return theArrayKeys != null || getBooleanJsonProperty(ROOT_IS_ARRAY_PROPERTY, serializeAsArray);
     }
 
 

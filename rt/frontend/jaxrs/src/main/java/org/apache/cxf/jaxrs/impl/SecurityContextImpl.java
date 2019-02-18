@@ -73,7 +73,7 @@ public class SecurityContextImpl implements SecurityContext {
 
     public boolean isUserInRole(String role) {
         org.apache.cxf.security.SecurityContext sc = getInternalSecurityContext();
-        return sc == null ? false : sc.isUserInRole(role);
+        return sc != null && sc.isUserInRole(role);
     }
 
     private org.apache.cxf.security.SecurityContext getInternalSecurityContext() {

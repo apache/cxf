@@ -58,7 +58,7 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
         List<String> expectedRoles = getExpectedRoles(key);
         if (expectedRoles.isEmpty()) {
             List<String> denyRoles = getDenyRoles(key);
-            return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
+            return denyRoles.isEmpty() || isUserInRole(sc, denyRoles, true);
         }
 
         if (isUserInRole(sc, expectedRoles, false)) {

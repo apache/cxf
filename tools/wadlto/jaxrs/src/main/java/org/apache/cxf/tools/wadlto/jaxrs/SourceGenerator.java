@@ -728,8 +728,8 @@ public class SourceGenerator {
         final String id = idAttribute.isEmpty() ? methodNameLowerCase : idAttribute;
         
         final boolean responseRequired = isMethodMatched(responseMethods, methodNameLowerCase, id);
-        final boolean suspendedAsync = responseRequired ? false
-            : isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
+        final boolean suspendedAsync = !responseRequired
+            && isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
         final boolean oneway = isMethodMatched(onewayMethods, methodNameLowerCase, id);
 
         boolean jaxpSourceRequired = requestRepsWithElements.size() > 1 && !supportMultipleRepsWithElements;

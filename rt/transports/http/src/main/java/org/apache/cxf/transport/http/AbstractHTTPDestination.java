@@ -236,7 +236,7 @@ public abstract class AbstractHTTPDestination
      */
     protected final boolean isOneWay(Message message) {
         Exchange ex = message.getExchange();
-        return ex == null ? false : ex.isOneWay();
+        return ex != null && ex.isOneWay();
     }
 
     public void invoke(final ServletConfig config,

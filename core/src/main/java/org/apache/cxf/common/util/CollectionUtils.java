@@ -84,7 +84,7 @@ public final class CollectionUtils {
         }
 
         public boolean isEmpty() {
-            return map != null ? map.isEmpty() : true;
+            return map == null || map.isEmpty();
         }
 
         public Enumeration<S> keys() {
@@ -111,7 +111,7 @@ public final class CollectionUtils {
             }
 
             public boolean hasMoreElements() {
-                return iter != null ? iter.hasNext() : false;
+                return iter != null && iter.hasNext();
             }
 
             public X nextElement() {

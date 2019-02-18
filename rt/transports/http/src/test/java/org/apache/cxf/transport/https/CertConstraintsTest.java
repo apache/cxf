@@ -55,7 +55,7 @@ public class CertConstraintsTest {
         // gordy matches but bethal doesn't
         //
         tmp = loadCertConstraints("subject-CN-gordy");
-        assertTrue(!tmp.matches(bethalCert) && tmp.matches(gordyCert));
+        assertFalse(tmp.matches(bethalCert) && tmp.matches(gordyCert));
 
         //
         // both are under the ApacheTest organization

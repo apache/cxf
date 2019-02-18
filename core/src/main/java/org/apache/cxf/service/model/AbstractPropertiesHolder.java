@@ -271,7 +271,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             || o1 != null && o2 == null) {
             return false;
         }
-        return o1 == null ? true : o1.equals(o2);
+        return o1 == null || o1.equals(o2);
     }
 
 }

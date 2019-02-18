@@ -319,7 +319,7 @@ public class Option {
     }
 
     public boolean isWsdlList() {
-        return wsdlList == null ? false : wsdlList;
+        return wsdlList != null && wsdlList;
     }
 
     public void setWsdlList(boolean wsdlList) {
@@ -359,7 +359,7 @@ public class Option {
     }
 
     public boolean isExtendedSoapHeaders() {
-        return extendedSoapHeaders == null ? false : extendedSoapHeaders;
+        return extendedSoapHeaders != null && extendedSoapHeaders;
     }
 
     public void setExtendedSoapHeaders(boolean extendedSoapHeaders) {
@@ -378,7 +378,7 @@ public class Option {
     }
 
     public boolean isNoTypes() {
-        return noTypes == null ? false : noTypes;
+        return noTypes != null && noTypes;
     }
 
     public void setNoTypes(boolean noTypes) {
@@ -450,7 +450,7 @@ public class Option {
     }
 
     public boolean isAutoNameResolution() {
-        return autoNameResolution == null ? false : autoNameResolution;
+        return autoNameResolution != null && autoNameResolution;
     }
 
     public void setAutoNameResolution(boolean autoNameResolution) {
@@ -458,7 +458,7 @@ public class Option {
     }
 
     public boolean isNoAddressBinding() {
-        return noAddressBinding == null ? false : noAddressBinding;
+        return noAddressBinding != null && noAddressBinding;
     }
 
     public void setNoAddressBinding(boolean noAddressBinding) {
@@ -466,7 +466,7 @@ public class Option {
     }
 
     public boolean isAllowElementRefs() {
-        return allowElementRefs == null ? false : allowElementRefs;
+        return allowElementRefs != null && allowElementRefs;
     }
 
     public void setAllowElementRefs(boolean allowElementRefs) {

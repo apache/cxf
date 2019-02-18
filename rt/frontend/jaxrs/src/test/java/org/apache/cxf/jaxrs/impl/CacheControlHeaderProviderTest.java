@@ -31,6 +31,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CacheControlHeaderProviderTest {
@@ -44,9 +45,9 @@ public class CacheControlHeaderProviderTest {
     public void testFromSimpleString() {
         CacheControl c = CacheControl.valueOf(
             "public,must-revalidate");
-        assertTrue(!c.isPrivate() && !c.isNoStore()
+        assertFalse(c.isPrivate() && !c.isNoStore()
                    && c.isMustRevalidate() && !c.isProxyRevalidate());
-        assertTrue(!c.isNoCache()
+        assertFalse(c.isNoCache()
                    && !c.isNoTransform() && c.getNoCacheFields().isEmpty()
                    && c.getPrivateFields().isEmpty());
     }

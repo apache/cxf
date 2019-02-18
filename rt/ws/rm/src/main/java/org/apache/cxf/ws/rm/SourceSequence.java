@@ -206,7 +206,7 @@ public class SourceSequence extends AbstractSequence {
      */
 
     boolean isExpired() {
-        return expires == null ? false : new Date().after(expires);
+        return expires != null && new Date().after(expires);
 
     }
 

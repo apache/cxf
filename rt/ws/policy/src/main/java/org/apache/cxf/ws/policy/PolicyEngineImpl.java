@@ -186,7 +186,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
 
     public boolean isIgnoreUnknownAssertions() {
-        return ignoreUnknownAssertions == null ? true : ignoreUnknownAssertions;
+        return ignoreUnknownAssertions == null || ignoreUnknownAssertions;
     }
 
     public void setIgnoreUnknownAssertions(boolean ignore) {

@@ -1330,7 +1330,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Response response = wc.options();
         List<Object> values = response.getMetadata().get("Allow");
         assertNotNull(values);
-        assertTrue(!values.contains("POST") && values.contains("GET")
+        assertFalse(values.contains("POST") && values.contains("GET")
                    && !values.contains("DELETE") && values.contains("PUT"));
         assertEquals(0, ((InputStream)response.getEntity()).available());
         List<Object> date = response.getMetadata().get("Date");

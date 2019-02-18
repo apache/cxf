@@ -428,7 +428,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
 
     private boolean isOneWay(Message message) {
-        return (message.getExchange() != null) ? message.getExchange().isOneWay() && !isRobustOneWay(message) : false;
+        return (message.getExchange() != null) && message.getExchange().isOneWay() && !isRobustOneWay(message);
     }
 
     private boolean isRobustOneWay(Message message) {

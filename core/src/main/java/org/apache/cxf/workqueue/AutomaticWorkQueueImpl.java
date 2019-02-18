@@ -513,11 +513,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
 
     public boolean isEmpty() {
-        return executor == null ? true : executor.getQueue().isEmpty();
+        return executor == null || executor.getQueue().isEmpty();
     }
 
     public boolean isFull() {
-        return executor == null ? false : executor.getQueue().remainingCapacity() == 0;
+        return executor != null && executor.getQueue().remainingCapacity() == 0;
     }
 
     public int getHighWaterMark() {

@@ -272,9 +272,9 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             if (conduitAddress.equalsIgnoreCase(actualAddress)) {
                 return true;
             }
-            return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
+            return !cbg.isFullComparison() && matchAddressSubstrings(conduitAddress, actualAddress);
         }
-        return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
+        return !cbg.isFullComparison() && matchAddressSubstrings(conduitAddress, actualAddress);
     }
 
     //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required

@@ -303,7 +303,7 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
     }
 
     private boolean isJoinProperty(String prop) {
-        return joinProperties == null ? false : joinProperties.contains(prop);
+        return joinProperties != null && joinProperties.contains(prop);
     }
 
     private Path<?> getExistingJoinProperty(From<?, ?> element, String prop) {

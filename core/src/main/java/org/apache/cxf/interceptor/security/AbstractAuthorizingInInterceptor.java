@@ -80,7 +80,7 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
 
             List<String> denyRoles = getDenyRoles(method);
 
-            return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
+            return denyRoles.isEmpty() || isUserInRole(sc, denyRoles, true);
         }
 
         if (isUserInRole(sc, expectedRoles, false)) {

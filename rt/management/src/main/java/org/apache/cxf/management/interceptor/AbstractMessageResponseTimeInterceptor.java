@@ -50,7 +50,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
     }
 
     protected boolean isClient(Message msg) {
-        return msg == null ? false : Boolean.TRUE.equals(msg.get(Message.REQUESTOR_ROLE));
+        return msg != null && Boolean.TRUE.equals(msg.get(Message.REQUESTOR_ROLE));
     }
 
     protected void beginHandlingMessage(Exchange ex) {

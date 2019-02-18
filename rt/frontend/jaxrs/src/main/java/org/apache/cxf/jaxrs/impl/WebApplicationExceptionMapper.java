@@ -56,7 +56,7 @@ public class WebApplicationExceptionMapper
         if (r == null) {
             r = Response.serverError().build();
         }
-        boolean doAddMessage = r.getEntity() != null ? false : addMessageToResponse;
+        boolean doAddMessage = r.getEntity() == null && addMessageToResponse;
 
 
         Message msg = PhaseInterceptorChain.getCurrentMessage();

@@ -93,7 +93,7 @@ public class ToolContext {
     }
 
     public boolean containsKey(String key) {
-        return (paramMap == null) ? false : paramMap.containsKey(key);
+        return (paramMap != null) && paramMap.containsKey(key);
     }
 
     public Object get(String key) {

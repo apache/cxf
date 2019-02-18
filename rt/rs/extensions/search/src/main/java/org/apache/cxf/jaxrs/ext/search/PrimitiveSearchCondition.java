@@ -102,7 +102,7 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         }
         Object lValue = getValue(propertyName, pojo);
         Object rValue = getPrimitiveValue(propertyName, propertyValue);
-        return lValue == null ? false : compare(lValue, cType, rValue);
+        return lValue != null && compare(lValue, cType, rValue);
     }
 
     private Object getValue(String getter, T pojo) {

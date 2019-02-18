@@ -41,8 +41,8 @@ import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This a test of the Signature Confirmation functionality that is contained in the
@@ -91,7 +91,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         //
         Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
-        assertTrue(!sigv.isEmpty());
+        assertFalse(sigv.isEmpty());
 
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
@@ -125,7 +125,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         List<WSHandlerResult> sigReceived =
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
-        assertTrue(!sigReceived.isEmpty());
+        assertFalse(sigReceived.isEmpty());
 
         testSignatureConfirmationResponse(sigv, sigReceived);
     }

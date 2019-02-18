@@ -164,7 +164,7 @@ public class Option {
     }
 
     public boolean isImpl() {
-        return generateImpl == null ? false : generateImpl;
+        return generateImpl != null && generateImpl;
     }
 
     public void setImpl(boolean impl) {
@@ -172,7 +172,7 @@ public class Option {
     }
 
     public boolean isInterface() {
-        return generateInterface == null ? false : generateInterface;
+        return generateInterface != null && generateInterface;
     }
 
     public void setInterface(boolean interf) {
