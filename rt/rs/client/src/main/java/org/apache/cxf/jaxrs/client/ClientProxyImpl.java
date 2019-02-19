@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -182,9 +183,15 @@ public class ClientProxyImpl extends AbstractClient implements
                         final MethodHandles.Lookup lookup = MethodHandles
                                 .publicLookup()
                                 .in(declaringClass);
-                        
                         // force private access so unreflectSpecial can invoke the interface's default method
-                        final Field f = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+                        Field f;
+                        try { 
+                            f = MethodHandles.Lookup.class.getDeclaredField("allowedModes");
+                        } catch (NoSuchFieldException nsfe) {
+                            // IBM and OpenJ9 JDKs use a different field name
+                            f = MethodHandles.Lookup.class.getDeclaredField("accessMode");
+                            m.setAccessible(true);
+                        }
                         final int modifiers = f.getModifiers();
                         if (Modifier.isFinal(modifiers)) {
                             final Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -193,10 +200,8 @@ public class ClientProxyImpl extends AbstractClient implements
                             f.setAccessible(true);
                             f.set(lookup, MethodHandles.Lookup.PRIVATE);
                         }
-
-                        return lookup.unreflectSpecial(m, declaringClass)
-                                     .bindTo(o)
-                                     .invokeWithArguments(params);
+                        MethodHandle mh = lookup.unreflectSpecial(m, declaringClass).bindTo(o);
+                        return params != null && params.length > 0 ? mh.invokeWithArguments(params) : mh.invoke();
                     } catch (Throwable t) {
                         if (t instanceof IllegalAccessException) {
                             try {
