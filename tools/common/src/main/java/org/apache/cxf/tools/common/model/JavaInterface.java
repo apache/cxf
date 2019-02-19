@@ -76,7 +76,7 @@ public class JavaInterface implements JavaAnnotatable {
                     }
                     if (pfx != null) {
                         if (d2.length() > 0) {
-                            d2.append("\n");
+                            d2.append('\n');
                         }
                         d2.append(spaces).append("* ");
                         if (s2.startsWith(pfx)) {
@@ -308,7 +308,7 @@ public class JavaInterface implements JavaAnnotatable {
         StringBuilder sb = new StringBuilder();
         for (JAnnotation anno : annotations) {
             sb.append(anno);
-            sb.append("\n");
+            sb.append('\n');
         }
         sb.append(getFullClassName());
         return sb.toString();

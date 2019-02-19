@@ -1707,7 +1707,7 @@ public class SourceGenerator {
         }
         Class<?> cls = inRep ? Consumes.class : Produces.class;
         addImport(imports, cls.getName());
-        sbCode.append('@').append(cls.getSimpleName()).append("(");
+        sbCode.append('@').append(cls.getSimpleName()).append('(');
         if (repElements.size() > 1) {
             sbCode.append('{');
         }

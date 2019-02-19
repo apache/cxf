@@ -51,7 +51,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
             for (final ConstraintViolation< ? > violation: constraint.getConstraintViolations()) {
                 String message = buildErrorMessage(violation);
                 if (responseBody != null) {
-                    responseBody.append(message).append("\n");
+                    responseBody.append(message).append('\n');
                 }
                 LOG.log(Level.WARNING, message);
             }

@@ -324,7 +324,7 @@ class NewStackTraceErrorHandler implements ErrorHandler {
     void addError(String msg, SAXParseException ex) {
         valid = false;
         if (numErrors == 0) {
-            buffer.append("\n");
+            buffer.append('\n');
         } else {
             buffer.append("\n\n");
         }

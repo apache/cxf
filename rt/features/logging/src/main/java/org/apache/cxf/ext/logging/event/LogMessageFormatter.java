@@ -61,7 +61,7 @@ public final class LogMessageFormatter {
 
     protected static void write(StringBuilder b, String key, String value) {
         if (value != null) {
-            b.append("    ").append(key).append(": ").append(value).append("\n");
+            b.append("    ").append(key).append(": ").append(value).append('\n');
         }
     }
 }

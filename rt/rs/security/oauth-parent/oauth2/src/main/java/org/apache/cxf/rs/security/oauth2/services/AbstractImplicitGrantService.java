@@ -94,11 +94,11 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
             sb.append('&').append(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN)
                 .append('=').append(clientToken.getExpiresIn());
             if (!StringUtils.isEmpty(clientToken.getApprovedScope())) {
-                sb.append('&').append(OAuthConstants.SCOPE).append("=")
+                sb.append('&').append(OAuthConstants.SCOPE).append('=')
                     .append(HttpUtils.queryEncode(clientToken.getApprovedScope()));
             }
             for (Map.Entry<String, String> entry : clientToken.getParameters().entrySet()) {
-                sb.append('&').append(entry.getKey()).append("=").append(HttpUtils.queryEncode(entry.getValue()));
+                sb.append('&').append(entry.getKey()).append('=').append(HttpUtils.queryEncode(entry.getValue()));
             }
         }
         if (clientToken.getRefreshToken() != null) {
@@ -181,7 +181,7 @@ public abstract class AbstractImplicitGrantService extends RedirectionBasedGrant
             sb.append(OAuthConstants.STATE).append('=').append(HttpUtils.urlEncode(stateParam));
         }
         if (reportClientId) {
-            sb.append('&').append(OAuthConstants.CLIENT_ID).append("=").append(state.getClientId());
+            sb.append('&').append(OAuthConstants.CLIENT_ID).append('=').append(state.getClientId());
         }
     }
 

@@ -81,7 +81,7 @@ public class ProviderFactory {
                 if (line == null) {
                     break;
                 }
-                sb.append(line).append("\n");
+                sb.append(line).append('\n');
             }
         }
 

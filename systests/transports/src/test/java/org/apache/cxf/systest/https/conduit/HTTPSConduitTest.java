@@ -481,7 +481,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             for (int i = 0; i < trustName.length; i++) {
                 sb.append("\"OU=");
                 sb.append(trustName[i]);
-                sb.append("\"");
+                sb.append('"');
                 if (i < trustName.length - 1) {
                     sb.append(", ");
                 }

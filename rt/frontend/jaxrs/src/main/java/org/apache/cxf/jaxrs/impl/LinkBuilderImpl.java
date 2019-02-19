@@ -220,7 +220,7 @@ public class LinkBuilderImpl implements Builder {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append('<').append(uri.toString()).append(">");
+            sb.append('<').append(uri.toString()).append('>');
             String rel = getRel();
             if (rel != null) {
                 sb.append(';').append(Link.REL).append("=\"").append(rel).append('"');

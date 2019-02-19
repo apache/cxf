@@ -762,7 +762,7 @@ public class DynamicClientFactory {
             if (errors.length() == 0) {
                 errors.append("Error compiling schema from WSDL at {").append(url).append("}: \n");
             } else {
-                errors.append("\n");
+                errors.append('\n');
             }
             if (arg0.getLineNumber() > 0) {
                 errors.append(arg0.getLocalizedMessage() + "\n"
@@ -772,7 +772,7 @@ public class DynamicClientFactory {
                     + "\n");
             } else {
                 errors.append(arg0.getMessage());
-                errors.append("\n");
+                errors.append('\n');
             }
         }
 

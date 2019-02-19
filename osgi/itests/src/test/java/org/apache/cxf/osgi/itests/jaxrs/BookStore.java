@@ -115,7 +115,7 @@ public class BookStore {
             StringBuilder violationMessages = new StringBuilder();
             for (ConstraintViolation<?> constraintViolation : cve.getConstraintViolations()) {
                 violationMessages.append(constraintViolation.getPropertyPath())
-                        .append(": ").append(constraintViolation.getMessage()).append("\n");
+                        .append(": ").append(constraintViolation.getMessage()).append('\n');
             }
             return Response.status(Response.Status.BAD_REQUEST)
                     .type("text/plain").entity(violationMessages.toString()).build();

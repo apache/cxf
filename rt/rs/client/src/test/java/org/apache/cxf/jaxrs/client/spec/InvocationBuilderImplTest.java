@@ -45,7 +45,7 @@ public class InvocationBuilderImplTest {
             MultivaluedMap<String, Object> headers = context.getHeaders();
             StringBuilder entity = new StringBuilder();
             for (String key : headers.keySet()) {
-                entity.append(key).append('=').append(headers.getFirst(key)).append(";");
+                entity.append(key).append('=').append(headers.getFirst(key)).append(';');
             }
             context.abortWith(Response.ok(entity.toString()).build());
         }

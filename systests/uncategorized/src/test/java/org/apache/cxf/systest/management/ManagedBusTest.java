@@ -145,7 +145,7 @@ public class ManagedBusTest {
                        o.toString().indexOf("bus.id=" + expect + ",") != -1);
             assertTrue("unexpected " + reject + " in object name: " + o,
                        o.toString().indexOf("bus.id=" + reject + ",") == -1);
-            b.append("\n");
+            b.append('\n');
         }
         assertEquals("Size is wrong: " + b.toString(), 1, s.size());
 
@@ -162,7 +162,7 @@ public class ManagedBusTest {
                        o.toString().indexOf("bus.id=" + expect + ",") != -1);
             assertTrue("unexpected " + reject + " in object name: " + o,
                        o.toString().indexOf("bus.id=" + reject + ",") == -1);
-            b.append("\n");
+            b.append('\n');
         }
         assertEquals("Size is wrong: " + b.toString(), 2, s.size());
 

@@ -69,7 +69,7 @@ public class MapEventLogger implements MapEventListener {
         final StringBuilder builder = new StringBuilder();
         for (String key : fieldOrder) {
             if (this.logFieldname) {
-                builder.append(key).append('=').append(map.get(key)).append(";");
+                builder.append(key).append('=').append(map.get(key)).append(';');
             } else {
                 builder.append(format(map.get(key))).append(';');
             }

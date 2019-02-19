@@ -173,7 +173,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
         StringBuilder error = new StringBuilder();
         for (String msg : msgs) {
-            error.append("\n").append(msg);
+            error.append('\n').append(msg);
         }
 
         throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, error.toString()));

@@ -675,7 +675,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         StreamConsumer err = new StreamConsumer() {
             public void consumeLine(String line) {
                 b.append(line);
-                b.append("\n");
+                b.append('\n');
                 getLog().warn(line);
             }
         };

@@ -108,7 +108,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                         if (i > 0) {
                             arr.append(',');
                         }
-                        arr.append("\"").append(auds.get(i)).append("\"");
+                        arr.append('"').append(auds.get(i)).append('"');
                     }
                     arr.append(']');
                     appendJsonPair(sb, "aud", arr.toString(), false);
@@ -205,14 +205,14 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
 
     private void appendJsonPair(StringBuilder sb, String key, Object value,
                                 boolean valueQuote) {
-        sb.append("\"").append(key).append("\"");
+        sb.append('"').append(key).append('"');
         sb.append(':');
         if (valueQuote) {
-            sb.append("\"");
+            sb.append('"');
         }
         sb.append(value);
         if (valueQuote) {
-            sb.append("\"");
+            sb.append('"');
         }
     }
 

@@ -380,7 +380,7 @@ public class AttachmentDeserializerTest {
         buf.append("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\n");
         buf.append("Content-Transfer-Encoding: 8bit\n");
         buf.append("Content-ID: <soap.xml@xfire.codehaus.org>\n");
-        buf.append("\n");
+        buf.append('\n');
         buf.append("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" "
                    + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
                    + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"

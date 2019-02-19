@@ -71,14 +71,14 @@ public final class ValidationResult {
             sb.append("\n\n <<< ERROR! \n");
             while (!errors.empty()) {
                 sb.append(errors.pop());
-                sb.append("\n");
+                sb.append('\n');
             }
         }
         if (!warnings.isEmpty()) {
             sb.append("\n <<< WARNING! \n");
             while (!warnings.empty()) {
                 sb.append(warnings.pop());
-                sb.append("\n");
+                sb.append('\n');
             }
         }
         return sb.toString();

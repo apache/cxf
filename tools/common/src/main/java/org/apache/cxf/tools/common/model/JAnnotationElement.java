@@ -144,9 +144,9 @@ public final class JAnnotationElement {
     }
 
     private void getStringValue(final StringBuilder sb, final Object obj) {
-        sb.append("\"");
+        sb.append('"');
         sb.append(obj);
-        sb.append("\"");
+        sb.append('"');
     }
 
     private boolean containsSameClassName(Class<?> clz) {

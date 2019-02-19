@@ -109,7 +109,7 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 sb.append(name).append(' ').append(
                             SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value,
                                                                    originalValue))
-                            .append(' ').append("'").append(value).append("'");
+                            .append(' ').append("'").append(value).append("'"); //NOPMD
             }
         } else {
             boolean first = true;
