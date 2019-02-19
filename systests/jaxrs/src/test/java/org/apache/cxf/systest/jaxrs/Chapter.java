@@ -97,7 +97,7 @@ public class Chapter {
     }
 
     @GET
-    @Path("/matched%21uris")
+    @Path("/matched!uris")
     @Produces("text/plain")
     public String getMatchedUris(@Context UriInfo ui,
                                  @QueryParam("decode") String decode) {
