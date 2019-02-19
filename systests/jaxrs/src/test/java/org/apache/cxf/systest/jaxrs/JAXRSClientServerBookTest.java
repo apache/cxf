@@ -2664,21 +2664,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                           + "bookstore/booksubresource/123/, "
                           + "bookstore]";
         getAndCompare("http://localhost:" + PORT + "/bookstore/"
-                      + "booksubresource/123/chapters/sub/1/matched%21uris?decode=true",
+                      + "booksubresource/123/chapters/sub/1/matched!uris?decode=true",
                       expected, "text/plain", "text/plain", 200);
-    }
-
-    @Test
-    public void testUriInfoMatchedUrisNoDecode() throws Exception {
-        //note '%21' instead of '!'
-        String expected = "[bookstore/booksubresource/123/chapters/sub/1/matched%21uris, "
-            + "bookstore/booksubresource/123/chapters/sub/1/, "
-            + "bookstore/booksubresource/123/, "
-            + "bookstore]";
-        getAndCompare("http://localhost:" + PORT + "/bookstore/"
-                      + "booksubresource/123/chapters/sub/1/matched%21uris?decode=false",
-                      expected,
-                      "text/plain", "text/plain", 200);
     }
 
     @Test
