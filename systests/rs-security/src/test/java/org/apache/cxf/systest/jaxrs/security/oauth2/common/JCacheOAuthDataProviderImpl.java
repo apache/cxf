@@ -176,6 +176,7 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         ServerAccessToken token = super.createNewAccessToken(client, userSub);
         token.setNotBefore((System.currentTimeMillis() / 1000L) - 5L);
+        token.setIssuer("jwt-issuer");
         return token;
     }
 

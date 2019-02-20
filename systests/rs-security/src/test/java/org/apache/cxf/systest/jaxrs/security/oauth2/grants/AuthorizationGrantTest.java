@@ -56,6 +56,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -547,6 +548,7 @@ public class AuthorizationGrantTest extends AbstractBusClientServerTestBase {
         assertNotNull(jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         assertNotNull(jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
         assertNotNull(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
+        assertEquals("jwt-issuer", jwt.getClaim(JwtConstants.CLAIM_ISSUER));
 
         KeyStore keystore = KeyStore.getInstance("JKS");
         keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
