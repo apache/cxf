@@ -390,7 +390,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     }
 
     private void retrieveListenerFactory() {
-        if (tlsServerParameters != null) {
+        if (tlsServerParameters != null && tlsServerParameters.getClientAuthentication() != null) {
             protocol = "https";
 
         } else {

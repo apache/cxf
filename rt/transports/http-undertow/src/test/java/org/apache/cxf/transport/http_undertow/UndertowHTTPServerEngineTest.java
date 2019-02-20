@@ -36,6 +36,7 @@ import javax.management.ObjectName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
@@ -110,10 +111,15 @@ public class UndertowHTTPServerEngineTest {
         assertTrue("Protocol must be http",
                 "http".equals(engine.getProtocol()));
 
+        TLSServerParameters tlsServerParameters = new TLSServerParameters();
+        tlsServerParameters.setClientAuthentication(new ClientAuthentication());
+        tlsServerParameters.getClientAuthentication().setRequired(true);
+        tlsServerParameters.getClientAuthentication().setWant(true);
+
         engine = new UndertowHTTPServerEngine();
         engine.setPort(PORT2);
         engine.setMaxIdleTime(30000);
-        engine.setTlsServerParameters(new TLSServerParameters());
+        engine.setTlsServerParameters(tlsServerParameters);
         engine.finalizeConfig();
 
         List<UndertowHTTPServerEngine> list = new ArrayList<>();
@@ -128,12 +134,12 @@ public class UndertowHTTPServerEngineTest {
 
         assertEquals("Get the wrong maxIdleTime.", 30000, engine.getMaxIdleTime());
 
-        factory.setTLSServerParametersForPort(PORT1, new TLSServerParameters());
+        factory.setTLSServerParametersForPort(PORT1, tlsServerParameters);
         engine = factory.createUndertowHTTPServerEngine(PORT1, "https");
         assertTrue("Protocol must be https",
                    "https".equals(engine.getProtocol()));
 
-        factory.setTLSServerParametersForPort(PORT3, new TLSServerParameters());
+        factory.setTLSServerParametersForPort(PORT3, tlsServerParameters);
         engine = factory.createUndertowHTTPServerEngine(PORT3, "https");
         assertTrue("Protocol must be https",
                    "https".equals(engine.getProtocol()));
