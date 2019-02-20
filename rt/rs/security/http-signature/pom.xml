@@ -65,7 +65,6 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>${cxf.javax.annotation-api.version}</version>
         </dependency>
     </dependencies>
 
