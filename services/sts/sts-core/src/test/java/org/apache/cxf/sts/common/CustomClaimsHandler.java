@@ -97,7 +97,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
                     claim.addValue(attributeValue);
 
-                } else if (ROLE_CLAIM.toString().equals(requestClaim.getClaimType())) {
+                } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
                     if (requestClaim.getValues().size() > 0) {
                         for (Object requestedRole : requestClaim.getValues()) {
                             if (isUserInRole(parameters.getPrincipal(), requestedRole.toString())) {

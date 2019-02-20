@@ -72,11 +72,11 @@ public class CustomClaimsHandler implements ClaimsHandler {
                 claim.setIssuer("Test Issuer");
                 claim.setOriginalIssuer("Original Issuer");
                 if (foundContent) {
-                    if (ROLE.toString().equals(requestClaim.getClaimType())) {
+                    if (ROLE.equals(requestClaim.getClaimType())) {
                         claim.addValue("admin-user");
-                    } else if (GIVEN_NAME.toString().equals(requestClaim.getClaimType())) {
+                    } else if (GIVEN_NAME.equals(requestClaim.getClaimType())) {
                         claim.addValue(parameters.getPrincipal().getName());
-                    } else if (LANGUAGE.toString().equals(requestClaim.getClaimType())) {
+                    } else if (LANGUAGE.equals(requestClaim.getClaimType())) {
                         claim.addValue(parameters.getPrincipal().getName());
                     }
                 }

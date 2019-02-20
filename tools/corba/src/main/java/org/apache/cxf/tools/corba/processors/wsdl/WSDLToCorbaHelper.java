@@ -288,7 +288,7 @@ public class WSDLToCorbaHelper {
             + IDL_VERSION;
         ((Union)corbatype).setRepositoryID(repoId);
 
-        if (!(choice.getMaxOccurs() == 1) || !(choice.getMinOccurs() == 1)) {
+        if (choice.getMaxOccurs() != 1 || choice.getMinOccurs() != 1) {
             QName name = createQNameTargetNamespace(corbatype.getQName().getLocalPart() + "Array");
             CorbaType arrayType =
                 createArray(name, corbatype.getQName(), corbatype.getQName(),
@@ -365,7 +365,7 @@ public class WSDLToCorbaHelper {
             return null;
         }
 
-        if (!(element.getMaxOccurs() == 1) || !(element.getMinOccurs() == 1)) {
+        if (element.getMaxOccurs() != 1 || element.getMinOccurs() != 1) {
             QName name = createQNameCorbaNamespace(getModulePrefix(membertype)
                                                     + elemName.getLocalPart() + "Array");
             CorbaType arraytype = null;
@@ -885,7 +885,7 @@ public class WSDLToCorbaHelper {
             if ((stype.getItems().size() == 1)
                 && (stype.getItems().get(0) instanceof XmlSchemaElement)) {
                 XmlSchemaElement el = (XmlSchemaElement)stype.getItems().get(0);
-                if (!(el.getMaxOccurs() == 1)) {
+                if (el.getMaxOccurs() != 1) {
                     // it's a literal array
                     array = true;
                 }

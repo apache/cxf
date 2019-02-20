@@ -210,7 +210,7 @@ public class SAMLClaimsTest {
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
         Map<String, String> staticClaimsMap = new HashMap<>();
-        staticClaimsMap.put(CLAIM_STATIC_COMPANY.toString(), CLAIM_STATIC_COMPANY_VALUE);
+        staticClaimsMap.put(CLAIM_STATIC_COMPANY, CLAIM_STATIC_COMPANY_VALUE);
         claimsHandler.setGlobalClaims(staticClaimsMap);
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
@@ -236,7 +236,7 @@ public class SAMLClaimsTest {
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
-        assertEquals(attributes.get(0).getName(), CLAIM_STATIC_COMPANY.toString());
+        assertEquals(attributes.get(0).getName(), CLAIM_STATIC_COMPANY);
         XMLObject valueObj = attributes.get(0).getAttributeValues().get(0);
         assertEquals(valueObj.getDOM().getTextContent(), CLAIM_STATIC_COMPANY_VALUE);
     }
@@ -255,7 +255,7 @@ public class SAMLClaimsTest {
 
         // Create claims map for specific application
         Map<String, String> endpointClaimsMap = new HashMap<>();
-        endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
+        endpointClaimsMap.put(CLAIM_APPLICATION, CLAIM_APPLICATION_VALUE);
 
         Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
@@ -289,7 +289,7 @@ public class SAMLClaimsTest {
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(token);
         List<Attribute> attributes = assertion.getSaml2().getAttributeStatements().get(0).getAttributes();
         assertEquals(attributes.size(), 1);
-        assertEquals(attributes.get(0).getName(), CLAIM_APPLICATION.toString());
+        assertEquals(attributes.get(0).getName(), CLAIM_APPLICATION);
         XMLObject valueObj = attributes.get(0).getAttributeValues().get(0);
         assertEquals(valueObj.getDOM().getTextContent(), CLAIM_APPLICATION_VALUE);
     }
@@ -310,7 +310,7 @@ public class SAMLClaimsTest {
 
         // Create claims map for specific application
         Map<String, String> endpointClaimsMap = new HashMap<>();
-        endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
+        endpointClaimsMap.put(CLAIM_APPLICATION, CLAIM_APPLICATION_VALUE);
 
         Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);

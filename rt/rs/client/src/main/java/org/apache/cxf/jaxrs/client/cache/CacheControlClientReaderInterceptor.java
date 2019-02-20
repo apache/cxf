@@ -88,7 +88,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         }
         final MultivaluedMap<String, String> responseHeaders = context.getHeaders();
         final String cacheControlHeader = responseHeaders.getFirst(HttpHeaders.CACHE_CONTROL);
-        final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader.toString());
+        final CacheControl cacheControl = CacheControl.valueOf(cacheControlHeader);
 
         byte[] cachedBytes = null;
         final boolean validCacheControl = isCacheControlValid(context, cacheControl);

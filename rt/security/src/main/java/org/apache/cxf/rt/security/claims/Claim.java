@@ -99,7 +99,7 @@ public class Claim implements Serializable, Cloneable {
             localname = "ClaimValue";
         }
         writer.writeStartElement(prefix, localname, namespace);
-        writer.writeAttribute(null, "Uri", claimType.toString());
+        writer.writeAttribute(null, "Uri", claimType);
         if (optional) {
             writer.writeAttribute(null, "Optional", "true");
         }

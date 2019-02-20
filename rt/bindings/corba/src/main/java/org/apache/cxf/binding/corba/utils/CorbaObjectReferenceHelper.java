@@ -152,7 +152,7 @@ public final class CorbaObjectReferenceHelper {
         byte[] data = DatatypeConverter.parseHexBinary(url.substring(4));
         if (data.length > 0) {
             // parse out type_id from IOR CDR encapsulation
-            boolean bigIndian = !(data[0] > 0);
+            boolean bigIndian = data[0] <= 0;
             int typeIdStringSize = readIntFromAlignedCDREncaps(data, 4, bigIndian);
             if (typeIdStringSize > 1) {
                 ret = readStringFromAlignedCDREncaps(data, 8, typeIdStringSize - 1);

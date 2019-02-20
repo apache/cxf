@@ -58,11 +58,11 @@ public class CustomClaimsHandler implements ClaimsHandler {
                 claim.setClaimType(requestClaim.getClaimType());
                 claim.setIssuer("Test Issuer");
                 claim.setOriginalIssuer("Original Issuer");
-                if (ROLE.toString().equals(requestClaim.getClaimType())) {
+                if (ROLE.equals(requestClaim.getClaimType())) {
                     claim.addValue("admin-user");
-                } else if (GIVEN_NAME.toString().equals(requestClaim.getClaimType())) {
+                } else if (GIVEN_NAME.equals(requestClaim.getClaimType())) {
                     claim.addValue(parameters.getPrincipal().getName());
-                } else if (NUMBER.toString().equals(requestClaim.getClaimType())) {
+                } else if (NUMBER.equals(requestClaim.getClaimType())) {
                     // Create and add a custom Attribute (Integer)
                     OpenSAMLUtil.initSamlEngine();
                     XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();

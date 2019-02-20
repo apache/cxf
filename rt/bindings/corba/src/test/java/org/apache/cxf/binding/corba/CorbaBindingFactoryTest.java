@@ -142,9 +142,9 @@ public class CorbaBindingFactoryTest {
         List<String> retStrs = factory.getTransportIds();
         assertNotNull(retStrs);
         String str = retStrs.get(0);
-        assertEquals("one", str.toString());
+        assertEquals("one", str);
         str = retStrs.get(1);
-        assertEquals("two", str.toString());
+        assertEquals("two", str);
     }
 
     @Test

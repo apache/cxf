@@ -42,7 +42,7 @@ public abstract class AbstractBeanValidationInterceptor extends AbstractValidati
         if (object == null) {
             String message = new org.apache.cxf.common.i18n.Message(name, BUNDLE).toString();
             LOG.severe(message);
-            throw new ValidationException(message.toString());
+            throw new ValidationException(message);
         }
         return object;
     }

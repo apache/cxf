@@ -334,7 +334,7 @@ public class CorbaPrimitiveHandlerTest {
                                       null);
         assertNotNull(obj);
 
-        obj.setValueFromData(val.toString());
+        obj.setValueFromData(val);
         String result = obj.getDataFromValue();
         assertEquals(val, result);
 
@@ -356,7 +356,7 @@ public class CorbaPrimitiveHandlerTest {
                                       null);
         assertNotNull(obj);
 
-        obj.setValueFromData(val.toString());
+        obj.setValueFromData(val);
         String result = obj.getDataFromValue();
         assertEquals(val, result);
 
