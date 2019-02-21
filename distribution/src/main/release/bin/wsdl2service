@@ -57,7 +57,7 @@ fi
 #
 
 sun_tool_path=""
-if [ $darwin == false ]; then
+if [ $darwin = false ]; then
     sun_tool_path=${JAVA_HOME}/lib/tools.jar
     if [ ! -f $sun_tool_path ]; then
 	echo "ERROR: Set JAVA_HOME to the path where the Java Development Kit (JDK) is installed"
