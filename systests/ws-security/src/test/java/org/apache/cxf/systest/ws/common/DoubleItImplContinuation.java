@@ -41,7 +41,7 @@ public class DoubleItImplContinuation implements DoubleItPortType {
     private WebServiceContext context;
 
     public int doubleIt(int numberToDouble) throws DoubleItFault {
-        Continuation continuation = getContinuation(numberToDouble);
+        Continuation continuation = getContinuation();
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
@@ -63,7 +63,7 @@ public class DoubleItImplContinuation implements DoubleItPortType {
     
     
 
-    private Continuation getContinuation(Integer name) {
+    private Continuation getContinuation() {
         ContinuationProvider provider =
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());
         return provider.getContinuation();

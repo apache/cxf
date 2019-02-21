@@ -26,7 +26,6 @@ import org.apache.cxf.BusException;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ErrorContextSerletTest extends AbstractServletTest {
@@ -48,16 +47,14 @@ public class ErrorContextSerletTest extends AbstractServletTest {
     }
 
     @Test
-    public void testInvoke() {
+    public void testInvoke() throws Exception {
         try {
             sr = new ServletRunner(getResourceAsStream(getConfiguration()), CONTEXT);
             sr.newClient().getResponse(CONTEXT_URL + "/services");
             // there expect a spring bean exception
             fail("we expect a spring bean Exception here");
-        } catch (Exception ex) {
-            // supprot spring 2.0.x and sping 2.5
-            assertTrue("we expect a Bean Exception here",
-                      ex instanceof org.springframework.beans.FatalBeanException);
+        } catch (org.springframework.beans.FatalBeanException ex) {
+            // expected
         }
     }
 

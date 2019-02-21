@@ -30,7 +30,7 @@ public class ErrorData implements java.io.Serializable {
     public ErrorData() {
     }
 
-    public ErrorData(long code, String title, String description, String stack) {
+    public ErrorData(long code, String title, String description) {
         this.code = code;
         this.title = title;
         this.description = description;

@@ -206,7 +206,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         DerivedStructBaseStruct yOrig = new DerivedStructBaseStruct();
         //Base
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("BaseStruct-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -310,7 +310,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         DerivedChoiceBaseStruct yOrig = new DerivedChoiceBaseStruct();
         // Base
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("BaseStruct-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
         // Derived

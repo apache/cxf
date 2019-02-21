@@ -142,8 +142,18 @@ public abstract class Widget {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = 17;
+        result *= Long.hashCode(id);
+        if (name != null) {
+            result = 31 * result + name.hashCode();
+        }
+        if (serialNumber != null) {
+            result = 31 * result + serialNumber.hashCode();
+        }
+        result *= Boolean.hashCode(broken);
+        return result;
     }
+
     /*
      * (non-Javadoc)
      *

@@ -103,7 +103,7 @@ public class JAXRSLDAPUserTest extends AbstractLdapTestUnit {
             // Read in ldap.xml and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/ldap-jaxrs.xml");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            content = content.replaceAll("portno", "" + super.getLdapServer().getPort());
+            content = content.replaceAll("portno", Integer.toString(super.getLdapServer().getPort()));
 
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/ldap-jaxrsport.xml");
             Files.write(path2, content.getBytes());

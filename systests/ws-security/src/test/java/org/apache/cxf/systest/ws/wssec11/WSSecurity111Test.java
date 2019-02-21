@@ -85,11 +85,6 @@ public class WSSecurity111Test extends WSSecurity11Common {
                        launchServer(StaxServer11.class, true)
             );
         } else {
-            if (WSSecurity11Common.isIBMJDK16()) {
-                System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
-                return;
-            }
-
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -176,8 +171,7 @@ public class WSSecurity111Test extends WSSecurity11Common {
 
     @Test
     public void testClientServer() throws IOException {
-        if ((!unrestrictedPoliciesInstalled)
-                && (WSSecurity11Common.isIBMJDK16())) {
+        if (!unrestrictedPoliciesInstalled) {
             System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
             return;
         }

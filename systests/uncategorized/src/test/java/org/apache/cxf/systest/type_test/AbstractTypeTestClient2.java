@@ -1387,7 +1387,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         SgBaseTypeA baseA = new SgBaseTypeA();
-        baseA.setVarInt(new BigInteger("1"));
+        baseA.setVarInt(BigInteger.ONE);
 
         SgDerivedTypeB derivedB = new SgDerivedTypeB();
         derivedB.setVarInt(new BigInteger("32"));
@@ -1564,14 +1564,14 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         SgBaseTypeA baseA = new SgBaseTypeA();
-        baseA.setVarInt(new BigInteger("1"));
+        baseA.setVarInt(BigInteger.ONE);
 
         SgDerivedTypeB derivedB = new SgDerivedTypeB();
         derivedB.setVarInt(new BigInteger("32"));
         derivedB.setVarString("y-SgDerivedTypeB");
 
         SgDerivedTypeC derivedC = new SgDerivedTypeC();
-        derivedC.setVarInt(new BigInteger("1"));
+        derivedC.setVarInt(BigInteger.ONE);
         derivedC.setVarFloat(3.14f);
 
         ObjectFactory objectFactory = new ObjectFactory();
@@ -1588,7 +1588,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
         x.setSg02BaseElementA(x2);
         StructWithMultipleSubstitutionGroups yOrig = new StructWithMultipleSubstitutionGroups();
         yOrig.setVarFloat(1.1f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("y-varString");
         yOrig.setSg01BaseElementA(y1);
         yOrig.setSg02BaseElementA(y2);
@@ -1797,7 +1797,7 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         SgBaseTypeA baseA = new SgBaseTypeA();
-        baseA.setVarInt(new BigInteger("1"));
+        baseA.setVarInt(BigInteger.ONE);
 
         ObjectFactory objectFactory = new ObjectFactory();
         JAXBElement<? extends SgBaseTypeA> elementA = objectFactory.createSg01BaseElementA(baseA);

@@ -94,25 +94,4 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         }
     }
 
-
-    public static boolean isIBMJDK16() {
-        String fullVersion = System.getProperty("java.fullversion");
-        if (fullVersion == null) {
-            //Maybe one of the non IBM JDKs dont set this property, but
-            //the IBM one definitely does
-            return false;
-        }
-        if (fullVersion.indexOf("IBM") == -1) {
-            return false;
-        }
-
-        String javaVersion = System.getProperty("java.version");
-        double javaVersionNum = 0.0;
-        if (javaVersion.length() > 3) {
-            javaVersionNum = Double.valueOf(javaVersion.substring(0, 3)).doubleValue();
-        } else {
-            javaVersionNum = Double.valueOf(javaVersion).doubleValue();
-        }
-        return javaVersionNum >= 1.6;
-    }
 }

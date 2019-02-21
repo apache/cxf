@@ -1174,7 +1174,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedAllBaseStruct yy = new DerivedAllBaseStruct();
         //Base
         yy.setVarFloat(-9.14f);
-        yy.setVarInt(new BigInteger("10"));
+        yy.setVarInt(BigInteger.TEN);
         yy.setVarString("BaseStruct-y");
         yy.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -1302,7 +1302,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedChoiceBaseComplex yy = new DerivedChoiceBaseComplex();
         //Base
         yy.setVarFloat(-9.14f);
-        yy.setVarInt(new BigInteger("10"));
+        yy.setVarInt(BigInteger.TEN);
         yy.setVarString("BaseSequence-y");
         yy.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -1366,7 +1366,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedChoiceBaseComplex yOrig = new DerivedChoiceBaseComplex();
         //Base
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("BaseSequence-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -1522,7 +1522,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedAllBaseStruct yOrig = new DerivedAllBaseStruct();
         //Base
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("BaseStruct-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -1727,7 +1727,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         x.setVarAttrString("BaseStructAttr-x");
         RestrictedStructBaseStruct yOrig = new RestrictedStructBaseStruct();
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarAttrString("BaseStructAttr-y");
 
         Holder<RestrictedStructBaseStruct> y = new Holder<>(yOrig);
@@ -1986,7 +1986,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedStructBaseStruct ys = new DerivedStructBaseStruct();
         //Base
         ys.setVarFloat(-9.14f);
-        ys.setVarInt(new BigInteger("10"));
+        ys.setVarInt(BigInteger.TEN);
         ys.setVarString("BaseStruct-y");
         ys.setVarAttrString("BaseStructAttr-y");
         //Derived
@@ -2049,7 +2049,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         DerivedStructBaseStruct yOrig = new DerivedStructBaseStruct();
         //Base
         yOrig.setVarFloat(-9.14f);
-        yOrig.setVarInt(new BigInteger("10"));
+        yOrig.setVarInt(BigInteger.TEN);
         yOrig.setVarString("BaseStruct-y");
         yOrig.setVarAttrString("BaseStructAttr-y");
         //Derived

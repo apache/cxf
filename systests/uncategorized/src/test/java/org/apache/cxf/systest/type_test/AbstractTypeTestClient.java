@@ -347,9 +347,9 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("UnsignedLong")) {
             return;
         }
-        BigInteger[][] valueSets = {{new BigInteger("0"), new BigInteger("1")},
-                                    {new BigInteger("1"), new BigInteger("0")},
-                                    {new BigInteger("0"),
+        BigInteger[][] valueSets = {{BigInteger.ZERO, BigInteger.ONE},
+                                    {BigInteger.ONE, BigInteger.ZERO},
+                                    {BigInteger.ZERO,
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
         for (int i = 0; i < valueSets.length; i++) {
@@ -1182,7 +1182,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("PositiveInteger")) {
             return;
         }
-        BigInteger[][] valueSets = {{new BigInteger("1"), new BigInteger("1234567890")},
+        BigInteger[][] valueSets = {{BigInteger.ONE, new BigInteger("1234567890")},
                                     {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};
 
@@ -1213,7 +1213,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NonPositiveInteger")) {
             return;
         }
-        BigInteger[][] valueSets = {{new BigInteger("0"), new BigInteger("-1234567890")},
+        BigInteger[][] valueSets = {{BigInteger.ZERO, new BigInteger("-1234567890")},
                                     {new BigInteger("-"
                                                     + String.valueOf(Integer.MAX_VALUE * Integer.MAX_VALUE)),
                                      new BigInteger("-" + String.valueOf(Long.MAX_VALUE * Long.MAX_VALUE))}};
@@ -1277,7 +1277,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("NonNegativeInteger")) {
             return;
         }
-        BigInteger[][] valueSets = {{new BigInteger("0"),
+        BigInteger[][] valueSets = {{BigInteger.ZERO,
                                         new BigInteger("1234567890")},
                                     {new BigInteger(String.valueOf(Integer.MAX_VALUE)),
                                      new BigInteger(String.valueOf(Long.MAX_VALUE))}};

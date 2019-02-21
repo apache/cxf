@@ -88,8 +88,11 @@ public class ExtendedWidget extends Widget {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int result = super.hashCode();
+        result *= Boolean.hashCode(extended);
+        return result;
     }
+
     /*
      * (non-Javadoc)
      *

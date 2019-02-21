@@ -233,7 +233,7 @@ public class WSDiscoveryClient implements Closeable {
             dispatch.getRequestContext().put("thread.local.request.context", Boolean.TRUE);
             version.addVersionTransformer(dispatch);
         }
-        addAddressing(dispatch, false, action);
+        addAddressing(dispatch, addSeq, action);
         return dispatch;
     }
     private void addAddressing(BindingProvider p, boolean addSeq, String action) {
@@ -278,8 +278,8 @@ public class WSDiscoveryClient implements Closeable {
         service = null;
     }
     protected void finalize() throws Throwable {
-        super.finalize();
         close();
+        super.finalize();
     }
 
     /**

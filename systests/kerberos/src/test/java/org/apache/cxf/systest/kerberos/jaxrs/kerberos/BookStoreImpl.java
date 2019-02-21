@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.UriInfo;
 
 public class BookStoreImpl implements BookStore {
     private Map<Long, Book> books = new HashMap<>();
@@ -37,9 +36,6 @@ public class BookStoreImpl implements BookStore {
     private String currentBookId;
 
     public BookStoreImpl() {
-        init();
-    }
-    public BookStoreImpl(UriInfo ui) {
         init();
     }
 

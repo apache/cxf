@@ -113,12 +113,11 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     public static void tearDownAfterClass() throws Exception {
     }
 
-    private void init(String cfgResource, boolean useDecoupledEndpoint, boolean useDispatchClient) {
-        init(cfgResource, useDecoupledEndpoint, useDispatchClient, null);
+    private void init(String cfgResource, boolean useDispatchClient) {
+        init(cfgResource, useDispatchClient, null);
     }
 
     private void init(String cfgResource,
-                      boolean useDecoupledEndpoint,
                       boolean useDispatchClient,
                       Executor executor) {
 
@@ -127,7 +126,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         if (useDispatchClient) {
             initDispatch();
         } else {
-            initProxy(useDecoupledEndpoint, executor);
+            initProxy(executor);
         }
     }
     private void initGreeterBus(SpringBusFactory bf,
@@ -153,7 +152,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
         return dispatch;
     }
 
-    private void initProxy(boolean useDecoupledEndpoint, Executor executor) {
+    private void initProxy(Executor executor) {
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
@@ -171,7 +170,7 @@ public class SequenceTimeoutTest extends AbstractBusClientServerTestBase {
     }
     @Test
     public void testTimeout() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true, true);
+        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true);
 
         List<Dispatch<DOMSource>> dispatches = new ArrayList<>(5);
         int count = 5;
