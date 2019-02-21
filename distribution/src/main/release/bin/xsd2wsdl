@@ -21,77 +21,16 @@
 #
 # run the Apache CXF xsd2wsdl tool 
 #
-# Check for irritating 'operating systems'.
-cygwin=false;
-darwin=false;
-case "`uname`" in
-  CYGWIN*) cygwin=true ;;
-  Darwin*) darwin=true
-           if [ -z "$JAVA_HOME" ] ; then
-             JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
-           fi
-           ;;
-esac
-
-me=`basename $0`
-cxf_home=$CXF_HOME
-if [ ! -f  $cxf_home/lib/cxf-manifest.jar ]; then
-    cxf_home=`dirname $0`/..
-fi
-
-cxf_jar=$cxf_home/lib/cxf-manifest.jar
-
-if [ ! -f $cxf_jar ]; then 
-    if [ ! -f ${cxf_home}/../../../target/srcbuild_env ]; then
-        echo "ERROR: Unable to find cxf-manifest.jar in $cxf_home/lib"
-        exit 1
-    else
-        . ${cxf_home}/../../../target/srcbuild_env
-        cxf_jar=${CXF_CLASSPATH}
-    fi
-fi 
 
 #
-# add the jdk's tools.jar to the classpath
+# Load common functions
 #
+REALNAME=$(realpath "$0")
+DIRNAME=$(dirname "${REALNAME}")
+. "${DIRNAME}/base"
 
-sun_tool_path=""
-if [ $darwin = false ]; then
-    sun_tool_path=${JAVA_HOME}/lib/tools.jar
-    if [ ! -f $sun_tool_path ]; then
-	echo "ERROR: Set JAVA_HOME to the path where the Java Development Kit (JDK) is installed"
-	exit 1
-    fi
-fi 
-
-
-log_config=$cxf_home/etc/logging.properties 
-if $cygwin; then
-  if [ "$OS" = "Windows_NT" ] && cygpath -m .>/dev/null 2>/dev/null ; then
-    format=mixed
-  else
-    format=windows
-  fi
-  cxf_classpath=`cygpath --$format "${cxf_jar}"`
-  if [ ! -z "${CLASSPATH}" ]; then
-    cxf_classpath=${cxf_classpath}\;`cygpath --$format --path "${CLASSPATH}"`
-  fi
-  if [ ! -z "${sun_tool_path}" ] ; then
-    cxf_classpath=${cxf_classpath}\;`cygpath --$format "${sun_tool_path}"`
-  fi
-  log_config=`cygpath --$format "$log_config"`
+if [ "${VERSION}" -le "8" ]; then
+    $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.XSDToWSDL "$@"
 else
-   cxf_classpath=${cxf_jar}:${CLASSPATH}:${sun_tool_path}
+     $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.XSDToWSDL "$@"
 fi
-
-if [ "x${JAVA_MAX_MEM}" = "x" ]; then
-    JAVA_MAX_MEM=512M
-    export JAVA_MAX_MEM
-fi
-
-$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.XSDToWSDL "$@"
-
-
-
-
-
