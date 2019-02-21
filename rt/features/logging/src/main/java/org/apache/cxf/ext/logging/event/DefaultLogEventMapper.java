@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.security.auth.Subject;
+
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Endpoint;

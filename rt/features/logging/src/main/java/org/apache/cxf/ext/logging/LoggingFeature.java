@@ -113,7 +113,7 @@ public class LoggingFeature extends AbstractFeature {
         in.setLogMultipart(logMultipart);
         out.setLogMultipart(logMultipart);
     }
-    
+
     public void setVerbose(boolean verbose) {
         setSender(verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender());
     }
@@ -124,7 +124,7 @@ public class LoggingFeature extends AbstractFeature {
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addInBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addInBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
@@ -139,7 +139,7 @@ public class LoggingFeature extends AbstractFeature {
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addOutBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addOutBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
@@ -154,7 +154,7 @@ public class LoggingFeature extends AbstractFeature {
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
