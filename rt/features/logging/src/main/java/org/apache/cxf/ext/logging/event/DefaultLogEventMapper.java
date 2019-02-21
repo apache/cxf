@@ -57,7 +57,7 @@ public class DefaultLogEventMapper {
 
     private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
 
-    public void setBinaryContentMediaTypes(String mediaTypes) {
+    public void addBinaryContentMediaTypes(String mediaTypes) {
         if (mediaTypes != null) {
             binaryContentMediaTypes.addAll(Arrays.asList(mediaTypes.split(";")));
         }

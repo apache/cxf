@@ -120,47 +120,47 @@ public class LoggingFeature extends AbstractFeature {
 
     /**
      * Set binary media types for Logging In Interceptor.
-     * Contet for these types was not logged.
+     * Content for these types was not logged.
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="inBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addInBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
      */
-    public void setInBinaryContentMediaTypes(String mediaTypes) {
-        in.setBinaryContentMediaTypes(mediaTypes);
+    public void addInBinaryContentMediaTypes(String mediaTypes) {
+        in.addBinaryContentMediaTypes(mediaTypes);
     }
 
     /**
      * Set binary media types for Logging Out Interceptor.
-     * Contet for these types was not logged.
+     * Content for these types was not logged.
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="outBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addOutBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
      */
-    public void setOutBinaryContentMediaTypes(String mediaTypes) {
-        out.setBinaryContentMediaTypes(mediaTypes);
+    public void addOutBinaryContentMediaTypes(String mediaTypes) {
+        out.addBinaryContentMediaTypes(mediaTypes);
     }
 
     /**
      * Set binary media types for both Logging Interceptors.
-     * Contet for these types was not logged.
+     * Content for these types was not logged.
      * Uses, for example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="binaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
+     *   &lt;property name="addBinaryContentMediaTypes" value="application/vnd.oasis.opendocument.spreadsheet;application/zip"/&gt;
      * &lt;/bean&gt;
      * </pre>
      * @param mediaTypes list of mediaTypes. symbol ; - delimeter
      */
-    public void setBinaryContentMediaTypes(String mediaTypes) {
-        setInBinaryContentMediaTypes(mediaTypes);
-        setOutBinaryContentMediaTypes(mediaTypes);
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        addInBinaryContentMediaTypes(mediaTypes);
+        addOutBinaryContentMediaTypes(mediaTypes);
     }
 }

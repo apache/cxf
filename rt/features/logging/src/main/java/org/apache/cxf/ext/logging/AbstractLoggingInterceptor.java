@@ -53,8 +53,8 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
 
-    public void setBinaryContentMediaTypes(String mediaTypes) {
-        eventMapper.setBinaryContentMediaTypes(mediaTypes);
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        eventMapper.addBinaryContentMediaTypes(mediaTypes);
     }
     
     public void setLimit(int lim) {
