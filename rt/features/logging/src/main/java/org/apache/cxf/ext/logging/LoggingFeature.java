@@ -119,7 +119,7 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Set binary media types for Logging In Interceptor.
+     * Add additionaly binary media types for Logging In Interceptor to default values.
      * Content for these types was not logged.
      * Uses, for example:
      * <pre>
@@ -134,7 +134,7 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Set binary media types for Logging Out Interceptor.
+     * Add additionaly binary media types for Logging Out Interceptor to default values.
      * Content for these types was not logged.
      * Uses, for example:
      * <pre>
@@ -149,7 +149,7 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Set binary media types for both Logging Interceptors.
+     * Add additionaly binary media types for both Logging Interceptors to default values.
      * Content for these types was not logged.
      * Uses, for example:
      * <pre>
