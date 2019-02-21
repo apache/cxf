@@ -21,7 +21,6 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,8 +64,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
         File faultBeanClass = new File(output, pkgBase + "/DBServiceFaultBean.java");
         assertTrue(faultBeanClass.exists());
 
-        URI expectedFile = getClass().getResource("expected/DBServiceFaultBean.java.source").toURI();
-        assertFileEquals(new File(expectedFile), faultBeanClass);
+        assertFileEquals("expected/DBServiceFaultBean.java.source", faultBeanClass);
     }
 
     @Test
@@ -85,8 +83,7 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
         File faultBeanClass = new File(output, pkgBase + "/FaultDetail.java");
         assertTrue(faultBeanClass.exists());
 
-        URI expectedFile = getClass().getResource("expected/FaultDetail.java.source").toURI();
-        assertFileEquals(new File(expectedFile), faultBeanClass);
+        assertFileEquals("expected/FaultDetail.java.source", faultBeanClass);
     }
 
     @Test

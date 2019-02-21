@@ -53,6 +53,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
+import org.apache.cxf.tools.common.TestFileUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.fortest.exception.TransientMessageException;
@@ -531,17 +532,17 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "add_numbers.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
         // To test there is wsam:action generated for the
-        String wsdlString = getStringFromFile(wsdlFile);
+        String wsdlString = TestFileUtils.getStringFromFile(wsdlFile);
         assertTrue("The wsam and wsaw action are not both generated", wsdlString
-            .indexOf("wsam:Action=\"http://cxf.apache.org/fault3\"") > -1
-            && wsdlString.indexOf("wsaw:Action=\"http://cxf.apache.org/fault3\"") > -1);
+            .contains("wsam:Action=\"http://cxf.apache.org/fault3\"")
+            && wsdlString.contains("wsaw:Action=\"http://cxf.apache.org/fault3\""));
         assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
-            .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request") > -1);
+            .contains("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request"));
         assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
-            .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response") > -1);
+            .contains("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response"));
         assertTrue("The wsaAction computed for empty FaultAction is not correct", wsdlString
-            .indexOf("http://fortest.tools.cxf.apache.org/"
-                     + "AddNumbersImpl/addNumbers4/Fault/AddNumbersException") > -1);
+            .contains("http://fortest.tools.cxf.apache.org/"
+                     + "AddNumbersImpl/addNumbers4/Fault/AddNumbersException"));
         URI expectedFile = getClass().getResource("expected/add_numbers_expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
@@ -567,12 +568,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(requestWrapperClass.exists());
         assertTrue(responseWrapperClass.exists());
 
-        String req = getStringFromFile(requestWrapperClass);
-        String resp = getStringFromFile(responseWrapperClass);
-        assertTrue(req.indexOf("String  arg0") != -1);
-        assertTrue(req.indexOf("Holder") == -1);
-        assertTrue(resp.indexOf("String  arg0") != -1);
-        assertTrue(resp.indexOf("Holder") == -1);
+        String req = TestFileUtils.getStringFromFile(requestWrapperClass);
+        String resp = TestFileUtils.getStringFromFile(responseWrapperClass);
+        assertTrue(req.contains("String arg0"));
+        assertFalse(req.contains("Holder"));
+        assertTrue(resp.contains("String arg0"));
+        assertFalse(resp.contains("Holder"));
     }
 
     @Test
@@ -591,7 +592,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "inherit.wsdl");
         assertTrue(wsdlFile.exists());
-        assertTrue(getStringFromFile(wsdlFile).indexOf("name=\"bye\"") != -1);
+        assertTrue(TestFileUtils.getStringFromFile(wsdlFile).contains("name=\"bye\""));
     }
 
     @Test
@@ -611,8 +612,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File requestWrapperClass = new File(output, pkgBase + "/AddNumbers.java");
         assertTrue(requestWrapperClass.exists());
 
-        String expectedString = "@XmlElement(name  =  \"number2\",  namespace  =  \"http://example.com\")";
-        assertTrue(getStringFromFile(requestWrapperClass).indexOf(expectedString) != -1);
+        String expectedString = "@XmlElement(name = \"number2\", namespace = \"http://example.com\")";
+        assertTrue(TestFileUtils.getStringFromFile(requestWrapperClass).contains(expectedString));
     }
 
     // Generated schema should use unqualified form in the jaxws case
@@ -631,7 +632,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "action.wsdl");
         assertTrue(wsdlFile.exists());
-        assertTrue(getStringFromFile(wsdlFile).indexOf("elementFormDefault=\"unqualified\"") != -1);
+        assertTrue(TestFileUtils.getStringFromFile(wsdlFile).contains("elementFormDefault=\"unqualified\""));
     }
 
     @Test
@@ -649,8 +650,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         File wsdlFile = new File(output, "epr_schema1.xsd");
         assertTrue(wsdlFile.exists());
-        String xsd = getStringFromFile(wsdlFile);
-        assertTrue(xsd, xsd.indexOf("ref=") == -1);
+        String xsd = TestFileUtils.getStringFromFile(wsdlFile);
+        assertFalse(xsd, xsd.contains("ref="));
 
     }
 
@@ -718,11 +719,11 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "cxf1519.wsdl");
         assertTrue(wsdlFile.exists());
         // schema element
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        assertTrue(wsdlContent.indexOf("xmlns:tns=\"http://cxf.apache.org/cxf1519/exceptions\"") != -1);
-        assertTrue(wsdlContent.indexOf("xmlns:tns=\"http://cxf.apache.org/cxf1519/faults\"") != -1);
-        assertTrue(wsdlContent.indexOf("<xsd:complexType name=\"UserException\">") != -1);
-        assertTrue(wsdlContent.indexOf("<xsd:element name=\"UserExceptionFault\"") != -1);
+        String wsdlContent = TestFileUtils.getStringFromFile(wsdlFile);
+        assertTrue(wsdlContent.contains("xmlns:tns=\"http://cxf.apache.org/cxf1519/exceptions\""));
+        assertTrue(wsdlContent.contains("xmlns:tns=\"http://cxf.apache.org/cxf1519/faults\""));
+        assertTrue(wsdlContent.contains("<xsd:complexType name=\"UserException\">"));
+        assertTrue(wsdlContent.contains("<xsd:element name=\"UserExceptionFault\""));
 
     }
 
@@ -740,11 +741,10 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "cxf4147.wsdl");
         assertTrue(wsdlFile.exists());
-        String wsdlContent = getStringFromFile(wsdlFile).replaceAll("  ", " ");
-        assertTrue(wsdlContent.indexOf("xsd:element name=\"add\" nillable=\"true\" type=\"xsd:int\"") != -1);
-        assertTrue(wsdlContent.indexOf("xsd:element name=\"add1\" nillable=\"true\" type=\"xsd:string\"")
-                   != -1);
-        assertTrue(wsdlContent.indexOf("wsdl:part name=\"add1\" element=\"tns:add1\"") != -1);
+        String wsdlContent = TestFileUtils.getStringFromFile(wsdlFile);
+        assertTrue(wsdlContent.contains("xsd:element name=\"add\" nillable=\"true\" type=\"xsd:int\""));
+        assertTrue(wsdlContent.contains("xsd:element name=\"add1\" nillable=\"true\" type=\"xsd:string\""));
+        assertTrue(wsdlContent.contains("wsdl:part name=\"add1\" element=\"tns:add1\""));
     }
 
 

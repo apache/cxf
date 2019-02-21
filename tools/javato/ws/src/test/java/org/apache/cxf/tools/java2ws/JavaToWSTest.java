@@ -33,6 +33,7 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
+import org.apache.cxf.tools.common.TestFileUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolTestBase;
 
@@ -112,11 +113,11 @@ public class JavaToWSTest extends ToolTestBase {
         j2w.run();
 
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloStringResponse.java");
-        String str = FileUtils.getStringFromFile(wrapper);
+        String str = TestFileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct",
-                   str.indexOf("hello/name") > -1);
+                   str.contains("hello/name"));
         assertTrue("name value in annoataion @XmlElement is not correct",
-                   str.indexOf("\"name\"") > -1);
+                   str.contains("\"name\""));
     }
 
 
@@ -133,9 +134,9 @@ public class JavaToWSTest extends ToolTestBase {
         j2w.run();
 
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloStringResponse.java");
-        String str = FileUtils.getStringFromFile(wrapper);
+        String str = TestFileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
-                   str.indexOf("helloString/Name") > -1);
+                   str.contains("helloString/Name"));
     }
     @Test
     public void testCXF1450() throws Exception {
@@ -150,7 +151,7 @@ public class JavaToWSTest extends ToolTestBase {
         j2w.run();
 
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf1450/jaxws/HelloStringResponse.java");
-        String str = FileUtils.getStringFromFile(wrapper);
+        String str = TestFileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
                    str.indexOf("helloString/Name") > -1);
     }
@@ -174,18 +175,18 @@ public class JavaToWSTest extends ToolTestBase {
 
         //checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
-        String str = FileUtils.getStringFromFile(wsdlFile);
+        String str = TestFileUtils.getStringFromFile(wsdlFile);
         assertTrue("Port address in generated wsdl is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
         File client = outputFile("org/apache/hello_world_doc_lit/GreeterClient.java");
-        str = FileUtils.getStringFromFile(client);
+        str = TestFileUtils.getStringFromFile(client);
         assertTrue("Address generated in client side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
 
         File server = outputFile("org/apache/hello_world_doc_lit/GreeterServer.java");
-        str = FileUtils.getStringFromFile(server);
+        str = TestFileUtils.getStringFromFile(server);
         assertTrue("Address generated in server side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
 
         File impl = outputFile("org/apache/hello_world_doc_lit/GreeterImpl.java");
         Compiler compiler = new Compiler();
@@ -207,18 +208,18 @@ public class JavaToWSTest extends ToolTestBase {
 
         //checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
-        String str = FileUtils.getStringFromFile(wsdlFile);
+        String str = TestFileUtils.getStringFromFile(wsdlFile);
         assertTrue("Port address in generated wsdl is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
         File client = outputFile("org/apache/hello_world_doc_lit/GreeterClient.java");
-        str = FileUtils.getStringFromFile(client);
+        str = TestFileUtils.getStringFromFile(client);
         assertTrue("Address generated in client side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
 
         File server = outputFile("org/apache/hello_world_doc_lit/GreeterServer.java");
-        str = FileUtils.getStringFromFile(server);
+        str = TestFileUtils.getStringFromFile(server);
         assertTrue("Address generated in server side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
 
         File impl = outputFile("org/apache/hello_world_doc_lit/GreeterImpl.java");
         Compiler compiler = new Compiler();
@@ -248,15 +249,15 @@ public class JavaToWSTest extends ToolTestBase {
         assertTrue("Failed to generate impl file for simple front end ", impl.exists());
         assertTrue("Failed to generate wsdl file for simple front end ", wsdl.exists());
 
-        String str = FileUtils.getStringFromFile(client);
+        String str = TestFileUtils.getStringFromFile(client);
         assertTrue("Address generated in client side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
-        str = FileUtils.getStringFromFile(server);
+                   str.contains("http://localhost:1234/test"));
+        str = TestFileUtils.getStringFromFile(server);
         assertTrue("Address generated in server side code is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
-        str = FileUtils.getStringFromFile(wsdl);
+                   str.contains("http://localhost:1234/test"));
+        str = TestFileUtils.getStringFromFile(wsdl);
         assertTrue("Address generated in wsdl is not correct",
-                   str.indexOf("http://localhost:1234/test") > -1);
+                   str.contains("http://localhost:1234/test"));
 
 
         Compiler compiler = new Compiler();
@@ -345,7 +346,7 @@ public class JavaToWSTest extends ToolTestBase {
         assertTrue("Client was not generated", client.exists());
         assertTrue("Greeter_GreeterPort_Server.java was not generated", server.exists());
         assertTrue("Impl was not generated", impl.exists());
-        String implContent = FileUtils.getStringFromFile(impl);
+        String implContent = TestFileUtils.getStringFromFile(impl);
 
         int idx = implContent.indexOf("serviceName");
         assertFalse("serviceName annotation was not generated", idx == -1);
@@ -485,7 +486,7 @@ public class JavaToWSTest extends ToolTestBase {
         j2w.run();
 
         File file = new File(output.getPath() + "/AddNumbers.wsdl");
-        String str = FileUtils.getStringFromFile(file);
+        String str = TestFileUtils.getStringFromFile(file);
         String swaImport = "http://ws-i.org/profiles/basic/1.1/xsd";
         String schemaLoc = "http://ws-i.org/profiles/basic/1.1/swaref.xsd";
         assertTrue("Java2wsdl did not generate swaRef type element",

@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -85,34 +84,30 @@ public class DateTypeCustomGeneratorTest extends ProcessorTestBase {
         gen.setServiceModel(getServiceInfo(EchoDate.class));
         assertEquals(Date.class, gen.getDateType());
 
-        URI expectedFile = getClass().getResource("expected/date_embed.xml").toURI();
-        assertFileEquals(new File(expectedFile), gen.generate(output));
+        assertFileEquals("expected/date_embed.xml", gen.generate(output));
 
         gen.setWSDLName("calendar_embed");
         gen.setServiceModel(getServiceInfo(EchoCalendar.class));
         assertEquals(Calendar.class, gen.getDateType());
 
-        expectedFile = getClass().getResource("expected/calendar_embed.xml").toURI();
-        assertFileEquals(new File(expectedFile), gen.generate(output));
+        assertFileEquals("expected/calendar_embed.xml", gen.generate(output));
     }
 
     @Test
     public void testGenerateExternalStyle() throws Exception {
         gen.setAllowImports(true);
-        gen.addSchemaFiles(Arrays.asList(new String[]{"hello_schema1.xsd", "hello_schema2.xsd"}));
+        gen.addSchemaFiles(Arrays.asList("hello_schema1.xsd", "hello_schema2.xsd"));
 
         gen.setWSDLName("date_external");
         gen.setServiceModel(getServiceInfo(EchoDate.class));
         assertEquals(Date.class, gen.getDateType());
 
-        URI expectedFile = getClass().getResource("expected/date.xjb").toURI();
-        assertFileEquals(new File(expectedFile), gen.generate(output));
+        assertFileEquals("expected/date.xjb", gen.generate(output));
 
         gen.setWSDLName("calendar_external");
         gen.setServiceModel(getServiceInfo(EchoCalendar.class));
         assertEquals(Calendar.class, gen.getDateType());
 
-        expectedFile = getClass().getResource("expected/calendar.xjb").toURI();
-        assertFileEquals(new File(expectedFile), gen.generate(output));
+        assertFileEquals("expected/calendar.xjb", gen.generate(output));
     }
 }

@@ -47,6 +47,7 @@ import javax.xml.ws.ResponseWrapper;
 import javax.xml.ws.WebFault;
 
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.tools.common.TestFileUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
@@ -1289,9 +1290,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File greeter = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
         assertTrue(output.exists());
-        String contents = FileUtils.getStringFromFile(greeter);
-        assertTrue(contents.indexOf("SOAPBinding.ParameterStyle.BARE") != -1);
-        assertTrue(contents.indexOf("@ResponseWrapper") == -1);
+        String contents = TestFileUtils.getStringFromFile(greeter);
+        assertTrue(contents.contains("SOAPBinding.ParameterStyle.BARE"));
+        assertFalse(contents.contains("@ResponseWrapper"));
     }
     @Test
     public void testBareFromCommandLine() throws Exception {
@@ -1303,9 +1304,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File greeter = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
         assertTrue(output.exists());
-        String contents = FileUtils.getStringFromFile(greeter);
-        assertTrue(contents.indexOf("SOAPBinding.ParameterStyle.BARE") != -1);
-        assertTrue(contents.indexOf("@ResponseWrapper") == -1);
+        String contents = TestFileUtils.getStringFromFile(greeter);
+        assertTrue(contents.contains("SOAPBinding.ParameterStyle.BARE"));
+        assertFalse(contents.contains("@ResponseWrapper"));
     }
     @Test
     public void testMimeFromCommandLine() throws Exception {
@@ -1319,8 +1320,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         String str1 = "javax.xml.ws.Holder<java.awt.Image>";
         String str2 = "javax.xml.transform.Source";
 
-        String file = getStringFromFile(new File(output.getCanonicalPath()
-                                        + "/org/apache/cxf/w2j/hello_world_mime/Hello.java"));
+        String file = TestFileUtils.getStringFromFile(new File(output,
+                                        "org/apache/cxf/w2j/hello_world_mime/Hello.java"));
 
         assertTrue(file.contains(str1));
         assertTrue(file.contains(str2));
@@ -1334,8 +1335,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File sei = new File(output, "type_substitution/server/CarDealer.java");
         assertTrue(output.exists());
-        String contents = FileUtils.getStringFromFile(sei);
-        assertTrue(contents.indexOf("@XmlSeeAlso({ObjectFactory.class})") != -1);
+        String contents = TestFileUtils.getStringFromFile(sei);
+        assertTrue(contents.contains("@XmlSeeAlso({ObjectFactory.class})"));
     }
 
     @Test
@@ -1347,12 +1348,12 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File sei = new File(output, "com/example/AddNumbersPortType.java");
         assertTrue(sei.exists());
-        String contents = FileUtils.getStringFromFile(sei).replace("  ", " ");
+        String contents = TestFileUtils.getStringFromFile(sei).replace("  ", " ");
         String expected = "@Action(input = \"3in\", output = \"3out\", "
             + "fault = {@FaultAction(className = AddNumbersFault_Exception.class, value = \"3fault\")})";
-        assertTrue(contents.indexOf("import javax.xml.ws.Action;") != -1);
-        assertTrue(contents.indexOf("import javax.xml.ws.FaultAction;") != -1);
-        assertTrue(contents.indexOf(expected) != -1);
+        assertTrue(contents.contains("import javax.xml.ws.Action;"));
+        assertTrue(contents.contains("import javax.xml.ws.FaultAction;"));
+        assertTrue(contents.contains(expected));
     }
 
     @Test
@@ -1651,13 +1652,13 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        List<String> results1 = FileUtils.readLines(new File(output.getCanonicalPath(),
+        List<String> results1 = FileUtils.readLines(new File(output,
             "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java"));
 
         assertTrue(results1.contains(" * porttype documentation"));
         assertTrue(results1.contains("     * porttype op documentation"));
 
-        List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(),
+        List<String> results2 = FileUtils.readLines(new File(output,
             "org/apache/cxf/w2j/hello_world_soap_http/SOAPServiceTest1.java"));
 
         boolean match1 = false;
