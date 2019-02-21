@@ -44,7 +44,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 
@@ -159,13 +158,9 @@ public class ProcessorTestBase {
     }
 
 
-    protected void assertFileEquals(String f1, String f2) {
-        assertFileEquals(new File(f1), new File(f2));
-    }
-
-    protected void assertFileEquals(File location1, File location2) {
-        String str1 = FileUtils.getStringFromFile(location1);
-        String str2 = FileUtils.getStringFromFile(location2);
+    protected void assertFileEquals(String resource, File location) throws IOException {
+        String str1 = TestFileUtils.getStringFromStream(getClass().getResourceAsStream(resource));
+        String str2 = TestFileUtils.getStringFromFile(location);
 
         StringTokenizer st1 = new StringTokenizer(str1, " \t\n\r\f(),");
         StringTokenizer st2 = new StringTokenizer(str2, " \t\n\r\f(),");
@@ -191,17 +186,13 @@ public class ProcessorTestBase {
                 }
                 unmatched.add(tok2);
             }
-            assertEquals("Compare failed " + location1.getAbsolutePath()
-                         + " != " + location2.getAbsolutePath(), tok1, tok2);
+            assertEquals("Compare failed " + resource
+                         + " != " + location.getAbsolutePath(), tok1, tok2);
         }
 
         assertFalse(st1.hasMoreTokens());
         assertFalse(st2.hasMoreTokens());
         assertTrue("Files did not match: " + unmatched, unmatched.isEmpty());
-    }
-
-    public String getStringFromFile(File location) {
-        return FileUtils.getStringFromFile(location);
     }
 
     public boolean assertXmlEquals(final File expected, final File source) throws Exception {
