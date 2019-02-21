@@ -164,6 +164,8 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
         // external clients (in LDAP/etc) which can be used for client cred
         externalClients.add("bob:bobPassword");
 
+        this.setIssuer("jwt-issuer");
+
     }
 
     private Certificate loadCert() throws Exception {
@@ -176,7 +178,6 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         ServerAccessToken token = super.createNewAccessToken(client, userSub);
         token.setNotBefore((System.currentTimeMillis() / 1000L) - 5L);
-        token.setIssuer("jwt-issuer");
         return token;
     }
 

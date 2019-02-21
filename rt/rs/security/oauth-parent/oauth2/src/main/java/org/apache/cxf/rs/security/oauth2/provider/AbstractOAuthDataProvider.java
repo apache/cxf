@@ -60,6 +60,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private OAuthJoseJwtProducer jwtAccessTokenProducer;
     private Map<String, String> jwtAccessTokenClaimMap;
     private ProviderAuthenticationStrategy authenticationStrategy;
+    private String issuer;
 
     protected AbstractOAuthDataProvider() {
     }
@@ -187,7 +188,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
-        return new BearerAccessToken(client, accessTokenLifetime);
+        BearerAccessToken token = new BearerAccessToken(client, accessTokenLifetime);
+        if (issuer != null) {
+            token.setIssuer(issuer);
+        }
+        return token;
     }
 
     @Override
@@ -658,5 +663,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setPersistJwtEncoding(boolean persistJwtEncoding) {
         this.persistJwtEncoding = persistJwtEncoding;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 }
