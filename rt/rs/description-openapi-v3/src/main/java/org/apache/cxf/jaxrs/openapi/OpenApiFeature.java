@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -40,8 +39,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
-import org.apache.cxf.jaxrs.model.ApplicationInfo;
-import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.common.openapi.DefaultApplicationFactory;
+import org.apache.cxf.jaxrs.common.openapi.SwaggerProperties;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiSupport;
@@ -62,10 +61,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport, SwaggerProperties {
-    private static final String DEFAULT_PROPS_LOCATION = "/swagger.properties";
-    private static final String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
-    private static final String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
-    
     private String version;
     private String title;
     private String description;
@@ -105,26 +100,6 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     // Swagger UI configuration parameters (to be passed as query string).
     private SwaggerUiConfig swaggerUiConfig;
 
-    protected static class DefaultApplication extends Application {
-
-        private final Set<Class<?>> serviceClasses;
-
-        DefaultApplication(final List<ClassResourceInfo> cris, final Set<String> resourcePackages) {
-            this.serviceClasses = cris.stream().map(ClassResourceInfo::getServiceClass).
-                    filter(cls -> {
-                        return resourcePackages == null || resourcePackages.isEmpty()
-                            ? true
-                                : resourcePackages.stream().
-                                anyMatch(pkg -> cls.getPackage().getName().startsWith(pkg));
-                    }).collect(Collectors.toSet());
-        }
-
-        @Override
-        public Set<Class<?>> getClasses() {
-            return serviceClasses;
-        }
-    }
-
     @Override
     public void initialize(Server server, Bus bus) {
         final JAXRSServiceFactoryBean sfb = (JAXRSServiceFactoryBean)server
@@ -142,7 +117,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
 
         Properties swaggerProps = null;
         GenericOpenApiContextBuilder<?> openApiConfiguration; 
-        final Application application = getApplicationOrDefault(server, factory, sfb, bus);
+        final Application application = DefaultApplicationFactory.createApplicationOrDefault(server, factory, 
+            sfb, bus, resourcePackages, isScan());
         
         String defaultConfigLocation = getConfigLocation();
         if (scanKnownConfigLocations && StringUtils.isEmpty(defaultConfigLocation)) {
@@ -459,29 +435,6 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         } 
 
         factory.setUserProviders(swaggerUiRegistration.getProviders());
-    }
-
-    /**
-     * Detects the application (if present) or creates the default application (in case the scan is disabled).
-     */
-    protected Application getApplicationOrDefault(
-            final Server server,
-            final ServerProviderFactory factory,
-            final JAXRSServiceFactoryBean sfb,
-            final Bus bus) {
-
-        ApplicationInfo appInfo = null;
-        if (!isScan()) {
-            appInfo = factory.getApplicationProvider();
-            
-            if (appInfo == null) {
-                appInfo = new ApplicationInfo(
-                        new DefaultApplication(sfb.getClassResourceInfo(), resourcePackages), bus);
-                server.getEndpoint().put(Application.class.getName(), appInfo);
-            }
-        }
-        
-        return (appInfo == null) ? null : appInfo.getProvider();
     }
 
     /**
