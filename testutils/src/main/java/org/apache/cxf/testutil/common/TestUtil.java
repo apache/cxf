@@ -189,10 +189,8 @@ public final class TestUtil {
         }
         while (p == null) {
             int pn = portNum++;
-            try {
+            try (ServerSocket sock = new ServerSocket(pn)) {
                 //make sure the port can be opened.   Something MIGHT be running on it.
-                ServerSocket sock = new ServerSocket(pn);
-                sock.close();
                 p = Integer.toString(pn);
                 LOG.fine("Setting port for " + fullName + " to " + p);
             } catch (IOException ex) {
