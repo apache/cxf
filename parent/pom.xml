@@ -166,7 +166,7 @@
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.swagger2.version>1.5.21</cxf.swagger2.version>
         <cxf.swagger.v3.version>2.0.6</cxf.swagger.v3.version>
-        <cxf.swagger.ui.version>3.20.5</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>3.20.9</cxf.swagger.ui.version>
         <cxf.tomcat.version>8.5.37</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.1</cxf.tomitribe.http.signature.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
