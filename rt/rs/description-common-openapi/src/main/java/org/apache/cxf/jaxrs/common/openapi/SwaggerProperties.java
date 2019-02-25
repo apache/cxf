@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.openapi;
+package org.apache.cxf.jaxrs.common.openapi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,11 @@ import java.util.Properties;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-interface SwaggerProperties {
+public interface SwaggerProperties {
+    String DEFAULT_PROPS_LOCATION = "/swagger.properties";
+    String DEFAULT_LICENSE_VALUE = "Apache 2.0 License";
+    String DEFAULT_LICENSE_URL = "http://www.apache.org/licenses/LICENSE-2.0.html";
+
     String RESOURCE_PACKAGE_PROPERTY = "resource.package";
     String TITLE_PROPERTY = "title";
     String VERSION_PROPERTY = "version";
@@ -46,7 +50,7 @@ interface SwaggerProperties {
      * @return the properties if available 
      */
     default Properties getSwaggerProperties(String location, Bus bus) {
-        InputStream is = ResourceUtils.getClasspathResourceStream(location, SwaggerProperties.class, bus);
+        InputStream is = ResourceUtils.getClasspathResourceStream(location, getClass(), bus);
         Properties props = null;
         
         if (is != null) {
