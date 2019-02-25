@@ -20,29 +20,27 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 public class ServerLauncher {
-    public static final int DEFAULT_TIMEOUT = 3 * 60 * 1000;
+    public static final long DEFAULT_TIMEOUT = TimeUnit.MINUTES.toMillis(3L);
 
     protected static final String SERVER_FAILED =
         "server startup failed (not a log message)";
@@ -99,7 +97,7 @@ public class ServerLauncher {
             TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
             while (!serverIsStopped) {
                 try {
-                    mutex.wait(1000);
+                    mutex.wait(1000L);
                     if (tc.isTimeoutExpired()) {
                         System.out.println("destroying server process");
                         process.destroy();
@@ -119,7 +117,7 @@ public class ServerLauncher {
                     } catch (IllegalThreadStateException ex) {
                         //ignore, process hasn't ended
                         try {
-                            mutex.wait(1000);
+                            mutex.wait(1000L);
                         } catch (InterruptedException ex1) {
                             //ignore
                         }
@@ -229,13 +227,14 @@ public class ServerLauncher {
             pb.redirectErrorStream(true);
             process = pb.start();
 
-            OutputMonitorThread out = launchOutputMonitorThread(process.getInputStream(), System.out);
+            OutputMonitorThread out = new OutputMonitorThread(process.getInputStream());
+            out.start();
 
             synchronized (mutex) {
                 TimeoutCounter tc = new TimeoutCounter(DEFAULT_TIMEOUT);
                 while (!(serverIsReady || serverLaunchFailed)) {
                     try {
-                        mutex.wait(1000);
+                        mutex.wait(1000L);
                         if (tc.isTimeoutExpired()) {
                             break;
                         }
@@ -263,20 +262,12 @@ public class ServerLauncher {
         return ret;
     }
 
-    private OutputMonitorThread launchOutputMonitorThread(final InputStream in, final PrintStream out) {
-        OutputMonitorThread t = new OutputMonitorThread(in, out);
-        t.start();
-        return t;
-    }
     private class OutputMonitorThread extends Thread {
         InputStream in;
-        PrintStream out;
         StringBuilder serverOutputAll = new StringBuilder();
 
-
-        OutputMonitorThread(InputStream i, PrintStream o) {
+        OutputMonitorThread(InputStream i) {
             in = i;
-            out = o;
         }
         public String getServerOutput() {
             return serverOutputAll.toString();
@@ -286,24 +277,9 @@ public class ServerLauncher {
             String outputDir = System.getProperty("server.output.dir", "target/surefire-reports/");
             OutputStream os = null;
             try {
-                try {
-                    os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
-                } catch (IOException ioe) {
-                    if (ioe instanceof FileNotFoundException || ioe instanceof NoSuchFileException) {
-                        outputDir = System.getProperty("basedir");
-                        if (outputDir == null) {
-                            outputDir = "target/surefire-reports/";
-                        } else {
-                            outputDir += "/target/surefire-reports/";
-                        }
-
-                        File file = new File(outputDir);
-                        file.mkdirs();
-                        os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
-                    } else {
-                        throw ioe;
-                    }
-                }
+                Path logFile = Paths.get(outputDir + className + ".out");
+                Files.createDirectories(logFile.getParent());
+                os = Files.newOutputStream(logFile);
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
                     ex.printStackTrace();
@@ -311,35 +287,29 @@ public class ServerLauncher {
             }
 
             try (PrintStream ps = new PrintStream(os)) {
-                boolean running = true;
                 StringBuilder serverOutput = new StringBuilder();
                 for (int ch = in.read(); ch != -1; ch = in.read()) {
                     serverOutput.append((char)ch);
-                    serverOutputAll.append((char)ch);
-                    if (debug) {
-                        System.err.print((char)ch);
-                    }
-                    String s = serverOutput.toString();
-                    if (s.contains("server ready")) {
-                        notifyServerIsReady();
-                    } else if (s.contains("server passed")) {
-                        serverPassed = true;
-                    } else if (s.contains("server stopped")) {
-                        notifyServerIsStopped();
-                        running = false;
-                    } else if (s.contains(SERVER_FAILED)) {
-                        notifyServerFailed();
-                        running = false;
-                    }
-                    if (ch == '\n' || !running) {
-                        synchronized (out) {
-                            ps.print(serverOutput.toString());
-                            serverOutput.setLength(0);
-                            ps.flush();
+                    if (ch == '\n') {
+                        final String line = serverOutput.toString();
+                        serverOutput.setLength(0);
+                        serverOutputAll.append(line);
+                        if (debug) {
+                            System.err.print(line);
                         }
-                    }
-                    if (serverOutputAll.length() > 64000) {
-                        serverOutputAll.delete(0, 10000);
+                        if (line.contains("server ready")) {
+                            notifyServerIsReady();
+                        } else if (line.contains("server passed")) {
+                            serverPassed = true;
+                        } else if (line.contains("server stopped")) {
+                            notifyServerIsStopped();
+                        } else if (line.contains(SERVER_FAILED)) {
+                            notifyServerFailed();
+                        }
+                        ps.print(line);
+                        if (serverOutputAll.length() > 64000) {
+                            serverOutputAll.delete(0, 10000);
+                        }
                     }
                 }
             } catch (IOException ex) {
@@ -383,15 +353,24 @@ public class ServerLauncher {
                 cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
             }
         }
+        // expose only running server ports
+        String simpleName = className.substring(className.lastIndexOf('.') + 1);
+        int idx = simpleName.indexOf('$');
+        if (-1 != idx) {
+            simpleName = simpleName.substring(0,  idx);
+        }
         for (Map.Entry<Object, Object> entry : TestUtil.getAllPorts().entrySet()) {
-            cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
+            final String key = entry.getKey().toString();
+            if (key.contains(simpleName)) {
+                cmd.add("-D" + key + "=" + entry.getValue());
+            }
         }
         String vmargs = System.getProperty("server.launcher.vmargs");
         if (StringUtils.isEmpty(vmargs)) {
             cmd.add("-ea");
         } else {
             vmargs = vmargs.trim();
-            int idx = vmargs.indexOf(' ');
+            idx = vmargs.indexOf(' ');
             while (idx != -1) {
                 cmd.add(vmargs.substring(0, idx));
                 vmargs = vmargs.substring(idx + 1);
@@ -410,24 +389,16 @@ public class ServerLauncher {
         }
 
         cmd.add("-classpath");
-
-        ClassLoader loader = this.getClass().getClassLoader();
         StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (classpath.indexOf("/.compatibility/") != -1) {
             classpath.append(':');
             //on OSX, the compatibility lib brclasspath.indexOf("/.compatibility/")
-            int idx = classpath.indexOf("/.compatibility/");
+            idx = classpath.indexOf("/.compatibility/");
             int idx1 = classpath.lastIndexOf(":", idx);
             int idx2 = classpath.indexOf(":", idx);
             classpath.replace(idx1, idx2, ":");
         }
 
-        if (loader instanceof URLClassLoader) {
-            for (URL url : ((URLClassLoader)loader).getURLs()) {
-                classpath.append(File.pathSeparatorChar);
-                classpath.append(url.toURI().getPath());
-            }
-        }
         cmd.add(classpath.toString());
 
 
