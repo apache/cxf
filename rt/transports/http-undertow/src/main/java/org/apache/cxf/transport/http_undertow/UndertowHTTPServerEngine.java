@@ -279,7 +279,8 @@ public class UndertowHTTPServerEngine implements ServerEngine {
             builder = builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, SslClientAuthMode.REQUIRED);
         }
         if (this.tlsServerParameters != null && this.tlsServerParameters.getClientAuthentication() != null
-            && this.tlsServerParameters.getClientAuthentication().isWant()) {
+            && this.tlsServerParameters.getClientAuthentication().isWant()
+            && !this.tlsServerParameters.getClientAuthentication().isRequired()) {
             builder = builder.setSocketOption(Options.SSL_CLIENT_AUTH_MODE, SslClientAuthMode.REQUESTED);
         }
         return builder;
