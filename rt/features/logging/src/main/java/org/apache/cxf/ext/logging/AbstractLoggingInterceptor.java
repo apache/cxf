@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 import java.util.UUID;
 
 import org.apache.cxf.common.util.PropertyUtils;
+import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
@@ -40,6 +41,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected boolean logMultipart = true;
 
     protected LogEventSender sender;
+    protected final DefaultLogEventMapper eventMapper = new DefaultLogEventMapper();
 
     public AbstractLoggingInterceptor(String phase, LogEventSender sender) {
         super(phase);
@@ -49,6 +51,10 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
         Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
+    }
+
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        eventMapper.addBinaryContentMediaTypes(mediaTypes);
     }
     
     public void setLimit(int lim) {

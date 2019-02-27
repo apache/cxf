@@ -46,16 +46,24 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class DefaultLogEventMapper {
-    private static final Set<String> BINARY_CONTENT_MEDIA_TYPES;
+    private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
     static {
-        BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
-        BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
-        BINARY_CONTENT_MEDIA_TYPES.add("application/pdf");
-        BINARY_CONTENT_MEDIA_TYPES.add("image/png");
-        BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
-        BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("application/pdf");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/png");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
     }
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
+
+    private final Set<String> binaryContentMediaTypes = new HashSet<>(DEFAULT_BINARY_CONTENT_MEDIA_TYPES);
+
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        if (mediaTypes != null) {
+            binaryContentMediaTypes.addAll(Arrays.asList(mediaTypes.split(";")));
+        }
+    }
 
     public LogEvent map(Message message) {
         final LogEvent event = new LogEvent();
@@ -171,7 +179,7 @@ public class DefaultLogEventMapper {
 
     private boolean isBinaryContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
-        return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
+        return contentType != null && binaryContentMediaTypes.contains(contentType);
     }
 
     private boolean isMultipartContent(Message message) {

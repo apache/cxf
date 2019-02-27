@@ -27,7 +27,6 @@ import java.io.Writer;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
@@ -140,7 +139,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void close() throws IOException {
-            final LogEvent event = new DefaultLogEventMapper().map(message);
+            final LogEvent event = eventMapper.map(message);
             StringWriter w2 = out2;
             if (w2 == null) {
                 w2 = (StringWriter) out;
@@ -190,7 +189,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
 
         public void onClose(CachedOutputStream cos) {
-            final LogEvent event = new DefaultLogEventMapper().map(message);
+            final LogEvent event = eventMapper.map(message);
             if (shouldLogContent(event)) {
                 copyPayload(cos, event);
             } else {

@@ -113,8 +113,54 @@ public class LoggingFeature extends AbstractFeature {
         in.setLogMultipart(logMultipart);
         out.setLogMultipart(logMultipart);
     }
-    
+
     public void setVerbose(boolean verbose) {
         setSender(verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender());
+    }
+
+    /**
+     * Add additionaly binary media types for Logging In Interceptor to default values.
+     * Content for these types was not logged.
+     * Uses, for example:
+     * <pre>
+     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+     *   &lt;property name="addInBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+     * &lt;/bean&gt;
+     * </pre>
+     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+     */
+    public void addInBinaryContentMediaTypes(String mediaTypes) {
+        in.addBinaryContentMediaTypes(mediaTypes);
+    }
+
+    /**
+     * Add additionaly binary media types for Logging Out Interceptor to default values.
+     * Content for these types was not logged.
+     * Uses, for example:
+     * <pre>
+     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+     *   &lt;property name="addOutBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+     * &lt;/bean&gt;
+     * </pre>
+     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+     */
+    public void addOutBinaryContentMediaTypes(String mediaTypes) {
+        out.addBinaryContentMediaTypes(mediaTypes);
+    }
+
+    /**
+     * Add additionaly binary media types for both Logging Interceptors to default values.
+     * Content for these types was not logged.
+     * Uses, for example:
+     * <pre>
+     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+     *   &lt;property name="addBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+     * &lt;/bean&gt;
+     * </pre>
+     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+     */
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        addInBinaryContentMediaTypes(mediaTypes);
+        addOutBinaryContentMediaTypes(mediaTypes);
     }
 }

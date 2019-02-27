@@ -26,7 +26,6 @@ import java.util.Collection;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
@@ -83,7 +82,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             return;
         }
         createExchangeId(message);
-        final LogEvent event = new DefaultLogEventMapper().map(message);
+        final LogEvent event = eventMapper.map(message);
         if (shouldLogContent(event)) {
             addContent(message, event);
         } else {
