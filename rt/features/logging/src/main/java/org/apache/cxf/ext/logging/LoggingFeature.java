@@ -119,9 +119,9 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Add additionaly binary media types for Logging In Interceptor to default values.
-     * Content for these types was not logged.
-     * Uses, for example:
+     * Add additional binary media types to the default values in the LoggingInInterceptor.
+     * Content for these types will not be logged.
+     * For example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
      *   &lt;property name="addInBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
@@ -134,9 +134,9 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Add additionaly binary media types for Logging Out Interceptor to default values.
-     * Content for these types was not logged.
-     * Uses, for example:
+     * Add additional binary media types to the default values in the LoggingOutInterceptor.
+     * Content for these types will not be logged.
+     * For example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
      *   &lt;property name="addOutBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
@@ -149,9 +149,9 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * Add additionaly binary media types for both Logging Interceptors to default values.
-     * Content for these types was not logged.
-     * Uses, for example:
+     * Add additional binary media types to the default values for both logging interceptors
+     * Content for these types will not be logged.
+     * For example:
      * <pre>
      * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
      *   &lt;property name="addBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;

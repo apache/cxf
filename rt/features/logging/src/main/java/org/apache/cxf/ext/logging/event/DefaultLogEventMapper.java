@@ -48,12 +48,13 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 public class DefaultLogEventMapper {
     private static final Set<String> DEFAULT_BINARY_CONTENT_MEDIA_TYPES;
     static {
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("application/pdf");
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/png");
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
-        DEFAULT_BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
+        Set<String> mediaTypes = new HashSet<>(5);
+        mediaTypes.add("application/octet-stream");
+        mediaTypes.add("application/pdf");
+        mediaTypes.add("image/png");
+        mediaTypes.add("image/jpeg");
+        mediaTypes.add("image/gif");
+        DEFAULT_BINARY_CONTENT_MEDIA_TYPES = Collections.unmodifiableSet(mediaTypes);
     }
     private static final String MULTIPART_CONTENT_MEDIA_TYPE = "multipart";
 
