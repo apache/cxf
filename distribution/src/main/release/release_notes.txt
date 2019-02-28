@@ -1,4 +1,4 @@
-Apache CXF 3.3 Release Notes
+Apache CXF 3.3.1 Release Notes
 
 1. Overview
 
@@ -22,6 +22,9 @@ Users are encouraged to review the migration guide at:
 http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
+
+3.3.1 fixes over 11 JIRA issues reported by users and the community.
+
 
 
 2. Installation Prerequisites 
@@ -60,3 +63,29 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/33-migration-guide.html
 for caveats when upgrading.
+
+7. Specific issues, features, and improvements fixed in this version
+
+** Bug
+* [CXF-7956] - add NPE guard for jetty and undertow threads configuration in blueprint
+* [CXF-7957] - Swagger2Feature Doesn't Work With Swagger Versions Above 1.5.17
+* [CXF-7968] - JavaDocProvider does not work with JDK > 8
+* [CXF-7969] - NullPointerException in CXF JavaToWS
+* [CXF-7970] - Fix Undertow import range
+* [CXF-7973] - Add NPE guard for jetty and undertow threads configuration in blueprint (to prevent NPE during karaf-quickstart/../Keycloak-cxf quickstarts)
+* [CXF-7974] - Definition of <library ..jaxws-api..> defined in cxf-jaxws causes trouble in jdk11
+* [CXF-7976] - [oauth2] token service does not serialize the issuer
+* [CXF-7981] - mutual SSL configuration for http-undertow transport not handle want and required for clientAuthentication correctly
+* [CXF-7984] - UsernameTokenInterceptor doesn't respect contextual property "allowNamespaceQualifiedPasswordTypes"
+* [CXF-7985] - Blocking Class.forName calls on JAX-RS dispatch path
+
+** Improvement
+* [CXF-7967] - Ability to skip the garbage collection in maven plugins
+
+
+
+
+
+
+
+
