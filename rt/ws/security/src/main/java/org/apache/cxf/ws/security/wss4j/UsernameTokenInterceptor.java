@@ -244,7 +244,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
         throws WSSecurityException, Base64DecodingException {
         BSPEnforcer bspEnforcer = new org.apache.wss4j.common.bsp.BSPEnforcer(!bspCompliant);
         org.apache.wss4j.dom.message.token.UsernameToken ut =
-            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, allowNamespaceQualifiedPWDTypes, 
+            new org.apache.wss4j.dom.message.token.UsernameToken(tokenElement, allowNamespaceQualifiedPWDTypes,
                                                                  bspEnforcer);
 
         WSUsernameTokenPrincipalImpl principal = new WSUsernameTokenPrincipalImpl(ut.getName(), ut.isHashed());
@@ -266,7 +266,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
     private boolean allowNamespaceQualifiedPWDTypes(final SoapMessage message) {
         String allow = (String)message
             .getContextualProperty(ConfigurationConstants.ALLOW_NAMESPACE_QUALIFIED_PASSWORD_TYPES);
-        return !("false".equals(allow) || "0".equals(allow));
+        return "true".equals(allow) || "1".equals(allow);
     }
     private boolean isAllowNoPassword(AssertionInfoMap aim) throws WSSecurityException {
         Collection<AssertionInfo> ais =
