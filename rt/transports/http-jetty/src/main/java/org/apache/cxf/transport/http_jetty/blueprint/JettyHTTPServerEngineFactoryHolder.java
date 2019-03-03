@@ -179,7 +179,9 @@ public class JettyHTTPServerEngineFactoryHolder {
                 }
 
                 //eng.setServer(engine.getTlsServerParameters());
-                if (engine.getTlsServerParameters() != null) {
+                if (engine.getTlsServerParameters() != null
+                    && (engine.getTlsServerParameters().getKeyManagers() != null
+                    || engine.getTlsServerParameters().getTrustManagers() != null)) {
                     TLSServerParameters parameter = null;
                     try {
                         parameter = new TLSServerParametersConfig(engine.getTlsServerParameters());
