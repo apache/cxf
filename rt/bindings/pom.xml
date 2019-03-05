@@ -29,30 +29,10 @@
         <artifactId>cxf-rt</artifactId>
         <version>3.3.2-SNAPSHOT</version>
     </parent>
-    <profiles>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>soap</module>
-                <module>xml</module>
-                <module>coloc</module>
-                <module>corba</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>java9plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <modules>
-                <!--java.corba was removed from jdk11 and can't find an external equivalent-->
-                <module>soap</module>
-                <module>xml</module>
-                <module>coloc</module>
-            </modules>
-        </profile>
-    </profiles>
+        <modules>
+            <module>soap</module>
+            <module>xml</module>
+            <module>coloc</module>
+            <module>corba</module>
+        </modules>
 </project>

@@ -74,6 +74,8 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
     public void testTimeout() throws Exception {
         System.getProperties().remove("com.sun.CORBA.POA.ORBServerId");
         System.getProperties().remove("com.sun.CORBA.POA.ORBPersistentServerPort");
+
+        String orbClass = System.getProperty("org.omg.CORBA.ORBClass");
         System.setProperty("org.omg.CORBA.ORBClass", "org.jacorb.orb.ORB");
         System.setProperty("org.omg.CORBA.ORBSingletonClass", "org.jacorb.orb.ORBSingleton");
         System.setProperty("jacorb.connection.client.pending_reply_timeout", "1000");
@@ -93,7 +95,9 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
         } finally {
             System.getProperties().remove("org.omg.CORBA.ORBClass");
             System.getProperties().remove("org.omg.CORBA.ORBSingletonClass");
-            System.setProperty("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
+            if (orbClass != null) {
+                System.setProperty("org.omg.CORBA.ORBClass", orbClass);
+            }
         }
     }
 
