@@ -435,7 +435,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <systemPropertyVariables>
-                                <org.omg.CORBA.ORBClass>com.sun.corba.se.impl.orb.ORBImpl</org.omg.CORBA.ORBClass>
+                                <!-- Test with the Jacorb implementation as the Sun orb has been removed since jdk 11 -->
+                                <org.omg.CORBA.ORBClass>org.jacorb.orb.ORB</org.omg.CORBA.ORBClass>
                             </systemPropertyVariables>
                             <argLine>
                                 ${cxf.surefire.fork.vmargs}
@@ -445,12 +446,6 @@
                                 <include>**/*TestCase.java</include>
                                 <include>**/*TestCases.java</include>
                             </includes>
-                            <excludes>
-                                <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
-                                <exclude>**/*CorbaTest.java</exclude>
-                                <exclude>**/*CorbaTimeoutTest.java</exclude>
-                                <exclude>**/*ValidationClientServerTest.java</exclude>
-                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>

@@ -2858,10 +2858,10 @@
                     <version>3.7</version>
                     <scope>test</scope>
                 </dependency>
+		<!-- This artifact needs to be included in compile scope since the corba module has been removed from jdk 11 -->
                 <dependency>
                     <groupId>org.jacorb</groupId>
                     <artifactId>jacorb-omgapi</artifactId>
-                    <scope>test</scope>
                     <version>3.7</version>
                 </dependency>
                 <dependency>
