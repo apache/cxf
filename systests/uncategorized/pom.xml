@@ -446,6 +446,9 @@
                                 <include>**/*TestCase.java</include>
                                 <include>**/*TestCases.java</include>
                             </includes>
+                            <excludes>
+                                <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>
