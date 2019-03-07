@@ -105,9 +105,9 @@ if [ "x${JAVA_MAX_MEM}" = "x" ]; then
 fi
 
 if [ "${VERSION}" -gt "8" ]; then
-$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.WSDLToService "$@"
+    $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.WSDLToService "$@"
 else
-$JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.WSDLToService "$@"
+    $JAVA_HOME/bin/java -Xmx${JAVA_MAX_MEM} -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp ${cxf_classpath} -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.misc.WSDLToService "$@"
 fi
 
 
