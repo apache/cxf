@@ -93,6 +93,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         }
         JAXRS_UTILS_GET_CURRENT_MESSAGE_METHOD = m;
     }
+
     private final CDIInterceptorWrapper interceptorWrapper;
     private Object objectInstance;
 
@@ -102,9 +103,8 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper, 
                                        Object... varValues) {
         super(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
-        cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
-        cfg.getRequestContext().putAll(configuration.getProperties());
         this.interceptorWrapper = interceptorWrapper;
+        init(executorService, configuration);
     }
 
     public MicroProfileClientProxyImpl(ClientState initialState, ClassLoader loader, ClassResourceInfo cri,
@@ -112,12 +112,19 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                        Configuration configuration, CDIInterceptorWrapper interceptorWrapper,
                                        Object... varValues) {
         super(initialState, loader, cri, isRoot, inheritHeaders, varValues);
-        cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
-        cfg.getRequestContext().putAll(configuration.getProperties());
         this.interceptorWrapper = interceptorWrapper;
+        init(executorService, configuration);
     }
     //CHECKSTYLE:ON
 
+    private void init(ExecutorService executorService, Configuration configuration) {
+        cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
+        cfg.getRequestContext().putAll(configuration.getProperties());
+
+        List<Interceptor<? extends Message>>inboundChain = cfg.getInInterceptors();
+        inboundChain.add(new MPAsyncInvocationInterceptorPostAsyncImpl());
+        inboundChain.add(new MPAsyncInvocationInterceptorRemoveContextImpl());
+    }
     @SuppressWarnings("unchecked")
     @Override
     protected InvocationCallback<Object> checkAsyncCallback(OperationResourceInfo ori,
@@ -142,9 +149,6 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                    InvocationCallback<Object> asyncCallback) {
         MPAsyncInvocationInterceptorImpl aiiImpl = new MPAsyncInvocationInterceptorImpl(outMessage);
         outMessage.getInterceptorChain().add(aiiImpl);
-        List<Interceptor<? extends Message>>inboundChain = cfg.getInInterceptors();
-        inboundChain.add(new MPAsyncInvocationInterceptorPostAsyncImpl(aiiImpl.getInterceptors()));
-        inboundChain.add(new MPAsyncInvocationInterceptorRemoveContextImpl(aiiImpl.getInterceptors()));
 
         setTimeouts(cfg.getRequestContext());
         super.doInvokeAsync(ori, outMessage, asyncCallback);

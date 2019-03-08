@@ -36,22 +36,23 @@ import org.eclipse.microprofile.rest.client.ext.AsyncInvocationInterceptor;
 public class MPAsyncInvocationInterceptorPostAsyncImpl extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(MPAsyncInvocationInterceptorPostAsyncImpl.class);
 
-    private List<AsyncInvocationInterceptor> interceptors;
-
-    public MPAsyncInvocationInterceptorPostAsyncImpl(List<AsyncInvocationInterceptor> interceptors) {
+    public MPAsyncInvocationInterceptorPostAsyncImpl() {
         super(Phase.PRE_PROTOCOL);
-        this.interceptors = interceptors;
     }
 
     /** {@inheritDoc}*/
     @Override
     public void handleMessage(Message message) throws Fault {
-        for (AsyncInvocationInterceptor interceptor : interceptors) {
-            try {
-                interceptor.applyContext();
-            } catch (Throwable t) {
-                LOG.log(Level.WARNING, "ASYNC_INTERCEPTOR_EXCEPTION_APPLY_CONTEXT", 
-                        new Object[]{interceptor.getClass().getName(), t});
+        MPAsyncInvocationInterceptorImpl aiii = message.getExchange().get(MPAsyncInvocationInterceptorImpl.class);
+        if (aiii != null) {
+            List<AsyncInvocationInterceptor> interceptors = aiii.getInterceptors();
+            for (AsyncInvocationInterceptor interceptor : interceptors) {
+                try {
+                    interceptor.applyContext();
+                } catch (Throwable t) {
+                    LOG.log(Level.WARNING, "ASYNC_INTERCEPTOR_EXCEPTION_APPLY_CONTEXT", 
+                            new Object[]{interceptor.getClass().getName(), t});
+                }
             }
         }
     }

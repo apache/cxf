@@ -40,7 +40,6 @@ public class MPAsyncInvocationInterceptorImpl extends AbstractPhaseInterceptor<M
 
     private final List<AsyncInvocationInterceptor> interceptors = new ArrayList<>();
 
-    
     MPAsyncInvocationInterceptorImpl(Message message) {
         super(Phase.POST_MARSHAL);
 
@@ -70,6 +69,7 @@ public class MPAsyncInvocationInterceptorImpl extends AbstractPhaseInterceptor<M
                         new Object[]{interceptors.get(i).getClass().getName(), t});
             }
         }
+        message.getExchange().put(MPAsyncInvocationInterceptorImpl.class, this);
     }
 
 }
