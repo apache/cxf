@@ -189,7 +189,7 @@
      This client is optional if the application is happy working with OIDC IDToken only -->
      
      <jaxrsclient:client id="userInfoServiceClient" threadSafe="true" 
-        address="https://www.googleapis.com/plus/v1/people/me/openIdConnect"
+        address="https://openidconnect.googleapis.com/v1/userinfo"
         serviceClass="org.apache.cxf.jaxrs.client.WebClient">
         <jaxrsclient:headers>
             <entry key="Accept" value="application/json"/>
