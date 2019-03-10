@@ -26,6 +26,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseEventSink;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -33,7 +34,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class SseEventSinkContextProvider implements ContextProvider<SseEventSink> {
-
     @Override
     public SseEventSink createContext(Message message) {
         final HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
@@ -45,6 +45,12 @@ public class SseEventSinkContextProvider implements ContextProvider<SseEventSink
             ServerProviderFactory.getInstance(message), message.getExchange());
 
         final AsyncResponse async = new AsyncResponseImpl(message);
-        return new SseEventSinkImpl(writer, async, request.getAsyncContext());
+        final Integer bufferSize = PropertyUtils.getInteger(message, SseEventSinkImpl.BUFFER_SIZE_PROPERTY);
+        
+        if (bufferSize != null) {
+            return new SseEventSinkImpl(writer, async, request.getAsyncContext(), bufferSize);
+        } else {        
+            return new SseEventSinkImpl(writer, async, request.getAsyncContext());
+        }
     }
 }
