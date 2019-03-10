@@ -42,9 +42,11 @@ import javax.ws.rs.sse.SseEventSink;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class SseEventSinkImpl implements SseEventSink {
+    public static final String BUFFER_SIZE_PROPERTY = "org.apache.cxf.sse.sink.buffer.size";
+    
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation [] {};
     private static final Logger LOG = LogUtils.getL7dLogger(SseEventSinkImpl.class);
-    private static final int BUFFER_SIZE = 10000; // buffering 10000 messages
+    private static final int DEFAULT_BUFFER_SIZE = 10000; // buffering 10000 messages
 
     private final AsyncContext ctx;
     private final MessageBodyWriter<OutboundSseEvent> writer;
@@ -53,13 +55,37 @@ public class SseEventSinkImpl implements SseEventSink {
     private final AtomicBoolean dispatching = new AtomicBoolean(false);
     private final AtomicReference<Throwable> throwable = new AtomicReference<>();
     private final AtomicBoolean completed = new AtomicBoolean(false);
+    private final int bufferSize;
 
+    /**
+     * Create new SseEventSink implementation with the default buffer size of 10000
+     * SSE events.
+     * 
+     * @param writer message body writer
+     * @param async asynchronous response 
+     * @param ctx asynchronous context
+     */
     public SseEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
             final AsyncResponse async, final AsyncContext ctx) {
+        this(writer, async, ctx, DEFAULT_BUFFER_SIZE);
+    }
+
+    /**
+     * Create new SseEventSink implementation with the configurable SSE events buffer 
+     * size.
+     * 
+     * @param writer message body writer
+     * @param async asynchronous response 
+     * @param ctx asynchronous context
+     * @param bufferSize SSE events buffer size
+     */
+    public SseEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
+            final AsyncResponse async, final AsyncContext ctx, final int bufferSize) {
         
         this.writer = writer;
-        this.buffer = new ArrayBlockingQueue<>(BUFFER_SIZE);
+        this.buffer = new ArrayBlockingQueue<>(bufferSize);
         this.ctx = ctx;
+        this.bufferSize = bufferSize;
 
         if (ctx == null) {
             throw new IllegalStateException("Unable to retrieve the AsyncContext for this request. "
@@ -168,8 +194,9 @@ public class SseEventSinkImpl implements SseEventSink {
                     ctx.start(this::dequeue);
                 }
             } else {
-                future.completeExceptionally(new IllegalStateException(
-                    "The buffer is full (10000), unable to queue SSE event for send"));
+                future.completeExceptionally(new IllegalStateException("The buffer is full (" 
+                    + bufferSize + "), unable to queue SSE event for send. Please use '" 
+                        + BUFFER_SIZE_PROPERTY + "' property to increase the limit."));
             }
         } else {
             future.completeExceptionally(new IllegalStateException(
