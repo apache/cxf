@@ -180,13 +180,11 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 marshaller.setEventHandler(new MtomValidationHandler(marshaller.getEventHandler(),
                                                             (JAXBAttachmentMarshaller)atmarsh));
             }
+        } catch (javax.xml.bind.MarshalException ex) {
+            Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage());
+            throw new Fault(faultMessage, ex);
         } catch (JAXBException ex) {
-            if (ex instanceof javax.xml.bind.MarshalException) {
-                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
-                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
-                    .getMessage());
-                throw new Fault(faultMessage, ex);
-            }
             throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
         for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {

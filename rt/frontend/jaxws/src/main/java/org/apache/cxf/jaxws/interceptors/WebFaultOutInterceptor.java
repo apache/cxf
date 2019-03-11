@@ -173,15 +173,13 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 }
 
                 f.setMessage(ex.getMessage());
+            } catch (Fault f2) {
+                message.setContent(Exception.class, f2);
+                super.handleMessage(message);
             } catch (Exception nex) {
-                if (nex instanceof Fault) {
-                    message.setContent(Exception.class, nex);
-                    super.handleMessage(message);
-                } else {
-                    //if exception occurs while writing a fault, we'll just let things continue
-                    //and let the rest of the chain try handling it as is.
-                    LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
-                }
+                //if exception occurs while writing a fault, we'll just let things continue
+                //and let the rest of the chain try handling it as is.
+                LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
             }
         } else {
             FaultMode mode = message.get(FaultMode.class);

@@ -43,12 +43,10 @@ public final class NamespaceHandlerRegisterer {
                 bc.registerService(NamespaceHandler.class.getName(), handler, properties);
                 LOG.fine("Registered blueprint namespace handler for " + namespace);
             }
+        } catch (NoClassDefFoundError e) {
+            LOG.log(Level.INFO, "Aries Blueprint packages not available. So namespaces will not be registered");
         } catch (Throwable e) {
-            if (e instanceof NoClassDefFoundError) {
-                LOG.log(Level.INFO, "Aries Blueprint packages not available. So namespaces will not be registered");
-            } else {
-                LOG.log(Level.WARNING, "Unexpected exception when trying to install Aries Blueprint namespaces", e);
-            }
+            LOG.log(Level.WARNING, "Unexpected exception when trying to install Aries Blueprint namespaces", e);
         }
     }
 

@@ -1116,11 +1116,10 @@ public class WebClient extends AbstractClient {
             if (results != null && results.length == 1) {
                 return (Response)results[0];
             }
+        } catch (WebApplicationException | ProcessingException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw ex instanceof WebApplicationException
-                ? (WebApplicationException)ex
-                : ex instanceof ProcessingException
-                ? (ProcessingException)ex : new ProcessingException(ex);
+            throw new ProcessingException(ex);
         }
 
         try {
@@ -1154,9 +1153,10 @@ public class WebClient extends AbstractClient {
             getState().setResponse(r);
             ((ResponseImpl)r).setOutMessage(outMessage);
             return r;
+        } catch (ProcessingException ex) {
+            throw ex;
         } catch (Throwable ex) {
-            throw (ex instanceof ProcessingException) ? (ProcessingException)ex
-                                                  : new ProcessingException(ex);
+            throw new ProcessingException(ex);
         } finally {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }

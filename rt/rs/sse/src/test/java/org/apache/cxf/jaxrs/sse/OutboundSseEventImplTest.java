@@ -129,38 +129,39 @@ public class OutboundSseEventImplTest {
         try {
             builder.data(null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
-        } catch (Throwable t) {
-            assertTrue(t instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
+            // expected
         }
 
         try {
             builder.data(Object.class, null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
-        } catch (Throwable t) {
-            assertTrue(t instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
+            // expected
         }
 
         try {
             builder.data((Class<?>)null, "123");
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
-        } catch (Throwable t) {
-            assertTrue(t instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
+            // expected
         }
 
         try {
             builder.data(new GenericType<List<String>>() { }, null);
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
-        } catch (Throwable t) {
-            assertTrue(t instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
+            // expected
         }
 
         try {
             builder.data((GenericType<?>)null, "456");
             fail("Passing a null data object should have resulted in an IllegalArgumentException");
-        } catch (Throwable t) {
-            assertTrue(t instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException e) {
+            // expected
         }
     }
+
     /**
      * Test that event built by the builder contains all of the data passed in
      * to it.

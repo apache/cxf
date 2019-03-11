@@ -309,8 +309,7 @@ public class RMInInterceptorTest {
         try {
             interceptor.handle(message);
             fail("must reject the invalid rm message");
-        } catch (Exception e) {
-            assertTrue(e instanceof RMException);
+        } catch (RMException e) {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSA_REQUIRED_EXC in Messages.properties)
             final String text = "WS-Addressing is required";
@@ -336,8 +335,7 @@ public class RMInInterceptorTest {
         try {
             interceptor.handle(message);
             fail("must reject the invalid rm message");
-        } catch (Exception e) {
-            assertTrue(e instanceof RMException);
+        } catch (RMException e) {
             // verify a partial error text match to exclude an unexpected exception
             // (see WSRM_REQUIRED_EXC in Messages.properties)
             final String text = "WS-ReliableMessaging is required";

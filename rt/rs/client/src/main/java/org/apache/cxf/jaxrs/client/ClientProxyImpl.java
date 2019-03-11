@@ -202,16 +202,14 @@ public class ClientProxyImpl extends AbstractClient implements
                         }
                         MethodHandle mh = lookup.unreflectSpecial(m, declaringClass).bindTo(o);
                         return params != null && params.length > 0 ? mh.invokeWithArguments(params) : mh.invoke();
-                    } catch (Throwable t) {
-                        if (t instanceof IllegalAccessException) {
-                            try {
-                                return invokeDefaultMethodUsingPrivateLookup(declaringClass, o, m, params);
-                            } catch (final NoSuchMethodException ex) {
-                                throw new WrappedException(t);
-                            }
-                        } else {
-                            throw new WrappedException(t);
+                    } catch (IllegalAccessException e) {
+                        try {
+                            return invokeDefaultMethodUsingPrivateLookup(declaringClass, o, m, params);
+                        } catch (final NoSuchMethodException ex) {
+                            throw new WrappedException(e);
                         }
+                    } catch (Throwable t) {
+                        throw new WrappedException(t);
                     }
                 }
             });

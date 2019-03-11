@@ -99,10 +99,9 @@ public class BeanTypeInfo {
             if (!initialized) {
                 initializeSync();
             }
+        } catch (DatabindingException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof DatabindingException) {
-                throw (DatabindingException)e;
-            }
             throw new DatabindingException("Couldn't create TypeInfo.", e);
         }
     }
@@ -171,10 +170,9 @@ public class BeanTypeInfo {
             PropertyDescriptor desc;
             try {
                 desc = getPropertyDescriptorFromMappedName(name);
+            } catch (DatabindingException e) {
+                throw e;
             } catch (Exception e) {
-                if (e instanceof DatabindingException) {
-                    throw (DatabindingException)e;
-                }
                 throw new DatabindingException("Couldn't get properties.", e);
             }
 

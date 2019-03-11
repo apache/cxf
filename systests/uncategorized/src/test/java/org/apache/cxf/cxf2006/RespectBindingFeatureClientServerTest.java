@@ -68,8 +68,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (Exception ex) {
-            assertTrue("WebServiceException is expected", ex instanceof javax.xml.ws.WebServiceException);
+        } catch (javax.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -85,8 +84,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (Exception ex) {
-            assertTrue("WebServiceException is expected", ex instanceof javax.xml.ws.WebServiceException);
+        } catch (javax.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -102,8 +100,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (Exception ex) {
-            assertTrue("WebServiceException is expected", ex instanceof javax.xml.ws.WebServiceException);
+        } catch (javax.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }
@@ -119,8 +116,7 @@ public class RespectBindingFeatureClientServerTest extends AbstractBusClientServ
             updateAddressPort(greeter, PORT);
             greeter.greetMe("hello");
             fail("WebServiceException is expected");
-        } catch (Exception ex) {
-            assertTrue("WebServiceException is expected", ex instanceof javax.xml.ws.WebServiceException);
+        } catch (javax.xml.ws.WebServiceException ex) {
             assertTrue("RespectBindingFeature message is expected: " + ex.getMessage(),
                        ex.getMessage().indexOf("extension with required=true attribute") > -1);
         }

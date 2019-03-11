@@ -301,11 +301,9 @@ public class BeanType extends AegisType {
                     property
                 });
             }
+        } catch (DatabindingException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof DatabindingException) {
-                throw (DatabindingException)e;
-            }
-
             throw new DatabindingException("Couldn't set property " + name + " on " + object + ". "
                                            + e.getMessage(), e);
         }

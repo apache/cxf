@@ -80,10 +80,9 @@ public class JCABusFactory {
             BusFactory bf = BusFactory.newInstance();
             bus = bf.createBus();
             initializeServants();
+        } catch (ResourceAdapterInternalException ex) {
+            throw ex;
         } catch (Exception ex) {
-            if (ex instanceof ResourceAdapterInternalException) {
-                throw (ResourceException)ex;
-            }
             throw new ResourceAdapterInternalException(
                               new Message("FAIL_TO_INITIALIZE_JCABUSFACTORY", BUNDLE).toString(), ex);
         } finally {

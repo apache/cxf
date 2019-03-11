@@ -732,11 +732,12 @@ public abstract class AbstractClient implements Client {
             Object response = retryInvoke(newRequestURI, headers, body, exchange, context);
             exchange.put(List.class, getContentsList(response));
             return new Object[]{response};
-        } catch (Throwable t) {
-            Exception ex = t instanceof Exception ? (Exception)t : new Exception(t);
+        } catch (Exception ex) {
             exchange.put(Exception.class, ex);
-            return null;
+        } catch (Throwable t) {
+            exchange.put(Exception.class, new Exception(t));
         }
+        return null;
     }
 
     protected abstract Object retryInvoke(URI newRequestURI,
@@ -1318,12 +1319,11 @@ public abstract class AbstractClient implements Client {
                 if (results != null && results.length == 1) {
                     r = (Response)results[0];
                 }
+            } catch (WebApplicationException | ProcessingException ex) {
+                cb.handleException(message, ex);
+                return;
             } catch (Exception ex) {
-                Throwable t = ex instanceof WebApplicationException
-                    ? (WebApplicationException)ex
-                    : ex instanceof ProcessingException
-                    ? (ProcessingException)ex : new ProcessingException(ex);
-                cb.handleException(message, t);
+                cb.handleException(message, new ProcessingException(ex));
                 return;
             }
             doHandleAsyncResponse(message, r, cb);

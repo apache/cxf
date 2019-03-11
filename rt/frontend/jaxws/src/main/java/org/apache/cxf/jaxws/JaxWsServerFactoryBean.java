@@ -225,10 +225,9 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             try {
                 injectResources(getServiceBean());
                 buildHandlerChain(server);
+            } catch (WebServiceException ex) {
+                throw ex;
             } catch (Exception ex) {
-                if (ex instanceof WebServiceException) {
-                    throw (WebServiceException)ex;
-                }
                 throw new WebServiceException("Creation of Endpoint failed", ex);
             }
         }

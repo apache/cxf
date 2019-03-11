@@ -432,10 +432,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
         public Object call() throws Exception {
             try {
                 return proxy.invokeActual(targetObject, method, params);
+            } catch (Exception ex) {
+                throw ex;
             } catch (Throwable t) {
-                if (t instanceof Exception) {
-                    throw (Exception) t;
-                }
                 throw new RuntimeException(t);
             }
         }

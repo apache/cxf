@@ -261,13 +261,11 @@ public final class JAXBEncoderDecoder {
             }
         } catch (Fault ex) {
             throw ex;
+        } catch (javax.xml.bind.MarshalException ex) {
+            Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage());
+            throw new Fault(faultMessage, ex);
         } catch (Exception ex) {
-            if (ex instanceof javax.xml.bind.MarshalException) {
-                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
-                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
-                    .getMessage());
-                throw new Fault(faultMessage, ex);
-            }
             throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
     }
@@ -306,13 +304,11 @@ public final class JAXBEncoderDecoder {
             } else {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
+        } catch (javax.xml.bind.MarshalException ex) {
+            Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage());
+            throw new Fault(faultMessage, ex);
         } catch (Exception ex) {
-            if (ex instanceof javax.xml.bind.MarshalException) {
-                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
-                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
-                    .getMessage());
-                throw new Fault(faultMessage, ex);
-            }
             throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
 
@@ -339,13 +335,11 @@ public final class JAXBEncoderDecoder {
             } else {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
+        } catch (javax.xml.bind.MarshalException ex) {
+            Message faultMessage = new Message("MARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage());
+            throw new Fault(faultMessage, ex);
         } catch (Exception ex) {
-            if (ex instanceof javax.xml.bind.MarshalException) {
-                javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
-                Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
-                    .getMessage());
-                throw new Fault(faultMessage, ex);
-            }
             throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
 
@@ -1116,12 +1110,10 @@ public final class JAXBEncoderDecoder {
             return ret;
         } catch (Fault ex) {
             throw ex;
+        } catch (javax.xml.bind.MarshalException ex) {
+            throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getLinkedException()
+                .getMessage()), ex);
         } catch (Exception ex) {
-            if (ex instanceof javax.xml.bind.UnmarshalException) {
-                javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
-                throw new Fault(new Message("UNMARSHAL_ERROR", LOG, unmarshalEx.getLinkedException()
-                    .getMessage()), ex);
-            }
             throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
     }
