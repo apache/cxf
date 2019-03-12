@@ -331,7 +331,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                     code.append("// - Object constructor is "
                                     + nameManager.getJavascriptName(baseName) + "\n");
                 } else if (type != null) {
-                    code.append("// - simple type " + type.getQName());
+                    code.append("// - simple type ").append(type.getQName());
                 }
             }
         }

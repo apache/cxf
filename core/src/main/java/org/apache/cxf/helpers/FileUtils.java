@@ -327,7 +327,7 @@ public final class FileUtils {
 
                 for (int x = 0; x < tok.length; x++) {
                     String token = tok[x];
-                    result.append("  " + token);
+                    result.append("  ").append(token);
                 }
                 line = in.readLine();
             }

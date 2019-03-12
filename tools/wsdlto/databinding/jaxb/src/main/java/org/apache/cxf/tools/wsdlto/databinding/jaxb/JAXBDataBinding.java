@@ -411,7 +411,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             } catch (BadCommandLineException e) {
                 StringBuilder msg = new StringBuilder("XJC reported 'BadCommandLineException' for -xjc argument:");
                 for (String arg : args) {
-                    msg.append(arg + " ");
+                    msg.append(arg).append(" ");
                 }
                 LOG.log(Level.FINE, msg.toString(), e);
                 if (opts != null) {

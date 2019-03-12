@@ -58,7 +58,7 @@ public class MemoryIdentityCacheStatistics implements ManagedComponent {
                         .append(ManagementConstants.TYPE_PROP).append('=')
                         .append("MemoryIdentityCacheStatistics").append(',')
                         .append(ManagementConstants.NAME_PROP).append('=')
-                        .append("MemoryIdentityCacheStatistics-" + System.identityHashCode(this));
+                        .append("MemoryIdentityCacheStatistics-").append(System.identityHashCode(this));
                     objectName = new ObjectName(buffer.toString());
 
                     im.register(this);

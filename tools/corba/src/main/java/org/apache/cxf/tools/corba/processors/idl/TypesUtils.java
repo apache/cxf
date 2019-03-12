@@ -91,7 +91,7 @@ public final class TypesUtils {
             id++;
             StringBuilder name = new StringBuilder();
             name.append('_');
-            name.append("Anon" + id.toString());
+            name.append("Anon").append(id.toString());
             name.append('_');
             name.append(scope.tail());
             scopedName = new Scope(scope.getParent(), name.toString());

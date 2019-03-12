@@ -69,7 +69,7 @@ public class ServletControllerTest {
         req.getParameter("formatted");
         EasyMock.expectLastCall().andReturn(formatted);
         req.getRequestURL();
-        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080" + requestUri));
+        EasyMock.expectLastCall().andReturn(new StringBuffer("http://localhost:8080" + requestUri)); //NOPMD
         registry.getDestinationsPaths();
         EasyMock.expectLastCall().andReturn(Collections.emptySet()).atLeastOnce();
         registry.getDestinationForPath("", true);

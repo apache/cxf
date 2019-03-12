@@ -230,7 +230,8 @@ public class PortTypeVisitor extends VisitorBase {
 
 
     public Binding createBinding(String scopedPortTypeName) {
-        StringBuilder bname = new StringBuilder(scopedPortTypeName + "CORBABinding");
+        StringBuilder bname = new StringBuilder();
+        bname.append(scopedPortTypeName).append("CORBABinding");
         QName bqname = new QName(rootDefinition.getTargetNamespace(),
                                  bname.toString());
         int count = 0;

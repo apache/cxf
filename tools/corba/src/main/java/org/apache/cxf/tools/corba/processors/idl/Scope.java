@@ -116,7 +116,7 @@ public final class Scope implements Comparable<Object> {
         StringBuilder result = new StringBuilder();
         result.append(CorbaConstants.REPO_STRING);
         if (prefix != null && prefix.length() > 0) {
-            result.append(prefix + "/");
+            result.append(prefix).append("/");
         }
         result.append(toString("/"));
         result.append(CorbaConstants.IDL_VERSION);

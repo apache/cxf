@@ -88,9 +88,9 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                     }
                     joiningKey += "_id";
                     
-                    topBuilder.append(" left join " + joinTable);
-                    topBuilder.append(" on " + primaryTable + ".id" + " = " + joinTable
-                                      + "." + joiningKey);
+                    topBuilder.append(" left join ").append(joinTable);
+                    topBuilder.append(" on ").append(primaryTable).append(".id").append(" = ")
+                        .append(joinTable).append(".").append(joiningKey);
                     
                     property = joinTable + "." + getRealPropertyName(properties[1]);
                 }

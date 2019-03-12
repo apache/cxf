@@ -168,7 +168,7 @@ public final class PackageUtils {
 
             if (i == 0 && !Character.isJavaIdentifierStart(c)) {
                 // prefix an '_' if the first char is illegal
-                newToken.append("_" + c);
+                newToken.append("_").append(c);
             } else if (!Character.isJavaIdentifierPart(c)) {
                 // replace the char with an '_' if it is illegal
                 newToken.append('_');

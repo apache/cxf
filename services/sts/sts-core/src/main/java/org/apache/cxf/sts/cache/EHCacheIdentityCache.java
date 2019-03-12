@@ -190,7 +190,7 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
         }
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append("EHCacheIdentityCache").append(',');
         buffer.append(ManagementConstants.NAME_PROP).append('=')
-            .append("EHCacheIdentityCache-" + System.identityHashCode(this));
+            .append("EHCacheIdentityCache-").append(System.identityHashCode(this));
         return new ObjectName(buffer.toString());
     }
 }

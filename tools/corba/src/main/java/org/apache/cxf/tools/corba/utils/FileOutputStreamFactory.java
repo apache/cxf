@@ -99,7 +99,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
         StringBuilder result = new StringBuilder("");
         while (pos2 != -1) {
-            result.append(packageName.substring(pos1, pos2) + File.separator);
+            result.append(packageName.substring(pos1, pos2)).append(File.separator);
             pos1 = pos2 + 1;
             pos2 = packageName.indexOf('.', pos1);
         }

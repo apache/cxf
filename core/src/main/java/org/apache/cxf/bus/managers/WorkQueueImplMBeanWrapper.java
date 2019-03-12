@@ -116,7 +116,7 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
             buffer.append(WorkQueueManagerImplMBeanWrapper.NAME_VALUE).append(',');
         } else {
             buffer.append(ManagementConstants.BUS_ID_PROP).append("=Shared,");
-            //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=Shared,");
+            //buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE).append("=Shared,");
         }
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
         buffer.append(ManagementConstants.NAME_PROP).append('=').append(aWorkQueue.getName()).append(',');

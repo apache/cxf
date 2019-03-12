@@ -81,7 +81,7 @@ public class JwsJsonProducer {
         StringBuilder sb = new StringBuilder();
         sb.append('{');
         if (!detached) {
-            sb.append("\"payload\":\"" + getActualPayload(b64Status) + "\"");
+            sb.append("\"payload\":\"").append(getActualPayload(b64Status)).append("\"");
             sb.append(',');
         }
         if (!supportFlattened || signatures.size() > 1) {

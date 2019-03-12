@@ -91,9 +91,9 @@ public class SchemaJavascriptBuilder {
         xmlSchema = schema;
         code = new StringBuilder();
         code.append("//\n");
-        code.append("// Definitions for schema: " + schema.getTargetNamespace());
+        code.append("// Definitions for schema: ").append(schema.getTargetNamespace());
         if (schema.getSourceURI() != null) {
-            code.append("\n//  " + schema.getSourceURI());
+            code.append("\n//  ").append(schema.getSourceURI());
         }
         code.append("\n//\n");
 

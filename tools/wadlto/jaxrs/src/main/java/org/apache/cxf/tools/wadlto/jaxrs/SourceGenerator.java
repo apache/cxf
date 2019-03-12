@@ -469,7 +469,7 @@ public class SourceGenerator {
                 StringBuilder builder = new StringBuilder(resourceId);
                 for (int i = 0; i < split.length; i++) {
                     if (split[i].length() > 0) {
-                        builder.append(split[i].toUpperCase().charAt(0) + split[i].substring(1));
+                        builder.append(split[i].toUpperCase().charAt(0)).append(split[i].substring(1));
                     }
                 }
                 resourceId = builder.toString();
@@ -501,7 +501,7 @@ public class SourceGenerator {
 
 
         sbImports.append(getClassComment()).append(getLineSep());
-        sbImports.append("package " + classPackage)
+        sbImports.append("package ").append(classPackage)
             .append(';').append(getLineSep()).append(getLineSep());
         boolean doCreateJavaDocs = isJavaDocNeeded(info);
         if (doCreateJavaDocs) {
@@ -512,9 +512,9 @@ public class SourceGenerator {
             writeAnnotation(sbCode, imports, Path.class, path, true, false);
         }
 
-        sbCode.append("public " + getClassType(info.interfaceIsGenerated) + " " + className);
+        sbCode.append("public ").append(getClassType(info.interfaceIsGenerated)).append(" ").append(className);
         writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());
-        sbCode.append(" {" + getLineSep() + getLineSep());
+        sbCode.append(" {").append(getLineSep()).append(getLineSep());
 
         Map<String, Integer> methodNameMap = new HashMap<>();
         writeMethods(rElement, classPackage, imports, sbCode,
@@ -604,7 +604,7 @@ public class SourceGenerator {
     private void writeImplementsInterface(StringBuilder sb, String clsName,
                                              boolean interfaceIsGenerated) {
         if (generateInterfaces && !interfaceIsGenerated) {
-            sb.append(" implements " + StringUtils.capitalize(clsName));
+            sb.append(" implements ").append(StringUtils.capitalize(clsName));
         }
     }
 
@@ -661,7 +661,7 @@ public class SourceGenerator {
         addImport(imports, cls.getName());
         sbCode.append('@').append(cls.getSimpleName());
         if (value != null) {
-            sbCode.append("(\"" + value + "\")");
+            sbCode.append("(\"").append(value).append("\")");
         }
         if (nextLine) {
             sbCode.append(getLineSep());
@@ -686,7 +686,7 @@ public class SourceGenerator {
             if (index != -1 && clsName.substring(0, index).equals(classPackage)) {
                 continue;
             }
-            sbImports.append("import " + clsName).append(';').append(getLineSep());
+            sbImports.append("import ").append(clsName).append(';').append(getLineSep());
         }
     }
 
@@ -957,7 +957,7 @@ public class SourceGenerator {
 
         StringBuilder sbMethodClassImports = new StringBuilder();
         sbMethodClassImports.append(getClassComment()).append(getLineSep());
-        sbMethodClassImports.append("package " + classPackage)
+        sbMethodClassImports.append("package ").append(classPackage)
             .append(';').append(getLineSep()).append(getLineSep());
 
         sbMethodClassImports.append("import java.lang.annotation.ElementType;").append(getLineSep());
@@ -969,9 +969,9 @@ public class SourceGenerator {
         StringBuilder sbMethodClassCode = new StringBuilder();
         sbMethodClassCode.append("@Target({ElementType.METHOD })").append(getLineSep());
         sbMethodClassCode.append("@Retention(RetentionPolicy.RUNTIME)").append(getLineSep());
-        sbMethodClassCode.append("@HttpMethod(\"" + methodName + "\")").append(getLineSep());
-        sbMethodClassCode.append("public @interface " + methodName);
-        sbMethodClassCode.append(" {" + getLineSep() + getLineSep());
+        sbMethodClassCode.append("@HttpMethod(\"").append(methodName).append("\")").append(getLineSep());
+        sbMethodClassCode.append("public @interface ").append(methodName);
+        sbMethodClassCode.append(" {").append(getLineSep()).append(getLineSep());
         sbMethodClassCode.append('}');
         createJavaSourceFile(info.getSrcDir(), new QName(classPackage, className),
                              sbMethodClassCode, sbMethodClassImports, true);
@@ -1002,7 +1002,7 @@ public class SourceGenerator {
         writeSubResponseType(id.equals(parentId), subResponseNs, localName,
                 sbCode, imports);
 
-        sbCode.append("get" + localName + suffixName);
+        sbCode.append("get").append(localName).append(suffixName);
     }
 
     private static boolean isMethodMatched(Set<String> methodNames, String methodNameLowerCase, String id) {
@@ -1201,7 +1201,7 @@ public class SourceGenerator {
                                info, imports, true);
         }
         if (elementType != null) {
-            sbCode.append(elementType + " ");
+            sbCode.append(elementType).append(" ");
         } else {
             writeJaxrResponse(sbCode, imports);
         }
@@ -1432,10 +1432,10 @@ public class SourceGenerator {
         StringBuilder sbImports = new StringBuilder();
         StringBuilder sbCode = new StringBuilder();
         sbImports.append(getClassComment()).append(getLineSep());
-        sbImports.append("package " + classPackage)
+        sbImports.append("package ").append(classPackage)
             .append(';').append(getLineSep()).append(getLineSep());
 
-        sbCode.append("public enum " + clsName);
+        sbCode.append("public enum ").append(clsName);
         openBlock(sbCode);
 
         for (int i = 0; i < options.size(); i++) {
@@ -1728,7 +1728,7 @@ public class SourceGenerator {
                     mediaTypes.append(", ");
                 }
                 first = false;
-                mediaTypes.append("\"" + mediaType + "\"");
+                mediaTypes.append("\"").append(mediaType).append("\"");
             }
         }
         sbCode.append(mediaTypes.toString());

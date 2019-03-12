@@ -125,7 +125,7 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
         }
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append("MemoryIdentityCache").append(',');
         buffer.append(ManagementConstants.NAME_PROP).append('=')
-            .append("MemoryIdentityCache-" + System.identityHashCode(this));
+            .append("MemoryIdentityCache-").append(System.identityHashCode(this));
         return new ObjectName(buffer.toString());
     }
 }

@@ -136,10 +136,10 @@ public class BusRegistrationTest {
 
     private static ObjectName getObjectName(String id, Bus bus) throws JMException {
         StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
-        buffer.append(ManagementConstants.BUS_ID_PROP + "=" +  id + ",");
-        buffer.append(ManagementConstants.TYPE_PROP + "=Bus,");
+        buffer.append(ManagementConstants.BUS_ID_PROP).append("=").append(id).append(",");
+        buffer.append(ManagementConstants.TYPE_PROP).append("=Bus,");
         // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP + "=" + bus.hashCode());
+        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append("=").append(bus.hashCode());
         return new ObjectName(buffer.toString());
     }
 }

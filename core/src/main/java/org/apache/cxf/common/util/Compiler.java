@@ -329,11 +329,11 @@ public class Compiler {
         for (int i = 0; i < args.length; i++) {
             strBuffer.append(args[i]);
         }
-        return strBuffer.toString().length() > 4096 ? true : false;
+        return strBuffer.length() > 4096;
     }
 
     private boolean isLongClasspath(String classpath) {
-        return classpath.length() > 2048 ? true : false;
+        return classpath.length() > 2048;
     }
 
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {

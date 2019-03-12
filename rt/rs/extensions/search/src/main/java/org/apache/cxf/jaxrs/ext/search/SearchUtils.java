@@ -156,7 +156,7 @@ public final class SearchUtils {
         }
         sb.append(" FROM ").append(table);
         if (tableAlias != null) {
-            sb.append(" " + tableAlias);
+            sb.append(" ").append(tableAlias);
         }
     }
 
