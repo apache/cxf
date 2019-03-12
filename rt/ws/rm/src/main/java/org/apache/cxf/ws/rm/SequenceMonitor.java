@@ -19,8 +19,8 @@
 
 package org.apache.cxf.ws.rm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -31,24 +31,24 @@ public class SequenceMonitor {
     private static final Logger LOG = LogUtils.getL7dLogger(SequenceMonitor.class);
     private long monitorInterval = DEFAULT_MONITOR_INTERVAL;
     private long firstCheck;
-    private List<Long> receiveTimes = new ArrayList<>();
+    private final Deque<Long> receiveTimes = new ConcurrentLinkedDeque<>();
 
     public void acknowledgeMessage() {
         long now = System.currentTimeMillis();
-        if (0 == firstCheck) {
+        if (0L == firstCheck) {
             firstCheck = now + monitorInterval;
         }
-        receiveTimes.add(Long.valueOf(now));
+        receiveTimes.add(now);
     }
 
     public int getMPM() {
         long now = System.currentTimeMillis();
         int mpm = 0;
-        if (firstCheck > 0 && now >= firstCheck) {
+        if (firstCheck > 0L && now >= firstCheck) {
             long threshold = now - monitorInterval;
             while (!receiveTimes.isEmpty()) {
-                if (receiveTimes.get(0).longValue() <= threshold) {
-                    receiveTimes.remove(0);
+                if (receiveTimes.getFirst() <= threshold) {
+                    receiveTimes.removeFirst();
                 } else {
                     break;
                 }
@@ -59,16 +59,13 @@ public class SequenceMonitor {
         return mpm;
     }
 
-    public synchronized long getLastArrivalTime() {
-        if (!receiveTimes.isEmpty()) {
-            return receiveTimes.get(receiveTimes.size() - 1).longValue();
-        }
-        return 0;
+    public long getLastArrivalTime() {
+        return !receiveTimes.isEmpty() ? receiveTimes.getLast() : 0L;
     }
 
     protected void setMonitorInterval(long i) {
         if (receiveTimes.isEmpty()) {
-            firstCheck = 0;
+            firstCheck = 0L;
             monitorInterval = i;
         } else {
             LOG.warning("Cannot change monitor interval at this point.");
