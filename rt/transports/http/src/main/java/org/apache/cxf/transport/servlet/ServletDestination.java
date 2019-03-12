@@ -72,7 +72,7 @@ public class ServletDestination extends AbstractHTTPDestination implements Servl
             return contextPath;
         }
         if (address.startsWith("http")) {
-            return URI.create(address).getPath();
+            return URI.create(address.replaceAll(" ", "%20")).getPath();
         }
 
         return contextPath + address;
