@@ -50,6 +50,7 @@ public abstract class AbstractManagedConnectionImpl implements ManagedConnection
 
         this.managedConnectionFactory = managedFactory;
         this.crinfo = crInfo;
+        this.subject = sj;
     }
 
 

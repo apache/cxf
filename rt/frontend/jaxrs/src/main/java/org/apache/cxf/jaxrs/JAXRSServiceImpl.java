@@ -82,7 +82,7 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
 
     public JAXRSServiceImpl(List<ClassResourceInfo> cri, boolean create) {
         this(cri, null);
-        createServiceModel = true;
+        createServiceModel = create;
     }
 
     public void setCreateServiceModel(boolean create) {

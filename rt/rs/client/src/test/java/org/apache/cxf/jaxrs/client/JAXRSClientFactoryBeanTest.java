@@ -200,7 +200,7 @@ public class JAXRSClientFactoryBeanTest {
         IProductResource productResourceElement = parts.elementAt("1");
         assertNotNull(productResourceElement);
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testInvokePathNull() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -218,7 +218,7 @@ public class JAXRSClientFactoryBeanTest {
         BookInterface store = bean.create(BookInterface.class);
         store.getBook("");
     }
-    
+
     @Test
     public void testInvokePathEmptyAllowed() throws Exception {
         Bus bus = BusFactory.newInstance().createBus();
@@ -250,10 +250,6 @@ public class JAXRSClientFactoryBeanTest {
         private boolean isInitialized;
 
         TestInterceptor() {
-            this(Phase.PRE_STREAM);
-        }
-
-        TestInterceptor(String s) {
             super(Phase.PRE_STREAM);
             isInitialized = true;
         }

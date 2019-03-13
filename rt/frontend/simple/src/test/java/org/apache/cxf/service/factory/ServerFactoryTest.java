@@ -53,7 +53,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         svrBean.setServiceClass(HelloService.class);
         svrBean.setServiceBean(new HelloServiceImpl());
         svrBean.setBus(getBus());
-        svrBean.setDestinationFactory(new CustomDestinationFactory(getBus()));
+        svrBean.setDestinationFactory(new CustomDestinationFactory());
 
         ServerImpl server = (ServerImpl)svrBean.create();
         assertTrue(server.getDestination() instanceof CustomDestination);
@@ -108,7 +108,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     }
 
     public class CustomDestinationFactory extends AbstractTransportFactory implements DestinationFactory {
-        public CustomDestinationFactory(Bus b) {
+        public CustomDestinationFactory() {
             super(Arrays.asList("id"));
         }
         public Destination getDestination(EndpointInfo ei, Bus b) throws IOException {

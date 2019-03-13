@@ -240,12 +240,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
 
     private static class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         TestFaultInInterceptor() {
-            this(Phase.PRE_STREAM);
-        }
-
-        TestFaultInInterceptor(String s) {
             super(Phase.PRE_STREAM);
-
         }
 
         public void handleMessage(Message message) throws Fault {

@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.multipart;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -34,27 +35,25 @@ public class MultipartBody {
     private List<Attachment> atts;
     private MediaType mt;
 
-    public MultipartBody(List<Attachment> atts, MediaType mt, boolean outbound) {
-        this.atts = atts;
-        this.mt = mt == null ? MULTIPART_RELATED_TYPE : mt;
+    public MultipartBody(Attachment att) {
+        this(Collections.singletonList(att));
+    }
+
+    public MultipartBody(List<Attachment> atts) {
+        this(atts, false);
     }
 
     public MultipartBody(List<Attachment> atts, boolean outbound) {
         this(atts, MULTIPART_RELATED_TYPE, outbound);
     }
 
-    public MultipartBody(Attachment att) {
-        atts = new ArrayList<>();
-        atts.add(att);
-        this.mt = MULTIPART_RELATED_TYPE;
-    }
-
-    public MultipartBody(List<Attachment> atts) {
-        this(atts, MULTIPART_RELATED_TYPE, false);
-    }
-
     public MultipartBody(boolean outbound) {
         this(new ArrayList<>(), MULTIPART_RELATED_TYPE, outbound);
+    }
+
+    public MultipartBody(List<Attachment> atts, MediaType mt, boolean outbound) {
+        this.atts = atts;
+        this.mt = mt == null ? MULTIPART_RELATED_TYPE : mt;
     }
 
     public MediaType getType() {
@@ -62,16 +61,11 @@ public class MultipartBody {
     }
 
     public List<Attachment> getAllAttachments() {
-
         return atts;
     }
 
     public List<Attachment> getChildAttachments() {
-        List<Attachment> childAtts = new ArrayList<>();
-        for (int i = 1; i < atts.size(); i++) {
-            childAtts.add(atts.get(i));
-        }
-        return childAtts;
+        return atts.subList(1, atts.size());
     }
 
     public Attachment getRootAttachment() {

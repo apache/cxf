@@ -1068,12 +1068,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         private boolean handleMessageCalled;
 
         public TestInInterceptor() {
-            this(Phase.PRE_STREAM);
-        }
-
-        public TestInInterceptor(String s) {
             super(Phase.PRE_STREAM);
-
         }
 
         public void handleMessage(Message message) throws Fault {
@@ -1093,13 +1088,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
 
 
         public TestOutInterceptor(boolean isBadOutInterceptor) {
-            this(Phase.PRE_MARSHAL);
-            this.isBadOutInterceptor = isBadOutInterceptor;
-        }
-
-        public TestOutInterceptor(String s) {
             super(Phase.PRE_MARSHAL);
-
+            this.isBadOutInterceptor = isBadOutInterceptor;
         }
 
         public void handleMessage(Message message) throws Fault {
@@ -1119,12 +1109,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean handleMessageCalled;
         public TestFaultInInterceptor() {
-            this(Phase.PRE_STREAM);
-        }
-
-        public TestFaultInInterceptor(String s) {
             super(Phase.PRE_STREAM);
-
         }
 
         public void handleMessage(Message message) throws Fault {

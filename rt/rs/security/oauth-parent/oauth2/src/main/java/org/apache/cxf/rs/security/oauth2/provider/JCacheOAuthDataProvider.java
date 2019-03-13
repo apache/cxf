@@ -60,7 +60,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         this(false);
     }
     public JCacheOAuthDataProvider(boolean storeJwtTokenKeyOnly) throws Exception {
-        this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
+        this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true), storeJwtTokenKeyOnly);
     }
 
     public JCacheOAuthDataProvider(String configFileURL, Bus bus) throws Exception {

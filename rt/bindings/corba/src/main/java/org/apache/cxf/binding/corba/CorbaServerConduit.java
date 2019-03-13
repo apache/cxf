@@ -67,7 +67,7 @@ public class CorbaServerConduit implements Conduit {
     public void prepare(Message message) throws IOException {
         message.put(CorbaConstants.ORB, orb);
         message.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, targetObject);
-        message.setContent(OutputStream.class, new CorbaOutputStream(message));
+        message.setContent(OutputStream.class, new CorbaOutputStream());
         if (message instanceof CorbaMessage) {
             ((CorbaMessage) message).setCorbaTypeMap(typeMap);
         }
@@ -153,9 +153,6 @@ public class CorbaServerConduit implements Conduit {
     }
 
     private class CorbaOutputStream extends CachedOutputStream {
-
-        CorbaOutputStream(Message m) {
-        }
 
         /**
          * Perform any actions required on stream flush (freeze headers, reset
