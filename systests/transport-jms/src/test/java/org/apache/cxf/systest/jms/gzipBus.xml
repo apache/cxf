@@ -24,7 +24,7 @@
     xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     <cxf:bus>
         <cxf:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <bean class="org.apache.cxf.transport.common.gzip.GZIPFeature">
                 <property name="threshold">
                     <!-- set threshold as 10 byte to ensure gzip compress happen for short test message-->

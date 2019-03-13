@@ -32,7 +32,7 @@
     </http:conduit>
     <jaxws:endpoint name="{http://cxf.apache.org/greeter_control}GreeterPort" createdFromAPI="true">
         <jaxws:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <p:policies>
                 <wsp2006:PolicyReference URI="#AddressingPolicy"/>
             </p:policies>
@@ -40,7 +40,7 @@
     </jaxws:endpoint>
     <jaxws:client name="{http://cxf.apache.org/greeter_control}GreeterPort" createdFromAPI="true">
         <jaxws:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
             <p:policies>
                 <wsp2006:PolicyReference URI="#AddressingPolicy"/>
             </p:policies>

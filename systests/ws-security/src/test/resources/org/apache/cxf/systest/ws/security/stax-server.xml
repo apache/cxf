@@ -30,7 +30,7 @@
     -->
     <cxf:bus>
         <cxf:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </cxf:features>
     </cxf:bus>
     <!--    

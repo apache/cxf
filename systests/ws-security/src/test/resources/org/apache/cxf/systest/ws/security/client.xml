@@ -27,7 +27,7 @@
     -->
     <jaxws:client name="{http://apache.org/hello_world_soap_http}TimestampSignEncryptPort" createdFromAPI="true">
         <jaxws:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxws:features>
         <jaxws:outInterceptors>
             <ref bean="TimestampSignEncrypt_Request"/>

@@ -30,7 +30,7 @@
     </http:destination>
     <jaxws:client name="{http://apache.org/hello_world_doc_lit_bare}SoapPort" createdFromAPI="true">
         <jaxws:features>
-            <bean class="org.apache.cxf.feature.LoggingFeature"/>
+            <bean class="org.apache.cxf.ext.logging.LoggingFeature"/>
         </jaxws:features>
     </jaxws:client>
 </beans>
