@@ -107,6 +107,23 @@ under the License.
             <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
         </jaxrs:properties>
     </jaxrs:server>
+    
+    <bean id="encrSignJwsInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJwsContainerRequestFilter"/>
+    <bean id="encrSignJweInFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.EncrSignJweContainerRequestFilter"/>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsaencrsign">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="encrSignJweInFilter"/>
+            <ref bean="encrSignJwsInFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.in.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.signature.in.properties" value="org/apache/cxf/systest/jaxrs/security/bob.rs.properties"/>
+            <entry key="rs.security.decryption.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwejwsrsacert">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>

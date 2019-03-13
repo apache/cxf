@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.Priority;
 import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -39,6 +40,7 @@ import org.apache.cxf.rs.security.jose.jaxrs.JweClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsClientResponseFilter;
 import org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor;
+import org.apache.cxf.rs.security.jose.jaxrs.Priorities;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
@@ -83,6 +85,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
+
     @Test
     public void testJweJwkPlainTextRSA() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwkrsa";
@@ -185,6 +188,35 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
+
+    @Test
+    public void testJweRsaJwsRsaEncryptThenSign() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejwsrsaencrsign";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<>();
+        JweWriterInterceptor jweWriter = new EncrSignJweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        providers.add(jweWriter);
+        JwsWriterInterceptor jwsWriter = new EncrSignJwsWriterInterceptor();
+        jwsWriter.setUseJwsOutputStream(true);
+        providers.add(jwsWriter);
+        bean.setProviders(providers);
+        bean.getProperties(true).put("rs.security.encryption.out.properties", SERVER_JWEJWS_PROPERTIES);
+        bean.getProperties(true).put("rs.security.signature.out.properties", CLIENT_JWEJWS_PROPERTIES);
+        PrivateKeyPasswordProvider provider = new PrivateKeyPasswordProviderImpl();
+        bean.getProperties(true).put("rs.security.signature.key.password.provider", provider);
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+
     @Test
     public void testJweRsaJwsRsaCert() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejwsrsacert";
@@ -507,6 +539,18 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         public char[] getPassword(Properties storeProperties) {
             return password.toCharArray();
         }
+
+    }
+
+    // Switch the priorities to have encryption run before signature
+    @Priority(Priorities.JWS_WRITE_PRIORITY)
+    private static class EncrSignJweWriterInterceptor extends JweWriterInterceptor {
+
+    }
+
+    // Switch the priorities to have encryption run before signature
+    @Priority(Priorities.JWE_WRITE_PRIORITY)
+    private static class EncrSignJwsWriterInterceptor extends JwsWriterInterceptor {
 
     }
 }
