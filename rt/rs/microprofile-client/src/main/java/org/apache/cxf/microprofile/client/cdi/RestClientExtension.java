@@ -32,8 +32,8 @@ import javax.enterprise.inject.spi.WithAnnotations;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 public class RestClientExtension implements Extension {
-    private static Set<Class<?>> restClientClasses = new LinkedHashSet<>();
-    private static Set<Throwable> errors = new LinkedHashSet<>();
+    private Set<Class<?>> restClientClasses = new LinkedHashSet<>();
+    private Set<Throwable> errors = new LinkedHashSet<>();
     public void findClients(@Observes @WithAnnotations({RegisterRestClient.class}) ProcessAnnotatedType<?> pat) {
         Class<?> restClient = pat.getAnnotatedType().getJavaClass();
         if (restClient.isInterface()) {
