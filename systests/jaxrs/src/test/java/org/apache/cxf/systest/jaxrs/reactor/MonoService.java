@@ -47,7 +47,7 @@ public class MonoService {
         Mono.just("Hello")
                 .map(HelloWorldBean::new)
                 .subscribeOn(Schedulers.elastic())
-                .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000, 0));
+                .subscribe(new JsonStreamingAsyncSubscriber<>(ar, null, null, null, 1000L, 0L));
     }
 
     @GET

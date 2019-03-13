@@ -19,10 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -35,6 +37,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class FluxReactorTest extends AbstractBusClientServerTestBase {
@@ -48,19 +51,19 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
-        List<HelloWorldBean> collector = new ArrayList<>();
+        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
-                .request("application/json")
+                .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
-                .doOnNext(collector::add)
+                .doOnNext(holder::offer)
                 .subscribe();
-        Thread.sleep(500);
-        assertEquals(1, collector.size());
-        HelloWorldBean bean = collector.get(0);
+
+        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(bean);
         assertEquals("Hello", bean.getGreeting());
         assertEquals("World", bean.getAudience());
     }
@@ -76,20 +79,23 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
         doTestTextJsonImplicitListAsyncStream(address);
     }
     private void doTestTextJsonImplicitListAsyncStream(String address) throws Exception {
-        List<HelloWorldBean> holder = new ArrayList<>();
+        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
-                .request("application/json")
+                .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .getFlux(HelloWorldBean.class)
-                .doOnNext(holder::add)
+                .doOnNext(holder::offer)
                 .subscribe();
-        Thread.sleep(500);
-        assertEquals(2, holder.size());
-        assertEquals("Hello", holder.get(0).getGreeting());
-        assertEquals("World", holder.get(0).getAudience());
-        assertEquals("Ciao", holder.get(1).getGreeting());
+
+        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(bean);
+        assertEquals("Hello", bean.getGreeting());
+        assertEquals("World", bean.getAudience());
+        bean = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(bean);
+        assertEquals("Ciao", bean.getGreeting());
     }
 }

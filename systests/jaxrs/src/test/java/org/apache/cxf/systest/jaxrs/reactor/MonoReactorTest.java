@@ -19,11 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.ClientBuilder;
-import javax.xml.ws.Holder;
+import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
@@ -50,19 +51,19 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/mono/textJson";
-        List<HelloWorldBean> holder = new ArrayList<>();
+        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
-                .request("application/json")
+                .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
-                .doOnNext(holder::add)
+                .doOnNext(holder::offer)
                 .subscribe();
-        Thread.sleep(500);
-        assertEquals(1, holder.size());
-        HelloWorldBean bean = holder.get(0);
+
+        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(bean);
         assertEquals("Hello", bean.getGreeting());
         assertEquals("World", bean.getAudience());
     }
@@ -70,36 +71,37 @@ public class MonoReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTextJsonImplicitListAsyncStream() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/mono/textJsonImplicitListAsyncStream";
-        Holder<HelloWorldBean> holder = new Holder<>();
+        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
         ClientBuilder.newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
-                .request("application/json")
+                .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
                 .get(HelloWorldBean.class)
-                .doOnNext(helloWorldBean -> holder.value = helloWorldBean)
+                .doOnNext(holder::offer)
                 .subscribe();
-        Thread.sleep(500);
-        assertNotNull(holder.value);
-        assertEquals("Hello", holder.value.getGreeting());
-        assertEquals("World", holder.value.getAudience());
+        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(bean);
+        assertEquals("Hello", bean.getGreeting());
+        assertEquals("World", bean.getAudience());
     }
 
     @Test
     public void testGetString() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/mono/textAsync";
-        Holder<String> holder = new Holder<>();
+        final BlockingQueue<String> holder = new LinkedBlockingQueue<>();
         ClientBuilder.newClient()
                 .register(new ReactorInvokerProvider())
                 .target(address)
-                .request("text/plain")
+                .request(MediaType.TEXT_PLAIN)
                 .rx(ReactorInvoker.class)
                 .get(String.class)
-                .doOnNext(msg -> holder.value = msg)
+                .doOnNext(holder::offer)
                 .subscribe();
 
-        Thread.sleep(500);
-        assertEquals("Hello, world!", holder.value);
+        String value = holder.poll(1L, TimeUnit.SECONDS);
+        assertNotNull(value);
+        assertEquals("Hello, world!", value);
     }
 }
