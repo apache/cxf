@@ -61,6 +61,9 @@ public final class JavaUtils {
         if (version.indexOf('.') > 0) {
             version = version.substring(0, version.indexOf('.'));
         }
+        if (version.indexOf("-") > 0) {
+            version = version.substring(0, version.indexOf("-"));
+        }
 
         setJava9Compatible(Integer.valueOf(version) >= 9);
     }
