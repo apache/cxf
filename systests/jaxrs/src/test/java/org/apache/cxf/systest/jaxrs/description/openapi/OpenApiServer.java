@@ -19,52 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs.description.openapi;
 
-import java.net.URISyntaxException;
-
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
 
 
-public class OpenApiServer extends AbstractBusTestServerBase {
+public class OpenApiServer extends AbstractSpringServer {
     static final String PORT = allocatePort(OpenApiServer.class);
 
-    private org.eclipse.jetty.server.Server server;
-
-    protected void run() {
-        server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
-
-        WebAppContext webappcontext = new WebAppContext();
-        String contextPath = null;
-        try {
-            contextPath = getClass().getResource("/jaxrs_openapi_v3").toURI().getPath();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        }
-        webappcontext.setContextPath("/");
-
-        webappcontext.setWar(contextPath);
-
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
-
-        server.setHandler(handlers);
-        try {
-            server.start();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public void tearDown() throws Exception {
-        super.tearDown();
-        if (server != null) {
-            server.stop();
-            server.destroy();
-            server = null;
-        }
+    public OpenApiServer() {
+        super("/jaxrs_openapi_v3", Integer.parseInt(PORT));
     }
 
     public static void main(String[] args) {
