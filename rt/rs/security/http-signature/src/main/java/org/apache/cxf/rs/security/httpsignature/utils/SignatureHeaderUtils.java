@@ -47,9 +47,9 @@ public final class SignatureHeaderUtils {
      * @return A map with comma-separated values
      */
     public static Map<String, String> mapHeaders(Map<String, List<String>> multivaluedMap) {
-        Map<String, String> mappedStrings = new HashMap<>();
+        Map<String, String> mappedStrings = new HashMap<>(multivaluedMap.size());
         for (Map.Entry<String, List<String>> entry : multivaluedMap.entrySet()) {
-            mappedStrings.put(entry.getKey(), concatValues(entry.getValue()));
+            mappedStrings.put(entry.getKey(), String.join(", ", entry.getValue()));
         }
         return mappedStrings;
     }
@@ -92,19 +92,10 @@ public final class SignatureHeaderUtils {
         if (messageHeaders.isEmpty()) {
             throw new IllegalStateException("message headers are empty");
         }
-        messageHeaders.forEach((key, list) -> Objects.requireNonNull(list));
-        messageHeaders.forEach((key, list) -> list.forEach(Objects::requireNonNull));
-    }
-
-    private static String concatValues(List<String> values) {
-        StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < values.size(); x++) {
-            sb.append(values.get(x));
-            if (x != values.size() - 1) {
-                sb.append(", ");
-            }
-        }
-        return sb.toString();
+        messageHeaders.forEach((key, list) -> {
+            Objects.requireNonNull(list);
+            list.forEach(Objects::requireNonNull);
+        });
     }
 
 }

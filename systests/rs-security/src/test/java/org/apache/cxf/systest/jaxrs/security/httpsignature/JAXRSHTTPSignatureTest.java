@@ -21,8 +21,11 @@ package org.apache.cxf.systest.jaxrs.security.httpsignature;
 
 import java.io.IOException;
 import java.net.URL;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +82,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -106,7 +109,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -137,7 +140,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -151,7 +154,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -177,7 +180,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -203,7 +206,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -229,7 +232,80 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "https://localhost:" + PORT + "/httpsig/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testEmptySignatureValue() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        ClientTestFilter signatureFilter = new ClientTestFilter();
+        signatureFilter.setEmptySignatureValue(true);
+
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testChangedSignatureValue() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        ClientTestFilter signatureFilter = new ClientTestFilter();
+        signatureFilter.setChangeSignatureValue(true);
+
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testDifferentSigningKey() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        ClientTestFilter signatureFilter = new ClientTestFilter();
+
+        KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+
+        MessageSigner messageSigner = new MessageSigner(keyPair.getPrivate(), "custom_key_id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -246,6 +322,8 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         private String httpMethod;
         private String uri;
         private boolean changeSignatureAlgorithm;
+        private boolean emptySignatureValue;
+        private boolean changeSignatureValue;
 
         @Override
         public void filter(ClientRequestContext requestCtx) {
@@ -263,6 +341,23 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
             if (changeSignatureAlgorithm) {
                 String signatureValue = convertedHeaders.get("Signature").get(0);
                 signatureValue = signatureValue.replace("rsa-sha256", "rsa-sha512");
+                requestHeaders.put("Signature", Collections.singletonList(signatureValue));
+            } else if (emptySignatureValue) {
+                String signatureValue = convertedHeaders.get("Signature").get(0);
+                signatureValue =
+                    signatureValue.substring(0, signatureValue.indexOf("signature=") + "signature=\"".length()) + "\"";
+                requestHeaders.put("Signature", Collections.singletonList(signatureValue));
+            } else if (changeSignatureValue) {
+                String signatureValue = convertedHeaders.get("Signature").get(0);
+                String signature =
+                    signatureValue.substring(signatureValue.indexOf("signature=") + "signature=\"".length(),
+                                                            signatureValue.length() - 1);
+                byte[] decodedSignature = Base64.getDecoder().decode(signature);
+                decodedSignature[0]++;
+                signatureValue =
+                    signatureValue.substring(0, signatureValue.indexOf("signature=") + "signature=\"".length())
+                    + Base64.getEncoder().encodeToString(decodedSignature)
+                    + "\"";
                 requestHeaders.put("Signature", Collections.singletonList(signatureValue));
             } else {
                 requestHeaders.put("Signature", Collections.singletonList(convertedHeaders.get("Signature").get(0)));
@@ -295,6 +390,14 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         public void setChangeSignatureAlgorithm(boolean changeSignatureAlgorithm) {
             this.changeSignatureAlgorithm = changeSignatureAlgorithm;
+        }
+
+        public void setChangeSignatureValue(boolean changeSignatureValue) {
+            this.changeSignatureValue = changeSignatureValue;
+        }
+
+        public void setEmptySignatureValue(boolean emptySignatureValue) {
+            this.emptySignatureValue = emptySignatureValue;
         }
 
     }

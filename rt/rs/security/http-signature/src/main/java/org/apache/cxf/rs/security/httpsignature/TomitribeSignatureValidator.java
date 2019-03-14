@@ -75,10 +75,10 @@ public class TomitribeSignatureValidator implements SignatureValidator {
                              java.security.Provider provider,
                              String method,
                              String uri) {
-        Verifier verifier = new Verifier(key, signature, provider);
         LOG.fine("Starting signature validation");
         boolean success;
         try {
+            Verifier verifier = new Verifier(key, signature, provider);
             success = verifier.verify(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
         } catch (Exception e) {
             throw new InvalidDataToVerifySignatureException(e.getMessage(), e);

@@ -32,19 +32,6 @@ under the License.
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    <httpj:engine-factory id="port-9095-tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-httpsignature}">
-            <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
-                </sec:keyManagers>
-                <sec:trustManagers>
-                    <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
-                </sec:trustManagers>
-                <sec:clientAuthentication want="true" required="true"/>
-            </httpj:tlsServerParameters>
-        </httpj:engine>
-    </httpj:engine-factory>
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     
     <bean id="publicKeyProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomPublicKeyProvider"/>
@@ -57,7 +44,7 @@ under the License.
     <bean id="httpSignatureVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifier"/>
     </bean>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-httpsignature}/httpsig">
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsig">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -82,7 +69,7 @@ under the License.
     <bean id="httpSignatureVerifierRsaSha512" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifierRsaSha512"/>
     </bean>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigrsasha512">
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigrsasha512">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
