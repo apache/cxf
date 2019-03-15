@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 
 import org.junit.AfterClass;
@@ -202,8 +203,19 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
             "MultipleOccursSequenceInSequence",
             "DerivedEmptyBaseEmptyChoice"
         };
+        String[] notWorkingJDK11 = new String[] {
+            "SimpleRestriction",
+            "SimpleRestriction4",
+            "AnyURIEnum",
+            "DecimalEnum",
+            "NumberEnum",
+            "StringEnum"
+        };
         if (System.getProperty("java.vendor").contains("IBM")) {
             NOT_WORKING_TESTS.addAll(Arrays.asList(notWorkingIBM));
+        }
+        if (JavaUtils.isJava11Compatible()) {
+            NOT_WORKING_TESTS.addAll(Arrays.asList(notWorkingJDK11));
         }
     }
 

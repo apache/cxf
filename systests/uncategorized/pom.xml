@@ -96,8 +96,6 @@
                         <id>generate-test-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
-                            <fork>${cxf.codegen.forkmode}</fork>
-                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>                         
                             <outputDir>${basedir}/target/generated/src/test/resources/wsdl_systest/type_test_corba/</outputDir>
                             <wsdltoidlOptions>
                                 <wsdltoidlOption>
@@ -138,13 +136,11 @@
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb</artifactId>
                 <version>3.7</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-omgapi</artifactId>
                 <version>3.7</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -422,37 +418,6 @@
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>java9plus</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <!-- Test with the Jacorb implementation as the Sun orb has been removed since jdk 11 -->
-                                <org.omg.CORBA.ORBClass>org.jacorb.orb.ORB</org.omg.CORBA.ORBClass>
-                            </systemPropertyVariables>
-                            <argLine>
-                                ${cxf.surefire.fork.vmargs}
-                            </argLine>
-                            <includes>
-                                <include>**/*Test.java</include>
-                                <include>**/*TestCase.java</include>
-                                <include>**/*TestCases.java</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/*CORBADocLitClientTypeTest.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 </project>
