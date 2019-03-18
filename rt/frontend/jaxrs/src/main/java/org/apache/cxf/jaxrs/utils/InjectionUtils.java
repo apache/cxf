@@ -455,6 +455,10 @@ public final class InjectionUtils {
                 throw createParamConversionException(pType, nfe);
             }
         }
+        // try to bypass JAXB code loading
+        if (pClass == String.class) {
+            return value;
+        }
 
         boolean adapterHasToBeUsed = false;
         Class<?> cls = pClass;
