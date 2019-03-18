@@ -1253,6 +1253,20 @@ public class JAXRSUtilsTest {
         Customer.CustomerBean bean = (Customer.CustomerBean)params.get(0);
         assertEquals("aValue", bean.getA());
     }
+    @Test
+    public void testXmlAdapterString() throws Exception {
+        Method m = Customer.class.getMethod("testXmlAdapter4", String.class);
+        Message messageImpl = createMessage();
+        messageImpl.put(Message.QUERY_STRING, "a=3");
+
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m,
+                                                               new ClassResourceInfo(Customer.class)),
+                                                           null, messageImpl);
+        assertEquals(1, params.size());
+        
+        String ret = (String)params.get(0);
+        assertEquals("Val: 3", ret);
+    }    
 
 
     @Test

@@ -235,6 +235,13 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
 
     }
 
+    public String testXmlAdapter4(@QueryParam("a")
+                                   @XmlJavaTypeAdapter(CustomerStringAdapter.class)
+                                   String value) {
+        return value;
+    }
+            
+    
     public void testPathBean(@PathParam("") CustomerBean cb) {
 
     }
@@ -530,6 +537,22 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
             return null;
         }
 
+    }
+    public static class CustomerStringAdapter extends XmlAdapter<Integer, String> {
+
+        @Override
+        public String unmarshal(Integer v) throws Exception {
+            return "Val: " + v.toString();
+        }
+
+        @Override
+        public Integer marshal(String v) throws Exception {
+            if (v.startsWith("Val: ")) {
+                v = v.substring(5);
+            }
+            return Integer.parseInt(v);
+        }
+ 
     }
 
     public static final class ABean {
