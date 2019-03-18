@@ -457,7 +457,7 @@ public final class InjectionUtils {
         }
         // try to bypass JAXB code loading
         if (pClass == String.class) {
-            return value;
+            return (T) value;
         }
 
         boolean adapterHasToBeUsed = false;
