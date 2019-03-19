@@ -54,6 +54,7 @@ public class CompletableFutureServer extends AbstractBusTestServerBase {
         sf.setResourceProvider(CompletableFutureService.class,
                                new SingletonResourceProvider(new CompletableFutureService(), true));
         sf.setAddress("http://localhost:" + PORT + "/");
+        sf.setProvider(new MappedExceptionMapper());
         server = sf.create();
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);

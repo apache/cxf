@@ -22,6 +22,9 @@ package org.apache.cxf.systest.jaxrs.reactive;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.xml.ws.Holder;
 
@@ -33,7 +36,9 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -91,8 +96,86 @@ public class JAXRSCompletionStageTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof NotFoundException);
         }
-
     }
+
+    @Test
+    public void testGetBookAsyncStageThrowsBadRequestException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/badRequest";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(BadRequestException.class));
+        }
+    }
+
+    @Test
+    public void testGetBookAsyncStageThrowsForbiddenException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/forbidden";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(ForbiddenException.class));
+        }
+    }
+
+    @Test
+    public void testGetBookAsyncStageThrowsNotAuthorizedException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/unauthorized";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(NotAuthorizedException.class));
+        }
+    }
+
+    @Test
+    public void testGetBookAsyncStageThrowsBadRequestMappedException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/mapped/badRequest";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(BadRequestException.class));
+        }
+    }
+
+    @Test
+    public void testGetBookAsyncStageThrowsForbiddenMappedException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/mapped/forbidden";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(ForbiddenException.class));
+        }
+    }
+
+    @Test
+    public void testGetBookAsyncStageThrowsNotAuthorizedMappedException() throws Exception {
+        String address = "http://localhost:" + PORT + "/completable/mapped/unauthorized";
+        WebClient wc = createWebClient(address);
+        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
+        try {
+            stage.toCompletableFuture().get();
+            fail("Exception expected");
+        } catch (ExecutionException ex) {
+            assertThat(ex.getCause(), instanceOf(NotAuthorizedException.class));
+        }
+    }
+
     private WebClient createWebClient(String address) {
         return WebClient.create(address);
     }
