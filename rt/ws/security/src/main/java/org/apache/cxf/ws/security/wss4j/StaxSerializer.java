@@ -139,7 +139,7 @@ public class StaxSerializer extends AbstractSerializer {
     }
 
     InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
-        Vector<InputStream> v = new Vector<>(2);
+        Vector<InputStream> v = new Vector<>(2); //NOPMD
 
         LoadingByteArrayOutputStream byteArrayOutputStream = new LoadingByteArrayOutputStream();
         try {

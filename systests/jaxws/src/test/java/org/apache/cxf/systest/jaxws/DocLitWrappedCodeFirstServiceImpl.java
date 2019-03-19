@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.systest.jaxws;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -64,11 +64,11 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         return DATA;
     }
 
-    public Vector<String> listOutput() {
+    public List<String> listOutput() {
         if (context == null) {
             throw new RuntimeException("No CONTEXT!!!");
         }
-        return new Vector<String>(Arrays.asList(DATA));
+        return new ArrayList<String>(Arrays.asList(DATA));
     }
 
     public String arrayInput(String[] inputs) {

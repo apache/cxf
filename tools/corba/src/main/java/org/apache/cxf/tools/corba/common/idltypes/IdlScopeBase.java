@@ -20,11 +20,11 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Stack;
-import java.util.Vector;
 
 
 public abstract class IdlScopeBase extends IdlDefnImplBase {
@@ -34,9 +34,9 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
     protected IdlScopeBase(IdlScopeBase parent, String name) {
         super(parent, name);
-        defns = new Vector<>();
+        defns = new ArrayList<>();
         hold = new Stack<>();
-        park = new Vector<>();
+        park = new ArrayList<>();
     }
 
     public IdlDefn addToScope(IdlDefn def) {

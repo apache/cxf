@@ -21,7 +21,6 @@ package org.apache.cxf.systest.jaxws;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
@@ -75,7 +74,7 @@ public interface DocLitWrappedCodeFirstService {
             @WebParam(name = "input") String[] inputs);
 
     @WebMethod
-    Vector<String> listOutput();
+    List<String> listOutput();
 
     @WebMethod
     String echoStringNotReallyAsync(String s);

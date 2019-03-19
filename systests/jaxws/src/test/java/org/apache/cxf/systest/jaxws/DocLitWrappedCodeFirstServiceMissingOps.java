@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.jaxws;
 
-import java.util.Vector;
+import java.util.List;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -40,7 +40,7 @@ public interface DocLitWrappedCodeFirstServiceMissingOps {
             @WebParam(name = "input") String[] inputs);
 
     @WebMethod
-    Vector<String> listOutput();
+    List<String> listOutput();
 
     @WebMethod
     int[] echoIntArray(int[] ar);

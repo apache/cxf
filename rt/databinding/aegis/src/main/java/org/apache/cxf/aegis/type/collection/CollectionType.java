@@ -75,8 +75,8 @@ public class CollectionType extends ArrayType {
             values = new HashSet<>();
         } else if (userTypeClass.isAssignableFrom(SortedSet.class)) {
             values = new TreeSet<>();
-        } else if (userTypeClass.isAssignableFrom(Vector.class)) {
-            values = new Vector<>();
+        } else if (userTypeClass.isAssignableFrom(Vector.class)) { //NOPMD
+            values = new Vector<>(); //NOPMD
         } else if (userTypeClass.isAssignableFrom(Stack.class)) {
             values = new Stack<>();
         } else if (userTypeClass.isInterface()) {

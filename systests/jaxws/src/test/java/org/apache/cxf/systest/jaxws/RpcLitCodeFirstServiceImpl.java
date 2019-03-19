@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.systest.jaxws;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
@@ -40,8 +40,8 @@ public class RpcLitCodeFirstServiceImpl implements RpcLitCodeFirstService {
         return DATA;
     }
 
-    public Vector<String> listOutput() {
-        return new Vector<String>(Arrays.asList(DATA));
+    public List<String> listOutput() {
+        return new ArrayList<String>(Arrays.asList(DATA));
     }
 
     public String arrayInput(String[] inputs) {

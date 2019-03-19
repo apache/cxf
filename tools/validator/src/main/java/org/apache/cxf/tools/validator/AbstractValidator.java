@@ -19,11 +19,11 @@
 
 package org.apache.cxf.tools.validator;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public abstract class AbstractValidator {
-    protected List<String> errorMessages = new Vector<>();
+    protected List<String> errorMessages = new ArrayList<>();
 
     public AbstractValidator() {
     }
