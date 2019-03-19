@@ -31,11 +31,18 @@ public class TomitribeSignatureCreator implements SignatureCreator {
     private final String signatureAlgorithmName;
     private final PrivateKey privateKey;
     private final String keyId;
+    private final boolean includeRequestTarget;
 
     public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey, String keyId) {
+        this(signatureAlgorithmName, privateKey, keyId, true);
+    }
+
+    public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey,
+                                     String keyId, boolean includeRequestTarget) {
         this.signatureAlgorithmName = signatureAlgorithmName;
         this.privateKey = privateKey;
         this.keyId = keyId;
+        this.includeRequestTarget = includeRequestTarget;
     }
 
     @Override
@@ -46,8 +53,9 @@ public class TomitribeSignatureCreator implements SignatureCreator {
         }
 
         List<String> headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
-
-        headers.add("(request-target)");
+        if (includeRequestTarget) {
+            headers.add("(request-target)");
+        }
 
         if (keyId == null) {
             throw new IllegalArgumentException("key id cannot be null");

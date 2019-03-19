@@ -78,4 +78,27 @@ under the License.
         </jaxrs:providers>
     </jaxrs:server>
     
+    <bean id="messageSigner" class="org.apache.cxf.rs.security.httpsignature.MessageSigner">
+        <constructor-arg>
+            <bean class="org.apache.cxf.systest.jaxrs.security.httpsignature.PrivateKeyProvider" factory-method="loadPrivateKey" />
+        </constructor-arg>
+        <constructor-arg value="custom_key_id" />
+        <constructor-arg value="false" />
+    </bean>
+    <bean id="httpSignatureCreator" class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter">
+        <property name="messageSigner" ref="messageSigner"/>
+    </bean>
+    <bean id="httpSignatureClientVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter">
+        <property name="messageVerifier" ref="messageVerifier"/>
+    </bean>
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigresponse">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="httpSignatureVerifier"/>
+            <ref bean="httpSignatureCreator"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    
 </beans>

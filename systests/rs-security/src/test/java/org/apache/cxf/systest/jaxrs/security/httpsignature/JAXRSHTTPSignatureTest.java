@@ -25,6 +25,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +45,9 @@ import javax.ws.rs.ext.Provider;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
+import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
+import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -112,6 +115,39 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureResponse() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        VerifySignatureClientFilter signatureResponseFilter = new VerifySignatureClientFilter();
+        MessageVerifier messageVerifier = new MessageVerifier(new CustomPublicKeyProvider());
+        signatureResponseFilter.setMessageVerifier(messageVerifier);
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(signatureFilter);
+        providers.add(signatureResponseFilter);
+        String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/books";
+        WebClient client = WebClient.create(address, providers, busFile.toString());
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));

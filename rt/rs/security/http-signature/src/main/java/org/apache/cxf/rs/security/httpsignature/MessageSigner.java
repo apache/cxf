@@ -36,19 +36,35 @@ public class MessageSigner {
                          String digestAlgorithmName,
                          PrivateKey privateKey,
                          String keyId) {
+        this(signatureAlgorithmName, digestAlgorithmName, privateKey, keyId, true);
+    }
+
+    public MessageSigner(String signatureAlgorithmName,
+                         String digestAlgorithmName,
+                         PrivateKey privateKey,
+                         String keyId,
+                         boolean includeRequestTarget) {
         this.digestAlgorithmName = Objects.requireNonNull(digestAlgorithmName);
         this.signatureCreator = new TomitribeSignatureCreator(
                 Objects.requireNonNull(signatureAlgorithmName),
                 Objects.requireNonNull(privateKey),
-                Objects.requireNonNull(keyId));
+                Objects.requireNonNull(keyId),
+                includeRequestTarget);
     }
 
     public MessageSigner(PrivateKey privateKey,
                          String keyId) {
+        this(privateKey, keyId, true);
+    }
+
+    public MessageSigner(PrivateKey privateKey,
+                         String keyId,
+                         boolean includeRequestTarget) {
         this(DefaultSignatureConstants.SIGNING_ALGORITHM,
                 DefaultSignatureConstants.DIGEST_ALGORITHM,
                 privateKey,
-                keyId);
+                keyId,
+                includeRequestTarget);
     }
 
     public void sign(Map<String, List<String>> messageHeaders,
