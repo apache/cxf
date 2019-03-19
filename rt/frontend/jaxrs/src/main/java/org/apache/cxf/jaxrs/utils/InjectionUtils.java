@@ -100,8 +100,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
-import static java.lang.ClassLoader.getSystemClassLoader;
-
 public final class InjectionUtils {
     public static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
     public static final Set<String> VALUE_CONTEXTS = new HashSet<>();
@@ -133,11 +131,9 @@ public final class InjectionUtils {
 
         boolean useJaxb;
         try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            if (loader == null) {
-                loader = getSystemClassLoader();
-            }
-            loader.loadClass("javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter");
+            ClassLoaderUtils.loadClass(
+                    "javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
+                    InjectionUtils.class);
             useJaxb = true;
         } catch (final ClassNotFoundException cnfe) {
             useJaxb = false;
