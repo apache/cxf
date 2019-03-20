@@ -22,7 +22,6 @@ package org.apache.cxf.bus.managers;
 import javax.management.JMException;
 import javax.management.ObjectName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.management.ManagedComponent;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
@@ -36,12 +35,19 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
     static final String NAME_VALUE = "Bus.WorkQueueManager";
     static final String TYPE_VALUE = "WorkQueueManager";
 
-    private WorkQueueManagerImpl wqManager;
-    private Bus bus;
+    private final WorkQueueManagerImpl wqManager;
+    private final String objectName;
 
     public WorkQueueManagerImplMBeanWrapper(WorkQueueManagerImpl wq) {
         wqManager = wq;
-        bus = wq.getBus();
+
+        //Use default domain name of server
+        objectName = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':')
+                .append(ManagementConstants.BUS_ID_PROP).append('=').append(wqManager.getBus().getId()).append(',')
+                .append("WorkQueueManager=").append(NAME_VALUE)
+                .append(',').append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',')
+                // Added the instance id to make the ObjectName unique
+                .append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(wqManager.hashCode()).toString();
     }
 
     @ManagedOperation(currencyTimeLimit = 30)
@@ -50,16 +56,7 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
     }
 
     public ObjectName getObjectName() throws JMException {
-        StringBuilder buffer = new StringBuilder();
-
-        buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
-        buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
-        buffer.append("WorkQueueManager=").append(NAME_VALUE);
-        buffer.append(',').append(ManagementConstants.TYPE_PROP).append('=').append(TYPE_VALUE).append(',');
-        // Added the instance id to make the ObjectName unique
-        buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(wqManager.hashCode());
-        //Use default domain name of server
-        return new ObjectName(buffer.toString());
+        return new ObjectName(objectName);
     }
 
 }
