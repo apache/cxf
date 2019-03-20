@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -39,12 +40,11 @@ import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 
 /**
  * RS CXF client Filter which signs outgoing messages. It does not create a digest header
- *
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public final class CreateSignatureClientFilter implements ClientRequestFilter {
-    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(CreateSignatureClientFilter.class);
 
     private MessageSigner messageSigner;
     private boolean enabled;
@@ -76,8 +76,8 @@ public final class CreateSignatureClientFilter implements ClientRequestFilter {
         try {
             messageSigner.sign(convertedHeaders,
                 requestCtx.getUri().getPath(), requestCtx.getMethod());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            throw new BadRequestException(ex);
         }
         requestHeaders.put("Signature", Collections.singletonList(convertedHeaders.get("Signature").get(0)));
         LOG.fine("Finished filter message verification process");

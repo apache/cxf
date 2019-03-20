@@ -40,8 +40,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeader
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 
 /**
- * RS CXF Filter which extracts signature data from the context and sends it to the message verifier
- *
+ * RS CXF container Filter which extracts signature data from the context and sends it to the message verifier
  */
 @Provider
 @PreMatching
@@ -72,7 +71,8 @@ public final class VerifySignatureFilter implements ContainerRequestFilter {
         MultivaluedMap<String, String> responseHeaders = requestCtx.getHeaders();
         try {
             messageVerifier.verifyMessage(responseHeaders,
-                                          requestCtx.getMethod(), requestCtx.getUriInfo().getAbsolutePath().getPath());
+                                          requestCtx.getMethod(),
+                                          requestCtx.getUriInfo().getAbsolutePath().getPath());
         } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {

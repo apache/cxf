@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -46,7 +47,7 @@ import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public final class CreateSignatureFilter implements ContainerResponseFilter {
-    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureFilter.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(CreateSignatureFilter.class);
 
     private MessageSigner messageSigner;
     private boolean enabled;
@@ -78,8 +79,8 @@ public final class CreateSignatureFilter implements ContainerResponseFilter {
         try {
             // We don't pass the HTTP method + URI for the response case
             messageSigner.sign(convertedHeaders, "", "");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            throw new InternalServerErrorException(ex);
         }
         responseHeaders.put("Signature", Collections.singletonList(convertedHeaders.get("Signature").get(0)));
         LOG.fine("Finished filter message verification process");

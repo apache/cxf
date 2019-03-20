@@ -42,7 +42,6 @@ import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeade
 
 /**
  * RS CXF client Filter which extracts signature data from the context and sends it to the message verifier
- *
  */
 @Provider
 @PreMatching
