@@ -27,6 +27,10 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.systest.jaxrs.Book;
 
@@ -48,6 +52,72 @@ public class CompletableFutureService {
     @Path("booksAsync/{id}")
     public CompletableFuture<Book> getBookAsync(@PathParam("id") long id) {
         return CompletableFuture.supplyAsync(() -> new Book("cxf", 123L));
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("badRequest/{id}")
+    public CompletableFuture<Book> getBookAsyncExceptionBadRequest(@PathParam("id") long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        });
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("forbidden/{id}")
+    public CompletableFuture<Book> getBookAsyncExceptionForbidden(@PathParam("id") long id) {
+        final CompletableFuture<Book> future = new CompletableFuture<Book>();
+        future.completeExceptionally(new WebApplicationException(Status.FORBIDDEN));
+        return future;
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("unauthorized/{id}")
+    public void getBookAsyncExceptionUnauthorized(@PathParam("id") long id, @Suspended AsyncResponse response) {
+        CompletableFuture.supplyAsync(() -> {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }).whenComplete((r, ex) -> {
+            if (ex != null) {
+                response.resume(ex);
+            } else {
+                response.resume(r);
+            }
+        });
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("mapped/badRequest/{id}")
+    public CompletableFuture<Book> getBookAsyncExceptionBadRequestMapped(@PathParam("id") long id) {
+        return CompletableFuture.supplyAsync(() -> {
+            throw new MappedException(Status.BAD_REQUEST);
+        });
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("mapped/forbidden/{id}")
+    public CompletableFuture<Book> getBookAsyncExceptionForbiddenMapped(@PathParam("id") long id) {
+        final CompletableFuture<Book> future = new CompletableFuture<Book>();
+        future.completeExceptionally(new MappedException(Status.FORBIDDEN));
+        return future;
+    }
+
+    @GET
+    @Produces("text/xml")
+    @Path("mapped/unauthorized/{id}")
+    public void getBookAsyncExceptionUnauthorizedMapped(@PathParam("id") long id, @Suspended AsyncResponse response) {
+        CompletableFuture.supplyAsync(() -> {
+            throw new MappedException(Status.UNAUTHORIZED);
+        }).whenComplete((r, ex) -> {
+            if (ex != null) {
+                response.resume(ex);
+            } else {
+                response.resume(r);
+            }
+        });
     }
 }
 
