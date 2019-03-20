@@ -233,24 +233,11 @@ public final class ServiceUtils {
         StringTokenizer st = new StringTokenizer(packageName, ".");
         String[] words = new String[st.countTokens()];
 
-        for (int i = 0; i < words.length; ++i) {
+        for (int i = words.length - 1; i >= 0; --i) {
             words[i] = st.nextToken();
         }
 
-        StringBuilder sb = new StringBuilder(80);
-
-        for (int i = words.length - 1; i >= 0; --i) {
-            String word = words[i];
-
-            // seperate with dot
-            if (i != words.length - 1) {
-                sb.append('.');
-            }
-
-            sb.append(word);
-        }
-
-        return protocol + "://" + sb.toString() + "/";
+        return protocol + "://" + String.join(".", words) + "/";
     }
 
     /**

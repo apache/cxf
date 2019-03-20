@@ -75,14 +75,7 @@ public final class PackageUtils {
                 break;
             }
         }
-        StringBuilder sb = new StringBuilder();
-        for (String part : currentParts) {
-            if (sb.length() > 0) {
-                sb.append('.');
-            }
-            sb.append(part);
-        }
-        return sb.toString();
+        return String.join(".", currentParts);
     }
 
     public static String parsePackageName(String namespace, String defaultPackageName) {

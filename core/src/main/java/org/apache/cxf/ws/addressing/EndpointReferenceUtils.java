@@ -467,13 +467,7 @@ public final class EndpointReferenceUtils {
         MetadataType metadata = getSetMetadata(ref);
 
         //wsdlLocation attribute is a list of anyURI.
-        StringBuilder strBuf = new StringBuilder();
-        for (String str : wsdlLocation) {
-            strBuf.append(str);
-            strBuf.append(' ');
-        }
-
-        metadata.getOtherAttributes().put(WSDL_LOCATION, strBuf.toString().trim());
+        metadata.getOtherAttributes().put(WSDL_LOCATION, String.join(" ", wsdlLocation).trim());
     }
 
     public static String getWSDLLocation(EndpointReferenceType ref) {

@@ -173,12 +173,11 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
 
             if (LOG.isLoggable(Level.FINE)) {
-                StringBuilder buf = new StringBuilder();
-                buf.append("Constructing automatic work queue with:\n");
-                buf.append("max queue size: " + maxQueueSize + "\n");
-                buf.append("initialThreads: " + initialThreads + "\n");
-                buf.append("lowWaterMark: " + lowWaterMark + "\n");
-                buf.append("highWaterMark: " + highWaterMark + "\n");
+                StringBuilder buf = new StringBuilder("Constructing automatic work queue with:\n")
+                        .append("max queue size: ").append(maxQueueSize).append("\n")
+                        .append("initialThreads: ").append(initialThreads).append("\n")
+                        .append("lowWaterMark: ").append(lowWaterMark).append("\n")
+                        .append("highWaterMark: ").append(highWaterMark).append("\n");
                 LOG.fine(buf.toString());
             }
 
@@ -391,22 +390,14 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append(super.toString());
-        buf.append(" [queue size: ");
-        buf.append(getSize());
-        buf.append(", max size: ");
-        buf.append(maxQueueSize);
-        buf.append(", threads: ");
-        buf.append(getPoolSize());
-        buf.append(", active threads: ");
-        buf.append(getActiveCount());
-        buf.append(", low water mark: ");
-        buf.append(getLowWaterMark());
-        buf.append(", high water mark: ");
-        buf.append(getHighWaterMark());
-        buf.append(']');
-        return buf.toString();
+        return new StringBuilder(super.toString())
+                .append(" [queue size: ").append(getSize())
+                .append(", max size: ").append(maxQueueSize)
+                .append(", threads: ").append(getPoolSize())
+                .append(", active threads: ").append(getActiveCount())
+                .append(", low water mark: ").append(getLowWaterMark())
+                .append(", high water mark: ").append(getHighWaterMark())
+                .append(']').toString();
     }
 
     public void execute(final Runnable command) {

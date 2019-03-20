@@ -501,15 +501,8 @@ public final class SSLUtils {
                                                boolean exclude) {
         String[] cipherSuites = cipherSuitesList.toArray(new String[0]);
         if (log.isLoggable(Level.FINE)) {
-            StringBuilder ciphsStr = new StringBuilder();
-            for (String s : cipherSuites) {
-                if (ciphsStr.length() != 0) {
-                    ciphsStr.append(", ");
-                }
-                ciphsStr.append(s);
-            }
             LogUtils.log(log, Level.FINE,
-                exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());
+                exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", String.join(", ", cipherSuites));
         }
         return cipherSuites;
     }

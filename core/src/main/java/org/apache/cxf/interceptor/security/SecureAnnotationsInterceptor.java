@@ -116,14 +116,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                 try {
                     Method valueMethod = ann.annotationType().getMethod("value");
                     String[] roles = (String[])valueMethod.invoke(ann);
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < roles.length; i++) {
-                        sb.append(roles[i]);
-                        if (i + 1 < roles.length) {
-                            sb.append(' ');
-                        }
-                    }
-                    return sb.toString();
+                    return String.join(" ", roles);
                 } catch (Exception ex) {
                     // ignore
                 }

@@ -126,11 +126,10 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
 
     public Object getBeanInfo(Class<?> cls) {
         Class<?> origCls = cls;
-        StringBuilder postfix = new StringBuilder();
-        postfix.append("");
+        String postfix = "";
         while (cls.isArray()) {
             cls = cls.getComponentType();
-            postfix.append("Array");
+            postfix = "Array";
         }
         XmlRootElement xre = cls.getAnnotation(XmlRootElement.class);
         String name = xre == null ? "##default" : xre.name();
@@ -150,7 +149,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
                 namespace = defaultNamespace;
             }
         }
-        final QName qname = new QName(namespace, name + postfix.toString());
+        final QName qname = new QName(namespace, name + postfix);
         final XmlSchemaElement el = schemas.getElementByQName(qname);
         XmlSchemaType type = null;
         if (el != null) {
