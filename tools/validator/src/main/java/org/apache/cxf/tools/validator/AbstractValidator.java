@@ -25,9 +25,6 @@ import java.util.List;
 public abstract class AbstractValidator {
     protected List<String> errorMessages = new ArrayList<>();
 
-    public AbstractValidator() {
-    }
-
     public abstract boolean isValid();
 
     public void addErrorMessage(String err) {
@@ -35,11 +32,6 @@ public abstract class AbstractValidator {
     }
 
     public String getErrorMessage() {
-        StringBuilder strbuffer = new StringBuilder();
-        for (int i = 0; i < errorMessages.size(); i++) {
-            strbuffer.append(errorMessages.get(i));
-            strbuffer.append(System.getProperty("line.separator"));
-        }
-        return strbuffer.toString();
+        return String.join(System.getProperty("line.separator"), errorMessages);
     }
 }
