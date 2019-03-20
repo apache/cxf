@@ -94,7 +94,7 @@ public class ServerImpl implements Server {
         LOG.info("Setting the server's publish address to be " + wantFilter);
         serverRegistry = bus.getExtension(ServerRegistry.class);
 
-        mep = createManagedEndpoint();
+        mep = new ManagedEndpoint(bus, endpoint, this);
 
         slcMgr = bus.getExtension(ServerLifeCycleManager.class);
         if (slcMgr != null) {
@@ -109,10 +109,6 @@ public class ServerImpl implements Server {
                 LOG.log(Level.WARNING, "Registering ManagedEndpoint failed.", jmex);
             }
         }
-    }
-
-    private ManagedEndpoint createManagedEndpoint() {
-        return new ManagedEndpoint(bus, endpoint, this);
     }
 
     public Destination getDestination() {
