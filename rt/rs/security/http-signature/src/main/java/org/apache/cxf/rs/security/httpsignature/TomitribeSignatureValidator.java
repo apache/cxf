@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,6 +38,11 @@ import org.tomitribe.auth.signatures.Verifier;
 
 public class TomitribeSignatureValidator implements SignatureValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(TomitribeSignatureValidator.class);
+    private final List<String> requiredHeaders;
+
+    public TomitribeSignatureValidator(List<String> requiredHeaders) {
+        this.requiredHeaders = new ArrayList<>(requiredHeaders);
+    }
 
     @Override
     public void validate(Map<String, List<String>> messageHeaders,
@@ -80,6 +86,11 @@ public class TomitribeSignatureValidator implements SignatureValidator {
         try {
             Verifier verifier = new Verifier(key, signature, provider);
             success = verifier.verify(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
+
+            if (!signature.getHeaders().containsAll(requiredHeaders)) {
+                LOG.warning("Not all of the required headers are signed");
+                throw new InvalidDataToVerifySignatureException();
+            }
         } catch (Exception e) {
             throw new InvalidDataToVerifySignatureException(e.getMessage(), e);
         }

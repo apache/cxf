@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.httpsignature;
 
 import java.io.IOException;
 import java.security.PrivateKey;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,17 +33,19 @@ public class TomitribeSignatureCreator implements SignatureCreator {
     private final PrivateKey privateKey;
     private final String keyId;
     private final boolean includeRequestTarget;
+    private final List<String> headersToSign;
 
     public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey, String keyId) {
-        this(signatureAlgorithmName, privateKey, keyId, true);
+        this(signatureAlgorithmName, privateKey, keyId, true, Collections.emptyList());
     }
 
     public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey,
-                                     String keyId, boolean includeRequestTarget) {
+                                     String keyId, boolean includeRequestTarget, List<String> headersToSign) {
         this.signatureAlgorithmName = signatureAlgorithmName;
         this.privateKey = privateKey;
         this.keyId = keyId;
         this.includeRequestTarget = includeRequestTarget;
+        this.headersToSign = headersToSign;
     }
 
     @Override
@@ -52,7 +55,13 @@ public class TomitribeSignatureCreator implements SignatureCreator {
             throw new IllegalArgumentException("message headers cannot be null");
         }
 
-        List<String> headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
+        List<String> headers = null;
+        // If we have explicit headers to sign then use these. Otherwise sign all headers
+        if (headersToSign.isEmpty()) {
+            headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
+        } else {
+            headers = headersToSign.stream().map(String::toLowerCase).collect(Collectors.toList());
+        }
         if (includeRequestTarget) {
             headers.add("(request-target)");
         }

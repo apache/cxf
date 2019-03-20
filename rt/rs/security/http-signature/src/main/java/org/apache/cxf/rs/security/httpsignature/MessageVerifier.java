@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.Security;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,18 +43,30 @@ public class MessageVerifier {
     private final SignatureValidator signatureValidator;
 
     public MessageVerifier(PublicKeyProvider publicKeyProvider) {
+        this(publicKeyProvider, Collections.emptyList());
+    }
+
+    public MessageVerifier(PublicKeyProvider publicKeyProvider, List<String> requiredHeaders) {
         this(publicKeyProvider,
             keyId -> Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER),
-            keyId -> DefaultSignatureConstants.SIGNING_ALGORITHM);
+            keyId -> DefaultSignatureConstants.SIGNING_ALGORITHM,
+            requiredHeaders);
     }
 
     public MessageVerifier(PublicKeyProvider publicKeyProvider,
                            SecurityProvider securityProvider,
                            AlgorithmProvider algorithmProvider) {
+        this(publicKeyProvider, securityProvider, algorithmProvider, Collections.emptyList());
+    }
+
+    public MessageVerifier(PublicKeyProvider publicKeyProvider,
+                           SecurityProvider securityProvider,
+                           AlgorithmProvider algorithmProvider,
+                           List<String> requiredHeaders) {
         setPublicKeyProvider(publicKeyProvider);
         setSecurityProvider(securityProvider);
         setAlgorithmProvider(algorithmProvider);
-        this.signatureValidator = new TomitribeSignatureValidator();
+        this.signatureValidator = new TomitribeSignatureValidator(requiredHeaders);
     }
 
     public final void setPublicKeyProvider(PublicKeyProvider publicKeyProvider) {

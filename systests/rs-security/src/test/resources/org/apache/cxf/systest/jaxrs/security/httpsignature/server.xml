@@ -40,6 +40,11 @@ under the License.
         <constructor-arg>
             <ref bean="publicKeyProvider"/>
         </constructor-arg>
+        <constructor-arg>
+            <util:list>
+                <value>(request-target)</value>
+            </util:list>
+        </constructor-arg>
     </bean>
     <bean id="httpSignatureVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifier"/>
