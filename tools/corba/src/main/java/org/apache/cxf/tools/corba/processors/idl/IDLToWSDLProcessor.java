@@ -435,7 +435,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 if (bindingTokens.length > 1) {
                     StringBuilder name = new StringBuilder("");
                     for (int j = 0; j < bindingTokens.length - 2; j++) {
-                        name.append(bindingTokens[j]).append(".");
+                        name.append(bindingTokens[j]).append('.');
                     }
                     name.append(bindingTokens[bindingTokens.length - 2] + "CORBAService");
                     serviceNames.put(ns, name.toString());

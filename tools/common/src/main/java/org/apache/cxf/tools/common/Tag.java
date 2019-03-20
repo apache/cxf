@@ -117,7 +117,7 @@ public class Tag {
         if (text != null) {
             sb.append(text);
         }
-        sb.append("\n");
+        sb.append('\n');
 
         if (tag.getTags().size() > 0) {
             indent++;

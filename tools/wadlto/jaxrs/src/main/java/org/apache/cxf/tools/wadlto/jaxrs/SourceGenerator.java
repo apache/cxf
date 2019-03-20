@@ -512,7 +512,7 @@ public class SourceGenerator {
             writeAnnotation(sbCode, imports, Path.class, path, true, false);
         }
 
-        sbCode.append("public ").append(getClassType(info.interfaceIsGenerated)).append(" ").append(className);
+        sbCode.append("public ").append(getClassType(info.interfaceIsGenerated)).append(' ').append(className);
         writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());
         sbCode.append(" {").append(getLineSep()).append(getLineSep());
 
@@ -726,7 +726,7 @@ public class SourceGenerator {
         final String methodNameLowerCase = methodName.toLowerCase();
         String idAttribute = methodEl.getAttribute("id");
         final String id = idAttribute.isEmpty() ? methodNameLowerCase : idAttribute;
-        
+
         final boolean responseRequired = isMethodMatched(responseMethods, methodNameLowerCase, id);
         final boolean suspendedAsync = !responseRequired
             && isMethodMatched(suspendedAsyncMethods, methodNameLowerCase, id);
@@ -1201,7 +1201,7 @@ public class SourceGenerator {
                                info, imports, true);
         }
         if (elementType != null) {
-            sbCode.append(elementType).append(" ");
+            sbCode.append(elementType).append(' ');
         } else {
             writeJaxrResponse(sbCode, imports);
         }
@@ -1650,14 +1650,14 @@ public class SourceGenerator {
                 String elementTypeName = pair.length == 2 ? pair[1] : pair[0];
                 clsName = matchClassName(typeClassNames, packageName, elementTypeName);
                 if (clsName == null && jaxbClassNameSuffix != null) {
-                    clsName = matchClassName(typeClassNames, packageName, 
+                    clsName = matchClassName(typeClassNames, packageName,
                                              elementTypeName + jaxbClassNameSuffix);
                 }
                 if (clsName == null && elementTypeName.contains("_")) {
                     String elementTypeNameWithoutUnderscore = elementTypeName.replaceAll("_", "");
                     clsName = matchClassName(typeClassNames, packageName, elementTypeNameWithoutUnderscore);
                     if (clsName == null && jaxbClassNameSuffix != null) {
-                        clsName = matchClassName(typeClassNames, packageName, 
+                        clsName = matchClassName(typeClassNames, packageName,
                                                  elementTypeNameWithoutUnderscore + jaxbClassNameSuffix);
                     }
                 }
@@ -1668,7 +1668,7 @@ public class SourceGenerator {
                         clsName = matchClassName(typeClassNames, packageName, elementTypeName);
                         //CHECKSTYLE:OFF
                         if (clsName == null && jaxbClassNameSuffix != null) {
-                            clsName = matchClassName(typeClassNames, packageName, 
+                            clsName = matchClassName(typeClassNames, packageName,
                                                      elementTypeName + jaxbClassNameSuffix);
                         }
                         //CHECKSTYLE:ON
@@ -1728,7 +1728,7 @@ public class SourceGenerator {
                     mediaTypes.append(", ");
                 }
                 first = false;
-                mediaTypes.append("\"").append(mediaType).append("\"");
+                mediaTypes.append('"').append(mediaType).append('"');
             }
         }
         sbCode.append(mediaTypes.toString());
@@ -1927,7 +1927,7 @@ public class SourceGenerator {
             InputStream is = null;
             if (!href.startsWith("http")) {
                 is = ResourceUtils.getResourceStream(href, bus);
-            } 
+            }
             if (is == null) {
                 URL url = URI.create(href).toURL();
                 if (href.startsWith("https") && authentication != null) {

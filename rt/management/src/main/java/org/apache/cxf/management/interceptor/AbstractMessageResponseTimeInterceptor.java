@@ -128,19 +128,19 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
                 String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
                 String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
 
-                buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(":");
-                buffer.append(ManagementConstants.BUS_ID_PROP).append("=").append(bus.getId()).append(",");
+                buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
+                buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(bus.getId()).append(',');
                 Message message = ex.getOutMessage();
                 if (isClient(message)) {
-                    buffer.append(ManagementConstants.TYPE_PROP).append("=")
+                    buffer.append(ManagementConstants.TYPE_PROP).append('=')
                         .append(Counter.PERFORMANCE_COUNTER).append(".Client,");
                 } else {
-                    buffer.append(ManagementConstants.TYPE_PROP).append("=")
+                    buffer.append(ManagementConstants.TYPE_PROP).append('=')
                         .append(Counter.PERFORMANCE_COUNTER).append(".Server,");
                 }
-                buffer.append(ManagementConstants.SERVICE_NAME_PROP).append("=").append(serviceName).append(",");
+                buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
 
-                buffer.append(ManagementConstants.PORT_NAME_PROP).append("=").append(portName);
+                buffer.append(ManagementConstants.PORT_NAME_PROP).append('=').append(portName);
 
                 try {
                     serviceCounterName = new ObjectName(buffer.toString());
@@ -185,7 +185,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         }
         StringBuilder buffer = new StringBuilder(sericeCounterName.toString());
         if (operationName != null) {
-            buffer.append(",").append(ManagementConstants.OPERATION_NAME_PROP).append("=").append(operationName);
+            buffer.append(',').append(ManagementConstants.OPERATION_NAME_PROP).append('=').append(operationName);
         }
         String operationCounterName = buffer.toString();
         ObjectName operationCounter = null;

@@ -70,7 +70,7 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                
+
                 String property = statement.getProperty();
                 String[] properties =  property.split("\\.");
                 if (properties.length > 2) {
@@ -87,14 +87,14 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                         joiningKey = joiningKey.substring(0, joiningKey.length() - 1);
                     }
                     joiningKey += "_id";
-                    
+
                     topBuilder.append(" left join ").append(joinTable);
                     topBuilder.append(" on ").append(primaryTable).append(".id").append(" = ")
-                        .append(joinTable).append(".").append(joiningKey);
-                    
+                        .append(joinTable).append('.').append(joiningKey);
+
                     property = joinTable + "." + getRealPropertyName(properties[1]);
                 }
-                
+
                 String name = getRealPropertyName(property);
                 String originalValue = getPropertyValue(name, statement.getValue());
                 validatePropertyValue(name, originalValue);

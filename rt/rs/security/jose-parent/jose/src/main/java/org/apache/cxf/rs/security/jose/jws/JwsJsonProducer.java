@@ -49,7 +49,7 @@ public class JwsJsonProducer {
     public JwsJsonProducer(String tbsDocument, boolean supportFlattened) {
         this(tbsDocument, supportFlattened, false);
     }
-    
+
     public JwsJsonProducer(String tbsDocument, boolean supportFlattened, boolean supportDetached) {
         this.plainPayload = tbsDocument;
         this.supportFlattened = supportFlattened;
@@ -72,7 +72,7 @@ public class JwsJsonProducer {
     public String getJwsJsonSignedDocument(boolean detached) {
         return doGetJwsJsonSignedDocument(detached);
     }
-    private String doGetJwsJsonSignedDocument(boolean detached) {    
+    private String doGetJwsJsonSignedDocument(boolean detached) {
         if (signatures.isEmpty()) {
             return null;
         }
@@ -81,7 +81,7 @@ public class JwsJsonProducer {
         StringBuilder sb = new StringBuilder();
         sb.append('{');
         if (!detached) {
-            sb.append("\"payload\":\"").append(getActualPayload(b64Status)).append("\"");
+            sb.append("\"payload\":\"").append(getActualPayload(b64Status)).append('"');
             sb.append(',');
         }
         if (!supportFlattened || signatures.size() > 1) {

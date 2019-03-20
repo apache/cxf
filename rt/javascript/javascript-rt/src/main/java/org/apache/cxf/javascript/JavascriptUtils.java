@@ -164,7 +164,7 @@ public class JavascriptUtils {
         code.append(prefix());
         code.append(xmlStringAccumulatorVariable + " = " + xmlStringAccumulatorVariable + " + ");
         code.append(value);
-        code.append(";").append(NL);
+        code.append(';').append(NL);
     }
 
     private String prefix() {
@@ -185,7 +185,7 @@ public class JavascriptUtils {
 
     public void startBlock() {
         code.append(prefix());
-        code.append("{").append(NL);
+        code.append('{').append(NL);
         prefixStack.push(prefix() + " ");
     }
 
@@ -199,7 +199,7 @@ public class JavascriptUtils {
     public void endBlock() {
         prefixStack.pop();
         code.append(prefix());
-        code.append("}").append(NL);
+        code.append('}').append(NL);
     }
 
     public void startFor(String start, String test, String increment) {

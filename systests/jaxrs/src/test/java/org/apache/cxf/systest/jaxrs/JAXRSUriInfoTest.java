@@ -120,7 +120,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
             StringBuilder sb = new StringBuilder();
             sb.append(uriInfo.getBaseUri());
             sb.append(",\"" + path + "\"");
-            sb.append(",").append(uriInfo.getPath());
+            sb.append(',').append(uriInfo.getPath());
             return sb.toString();
         }
 

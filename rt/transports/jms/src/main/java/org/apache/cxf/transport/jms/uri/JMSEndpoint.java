@@ -211,15 +211,15 @@ public class JMSEndpoint {
         } else {
             requestUri.append(jmsVariant);
         }
-        requestUri.append(":").append(destinationName);
+        requestUri.append(':').append(destinationName);
         boolean first = true;
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             String value = entry.getValue();
             if (first) {
-                requestUri.append("?").append(entry.getKey()).append("=").append(value);
+                requestUri.append('?').append(entry.getKey()).append('=').append(value);
                 first = false;
             } else {
-                requestUri.append("&").append(entry.getKey()).append("=").append(value);
+                requestUri.append('&').append(entry.getKey()).append('=').append(value);
             }
         }
         return requestUri.toString();

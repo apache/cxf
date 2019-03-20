@@ -144,7 +144,7 @@ public class JwsJsonSignatureEntry implements JsonObject {
             sb.append('{');
         }
         if (protectedHeader != null) {
-            sb.append("\"protected\":\"").append(Base64UrlUtility.encode(writer.toJson(protectedHeader))).append("\"");
+            sb.append("\"protected\":\"").append(Base64UrlUtility.encode(writer.toJson(protectedHeader))).append('"');
         }
         if (unprotectedHeader != null) {
             if (protectedHeader != null) {
@@ -153,7 +153,7 @@ public class JwsJsonSignatureEntry implements JsonObject {
             sb.append("\"header\":").append(writer.toJson(unprotectedHeader));
         }
         sb.append(',');
-        sb.append("\"signature\":\"").append(encodedSignature).append("\"");
+        sb.append("\"signature\":\"").append(encodedSignature).append('"');
         if (!flattenedMode) {
             sb.append('}');
         }
