@@ -69,7 +69,8 @@ public class MarshalRegistry implements Iterable<Object> {
     public String getInstanceId(Object instance) {
         String id = instances.get(instance);
         if (id == null) {
-            id = "" + nextId++;
+            id = Integer.toString(nextId);
+            nextId++;
             instances.put(instance, id);
             notMarshalled.put(id, instance);
         }

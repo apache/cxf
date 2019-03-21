@@ -19,29 +19,17 @@
 
 package org.apache.cxf.systest.coloc;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.junit.Test;
-
 
 public class ColocHeaderRpcLitTest extends AbstractHeaderServiceRpcLitTest {
     static final String TRANSPORT_URI = "http://localhost:" + PORT + "/headers";
-
-    private Log logger = LogFactory.getLog(ColocHeaderRpcLitTest.class);
 
     protected String getCxfConfig() {
         return "org/apache/cxf/systest/coloc/coloc_rpc.xml";
     }
 
-    protected Log getLogger() {
-        return logger;
-    }
-
     protected Object getServiceImpl() {
-        HttpServiceImpl impl = new HttpServiceImpl();
-        impl.init(getLogger());
-        return impl;
+        return new HttpServiceImpl();
     }
 
     protected String getTransportURI() {

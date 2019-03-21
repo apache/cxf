@@ -41,12 +41,12 @@ import org.apache.maven.project.MavenProject;
  */
 public class ClassLoaderSwitcher {
 
-    private Log log;
+    private Log log; //NOPMD
     private String origClassPath;
     private Properties origProps;
     private ClassLoader origContextClassloader;
 
-    public ClassLoaderSwitcher(Log log) {
+    public ClassLoaderSwitcher(Log log) { //NOPMD
         this.log = log;
     }
 

@@ -43,7 +43,7 @@ import org.apache.maven.project.MavenProject;
 // TODO: Move to the common plugin module
 public class ClassLoaderSwitcher {
 
-    private Log log;
+    private Log log;    //NOPMD
     private String origClassPath;
     private Properties origProps;
     private ClassLoader origContextClassloader;
@@ -123,7 +123,7 @@ public class ClassLoaderSwitcher {
             Thread.currentThread().setContextClassLoader(origContextClassloader);
             origContextClassloader = null; // don't hold a reference.
         }
-        
+
 
         if (origProps != null) {
             System.setProperties(origProps);

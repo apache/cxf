@@ -26,7 +26,6 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
-import org.apache.commons.logging.Log;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -82,8 +81,6 @@ public abstract class AbstractColocTest {
     @After
     public void tearDown() throws Exception {
 
-        getLogger().debug("tearDown ...");
-
         if (endpoint != null) {
             endpoint.stop();
         }
@@ -117,11 +114,6 @@ public abstract class AbstractColocTest {
      * @return the greeter impl object
      */
     protected abstract Object getServiceImpl();
-
-    /**
-     * @return logger object
-     */
-    protected abstract Log getLogger();
 
     /**
      * @return transport URI for the WS Endpoint

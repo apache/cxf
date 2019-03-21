@@ -227,7 +227,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
 
             // KeySize
             writer.writeStartElement(prefix, "KeySize", namespace);
-            writer.writeCharacters("" + keySize);
+            writer.writeCharacters(Integer.toString(keySize));
             writer.writeEndElement();
 
             byte[] secret = WSSecurityUtil.generateNonce(keySize / 8);

@@ -19,11 +19,14 @@
 
 package org.apache.cxf.systest.coloc;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.headers.coloc.types.FaultDetailT;
 import org.apache.headers.coloc.types.HeaderInfo;
@@ -57,11 +60,14 @@ import static org.junit.Assert.fail;
  *
  */
 public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest {
+
     static final QName SERVICE_NAME = new QName("http://apache.org/headers/rpc_lit",
                                                 "SOAPHeaderService");
     static final QName PORT_NAME = new QName("http://apache.org/headers/rpc_lit",
                                              "SoapPort");
     static final String WSDL_LOCATION = "/wsdl/header_rpc_lit.wsdl";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractHeaderServiceRpcLitTest.class);
 
     private HeaderTester port;
 
@@ -122,7 +128,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     }
 
     public void verifyTwoWay(HeaderTester ht) {
-        getLogger().debug("Client: calling pingMe");
+        LOG.fine("Client: calling pingMe");
         PingMeT in = new PingMeT();
         try {
             in.setFaultType("ABCD");
@@ -134,7 +140,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     }
 
     protected void verifyInHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling inHeader");
+        LOG.fine("Client: calling inHeader");
         InHeaderT inHeader = new InHeaderT();
         inHeader.setRequestType(HeaderTesterUtil.IN_REQUEST_TYPE);
 
@@ -147,7 +153,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     }
 
     protected void verifyInOutHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling inoutHeader");
+        LOG.fine("Client: calling inoutHeader");
         InoutHeaderT inoutHeader = new InoutHeaderT();
         inoutHeader.setRequestType(HeaderTesterUtil.INOUT_REQUEST_TYPE_IN);
 
@@ -169,7 +175,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     }
 
     protected void verifyOutHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling outHeader");
+        LOG.fine("Client: calling outHeader");
         OutHeaderT outHeader = new OutHeaderT();
         outHeader.setRequestType(HeaderTesterUtil.OUT_REQUEST_TYPE);
 
@@ -191,7 +197,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     }
 
     public void verifyFaults(HeaderTester ht) {
-        getLogger().debug("Client: calling pingMe user fault");
+        LOG.fine("Client: calling pingMe user fault");
         PingMeT in = new PingMeT();
 
         try {
@@ -208,7 +214,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
             }
         }
 
-        getLogger().debug("Client: calling pingMe Cxf System Fault");
+        LOG.fine("Client: calling pingMe Cxf System Fault");
         try {
             in.setFaultType("SYSTEM");
             ht.pingMe(in);
@@ -223,7 +229,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
             fail("Should not receive PingMefault");
         }
 
-        getLogger().debug("Client: calling pingMe java runtime exception");
+        LOG.fine("Client: calling pingMe java runtime exception");
         try {
             in.setFaultType("RUNTIME");
             ht.pingMe(in);

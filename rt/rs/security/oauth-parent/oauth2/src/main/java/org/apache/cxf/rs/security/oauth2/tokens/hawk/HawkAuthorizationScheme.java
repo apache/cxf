@@ -106,8 +106,8 @@ public class HawkAuthorizationScheme {
             + requestURI + SEPARATOR
             + props.getHostName() + SEPARATOR
             + props.getPort() + SEPARATOR
-            + "" + SEPARATOR
-            + "" + SEPARATOR;
+            + SEPARATOR
+            + SEPARATOR;
     }
 
     private static String normalizeQuery(String query) {

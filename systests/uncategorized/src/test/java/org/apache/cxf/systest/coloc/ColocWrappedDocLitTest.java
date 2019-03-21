@@ -19,21 +19,10 @@
 
 package org.apache.cxf.systest.coloc;
 
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.junit.Test;
-
 
 public class ColocWrappedDocLitTest extends AbstractWrappedDocLitTest {
     static final String TRANSPORT_URI = "http://localhost:" + PORT + "/SoapContext/SoapPort";
-
-    private Log logger = LogFactory.getLog(ColocWrappedDocLitTest.class);
-
-    protected Log getLogger() {
-        return logger;
-    }
 
     protected String getTransportURI() {
         return TRANSPORT_URI;

@@ -19,9 +19,12 @@
 
 package org.apache.cxf.systest.coloc;
 
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.headers.coloc.types.HeaderInfo;
 import org.apache.headers.coloc.types.InHeaderResponseT;
 import org.apache.headers.coloc.types.InHeaderT;
@@ -50,6 +53,8 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
     static final QName SERVICE_NAME = new QName("http://apache.org/headers/doc_lit", "SOAPHeaderService");
     static final QName PORT_NAME = new QName("http://apache.org/headers/doc_lit", "SoapPort9000");
     static final String WSDL_LOCATION = "/wsdl/header_doc_lit.wsdl";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractHeaderServiceDocLitTest.class);
 
     private HeaderTester service;
 
@@ -98,7 +103,7 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
     }
 
     protected void verifyInHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling inHeader");
+        LOG.fine("Client: calling inHeader");
         InHeaderT inHeader = new InHeaderT();
         inHeader.setRequestType(HeaderTesterUtil.IN_REQUEST_TYPE);
 
@@ -111,7 +116,7 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
     }
 
     protected void verifyInOutHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling inoutHeader");
+        LOG.fine("Client: calling inoutHeader");
         InoutHeaderT inoutHeader = new InoutHeaderT();
         inoutHeader.setRequestType(HeaderTesterUtil.INOUT_REQUEST_TYPE_IN);
 
@@ -132,7 +137,7 @@ public abstract class AbstractHeaderServiceDocLitTest extends AbstractColocTest 
     }
 
     protected void verifyOutHeaderParts(HeaderTester ht) {
-        getLogger().debug("Client: calling outHeader");
+        LOG.fine("Client: calling outHeader");
         OutHeaderT outHeader = new OutHeaderT();
         outHeader.setRequestType(HeaderTesterUtil.OUT_REQUEST_TYPE);
 

@@ -66,7 +66,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
     }
 
     public String getSignature() {
-        return "" + System.identityHashCode(this);
+        return Integer.toString(System.identityHashCode(this));
     }
 
     protected abstract Object createWrapperObject(Class<?> typeClass) throws Exception;
