@@ -18,27 +18,13 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
-import java.util.Objects;
-import java.util.logging.Logger;
-
 import javax.annotation.Priority;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
-
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
-import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
-import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
-import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
-import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeaderException;
-import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
-import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 
 /**
  * RS CXF client Filter which extracts signature data from the context and sends it to the message verifier
@@ -46,52 +32,15 @@ import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeade
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public final class VerifySignatureClientFilter implements ClientResponseFilter {
-    private static final Logger LOG = LogUtils.getL7dLogger(VerifySignatureClientFilter.class);
-
-    private MessageVerifier messageVerifier;
-    private boolean enabled;
+public final class VerifySignatureClientFilter extends AbstractSignatureInFilter implements ClientResponseFilter {
 
     public VerifySignatureClientFilter() {
-        setEnabled(true);
+        super();
     }
 
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) {
-        if (!enabled) {
-            LOG.fine("Verify signature client filter is disabled");
-            return;
-        }
-
-        if (messageVerifier == null) {
-            LOG.warning("Message verifier cannot be null");
-            return;
-        }
-
-        LOG.fine("Starting filter message verification process");
-        MultivaluedMap<String, String> responseHeaders = responseContext.getHeaders();
-        try {
-            messageVerifier.verifyMessage(responseHeaders, "", "");
-        } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
-            | InvalidDataToVerifySignatureException | InvalidSignatureException
-            | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {
-            LOG.warning(ex.getMessage());
-            throw new BadRequestException(ex);
-        }
-        LOG.fine("Finished filter message verification process");
-    }
-
-    public void setMessageVerifier(MessageVerifier messageVerifier) {
-        Objects.requireNonNull(messageVerifier);
-        this.messageVerifier = messageVerifier;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
+        verifySignature(responseContext.getHeaders(), "", "");
     }
 
 }
