@@ -144,6 +144,18 @@ public final class JoseUtils {
             LOG.info(thePrefix + " Headers: \r\n" + writer.toJson(headers));
         }
     }
+
+    public static boolean checkBooleanProperty(JoseHeaders headers, Properties props, Message m,
+                                               String propertyName) {
+        if (headers == null) {
+            return false;
+        }
+        if (props.containsKey(propertyName)) {
+            return PropertyUtils.isTrue(props.get(propertyName));
+        }
+        return MessageUtils.getContextualBoolean(m, propertyName, false);
+    }
+
     //
     // <Start> Copied from JAX-RS RT FRONTEND ResourceUtils
     //
@@ -204,17 +216,6 @@ public final class JoseUtils {
         return props;
     }
 
-    public static boolean checkBooleanProperty(JoseHeaders headers, Properties props, Message m,
-                                                String propertyName) {
-        if (headers == null) {
-            return false;
-        }
-        if (props.containsKey(propertyName)) {
-            return PropertyUtils.isTrue(props.get(propertyName));
-        }
-        return MessageUtils.getContextualBoolean(m, propertyName, false);
-    }
-    
     //
     // <End> Copied from JAX-RS RT FRONTEND ResourceUtils
     //
