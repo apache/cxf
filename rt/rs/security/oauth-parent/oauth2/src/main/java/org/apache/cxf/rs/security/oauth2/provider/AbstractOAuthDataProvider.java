@@ -94,7 +94,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (messageContext != null) {
             String certCnf = (String)messageContext.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
             if (certCnf != null) {
-                // At a later stage we will likely introduce a dedicate Confirmation bean (as it is used in POP etc)
+                // At a later stage we will likely introduce a dedicated Confirmation bean (as it is used in POP etc)
                 at.getExtraProperties().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf);
             }
         }

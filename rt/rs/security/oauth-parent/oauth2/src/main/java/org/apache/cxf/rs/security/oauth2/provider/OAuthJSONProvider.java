@@ -43,6 +43,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -137,7 +138,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                         cnfObj.append('{');
                         appendJsonPair(cnfObj, entry.getKey(), entry.getValue());
                         cnfObj.append('}');
-                        appendJsonPair(sb, "cnf", cnfObj.toString(), false);
+                        appendJsonPair(sb, JwtConstants.CLAIM_CONFIRMATION, cnfObj.toString(), false);
                     } else {
                         appendJsonPair(sb, entry.getKey(), entry.getValue());
                     }
@@ -286,7 +287,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (nbf != null) {
             resp.setNbf(nbf);
         }
-        Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get("cnf"));
+        Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get(JwtConstants.CLAIM_CONFIRMATION));
         if (cnf != null) {
             String thumbprint = (String)cnf.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
             if (thumbprint != null) {
