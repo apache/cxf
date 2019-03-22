@@ -83,7 +83,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -165,6 +165,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         PrivateKeyPasswordProvider passwordProvider = storeProperties -> "password".toCharArray();
         properties.put("rs.security.key.password.provider", passwordProvider);
+        properties.put("rs.security.signature.key.id", "alice-key-id");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
@@ -186,7 +187,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
@@ -219,6 +220,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.signature.algorithm", "rsa-sha512");
+        properties.put("rs.security.signature.key.id", "alice-key-id");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
@@ -240,7 +242,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         VerifySignatureClientFilter signatureResponseFilter = new VerifySignatureClientFilter();
@@ -273,7 +275,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "custom_key_id", false);
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id", false);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
@@ -300,7 +302,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id", true,
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", true,
                                                         Collections.singletonList("accept"));
         signatureFilter.setMessageSigner(messageSigner);
 
@@ -332,7 +334,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -372,7 +374,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -398,7 +400,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -424,7 +426,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -450,7 +452,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -476,7 +478,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -497,7 +499,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
-        MessageSigner messageSigner = new MessageSigner(keyPair.getPrivate(), "custom_key_id");
+        MessageSigner messageSigner = new MessageSigner(keyPair.getPrivate(), "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -521,7 +523,31 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "custom_key_id", false);
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", false);
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testUnknownKeyId() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "unknown-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";

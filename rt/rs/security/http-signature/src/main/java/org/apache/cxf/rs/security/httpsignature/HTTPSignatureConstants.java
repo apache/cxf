@@ -82,6 +82,11 @@ public final class HTTPSignatureConstants {
      */
     public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
 
+    /**
+     * The signature key id.
+     */
+    public static final String RSSEC_SIGNATURE_KEY_ID = "rs.security.signature.key.id";
+
 
     private HTTPSignatureConstants() {
         // complete

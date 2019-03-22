@@ -33,6 +33,9 @@ public class CustomPublicKeyProvider implements PublicKeyProvider {
 
     @Override
     public PublicKey getKey(String keyId) {
+        if (!"alice-key-id".equals(keyId)) {
+            return null;
+        }
         KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance("JKS");
