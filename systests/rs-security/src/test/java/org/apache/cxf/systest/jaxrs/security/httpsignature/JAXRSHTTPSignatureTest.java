@@ -111,6 +111,30 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.out.properties",
+                       "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureOutProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -121,6 +145,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(126L, returnedBook.getId());
     }
+
 
     @Test
     public void testHttpSignaturePropertiesPasswordProvider() throws Exception {
