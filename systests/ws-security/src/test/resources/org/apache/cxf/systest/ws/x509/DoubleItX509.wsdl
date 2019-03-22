@@ -264,6 +264,25 @@
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
+    <wsdl:binding name="DoubleItAsymmetricIssuerSerialOperationBinding" type="tns:DoubleItPortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction=""/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                 <wsp:PolicyReference URI="#DoubleItAsymmetricIssuerSerialPolicy"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Input_Policy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#DoubleItAsymmetricIssuerSerialPolicy"/>
+                <wsp:PolicyReference URI="#DoubleItBinding_DoubleIt_Output_Policy"/>
+            </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
     <wsdl:binding name="DoubleItAsymmetricSHA512Binding" type="tns:DoubleItPortType">
         <wsp:PolicyReference URI="#DoubleItAsymmetricSHA512Policy"/>
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
@@ -714,6 +733,9 @@
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricIssuerSerialPort" binding="tns:DoubleItAsymmetricIssuerSerialBinding">
             <soap:address location="http://localhost:9001/DoubleItX509Asymmetric"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItAsymmetricIssuerSerialOperationPort" binding="tns:DoubleItAsymmetricIssuerSerialOperationBinding">
+            <soap:address location="http://localhost:9001/DoubleItX509AsymmetricOperation"/>
         </wsdl:port>
         <wsdl:port name="DoubleItAsymmetricSHA512Port" binding="tns:DoubleItAsymmetricSHA512Binding">
             <soap:address location="http://localhost:9001/DoubleItX509AsymmetricSHA512"/>

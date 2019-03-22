@@ -19,15 +19,27 @@
 
 package org.apache.cxf.systest.ws.x509;
 
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
+import javax.xml.ws.Service.Mode;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.xpath.XPathConstants;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -35,7 +47,9 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
@@ -522,6 +536,50 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         assertEquals(50, x509Port.doubleIt(25));
 
         ((java.io.Closeable)x509Port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testAsymmetricIssuerSerialDispatch() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = X509TokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricIssuerSerialOperationPort");
+
+        Dispatch<Source> disp = service.createDispatch(portQName, Source.class, Mode.PAYLOAD);
+        updateAddressPort(disp, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(disp);
+        }
+
+        // We need to set the wsdl operation name here, or otherwise the policy layer won't pick
+        // up the security policy attached at the operation level
+        QName wsdlOperationQName = new QName(NAMESPACE, "DoubleIt");
+        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, wsdlOperationQName);
+
+        String req = "<ns2:DoubleIt xmlns:ns2=\"http://www.example.org/schema/DoubleIt\">"
+            + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>";
+        Source source = new StreamSource(new StringReader(req));
+        source = disp.invoke(source);
+
+        Node nd = StaxUtils.read(source);
+        if (nd instanceof Document) {
+            nd = ((Document)nd).getDocumentElement();
+        }
+        Map<String, String> ns = new HashMap<>();
+        ns.put("ns2", "http://www.example.org/schema/DoubleIt");
+        XPathUtils xp = new XPathUtils(ns);
+        Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
+        assertEquals(StaxUtils.toString(nd), "50", o);
+
         bus.shutdown(true);
     }
 
@@ -1627,4 +1685,5 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+
 }
