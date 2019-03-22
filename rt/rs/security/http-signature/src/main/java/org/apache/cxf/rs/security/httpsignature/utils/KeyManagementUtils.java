@@ -34,6 +34,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
@@ -99,12 +100,21 @@ public final class KeyManagementUtils {
         String keyPswd = props.getProperty(HTTPSignatureConstants.RSSEC_KEY_PSWD);
         String alias = props.getProperty(HTTPSignatureConstants.RSSEC_KEY_STORE_ALIAS);
         char[] keyPswdChars = keyPswd != null ? keyPswd.toCharArray() : null;
-        // TODO
-//        if (keyPswdChars == null) {
-//            PrivateKeyPasswordProvider provider = loadPasswordProvider(m, props, keyOper);
-//            keyPswdChars = provider != null ? provider.getPassword(props) : null;
-//        }
+        if (keyPswdChars == null) {
+            PrivateKeyPasswordProvider provider = loadPasswordProvider(m, props);
+            keyPswdChars = provider != null ? provider.getPassword(props) : null;
+        }
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, alias);
+    }
+
+    private static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props) {
+        PrivateKeyPasswordProvider cb = null;
+        if (props.containsKey(HTTPSignatureConstants.RSSEC_KEY_PSWD_PROVIDER)) {
+            cb = (PrivateKeyPasswordProvider)props.get(HTTPSignatureConstants.RSSEC_KEY_PSWD_PROVIDER);
+        } else if (m != null) {
+            cb = (PrivateKeyPasswordProvider)m.getContextualProperty(HTTPSignatureConstants.RSSEC_KEY_PSWD_PROVIDER);
+        }
+        return cb;
     }
 
     private static KeyStore loadPersistKeyStore(Message m, Properties props) {

@@ -46,6 +46,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
+import org.apache.cxf.rs.security.httpsignature.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -112,6 +113,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignaturePropertiesPasswordProvider() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.alias", "alice");
+        properties.put("rs.security.keystore.password", "password");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
+        PrivateKeyPasswordProvider passwordProvider = storeProperties -> "password".toCharArray();
+        properties.put("rs.security.key.password.provider", passwordProvider);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
