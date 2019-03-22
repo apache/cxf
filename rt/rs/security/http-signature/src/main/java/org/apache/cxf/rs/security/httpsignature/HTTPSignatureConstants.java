@@ -61,7 +61,7 @@ public final class HTTPSignatureConstants {
     public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
 
     /**
-     * The signature algorithm to use. The default algorithm if not specified is XXXX
+     * The signature algorithm to use. The default algorithm if not specified is "rsa-sha256".
      */
     public static final String RSSEC_SIGNATURE_ALGORITHM = "rs.security.signature.algorithm";
 

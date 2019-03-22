@@ -177,6 +177,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testHttpSignatureSignaturePropertiesRsaSha512() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+
+        String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.keystore.alias", "alice");
+        properties.put("rs.security.keystore.password", "password");
+        properties.put("rs.security.keystore.file", "keys/alice.jks");
+        properties.put("rs.security.key.password", "password");
+        properties.put("rs.security.signature.algorithm", "rsa-sha512");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
     public void testHttpSignatureResponse() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");

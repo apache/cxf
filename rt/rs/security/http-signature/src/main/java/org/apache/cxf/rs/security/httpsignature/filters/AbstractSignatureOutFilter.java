@@ -35,6 +35,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
@@ -115,9 +116,13 @@ abstract class AbstractSignatureOutFilter {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         PrivateKey privateKey = KeyManagementUtils.loadPrivateKey(m, props);
 
-        return new MessageSigner(DefaultSignatureConstants.SIGNING_ALGORITHM,
-                                 DefaultSignatureConstants.DIGEST_ALGORITHM, privateKey,
-                                                        "some-key-id", true, Collections.emptyList());
+        String signatureAlgorithm = (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_SIGNATURE_ALGORITHM);
+        if (signatureAlgorithm == null) {
+            signatureAlgorithm = DefaultSignatureConstants.SIGNING_ALGORITHM;
+        }
+
+        return new MessageSigner(signatureAlgorithm, DefaultSignatureConstants.DIGEST_ALGORITHM, privateKey,
+                                 "some-key-id", true, Collections.emptyList());
     }
 
 }
