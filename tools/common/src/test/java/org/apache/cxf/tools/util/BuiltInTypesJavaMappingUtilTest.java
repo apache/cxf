@@ -25,11 +25,11 @@ import static org.junit.Assert.assertEquals;
 
 
 public class BuiltInTypesJavaMappingUtilTest {
-    private final String xmlSchemaNS = "http://www.w3.org/2000/10/XMLSchema";
+    private static final String XML_SCHEMA_NS = "http://www.w3.org/2000/10/XMLSchema";
 
     @Test
     public void testGetJType() {
-        String jType = BuiltInTypesJavaMappingUtil.getJType(xmlSchemaNS, "string");
+        String jType = BuiltInTypesJavaMappingUtil.getJType(XML_SCHEMA_NS, "string");
         assertEquals(jType, "java.lang.String");
     }
 }

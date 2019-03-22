@@ -49,11 +49,11 @@ public class ServerLauncher {
 
     private static final Logger LOG = LogUtils.getLogger(ServerLauncher.class);
 
+    private static final boolean DEBUG = false;
+
     boolean serverPassed;
     final String className;
 
-
-    private final boolean debug = false;
     private boolean inProcess = DEFAULT_IN_PROCESS;
     private AbstractTestServerBase inProcessServer;
 
@@ -218,7 +218,7 @@ public class ServerLauncher {
             }
 
             LOG.fine("CMD: " + cmd);
-            if (debug) {
+            if (DEBUG) {
                 System.err.print("CMD: " + cmd);
             }
 
@@ -294,7 +294,7 @@ public class ServerLauncher {
                         final String line = serverOutput.toString();
                         serverOutput.setLength(0);
                         serverOutputAll.append(line);
-                        if (debug) {
+                        if (DEBUG) {
                             System.err.print(line);
                         }
                         if (line.contains("server ready")) {

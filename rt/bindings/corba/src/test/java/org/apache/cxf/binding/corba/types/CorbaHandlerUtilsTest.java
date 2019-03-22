@@ -47,14 +47,15 @@ import static org.junit.Assert.assertTrue;
 
 public class CorbaHandlerUtilsTest {
 
+    private static final String COMPLEX_TYPES_NAMESPACE_URI
+        = "http://cxf.apache.org/bindings/corba/ComplexTypes/idl_types";
+    private static final String COMPLEX_TYPES_PREFIX = "corbatm";
+
     protected EndpointInfo endpointInfo;
     BindingFactory factory;
     CorbaTypeMap typeMap;
     ServiceInfo service;
 
-    private final String complexTypesNamespaceURI
-        = "http://cxf.apache.org/bindings/corba/ComplexTypes/idl_types";
-    private final String complexTypesPrefix = "corbatm";
     private ORB orb;
     private Bus bus;
 
@@ -106,19 +107,19 @@ public class CorbaHandlerUtilsTest {
 
         // Test for an array handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestArray", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaArrayHandler);
 
         // Test for an enum handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestEnum", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestEnum", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaEnumHandler);
 
         // Test for a fixed handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestFixed", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestFixed", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaFixedHandler);
 
@@ -130,19 +131,19 @@ public class CorbaHandlerUtilsTest {
 
         // Test for a sequence handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestSequence", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestSequence", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaSequenceHandler);
 
         // Test for a struct handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestStruct", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestStruct", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaStructHandler);
 
         // Test for a union handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestUnion", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestUnion", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.createTypeHandler(orb, objName, objIdlType, typeMap);
         assertTrue(result instanceof CorbaUnionHandler);
     }
@@ -155,7 +156,7 @@ public class CorbaHandlerUtilsTest {
 
         // Test for an array handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestArray", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestArray", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaArrayHandler);
         CorbaArrayHandler arrayHandler = (CorbaArrayHandler)result;
@@ -165,7 +166,7 @@ public class CorbaHandlerUtilsTest {
 
         // Test for a sequence handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestSequence", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestSequence", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaSequenceHandler);
         CorbaSequenceHandler seqHandler = (CorbaSequenceHandler)result;
@@ -176,7 +177,7 @@ public class CorbaHandlerUtilsTest {
 
         // Test for a bounded sequence handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestBoundedSequence", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestBoundedSequence", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaSequenceHandler);
         CorbaSequenceHandler boundedSeqHandler = (CorbaSequenceHandler)result;
@@ -185,7 +186,7 @@ public class CorbaHandlerUtilsTest {
 
         // Test for a struct handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestStruct", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestStruct", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaStructHandler);
         CorbaStructHandler structHandler = (CorbaStructHandler)result;
@@ -194,7 +195,7 @@ public class CorbaHandlerUtilsTest {
 
         // Test for a union handler
         objName = new QName("object");
-        objIdlType = new QName(complexTypesNamespaceURI, "TestUnion", complexTypesPrefix);
+        objIdlType = new QName(COMPLEX_TYPES_NAMESPACE_URI, "TestUnion", COMPLEX_TYPES_PREFIX);
         result = CorbaHandlerUtils.initializeObjectHandler(orb, objName, objIdlType, typeMap, service);
         assertTrue(result instanceof CorbaUnionHandler);
     }

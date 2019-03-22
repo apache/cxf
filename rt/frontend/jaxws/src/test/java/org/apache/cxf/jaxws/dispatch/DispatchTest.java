@@ -64,18 +64,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class DispatchTest extends AbstractJaxWsTest {
-    private final QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
+    private static final QName SERVICE_NAME = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
 
-    private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
+    private static final QName PORT_NAME = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
 
-    private final String address = "http://localhost:9000/SoapContext/SoapPort";
+    private static final String ADDRESS = "http://localhost:9000/SoapContext/SoapPort";
 
     private Destination d;
 
     @Before
     public void setUp() throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        ei.setAddress(address);
+        ei.setAddress(ADDRESS);
 
         d = localTransport.getDestination(ei, bus);
     }
@@ -87,11 +87,11 @@ public class DispatchTest extends AbstractJaxWsTest {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
-        SOAPService service = new SOAPService(wsdl, serviceName);
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
         assertNotNull(service);
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
-        Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
+        Dispatch<Object> disp = service.createDispatch(PORT_NAME, jc, Service.Mode.PAYLOAD);
 
         SayHi s = new SayHi();
 
@@ -103,10 +103,10 @@ public class DispatchTest extends AbstractJaxWsTest {
     @Test
     public void testDOMSource() throws Exception {
         ServiceImpl service =
-            new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
+            new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), SERVICE_NAME, null);
 
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, ADDRESS);
 
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));
 
@@ -119,17 +119,17 @@ public class DispatchTest extends AbstractJaxWsTest {
 
     @Test
     public void testHTTPBinding() throws Exception {
-        ServiceImpl service = new ServiceImpl(getBus(), null, serviceName, null);
-        service.addPort(portName, HTTPBinding.HTTP_BINDING, "local://foobar");
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
+        ServiceImpl service = new ServiceImpl(getBus(), null, SERVICE_NAME, null);
+        service.addPort(PORT_NAME, HTTPBinding.HTTP_BINDING, "local://foobar");
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
         assertTrue(disp.getBinding() instanceof HTTPBinding);
     }
 
     @Test
     public void testSOAPPBinding() throws Exception {
-        ServiceImpl service = new ServiceImpl(getBus(), null, serviceName, null);
-        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, "local://foobar");
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
+        ServiceImpl service = new ServiceImpl(getBus(), null, SERVICE_NAME, null);
+        service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, "local://foobar");
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
         assertTrue(disp.getBinding() instanceof SOAPBinding);
     }
 
@@ -140,11 +140,11 @@ public class DispatchTest extends AbstractJaxWsTest {
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
-        SOAPService service = new SOAPService(wsdl, serviceName);
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
         assertNotNull(service);
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_soap_http.types");
-        Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
+        Dispatch<Object> disp = service.createDispatch(PORT_NAME, jc, Service.Mode.PAYLOAD);
         try {
             // Send a null message
             disp.invoke(null);
@@ -162,9 +162,9 @@ public class DispatchTest extends AbstractJaxWsTest {
         String cfgFile = "org/apache/cxf/jaxws/dispatch/bus-dispatch.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
         ServiceImpl service = new ServiceImpl(bus, getClass().getResource("/wsdl/hello_world.wsdl"),
-                                              serviceName, null);
+                                              SERVICE_NAME, null);
 
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
         List<Interceptor<? extends Message>> interceptors = ((DispatchImpl<?>)disp).getClient()
             .getInInterceptors();
         boolean exists = false;
@@ -179,10 +179,10 @@ public class DispatchTest extends AbstractJaxWsTest {
     @Test
     public void testFindOperationWithSource() throws Exception {
         ServiceImpl service =
-            new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
+            new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), SERVICE_NAME, null);
 
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, ADDRESS);
         disp.getRequestContext().put("find.dispatch.operation", Boolean.TRUE);
 
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));

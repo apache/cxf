@@ -49,26 +49,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class DispatchOpTest extends AbstractJaxWsTest {
-    private final QName serviceName = new QName("http://cxf.apache.org/test/dispatch", "DispatchTest");
+    private static final QName SERVICE_NAME = new QName("http://cxf.apache.org/test/dispatch", "DispatchTest");
 
-    private final QName portName = new QName("http://cxf.apache.org/test/dispatch", "DispatchPort");
+    private static final QName PORT_NAME = new QName("http://cxf.apache.org/test/dispatch", "DispatchPort");
 
-    private final String address = "http://localhost:9120/SoapContext/DispatchPort";
+    private static final String ADDRESS = "http://localhost:9120/SoapContext/DispatchPort";
 
-    private final QName operationName = new QName("http://cxf.apache.org/test/dispatch", "RequestResponseOperation");
+    private static final QName OP_NAME = new QName("http://cxf.apache.org/test/dispatch", "RequestResponseOperation");
 
-    private final String wsdlResource = "/org/apache/cxf/jaxws/dispatch/DispatchTest.wsdl";
+    private static final String WSDL_RESOURCE = "/org/apache/cxf/jaxws/dispatch/DispatchTest.wsdl";
 
-    private final String requestResource = "/org/apache/cxf/jaxws/dispatch/OperationRequest.xml";
+    private static final String REQ_RESOURCE = "/org/apache/cxf/jaxws/dispatch/OperationRequest.xml";
 
-    private final String responseResource = "/org/apache/cxf/jaxws/dispatch/OperationResponse.xml";
+    private static final String RESP_RESOURCE = "/org/apache/cxf/jaxws/dispatch/OperationResponse.xml";
 
     private Destination d;
 
     @Before
     public void setUp() throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
-        ei.setAddress(address);
+        ei.setAddress(ADDRESS);
 
         d = localTransport.getDestination(ei, bus);
     }
@@ -76,19 +76,19 @@ public class DispatchOpTest extends AbstractJaxWsTest {
     @Test
     public void testResolveOperationWithSource() throws Exception {
         ServiceImpl service =
-            new ServiceImpl(getBus(), getClass().getResource(wsdlResource), serviceName, null);
+            new ServiceImpl(getBus(), getClass().getResource(WSDL_RESOURCE), SERVICE_NAME, null);
 
         Dispatch<Source> disp = service.createDispatch(
-                portName, Source.class, Service.Mode.PAYLOAD);
-        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
-        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+                PORT_NAME, Source.class, Service.Mode.PAYLOAD);
+        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, OP_NAME);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, ADDRESS);
 
-        d.setMessageObserver(new MessageReplayObserver(responseResource));
+        d.setMessageObserver(new MessageReplayObserver(RESP_RESOURCE));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
         ((DispatchImpl<?>)disp).getClient().getOutInterceptors().add(bov);
 
-        Document doc = StaxUtils.read(getResourceAsStream(requestResource));
+        Document doc = StaxUtils.read(getResourceAsStream(REQ_RESOURCE));
         DOMSource source = new DOMSource(doc);
         Source res = disp.invoke(source);
         assertNotNull(res);
@@ -96,26 +96,26 @@ public class DispatchOpTest extends AbstractJaxWsTest {
         BindingOperationInfo boi = bov.getBindingOperationInfo();
         assertNotNull(boi);
 
-        assertEquals(operationName, boi.getName());
+        assertEquals(OP_NAME, boi.getName());
     }
 
     @Test
     public void testResolveOperationWithSourceAndWSA() throws Exception {
         ServiceImpl service =
-            new ServiceImpl(getBus(), getClass().getResource(wsdlResource),
-                    serviceName, null, new AddressingFeature());
+            new ServiceImpl(getBus(), getClass().getResource(WSDL_RESOURCE),
+                    SERVICE_NAME, null, new AddressingFeature());
 
         Dispatch<Source> disp = service.createDispatch(
-                portName, Source.class, Service.Mode.PAYLOAD);
-        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
-        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+                PORT_NAME, Source.class, Service.Mode.PAYLOAD);
+        disp.getRequestContext().put(MessageContext.WSDL_OPERATION, OP_NAME);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, ADDRESS);
 
-        d.setMessageObserver(new MessageReplayObserver(responseResource));
+        d.setMessageObserver(new MessageReplayObserver(RESP_RESOURCE));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
         ((DispatchImpl<?>)disp).getClient().getOutInterceptors().add(bov);
 
-        Document doc = StaxUtils.read(getResourceAsStream(requestResource));
+        Document doc = StaxUtils.read(getResourceAsStream(REQ_RESOURCE));
         DOMSource source = new DOMSource(doc);
         Source res = disp.invoke(source);
         assertNotNull(res);
@@ -123,7 +123,7 @@ public class DispatchOpTest extends AbstractJaxWsTest {
         BindingOperationInfo boi = bov.getBindingOperationInfo();
         assertNotNull(boi);
 
-        assertEquals(operationName, boi.getName());
+        assertEquals(OP_NAME, boi.getName());
     }
 
     private static class BindingOperationVerifier extends AbstractSoapInterceptor {

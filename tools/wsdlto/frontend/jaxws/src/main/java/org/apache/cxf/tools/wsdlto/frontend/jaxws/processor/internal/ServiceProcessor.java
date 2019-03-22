@@ -69,19 +69,19 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
 
 public class ServiceProcessor extends AbstractProcessor {
 
+    private static final int IN_HEADER = 1;
+
+    private static final int OUT_HEADER = 2;
+
+    private static final int RESULT_HEADER = 3;
+
+    private static final int NO_HEADER = 0;
+
     private String soapOPAction = "SOAPACTION";
 
     private String soapOPStyle = "STYLE";
 
     private BindingType bindingType;
-
-    private final int inHEADER = 1;
-
-    private final int outHEADER = 2;
-
-    private final int resultHeader = 3;
-
-    private final int noHEADER = 0;
 
     private Object bindingObj;
     private ServiceInfo service;
@@ -420,7 +420,7 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (jaxwsBinding.isEnableMime() || enableMime) {
                     jm.setMimeEnable(true);
                 }
-                if ((jm.isWrapperStyle() && headerType > this.noHEADER)
+                if ((jm.isWrapperStyle() && headerType > NO_HEADER)
                     || !jaxwsBinding.isEnableWrapperStyle()
                     || (jm.enableMime() && jm.isWrapperStyle())
                     || !enableWrapperStyle) {
@@ -435,7 +435,7 @@ public class ServiceProcessor extends AbstractProcessor {
                     processor.processMethod(jm, bop.getOperationInfo());
                 }
 
-                if (headerType == this.resultHeader) {
+                if (headerType == RESULT_HEADER) {
                     JAnnotation resultAnno = jm.getAnnotationMap().get("WebResult");
                     if (resultAnno != null) {
                         resultAnno.addElement(new JAnnotationElement("header", true, true));
@@ -684,7 +684,7 @@ public class ServiceProcessor extends AbstractProcessor {
         boolean isSameMessage = false;
         boolean isNonWrappable = false;
         boolean allPartsHeader = false;
-        int result = this.noHEADER;
+        int result = NO_HEADER;
 
         // begin process input
         if (bop.getInput() != null
@@ -714,7 +714,7 @@ public class ServiceProcessor extends AbstractProcessor {
             isNonWrappable = isSameMessage && containParts;
             // if is nonwrapple then return
             if (isNonWrappable) {
-                result = this.inHEADER;
+                result = IN_HEADER;
             }
         }
         isSameMessage = false;
@@ -748,10 +748,10 @@ public class ServiceProcessor extends AbstractProcessor {
             }
             isNonWrappable = isSameMessage && containParts;
             if (isNonWrappable && allPartsHeader) {
-                result = this.resultHeader;
+                result = RESULT_HEADER;
             }
             if (isNonWrappable && !allPartsHeader) {
-                result = this.outHEADER;
+                result = OUT_HEADER;
             }
         }
 

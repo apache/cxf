@@ -54,7 +54,7 @@ public class MessageVerifierTest {
     private static MessageVerifier messageVerifier;
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
 
         try {
             final KeyPair keyPair = KeyPairGenerator.getInstance(KEY_PAIR_GENERATOR_ALGORITHM)

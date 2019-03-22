@@ -37,7 +37,7 @@ public class DigestVerifierTest {
     private static DigestVerifier digestVerifier;
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         digestVerifier = new DigestVerifier();
     }
 

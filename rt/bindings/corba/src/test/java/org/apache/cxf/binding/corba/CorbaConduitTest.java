@@ -21,7 +21,6 @@ package org.apache.cxf.binding.corba;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -208,7 +207,7 @@ public class CorbaConduitTest {
         OperationType opType = control.createMock(OperationType.class);
         CorbaTypeMap typeMap = control.createMock(CorbaTypeMap.class);
 
-        List<RaisesType> exlist = control.createMock(ArrayList.class);
+        List<RaisesType> exlist = control.createMock(List.class);
         opType.getRaises();
         EasyMock.expectLastCall().andReturn(exlist);
         int i = 0;

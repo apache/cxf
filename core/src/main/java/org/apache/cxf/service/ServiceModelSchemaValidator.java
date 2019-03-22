@@ -49,7 +49,7 @@ public class ServiceModelSchemaValidator extends ServiceModelVisitor {
             try {
                 schemaCollection.validateElementName(part.getName(), part.getElementQName());
             } catch (InvalidXmlSchemaReferenceException ixsre) {
-                complaints.append(part.getName()).append(" part element name ").append(ixsre.getMessage()).append("\n");
+                complaints.append(part.getName()).append(" part element name ").append(ixsre.getMessage()).append('\n');
             }
         } else if (!part.getMessageInfo().getOperation().isUnwrapped()) {
             if (part.getTypeQName() == null) {
@@ -60,7 +60,7 @@ public class ServiceModelSchemaValidator extends ServiceModelVisitor {
                     schemaCollection.validateTypeName(part.getName(), part.getTypeQName());
                 } catch (InvalidXmlSchemaReferenceException ixsre) {
                     complaints.append(part.getName()).append(" part type name ").append(ixsre.getMessage())
-                            .append("\n");
+                            .append('\n');
                 }
             }
         }

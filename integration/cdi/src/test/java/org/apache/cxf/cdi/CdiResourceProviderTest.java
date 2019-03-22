@@ -55,7 +55,7 @@ public class CdiResourceProviderTest {
     private Bean<?> bean;
 
     @Before
-    public void setup() {
+    public void setUp() {
         final Class beanClass = Object.class;
         when(bean.getBeanClass()).thenReturn(beanClass);
         when(beanManager.isNormalScope(any())).thenAnswer(invocationOnMock ->
