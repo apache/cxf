@@ -19,68 +19,12 @@
 
 package org.apache.cxf.rs.security.httpsignature;
 
+import org.apache.cxf.rt.security.rs.RSSecurityConstants;
+
 /**
- * Some security constants to be used with HTTP Signature. Note that some of the configuration tags are
- * shared with some of the JOSEConstants, meaning we could consolidate these in the future.
+ * Some security constants to be used with HTTP Signature.
  */
-public final class HTTPSignatureConstants {
-
-    /**
-     * The keystore type. It defaults to "JKS".
-     */
-    public static final String RSSEC_KEY_STORE_TYPE = "rs.security.keystore.type";
-
-    /**
-     * The password required to access the keystore.
-     */
-    public static final String RSSEC_KEY_STORE_PSWD = "rs.security.keystore.password";
-
-    /**
-     * The password required to access the private key (in the keystore).
-     */
-    public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
-
-    /**
-     * The keystore alias corresponding to the key to use.
-     */
-    public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
-
-    /**
-     * The path to the keystore file.
-     */
-    public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
-
-    /**
-     * The KeyStore Object.
-     */
-    public static final String RSSEC_KEY_STORE = "rs.security.keystore";
-
-    /**
-     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys.
-     */
-    public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
-
-    /**
-     * The signature algorithm to use. The default algorithm if not specified is "rsa-sha256".
-     */
-    public static final String RSSEC_SIGNATURE_ALGORITHM = "rs.security.signature.algorithm";
-
-    /**
-     * The signature properties file for signature creation. If not specified then it falls back to
-     * RSSEC_SIGNATURE_PROPS.
-     */
-    public static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
-
-    /**
-     * The signature properties file for signature verification. If not specified then it falls back to
-     * RSSEC_SIGNATURE_PROPS.
-     */
-    public static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
-
-    /**
-     * The signature properties file for signature creation/verification.
-     */
-    public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
+public final class HTTPSignatureConstants extends RSSecurityConstants {
 
     /**
      * The signature key id.

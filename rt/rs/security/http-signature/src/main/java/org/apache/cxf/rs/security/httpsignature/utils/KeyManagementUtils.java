@@ -34,9 +34,9 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
-import org.apache.cxf.rs.security.httpsignature.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 
 public final class KeyManagementUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(KeyManagementUtils.class);

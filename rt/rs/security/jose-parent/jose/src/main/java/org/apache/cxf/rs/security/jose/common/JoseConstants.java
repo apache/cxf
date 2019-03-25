@@ -19,7 +19,9 @@
 
 package org.apache.cxf.rs.security.jose.common;
 
-public final class JoseConstants {
+import org.apache.cxf.rt.security.rs.RSSecurityConstants;
+
+public final class JoseConstants extends RSSecurityConstants {
     public static final String HEADER_TYPE = "typ";
     public static final String HEADER_ALGORITHM = "alg";
     public static final String HEADER_CONTENT_TYPE = "cty";
@@ -57,52 +59,12 @@ public final class JoseConstants {
     //
 
     /**
-     * The keystore type. Suitable values are "jks" or "jwk". The default value is "jwk".
-     */
-    public static final String RSSEC_KEY_STORE_TYPE = "rs.security.keystore.type";
-
-    /**
-     * The password required to access the keystore.
-     */
-    public static final String RSSEC_KEY_STORE_PSWD = "rs.security.keystore.password";
-
-    /**
-     * The password required to access the private key (in the keystore).
-     */
-    public static final String RSSEC_KEY_PSWD = "rs.security.key.password";
-
-    /**
-     * The keystore alias corresponding to the key to use. You can append one of the following to this tag to
-     * get the alias for more specific operations:
-     *  - jwe.out
-     *  - jwe.in
-     *  - jws.out
-     *  - jws.in
-     */
-    public static final String RSSEC_KEY_STORE_ALIAS = "rs.security.keystore.alias";
-
-    /**
      * The keystore aliases corresponding to the keys to use, when using the JSON serialization form. You can
      * append one of the following to this tag to get the alias for more specific operations:
      *  - jws.out
      *  - jws.in
      */
     public static final String RSSEC_KEY_STORE_ALIASES = "rs.security.keystore.aliases";
-
-    /**
-     * The path to the keystore file.
-     */
-    public static final String RSSEC_KEY_STORE_FILE = "rs.security.keystore.file";
-
-    /**
-     * The KeyStore Object.
-     */
-    public static final String RSSEC_KEY_STORE = "rs.security.keystore";
-
-    /**
-     * A reference to a PrivateKeyPasswordProvider instance used to retrieve passwords to access keys.
-     */
-    public static final String RSSEC_KEY_PSWD_PROVIDER = "rs.security.key.password.provider";
 
     /**
      * Whether to allow using a JWK received in the header for signature validation. The default
@@ -127,32 +89,10 @@ public final class JoseConstants {
     public static final String RSSEC_SIGNATURE_KEY_PSWD_PROVIDER = "rs.security.signature.key.password.provider";
 
     /**
-     * The signature algorithm to use. The default algorithm if not specified is 'RS256'.
-     */
-    public static final String RSSEC_SIGNATURE_ALGORITHM = "rs.security.signature.algorithm";
-
-    /**
      * The EC Curve to use with EC keys loaded from Java Key Store.
      * JWK EC Keys are expected to use a standard "crv" property instead.
      */
     public static final String RSSEC_EC_CURVE = "rs.security.elliptic.curve";
-
-    /**
-     * The signature properties file for compact signature creation. If not specified then it falls back to
-     * RSSEC_SIGNATURE_PROPS.
-     */
-    public static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
-
-    /**
-     * The signature properties file for compact signature verification. If not specified then it falls back to
-     * RSSEC_SIGNATURE_PROPS.
-     */
-    public static final String RSSEC_SIGNATURE_IN_PROPS = "rs.security.signature.in.properties";
-
-    /**
-     * The signature properties file for compact signature creation/verification.
-     */
-    public static final String RSSEC_SIGNATURE_PROPS = "rs.security.signature.properties";
 
     /**
      * Include the JWK public key for signature in the "jwk" header.

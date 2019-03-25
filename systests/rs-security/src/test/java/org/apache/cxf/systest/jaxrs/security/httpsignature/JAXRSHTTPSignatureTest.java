@@ -46,9 +46,9 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
-import org.apache.cxf.rs.security.httpsignature.PrivateKeyPasswordProvider;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
+import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 

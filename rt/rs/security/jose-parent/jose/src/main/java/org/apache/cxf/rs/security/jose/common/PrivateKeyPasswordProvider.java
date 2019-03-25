@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.jose.common;
 
-import java.util.Properties;
-
-public interface PrivateKeyPasswordProvider {
-    char[] getPassword(Properties storeProperties);
+@Deprecated
+public interface PrivateKeyPasswordProvider extends org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider {
 }
