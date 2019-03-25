@@ -16,20 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.common.openapi;
 
 import java.util.Enumeration;
-import java.util.Objects;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-import io.swagger.jaxrs.config.SwaggerContextService;
-
-class DelegatingServletConfig implements ServletConfig {
+public class DelegatingServletConfig implements ServletConfig {
     private final ServletConfig delegate;
 
-    DelegatingServletConfig(final ServletConfig sc) {
+    public DelegatingServletConfig(final ServletConfig sc) {
         this.delegate = sc;
     }
 
@@ -50,9 +47,6 @@ class DelegatingServletConfig implements ServletConfig {
 
     @Override
     public String getInitParameter(String name) {
-        if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
-            return "true";
-        }
         return delegate.getInitParameter(name);
     }
 }
