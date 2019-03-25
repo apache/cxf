@@ -103,6 +103,9 @@ import org.apache.cxf.message.MessageUtils;
 public final class InjectionUtils {
     public static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
     public static final Set<String> VALUE_CONTEXTS = new HashSet<>();
+
+    private static final boolean USE_JAXB;
+
     static {
         // JAX-RS 1.0-1.1
         STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
@@ -125,6 +128,17 @@ public final class InjectionUtils {
 
         VALUE_CONTEXTS.add(Application.class.getName());
         VALUE_CONTEXTS.add("javax.ws.rs.sse.Sse");
+
+        boolean useJaxb;
+        try {
+            ClassLoaderUtils.loadClass(
+                    "javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter",
+                    InjectionUtils.class);
+            useJaxb = true;
+        } catch (final ClassNotFoundException cnfe) {
+            useJaxb = false;
+        }
+        USE_JAXB = useJaxb;
     }
 
     private static final Logger LOG = LogUtils.getL7dLogger(InjectionUtils.class);
@@ -458,7 +472,9 @@ public final class InjectionUtils {
 
         boolean adapterHasToBeUsed = false;
         Class<?> cls = pClass;
-        Class<?> valueType = JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
+        Class<?> valueType = !USE_JAXB
+                ? cls
+                : JAXBUtils.getValueTypeFromAdapter(pClass, pClass, paramAnns);
         if (valueType != cls) {
             cls = valueType;
             adapterHasToBeUsed = true;
