@@ -165,7 +165,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         PrivateKeyPasswordProvider passwordProvider = storeProperties -> "password".toCharArray();
         properties.put("rs.security.key.password.provider", passwordProvider);
-        properties.put("rs.security.signature.key.id", "alice-key-id");
+        properties.put("rs.security.http.signature.key.id", "alice-key-id");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
@@ -220,7 +220,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.keystore.file", "keys/alice.jks");
         properties.put("rs.security.key.password", "password");
         properties.put("rs.security.signature.algorithm", "rsa-sha512");
-        properties.put("rs.security.signature.key.id", "alice-key-id");
+        properties.put("rs.security.http.signature.key.id", "alice-key-id");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));

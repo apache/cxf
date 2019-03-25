@@ -29,7 +29,7 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
     /**
      * The signature key id.
      */
-    public static final String RSSEC_SIGNATURE_KEY_ID = "rs.security.signature.key.id";
+    public static final String RSSEC_HTTP_SIGNATURE_KEY_ID = "rs.security.http.signature.key.id";
 
 
     private HTTPSignatureConstants() {

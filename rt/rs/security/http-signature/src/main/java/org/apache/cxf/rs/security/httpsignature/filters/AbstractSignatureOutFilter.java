@@ -121,9 +121,9 @@ abstract class AbstractSignatureOutFilter {
             signatureAlgorithm = DefaultSignatureConstants.SIGNING_ALGORITHM;
         }
 
-        String keyId = (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_SIGNATURE_KEY_ID);
+        String keyId = (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_KEY_ID);
         if (keyId == null) {
-            keyId = props.getProperty(HTTPSignatureConstants.RSSEC_SIGNATURE_KEY_ID);
+            keyId = props.getProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_KEY_ID);
             if (keyId == null) {
                 throw new SignatureException("The signature key id is a required configuration property");
             }
