@@ -70,7 +70,7 @@ public class ResourceUtilsTest {
     @Test
     public void testClassResourceInfoUserResource() throws Exception {
         UserResource ur = new UserResource();
-        ur.setName(HashMap.class.getName());
+        ur.setName(HashMap.class.getName()); //NOPMD
         ur.setPath("/hashmap");
         UserOperation op = new UserOperation();
         op.setPath("/key/{id}");
@@ -86,7 +86,7 @@ public class ResourceUtilsTest {
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
         Method method =
-            HashMap.class.getMethod("get", new Class[]{Object.class});
+            HashMap.class.getMethod("get", new Class[]{Object.class}); //NOPMD
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(method);
         assertNotNull(ori);
         assertEquals("/key/{id}", ori.getURITemplate().getValue());
@@ -187,7 +187,7 @@ public class ResourceUtilsTest {
             return "Hello " + name + "!";
         }
     }
-    
+
     @Test
     public void testClassResourceInfoWithSyntheticMethod() throws Exception {
         ClassResourceInfo cri =
@@ -220,17 +220,17 @@ public class ResourceUtilsTest {
     protected interface OverriddenInterfaceString extends OverriddenInterface<String> {
         @NotNull @Override
         String read(String key);
-        
+
         @NotNull
         Set<String> read(String key, String type);
     }
-    
+
     public static class OverriddenInterfaceImpl implements OverriddenInterfaceString {
         @Override
         public String read(String key) {
             return key;
         }
-        
+
         @Override
         public Set<String> read(String key, String type) {
             return Collections.singleton(key);
@@ -255,7 +255,7 @@ public class ResourceUtilsTest {
         assertEquals("there must be one read method", 1, oris.size());
         assertEquals(notSynthetic, oris.iterator().next().getMethodToInvoke());
     }
-    
+
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
         JAXRSServerFactoryBean application = ResourceUtils.createApplication(

@@ -1149,7 +1149,7 @@ public class JAXRSUtilsTest {
 
     @Test
     public void testWrongType() throws Exception {
-        Class<?>[] argType = {HashMap.class};
+        Class<?>[] argType = {HashMap.class}; //NOPMD
         Method m = Customer.class.getMethod("testWrongType", argType);
         Message messageImpl = createMessage();
         messageImpl.put(Message.QUERY_STRING, "p1=1");
@@ -1263,10 +1263,10 @@ public class JAXRSUtilsTest {
                                                                new ClassResourceInfo(Customer.class)),
                                                            null, messageImpl);
         assertEquals(1, params.size());
-        
+
         String ret = (String)params.get(0);
         assertEquals("Val: 3", ret);
-    }    
+    }
 
 
     @Test

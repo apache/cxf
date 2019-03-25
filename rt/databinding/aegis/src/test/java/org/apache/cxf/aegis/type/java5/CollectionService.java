@@ -75,11 +75,11 @@ public class CollectionService implements CollectionServiceInterface {
     }
 
     //CHECKSTYLE:OFF
-    public String takeUnsortedSet(HashSet<String> strings) {
+    public String takeUnsortedSet(HashSet<String> strings) { //NOPMD
         return Integer.toString(strings.size());
     }
 
-    public String takeArrayList(ArrayList<String> strings) {
+    public String takeArrayList(ArrayList<String> strings) { //NOPMD
         return strings.get(0);
     }
     //CHECKSTYLE:ON

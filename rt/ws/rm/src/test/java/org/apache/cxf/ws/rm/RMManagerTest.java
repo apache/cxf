@@ -323,7 +323,7 @@ public class RMManagerTest {
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
-        
+
         RMConfiguration config = new RMConfiguration();
         config.setRMNamespace(RM10Constants.NAMESPACE_URI);
         config.setRM10AddressingNamespace(RM10Constants.NAMESPACE_URI);
@@ -435,7 +435,7 @@ public class RMManagerTest {
                              EasyMock.eq(false),
                              EasyMock.isA(ProtocolVariation.class),
                              EasyMock.isA(Exchange.class),
-                             CastUtils.cast(EasyMock.isA(HashMap.class), String.class, Object.class));
+                             CastUtils.cast(EasyMock.isA(HashMap.class), String.class, Object.class)); //NOPMD
         EasyMock.expectLastCall().andReturn(createResponse);
         Servant servant = control.createMock(Servant.class);
         EasyMock.expect(rme.getServant()).andReturn(servant);

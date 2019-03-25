@@ -90,10 +90,10 @@ public class InjectionUtilsTest {
 
     @Test
     public void testCollectionType() {
-        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class));
-        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class));
-        assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class));
-        assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class));
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class)); //NOPMD
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class)); //NOPMD
+        assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class)); //NOPMD
+        assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class)); //NOPMD
     }
 
     @Test
@@ -185,7 +185,7 @@ public class InjectionUtilsTest {
         assertEquals(String.class, str);
         ParameterizedType list = (ParameterizedType) InjectionUtils.getGenericResponseType(
             GenericInterface.class.getMethod("list"), TestService.class,
-            new ArrayList<>(), ArrayList.class, new ExchangeImpl());
+            new ArrayList<>(), ArrayList.class, new ExchangeImpl()); //NOPMD
         assertEquals(String.class, list.getActualTypeArguments()[0]);
     }
 

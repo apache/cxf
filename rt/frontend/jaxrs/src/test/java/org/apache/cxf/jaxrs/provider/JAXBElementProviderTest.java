@@ -949,7 +949,7 @@ public class JAXBElementProviderTest {
         };
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(list, ArrayList.class, type,
+        provider.writeTo(list, ArrayList.class, type, //NOPMD
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
 
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -1482,56 +1482,56 @@ public class JAXBElementProviderTest {
         }
 
         public void marshal(Object jaxbElement, Result result) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, OutputStream os) throws JAXBException {
         }
 
         public void marshal(Object jaxbElement, File output) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, Writer writer) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, ContentHandler handler) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, Node node) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, XMLStreamWriter writer) throws JAXBException {
-    
+
         }
 
         public void marshal(Object jaxbElement, XMLEventWriter writer) throws JAXBException {
-    
+
         }
 
         @SuppressWarnings("rawtypes")
         public void setAdapter(XmlAdapter adapter) {
-    
+
         }
 
         @SuppressWarnings("rawtypes")
         public <A extends XmlAdapter> void setAdapter(Class<A> type, A adapter) {
-    
+
         }
 
         public void setAttachmentMarshaller(AttachmentMarshaller am) {
-    
+
         }
 
         public void setEventHandler(ValidationEventHandler handler) throws JAXBException {
-    
+
         }
 
         public void setListener(Listener listener) {
-    
+
         }
 
         public void setProperty(String name, Object value) throws PropertyException {
@@ -1540,7 +1540,7 @@ public class JAXBElementProviderTest {
         }
 
         public void setSchema(Schema schema) {
-    
+
         }
 
     }

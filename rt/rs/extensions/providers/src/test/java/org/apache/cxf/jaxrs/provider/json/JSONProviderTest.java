@@ -1421,7 +1421,7 @@ public class JSONProviderTest {
         };
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(list, ArrayList.class, type,
+        provider.writeTo(list, ArrayList.class, type, //NOPMD
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected =
             "{\"tagholders\":["
@@ -1912,7 +1912,7 @@ public class JSONProviderTest {
 
         public void writeCharacters(String text) throws XMLStreamException {
         }
-        
+
         public void writeCharacters(char[] text, int arg1, int arg2) throws XMLStreamException {
         }
 
@@ -1923,8 +1923,8 @@ public class JSONProviderTest {
                 super.writeStartElement(p, local, uri);
             }
         }
-        
-        
+
+
 
         public void writeEndElement() throws XMLStreamException {
             if (count == 0) {
@@ -1947,7 +1947,7 @@ public class JSONProviderTest {
                 super.writeCharacters(text);
             }
         }
-        
+
         public void writeCharacters(char[] text, int arg1, int arg2) throws XMLStreamException {
             String str = new String(text);
             if (StringUtils.isEmpty(str.trim())) {

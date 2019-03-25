@@ -44,9 +44,9 @@ public interface CollectionServiceInterface {
     String takeSortedStrings(SortedSet<String> strings);
 
     //CHECKSTYLE:OFF
-    String takeUnsortedSet(HashSet<String> strings);
+    String takeUnsortedSet(HashSet<String> strings); //NOPMD
     String takeStack(Stack<String> strings);
-    String takeArrayList(ArrayList<String> strings);
+    String takeArrayList(ArrayList<String> strings); //NOPMD
     //CHECKSTYLE:ON
 
     void method1(List<String> headers1);

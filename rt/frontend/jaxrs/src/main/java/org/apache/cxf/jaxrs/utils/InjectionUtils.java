@@ -137,10 +137,10 @@ public final class InjectionUtils {
     private static final String ENUM_CONVERSION_CASE_SENSITIVE = "enum.conversion.case.sensitive";
 
     private static final String IGNORE_MATRIX_PARAMETERS = "ignore.matrix.parameters";
-    
-    private static ProxyClassLoaderCache proxyClassLoaderCache = 
+
+    private static ProxyClassLoaderCache proxyClassLoaderCache =
         new ProxyClassLoaderCache();
-    
+
     private InjectionUtils() {
 
     }
@@ -911,11 +911,11 @@ public final class InjectionUtils {
     static Class<?> getCollectionType(Class<?> rawType) {
         Class<?> type = null;
         if (SortedSet.class.isAssignableFrom(rawType)) {
-            type = TreeSet.class;
+            type = TreeSet.class; //NOPMD
         } else if (Set.class.isAssignableFrom(rawType)) {
-            type = HashSet.class;
+            type = HashSet.class; //NOPMD
         } else if (Collection.class.isAssignableFrom(rawType)) {
-            type = ArrayList.class;
+            type = ArrayList.class; //NOPMD
         }
         return type;
 
@@ -1080,19 +1080,19 @@ public final class InjectionUtils {
         }
         if (proxy == null) {
             ClassLoader loader
-                = proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(), 
-                                                            new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type}); 
+                = proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(),
+                                                            new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type});
             if (!canSeeAllClasses(loader, new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type})) {
-                LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache," 
+                LOG.log(Level.FINE, "find a loader from ProxyClassLoader cache,"
                     + " but can't see all interfaces");
-                
+
                 LOG.log(Level.FINE, "create a new one with parent  " + Proxy.class.getClassLoader());
                 proxyClassLoaderCache.removeStaleProxyClassLoader(type);
-                proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(), 
-                                                          new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type}); 
-                
-                
-            } 
+                proxyClassLoaderCache.getProxyClassLoader(Proxy.class.getClassLoader(),
+                                                          new Class<?>[]{Proxy.class, ThreadLocalProxy.class, type});
+
+
+            }
             return (ThreadLocalProxy<T>)Proxy.newProxyInstance(loader,
                                    new Class[] {type, ThreadLocalProxy.class },
                                    new ThreadLocalInvocationHandler<T>());
@@ -1100,7 +1100,7 @@ public final class InjectionUtils {
 
         return (ThreadLocalProxy<T>)proxy;
     }
-    
+
     private static boolean canSeeAllClasses(ClassLoader loader, Class<?>[] interfaces) {
         for (Class<?> currentInterface : interfaces) {
             String ifName = currentInterface.getName();
@@ -1109,15 +1109,15 @@ public final class InjectionUtils {
                 if (ifClass != currentInterface) {
                     return false;
                 }
-               
+
             } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return false;
             }
         }
         return true;
     }
-    
-    private static boolean isServletApiContext(String name) { 
+
+    private static boolean isServletApiContext(String name) {
         return name.startsWith("javax.servlet.");
     }
 

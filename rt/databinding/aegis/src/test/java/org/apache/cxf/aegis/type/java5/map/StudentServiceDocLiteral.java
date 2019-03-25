@@ -38,6 +38,6 @@ public interface StudentServiceDocLiteral {
     List<Student> getStudentsByIds(List<String> ids);
 
     //CHECKSTYLE:OFF
-    void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData);
+    void takeMapMap(HashMap<String, HashMap<String, Student>> myComplexData); //NOPMD
 
 }

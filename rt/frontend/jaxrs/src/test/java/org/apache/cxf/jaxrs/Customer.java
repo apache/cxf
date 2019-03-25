@@ -240,8 +240,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                    String value) {
         return value;
     }
-            
-    
+
+
     public void testPathBean(@PathParam("") CustomerBean cb) {
 
     }
@@ -460,7 +460,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
 
 //  CHECKSTYLE:OFF
-    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) {
+    public void testWrongType(@QueryParam("p1") HashMap<?, ?> map) { //NOPMD
         // complete
     }
 //  CHECKSTYLE:ON
@@ -552,7 +552,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
             }
             return Integer.parseInt(v);
         }
- 
+
     }
 
     public static final class ABean {

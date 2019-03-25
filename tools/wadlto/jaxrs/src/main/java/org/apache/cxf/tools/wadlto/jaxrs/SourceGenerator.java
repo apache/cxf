@@ -1689,7 +1689,7 @@ public class SourceGenerator {
         }
         String clsName = packageName + "." + localName.toLowerCase();
         for (String type : typeClassNames) {
-            if (type.toLowerCase().equals(clsName)) {
+            if (type.equalsIgnoreCase(clsName)) {
                 return type;
             }
         }
