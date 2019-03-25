@@ -80,7 +80,9 @@ public class PolicyBasedWSS4JStaxInInterceptor extends WSS4JStaxInInterceptor {
 
     @Override
     protected WSSSecurityProperties createSecurityProperties() {
-        return new WSSSecurityProperties();
+        WSSSecurityProperties securityProperties = new WSSSecurityProperties();
+        securityProperties.setSkipDocumentEvents(true);
+        return securityProperties;
     }
 
     private void checkAsymmetricBinding(

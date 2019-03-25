@@ -112,6 +112,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         ConfigurationConverter.parseCallback(properties, securityProperties);
         ConfigurationConverter.parseBooleanProperties(properties, securityProperties);
         ConfigurationConverter.parseNonBooleanProperties(properties, securityProperties);
+        securityProperties.setSkipDocumentEvents(true);
         return securityProperties;
     }
 

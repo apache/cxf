@@ -592,7 +592,6 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-    @org.junit.Ignore("Streaming mode not working yet")
     @org.junit.Test
     public void testAsymmetricIssuerSerialDispatchMessage() throws Exception {
 
