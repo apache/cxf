@@ -19,11 +19,17 @@
 
 package org.apache.cxf.jaxrs.openapi;
 
+import java.util.Objects;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
+import org.apache.cxf.jaxrs.common.openapi.DelegatingServletConfig;
+import org.apache.cxf.jaxrs.common.openapi.SyntheticServletConfig;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
+
+import io.swagger.v3.oas.integration.api.OpenApiContext;
 
 class ServletConfigProvider implements ContextProvider<ServletConfig> {
     private final String contextId;
@@ -43,10 +49,28 @@ class ServletConfigProvider implements ContextProvider<ServletConfig> {
         if (sc == null) {
             final ServletContext context = (ServletContext)message.get("HTTP.CONTEXT");
             if (context != null) {
-                return new SyntheticServletConfig(context, contextId);
+                return new SyntheticServletConfig(context) {
+                    @Override
+                    public String getInitParameter(String name) {
+                        if (Objects.equals(OpenApiContext.OPENAPI_CONTEXT_ID_KEY, name)) {
+                            return contextId;
+                        } else {
+                            return super.getInitParameter(name);
+                        }
+                    }
+                };
             }
         } else {
-            return new DelegatingServletConfig(sc, contextId);
+            return new DelegatingServletConfig(sc) {
+                @Override
+                public String getInitParameter(String name) {
+                    if (Objects.equals(OpenApiContext.OPENAPI_CONTEXT_ID_KEY, name)) {
+                        return contextId;
+                    } else {
+                        return super.getInitParameter(name);
+                    }
+                }
+            };
         }
 
         return sc;

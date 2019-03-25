@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -46,7 +47,9 @@ import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.common.openapi.DefaultApplicationFactory;
+import org.apache.cxf.jaxrs.common.openapi.DelegatingServletConfig;
 import org.apache.cxf.jaxrs.common.openapi.SwaggerProperties;
+import org.apache.cxf.jaxrs.common.openapi.SyntheticServletConfig;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
@@ -437,10 +440,28 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
             if (sc == null) {
                 final ServletContext context = (ServletContext)message.get("HTTP.CONTEXT");
                 if (context != null) {
-                    return new SyntheticServletConfig(context);
+                    return new SyntheticServletConfig(context) {
+                        @Override
+                        public String getInitParameter(String name) {
+                            if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
+                                return "true";
+                            } else {
+                                return super.getInitParameter(name);
+                            }
+                        }
+                    };
                 }
             } else if (sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
-                return new DelegatingServletConfig(sc);
+                return new DelegatingServletConfig(sc) {
+                    @Override
+                    public String getInitParameter(String name) {
+                        if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {
+                            return "true";
+                        } else {
+                            return super.getInitParameter(name);
+                        }
+                    }
+                };
             }
 
             return sc;

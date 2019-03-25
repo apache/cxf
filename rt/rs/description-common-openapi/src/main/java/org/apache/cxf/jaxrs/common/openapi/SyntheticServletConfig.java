@@ -16,33 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.openapi;
+package org.apache.cxf.jaxrs.common.openapi;
 
 import java.util.Enumeration;
-import java.util.Objects;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-import io.swagger.v3.oas.integration.api.OpenApiContext;
+public class SyntheticServletConfig implements ServletConfig {
+    private final ServletContext delegate;
 
-class DelegatingServletConfig implements ServletConfig {
-    private final ServletConfig delegate;
-    private final String contextId;
-
-    DelegatingServletConfig(final ServletConfig sc, String contextId) {
-        this.delegate = sc;
-        this.contextId = contextId;
+    public SyntheticServletConfig(final ServletContext context) {
+        this.delegate = context;
     }
 
     @Override
     public String getServletName() {
-        return delegate.getServletName();
+        return null; /* no servlet available */
     }
 
     @Override
     public ServletContext getServletContext() {
-        return delegate.getServletContext();
+        return delegate;
     }
 
     @Override
@@ -52,9 +47,6 @@ class DelegatingServletConfig implements ServletConfig {
 
     @Override
     public String getInitParameter(String name) {
-        if (Objects.equals(OpenApiContext.OPENAPI_CONTEXT_ID_KEY, name)) {
-            return contextId;
-        }
         return delegate.getInitParameter(name);
     }
 }
