@@ -84,7 +84,7 @@ public class ProcessorEnvironment {
     }
 
     public boolean getBooleanValue(String key, String defaultValue) {
-        return Boolean.valueOf((String) get(key, defaultValue)).booleanValue();
+        return Boolean.parseBoolean((String) get(key, defaultValue));
     }
 
     public void put(String key, Object value) {

@@ -385,13 +385,13 @@ public class XMLTypeCreator extends AbstractTypeCreator {
             btinfo.setDefaultNillable(getConfiguration().isDefaultNillable());
 
             if (extensibleElements != null) {
-                btinfo.setExtensibleElements(Boolean.valueOf(extensibleElements).booleanValue());
+                btinfo.setExtensibleElements(Boolean.parseBoolean(extensibleElements));
             } else {
                 btinfo.setExtensibleElements(getConfiguration().isDefaultExtensibleElements());
             }
 
             if (extensibleAttributes != null) {
-                btinfo.setExtensibleAttributes(Boolean.valueOf(extensibleAttributes).booleanValue());
+                btinfo.setExtensibleAttributes(Boolean.parseBoolean(extensibleAttributes));
             } else {
                 btinfo.setExtensibleAttributes(getConfiguration().isDefaultExtensibleAttributes());
             }
@@ -540,12 +540,12 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
         String flat = DOMUtils.getAttributeValueEmptyNull(parameter, "flat");
         if (flat != null) {
-            info.setFlat(Boolean.valueOf(flat.toLowerCase()).booleanValue());
+            info.setFlat(Boolean.parseBoolean(flat.toLowerCase()));
         }
 
         String nillable = DOMUtils.getAttributeValueEmptyNull(parameter, "nillable");
         if (nillable != null) {
-            info.setNillable(Boolean.valueOf(nillable.toLowerCase()).booleanValue());
+            info.setNillable(Boolean.parseBoolean(nillable.toLowerCase()));
         }
     }
 

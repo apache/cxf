@@ -284,7 +284,7 @@ public class CorbaObjectReaderTest {
         reader.readArray(obj);
         int length = obj.getElements().size();
         for (int i = 0; i < length; ++i) {
-            assertTrue(Long.valueOf(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue()).intValue()
+            assertTrue(Integer.parseInt(((CorbaPrimitiveHandler)obj.getElement(i)).getDataFromValue())
                        == data[i]);
         }
     }
@@ -388,11 +388,11 @@ public class CorbaObjectReaderTest {
         reader.readStruct(obj);
 
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
-        assertTrue(Integer.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0)).getDataFromValue()).intValue()
+        assertTrue(Integer.parseInt(((CorbaPrimitiveHandler)nestedObjs.get(0)).getDataFromValue())
                    == member1);
         assertEquals(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue(), member2);
-        assertTrue(Boolean.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(2))
-                                   .getDataFromValue()).booleanValue()
+        assertTrue(Boolean.parseBoolean(((CorbaPrimitiveHandler)nestedObjs.get(2))
+                                   .getDataFromValue())
                    == member3);
     }
 
@@ -449,8 +449,8 @@ public class CorbaObjectReaderTest {
         reader.readException(obj);
 
         List<CorbaObjectHandler> nestedObjs = obj.getMembers();
-        assertTrue(Short.valueOf(((CorbaPrimitiveHandler)nestedObjs.get(0))
-                                 .getDataFromValue()).shortValue() == code);
+        assertTrue(Short.parseShort(((CorbaPrimitiveHandler)nestedObjs.get(0))
+                                 .getDataFromValue()) == code);
         assertEquals(((CorbaPrimitiveHandler)nestedObjs.get(1)).getDataFromValue(), message);
     }
 

@@ -143,7 +143,7 @@ public class SAAJInInterceptorTest extends TestBase {
         Iterator<?> detailEntries = faultDetail.getDetailEntries();
         DetailEntry detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorcode", detailEntry.getLocalName());
-        assertEquals(3, Integer.valueOf(detailEntry.getTextContent()).intValue());
+        assertEquals(3, Integer.parseInt(detailEntry.getTextContent()));
         detailEntry = (DetailEntry)detailEntries.next();
         assertEquals("errorstring", detailEntry.getLocalName());
         assertEquals("This is a fault detail error string", detailEntry.getTextContent());

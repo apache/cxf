@@ -159,9 +159,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             exts2 = new Object[1];
         } else {
             exts2 = new Object[exts.length + 1];
-            for (int i = 0; i < exts.length; i++) {
-                exts2[i] = exts[i];
-            }
+            System.arraycopy(exts, 0, exts2, 0, exts.length);
         }
         exts2[exts2.length - 1] = el;
         if (!extensors.compareAndSet(exts, exts2)) {

@@ -205,7 +205,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             obj = Character.valueOf(data.charAt(0));
             break;
         case TCKind._tk_octet:
-            obj = Short.valueOf(data).byteValue();
+            obj = Short.valueOf(data).byteValue(); //NOPMD
             break;
         case TCKind._tk_short:
             obj = Short.valueOf(data);

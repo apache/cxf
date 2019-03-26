@@ -51,7 +51,7 @@ public class SymmetricKeyHandler {
     public SymmetricKeyHandler(TokenProviderParameters tokenParameters) {
         KeyRequirements keyRequirements = tokenParameters.getKeyRequirements();
 
-        keySize = Long.valueOf(keyRequirements.getKeySize()).intValue();
+        keySize = (int)keyRequirements.getKeySize();
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
         SignatureProperties signatureProperties = stsProperties.getSignatureProperties();
 
@@ -77,7 +77,7 @@ public class SymmetricKeyHandler {
         // Test KeySize
         if (keySize < signatureProperties.getMinimumKeySize()
             || keySize > signatureProperties.getMaximumKeySize()) {
-            keySize = Long.valueOf(signatureProperties.getKeySize()).intValue();
+            keySize = (int)signatureProperties.getKeySize();
             LOG.log(
                 Level.WARNING, "Received KeySize of " + keyRequirements.getKeySize()
                 + " not accepted so defaulting to " + signatureProperties.getKeySize()

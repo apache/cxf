@@ -178,7 +178,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 return ex;
             }
         }
-        
+
         if (ex instanceof Fault && ex.getCause() instanceof IOException) {
             return new WebServiceException(ex.getMessage(), ex.getCause());
         }
@@ -205,7 +205,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
         return new WebServiceException(ex);
     }
-    
+
     boolean isAsync(Method m) {
         return m.getName().endsWith("Async")
             && (Future.class.equals(m.getReturnType())
@@ -306,9 +306,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         if (params.length > 0 && params[params.length - 1] instanceof AsyncHandler) {
             handler = (AsyncHandler<Object>)params[params.length - 1];
             Object[] newParams = new Object[params.length - 1];
-            for (int i = 0; i < newParams.length; i++) {
-                newParams[i] = params[i];
-            }
+            System.arraycopy(params, 0, newParams, 0, newParams.length);
             params = newParams;
         } else {
             handler = null;

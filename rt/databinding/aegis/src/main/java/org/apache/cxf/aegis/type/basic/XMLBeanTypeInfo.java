@@ -141,7 +141,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
 
             String nillableVal = DOMUtils.getAttributeValueEmptyNull(e, "nillable");
             if (nillableVal != null && nillableVal.length() > 0) {
-                ensurePropertyInfo(mappedName).setNillable(Boolean.valueOf(nillableVal).booleanValue());
+                ensurePropertyInfo(mappedName).setNillable(Boolean.parseBoolean(nillableVal));
             }
 
             String minOccurs = DOMUtils.getAttributeValueEmptyNull(e, "minOccurs");

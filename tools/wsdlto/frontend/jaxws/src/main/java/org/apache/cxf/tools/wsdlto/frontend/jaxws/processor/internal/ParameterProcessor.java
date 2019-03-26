@@ -185,7 +185,7 @@ public class ParameterProcessor extends AbstractProcessor {
         if (StringUtils.isEmpty(value)) {
             return false;
         }
-        return Boolean.valueOf(value).booleanValue();
+        return Boolean.parseBoolean(value);
     }
 
     private int countOutOfBandHeader(MessageInfo message) {
@@ -701,7 +701,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
             if (outputUnlistedParts.size() == 1) {
                 processReturn(method, outputUnlistedParts.get(0));
-                outputPartsMap.remove((Object)outputUnlistedParts.get(0));
+                outputPartsMap.remove(outputUnlistedParts.get(0));
                 outputUnlistedParts.clear();
             } else {
                 processReturn(method, null);
