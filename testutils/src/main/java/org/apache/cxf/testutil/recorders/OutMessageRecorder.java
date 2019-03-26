@@ -85,7 +85,7 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
             // bytes were already copied after flush
             try {
                 byte[] bytes = cos.getBytes();
-                synchronized (outbound) {
+                synchronized (this) {
                     outbound.add(bytes);
                 }
             } catch (Exception e) {
