@@ -26,6 +26,7 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -275,7 +276,9 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id", false);
+        List<String> headerList = Arrays.asList("accept");
+        MessageSigner messageSigner =
+            new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
@@ -302,14 +305,45 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", true,
-                                                        Collections.singletonList("accept"));
+        List<String> headerList = Arrays.asList("accept", "(request-target)");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureSignSpecificHeaderProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.properties",
+                       "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        List<String> headerList = Arrays.asList("accept", "(request-target)");
+        properties.put("rs.security.http.signature.out.headers", headerList);
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
         assertEquals(response.getStatus(), 200);
@@ -523,7 +557,8 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", false);
+        List<String> headerList = Arrays.asList("accept");
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";

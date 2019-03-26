@@ -32,19 +32,17 @@ public class TomitribeSignatureCreator implements SignatureCreator {
     private final String signatureAlgorithmName;
     private final PrivateKey privateKey;
     private final String keyId;
-    private final boolean includeRequestTarget;
     private final List<String> headersToSign;
 
     public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey, String keyId) {
-        this(signatureAlgorithmName, privateKey, keyId, true, Collections.emptyList());
+        this(signatureAlgorithmName, privateKey, keyId, Collections.emptyList());
     }
 
     public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKey privateKey,
-                                     String keyId, boolean includeRequestTarget, List<String> headersToSign) {
+                                     String keyId, List<String> headersToSign) {
         this.signatureAlgorithmName = signatureAlgorithmName;
         this.privateKey = privateKey;
         this.keyId = keyId;
-        this.includeRequestTarget = includeRequestTarget;
         this.headersToSign = headersToSign;
     }
 
@@ -56,14 +54,13 @@ public class TomitribeSignatureCreator implements SignatureCreator {
         }
 
         List<String> headers = null;
-        // If we have explicit headers to sign then use these. Otherwise sign all headers
+        // If we have explicit headers to sign then use these.
+        // Otherwise sign all headers including "(request-target)"
         if (headersToSign.isEmpty()) {
             headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
+            headers.add("(request-target)");
         } else {
             headers = headersToSign.stream().map(String::toLowerCase).collect(Collectors.toList());
-        }
-        if (includeRequestTarget) {
-            headers.add("(request-target)");
         }
 
         if (keyId == null) {

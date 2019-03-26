@@ -36,53 +36,34 @@ public class MessageSigner {
                          String digestAlgorithmName,
                          PrivateKey privateKey,
                          String keyId) {
-        this(signatureAlgorithmName, digestAlgorithmName, privateKey, keyId, true);
+        this(signatureAlgorithmName, digestAlgorithmName, privateKey, keyId, Collections.emptyList());
     }
 
     public MessageSigner(String signatureAlgorithmName,
                          String digestAlgorithmName,
                          PrivateKey privateKey,
                          String keyId,
-                         boolean includeRequestTarget) {
-        this(signatureAlgorithmName, digestAlgorithmName, privateKey, keyId,
-             includeRequestTarget, Collections.emptyList());
-    }
-
-    public MessageSigner(String signatureAlgorithmName,
-                         String digestAlgorithmName,
-                         PrivateKey privateKey,
-                         String keyId,
-                         boolean includeRequestTarget,
                          List<String> headersToSign) {
         this.digestAlgorithmName = Objects.requireNonNull(digestAlgorithmName);
         this.signatureCreator = new TomitribeSignatureCreator(
                 Objects.requireNonNull(signatureAlgorithmName),
                 Objects.requireNonNull(privateKey),
                 Objects.requireNonNull(keyId),
-                includeRequestTarget,
                 headersToSign);
     }
 
     public MessageSigner(PrivateKey privateKey,
                          String keyId) {
-        this(privateKey, keyId, true);
+        this(privateKey, keyId, Collections.emptyList());
     }
 
     public MessageSigner(PrivateKey privateKey,
                          String keyId,
-                         boolean includeRequestTarget) {
-        this(privateKey, keyId, includeRequestTarget, Collections.emptyList());
-    }
-
-    public MessageSigner(PrivateKey privateKey,
-                         String keyId,
-                         boolean includeRequestTarget,
                          List<String> headersToSign) {
         this(DefaultSignatureConstants.SIGNING_ALGORITHM,
                 DefaultSignatureConstants.DIGEST_ALGORITHM,
                 privateKey,
                 keyId,
-                includeRequestTarget,
                 headersToSign);
     }
 

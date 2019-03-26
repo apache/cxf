@@ -33,6 +33,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
@@ -129,8 +130,14 @@ abstract class AbstractSignatureOutFilter {
             }
         }
 
+        List<String> signedHeaders =
+            CastUtils.cast((List<?>)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_OUT_HEADERS));
+        if (signedHeaders == null) {
+            signedHeaders = Collections.emptyList();
+        }
+
         return new MessageSigner(signatureAlgorithm, DefaultSignatureConstants.DIGEST_ALGORITHM, privateKey,
-                                 keyId, true, Collections.emptyList());
+                                 keyId, signedHeaders);
     }
 
 }
