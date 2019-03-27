@@ -28,6 +28,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -114,7 +115,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
 
 
         // This should fail as the client uses Basic256 + the server uses Basic128
-        if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port3");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);

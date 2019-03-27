@@ -20,6 +20,7 @@
 package org.apache.cxf.databinding;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,13 +51,16 @@ import org.apache.ws.commons.schema.XmlSchema;
  * Supply default implementations, as appropriate, for DataBinding.
  */
 public abstract class AbstractDataBinding implements DataBinding {
-    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<>();
-    {
-        BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
+    private static final Map<String, String> BUILTIN_SCHEMA_LOCS;
+    static {
+        Map<String, String> schemaLocations = new HashMap<>(2);
+        schemaLocations.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
-        BUILTIN_SCHEMA_LOCS.put("http://ws-i.org/profiles/basic/1.1/xsd",
+        schemaLocations.put("http://ws-i.org/profiles/basic/1.1/xsd",
                                 "http://ws-i.org/profiles/basic/1.1/swaref.xsd");
+        BUILTIN_SCHEMA_LOCS = Collections.unmodifiableMap(schemaLocations);
     }
+
     protected boolean mtomEnabled;
     protected int mtomThreshold;
     private Bus bus;

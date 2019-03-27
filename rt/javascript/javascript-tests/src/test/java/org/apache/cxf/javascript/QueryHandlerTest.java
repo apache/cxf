@@ -94,7 +94,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
 
             for (int x = 0; x < tok.length; x++) {
                 String token = tok[x];
-                js.append("  " + token);
+                js.append("  ").append(token);
             }
             line = in.readLine();
         }

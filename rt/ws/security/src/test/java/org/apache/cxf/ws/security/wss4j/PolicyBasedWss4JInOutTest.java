@@ -23,6 +23,7 @@ import java.util.Arrays;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.wss4j.policy.SP12Constants;
 
@@ -381,7 +382,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractPolicySecurityTest {
 
     @Test
     public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
-        if (!checkUnrestrictedPoliciesInstalled()) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
         this.runInInterceptorAndValidate(

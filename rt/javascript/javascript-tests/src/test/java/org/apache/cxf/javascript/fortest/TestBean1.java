@@ -168,7 +168,7 @@ public class TestBean1 {
         } else {
             builder.append(beanTwoNotRequiredItem.toString());
         }
-        builder.append(" " + enumeration);
+        builder.append(' ').append(enumeration);
 
         return builder.toString();
     }

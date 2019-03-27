@@ -28,6 +28,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -114,7 +115,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
 
 
         // This should fail as the client uses Basic256 + the server uses Basic128
-        if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port3");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);
@@ -144,7 +145,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testCombinedPolicy() throws Exception {
 
-        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 
@@ -207,7 +208,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         }
 
         // This should fail as the client uses AES-256 and the server uses AES-128
-        if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItEncryptionOAEPPort3");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);
@@ -245,7 +246,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         assertEquals(50, port.doubleIt(25));
 
         // This should fail as the client uses uses RSA-SHA256 + the server uses RSA-SHA1
-        if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSignaturePort2");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);
@@ -317,7 +318,7 @@ public class AlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     @org.junit.Test
     public void testMultipleAlgorithmSuitesPolicy() throws Exception {
 
-        if (!SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
+        if (!TestUtilities.checkUnrestrictedPoliciesInstalled()) {
             return;
         }
 

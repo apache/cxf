@@ -288,7 +288,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         if (requestedPerms != null && !requestedPerms.isEmpty()) {
             StringBuilder builder = new StringBuilder();
             for (OAuthPermission perm : requestedPerms) {
-                builder.append(perm.getPermission() + " ");
+                builder.append(perm.getPermission()).append(' ');
             }
             secData.setProposedScope(builder.toString().trim());
         }

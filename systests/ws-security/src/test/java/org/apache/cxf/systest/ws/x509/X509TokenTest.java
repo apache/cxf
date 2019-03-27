@@ -58,6 +58,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.ut.SecurityHeaderCacheInterceptor;
+import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -88,7 +89,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static boolean unrestrictedPoliciesInstalled =
-        SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        TestUtilities.checkUnrestrictedPoliciesInstalled();
 
     final TestParam test;
 
@@ -591,7 +592,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testAsymmetricIssuerSerialDispatchMessage() throws Exception {
 
@@ -612,11 +613,11 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(disp);
         }
-        
+
         Document xmlDocument = DOMUtils.newDocument();
 
         Element requestElement = xmlDocument.createElementNS("http://www.example.org/schema/DoubleIt", "tns:DoubleIt");
-        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns", 
+        requestElement.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:tns",
                                       "http://www.example.org/schema/DoubleIt");
         Element dataElement = xmlDocument.createElement("numberToDouble");
         dataElement.appendChild(xmlDocument.createTextNode("25"));
@@ -626,7 +627,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage request = factory.createMessage();
         request.getSOAPBody().appendChild(request.getSOAPPart().adoptNode(requestElement));
-            
+
         // We need to set the wsdl operation name here, or otherwise the policy layer won't pick
         // up the security policy attached at the operation level
         // this can be done in one of three ways:
@@ -640,7 +641,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         SOAPMessage resp = disp.invoke(request);
         Node nd = resp.getSOAPBody().getFirstChild();
-        
+
         Map<String, String> ns = new HashMap<>();
         ns.put("ns2", "http://www.example.org/schema/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
@@ -649,7 +650,7 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+
 
     @org.junit.Test
     public void testAsymmetricSHA512() throws Exception {

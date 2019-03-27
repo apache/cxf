@@ -29,6 +29,7 @@ import org.apache.cxf.systest.ws.wssec11.server.Server12;
 import org.apache.cxf.systest.ws.wssec11.server.Server12Restricted;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer12;
 import org.apache.cxf.systest.ws.wssec11.server.StaxServer12Restricted;
+import org.apache.cxf.test.TestUtilities;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
 
     static {
-        unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
+        unrestrictedPoliciesInstalled = TestUtilities.checkUnrestrictedPoliciesInstalled();
     };
 
     final TestParam test;
