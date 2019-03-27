@@ -33,18 +33,30 @@ public class CustomPublicKeyProvider implements PublicKeyProvider {
 
     @Override
     public PublicKey getKey(String keyId) {
-        if (!"alice-key-id".equals(keyId)) {
-            return null;
+        if ("alice-key-id".equals(keyId)) {
+            KeyStore keyStore;
+            try {
+                keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                              "password".toCharArray());
+                return keyStore.getCertificate("alice").getPublicKey();
+            } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else if ("bob-key-id".equals(keyId)) {
+            KeyStore keyStore;
+            try {
+                keyStore = KeyStore.getInstance("JKS");
+                keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", this.getClass()),
+                              "password".toCharArray());
+                return keyStore.getCertificate("bob").getPublicKey();
+            } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
-        KeyStore keyStore;
-        try {
-            keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
-                          "password".toCharArray());
-            return keyStore.getCertificate("alice").getPublicKey();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+        return null;
     }
 }

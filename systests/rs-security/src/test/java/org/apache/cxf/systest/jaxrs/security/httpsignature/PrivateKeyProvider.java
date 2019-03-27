@@ -42,9 +42,9 @@ public final class PrivateKeyProvider {
         KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", PrivateKeyProvider.class),
+            keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", PrivateKeyProvider.class),
                           "password".toCharArray());
-            return (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+            return (PrivateKey)keyStore.getKey("bob", "password".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException
             | IOException | UnrecoverableKeyException e) {
             e.printStackTrace();

@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Signature;
 
@@ -55,10 +58,13 @@ public class TomitribeSignatureCreator implements SignatureCreator {
 
         List<String> headers = null;
         // If we have explicit headers to sign then use these.
-        // Otherwise sign all headers including "(request-target)"
+        // Otherwise sign all headers including "(request-target)" (if on an inbound service request)
         if (headersToSign.isEmpty()) {
             headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
-            headers.add("(request-target)");
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            if (MessageUtils.isRequestor(m)) {
+                headers.add(HTTPSignatureConstants.REQUEST_TARGET);
+            }
         } else {
             headers = headersToSign.stream().map(String::toLowerCase).collect(Collectors.toList());
         }

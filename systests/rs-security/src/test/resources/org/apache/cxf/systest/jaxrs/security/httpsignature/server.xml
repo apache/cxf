@@ -87,7 +87,7 @@ under the License.
         <constructor-arg>
             <bean class="org.apache.cxf.systest.jaxrs.security.httpsignature.PrivateKeyProvider" factory-method="loadPrivateKey" />
         </constructor-arg>
-        <constructor-arg value="alice-key-id" />
+        <constructor-arg value="bob-key-id" />
     </bean>
     <bean id="httpSignatureCreator" class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter">
         <property name="messageSigner" ref="messageSigner"/>

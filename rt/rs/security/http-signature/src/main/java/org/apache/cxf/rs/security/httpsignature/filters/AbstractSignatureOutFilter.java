@@ -29,7 +29,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
@@ -75,7 +74,7 @@ abstract class AbstractSignatureOutFilter {
         try {
             messageSigner.sign(convertedHeaders, uriPath, httpMethod);
         } catch (IOException ex) {
-            throw new BadRequestException(ex);
+            throw new SignatureException("Error creating signature", ex);
         }
         headers.put("Signature", Collections.singletonList(convertedHeaders.get("Signature").get(0)));
         LOG.fine("Finished filter message verification process");

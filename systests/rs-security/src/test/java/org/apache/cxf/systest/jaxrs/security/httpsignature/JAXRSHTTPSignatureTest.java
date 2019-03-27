@@ -59,6 +59,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * A test for the HTTP Signature functionality in the cxf-rt-rs-security-http-signature module.
@@ -256,6 +257,32 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/books";
         WebClient client = WebClient.create(address, providers, busFile.toString());
         client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureResponseProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new CreateSignatureClientFilter());
+        providers.add(new VerifySignatureClientFilter());
+        String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/books";
+        WebClient client = WebClient.create(address, providers, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.out.properties",
+            "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        properties.put("rs.security.signature.in.properties",
+                       "org/apache/cxf/systest/jaxrs/security/httpsignature/bob.httpsig.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
         assertEquals(response.getStatus(), 200);
@@ -592,6 +619,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("CXF", 126L));
         assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testPropertiesWrongSignatureVerification() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(new CreateSignatureClientFilter());
+        providers.add(new VerifySignatureClientFilter());
+        String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/books";
+        WebClient client = WebClient.create(address, providers, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.out.properties",
+            "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        properties.put("rs.security.signature.in.properties",
+                       "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        try {
+            client.post(new Book("CXF", 126L));
+            fail("Failure expected on the wrong signature verification keystore");
+        } catch (Exception ex) {
+            // expected
+        }
     }
 
     @Provider

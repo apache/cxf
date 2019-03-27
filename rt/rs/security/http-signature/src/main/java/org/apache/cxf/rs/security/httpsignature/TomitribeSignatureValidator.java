@@ -92,7 +92,7 @@ public class TomitribeSignatureValidator implements SignatureValidator {
                 throw new InvalidDataToVerifySignatureException();
             }
         } catch (Exception e) {
-            throw new InvalidDataToVerifySignatureException(e.getMessage(), e);
+            throw new InvalidDataToVerifySignatureException("Error validating the signature", e);
         }
         if (!success) {
             throw new InvalidSignatureException("signature is not valid");

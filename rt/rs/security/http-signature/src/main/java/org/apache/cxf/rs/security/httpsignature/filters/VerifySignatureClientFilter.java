@@ -26,6 +26,8 @@ import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
+
 /**
  * RS CXF client Filter which extracts signature data from the context and sends it to the message verifier
  */
@@ -43,4 +45,8 @@ public final class VerifySignatureClientFilter extends AbstractSignatureInFilter
         verifySignature(responseContext.getHeaders(), "", "");
     }
 
+    @Override
+    protected void handleException(Exception ex) {
+        throw new SignatureException("Error verifying signature", ex);
+    }
 }

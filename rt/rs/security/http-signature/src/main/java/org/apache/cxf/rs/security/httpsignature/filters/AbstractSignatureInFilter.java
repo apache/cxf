@@ -18,13 +18,23 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
@@ -32,6 +42,9 @@ import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureExcept
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
+import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.KeyManagementUtils;
 
 /**
  * RS CXF abstract Filter which extracts signature data from the context and sends it to the message verifier
@@ -53,8 +66,7 @@ abstract class AbstractSignatureInFilter {
         }
 
         if (messageVerifier == null) {
-            LOG.warning("Message verifier cannot be null");
-            return;
+            messageVerifier = createMessageVerifier();
         }
 
         LOG.fine("Starting filter message verification process");
@@ -64,7 +76,7 @@ abstract class AbstractSignatureInFilter {
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {
             LOG.warning(ex.getMessage());
-            throw new BadRequestException(ex);
+            handleException(ex);
         }
         LOG.fine("Finished filter message verification process");
     }
@@ -82,4 +94,36 @@ abstract class AbstractSignatureInFilter {
         return enabled;
     }
 
+    protected MessageVerifier createMessageVerifier() {
+        Properties props = KeyManagementUtils.loadSignatureInProperties();
+        if (props == null) {
+            throw new SignatureException("Signature properties are not configured correctly");
+        }
+
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        PublicKey publicKey = KeyManagementUtils.loadPublicKey(m, props);
+
+        String signatureAlgorithm = (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_SIGNATURE_ALGORITHM);
+        if (signatureAlgorithm == null) {
+            signatureAlgorithm = DefaultSignatureConstants.SIGNING_ALGORITHM;
+        }
+
+        List<String> signedHeaders =
+            CastUtils.cast((List<?>)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS));
+        if (signedHeaders == null) {
+            if (!MessageUtils.isRequestor(m)) {
+                 // The service request must contain "(request-target)" by default
+                signedHeaders = Collections.singletonList(HTTPSignatureConstants.REQUEST_TARGET);
+            } else {
+                signedHeaders = Collections.emptyList();
+            }
+        }
+
+        final String finalSignatureAlgorithm = signatureAlgorithm;
+        final Provider provider = Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
+        return new MessageVerifier(keyId -> publicKey, keyId -> provider, keyId -> finalSignatureAlgorithm,
+            signedHeaders);
+    }
+
+    protected abstract void handleException(Exception ex);
 }

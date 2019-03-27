@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -49,6 +50,12 @@ public final class KeyManagementUtils {
     public static Properties loadSignatureOutProperties() {
         Message m = PhaseInterceptorChain.getCurrentMessage();
         return loadStoreProperties(m, HTTPSignatureConstants.RSSEC_SIGNATURE_OUT_PROPS,
+                                   HTTPSignatureConstants.RSSEC_SIGNATURE_PROPS);
+    }
+
+    public static Properties loadSignatureInProperties() {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        return loadStoreProperties(m, HTTPSignatureConstants.RSSEC_SIGNATURE_IN_PROPS,
                                    HTTPSignatureConstants.RSSEC_SIGNATURE_PROPS);
 
     }
@@ -105,6 +112,13 @@ public final class KeyManagementUtils {
             keyPswdChars = provider != null ? provider.getPassword(props) : null;
         }
         return CryptoUtils.loadPrivateKey(keyStore, keyPswdChars, alias);
+    }
+
+    public static PublicKey loadPublicKey(Message m, Properties props) {
+        KeyStore keyStore = loadPersistKeyStore(m, props);
+
+        String alias = props.getProperty(HTTPSignatureConstants.RSSEC_KEY_STORE_ALIAS);
+        return CryptoUtils.loadCertificate(keyStore, alias).getPublicKey();
     }
 
     private static PrivateKeyPasswordProvider loadPasswordProvider(Message m, Properties props) {

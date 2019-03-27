@@ -26,8 +26,10 @@ import org.apache.cxf.rt.security.rs.RSSecurityConstants;
  */
 public final class HTTPSignatureConstants extends RSSecurityConstants {
 
+    public static final String REQUEST_TARGET = "(request-target)";
+
     /**
-     * The signature key id. This is a required configuration option.
+     * The signature key id. This is a required configuration option on the outbound side.
      */
     public static final String RSSEC_HTTP_SIGNATURE_KEY_ID = "rs.security.http.signature.key.id";
 
@@ -37,6 +39,12 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
      * will include "(request-target)" in the signed headers list.
      */
     public static final String RSSEC_HTTP_SIGNATURE_OUT_HEADERS = "rs.security.http.signature.out.headers";
+
+    /**
+     * This is a list of String values which correspond to the list of HTTP headers that must be signed
+     * in the inbound request. By default, a client request must sign "(request-target)".
+     */
+    public static final String RSSEC_HTTP_SIGNATURE_IN_HEADERS = "rs.security.http.signature.in.headers";
 
 
     private HTTPSignatureConstants() {
