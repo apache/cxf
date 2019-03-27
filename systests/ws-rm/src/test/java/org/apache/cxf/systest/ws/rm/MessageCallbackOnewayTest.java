@@ -20,14 +20,14 @@
 package org.apache.cxf.systest.ws.rm;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.jws.WebService;
@@ -62,9 +62,9 @@ import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Tests the operation of MessageCallback for one-way messages to the server.
@@ -72,7 +72,7 @@ import static org.junit.Assert.fail;
 public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(MessageCallbackOnewayTest.class);
     private static final String GREETER_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-    private static final Long RETRANSMISSION_INTERVAL = Long.valueOf(2000);
+    private static final long RETRANSMISSION_INTERVAL = 500L;
 
     private static final Logger LOG = LogUtils.getLogger(MessageCallbackOnewayTest.class);
 
@@ -94,27 +94,6 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         } catch (Throwable t) {
             //ignore
         }
-        Thread.sleep(100);
-    }
-
-    /**
-     * Checks that all callbacks are received, that messages are accepted in order, and that each message is accepted
-     * before it is acknowledged (order of acknowledgements doesn't really matter).
-     */
-    private void verifyCallbacks() {
-        List<Callback> cbs = callback.getCallbacks();
-        Set<Long> acks = new HashSet<>();
-        long nextNum = 1;
-        for (Callback cb: cbs) {
-            if (cb.isAccept()) {
-                assertEquals(nextNum++, cb.getMsgNumber());
-            } else {
-                assertTrue(cb.getMsgNumber() < nextNum);
-                Long num = Long.valueOf(cb.getMsgNumber());
-                assertFalse(acks.contains(num));
-                acks.add(num);
-            }
-        }
     }
 
     @Test
@@ -133,12 +112,10 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
-        String[] callArgs = new String[] {"one", "two", "three", "four"};
-        for (int i = 0; i < callArgs.length; i++) {
-            greeter.greetMeOneWay(callArgs[i]);
+        for (String arg : new String[] {"one", "two", "three", "four"}) {
+            greeter.greetMeOneWay(arg);
         }
-        callback.waitDone(8, 3000, 60000);
-        verifyCallbacks();
+        callback.waitAndVerify(8, 1000L, 10000L);
     }
 
     @Test
@@ -157,13 +134,11 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
-        String[] callArgs = new String[] {"one", "two", "three", "four"};
-        for (int i = 0; i < callArgs.length; i++) {
-            greeter.greetMeOneWay(callArgs[i]);
+        for (String arg : new String[] {"one", "two", "three", "four"}) {
+            greeter.greetMeOneWay(arg);
         }
 
-        callback.waitDone(8, 3000, 60000);
-        verifyCallbacks();
+        callback.waitAndVerify(8, 1000L, 10000L);
     }
 
     @Test
@@ -182,13 +157,11 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
-        String[] callArgs = new String[] {"one", "two", "three", "four"};
-        for (int i = 0; i < callArgs.length; i++) {
-            greeter.greetMeOneWay(callArgs[i]);
+        for (String arg : new String[] {"one", "two", "three", "four"}) {
+            greeter.greetMeOneWay(arg);
         }
 
-        callback.waitDone(8, 3000, 60000);
-        verifyCallbacks();
+        callback.waitAndVerify(8, 1000L, 10000L);
     }
 
     @Test
@@ -207,13 +180,11 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(RETRANSMISSION_INTERVAL);
-        String[] callArgs = new String[] {"one", "two", "three", "four"};
-        for (int i = 0; i < callArgs.length; i++) {
-            greeter.greetMeOneWay(callArgs[i]);
+        for (String arg : new String[] {"one", "two", "three", "four"}) {
+            greeter.greetMeOneWay(arg);
         }
 
-        callback.waitDone(8, 3000, 60000);
-        verifyCallbacks();
+        callback.waitAndVerify(8, 1000L, 10000L);
     }
 
     // --- test utilities ---
@@ -228,9 +199,6 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     private void initServer(SpringBusFactory bf, String cfgResource) {
         String derbyHome = System.getProperty("derby.system.home");
         try {
-            synchronized (GreeterProvider.CALL_ARGS) {
-                GreeterProvider.CALL_ARGS.clear();
-            }
             System.setProperty("derby.system.home", derbyHome + "-server");
             serverBus = bf.createBus(cfgResource);
             BusFactory.setDefaultBus(serverBus);
@@ -309,8 +277,6 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     @ServiceMode(Mode.PAYLOAD)
     public static class GreeterProvider implements Provider<Source> {
 
-        public static final List<String> CALL_ARGS = new ArrayList<>();
-
         public Source invoke(Source obj) {
 
             Node el;
@@ -323,9 +289,8 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                 el = ((Document)el).getDocumentElement();
             }
 
-            Map<String, String> ns = new HashMap<>();
-            ns.put("ns", "http://cxf.apache.org/greeter_control/types");
-            XPathUtils xp = new XPathUtils(ns);
+            XPathUtils xp = new XPathUtils(
+                    Collections.singletonMap("ns", "http://cxf.apache.org/greeter_control/types"));
             String s = (String)xp.getValue("/ns:greetMe/ns:requestType",
                                            el,
                                            XPathConstants.STRING);
@@ -334,13 +299,7 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
                 s = (String)xp.getValue("/ns:greetMeOneWay/ns:requestType",
                                         el,
                                         XPathConstants.STRING);
-                synchronized (CALL_ARGS) {
-                    CALL_ARGS.add(s);
-                }
                 return null;
-            }
-            synchronized (CALL_ARGS) {
-                CALL_ARGS.add(s);
             }
             String resp =
                 "<greetMeResponse "
@@ -353,54 +312,47 @@ public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
 
     private static class RecordingMessageCallback implements MessageCallback {
 
-        private List<Callback> callbacks = new ArrayList<>();
+        private BlockingQueue<Callback> callbacks = new LinkedBlockingQueue<>();
 
         @Override
         public void messageAccepted(String seqId, long msgNum) {
-            synchronized (callbacks) {
-                callbacks.add(new Callback(true, msgNum));
-                callbacks.notifyAll();
-            }
+            callbacks.offer(new Callback(true, msgNum));
         }
 
         @Override
         public void messageAcknowledged(String seqId, long msgNum) {
-            synchronized (callbacks) {
-                callbacks.add(new Callback(false, msgNum));
-                callbacks.notifyAll();
-            }
-        }
-
-        public List<Callback> getCallbacks() {
-            return callbacks;
+            callbacks.offer(new Callback(false, msgNum));
         }
 
         /**
-         * Wait for expected number of callbacks.
+         * Wait for expected number of callbacks. Checks that all callbacks are
+         * received, that messages are accepted in order, and that each message
+         * is accepted before it is acknowledged (order of acknowledgements
+         * doesn't really matter).
          *
-         * @param count expected number of callbacks
-         * @param delay extra time to wait after expected number received (in case more are coming)
-         * @param timeout maximum time to wait, in milliseconds
+         * @param count
+         *            expected number of callbacks
+         * @param delay
+         *            extra time to wait after expected number received (in case
+         *            more are coming)
+         * @param timeout
+         *            maximum time to wait, in milliseconds
+         * @throws InterruptedException 
          */
-        public void waitDone(int count, int delay, long timeout) {
-            long start = System.currentTimeMillis();
-            synchronized (callbacks) {
-                while (callbacks.size() < count) {
-                    long remain = start + timeout - System.currentTimeMillis();
-                    if (remain <= 0) {
-                        fail("Expected " + count + " callbacks, only got " + callbacks.size());
-                    }
-                    try {
-                        callbacks.wait(remain);
-                    } catch (InterruptedException e) { /* ignored */ }
-                }
-                try {
-                    callbacks.wait(delay);
-                } catch (InterruptedException e) { /* ignored */ }
-                if (callbacks.size() > count) {
-                    fail("Expected " + count + " callbacks, got " + callbacks.size());
+        public void waitAndVerify(int count, long delay, long timeout) throws InterruptedException {
+            Set<Long> acks = new HashSet<>();
+            long nextNum = 1L;
+            for (int i = 0; i < count; ++i) {
+                Callback cb = callbacks.poll(timeout, TimeUnit.MILLISECONDS);
+                assertNotNull("Timeout", cb);
+                if (cb.isAccept()) {
+                    assertEquals(nextNum++, cb.getMsgNumber());
+                } else {
+                    assertTrue(cb.getMsgNumber() < nextNum);
+                    assertTrue(acks.add(cb.getMsgNumber()));
                 }
             }
+            assertNull("Unexpected callback", callbacks.poll(delay, TimeUnit.MILLISECONDS));
         }
     }
 
