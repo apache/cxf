@@ -127,7 +127,7 @@ public final class CryptoCoverageUtil {
         CoverageType type,
         CoverageScope scope
     ) throws WSSecurityException {
-        if (!CryptoCoverageUtil.matchElement(refs, type, scope, soapBody)) {
+        if (!CryptoCoverageUtil.matchElement(refs, scope, soapBody)) {
             Exception ex = new Exception("The " + getCoverageTypeString(type)
                     + " does not cover the required elements (soap:Body).");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
@@ -216,7 +216,7 @@ public final class CryptoCoverageUtil {
         }
 
         for (Element el : elements) {
-            if (!CryptoCoverageUtil.matchElement(refs, type, scope, el)) {
+            if (!CryptoCoverageUtil.matchElement(refs, scope, el)) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                         new Exception("The " + getCoverageTypeString(type)
                         + " does not cover the required elements ({"
@@ -344,7 +344,7 @@ public final class CryptoCoverageUtil {
 
                     final Element el = (Element)list.item(x);
 
-                    boolean instanceMatched = CryptoCoverageUtil.matchElement(refs, type, scope, el);
+                    boolean instanceMatched = CryptoCoverageUtil.matchElement(refs, scope, el);
 
                     // We looked through all of the refs, but the element was
                     // not signed.
@@ -359,8 +359,7 @@ public final class CryptoCoverageUtil {
         }
     }
 
-    private static boolean matchElement(Collection<WSDataRef> refs,
-            CoverageType type, CoverageScope scope, Element el) {
+    private static boolean matchElement(Collection<WSDataRef> refs, CoverageScope scope, Element el) {
         final boolean content;
 
         switch (scope) {

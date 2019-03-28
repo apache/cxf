@@ -334,16 +334,11 @@ public class STSLoginModule implements LoginModule {
     private TokenStore configureTokenStore() throws MalformedURLException {
         if (TokenStoreFactory.isEhCacheInstalled()) {
             String cfg = "cxf-ehcache.xml";
-            URL url = null;
-            if (url == null) {
-                url = ClassLoaderUtils.getResource(cfg, STSLoginModule.class);
-            }
+            URL url = ClassLoaderUtils.getResource(cfg, STSLoginModule.class);
             if (url == null) {
                 url = new URL(cfg);
             }
-            if (url != null) {
-                return new EHCacheTokenStore(TOKEN_STORE_KEY, BusFactory.getDefaultBus(), url);
-            }
+            return new EHCacheTokenStore(TOKEN_STORE_KEY, BusFactory.getDefaultBus(), url);
         }
         return null;
     }
@@ -402,7 +397,7 @@ public class STSLoginModule implements LoginModule {
     public boolean abort() throws LoginException {
         if (!succeeded) {
             return false;
-        } else if (succeeded && commitSucceeded) {
+        } else if (commitSucceeded) {
             // we succeeded, but another required module failed
             logout();
         } else {

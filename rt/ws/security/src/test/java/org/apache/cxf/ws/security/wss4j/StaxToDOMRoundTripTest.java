@@ -391,10 +391,6 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
             ConfigurationConstants.ENC_KEY_TRANSPORT,
             "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
         );
-        outConfig.put(
-             ConfigurationConstants.ENC_SYM_ALGO,
-             "http://www.w3.org/2001/04/xmlenc#tripledes-cbc"
-        );
         outConfig.put(ConfigurationConstants.ENC_SYM_ALGO, XMLSecurityConstants.NS_XENC_AES128);
         outConfig.put(ConfigurationConstants.ENC_PROP_FILE, "outsecurity.properties");
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);

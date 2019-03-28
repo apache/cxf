@@ -345,7 +345,7 @@ public class UsernameTokenInterceptor extends AbstractTokenInterceptor {
                 PolicyUtils.assertPolicy(aim, SPConstants.NO_PASSWORD);
             }
 
-            if (tok.isCreated() && princ.getCreatedTime() == null) {
+            if (tok.isCreated() && (princ == null || princ.getCreatedTime() == null)) {
                 ai.setNotAsserted("No Created Time");
             } else {
                 PolicyUtils.assertPolicy(aim, SP13Constants.CREATED);

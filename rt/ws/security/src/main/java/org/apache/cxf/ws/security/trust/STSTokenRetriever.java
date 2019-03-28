@@ -87,7 +87,7 @@ public final class STSTokenRetriever {
                 Element actAsToken = client.getActAsToken();
 
                 String key = appliesTo;
-                if (!enableAppliesTo || key == null || "".equals(key)) {
+                if (!enableAppliesTo || key == null || key.isEmpty()) {
                     key = ASSOCIATED_TOKEN;
                 }
                 

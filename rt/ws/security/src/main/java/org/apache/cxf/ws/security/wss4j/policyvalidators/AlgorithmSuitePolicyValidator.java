@@ -83,7 +83,7 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
                 PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(),
                                          new QName(algorithmSuite.getName().getNamespaceURI(),
                                                    algorithmSuite.getC14n().name()));
-            } else if (!valid && ai.isAsserted()) {
+            } else if (ai.isAsserted()) {
                 ai.setNotAsserted("Error in validating AlgorithmSuite policy");
             }
         }

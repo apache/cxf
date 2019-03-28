@@ -74,14 +74,12 @@ class SpnegoContextTokenOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 if (tok == null) {
                     tok = issueToken(message, aim);
                 }
-                if (tok != null) {
-                    for (AssertionInfo ai : ais) {
-                        ai.setAsserted(true);
-                    }
-                    message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                    TokenStoreUtils.getTokenStore(message).add(tok);
+                for (AssertionInfo ai : ais) {
+                    ai.setAsserted(true);
                 }
+                message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID, tok.getId());
+                message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
+                TokenStoreUtils.getTokenStore(message).add(tok);
             } else {
                 // server side should be checked on the way in
                 for (AssertionInfo ai : ais) {

@@ -178,7 +178,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                     List<WSHandlerResult> results =
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && !results.isEmpty()) {
-                        parseHandlerResults(results.get(0), message, aim, ais);
+                        parseHandlerResults(results.get(0), message, ais);
                     }
                 } else {
                     //client side should be checked on the way out
@@ -195,7 +195,6 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
         private void parseHandlerResults(
             WSHandlerResult rResult,
             Message message,
-            AssertionInfoMap aim,
             Collection<AssertionInfo> ais
         ) {
 
