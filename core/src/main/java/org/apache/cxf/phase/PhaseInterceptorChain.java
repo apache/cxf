@@ -696,7 +696,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         return toString("");
     }
     private String toString(String message) {
-        StringBuilder chain = new StringBuilder();
+        StringBuilder chain = new StringBuilder(128);
 
         chain.append("Chain ")
             .append(super.toString())

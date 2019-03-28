@@ -428,7 +428,7 @@ public class Java2WSMojo extends AbstractMojo {
             } catch (OutOfMemoryError e) {
                 getLog().debug(e);
 
-                StringBuilder msg = new StringBuilder();
+                StringBuilder msg = new StringBuilder(128);
                 msg.append(e.getMessage()).append('\n');
                 msg.append("Try to run this goal using the <fork>true</fork> and "
                         + "<additionalJvmArgs>-Xms128m -Xmx128m</additionalJvmArgs> parameters.");

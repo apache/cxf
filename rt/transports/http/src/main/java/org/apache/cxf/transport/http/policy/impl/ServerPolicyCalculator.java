@@ -188,7 +188,7 @@ public class ServerPolicyCalculator implements PolicyCalculator<HTTPServerPolicy
     }
 
     public static String toString(HTTPServerPolicy p) {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(64);
         buf.append(p);
         buf.append("[ContentType=\"");
         buf.append(p.getContentType());

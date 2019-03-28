@@ -349,7 +349,7 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         if (os == null) {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(256);
             sb.append("Jettison needs initialized OutputStream");
             if (getContext() != null && getContext().getContent(XMLStreamWriter.class) == null) {
                 sb.append("; if you need to customize Jettison output with the custom XMLStreamWriter"

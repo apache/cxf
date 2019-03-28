@@ -182,7 +182,7 @@ public class EHCacheIdentityCache extends AbstractIdentityCache
     }
 
     public ObjectName getObjectName() throws JMException {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
         if (super.getBus() != null) {
             buffer.append(

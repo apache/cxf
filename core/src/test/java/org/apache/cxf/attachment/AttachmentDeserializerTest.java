@@ -375,7 +375,7 @@ public class AttachmentDeserializerTest {
 
     @Test
     public void testCXF2542() throws Exception {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(512);
         buf.append("------=_Part_0_2180223.1203118300920\n");
         buf.append("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\n");
         buf.append("Content-Transfer-Encoding: 8bit\n");

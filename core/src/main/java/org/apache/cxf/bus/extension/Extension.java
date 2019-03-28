@@ -102,7 +102,7 @@ public class Extension {
     }
 
     public String toString() {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(128);
         buf.append("class: ");
         buf.append(className);
         buf.append(", interface: ");

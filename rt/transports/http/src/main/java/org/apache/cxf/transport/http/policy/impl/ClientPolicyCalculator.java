@@ -264,7 +264,7 @@ public class ClientPolicyCalculator implements PolicyCalculator<HTTPClientPolicy
     }
     
     public static String toString(HTTPClientPolicy p) {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder(64);
         buf.append(p);
         buf.append("[DecoupledEndpoint=\"");
         buf.append(p.getDecoupledEndpoint());

@@ -216,7 +216,7 @@ public class JavaType {
     }
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder(128);
         sb.append("\nName: ");
         sb.append(this.name);
         sb.append("\nType: ");

@@ -146,7 +146,7 @@ public class Cookie {
      * @return Cookie header text
      */
     public String requestCookieHeader() {
-        StringBuilder b = new StringBuilder();
+        StringBuilder b = new StringBuilder(64);
         b.append("$Version=\"1\"");
         b.append("; ").append(getName())
             .append('=').append(getValue());

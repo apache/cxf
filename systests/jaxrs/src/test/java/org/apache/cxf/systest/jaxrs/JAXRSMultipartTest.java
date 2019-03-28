@@ -959,7 +959,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
             "true");
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(100500);
         sb.append("form-data;");
         for (int i = 0; i < 10000; i++) {
             sb.append("aaaaaaaaaa");
@@ -990,7 +990,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().put("support.type.as.multipart",
             "true");
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(64);
         sb.append("form-data;");
         for (int i = 0; i < 35; i++) {
             sb.append("aaaaaaaaaa");

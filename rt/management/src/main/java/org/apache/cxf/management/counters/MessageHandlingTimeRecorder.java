@@ -73,7 +73,7 @@ public class MessageHandlingTimeRecorder {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(256);
         sb.append("MessageHandlingTimeRecorder@").append(Integer.toHexString(hashCode())).append('[');
         sb.append("beginTime: ").append(beginTime).append(", ");
         sb.append("endTime: ").append(endTime).append(", ");

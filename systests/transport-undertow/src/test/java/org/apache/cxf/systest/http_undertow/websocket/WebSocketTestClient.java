@@ -279,7 +279,7 @@ class WebSocketTestClient {
         }
 
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(128);
             sb.append("Status: ").append(statusCode).append("\r\n");
             sb.append("Type: ").append(contentType).append("\r\n");
             sb.append("Entity: ").append(gettext(entity)).append("\r\n");

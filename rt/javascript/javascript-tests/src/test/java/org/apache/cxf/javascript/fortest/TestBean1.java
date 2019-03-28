@@ -127,7 +127,7 @@ public class TestBean1 {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(256);
         builder.append("TestBean1");
         builder.append(" stringItem ");
         builder.append(stringItem == null ? "Null" : stringItem);

@@ -193,7 +193,7 @@ public final class OAuthClientUtils {
      * @return the header value
      */
     public static String createAuthorizationHeader(Consumer consumer) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(64);
         sb.append("OAuth ").append("oauth_consumer_key=").append(consumer.getKey())
           .append("oauth_consumer_secret=").append(consumer.getSecret());
         return sb.toString();

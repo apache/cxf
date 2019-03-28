@@ -132,7 +132,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(128);
         builder.append("WSDL: ").append(wsdl).append('\n');
         builder.append("OutputDir: ").append(outputDir).append('\n');
         builder.append("Extraargs: ").append(extraargs).append('\n');

@@ -141,7 +141,7 @@ public class IDLToWSDLTest extends ToolTestBase {
         String[] cmdArgs = {};
         int exc = execute(cmdArgs);
         assertEquals("IDLToWSDL Failed", error, exc);
-        StringBuilder strBuf = new StringBuilder();
+        StringBuilder strBuf = new StringBuilder(64);
         strBuf.append("Missing argument: idl\n\n");
         strBuf.append(usageBuf.toString());
         checkStrings(strBuf.toString().getBytes(), bout.toByteArray());

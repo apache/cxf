@@ -133,7 +133,7 @@ public class WadlOption extends Option {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(64);
         builder.append("WADL: ").append(wadl).append('\n');
         builder.append("OutputDir: ").append(outputDir).append('\n');
         builder.append('\n');

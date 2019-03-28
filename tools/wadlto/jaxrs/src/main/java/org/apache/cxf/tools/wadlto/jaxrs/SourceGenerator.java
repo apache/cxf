@@ -955,7 +955,7 @@ public class SourceGenerator {
         info.getResourceClassNames().add(className);
 
 
-        StringBuilder sbMethodClassImports = new StringBuilder();
+        StringBuilder sbMethodClassImports = new StringBuilder(256);
         sbMethodClassImports.append(getClassComment()).append(getLineSep());
         sbMethodClassImports.append("package ").append(classPackage)
             .append(';').append(getLineSep()).append(getLineSep());
@@ -966,7 +966,7 @@ public class SourceGenerator {
         sbMethodClassImports.append("import java.lang.annotation.Target;").append(getLineSep());
         sbMethodClassImports.append("import javax.ws.rs.HttpMethod;").append(getLineSep());
 
-        StringBuilder sbMethodClassCode = new StringBuilder();
+        StringBuilder sbMethodClassCode = new StringBuilder(256);
         sbMethodClassCode.append("@Target({ElementType.METHOD })").append(getLineSep());
         sbMethodClassCode.append("@Retention(RetentionPolicy.RUNTIME)").append(getLineSep());
         sbMethodClassCode.append("@HttpMethod(\"").append(methodName).append("\")").append(getLineSep());
@@ -1429,8 +1429,8 @@ public class SourceGenerator {
     }
 
     private void generateEnumClass(String clsName, List<Element> options, File src, String classPackage) {
-        StringBuilder sbImports = new StringBuilder();
-        StringBuilder sbCode = new StringBuilder();
+        StringBuilder sbImports = new StringBuilder(64);
+        StringBuilder sbCode = new StringBuilder(512);
         sbImports.append(getClassComment()).append(getLineSep());
         sbImports.append("package ").append(classPackage)
             .append(';').append(getLineSep()).append(getLineSep());

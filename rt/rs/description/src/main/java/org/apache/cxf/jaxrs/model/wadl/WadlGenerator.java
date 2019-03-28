@@ -300,7 +300,7 @@ public class WadlGenerator implements ContainerRequestFilter {
                                        boolean isJson,
                                        Message m,
                                        UriInfo ui) {
-        StringBuilder sbMain = new StringBuilder();
+        StringBuilder sbMain = new StringBuilder(64);
         if (!isJson && stylesheetReference != null && !applyStylesheetLocally) {
             sbMain.append("<?xml-stylesheet ").append(getStylesheetInstructionData(baseURI)).append("?>");
         }
@@ -309,10 +309,10 @@ public class WadlGenerator implements ContainerRequestFilter {
             sbMain.append(" xmlns=\"").append(getNamespace()).append("\" xmlns:xs=\"")
                 .append(Constants.URI_2001_SCHEMA_XSD).append('"');
         }
-        StringBuilder sbGrammars = new StringBuilder();
+        StringBuilder sbGrammars = new StringBuilder(32);
         sbGrammars.append("<grammars>");
 
-        StringBuilder sbResources = new StringBuilder();
+        StringBuilder sbResources = new StringBuilder(64);
         sbResources.append("<resources base=\"").append(baseURI).append("\">");
 
 

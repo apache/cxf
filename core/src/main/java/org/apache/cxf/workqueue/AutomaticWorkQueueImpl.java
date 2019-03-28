@@ -173,7 +173,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
 
 
             if (LOG.isLoggable(Level.FINE)) {
-                StringBuilder buf = new StringBuilder("Constructing automatic work queue with:\n")
+                StringBuilder buf = new StringBuilder(128).append("Constructing automatic work queue with:\n")
                         .append("max queue size: ").append(maxQueueSize).append("\n")
                         .append("initialThreads: ").append(initialThreads).append("\n")
                         .append("lowWaterMark: ").append(lowWaterMark).append("\n")

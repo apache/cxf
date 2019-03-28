@@ -342,7 +342,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(256);
         sb.append("\n========================\n");
         sb.append("\nMethod:");
         sb.append(getName());

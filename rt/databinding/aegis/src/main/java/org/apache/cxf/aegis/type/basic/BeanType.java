@@ -644,7 +644,7 @@ public class BeanType extends AegisType {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(32);
         sb.append(getClass().getName());
         sb.append(": [class=");
         Class<?> c = getTypeClass();

@@ -402,7 +402,7 @@ public class StaxUtilsTest {
 
     @Test
     public void testCopyWithEmptyNamespace() throws Exception {
-        StringBuilder in = new StringBuilder();
+        StringBuilder in = new StringBuilder(128);
         in.append("<foo xmlns=\"http://example.com/\">");
         in.append("<bar xmlns=\"\"/>");
         in.append("</foo>");
@@ -420,7 +420,7 @@ public class StaxUtilsTest {
 
     @Test
     public void testQName() throws Exception {
-        StringBuilder in = new StringBuilder();
+        StringBuilder in = new StringBuilder(128);
         in.append("<f:foo xmlns:f=\"http://example.com/\">");
         in.append("<bar>f:Bar</bar>");
         in.append("<bar> f:Bar </bar>");

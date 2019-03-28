@@ -92,7 +92,7 @@ public class Operation0ResponseType {
     }
 
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(128);
         if (name != null) {
             buffer.append("name : " + name + "\n");
         }

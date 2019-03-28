@@ -175,7 +175,7 @@ public class Claim implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(64);
         builder.append("Claim [values=");
         builder.append(values);
         builder.append(", claimType=");

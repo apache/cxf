@@ -139,7 +139,7 @@ public class JwsJsonSignatureEntry implements JsonObject {
         return toJson(false);
     }
     public String toJson(boolean flattenedMode) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(32);
         if (!flattenedMode) {
             sb.append('{');
         }
