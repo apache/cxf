@@ -101,6 +101,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testHttpSignatureServiceProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsigprops/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
     public void testHttpSignatureProperties() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
@@ -148,7 +175,6 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertEquals(126L, returnedBook.getId());
     }
 
-
     @Test
     public void testHttpSignaturePropertiesPasswordProvider() throws Exception {
 
@@ -193,6 +219,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureRsaSha512ServiceProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsigrsasha512props/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -255,6 +308,39 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         providers.add(signatureFilter);
         providers.add(signatureResponseFilter);
         String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/books";
+        WebClient client = WebClient.create(address, providers, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testHttpSignatureResponseServiceProperties() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        VerifySignatureClientFilter signatureResponseFilter = new VerifySignatureClientFilter();
+        MessageVerifier messageVerifier = new MessageVerifier(new CustomPublicKeyProvider());
+        signatureResponseFilter.setMessageVerifier(messageVerifier);
+
+        List<Object> providers = new ArrayList<>();
+        providers.add(signatureFilter);
+        providers.add(signatureResponseFilter);
+        String address = "http://localhost:" + PORT + "/httpsigresponseprops/bookstore/books";
         WebClient client = WebClient.create(address, providers, busFile.toString());
         client.type("application/xml").accept("application/xml");
 

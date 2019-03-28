@@ -49,6 +49,7 @@ under the License.
     <bean id="httpSignatureVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifier"/>
     </bean>
+    
     <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsig">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -56,6 +57,19 @@ under the License.
         <jaxrs:providers>
             <ref bean="httpSignatureVerifier"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigprops">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties" />
+        </jaxrs:properties>
     </jaxrs:server>
     
     <bean id="customSecurityProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomSecurityProvider" />
@@ -74,6 +88,7 @@ under the License.
     <bean id="httpSignatureVerifierRsaSha512" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifierRsaSha512"/>
     </bean>
+    
     <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigrsasha512">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -81,6 +96,20 @@ under the License.
         <jaxrs:providers>
             <ref bean="httpSignatureVerifierRsaSha512"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigrsasha512props">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties" />
+            <entry key="rs.security.signature.algorithm" value="rsa-sha512" />
+        </jaxrs:properties>
     </jaxrs:server>
     
     <bean id="messageSigner" class="org.apache.cxf.rs.security.httpsignature.MessageSigner">
@@ -92,9 +121,7 @@ under the License.
     <bean id="httpSignatureCreator" class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter">
         <property name="messageSigner" ref="messageSigner"/>
     </bean>
-    <bean id="httpSignatureClientVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter">
-        <property name="messageVerifier" ref="messageVerifier"/>
-    </bean>
+    
     <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigresponse">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
@@ -103,6 +130,22 @@ under the License.
             <ref bean="httpSignatureVerifier"/>
             <ref bean="httpSignatureCreator"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigresponseprops">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter" />
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.in.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties" />
+            <entry key="rs.security.signature.out.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/httpsignature/bob.httpsig.properties" />
+        </jaxrs:properties>
     </jaxrs:server>
     
 </beans>
