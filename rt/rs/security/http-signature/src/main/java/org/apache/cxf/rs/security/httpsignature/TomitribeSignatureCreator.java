@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
+import org.tomitribe.auth.signatures.Join;
 import org.tomitribe.auth.signatures.Signature;
 
 public class TomitribeSignatureCreator implements SignatureCreator {
@@ -76,7 +77,12 @@ public class TomitribeSignatureCreator implements SignatureCreator {
         final Signature signature = new Signature(keyId, signatureAlgorithmName, null, headers);
         final org.tomitribe.auth.signatures.Signer signer =
                 new org.tomitribe.auth.signatures.Signer(privateKey, signature);
-        return signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders)).toString();
+        Signature outputSignature = signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
+
+        return "keyId=\"" + outputSignature.getKeyId() + '\"'
+            + ",algorithm=\"" + outputSignature.getAlgorithm() + '\"'
+            + ",headers=\"" + Join.join(" ", outputSignature.getHeaders()) + '\"'
+            + ",signature=\"" + outputSignature.getSignature() + '\"';
     }
 
 }
