@@ -46,7 +46,8 @@ public class EvaluatePreconditionsTest {
     private static final Date DATE_NEW = new Date(DATE_OLD.getTime() + 60 * 60 * 1000L);
     private static final EntityTag ETAG_OLD = new EntityTag("helloworld", true);
     private static final EntityTag ETAG_NEW = new EntityTag("xyz", true);
-    private static final SimpleDateFormat DATE_FMT_822 = new SimpleDateFormat(
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(
         "EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US);
     private SimpleService service;
 
@@ -54,7 +55,7 @@ public class EvaluatePreconditionsTest {
     public void setUp() {
         service = new SimpleService();
         service.setEntityTag(ETAG_OLD);
-        DATE_FMT_822.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         service.setLastModified(DATE_OLD);
     }
@@ -69,7 +70,7 @@ public class EvaluatePreconditionsTest {
     @Test
     public void testIfModified200() {
         service.setLastModified(DATE_NEW);
-        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, DATE_FMT_822.format(DATE_OLD));
+        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(DATE_OLD));
         final Response response = service.perform(request);
         Assert.assertEquals(HttpServletResponse.SC_OK, response.getStatus());
     }
@@ -90,14 +91,14 @@ public class EvaluatePreconditionsTest {
 
     @Test
     public void testIfModified304() {
-        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, DATE_FMT_822.format(DATE_NEW));
+        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(DATE_NEW));
         final Response response = service.perform(request);
         Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatus());
     }
 
     @Test
     public void testIfNoneMatchIfModified304() {
-        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, DATE_FMT_822.format(DATE_OLD),
+        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(DATE_OLD),
                                            HttpHeaders.IF_NONE_MATCH, ETAG_OLD.toString());
         final Response response = service.perform(request);
         Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, response.getStatus());
@@ -110,7 +111,7 @@ public class EvaluatePreconditionsTest {
         // if the If-None-Match header field did not exist, but MUST also ignore any If-Modified-Since
         // header field(s) in the request. That is, if no entity tags match, then the server MUST NOT
         // return a 304 (Not Modified) response."
-        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, DATE_FMT_822.format(DATE_OLD),
+        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(DATE_OLD),
                                            HttpHeaders.IF_NONE_MATCH, ETAG_NEW.toString()); // ETags don't
                                                                                             // match,
                                                                                             // If-Modified-Since
@@ -128,7 +129,7 @@ public class EvaluatePreconditionsTest {
         // perform the requested method, unless required to do so because the resource's modification date
         // fails to match that supplied in an If-Modified-Since header field in the request"
         service.setLastModified(DATE_NEW);
-        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, DATE_FMT_822.format(DATE_OLD),
+        final Request request = getRequest(HttpHeaders.IF_MODIFIED_SINCE, dateFormat.format(DATE_OLD),
                                            HttpHeaders.IF_NONE_MATCH, ETAG_NEW.toString()); // ETags match,
                                                                                             // but resource
                                                                                             // has new date

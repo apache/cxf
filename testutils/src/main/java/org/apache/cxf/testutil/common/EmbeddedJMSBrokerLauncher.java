@@ -63,11 +63,9 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
         StringBuilder b = new StringBuilder(brokerUrl1.length());
         for (int x = 0; x < brokerUrl1.length(); x++) {
             char c = brokerUrl1.charAt(x);
-            switch (c) {
-            case '?':
+            if (c == '?') {
                 b.append("%3F");
-                break;
-            default:
+            } else {
                 b.append(c);
             }
         }
