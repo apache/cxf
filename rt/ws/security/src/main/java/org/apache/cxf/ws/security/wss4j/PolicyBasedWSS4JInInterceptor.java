@@ -155,7 +155,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
 
     private String checkDefaultBinding(
-        AssertionInfoMap aim, String action, SoapMessage message, RequestData data
+        String action, SoapMessage message, RequestData data
     ) throws WSSecurityException {
         action = addToAction(action, "Signature", true);
         action = addToAction(action, "Encrypt", true);
@@ -396,7 +396,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             action = checkSymmetricBinding(aim, action, message, data);
             Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
             if ("".equals(action) || (ais != null && !ais.isEmpty())) {
-                action = checkDefaultBinding(aim, action, message, data);
+                action = checkDefaultBinding(action, message, data);
             }
 
             // Allow for setting non-standard asymmetric signature algorithms
@@ -407,7 +407,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             if (asymSignatureAlgorithm != null || symSignatureAlgorithm != null) {
                 Collection<AssertionInfo> algorithmSuites =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ALGORITHM_SUITE);
-                if (algorithmSuites != null && !algorithmSuites.isEmpty()) {
+                if (!algorithmSuites.isEmpty()) {
                     for (AssertionInfo algorithmSuite : algorithmSuites) {
                         AlgorithmSuite algSuite = (AlgorithmSuite)algorithmSuite.getAssertion();
                         if (asymSignatureAlgorithm != null) {

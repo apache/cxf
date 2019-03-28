@@ -192,7 +192,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 }
             } else if (encryptionToken instanceof X509Token) {
                 if (isRequestor()) {
-                    tokenId = setupEncryptedKey(encryptionWrapper, encryptionToken);
+                    tokenId = setupEncryptedKey();
                 } else {
                     org.apache.xml.security.stax.securityToken.SecurityToken securityToken =
                         findEncryptedKeyToken();
@@ -246,7 +246,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                         new QName(sbinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
 
-                doEncryption(encryptionWrapper, encrParts, true);
+                doEncryption(encryptionWrapper, encrParts);
             }
 
             if (timestampAdded) {
@@ -261,10 +261,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 if (sigAbstractTokenWrapper != null) {
                     AbstractToken sigToken = sigAbstractTokenWrapper.getToken();
                     if (isRequestor()) {
-                        doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
+                        doSignature(sigAbstractTokenWrapper, sigToken, sigParts);
                     } else {
                         addSignatureConfirmation(sigParts);
-                        doSignature(sigAbstractTokenWrapper, sigToken, tok, sigParts);
+                        doSignature(sigAbstractTokenWrapper, sigToken, sigParts);
                     }
                 }
             }
@@ -318,7 +318,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                     }
                 } else if (sigToken instanceof X509Token) {
                     if (isRequestor()) {
-                        sigTokId = setupEncryptedKey(sigAbstractTokenWrapper, sigToken);
+                        sigTokId = setupEncryptedKey();
                     } else {
                         org.apache.xml.security.stax.securityToken.SecurityToken securityToken =
                             findEncryptedKeyToken();
@@ -361,7 +361,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
 
             if (!sigs.isEmpty()) {
-                doSignature(sigAbstractTokenWrapper, sigToken, sigTok, sigs);
+                doSignature(sigAbstractTokenWrapper, sigToken, sigs);
             }
 
             addSupportingTokens();
@@ -389,7 +389,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
                 enc.addAll(encryptedTokensList);
             }
             AbstractTokenWrapper encrAbstractTokenWrapper = getEncryptionToken();
-            doEncryption(encrAbstractTokenWrapper, enc, false);
+            doEncryption(encrAbstractTokenWrapper, enc);
 
             putCustomTokenAfterSignature();
         } catch (Exception e) {
@@ -398,8 +398,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
     }
 
     private void doEncryption(AbstractTokenWrapper recToken,
-                              List<SecurePart> encrParts,
-                              boolean externalRef) throws SOAPException {
+                              List<SecurePart> encrParts) throws SOAPException {
         //Do encryption
         if (recToken != null && recToken.getToken() != null) {
             AbstractToken encrToken = recToken.getToken();
@@ -501,8 +500,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
     }
 
-    private void doSignature(AbstractTokenWrapper wrapper, AbstractToken policyToken,
-                             SecurityToken tok, List<SecurePart> sigParts)
+    private void doSignature(AbstractTokenWrapper wrapper, AbstractToken policyToken, List<SecurePart> sigParts)
         throws WSSecurityException, SOAPException {
 
         // Action
@@ -599,7 +597,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         }
     }
 
-    private String setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken sigToken) throws WSSecurityException {
+    private String setupEncryptedKey() throws WSSecurityException {
 
         Instant created = Instant.now();
         Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);

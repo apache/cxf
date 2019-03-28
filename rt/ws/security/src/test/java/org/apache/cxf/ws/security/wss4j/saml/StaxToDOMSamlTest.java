@@ -471,7 +471,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
-        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);
@@ -592,7 +591,6 @@ public class StaxToDOMSamlTest extends AbstractSecurityTest {
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
         outConfig.put(ConfigurationConstants.SIG_PROP_FILE, "alice.properties");
         outConfig.put(ConfigurationConstants.SIG_KEY_ID, "DirectReference");
-        outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
         client.getOutInterceptors().add(ohandler);

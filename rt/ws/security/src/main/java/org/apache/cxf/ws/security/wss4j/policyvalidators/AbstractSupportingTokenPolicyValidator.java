@@ -112,8 +112,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults())) {
             return false;
         }
 
@@ -157,8 +156,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
         if (isEncrypted() && !areTokensEncrypted(tokenResults,
-                                                 parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+                                                 parameters.getEncryptedResults())) {
             return false;
         }
 
@@ -218,8 +216,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults())) {
             return false;
         }
 
@@ -274,8 +271,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults())) {
             return false;
         }
 
@@ -327,8 +323,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults())) {
             return false;
         }
         if (isEndorsing() && !checkEndorsed(tokenResults, parameters.getSignedResults(),
@@ -358,11 +353,11 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             return false;
         }
 
-        if (!validateSignedEncryptedElements(signedElements, false, signedResults, tokenResults, message)) {
+        if (!validateSignedEncryptedElements(signedElements, signedResults, tokenResults, message)) {
             return false;
         }
 
-        return validateSignedEncryptedElements(encryptedElements, false, encryptedResults, tokenResults, message);
+        return validateSignedEncryptedElements(encryptedElements, encryptedResults, tokenResults, message);
     }
 
 
@@ -381,8 +376,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
                                            parameters.getMessage())) {
             return false;
         }
-        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults(),
-                                                 parameters.getMessage())) {
+        if (isEncrypted() && !areTokensEncrypted(tokenResults, parameters.getEncryptedResults())) {
             return false;
         }
 
@@ -510,8 +504,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      * Return true if a list of tokens were encrypted, false otherwise.
      */
     private boolean areTokensEncrypted(List<WSSecurityEngineResult> tokens,
-                                       List<WSSecurityEngineResult> encryptedResults,
-                                       Message message) {
+                                       List<WSSecurityEngineResult> encryptedResults) {
         if (enforceEncryptedTokens) {
             for (WSSecurityEngineResult wser : tokens) {
                 Element tokenElement = (Element)wser.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
@@ -726,7 +719,6 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
      */
     private boolean validateSignedEncryptedElements(
         RequiredElements elements,
-        boolean content,
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults,
         Message message

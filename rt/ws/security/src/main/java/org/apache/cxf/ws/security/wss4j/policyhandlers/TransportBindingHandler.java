@@ -448,7 +448,7 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         if (token.getDerivedKeys() == DerivedKeys.RequireDerivedKeys) {
             return doDerivedKeySignature(tokenIncluded, secTok, token, sigParts);
         }
-        return doSignature(tokenIncluded, secTok, token, wrapper, sigParts);
+        return doSignature(tokenIncluded, secTok, token, sigParts);
     }
 
     private byte[] doDerivedKeySignature(
@@ -510,7 +510,6 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         boolean tokenIncluded,
         SecurityToken secTok,
         AbstractToken token,
-        SupportingTokens wrapper,
         List<WSEncryptionPart> sigParts
     ) throws Exception {
         WSSecSignature sig = new WSSecSignature(secHeader);

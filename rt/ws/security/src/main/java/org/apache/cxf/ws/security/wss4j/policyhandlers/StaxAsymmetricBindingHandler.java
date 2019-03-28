@@ -217,7 +217,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 assertTokenWrapper(encToken);
                 assertToken(encToken.getToken());
             }
-            doEncryption(encToken, enc, false);
+            doEncryption(encToken, enc);
 
             putCustomTokenAfterSignature();
         } catch (Exception e) {
@@ -311,7 +311,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                         new QName(abinding.getName().getNamespaceURI(), SPConstants.ENCRYPT_SIGNATURE));
                 }
 
-                doEncryption(wrapper, encrParts, true);
+                doEncryption(wrapper, encrParts);
             }
 
             if (timestampAdded) {
@@ -348,8 +348,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
     }
 
     private void doEncryption(AbstractTokenWrapper recToken,
-                                    List<SecurePart> encrParts,
-                                    boolean externalRef) throws SOAPException {
+                                    List<SecurePart> encrParts) throws SOAPException {
         //Do encryption
         if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
             AbstractToken encrToken = recToken.getToken();

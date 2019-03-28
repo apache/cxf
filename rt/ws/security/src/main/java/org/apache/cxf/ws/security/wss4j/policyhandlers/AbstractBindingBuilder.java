@@ -1956,8 +1956,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         doSymmSignatureDerived(supportingToken.getToken(), token, sigParts,
                                                isTokenProtection, isSigProtect);
                     } else {
-                        doSymmSignature(supportingToken.getToken(), token, sigParts,
-                                        isTokenProtection, isSigProtect);
+                        doSymmSignature(supportingToken.getToken(), token, sigParts, isSigProtect);
                     }
                 } catch (Exception e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
@@ -1985,8 +1984,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                         doSymmSignatureDerived(supportingToken.getToken(), secToken, sigParts,
                                                isTokenProtection, isSigProtect);
                     } else {
-                        doSymmSignature(supportingToken.getToken(), secToken, sigParts,
-                                        isTokenProtection, isSigProtect);
+                        doSymmSignature(supportingToken.getToken(), secToken, sigParts, isSigProtect);
                     }
                 } catch (Exception e) {
                     LOG.log(Level.FINE, e.getMessage(), e);
@@ -2085,7 +2083,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
 
     private void doSymmSignature(AbstractToken policyToken, SecurityToken tok,
-                                         List<WSEncryptionPart> sigParts, boolean isTokenProtection,
+                                         List<WSEncryptionPart> sigParts,
                                          boolean isSigProtect)
         throws WSSecurityException {
 

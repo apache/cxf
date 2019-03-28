@@ -184,7 +184,7 @@ abstract class STSInvoker implements Invoker {
 
     private SecurityToken findCancelOrRenewToken(Exchange exchange, Element el) throws WSSecurityException {
         Element childElement = DOMUtils.getFirstElement(el);
-        String uri = "";
+        final String uri;
         if ("SecurityContextToken".equals(childElement.getLocalName())) {
             SecurityContextToken sct = new SecurityContextToken(childElement);
             uri = sct.getIdentifier();
