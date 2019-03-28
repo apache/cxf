@@ -645,7 +645,8 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         Map<String, String> ns = new HashMap<>();
         ns.put("ns2", "http://www.example.org/schema/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
-        Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
+        Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", 
+                               DOMUtils.getDomElement(nd), XPathConstants.STRING);
         assertEquals(StaxUtils.toString(nd), "50", o);
 
         bus.shutdown(true);
