@@ -91,7 +91,7 @@ public class SpringBus extends ExtensionManagerBus
         }
         boolean doIt = false;
         ApplicationContext ac = ctx;
-        while (ac != null && !doIt) {
+        while (ac != null) {
             if (event.getSource() == ac) {
                 doIt = true;
                 break;

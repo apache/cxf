@@ -180,19 +180,11 @@ public class MessageImpl extends StringMapImpl implements Message {
     }
 
     private void calcContextCache() {
-        Map<String, Object> o = new HashMap<String, Object>() {
-            private static final long serialVersionUID = 7067290677790419348L;
-
-            public void putAll(Map<? extends String, ? extends Object> m) {
-                if (m != null && !m.isEmpty()) {
-                    super.putAll(m);
-                }
-            }
-        };
+        Map<String, Object> o = new HashMap<>();
         Exchange ex = getExchange();
         if (ex != null) {
             Bus b = ex.getBus();
-            if (b != null) {
+            if (b != null && b.getProperties() != null) {
                 o.putAll(b.getProperties());
             }
             Service sv = ex.getService();
@@ -203,13 +195,19 @@ public class MessageImpl extends StringMapImpl implements Message {
             if (ep != null) {
                 EndpointInfo ei = ep.getEndpointInfo();
                 if (ei != null) {
-                    o.putAll(ep.getEndpointInfo().getBinding().getProperties());
-                    o.putAll(ep.getEndpointInfo().getProperties());
+                    Map<String, Object> p = ep.getEndpointInfo().getBinding().getProperties();
+                    if (p != null) {
+                        o.putAll(p);
+                    }
+                    p = ep.getEndpointInfo().getProperties();
+                    if (p != null) {
+                        o.putAll(p);
+                    }
                 }
                 o.putAll(ep);
             }
+            o.putAll(ex);
         }
-        o.putAll(ex);
         o.putAll(this);
         contextCache = o;
     }

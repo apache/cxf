@@ -294,7 +294,7 @@ public class ClientImpl
     public boolean isThreadLocalRequestContext() {
         Object o = currentRequestContext.get(THREAD_LOCAL_REQUEST_CONTEXT);
         if (o != null) {
-            boolean local = false;
+            final boolean local;
             if (o instanceof Boolean) {
                 local = ((Boolean)o).booleanValue();
             } else {

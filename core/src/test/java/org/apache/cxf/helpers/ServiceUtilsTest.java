@@ -167,11 +167,9 @@ public class ServiceUtilsTest {
 
     private void setupSchemaValidationValue(Object value, boolean isRequestor) {
         control.reset();
-        msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        EasyMock.expectLastCall().andReturn(value);
+        EasyMock.expect(msg.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED)).andReturn(value);
 
-        msg.get(Message.REQUESTOR_ROLE);
-        EasyMock.expectLastCall().andReturn(isRequestor);
+        EasyMock.expect(msg.get(Message.REQUESTOR_ROLE)).andReturn(isRequestor);
 
         control.replay();
     }

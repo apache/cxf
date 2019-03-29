@@ -937,14 +937,8 @@ public final class EndpointReferenceUtils {
     }
 
     private static boolean portNameMatches(Server s, String portName) {
-        boolean ret = false;
-        if (null == portName
-            || portName.equals(s.getEndpoint().getEndpointInfo().getName().getLocalPart())) {
-            return true;
-        }
-        return ret;
+        return null == portName
+            || portName.equals(s.getEndpoint().getEndpointInfo().getName().getLocalPart());
     }
-
-
 
 }

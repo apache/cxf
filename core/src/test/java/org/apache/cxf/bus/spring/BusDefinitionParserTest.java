@@ -36,6 +36,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -44,18 +45,14 @@ import static org.junit.Assert.assertTrue;
 public class BusDefinitionParserTest {
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testFeatures() {
         String cfgFile = "org/apache/cxf/bus/spring/bus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
 
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
-        boolean found = false;
-        for (Interceptor<? extends Message> i : in) {
-            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
-                found = true;
-            }
-        }
-        assertTrue("could not find logging interceptor.", found);
+        assertTrue("could not find logging interceptor.",
+                in.stream().anyMatch(i -> i.getClass() == org.apache.cxf.interceptor.LoggingInInterceptor.class));
 
         Collection<Feature> features = bus.getFeatures();
         TestFeature tf = null;
@@ -74,37 +71,32 @@ public class BusDefinitionParserTest {
 
     @Test
     public void testBusConfigure() {
-        ClassPathXmlApplicationContext context = null;
-        try {
-            context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus.xml");
+        try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                "org/apache/cxf/bus/spring/customerBus.xml")) {
             Bus cxf1 = (Bus)context.getBean("cxf1");
 
-            assertTrue(cxf1.getOutInterceptors().size() == 1);
+            assertEquals(1, cxf1.getOutInterceptors().size());
             assertTrue(cxf1.getInInterceptors().isEmpty());
 
             Bus cxf2 = (Bus)context.getBean("cxf2");
-            assertTrue(cxf2.getInInterceptors().size() == 1);
+            assertEquals(1, cxf2.getInInterceptors().size());
             assertTrue(cxf2.getOutInterceptors().isEmpty());
-        } finally {
-            if (context != null) {
-                context.close();
-            }
         }
     }
+
     @Test
     public void testBusConfigureCreateBus() {
-        ClassPathXmlApplicationContext context = null;
         final AtomicBoolean b = new AtomicBoolean();
-        try {
-            context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus2.xml");
+        try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                "org/apache/cxf/bus/spring/customerBus2.xml")) {
             Bus cxf1 = (Bus)context.getBean("cxf1");
 
-            assertTrue(cxf1.getOutInterceptors().size() == 1);
+            assertEquals(1, cxf1.getOutInterceptors().size());
             assertTrue(cxf1.getInInterceptors().isEmpty());
 
             Bus cxf2 = (Bus)context.getBean("cxf2");
 
-            assertTrue(cxf2.getInInterceptors().size() == 1);
+            assertEquals(1, cxf2.getInInterceptors().size());
             assertTrue(cxf2.getOutInterceptors().isEmpty());
 
             cxf2.getExtension(BusLifeCycleManager.class)
@@ -120,26 +112,19 @@ public class BusDefinitionParserTest {
                     }
 
                 });
-        } finally {
-            if (context != null) {
-                context.close();
-            }
         }
         assertTrue("postShutdown not called", b.get());
     }
+
     @Test
+    @SuppressWarnings("deprecation")
     public void testLazyInit() {
         String cfgFile = "org/apache/cxf/bus/spring/lazyInitBus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
 
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
-        boolean found = false;
-        for (Interceptor<? extends Message> i : in) {
-            if ("LoggingInInterceptor".equals(i.getClass().getSimpleName())) {
-                found = true;
-            }
-        }
-        assertTrue("could not find logging interceptor.", found);
+        assertTrue("could not find logging interceptor.",
+                in.stream().anyMatch(i -> i.getClass() == org.apache.cxf.interceptor.LoggingInInterceptor.class));
     }
 
     static class TestBean {

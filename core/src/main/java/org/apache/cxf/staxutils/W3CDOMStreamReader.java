@@ -112,11 +112,6 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
         NamedNodeMap nodes = element.getAttributes();
 
-        String ePrefix = element.getPrefix();
-        if (ePrefix == null) {
-            ePrefix = "";
-        }
-
         if (nodes != null) {
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node node = nodes.item(i);

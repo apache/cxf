@@ -186,7 +186,7 @@ public class AutomaticWorkQueueTest {
             while ((workqueue.getActiveCount() < DEFAULT_HIGH_WATER_MARK 
                     || numRun < DEFAULT_HIGH_WATER_MARK 
                     || workqueue.getSize() > 0)
-                && max < 10) {
+                && max++ < 10) {
                 //wait up to a second for all the threads to start and grab items
                 Thread.sleep(100L);
                 numRun = numRunning(workItems);

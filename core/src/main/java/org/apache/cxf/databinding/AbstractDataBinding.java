@@ -174,7 +174,6 @@ public abstract class AbstractDataBinding implements DataBinding {
                 if (n instanceof Element) {
                     Element e = (Element)n;
                     if ("import".equals(e.getLocalName())) {
-                        e = (Element)n;
                         String loc = e.getAttribute("schemaLocation");
                         if (ids == null || ids.contains(loc)) {
                             e.removeAttribute("schemaLocation");

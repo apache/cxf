@@ -22,7 +22,6 @@ package org.apache.cxf.staxutils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -48,6 +47,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.IOUtils;
 
 import org.junit.Test;
 
@@ -120,25 +120,16 @@ public class StaxUtilsTest {
         baos.close();
 
         // re-read the input xml doc to a string
-        InputStreamReader inputStreamReader = new InputStreamReader(getTestStream(soapMessage));
-        StringWriter stringWriter = new StringWriter();
-        char[] buffer = new char[4096];
-        int n = 0;
-        n = inputStreamReader.read(buffer);
-        while (n > 0) {
-            stringWriter.write(buffer, 0, n);
-            n = inputStreamReader.read(buffer);
-        }
-        String input = stringWriter.toString();
-        stringWriter.close();
+        String input = IOUtils.toString(getTestStream(soapMessage));
+
         // seach for the first begin of "<soap:Envelope" to escape the apache licenses header
         int beginIndex = input.indexOf("<soap:Envelope");
         input = input.substring(beginIndex);
         beginIndex = output.indexOf("<soap:Envelope");
         output = output.substring(beginIndex);
 
-        output = output.replaceAll("\r\n", "\n");
-        input = input.replaceAll("\r\n", "\n");
+        output = output.replace("\r\n", "\n");
+        input = input.replace("\r\n", "\n");
 
         // compare the input and output string
         assertEquals(input, output);

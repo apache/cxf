@@ -455,8 +455,7 @@ public class PhaseInterceptorChainTest {
                                    boolean returnFromCustomLogger) {
         if (useCustomLogger) {
             FaultListener customLogger = control.createMock(FaultListener.class);
-            message.getContextualProperty(FaultListener.class.getName());
-            EasyMock.expectLastCall().andReturn(customLogger);
+            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(customLogger);
             if (expectFault) {
                 customLogger.faultOccurred(EasyMock.isA(Exception.class),
                                  EasyMock.isA(String.class),
@@ -465,15 +464,12 @@ public class PhaseInterceptorChainTest {
                 if (returnFromCustomLogger) {
                     //default logging should also be invoked
                     //not too beautiful way to verify that defaultLogging was invoked.
-                    message.get(FaultMode.class);
-                    EasyMock.expectLastCall().andReturn(FaultMode.RUNTIME_FAULT);
+                    EasyMock.expect(message.get(FaultMode.class)).andReturn(FaultMode.RUNTIME_FAULT);
                 }
             }
         } else {
-            message.getContextualProperty(FaultListener.class.getName());
-            EasyMock.expectLastCall().andReturn(null);
+            EasyMock.expect(message.getContextualProperty(FaultListener.class.getName())).andReturn(null);
         }
-
     }
 
 

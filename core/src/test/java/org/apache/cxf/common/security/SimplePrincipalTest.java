@@ -22,7 +22,7 @@ package org.apache.cxf.common.security;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 public class SimplePrincipalTest {
 
@@ -38,6 +38,6 @@ public class SimplePrincipalTest {
 
     @Test
     public void testNotEquals() {
-        assertFalse(new SimplePrincipal("barry").equals(new SimplePrincipal("john")));
+        assertNotEquals(new SimplePrincipal("barry"), new SimplePrincipal("john"));
     }
 }

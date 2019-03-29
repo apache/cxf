@@ -54,8 +54,7 @@ public final class TransformTestUtils {
                                            Map<String, String> transformElements,
                                            Map<String, String> appendElements,
                                            List<String> dropElements,
-                                           Map<String, String> transformAttributes,
-                                           Map<String, String> appendAttributes)
+                                           Map<String, String> transformAttributes)
         throws XMLStreamException {
 
         XMLStreamReader reader = createInTransformedStreamReader(inname,
@@ -74,8 +73,7 @@ public final class TransformTestUtils {
                                            Map<String, String> transformElements,
                                            Map<String, String> appendElements,
                                            List<String> dropElements,
-                                           Map<String, String> transformAttributes,
-                                           Map<String, String> appendAttributes)
+                                           Map<String, String> transformAttributes)
         throws XMLStreamException {
 
         XMLStreamReader reader = createOutTransformedStreamReader(inname,

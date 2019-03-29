@@ -219,8 +219,8 @@ public final class AttachmentUtil {
         //we don't need the cryptographically secure random uuid that
         //UUID.randomUUID() will produce.  Thus, use a faster
         //pseudo-random thing
-        long leastSigBits = 0;
-        long mostSigBits = 0;
+        long leastSigBits;
+        long mostSigBits;
         synchronized (BOUND_RANDOM) {
             mostSigBits = BOUND_RANDOM.nextLong();
             leastSigBits = BOUND_RANDOM.nextLong();

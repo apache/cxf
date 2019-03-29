@@ -44,7 +44,7 @@ public class ProxyClassLoaderCache {
                 + proxyInterface.getName());
             LOG.log(Level.FINE, "interface's classloader for new created ProxyClassLoader is "
                 + ClassLoaderUtils.getClassLoaderName(proxyInterface));
-            return createProxyClassLoader(proxyInterface);
+            return createProxyClassLoader(proxyInterface); // Parameter 'proxyInterface' is not used inside method body
         }
 
     };

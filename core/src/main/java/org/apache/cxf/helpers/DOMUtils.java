@@ -440,7 +440,7 @@ public final class DOMUtils {
         String localName = qualifiedName.substring(index + 1);
         String ns = node.lookupNamespaceURI(prefix);
 
-        if (ns == null || localName == null) {
+        if (ns == null) {
             throw new RuntimeException("Invalid QName in mapping: " + qualifiedName);
         }
 

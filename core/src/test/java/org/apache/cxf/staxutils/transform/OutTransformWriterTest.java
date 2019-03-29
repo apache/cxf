@@ -328,7 +328,7 @@ public class OutTransformWriterTest {
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeReqIn1.xml",
                                                      "../resources/greetMeReq.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -353,7 +353,7 @@ public class OutTransformWriterTest {
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeReqIn2.xml",
                                                      "../resources/greetMeReq.xml",
                                   transformElements, appendElements, dropElements,
-                                  transformAttributes, null);
+                                  transformAttributes);
     }
 
     @Test
@@ -364,7 +364,7 @@ public class OutTransformWriterTest {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeReqIn3.xml",
                                                      "../resources/greetMeReq.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
     @Test
@@ -375,7 +375,7 @@ public class OutTransformWriterTest {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeReqIn4.xml",
                                                      "../resources/greetMeReq.xml",
-                                  null, null, null, transformAttributes, null);
+                                  null, null, null, transformAttributes);
     }
 
     @Test
@@ -385,7 +385,7 @@ public class OutTransformWriterTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformOutStreamAndCompare("../resources/amazonIn1.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -396,7 +396,7 @@ public class OutTransformWriterTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformOutStreamAndCompare("../resources/amazonIn1nospace.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -410,7 +410,7 @@ public class OutTransformWriterTest {
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn2.xml",
                                                      "../resources/AddRequest2.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -423,7 +423,7 @@ public class OutTransformWriterTest {
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn2nospace.xml",
                                                      "../resources/AddRequest2.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -433,7 +433,7 @@ public class OutTransformWriterTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformOutStreamAndCompare("../resources/amazonIn2.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -444,7 +444,7 @@ public class OutTransformWriterTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformOutStreamAndCompare("../resources/amazonIn2nospace.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -455,7 +455,7 @@ public class OutTransformWriterTest {
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn1.xml",
                                                      "../resources/AddRequest.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -466,7 +466,7 @@ public class OutTransformWriterTest {
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn1nospace.xml",
                                                      "../resources/AddRequest.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -491,7 +491,7 @@ public class OutTransformWriterTest {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/AddRequestIn3.xml",
                                                      "../resources/AddRequest3.xml",
-                                  transformElements, appendElements, dropElements, null, null);
+                                  transformElements, appendElements, dropElements, null);
 
     }
 
@@ -503,7 +503,7 @@ public class OutTransformWriterTest {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/wstrustReqSTRCIn1.xml",
                                                      "../resources/wstrustReqSTRC.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
     @Test
@@ -514,7 +514,7 @@ public class OutTransformWriterTest {
 
         TransformTestUtils.transformOutStreamAndCompare("../resources/multiNSIn1.xml",
                                                      "../resources/multiNS.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
     @Test
@@ -543,7 +543,7 @@ public class OutTransformWriterTest {
         transformElements.put("{http://www.w3.org/2005/08/addressing}ReplyTo", "");
         TransformTestUtils.transformOutStreamAndCompare("../resources/greetMeWSAReqIn.xml",
                                                         "../resources/greetMeWSAReq.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
 }

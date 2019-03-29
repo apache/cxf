@@ -304,8 +304,7 @@ public class AttachmentSerializer {
             bufferSize = avail;
         }
         final byte[] buffer = new byte[bufferSize];
-        int n = 0;
-        n = input.read(buffer);
+        int n = input.read(buffer);
         int total = 0;
         int left = 0;
         while (-1 != n) {

@@ -20,7 +20,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:c="http://cxf.apache.org/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd" default-lazy-init="true">
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd"
+    default-lazy-init="true">
     <c:bus>
         <c:features>
             <c:logging/>

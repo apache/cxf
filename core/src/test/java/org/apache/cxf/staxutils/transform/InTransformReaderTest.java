@@ -258,7 +258,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn1.xml",
                                                      "../resources/greetMeReq.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -283,7 +283,7 @@ public class InTransformReaderTest {
         TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn2.xml",
                                                      "../resources/greetMeReq.xml",
                                   transformElements, appendElements, dropElements,
-                                  transformAttributes, null);
+                                  transformAttributes);
     }
 
     @Test
@@ -294,7 +294,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn3.xml",
                                                      "../resources/greetMeReq.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
     @Test
@@ -305,7 +305,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/greetMeReqIn4.xml",
                                                      "../resources/greetMeReq.xml",
-                                  null, null, null, transformAttributes, null);
+                                  null, null, null, transformAttributes);
     }
 
     @Test
@@ -315,7 +315,7 @@ public class InTransformReaderTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -326,7 +326,7 @@ public class InTransformReaderTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1nospace.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -340,7 +340,7 @@ public class InTransformReaderTest {
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml",
                                                      "../resources/AddRequest2.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -353,7 +353,7 @@ public class InTransformReaderTest {
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml",
                                                      "../resources/AddRequest2.xml",
-                                  transformElements, appendElements, null, null, null);
+                                  transformElements, appendElements, null, null);
     }
 
     @Test
@@ -363,7 +363,7 @@ public class InTransformReaderTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -374,7 +374,7 @@ public class InTransformReaderTest {
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2nospace.xml",
                                                      "../resources/amazon.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -385,7 +385,7 @@ public class InTransformReaderTest {
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1.xml",
                                                      "../resources/AddRequest.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -396,7 +396,7 @@ public class InTransformReaderTest {
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1nospace.xml",
                                                      "../resources/AddRequest.xml",
-                                  null, appendElements, null, null, null);
+                                  null, appendElements, null, null);
 
     }
 
@@ -421,7 +421,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn3.xml",
                                                      "../resources/AddRequest3.xml",
-                                  transformElements, appendElements, dropElements, null, null);
+                                  transformElements, appendElements, dropElements, null);
 
     }
 
@@ -435,7 +435,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/wstrustReqSTRCIn1.xml",
                                                      "../resources/wstrustReqSTRC.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
 
     }
 
@@ -447,7 +447,7 @@ public class InTransformReaderTest {
 
         TransformTestUtils.transformInStreamAndCompare("../resources/multiNSIn1.xml",
                                                      "../resources/multiNS.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
     }
 
     @Test
@@ -457,7 +457,7 @@ public class InTransformReaderTest {
                               "{http://bar.com/foobar}*");
         TransformTestUtils.transformInStreamAndCompare("../resources/multiNS2In1.xml",
                                                      "../resources/multiNS2.xml",
-                                  transformElements, null, null, null, null);
+                                  transformElements, null, null, null);
 
     }
 

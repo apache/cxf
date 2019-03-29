@@ -114,8 +114,7 @@ public final class ServiceModelUtil {
         return wrapperMap.get(opName);
     }
     public static SchemaInfo getSchema(ServiceInfo serviceInfo, MessagePartInfo messagePartInfo) {
-        SchemaInfo schemaInfo = null;
-        String tns = null;
+        final String tns;
         if (messagePartInfo.isElement()) {
             tns = messagePartInfo.getElementQName().getNamespaceURI();
         } else {
@@ -123,10 +122,10 @@ public final class ServiceModelUtil {
         }
         for (SchemaInfo schema : serviceInfo.getSchemas()) {
             if (tns.equals(schema.getNamespaceURI())) {
-                schemaInfo = schema;
+                return schema;
             }
         }
-        return schemaInfo;
+        return null;
     }
 
     public static List<String> getOperationInputPartNames(OperationInfo operation) {

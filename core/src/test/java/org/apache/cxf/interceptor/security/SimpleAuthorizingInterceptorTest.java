@@ -49,13 +49,11 @@ public class SimpleAuthorizingInterceptorTest {
         Service service = EasyMock.createMock(Service.class);
         ex.put(Service.class, service);
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
-        service.get(MethodDispatcher.class.getName());
-        EasyMock.expectLastCall().andReturn(md);
+        EasyMock.expect(service.get(MethodDispatcher.class.getName())).andReturn(md);
 
         BindingOperationInfo boi = EasyMock.createMock(BindingOperationInfo.class);
         ex.put(BindingOperationInfo.class, boi);
-        md.getMethod(boi);
-        EasyMock.expectLastCall().andReturn(method);
+        EasyMock.expect(md.getMethod(boi)).andReturn(method);
         EasyMock.replay(service, md);
     }
 

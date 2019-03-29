@@ -1859,7 +1859,7 @@ public final class StaxUtils {
         String localName = value.substring(index + 1);
         String ns = reader.getNamespaceURI(prefix);
 
-        if ((!StringUtils.isEmpty(prefix) && ns == null) || localName == null) {
+        if (!StringUtils.isEmpty(prefix) && ns == null) {
             throw new RuntimeException("Invalid QName in mapping: " + value);
         }
 

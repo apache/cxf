@@ -156,7 +156,6 @@ public final class JAXBUtils {
         BUILTIN_DATATYPES_MAP.put("gDay", "javax.xml.datatype.XMLGregorianCalendar");
         BUILTIN_DATATYPES_MAP.put("duration", "javax.xml.datatype.Duration");
         BUILTIN_DATATYPES_MAP.put("NOTATION", "javax.xml.namespace.QName");
-        BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
 
         HOLDER_TYPES_MAP = new HashMap<>();
         HOLDER_TYPES_MAP.put("int", java.lang.Integer.class);
@@ -404,10 +403,9 @@ public final class JAXBUtils {
         // algorithm will not change an XML name that is already a legal and
         // conventional (!) Java class, method, or constant identifier
 
-        boolean legalIdentifier = false;
         StringBuilder buf = new StringBuilder(name);
         boolean hasUnderscore = false;
-        legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
+        boolean legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
 
         for (int i = 1; i < name.length() && legalIdentifier; i++) {
             legalIdentifier &= Character.isJavaIdentifierPart(buf.charAt(i));
@@ -508,7 +506,7 @@ public final class JAXBUtils {
         if (null == buf || buf.length() == 0) {
             return false;
         }
-        boolean result = false;
+        final boolean result;
         if (IdentifierType.CONSTANT == type) {
             for (int i = 0; i < buf.length(); i++) {
                 if (Character.isLowerCase(buf.charAt(i))) {

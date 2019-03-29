@@ -406,15 +406,12 @@ public class AttachmentDeserializerTest {
 
     @Test
     public void imitateAttachmentInInterceptorForMessageWithMissingBoundary() throws Exception {
-        ByteArrayInputStream inputStream;
         String contentType = "multipart/mixed;boundary=abc123";
         String data = "--abc123\r\n\r\n<Document></Document>\r\n\r\n";
 
-        Message message;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data.getBytes());
 
-        inputStream = new ByteArrayInputStream(data.getBytes());
-
-        message = new XMLMessage(new MessageImpl());
+        Message message = new XMLMessage(new MessageImpl());
         message.put(Message.CONTENT_TYPE, contentType);
         message.setContent(InputStream.class, inputStream);
         message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
@@ -428,7 +425,7 @@ public class AttachmentDeserializerTest {
                                          Collections.singletonList("multipart/mixed"));
 
         ad.initializeAttachments();
-        message.getAttachments().size();
+        assertEquals(0, message.getAttachments().size());
 
         inputStream.close();
     }

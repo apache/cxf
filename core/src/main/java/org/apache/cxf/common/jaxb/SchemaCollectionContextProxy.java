@@ -211,10 +211,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
     }
     private XmlSchemaType mapToSchemaType(Class<?> cls, String namespace) {
         QName qn = getTypeQName(cls, namespace);
-        XmlSchemaType type = null;
-        if (qn != null) {
-            type = schemas.getTypeByQName(qn);
-        }
+        XmlSchemaType type = schemas.getTypeByQName(qn);
         if (type == null && cls.isArray()) {
             Class<?> compType = cls.getComponentType();
             int count = 1;
@@ -223,15 +220,13 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
                 count++;
             }
             QName aqn = getTypeQName(compType, namespace);
-            if (aqn != null) {
-                while (count > 0) {
-                    aqn = new QName(aqn.getNamespaceURI(), aqn.getLocalPart() + "Array");
-                    count--;
-                }
-                type = schemas.getTypeByQName(aqn);
-                if (type == null) {
-                    type = schemas.getTypeByQName(new QName("http://jaxb.dev.java.net/array", aqn.getLocalPart()));
-                }
+            while (count > 0) {
+                aqn = new QName(aqn.getNamespaceURI(), aqn.getLocalPart() + "Array");
+                count--;
+            }
+            type = schemas.getTypeByQName(aqn);
+            if (type == null) {
+                type = schemas.getTypeByQName(new QName("http://jaxb.dev.java.net/array", aqn.getLocalPart()));
             }
         }
         /*
