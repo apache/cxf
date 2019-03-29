@@ -349,12 +349,6 @@ abstract class AbstractOAuthDataProviderTest {
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
-        } finally {
-            try {
-                //connection.createStatement().execute("SHUTDOWN");
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
         }
     }
 

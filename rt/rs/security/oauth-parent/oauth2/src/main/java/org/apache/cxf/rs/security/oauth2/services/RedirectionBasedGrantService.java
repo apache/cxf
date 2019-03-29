@@ -392,7 +392,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
         List<String> approvedScope = new LinkedList<>();
         for (String rScope : requestedScope) {
             String param = params.getFirst(rScope + "_status");
-            if (param != null && OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
+            if (OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
                 approvedScope.add(rScope);
             }
         }

@@ -1251,7 +1251,7 @@ public class SourceGenerator {
         sbCode.append(localName).append(' ');
     }
     //CHECKSTYLE:OFF
-    private void writeRequestTypes(Element requestEl,
+    private void writeRequestTypes(Element requestEl, //NOPMD
                                    String classPackage,
                                    Element repElement,
                                    List<Element> inParamEls,

@@ -56,12 +56,6 @@ public class JPAOAuthDataProviderTest extends AbstractOAuthDataProviderTest {
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
-        } finally {
-            try {
-                //connection.createStatement().execute("SHUTDOWN");
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
         }
     }
 

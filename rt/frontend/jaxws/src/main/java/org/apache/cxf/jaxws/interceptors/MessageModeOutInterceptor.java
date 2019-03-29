@@ -252,8 +252,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     String cxfNamespace = cxfSoapMessage.getVersion().getNamespace();
                     SOAPHeader soapHeader = soapMessage.getSOAPHeader();
                     String namespace = soapHeader == null ? null : soapHeader.getNamespaceURI();
-                    if (namespace != null && cxfNamespace != null && !namespace.equals(cxfNamespace)
-                            && Soap12.SOAP_NAMESPACE.equals(namespace)) {
+                    if (Soap12.SOAP_NAMESPACE.equals(namespace) && !namespace.equals(cxfNamespace)) {
                         cxfSoapMessage.setVersion(Soap12.getInstance());
                         cxfSoapMessage.put(Message.CONTENT_TYPE, cxfSoapMessage.getVersion().getContentType());
                     }

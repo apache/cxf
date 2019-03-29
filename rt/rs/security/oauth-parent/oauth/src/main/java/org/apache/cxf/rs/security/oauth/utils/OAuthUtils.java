@@ -148,7 +148,7 @@ public final class OAuthUtils {
             // This path will most likely work only for the AuthorizationRequestService
             // when processing a user confirmation with only 3 parameters expected
             String ct = request.getContentType();
-            if (ct != null && MediaType.APPLICATION_FORM_URLENCODED.equals(ct)) {
+            if (MediaType.APPLICATION_FORM_URLENCODED.equals(ct)) {
                 Map<String, List<String>> map = new HashMap<>();
                 for (Entry<String, String> param : params) {
                     map.put(param.getKey(), Collections.singletonList(param.getValue()));

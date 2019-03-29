@@ -66,7 +66,7 @@ public class JsonpInInterceptor extends AbstractPhaseInterceptor<Message> {
         String callback = JAXRSUtils.getStructuredParams(theQuery, "&", false, false).getFirst(callbackParam);
         if (StringUtils.isEmpty(callback)) {
             String httpAcceptType = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-            if (httpAcceptType != null && mediaType.equals(httpAcceptType)) {
+            if (mediaType != null && mediaType.equals(httpAcceptType)) {
                 return defaultCallback;
             }
         }

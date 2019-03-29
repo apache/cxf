@@ -289,7 +289,7 @@ public class JAXBDataBindingTest {
             doNamespaceMappingTest(true, false);
             fail("Internal needs ASM");
         } catch (AssertionError er) {
-            er.getMessage().contains("Failed to map namespace");
+            assertTrue(er.getMessage().contains("Failed to map namespace"));
         }
     }
 
