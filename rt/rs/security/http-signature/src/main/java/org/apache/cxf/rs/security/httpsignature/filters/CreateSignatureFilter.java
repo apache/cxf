@@ -32,7 +32,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public final class CreateSignatureFilter extends AbstractSignatureOutFilter implements ContainerResponseFilter {
+public class CreateSignatureFilter extends AbstractSignatureOutFilter implements ContainerResponseFilter {
 
     public CreateSignatureFilter() {
         super();

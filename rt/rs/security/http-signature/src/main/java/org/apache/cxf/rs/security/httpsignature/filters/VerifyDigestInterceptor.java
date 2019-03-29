@@ -43,7 +43,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public final class VerifyDigestInterceptor implements ReaderInterceptor {
+public class VerifyDigestInterceptor implements ReaderInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(VerifyDigestInterceptor.class);
 
     private DigestVerifier digestVerifier;

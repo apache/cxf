@@ -34,7 +34,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
 @Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public final class VerifySignatureClientFilter extends AbstractSignatureInFilter implements ClientResponseFilter {
+public class VerifySignatureClientFilter extends AbstractSignatureInFilter implements ClientResponseFilter {
 
     public VerifySignatureClientFilter() {
         super();

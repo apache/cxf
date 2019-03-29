@@ -29,7 +29,7 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public final class CreateSignatureClientFilter extends AbstractSignatureOutFilter implements ClientRequestFilter {
+public class CreateSignatureClientFilter extends AbstractSignatureOutFilter implements ClientRequestFilter {
 
     public CreateSignatureClientFilter() {
         super();
