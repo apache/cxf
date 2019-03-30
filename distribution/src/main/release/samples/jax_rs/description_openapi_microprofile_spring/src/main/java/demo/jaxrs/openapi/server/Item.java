@@ -16,28 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.mpopenapi;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+package demo.jaxrs.openapi.server;
 
-import org.apache.geronimo.microprofile.openapi.jaxrs.OpenAPIEndpoint;
-import org.eclipse.microprofile.openapi.models.OpenAPI;
+public class Item {
+    private String name;
+    private String value;
 
-@Path("/openapi.{type:json|yaml}")
-public class OpenApiEndpoint extends OpenAPIEndpoint {
-    private OpenAPI openApi;
-
-    public OpenApiEndpoint(OpenAPI openApi) {
-        this.openApi = openApi;
+    public Item() {
     }
 
-    @Override
-    @GET
-    @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
-    public OpenAPI get() {
-        return openApi;
+    public Item(final String name, final String value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }

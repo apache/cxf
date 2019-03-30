@@ -142,6 +142,7 @@
         <module>wsdl_first_rpclit</module>
         <module>wsdl_first_soap12</module>
         <module>wsdl_first_xml_wrapped</module>
+        <module>jax_rs/description_openapi_microprofile_spring</module>
     </modules>
     <dependencyManagement>
         <dependencies>

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.jaxrs.mpopenapi;
+package org.apache.cxf.jaxrs.microprofile.openapi;
 
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiResolver;
 
