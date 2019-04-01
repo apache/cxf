@@ -27,6 +27,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
@@ -38,6 +39,10 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 public class ClientDigestInterceptor implements WriterInterceptor {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private final String digestAlgorithmName;
+
+    public ClientDigestInterceptor() {
+        this(MessageDigestInputStream.ALGO_SHA_256);
+    }
 
     public ClientDigestInterceptor(String digestAlgorithmName) {
         this.digestAlgorithmName = digestAlgorithmName;
