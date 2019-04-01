@@ -19,12 +19,12 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
@@ -34,35 +34,35 @@ public class MessageSigner {
 
     public MessageSigner(String signatureAlgorithmName,
                          String digestAlgorithmName,
-                         PrivateKey privateKey,
+                         PrivateKeyProvider privateKeyProvider,
                          String keyId) {
-        this(signatureAlgorithmName, digestAlgorithmName, privateKey, keyId, Collections.emptyList());
+        this(signatureAlgorithmName, digestAlgorithmName, privateKeyProvider, keyId, Collections.emptyList());
     }
 
     public MessageSigner(String signatureAlgorithmName,
                          String digestAlgorithmName,
-                         PrivateKey privateKey,
+                         PrivateKeyProvider privateKeyProvider,
                          String keyId,
                          List<String> headersToSign) {
         this.digestAlgorithmName = Objects.requireNonNull(digestAlgorithmName);
         this.signatureCreator = new TomitribeSignatureCreator(
                 Objects.requireNonNull(signatureAlgorithmName),
-                Objects.requireNonNull(privateKey),
+                Objects.requireNonNull(privateKeyProvider),
                 Objects.requireNonNull(keyId),
                 headersToSign);
     }
 
-    public MessageSigner(PrivateKey privateKey,
+    public MessageSigner(PrivateKeyProvider privateKeyProvider,
                          String keyId) {
-        this(privateKey, keyId, Collections.emptyList());
+        this(privateKeyProvider, keyId, Collections.emptyList());
     }
 
-    public MessageSigner(PrivateKey privateKey,
+    public MessageSigner(PrivateKeyProvider privateKeyProvider,
                          String keyId,
                          List<String> headersToSign) {
         this(DefaultSignatureConstants.SIGNING_ALGORITHM,
                 DefaultSignatureConstants.DIGEST_ALGORITHM,
-                privateKey,
+                privateKeyProvider,
                 keyId,
                 headersToSign);
     }
