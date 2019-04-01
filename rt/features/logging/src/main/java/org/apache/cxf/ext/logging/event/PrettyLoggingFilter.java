@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.ctc.wstx.exc.WstxLazyException;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.slf4j.Logger;
@@ -77,9 +78,9 @@ public class PrettyLoggingFilter implements LogEventSender {
         try {
             StaxUtils.copy(xreader, xwriter);
             xwriter.flush();
-        } catch (XMLStreamException xse) {
+        } catch (XMLStreamException | WstxLazyException e) {
             if (!event.isTruncated()) {
-                LOG.debug("Error while pretty printing cxf message, returning raw message.", xse);
+                LOG.debug("Error while pretty printing cxf message, returning raw message.", e);
                 return payload;
             } 
             
