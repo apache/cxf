@@ -172,7 +172,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
 
     /**
-     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is set to <code>true</code>.
+     * Sets the JVM arguments (i.e. <code>-Xms128m -Xmx128m</code>) if fork is not set to <code>false</code>.
      */
     @Parameter(property = "cxf.codegen.jvmArgs")
     private String additionalJvmArgs;
@@ -215,8 +215,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
                     + "--add-opens java.base/java.net=ALL-UNNAMED "
                     + "--add-opens java.base/java.lang=ALL-UNNAMED "
                     + "--add-opens java.base/java.util=ALL-UNNAMED "
-                    + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED " 
-                    + (additionalJvmArgs == null ? "" : additionalJvmArgs); 
+                    + "--add-opens java.base/java.util.concurrent=ALL-UNNAMED "
+                    + (additionalJvmArgs == null ? "" : additionalJvmArgs);
         }
         System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
@@ -254,7 +254,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String originalNonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
         String originalProxyUser = SystemPropertyAction.getProperty(HTTP_PROXY_USER);
         String originalProxyPassword = SystemPropertyAction.getProperty(HTTP_PROXY_PASSWORD);
-        
+
 
         Bus bus = null;
         ClassLoaderSwitcher classLoaderSwitcher = null;
@@ -269,7 +269,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             }
             classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
             boolean result = true;
-    
+
             Set<URI> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
@@ -782,7 +782,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
     }
 
-        
+
     protected void downloadRemoteWsdls(List<GenericWsdlOption> effectiveWsdlOptions)
         throws MojoExecutionException {
 
@@ -899,8 +899,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
                 artifactMatched = isArtifactMatched(targetArtifact, pArtifact);
-                if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null 
-                        && targetArtifact.getClassifier().equals(pArtifact.getClassifier()) 
+                if (targetArtifact.getClassifier() != null && pArtifact.getClassifier() != null
+                        && targetArtifact.getClassifier().equals(pArtifact.getClassifier())
                         && artifactMatched) {
                     //handle multile classifiers
                     return pArtifact;
@@ -911,12 +911,12 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         }
         return null;
     }
-    
+
     private boolean isArtifactMatched(Artifact targetArtifact, Artifact pArtifact) {
         return targetArtifact.getGroupId().equals(pArtifact.getGroupId())
                 && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
                 && targetArtifact.getVersion().equals(pArtifact.getVersion())
-                && ("wsdl".equals(pArtifact.getType()) 
+                && ("wsdl".equals(pArtifact.getType())
                 || (
                         targetArtifact.getClassifier() != null
                                 && pArtifact.getType() != null
