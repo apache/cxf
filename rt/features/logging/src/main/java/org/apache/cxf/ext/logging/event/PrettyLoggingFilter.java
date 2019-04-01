@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import com.ctc.wstx.exc.WstxLazyException;
 import org.apache.cxf.staxutils.PrettyPrintXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.slf4j.Logger;
@@ -78,26 +77,41 @@ public class PrettyLoggingFilter implements LogEventSender {
         try {
             StaxUtils.copy(xreader, xwriter);
             xwriter.flush();
-        } catch (XMLStreamException | WstxLazyException e) {
-            if (!event.isTruncated()) {
-                LOG.debug("Error while pretty printing cxf message, returning raw message.", e);
-                return payload;
-            } 
-            
-            // Expected behavior for truncated payloads - keep what is already written.
-            // This might effectively result in additional truncation, 
-            // as the truncated XML document might result in partially parsed XML nodes, 
-            // for example an open start tag. As long as a truncated payload is not 
-            // mistaken for a non-truncated payload, we're good.
-            flush(xwriter);
-            return swriter.toString();
+        } catch (XMLStreamException xse) {
+            return getPrettyMessageAfterExceptionHandling(xse, event, payload, swriter, xwriter);
+        } catch (RuntimeException ex) {
+            if (!(ex.getCause() instanceof XMLStreamException)) {
+                throw ex;
+            }
+
+            XMLStreamException xse = (XMLStreamException) ex.getCause();
+            return getPrettyMessageAfterExceptionHandling(xse, event, payload, swriter, xwriter);
         } finally {
             close(xwriter);
             close(xreader);
         } 
         return swriter.toString();
     }
-    
+
+    private String getPrettyMessageAfterExceptionHandling(XMLStreamException xse,
+                                                          LogEvent event,
+                                                          String payload,
+                                                          StringWriter swriter,
+                                                          XMLStreamWriter xwriter) {
+        if (!event.isTruncated()) {
+            LOG.debug("Error while pretty printing cxf message, returning raw message.", xse);
+            return payload;
+        }
+
+        // Expected behavior for truncated payloads - keep what is already written.
+        // This might effectively result in additional truncation,
+        // as the truncated XML document might result in partially parsed XML nodes,
+        // for example an open start tag. As long as a truncated payload is not
+        // mistaken for a non-truncated payload, we're good.
+        flush(xwriter);
+        return swriter.toString();
+    }
+
     private void flush(XMLStreamWriter xwriter) {
         try {
             xwriter.flush();
