@@ -119,7 +119,7 @@ public class Claim implements Serializable, Cloneable {
     }
 
     @Override
-    public Claim clone() {
+    public Claim clone() { //NOPMD
         try {
             super.clone(); // Checkstyle requires this call
         } catch (CloneNotSupportedException e) {

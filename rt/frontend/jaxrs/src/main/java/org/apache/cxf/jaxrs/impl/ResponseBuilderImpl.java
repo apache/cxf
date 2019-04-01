@@ -227,7 +227,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
 
 //  CHECKSTYLE:OFF
     @Override
-    public ResponseBuilder clone() {
+    public ResponseBuilder clone() { //NOPMD
         return new ResponseBuilderImpl(this);
     }
 //  CHECKSTYLE:ON

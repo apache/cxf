@@ -423,7 +423,6 @@
                             <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                         </excludeRoots>
                         <analysisCache>true</analysisCache>
-                        <failOnViolation>false</failOnViolation>
                     </configuration>
                     <executions>
                         <execution>

@@ -412,7 +412,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
 
     // CHECKSTYLE:OFF
     @Override
-    public UriBuilder clone() {
+    public UriBuilder clone() { //NOPMD
         UriBuilderImpl builder = new UriBuilderImpl();
         builder.scheme = scheme;
         builder.userInfo = userInfo;

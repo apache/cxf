@@ -128,7 +128,7 @@ public class ProcessedClaim extends Claim {
     }
 
     @Override
-    public ProcessedClaim clone() {
+    public ProcessedClaim clone() { //NOPMD
         super.clone(); // Checkstyle requires this call
         return new ProcessedClaim(this);
     }
