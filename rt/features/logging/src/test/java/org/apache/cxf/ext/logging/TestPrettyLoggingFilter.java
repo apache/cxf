@@ -72,7 +72,7 @@ public class TestPrettyLoggingFilter {
 
     /**
      * If truncation happens in the middle of an html entity, com.ctc.wstx.exc.WstxLazyException can be thrown.
-     * This test ensures that WstxLazyException is properly handled (ignored) just like the javax.xml.stream.XMLStreamException.
+     * This test ensures that WstxLazyException is properly handled (ignored) just like the XMLStreamException.
      * See CXF-8008.
      */
     @Test
