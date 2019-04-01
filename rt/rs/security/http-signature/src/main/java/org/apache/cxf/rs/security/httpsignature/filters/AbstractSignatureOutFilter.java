@@ -85,7 +85,7 @@ abstract class AbstractSignatureOutFilter {
         Map<String, List<String>> convertedHeaders = new HashMap<>(requestHeaders.size());
         for (Map.Entry<String, List<Object>> entry : requestHeaders.entrySet()) {
             convertedHeaders.put(entry.getKey(),
-                                 entry.getValue().stream().map(o -> o.toString()).collect(Collectors.toList()));
+                                 entry.getValue().stream().map(o -> o.toString().trim()).collect(Collectors.toList()));
         }
         return convertedHeaders;
     }
