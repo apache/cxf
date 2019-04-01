@@ -68,7 +68,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerHttpSignature.PORT;
 
     @BeforeClass
-    public static void startServers() throws Exception {
+    public static void startServers() {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerHttpSignature.class, true));
     }
@@ -176,7 +176,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testHttpSignaturePropertiesPasswordProvider() throws Exception {
+    public void testHttpSignaturePropertiesPasswordProvider() {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
@@ -258,7 +258,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testHttpSignatureSignaturePropertiesRsaSha512() throws Exception {
+    public void testHttpSignatureSignaturePropertiesRsaSha512() {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
@@ -352,7 +352,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testHttpSignatureResponseProperties() throws Exception {
+    public void testHttpSignatureResponseProperties() {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
@@ -478,7 +478,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertNotNull(privateKey);
 
         List<String> headerList = Arrays.asList("custom", "(request-target)");
-        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", headerList);
+        MessageSigner messageSigner = new MessageSigner(keyid -> privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -508,7 +508,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertNotNull(privateKey);
 
         List<String> headerList = Arrays.asList("custom", "(request-target)");
-        MessageSigner messageSigner = new MessageSigner(privateKey, "alice-key-id", headerList);
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
@@ -554,7 +554,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testNoHttpSignature() throws Exception {
+    public void testNoHttpSignature() {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
@@ -768,7 +768,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testPropertiesWrongSignatureVerification() throws Exception {
+    public void testPropertiesWrongSignatureVerification() {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
@@ -849,7 +849,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
             Map<String, List<String>> convertedHeaders = new HashMap<>(requestHeaders.size());
             for (Map.Entry<String, List<Object>> entry : requestHeaders.entrySet()) {
                 convertedHeaders.put(entry.getKey(),
-                                     entry.getValue().stream().map(o -> o.toString()).collect(Collectors.toList()));
+                                     entry.getValue().stream().map(Object::toString).collect(Collectors.toList()));
             }
             return convertedHeaders;
         }
