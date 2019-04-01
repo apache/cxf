@@ -138,7 +138,7 @@ public class XmlSigOutInterceptor extends AbstractXmlSecOutInterceptor {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
         }
 
-        String id = UUID.randomUUID().toString();
+        String id = "_" + UUID.randomUUID().toString();
         String referenceId = "#" + id;
 
         String digestAlgo = sigProps.getSignatureDigestAlgo() == null
