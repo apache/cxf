@@ -323,7 +323,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     checkSignatureConfirmation(reqData, wsResult);
                 }
 
-                checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
+                checkActions(msg, wsResult.getResults(), actions);
 
                 doResults(
                     msg, actor,
@@ -349,7 +349,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                               body,
                               wsResult, utWithCallbacks);
                 } else {
-                    checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
+                    checkActions(msg, wsResult.getResults(), actions);
                     doResults(msg, actor,
                               header,
                               body,
@@ -450,10 +450,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     protected void checkActions(
         SoapMessage msg,
-        RequestData reqData,
         List<WSSecurityEngineResult> wsResult,
-        List<Integer> actions,
-        Element body
+        List<Integer> actions
     ) throws WSSecurityException {
         if (ignoreActions) {
             // Not applicable for the WS-SecurityPolicy case
