@@ -70,7 +70,7 @@ public class InjectionUtilsTest {
         String value = "1.1";
 
         // Act
-        Object id = InjectionUtils.handleParameter(value,
+        Id id = InjectionUtils.handleParameter(value,
                                                    true,
                                                    Id.class,
                                                    Id.class,
@@ -79,8 +79,7 @@ public class InjectionUtilsTest {
                                                    createMessage());
 
         // Assert
-        assertTrue(id instanceof Id);
-        assertEquals(value, ((Id)id).getId());
+        assertEquals(value, id.getId());
     }
 
     @Test
@@ -272,24 +271,19 @@ public class InjectionUtilsTest {
         }
     }
 
-    private Message createMessage() {
+    private static Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;

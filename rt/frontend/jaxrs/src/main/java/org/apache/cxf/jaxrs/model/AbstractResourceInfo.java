@@ -86,7 +86,7 @@ public abstract class AbstractResourceInfo {
         findContextFields(cls, provider);
         findContextSetterMethods(cls, provider);
         if (constructorProxies != null) {
-            Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap(true);
+            Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> proxies = getConstructorProxyMap();
             proxies.put(serviceClass, constructorProxies);
             constructorProxiesAvailable = true;
         }
@@ -192,13 +192,13 @@ public abstract class AbstractResourceInfo {
 
     public Map<Class<?>, ThreadLocalProxy<?>> getConstructorProxies() {
         if (constructorProxiesAvailable) {
-            return getConstructorProxyMap(false).get(serviceClass);
+            return getConstructorProxyMap().get(serviceClass);
         }
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> getConstructorProxyMap(boolean create) {
+    private Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> getConstructorProxyMap() {
         Object property = bus.getProperty(CONSTRUCTOR_PROXY_MAP);
         if (property == null) {
             Map<Class<?>, Map<Class<?>, ThreadLocalProxy<?>>> map
@@ -315,7 +315,7 @@ public abstract class AbstractResourceInfo {
     public void clearThreadLocalProxies() {
         clearProxies(getFieldProxyMap(false));
         clearProxies(getSetterProxyMap(false));
-        clearProxies(getConstructorProxyMap(false));
+        clearProxies(getConstructorProxyMap());
     }
 
     private <T> void clearProxies(Map<Class<?>, Map<T, ThreadLocalProxy<?>>> tlps) {

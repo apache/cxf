@@ -211,7 +211,7 @@ public class PrimitiveTextProviderTest {
                 new Annotation[]{},
                 MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null,
                 new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
-        assertEquals(value, value);
+        assertEquals(s, value);
     }
 
     public enum TestEnum {

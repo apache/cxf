@@ -920,8 +920,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                     this.host = schemePair[0];
                     this.port = schemePair.length == 2 ? Integer.parseInt(schemePair[1]) : -1;
 
+                    uri = uri.substring(index);
                 }
-                uri = uri.substring(index);
             }
 
         }

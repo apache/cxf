@@ -175,20 +175,16 @@ public class JAXRSUtilsTest {
         sf.create();
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
 
-        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore", null));
-        assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.BookStore.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.BookStore.class, firstResourceClass(resources, "/bookstore"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore/", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.BookStore.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.BookStore.class, firstResourceClass(resources, "/bookstore/"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/bookstore/bar", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class,
+                firstResourceClass(resources, "/bookstore/bar"));
     }
 
-    private static ClassResourceInfo firstResource(Map<ClassResourceInfo, MultivaluedMap<String, String>> map) {
-        return map == null ? null : map.entrySet().iterator().next().getKey();
+    private static Class<?> firstResourceClass(List<ClassResourceInfo> resources, String path) {
+        return JAXRSUtils.selectResourceClass(resources, path, null).keySet().iterator().next().getResourceClass();
     }
 
     @Test
@@ -286,20 +282,15 @@ public class JAXRSUtilsTest {
         sf.create();
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
 
-        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1", null));
-        assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class, firstResourceClass(resources, "/1"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate1.class, firstResourceClass(resources, "/1/"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/foo", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class,
+                firstResourceClass(resources, "/1/foo"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/1/foo/bar", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate2.class,
+                firstResourceClass(resources, "/1/foo/bar"));
     }
 
     @Test
@@ -309,13 +300,10 @@ public class JAXRSUtilsTest {
                               org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
         sf.create();
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
-        ClassResourceInfo bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/", null));
-        assertEquals(bStore.getResourceClass(), org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class);
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate3.class, firstResourceClass(resources, "/"));
 
-        bStore = firstResource(JAXRSUtils.selectResourceClass(resources, "/test", null));
-        assertEquals(bStore.getResourceClass(),
-                     org.apache.cxf.jaxrs.resources.TestResourceTemplate4.class);
-
+        assertEquals(org.apache.cxf.jaxrs.resources.TestResourceTemplate4.class,
+                firstResourceClass(resources, "/test"));
     }
 
     @Test
@@ -329,44 +317,44 @@ public class JAXRSUtilsTest {
 
         //If acceptContentTypes does not specify a specific Mime type, the
         //method is declared with a most specific ProduceMime type is selected.
-        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(),
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(),
              "/bookstore/1/books/123/", "GET", new MetadataMap<String, String>(), contentTypes,
              getTypes("application/json,application/xml;q=0.9"));
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
 
         //test
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books/123",
              "GET", new MetadataMap<String, String>(), contentTypes, getTypes("application/json"));
         assertNotNull(ori);
         assertEquals("getBookJSON", ori.getMethodToInvoke().getName());
 
         //test
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books/123",
               "GET", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));
         assertNotNull(ori);
         assertEquals("getBook", ori.getMethodToInvoke().getName());
 
         //test
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books",
                       "GET", new MetadataMap<String, String>(), contentTypes,
                       getTypes("application/xml"));
         assertNotNull(ori);
         assertEquals("getBooks", ori.getMethodToInvoke().getName());
 
         //test find POST
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books",
                  "POST", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));
         assertNotNull(ori);
         assertEquals("addBook", ori.getMethodToInvoke().getName());
 
         //test find PUT
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books",
             "PUT", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
 
         //test find DELETE
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/1/books/123",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/1/books/123",
              "DELETE", new MetadataMap<String, String>(), contentTypes, getTypes("application/xml"));
         assertNotNull(ori);
         assertEquals("deleteBook", ori.getMethodToInvoke().getName());
@@ -410,7 +398,7 @@ public class JAXRSUtilsTest {
         //If acceptContentTypes does not specify a specific Mime type, the
         //method is declared with a most specific ProduceMime type is selected.
         MetadataMap<String, String> values = new MetadataMap<>();
-        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage2(), "/1/2/",
+        OperationResourceInfo ori = findTargetResourceClass(resources, createMessage(), "/1/2/",
              "GET", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("getBooks", ori.getMethodToInvoke().getName());
@@ -422,7 +410,7 @@ public class JAXRSUtilsTest {
         assertEquals("Second id is 2", "2", values.get("id").get(1));
 
         values = new MetadataMap<>();
-        ori = findTargetResourceClass(resources, createMessage2(), "/2",
+        ori = findTargetResourceClass(resources, createMessage(), "/2",
              "POST", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("updateBookStoreInfo", ori.getMethodToInvoke().getName());
@@ -433,7 +421,7 @@ public class JAXRSUtilsTest {
         assertEquals("Only the first {id} should've been picked up", "2", values.getFirst("id"));
 
         values = new MetadataMap<>();
-        ori = findTargetResourceClass(resources, createMessage2(), "/3/4",
+        ori = findTargetResourceClass(resources, createMessage(), "/3/4",
              "PUT", values, contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
@@ -446,29 +434,6 @@ public class JAXRSUtilsTest {
         assertEquals("Only the first {id} should've been picked up", "4", values.getFirst("bookId"));
     }
 
-    private Message createMessage2() {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
-        Message m = new MessageImpl();
-        m.put("org.apache.cxf.http.case_insensitive_queries", false);
-        Exchange e = new ExchangeImpl();
-        m.setExchange(e);
-        e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
-        e.put(Endpoint.class, endpoint);
-        return m;
-    }
-
     @Test
     public void testFindTargetResourceClassWithSubResource() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
@@ -479,28 +444,28 @@ public class JAXRSUtilsTest {
         String contentTypes = "*/*";
 
         OperationResourceInfo ori = findTargetResourceClass(resources,
-               createMessage2(), "/bookstore/books/sub/123", "GET", new MetadataMap<String, String>(), contentTypes,
+               createMessage(), "/bookstore/books/sub/123", "GET", new MetadataMap<String, String>(), contentTypes,
                getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("getBook", ori.getMethodToInvoke().getName());
 
-        ori = findTargetResourceClass(resources, createMessage2(),
+        ori = findTargetResourceClass(resources, createMessage(),
             "/bookstore/books/123/true/chapter/1", "GET", new MetadataMap<String, String>(), contentTypes,
             getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("getNewBook", ori.getMethodToInvoke().getName());
 
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/books",
             "POST", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("addBook", ori.getMethodToInvoke().getName());
 
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/books",
              "PUT", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("updateBook", ori.getMethodToInvoke().getName());
 
-        ori = findTargetResourceClass(resources, createMessage2(), "/bookstore/books/123",
+        ori = findTargetResourceClass(resources, createMessage(), "/bookstore/books/123",
             "DELETE", new MetadataMap<String, String>(), contentTypes, getTypes("*/*"));
         assertNotNull(ori);
         assertEquals("deleteBook", ori.getMethodToInvoke().getName());
@@ -952,17 +917,17 @@ public class JAXRSUtilsTest {
         assertEquals(Integer.valueOf(1), queryList6.get(0).get());
         assertEquals(Integer.valueOf(2), queryList6.get(1).get());
 
-        List<Integer> queryList7 = (List<Integer>)params.get(7);
+        List<Long> queryList7 = (List<Long>)params.get(7);
         assertNotNull(queryList7);
         assertEquals(2, queryList7.size());
-        assertEquals(Long.valueOf(1), queryList7.get(0));
-        assertEquals(Long.valueOf(2), queryList7.get(1));
+        assertEquals(1L, queryList7.get(0).longValue());
+        assertEquals(2L, queryList7.get(1).longValue());
 
-        List<Integer> queryList8 = (List<Integer>)params.get(8);
+        List<Double> queryList8 = (List<Double>)params.get(8);
         assertNotNull(queryList8);
         assertEquals(2, queryList8.size());
-        assertEquals(Double.valueOf(1), queryList8.get(0));
-        assertEquals(Double.valueOf(2), queryList8.get(1));
+        assertEquals(1., queryList8.get(0), 0.);
+        assertEquals(2., queryList8.get(1), 0.);
     }
 
     @Test
@@ -977,7 +942,7 @@ public class JAXRSUtilsTest {
                                                                new ClassResourceInfo(Customer.class)),
                                                            null,
                                                            messageImpl);
-        assertEquals(params.size(), 4);
+        assertEquals(4, params.size());
         assertEquals("c1Value", params.get(0));
         Set<Cookie> set1 = CastUtils.cast((Set<?>)params.get(1));
         assertEquals(1, set1.size());
@@ -1002,7 +967,7 @@ public class JAXRSUtilsTest {
                                                                new ClassResourceInfo(Customer.class)),
                                                            null,
                                                            messageImpl);
-        assertEquals(params.size(), 3);
+        assertEquals(3, params.size());
         assertEquals("c1Value", params.get(0));
         assertEquals("c2Value", params.get(1));
         assertEquals("c3Value", ((Cookie)params.get(2)).getValue());
@@ -1670,9 +1635,8 @@ public class JAXRSUtilsTest {
         assertEquals("3", list.get(1));
     }
 
-    private Map<ClassResourceInfo, MultivaluedMap<String, String>> getMap(ClassResourceInfo cri) {
-
-        return Collections.singletonMap(cri, (MultivaluedMap<String, String>)new MetadataMap<String, String>());
+    private static Map<ClassResourceInfo, MultivaluedMap<String, String>> getMap(ClassResourceInfo cri) {
+        return Collections.singletonMap(cri, new MetadataMap<String, String>());
     }
 
     @Test
@@ -1693,22 +1657,22 @@ public class JAXRSUtilsTest {
         md.bind(ori2, Customer.class.getMethod("getItPlain", new Class[]{}));
         cri.setMethodDispatcher(md);
 
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET",
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage(), "GET",
               new MetadataMap<String, String>(), "*/*", getTypes("text/plain"));
 
         assertSame(ori, ori2);
 
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(),
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage(), "GET", new MetadataMap<String, String>(),
                                               "*/*", getTypes("text/xml"));
 
         assertSame(ori, ori1);
 
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(),
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage(), "GET", new MetadataMap<String, String>(),
                                           "*/*",
                                           sortMediaTypes(getTypes("*/*;q=0.1,text/plain,text/xml;q=0.8")));
 
         assertSame(ori, ori2);
-        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage2(), "GET", new MetadataMap<String, String>(),
+        ori = JAXRSUtils.findTargetMethod(getMap(cri), createMessage(), "GET", new MetadataMap<String, String>(),
                                           "*/*",
                                           sortMediaTypes(getTypes("*;q=0.1,text/plain,text/xml;q=0.9,x/y")));
 
@@ -2120,28 +2084,30 @@ public class JAXRSUtilsTest {
         return null;
     }
 
-    private Message createMessage() {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
+    private static Message createMessage() {
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mockEndpoint();
         e.put(Endpoint.class, endpoint);
         return m;
     }
+
+    private static Endpoint mockEndpoint() {
+        Endpoint endpoint = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName()))
+                .andReturn(ServerProviderFactory.getInstance()).anyTimes();
+        EasyMock.replay(endpoint);
+        return endpoint;
+    }
+
     static class MyTypeParamConverterProvider
         implements ParamConverterProvider, ParamConverter<MyType<Integer>> {
 

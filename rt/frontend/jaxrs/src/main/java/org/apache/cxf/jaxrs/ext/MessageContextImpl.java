@@ -302,7 +302,6 @@ public class MessageContextImpl implements MessageContext {
         if (childAttachments == null) {
             childAttachments = Collections.emptyList();
         }
-        childAttachments.size();
         for (org.apache.cxf.message.Attachment a : childAttachments) {
             newAttachments.add(new Attachment(a, new ProvidersImpl(inMessage)));
         }

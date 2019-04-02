@@ -47,7 +47,6 @@ import org.apache.cxf.jaxrs.fortest.GenericEntityImpl4;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.Chapter;
@@ -108,18 +107,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(2);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -185,18 +173,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(3);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -233,18 +210,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(3);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -317,18 +283,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(2);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -482,18 +437,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(2);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -553,18 +497,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(3);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
         return m;
     }
@@ -582,18 +515,7 @@ public class SelectMethodCandidatesTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m);
         m.setExchange(ex);
-        Endpoint e = EasyMock.createMock(Endpoint.class);
-        e.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        e.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        e.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        e.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).times(3);
-        e.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        EasyMock.replay(e);
+        Endpoint e = mockEndpoint();
         ex.put(Endpoint.class, e);
 
         MetadataMap<String, String> values = new MetadataMap<>();
@@ -818,7 +740,6 @@ public class SelectMethodCandidatesTest {
         return createMessage(false);
     }
     private Message createMessage(boolean setKeepSubProp) {
-        ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
         if (setKeepSubProp) {
@@ -827,18 +748,7 @@ public class SelectMethodCandidatesTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
-        Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
-        EasyMock.replay(endpoint);
+        Endpoint endpoint = mockEndpoint();
         e.put(Endpoint.class, endpoint);
         return m;
     }
@@ -881,6 +791,19 @@ public class SelectMethodCandidatesTest {
 
         return null;
     }
+
+    private static Endpoint mockEndpoint() {
+        Endpoint e = EasyMock.mock(Endpoint.class);
+        EasyMock.expect(e.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(e.size()).andReturn(0).anyTimes();
+        EasyMock.expect(e.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(e.get(ServerProviderFactory.class.getName())).andReturn(ServerProviderFactory.getInstance())
+                .times(3);
+        EasyMock.expect(e.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
+        EasyMock.replay(e);
+        return e;
+    }
+
     @Path("{a}")
     @Produces("text/xml")
     @Consumes("text/xml")

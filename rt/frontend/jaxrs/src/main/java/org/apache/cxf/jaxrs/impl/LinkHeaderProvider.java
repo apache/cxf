@@ -85,7 +85,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
 
     }
 
-    private String removeQuotesIfNeeded(String value) {
+    private static String removeQuotesIfNeeded(String value) {
         if (value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
             return value.substring(1, value.length() - 1);
         }

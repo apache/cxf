@@ -82,14 +82,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private static final String SINGLE_PART_IS_COLLECTION = "single.multipart.is.collection";
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MultipartProvider.class);
-    private static final Set<Class<?>> WELL_KNOWN_MULTIPART_CLASSES;
-    private static final Set<String> MULTIPART_SUBTYPES;
+    private static final Set<Class<?>> WELL_KNOWN_MULTIPART_CLASSES = new HashSet<>();
+    private static final Set<String> MULTIPART_SUBTYPES = new HashSet<>();
     static {
-        WELL_KNOWN_MULTIPART_CLASSES = new HashSet<>();
         WELL_KNOWN_MULTIPART_CLASSES.add(MultipartBody.class);
         WELL_KNOWN_MULTIPART_CLASSES.add(Attachment.class);
 
-        MULTIPART_SUBTYPES = new HashSet<>();
         MULTIPART_SUBTYPES.add("form-data");
         MULTIPART_SUBTYPES.add("mixed");
         MULTIPART_SUBTYPES.add("related");
@@ -120,12 +118,11 @@ public class MultipartProvider extends AbstractConfigurableProvider
 
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                               MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, annotations, mt);
 
     }
 
-    private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns,
-                                MediaType mt) {
+    private boolean isSupported(Class<?> type, Annotation[] anns, MediaType mt) {
         return mediaTypeSupported(mt)
             && (WELL_KNOWN_MULTIPART_CLASSES.contains(type)
                 || Collection.class.isAssignableFrom(type)
@@ -253,7 +250,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, annotations, mt);
     }
 
 
@@ -362,7 +359,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             source.setContentType(mimeType);
             dh = new DataHandler(source);
         } else {
-            dh = getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
+            dh = getHandlerForObject(obj, cls, genericType, anns, mimeType);
         }
         String contentId = getContentId(anns, id);
         MultivaluedMap<String, String> headers = new MetadataMap<>();
@@ -382,7 +379,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
     private <T> DataHandler getHandlerForObject(T obj,
                                             Class<T> cls, Type genericType,
                                             Annotation[] anns,
-                                            String mimeType, int id) {
+                                            String mimeType) {
         MediaType mt = JAXRSUtils.toMediaType(mimeType);
         mc.put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
 
@@ -409,7 +406,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
                                             String mimeType, int id) {
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>)obj.getClass();
-        return getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
+        return getHandlerForObject(obj, cls, genericType, anns, mimeType);
     }
 
     private DataHandler createInputStreamDH(InputStream is, String mimeType) {

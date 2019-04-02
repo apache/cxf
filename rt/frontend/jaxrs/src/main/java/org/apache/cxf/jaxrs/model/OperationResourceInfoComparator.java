@@ -77,7 +77,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         String e1HttpMethod = e1.getHttpMethod();
         String e2HttpMethod = e2.getHttpMethod();
 
-        int result = 0;
+        int result;
         if (!getMethod && HttpMethod.HEAD.equals(httpMethod)) {
             result = compareWithHead(e1HttpMethod, e2HttpMethod);
             if (result != 0) {

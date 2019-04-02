@@ -94,7 +94,7 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
 
     public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, mt);
     }
 
     public T readFrom(
@@ -203,11 +203,10 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, mt);
     }
 
-    private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations,
-                                MediaType mt) {
+    private static boolean isSupported(Class<?> type, MediaType mt) {
         return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type))
             || (mt.getType().equalsIgnoreCase("multipart")
             && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)

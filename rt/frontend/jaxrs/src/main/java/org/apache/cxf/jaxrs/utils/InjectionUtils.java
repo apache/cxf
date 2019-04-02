@@ -578,7 +578,7 @@ public final class InjectionUtils {
         Exception factoryMethodEx = null;
         for (String mName : methodNames) {
             try {
-                result = evaluateFactoryMethod(value, cls, pType, mName);
+                result = evaluateFactoryMethod(value, cls, mName);
                 if (result != null) {
                     factoryMethodEx = null;
                     break;
@@ -604,7 +604,6 @@ public final class InjectionUtils {
 
     private static <T> T evaluateFactoryMethod(String value,
                                                Class<T> pClass,
-                                               ParameterType pType,
                                                String methodName)
         throws InvocationTargetException {
         try {
@@ -728,9 +727,9 @@ public final class InjectionUtils {
                             paramValue = InjectionUtils.mergeCollectionsOrArrays(paramValue, appendValue,
                                                             genericType);
                         } else if (isSupportedMap(genericType)) {
-                            Object appendValue = InjectionUtils.injectIntoMap(
-                                type, genericType, paramAnns, processedValues, true, pType, message);
-                            paramValue = InjectionUtils.mergeMap(paramValue, appendValue, genericType);
+                            Object appendValue = injectIntoMap(
+                                genericType, paramAnns, processedValues, true, pType, message);
+                            paramValue = mergeMap(paramValue, appendValue);
 
                         } else if (isbean) {
                             paramValue = InjectionUtils.handleBean(type, paramAnns, processedValues,
@@ -757,7 +756,7 @@ public final class InjectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object mergeMap(Object first, Object second, Type genericType) {
+    private static Object mergeMap(Object first, Object second) {
         if (first == null) {
             return second;
         } else if (first instanceof Map) {
@@ -768,7 +767,7 @@ public final class InjectionUtils {
     }
 
     // CHECKSTYLE:OFF
-    private static Object injectIntoMap(Class<?> rawType, Type genericType,
+    private static Object injectIntoMap(Type genericType,
                                         Annotation[] paramAnns,
                                         MultivaluedMap<String, String> processedValues,
                                         boolean decoded,

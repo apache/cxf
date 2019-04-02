@@ -138,14 +138,13 @@ public class OperationResourceInfoTest {
     }
 
 
-    private Message createMessage() {
+    private static Message createMessage() {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.get("org.apache.cxf.jaxrs.comparator");
-        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.expect(endpoint.get("org.apache.cxf.jaxrs.comparator")).andReturn(null);
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;

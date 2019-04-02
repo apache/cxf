@@ -474,8 +474,7 @@ public class ProviderFactoryTest {
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory);
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory);
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         assertSame(ProviderFactory.getInstance(m), factory);

@@ -20,12 +20,14 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Link;
@@ -131,16 +133,11 @@ public class ResponseImplTest {
         e.setInMessage(m);
         e.setOutMessage(new MessageImpl());
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
-        endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        endpoint.get(Application.class.getName());
-        EasyMock.expectLastCall().andReturn(null);
-        endpoint.size();
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        endpoint.isEmpty();
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        endpoint.get(ServerProviderFactory.class.getName());
-        EasyMock.expectLastCall().andReturn(factory).anyTimes();
+        EasyMock.expect(endpoint.getEndpointInfo()).andReturn(null).anyTimes();
+        EasyMock.expect(endpoint.get(Application.class.getName())).andReturn(null);
+        EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        EasyMock.expect(endpoint.get(ServerProviderFactory.class.getName())).andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);
         e.put(Endpoint.class, endpoint);
         return m;
@@ -330,7 +327,7 @@ public class ResponseImplTest {
         MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.ETAG, "1234");
         ri.addMetadata(meta);
-        assertEquals("\"1234\"", ri.getEntityTag().toString());
+        assertEquals(EntityTag.valueOf("\"1234\""), ri.getEntityTag());
     }
 
     @Test
@@ -339,7 +336,7 @@ public class ResponseImplTest {
         MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.LOCATION, "http://localhost:8080");
         ri.addMetadata(meta);
-        assertEquals("http://localhost:8080", ri.getLocation().toString());
+        assertEquals(URI.create("http://localhost:8080"), ri.getLocation());
     }
 
     @Test
@@ -348,16 +345,16 @@ public class ResponseImplTest {
         MetadataMap<String, Object> meta = new MetadataMap<>();
         meta.add(HttpHeaders.CONTENT_LANGUAGE, "en-US");
         ri.addMetadata(meta);
-        assertEquals("en_US", ri.getLanguage().toString());
+        assertEquals(Locale.US, ri.getLanguage());
     }
 
     @Test
     public void testGetMediaType() {
         ResponseImpl ri = new ResponseImpl(200);
         MetadataMap<String, Object> meta = new MetadataMap<>();
-        meta.add(HttpHeaders.CONTENT_TYPE, "text/xml");
+        meta.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_XML);
         ri.addMetadata(meta);
-        assertEquals("text/xml", ri.getMediaType().toString());
+        assertEquals(MediaType.TEXT_XML_TYPE, ri.getMediaType());
     }
 
     @Test
