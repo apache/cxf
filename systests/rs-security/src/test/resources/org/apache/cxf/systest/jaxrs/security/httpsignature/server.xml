@@ -114,7 +114,7 @@ under the License.
     
     <bean id="messageSigner" class="org.apache.cxf.rs.security.httpsignature.MessageSigner">
         <constructor-arg>
-            <bean class="org.apache.cxf.systest.jaxrs.security.httpsignature.PrivateKeyProvider" factory-method="loadPrivateKey" />
+            <bean class="org.apache.cxf.systest.jaxrs.security.httpsignature.PrivateKeyProviderTestHelper" />
         </constructor-arg>
         <constructor-arg value="bob-key-id" />
     </bean>
