@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 public class MessageSigner {
     private final String digestAlgorithmName;
-    private SignatureCreator signatureCreator;
+    private final SignatureCreator signatureCreator;
 
     public MessageSigner(String signatureAlgorithmName,
                          String digestAlgorithmName,
