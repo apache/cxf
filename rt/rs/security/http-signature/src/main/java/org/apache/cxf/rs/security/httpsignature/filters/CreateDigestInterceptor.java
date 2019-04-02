@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
@@ -36,15 +37,15 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
-public class ClientDigestInterceptor implements WriterInterceptor {
+public class CreateDigestInterceptor implements WriterInterceptor {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private final String digestAlgorithmName;
 
-    public ClientDigestInterceptor() {
+    public CreateDigestInterceptor() {
         this(MessageDigestInputStream.ALGO_SHA_256);
     }
 
-    public ClientDigestInterceptor(String digestAlgorithmName) {
+    public CreateDigestInterceptor(String digestAlgorithmName) {
         this.digestAlgorithmName = digestAlgorithmName;
     }
 
@@ -54,9 +55,11 @@ public class ClientDigestInterceptor implements WriterInterceptor {
         if (context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase)
             && context.getOutputStream() instanceof CacheAndWriteOutputStream) {
             CacheAndWriteOutputStream cacheAndWriteOutputStream = (CacheAndWriteOutputStream) context.getOutputStream();
+            String encoding = context.getMediaType().getParameters()
+                .getOrDefault(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.toString());
             // not so nice - would be better to have a stream
             String digest = SignatureHeaderUtils.createDigestHeader(
-                new String(cacheAndWriteOutputStream.getBytes(), StandardCharsets.UTF_8), digestAlgorithmName);
+                new String(cacheAndWriteOutputStream.getBytes(), encoding), digestAlgorithmName);
             context.getHeaders().add(DIGEST_HEADER_NAME, digest);
         }
     }
