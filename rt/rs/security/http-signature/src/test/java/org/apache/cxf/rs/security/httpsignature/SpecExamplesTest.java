@@ -39,6 +39,7 @@ import java.util.Map;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockPublicKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,7 +51,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class SpecExamplesTest {
 
-    private static PrivateKey privateKey;
+    private static PrivateKeyProvider privateKeyProvider;
     private static PublicKey publicKey;
 
     @BeforeClass
@@ -67,7 +68,8 @@ public class SpecExamplesTest {
             byte[] keyBytes = Files.readAllBytes(privateKeyPath);
 
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(keyBytes);
-            privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
+            privateKeyProvider = keyId -> privateKey;
 
             Path publicKeyPath = FileSystems.getDefault().getPath(basedir, "/src/test/resources/public_key.der");
             byte[] publicKeyBytes = Files.readAllBytes(publicKeyPath);
@@ -84,7 +86,7 @@ public class SpecExamplesTest {
     public void defaultTest() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "Test", Collections.singletonList("Date"));
+        MessageSigner messageSigner = new MessageSigner(privateKeyProvider, "Test", Collections.singletonList("Date"));
         messageSigner.sign(headers, "/foo?param=value&pet=dog", "POST");
         String signatureHeader = headers.get("Signature").get(0);
 
@@ -108,7 +110,7 @@ public class SpecExamplesTest {
     public void basicTest() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "Test",
+        MessageSigner messageSigner = new MessageSigner(privateKeyProvider, "Test",
                                                         Arrays.asList("(request-target)", "host", "Date"));
         messageSigner.sign(headers, "/foo?param=value&pet=dog", "POST");
         String signatureHeader = headers.get("Signature").get(0);
@@ -131,9 +133,9 @@ public class SpecExamplesTest {
     public void allHeadersTest() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
 
-        MessageSigner messageSigner = new MessageSigner(privateKey, "Test",
-                                                        Arrays.asList("(request-target)", "host", "date",
-                                                                      "content-type", "digest", "content-length"));
+        MessageSigner messageSigner = new MessageSigner(privateKeyProvider, "Test",
+            Arrays.asList("(request-target)", "host", "date",
+                "content-type", "digest", "content-length"));
         messageSigner.sign(headers, "/foo?param=value&pet=dog", "POST");
         String signatureHeader = headers.get("Signature").get(0);
 

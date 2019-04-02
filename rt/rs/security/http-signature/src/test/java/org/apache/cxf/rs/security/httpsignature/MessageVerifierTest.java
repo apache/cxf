@@ -64,7 +64,7 @@ public class MessageVerifierTest {
             messageVerifier.setSecurityProvider(new MockSecurityProvider());
             messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
 
-            messageSigner = new MessageSigner(keyPair.getPrivate(), KEY_ID);
+            messageSigner = new MessageSigner(keyId -> keyPair.getPrivate(), KEY_ID);
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

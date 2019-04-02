@@ -28,13 +28,14 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
 
 /**
  * Just a test-class to provide a static method to easily load a PrivateKey in spring config.
  */
-public final class PrivateKeyProvider {
+public final class PrivateKeyProviderTestHelper implements PrivateKeyProvider {
 
-    private PrivateKeyProvider() {
+    private PrivateKeyProviderTestHelper() {
         // complete
     }
 
@@ -42,7 +43,7 @@ public final class PrivateKeyProvider {
         KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", PrivateKeyProvider.class),
+            keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", PrivateKeyProviderTestHelper.class),
                           "password".toCharArray());
             return (PrivateKey)keyStore.getKey("bob", "password".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException
@@ -50,5 +51,10 @@ public final class PrivateKeyProvider {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public PrivateKey getKey(String keyId) {
+        return loadPrivateKey();
     }
 }
