@@ -38,6 +38,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -99,17 +100,18 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType utPort =
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, test.getPort());
+        updateAddressPort(port, test.getPort());
 
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(utPort);
+            SecurityTestUtil.enableStreaming(port);
         }
 
-        utPort.doubleIt(25);
+        int result = port.doubleIt(25);
+        assertEquals(50, result);
 
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 
@@ -129,22 +131,22 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItNoSecurityPort");
-        DoubleItPortType utPort =
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, test.getPort());
+        updateAddressPort(port, test.getPort());
 
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(utPort);
+            SecurityTestUtil.enableStreaming(port);
         }
 
         try {
-            utPort.doubleIt(25);
+            port.doubleIt(25);
             fail("Failure expected on no Security");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
 
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 
@@ -164,17 +166,18 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
-        DoubleItPortType utPort =
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, test.getPort());
+        updateAddressPort(port, test.getPort());
 
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(utPort);
+            SecurityTestUtil.enableStreaming(port);
         }
 
-        utPort.doubleIt(25);
+        int result = port.doubleIt(25);
+        assertEquals(50, result);
 
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 
@@ -195,16 +198,16 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItClientCertPort");
-        DoubleItPortType utPort =
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, PORT2);
+        updateAddressPort(port, PORT2);
 
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(utPort);
+            SecurityTestUtil.enableStreaming(port);
         }
 
         try {
-            utPort.doubleIt(25);
+            port.doubleIt(25);
             fail("Failure expected because no client certificate");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             if (!test.isStreaming()) {
@@ -212,7 +215,7 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
             }
         }
 
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 
@@ -305,17 +308,17 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType utPort =
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
-        updateAddressPort(utPort, test.getPort());
+        updateAddressPort(port, test.getPort());
 
         if (test.isStreaming()) {
-            SecurityTestUtil.enableStreaming(utPort);
+            SecurityTestUtil.enableStreaming(port);
         }
 
-        utPort.doubleIt(25);
+        assertEquals(50, port.doubleIt(25));
 
-        ((java.io.Closeable)utPort).close();
+        ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 }

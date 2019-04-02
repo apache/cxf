@@ -213,7 +213,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
             Headers h = new Headers(outMessage);
             entity.setContentType(h.determineContentType());
             //REVISIT may provide an option to add other headers
-//          boolean addHeaders = MessageUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
+//          boolean addHeaders = PropertyUtils.isTrue(outMessage.getContextualProperty(Headers.ADD_HEADERS_PROPERTY));
         }
 
         @Override

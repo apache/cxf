@@ -31,9 +31,11 @@ import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItSwaPortType;
 import org.example.schema.doubleit.DoubleIt3;
+import org.example.schema.doubleit.DoubleItResponse;
 
 import org.junit.BeforeClass;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -80,7 +82,8 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -105,7 +108,8 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -130,7 +134,8 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -155,7 +160,8 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
@@ -180,7 +186,8 @@ public class SWAActionTest extends AbstractBusClientServerTestBase {
 
         DoubleIt3 doubleIt = new DoubleIt3();
         doubleIt.setNumberToDouble(25);
-        port.doubleIt3(doubleIt, "12345".getBytes());
+        DoubleItResponse response = port.doubleIt3(doubleIt, "12345".getBytes());
+        assertEquals(50, response.getDoubledNumber());
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

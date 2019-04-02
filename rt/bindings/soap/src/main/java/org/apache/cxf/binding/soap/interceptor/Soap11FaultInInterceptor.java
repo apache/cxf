@@ -79,7 +79,7 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
                                 e,
                                 message.getVersion().getSender());
         }
-        // if the fault's content is invalid and fautlCode is not found, blame the receiver
+        // if the fault's content is invalid and faultCode is not found, blame the receiver
         if (faultCode == null) {
             faultCode = Soap11.getInstance().getReceiver();
             exMessage = new Message("INVALID_FAULT", LOG).toString();
