@@ -111,12 +111,16 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
             }
 
             for (Header h : p.getHeaders()) {
-                try {
-                    CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
-                            h.getNamespace(), h.getName(), coverageType,
-                            CoverageScope.ELEMENT);
-                } catch (WSSecurityException e) {
+                if (header == null) {
                     ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + coverageType);
+                } else {
+                    try {
+                        CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
+                                h.getNamespace(), h.getName(), coverageType,
+                                CoverageScope.ELEMENT);
+                    } catch (WSSecurityException e) {
+                        ai.setNotAsserted(h.getNamespace() + ":" + h.getName() + " not + " + coverageType);
+                    }
                 }
             }
 

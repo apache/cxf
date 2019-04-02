@@ -107,7 +107,8 @@ public class SamlTokenPolicyValidator extends AbstractSamlPolicyValidator {
                         ai.setNotAsserted("Assertion fails holder-of-key requirements");
                         continue;
                     }
-                    if (!DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
+                    if (parameters.getSoapBody() == null
+                        || !DOMSAMLUtil.checkSenderVouches(assertionWrapper, tlsCerts, parameters.getSoapBody(),
                                                         parameters.getSignedResults())) {
                         ai.setNotAsserted("Assertion fails sender-vouches requirements");
                         continue;

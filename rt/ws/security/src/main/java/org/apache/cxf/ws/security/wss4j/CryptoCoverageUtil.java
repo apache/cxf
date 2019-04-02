@@ -360,6 +360,9 @@ public final class CryptoCoverageUtil {
     }
 
     private static boolean matchElement(Collection<WSDataRef> refs, CoverageScope scope, Element el) {
+        if (el == null) {
+            return false;
+        }
         final boolean content;
 
         switch (scope) {

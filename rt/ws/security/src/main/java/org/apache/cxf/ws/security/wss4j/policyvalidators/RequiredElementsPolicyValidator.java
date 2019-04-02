@@ -80,15 +80,19 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
                     NodeList list;
                     Element header = parameters.getSoapHeader();
                     header = (Element)DOMUtils.getDomElement(header);
-                    try {
-                        list = (NodeList)xpath.evaluate(expression,
-                                                                 header,
-                                                                 XPathConstants.NODESET);
-                        if (list.getLength() == 0) {
-                            ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                    if (header == null) {
+                        ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                    } else {
+                        try {
+                            list = (NodeList)xpath.evaluate(expression,
+                                                                     header,
+                                                                     XPathConstants.NODESET);
+                            if (list.getLength() == 0) {
+                                ai.setNotAsserted("No header element matching XPath " + expression + " found.");
+                            }
+                        } catch (XPathExpressionException e) {
+                            ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
                         }
-                    } catch (XPathExpressionException e) {
-                        ai.setNotAsserted("Invalid XPath expression " + expression + " " + e.getMessage());
                     }
                 }
             }
