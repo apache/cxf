@@ -333,26 +333,26 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         return getQuery("RefreshToken", c, resourceOwnerSubject, entityManager, RefreshToken.class);
     }
 
-    private <T> TypedQuery<T> getQuery(String table, Client c, UserSubject resourceOwnerSubject,
+    private static <T> TypedQuery<T> getQuery(String table, Client c, UserSubject resourceOwnerSubject,
             EntityManager entityManager, Class<T> resultClass) {
         StringBuilder query = new StringBuilder("SELECT t FROM ").append(table).append(" t");
-        Map<String, Object> paramaterMap = new HashMap<>();
+        Map<String, Object> parameterMap = new HashMap<>();
         if (c != null || resourceOwnerSubject != null) {
             query.append(" WHERE");
             if (c != null) {
                 query.append(" t.client.clientId = :clientId");
-                paramaterMap.put("clientId", c.getClientId());
+                parameterMap.put("clientId", c.getClientId());
             }
             if (resourceOwnerSubject != null) {
-                if (!paramaterMap.isEmpty()) {
+                if (!parameterMap.isEmpty()) {
                     query.append(" AND");
                 }
                 query.append(" t.subject.login = :login");
-                paramaterMap.put("login", resourceOwnerSubject.getLogin());
+                parameterMap.put("login", resourceOwnerSubject.getLogin());
             }
         }
         TypedQuery<T> typedQuery = entityManager.createQuery(query.toString(), resultClass);
-        for (Map.Entry<String, Object> entry : paramaterMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : parameterMap.entrySet()) {
             typedQuery.setParameter(entry.getKey(), entry.getValue());
         }
         return typedQuery;
