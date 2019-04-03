@@ -344,10 +344,6 @@ public final class JweUtils {
     }
     public static JweDecryption getEcDirectKeyJweDecryption(JsonWebKey key, ContentAlgorithm ctAlgo) {
         if (AlgorithmUtils.isEcdhEsDirect(key.getAlgorithm())) {
-            String curve = key.getStringProperty(JsonWebKey.EC_CURVE);
-            if (curve == null) {
-                curve = JsonWebKey.EC_CURVE_P256;
-            }
             ECPrivateKey ecKey = JwkUtils.toECPrivateKey(key);
             return new EcdhDirectKeyJweDecryption(ecKey, ctAlgo);
         }

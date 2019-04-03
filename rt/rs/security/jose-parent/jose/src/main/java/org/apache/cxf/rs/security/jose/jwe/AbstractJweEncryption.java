@@ -217,7 +217,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
             state.theIv = theIv;
             state.theHeaders = theHeaders;
             state.protectedHeadersJson = protectedHeadersJson;
-            state.aad = jweInput != null ? jweInput.getAad() : null;
+            state.aad = jweInput.getAad();
             state.secretKey = theCek;
         }
 
