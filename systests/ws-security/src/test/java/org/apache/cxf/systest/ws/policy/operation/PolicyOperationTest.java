@@ -103,7 +103,7 @@ public class PolicyOperationTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType2.class);
         updateAddressPort(port, PORT);
 
-        assertEquals(50, port.doubleIt(25));
+        assertEquals(50, port.doubleIt2(25));
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);

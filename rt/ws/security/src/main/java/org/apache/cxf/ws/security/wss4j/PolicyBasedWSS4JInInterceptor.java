@@ -21,17 +21,24 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
@@ -44,6 +51,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParamete
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.ValidatorUtils;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -53,6 +61,7 @@ import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.Timestamp;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 import org.apache.wss4j.policy.SP13Constants;
 import org.apache.wss4j.policy.SPConstants;
@@ -65,6 +74,9 @@ import org.apache.wss4j.policy.model.Wss11;
  *
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(PolicyBasedWSS4JInInterceptor.class);
+
     /**
      *
      */
@@ -76,9 +88,71 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         boolean enableStax =
             MessageUtils.getContextualBoolean(msg, SecurityConstants.ENABLE_STREAMING_SECURITY);
-        if (aim != null && !enableStax) {
+        if (aim != null && !enableStax && !msg.containsKey(SECURITY_PROCESSED)
+            && !isGET(msg) && msg.getExchange() != null) {
+            try {
+                // First check to see if we have a security header before we apply the SAAJInInterceptor
+                // If there is no security header then we can just assert the policies and proceed
+                String actor = (String)getOption(ConfigurationConstants.ACTOR);
+                if (actor == null) {
+                    actor = (String)msg.getContextualProperty(SecurityConstants.ACTOR);
+                }
+                if (!containsSecurityHeader(msg, actor, msg.getVersion().getVersion() != 1.1)) {
+                    LOG.fine("The request contains no security header, so the SAAJInInterceptor is not applied");
+                    computeAction(msg, new RequestData());
+
+                    boolean utWithCallbacks =
+                        MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
+                    doResults(msg, actor,
+                              null,
+                              null,
+                              new WSHandlerResult(actor, Collections.emptyList(), Collections.emptyMap()),
+                              utWithCallbacks);
+                    msg.put(SECURITY_PROCESSED, Boolean.TRUE);
+                    return;
+                }
+            } catch (WSSecurityException e) {
+                throw WSS4JUtils.createSoapFault(msg, msg.getVersion(), e);
+            } catch (XMLStreamException e) {
+                throw new SoapFault(new Message("STAX_EX", LOG), e, msg.getVersion().getSender());
+            } catch (SOAPException e) {
+                throw new SoapFault(new Message("SAAJ_EX", LOG), e, msg.getVersion().getSender());
+            }
+
+
             super.handleMessage(msg);
         }
+    }
+
+    private boolean containsSecurityHeader(SoapMessage message, String actor, boolean soap12)
+        throws WSSecurityException {
+        String actorLocal = WSConstants.ATTR_ACTOR;
+        String soapNamespace = WSConstants.URI_SOAP11_ENV;
+        if (soap12) {
+            actorLocal = WSConstants.ATTR_ROLE;
+            soapNamespace = WSConstants.URI_SOAP12_ENV;
+        }
+
+        //
+        // Iterate through the security headers
+        //
+        for (Header h : message.getHeaders()) {
+            QName n = h.getName();
+            if (WSConstants.WSSE_LN.equals(n.getLocalPart())
+                && (n.getNamespaceURI().equals(WSS4JConstants.WSSE_NS)
+                    || n.getNamespaceURI().equals(WSS4JConstants.OLD_WSSE_NS))) {
+
+                Element elem = (Element)h.getObject();
+                Attr attr = elem.getAttributeNodeNS(soapNamespace, actorLocal);
+                String hActor = (attr != null) ? attr.getValue() : null;
+
+                if (WSSecurityUtil.isActorEqual(actor, hActor)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void handleWSS11(AssertionInfoMap aim, SoapMessage message) {
@@ -383,6 +457,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
     }
 
+    @Override
     protected void computeAction(SoapMessage message, RequestData data) throws WSSecurityException {
         String action = getString(ConfigurationConstants.ACTION, message);
         if (action == null) {

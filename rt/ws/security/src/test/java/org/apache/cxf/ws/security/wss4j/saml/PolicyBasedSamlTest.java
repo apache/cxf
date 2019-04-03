@@ -22,14 +22,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.w3c.dom.Document;
+import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.AbstractPolicySecurityTest;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.validate.SamlAssertionValidator;
 import org.apache.wss4j.policy.SP12Constants;
 
@@ -114,6 +119,14 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
             this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
+
+        Element securityHeaderElem = WSSecurityUtil.getSecurityHeader(document, "");
+        if (securityHeaderElem != null) {
+            SoapHeader securityHeader = new SoapHeader(new QName(securityHeaderElem.getNamespaceURI(),
+                                                                 securityHeaderElem.getLocalName()),
+                                                       securityHeaderElem);
+            inmsg.getHeaders().add(securityHeader);
+        }
 
         // Necessary because the Bearer Assertion does not have an internal signature
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();

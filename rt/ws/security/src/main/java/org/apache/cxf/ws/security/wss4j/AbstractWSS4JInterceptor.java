@@ -99,6 +99,10 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     }
 
     public Object getProperty(Object msgContext, String key) {
+        if (msgContext == null) {
+            return null;
+        }
+
         Object obj = SecurityUtils.getSecurityPropertyValue(key, (Message)msgContext);
         if (obj == null) {
             obj = getOption(key);

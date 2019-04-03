@@ -27,7 +27,9 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -37,6 +39,7 @@ import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.PolicyValidatorParameters;
 import org.apache.cxf.ws.security.wss4j.policyvalidators.SecurityPolicyValidator;
 import org.apache.neethi.Policy;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 
 import org.junit.Test;
@@ -132,6 +135,14 @@ public class PluggablePolicyValidatorTest extends AbstractPolicySecurityTest {
         PolicyBasedWSS4JInInterceptor inHandler = this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
+
+        Element securityHeaderElem = WSSecurityUtil.getSecurityHeader(document, "");
+        if (securityHeaderElem != null) {
+            SoapHeader securityHeader = new SoapHeader(new QName(securityHeaderElem.getNamespaceURI(),
+                                                                 securityHeaderElem.getLocalName()),
+                                                       securityHeaderElem);
+            inmsg.getHeaders().add(securityHeader);
+        }
 
         if (validators != null) {
             inmsg.put(SecurityConstants.POLICY_VALIDATOR_MAP, validators);

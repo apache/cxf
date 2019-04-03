@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,8 +37,10 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
 import org.apache.cxf.helpers.DOMUtils.NullResolver;
@@ -48,6 +51,7 @@ import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.wss4j.common.WSS4JConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 
 public abstract class AbstractSecurityTest extends AbstractCXFTest {
@@ -152,6 +156,10 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
+        Element securityHeaderElem = WSSecurityUtil.getSecurityHeader(doc, "");
+        SoapHeader securityHeader = new SoapHeader(new QName(securityHeaderElem.getNamespaceURI(),
+                                                             securityHeaderElem.getLocalName()), securityHeaderElem);
+        inmsg.getHeaders().add(securityHeader);
 
         inHandler.handleMessage(inmsg);
 

@@ -43,6 +43,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.Feature;
@@ -76,6 +77,7 @@ import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.policy.SP12Constants;
 
 import static org.junit.Assert.assertEquals;
@@ -262,6 +264,14 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
+
+        Element securityHeaderElem = WSSecurityUtil.getSecurityHeader(document, "");
+        if (securityHeaderElem != null) {
+            SoapHeader securityHeader = new SoapHeader(new QName(securityHeaderElem.getNamespaceURI(),
+                                                                 securityHeaderElem.getLocalName()),
+                                                       securityHeaderElem);
+            inmsg.getHeaders().add(securityHeader);
+        }
 
         inHandler.handleMessage(inmsg);
 
