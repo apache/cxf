@@ -62,5 +62,7 @@ public class CreateDigestInterceptor implements WriterInterceptor {
                 new String(cacheAndWriteOutputStream.getBytes(), encoding), digestAlgorithmName);
             context.getHeaders().add(DIGEST_HEADER_NAME, digest);
         }
+
+        context.proceed();
     }
 }
