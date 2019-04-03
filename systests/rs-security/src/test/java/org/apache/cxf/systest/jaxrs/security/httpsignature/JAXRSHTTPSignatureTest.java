@@ -74,6 +74,26 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        //CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            // WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+            WebClient.create(address, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
     public void testHttpSignature() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");

@@ -34,6 +34,12 @@ under the License.
     </cxf:bus>
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/digest">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+
     <bean id="publicKeyProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomPublicKeyProvider"/>
     
     <bean id="messageVerifier" class="org.apache.cxf.rs.security.httpsignature.MessageVerifier">
