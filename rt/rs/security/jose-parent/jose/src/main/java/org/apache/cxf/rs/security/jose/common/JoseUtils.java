@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -77,12 +78,7 @@ public final class JoseUtils {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         Object requestContext = message.get(JoseConstants.JOSE_CONTEXT_PROPERTY);
         Object headerContext = headers.getHeader(JoseConstants.JOSE_CONTEXT_PROPERTY);
-        if (requestContext == null && headerContext == null) {
-            return;
-        }
-        if (requestContext == null && headerContext != null
-            || requestContext != null && headerContext == null
-            || !requestContext.equals(headerContext)) {
+        if (!Objects.equals(requestContext, headerContext)) {
             LOG.warning("Invalid JOSE context property");
             throw new JoseException();
         }

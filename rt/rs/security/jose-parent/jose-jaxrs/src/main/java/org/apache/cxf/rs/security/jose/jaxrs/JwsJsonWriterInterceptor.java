@@ -93,7 +93,7 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
                 ctx.setOutputStream(jwsStream);
             }
             ctx.proceed();
-            if (encodePayload) {
+            if (base64Stream != null) {
                 base64Stream.flush();
             }
             jwsStream.flush();

@@ -60,12 +60,12 @@ public class JweJsonConsumer {
         return decryptWith(jwe, entry);
     }
     public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe, JweJsonEncryptionEntry entry) {
-        JweDecryptionInput jweDecryptionInput = getJweDecryptionInput(jwe, entry);
+        JweDecryptionInput jweDecryptionInput = getJweDecryptionInput(entry);
         byte[] content = jwe.decrypt(jweDecryptionInput);
         return new JweDecryptionOutput(jweDecryptionInput.getJweHeaders(), content);
     }
 
-    private JweDecryptionInput getJweDecryptionInput(JweDecryptionProvider jwe, JweJsonEncryptionEntry entry) {
+    private JweDecryptionInput getJweDecryptionInput(JweJsonEncryptionEntry entry) {
         if (entry == null) {
             LOG.warning("JWE JSON Entry is not available");
             throw new JweException(JweException.Error.INVALID_JSON_JWE);
