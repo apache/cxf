@@ -143,13 +143,13 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
         if (c == null && resourceOwnerSubject == null) {
             return em.createQuery("SELECT c FROM ServerAuthorizationCodeGrant c",
                     ServerAuthorizationCodeGrant.class);
-        } else if (c == null) {
+        } else if (c == null && resourceOwnerSubject != null) {
             return em.createQuery(
                     "SELECT c FROM ServerAuthorizationCodeGrant"
                             + " c JOIN c.subject s"
                             + " WHERE s.login = :login", ServerAuthorizationCodeGrant.class)
                     .setParameter("login", resourceOwnerSubject.getLogin());
-        } else if (resourceOwnerSubject == null) {
+        } else if (c != null && resourceOwnerSubject == null) {
             return em.createQuery(
                     "SELECT code FROM ServerAuthorizationCodeGrant code"
                             + " JOIN code.client c"
