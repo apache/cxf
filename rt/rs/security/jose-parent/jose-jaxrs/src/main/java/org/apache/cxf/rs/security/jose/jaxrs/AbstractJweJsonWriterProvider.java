@@ -148,7 +148,7 @@ public class AbstractJweJsonWriterProvider {
         } else {
             ContentEncryptionProvider ctProvider = JweUtils.getContentEncryptionProvider(ctAlgo, true);
             for (int i = 0; i < keyProviders.size(); i++) {
-                JweEncryptionProvider encProvider = new JweEncryption(keyProviders.get(0), ctProvider);
+                JweEncryptionProvider encProvider = new JweEncryption(keyProviders.get(i), ctProvider);
                 theEncProviders.add(encProvider);
             }
         }
