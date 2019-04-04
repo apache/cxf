@@ -21,7 +21,10 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.function.Function;
 
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.springframework.aop.AfterReturningAdvice;
@@ -34,13 +37,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
 
-
-
 public class ClassHelperTest {
 
     private Object proxiedObject;
 
     private Object springAopObject;
+    
+    private Object cglibProxyObject;
 
     private InvocationHandler realObjectInternalProxy;
 
@@ -49,6 +52,8 @@ public class ClassHelperTest {
     private Bus bus;
 
     private Bus currentThreadBus;
+    
+    private Function<String, Integer> fn;
 
     @Before
     public void setUp() {
@@ -74,6 +79,16 @@ public class ClassHelperTest {
         });
 
         springAopObject = proxyFactory.getProxy();
+        
+        final Callback callback = new net.sf.cglib.proxy.InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+        };
+        cglibProxyObject = Enhancer.create(Object.class, new Class[] {Function.class}, callback);
+        
+        fn = Integer::parseInt;
 
         currentThreadBus = BusFactory.getThreadDefaultBus();
 
@@ -117,6 +132,7 @@ public class ClassHelperTest {
     public void getRealClassFromClassPropertyWasSetInBus() {
 
         EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
         EasyMock.replay(bus);
 
         assertSame(proxiedObject.getClass(), ClassHelper.getRealClassFromClass(proxiedObject.getClass()));
@@ -129,6 +145,7 @@ public class ClassHelperTest {
     public void getRealClassFromClassPropertyWasNotSetInBus() {
 
         EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(false);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
         EasyMock.replay(bus);
 
         assertSame(realObjectInternalSpring.getClass(), ClassHelper.getRealClassFromClass(springAopObject.getClass()));
@@ -142,6 +159,7 @@ public class ClassHelperTest {
     public void getRealObjectPropertyWasSetInBus() {
 
         EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
         EasyMock.replay(bus);
 
         assertSame(realObjectInternalProxy, ClassHelper.getRealObject(proxiedObject));
@@ -154,12 +172,78 @@ public class ClassHelperTest {
     public void getRealObjectPropertyWasNotSetInBus() {
 
         EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(false);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
         EasyMock.replay(bus);
 
         assertSame(realObjectInternalSpring, ClassHelper.getRealObject(springAopObject));
 
         EasyMock.verify(bus);
 
+    }
+
+    @Test
+    public void getRealLambdaClassPropertyWasNotSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(false);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(fn.getClass(), ClassHelper.getRealClass(fn));
+
+        EasyMock.verify(bus);
+    }
+    
+    public void getRealLambdaClassPropertyWasSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(fn.getClass(), ClassHelper.getRealClass(fn));
+
+        EasyMock.verify(bus);
+    }
+
+    @Test
+    public void getRealLambdaClassFromClassPropertyWasSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(fn.getClass(), ClassHelper.getRealClassFromClass(fn.getClass()));
+
+        EasyMock.verify(bus);
+    }
+
+    @Test
+    public void getRealLambdaClassFromClassPropertyWasNotSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(false);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(fn.getClass(), ClassHelper.getRealClassFromClass(fn.getClass()));
+
+        EasyMock.verify(bus);
+    }
+
+    @Test
+    public void getRealCglibClassFromClassPropertyWasNotSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(false);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(Object.class, ClassHelper.getRealClassFromClass(cglibProxyObject.getClass()));
+
+        EasyMock.verify(bus);
+    }
+
+    @Test
+    public void getRealCglibClassFromClassPropertyWasSetInBus() {
+        EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);
+        EasyMock.expect(bus.getProperty(ClassUnwrapper.class.getName())).andReturn(null);
+        EasyMock.replay(bus);
+
+        assertSame(cglibProxyObject.getClass(), ClassHelper.getRealClassFromClass(cglibProxyObject.getClass()));
+
+        EasyMock.verify(bus);
     }
 
     public interface AnyInterface {

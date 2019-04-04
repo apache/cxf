@@ -28,26 +28,34 @@ import org.springframework.util.ClassUtils;
 /**
  *
  */
-class SpringAopClassHelper extends ClassHelper {
-    SpringAopClassHelper() throws Exception {
+class SpringClassUnwrapper implements ClassUnwrapper {
+    SpringClassUnwrapper() throws Exception {
         Class.forName("org.springframework.aop.support.AopUtils");
         Class.forName("org.springframework.aop.framework.Advised");
     }
 
-    protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
+    @Override
+    public Class<?> getRealClassFromClass(Class<?> cls) {
         if (ClassUtils.isCglibProxyClass(cls)) {
-            return getRealClassFromClassInternal(cls.getSuperclass());
+            final Class<?> superclass = cls.getSuperclass();
+            // Lambda's generated class names also contain $$ which makes them trigger CGLIB
+            // proxy path. Adding more checks to handle this particular case.
+            if (superclass != null && (superclass != Object.class || wasCglibEnhanced(cls))) {
+                return getRealClassFromClass(superclass);
+            }
         }
         return cls;
     }
-    protected Object getRealObjectInternal(Object o) {
+
+    @Override
+    public Object getRealObject(Object o) {
         if (o instanceof Advised) {
             try {
 
                 Advised advised = (Advised)o;
                 Object target = advised.getTargetSource().getTarget();
                 //could be a proxy of a proxy.....
-                return getRealObjectInternal(target);
+                return getRealObject(target);
             } catch (Exception ex) {
                 // ignore
             }
@@ -55,7 +63,8 @@ class SpringAopClassHelper extends ClassHelper {
         return o;
     }
 
-    protected Class<?> getRealClassInternal(Object o) {
+    @Override
+    public Class<?> getRealClass(Object o) {
         if (AopUtils.isAopProxy(o) && (o instanceof Advised)) {
             Advised advised = (Advised)o;
             try {
@@ -68,25 +77,36 @@ class SpringAopClassHelper extends ClassHelper {
                 } catch (BeanCreationException ex) {
                     // some scopes such as 'request' may not
                     // be active on the current thread yet
-                    return getRealClassFromClassInternal(targetSource.getTargetClass());
+                    return getRealClassFromClass(targetSource.getTargetClass());
                 }
 
                 if (target == null) {
                     Class<?> targetClass = AopUtils.getTargetClass(o);
                     if (targetClass != null) {
-                        return getRealClassFromClassInternal(targetClass);
+                        return getRealClassFromClass(targetClass);
                     }
                 } else {
-                    return getRealClassInternal(target);
+                    return getRealClass(target);
                 }
             } catch (Exception ex) {
                 // ignore
             }
 
         } else if (ClassUtils.isCglibProxyClass(o.getClass())) {
-            return getRealClassFromClassInternal(AopUtils.getTargetClass(o));
+            return getRealClassFromClass(AopUtils.getTargetClass(o));
         }
+        
         return o.getClass();
     }
 
+    /**
+     * This additional check is not very reliable since CGLIB allows to
+     * supply own NamingPolicy implementations. However, it works with native
+     * CGLIB proxies ("byCGLIB$$") as well as Spring CGLIB proxies (by "BySpringCGLIB$$").
+     * More expensive approach is to use reflection and inspect the class declared methods, 
+     * looking for CGLIB-specific ones like CGLIB$BIND_CALLBACKS. 
+     */
+    private static boolean wasCglibEnhanced(Class<?> cls) {
+        return cls.getName().contains("CGLIB");
+    }
 }

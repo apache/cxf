@@ -42,6 +42,11 @@ class CdiClassUnwrapper implements ClassUnwrapper {
     @Override
     public Class<?> getRealClass(Object o) {
         Class<?> clazz = o.getClass();
+        return getRealClassFromClass(clazz);
+    }
+    
+    @Override
+    public Class<?> getRealClassFromClass(Class<?> clazz) {
         if (PROXY_PATTERN.matcher(clazz.getSimpleName()).matches()) {
             return clazz.getSuperclass();
         }

@@ -18,8 +18,29 @@
  */
 package org.apache.cxf.common.util;
 
-public interface ClassUnwrapper {
+import java.lang.reflect.Proxy;
 
+public interface ClassUnwrapper {
+    /**
+     * Return a real class for the instance, possibly a proxy.
+     * @param o instance to get real class for
+     * @return real class for the instance
+     */
     Class<?> getRealClass(Object o);
 
+    /**
+     * Return a real class for the class, possibly a proxy class.
+     * @param clazz class to get real class for
+     * @return real class for the class
+     */
+    Class<?> getRealClassFromClass(Class<?> clazz);
+    
+    /**
+     * Return a real class for the instance, possibly a proxy.
+     * @param o instance to get real class for
+     * @return real class for the instance
+     */
+    default Object getRealObject(Object o) {
+        return (o instanceof Proxy) ? Proxy.getInvocationHandler(o) : o;
+    }
 }

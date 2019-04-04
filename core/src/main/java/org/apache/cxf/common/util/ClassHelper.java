@@ -33,17 +33,47 @@ public class ClassHelper {
     public static final String USE_DEFAULT_CLASS_HELPER = "org.apache.cxf.useDefaultClassHelpers";
 
     static final ClassHelper HELPER;
-    static final ClassHelper DEFAULT_HELPER;
+    static final ClassUnwrapper DEFAULT_UNWRAPPER;
+    static final ClassUnwrapper UNWRAPPER;
+    
+    /**
+     * Default class unwrapper implementation which delegates to the ClassHelper
+     * internal methods.
+     *
+     */
+    private static class DefaultClassUnwrapper implements ClassUnwrapper {
+        private final ClassHelper helper;
+        
+        DefaultClassUnwrapper(ClassHelper helper) {
+            this.helper = helper;
+        }
+        
+        @Override
+        public Class<?> getRealClassFromClass(Class<?> clazz) {
+            return helper.getRealClassFromClassInternal(clazz);
+        }
+        
+        @Override
+        public Class<?> getRealClass(Object o) {
+            return helper.getRealClassInternal(o);
+        }
+        
+        @Override
+        public Object getRealObject(Object o) {
+            return helper.getRealObjectInternal(o);
+        }
+    }
 
     static {
-        DEFAULT_HELPER = new ClassHelper();
-        HELPER = getClassHelper(DEFAULT_HELPER);
+        HELPER = new ClassHelper();
+        DEFAULT_UNWRAPPER = new DefaultClassUnwrapper(HELPER);
+        UNWRAPPER = getClassUnwrapper(DEFAULT_UNWRAPPER);
     }
 
     protected ClassHelper() {
     }
 
-    private static ClassHelper getClassHelper(ClassHelper defaultHelper) {
+    private static ClassUnwrapper getClassUnwrapper(ClassUnwrapper defaultHelper) {
         boolean useSpring = true;
         String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.useSpringClassHelpers");
         if (!StringUtils.isEmpty(s)) {
@@ -51,7 +81,7 @@ public class ClassHelper {
         }
         if (useSpring) {
             try {
-                return new SpringAopClassHelper();
+                return new SpringClassUnwrapper();
             } catch (Throwable ex) {
                 // ignore
             }
@@ -59,15 +89,15 @@ public class ClassHelper {
         return defaultHelper;
     }
 
-    protected Class<?> getRealClassInternal(Object o) {
+    private Class<?> getRealClassInternal(Object o) {
         return getRealObjectInternal(o).getClass();
     }
 
-    protected Class<?> getRealClassFromClassInternal(Class<?> cls) {
+    private Class<?> getRealClassFromClassInternal(Class<?> cls) {
         return cls;
     }
 
-    protected Object getRealObjectInternal(Object o) {
+    private Object getRealObjectInternal(Object o) {
         return o instanceof Proxy ? Proxy.getInvocationHandler(o) : o;
     }
 
@@ -80,26 +110,24 @@ public class ClassHelper {
     }
 
     public static Class<?> getRealClassFromClass(Bus bus, Class<?> cls) {
-        bus = getBus(bus);
-        return getContextClassHelper(bus).getRealClassFromClassInternal(cls);
+        return getContextClassUnwrapper(getBus(bus)).getRealClassFromClass(cls);
     }
 
     public static Object getRealObject(Object o) {
-        Bus bus = getBus(null);
-        return getContextClassHelper(bus).getRealObjectInternal(o);
+        return getContextClassUnwrapper(getBus(null)).getRealObject(o);
     }
 
     public static Class<?> getRealClass(Bus bus, Object o) {
-        bus = getBus(bus);
-        if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
-            ClassUnwrapper unwrapper = (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
-            return unwrapper.getRealClass(o);
-        }
-        return getContextClassHelper(bus).getRealClassInternal(o);
+        return getContextClassUnwrapper(getBus(bus)).getRealClass(o);
     }
 
-    private static ClassHelper getContextClassHelper(Bus bus) {
-        return (DEFAULT_HELPER == HELPER || checkUseDefaultClassHelper(bus)) ? DEFAULT_HELPER : HELPER;
+    private static ClassUnwrapper getContextClassUnwrapper(Bus bus) {
+        if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
+            ClassUnwrapper unwrapper = (ClassUnwrapper) bus.getProperty(ClassUnwrapper.class.getName());
+            return unwrapper;
+        }
+
+        return (DEFAULT_UNWRAPPER == UNWRAPPER || checkUseDefaultClassHelper(bus)) ? DEFAULT_UNWRAPPER : UNWRAPPER;
     }
 
     private static Bus getBus(Bus bus) {
