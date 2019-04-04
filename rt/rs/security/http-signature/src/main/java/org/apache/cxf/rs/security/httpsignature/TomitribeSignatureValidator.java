@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySig
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
-import org.apache.cxf.rs.security.httpsignature.provider.PublicKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Signature;
@@ -47,7 +47,7 @@ public class TomitribeSignatureValidator implements SignatureValidator {
     @Override
     public void validate(Map<String, List<String>> messageHeaders,
                          AlgorithmProvider algorithmProvider,
-                         PublicKeyProvider publicKeyProvider,
+                         KeyProvider keyProvider,
                          SecurityProvider securityProvider,
                          String method,
                          String uri) {
@@ -60,7 +60,7 @@ public class TomitribeSignatureValidator implements SignatureValidator {
             throw new DifferentAlgorithmsException("signature algorithm from header and provided are different");
         }
 
-        Key key = publicKeyProvider.getKey(signature.getKeyId());
+        Key key = keyProvider.getKey(signature.getKeyId());
 
         java.security.Provider provider = securityProvider.getProvider(signature.getKeyId());
 

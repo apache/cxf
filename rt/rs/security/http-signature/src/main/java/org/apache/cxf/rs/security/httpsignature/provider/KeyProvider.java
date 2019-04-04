@@ -16,21 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.httpsignature;
+package org.apache.cxf.rs.security.httpsignature.provider;
 
-import java.util.List;
-import java.util.Map;
+import java.security.Key;
 
-import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
-import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
-import org.apache.cxf.rs.security.httpsignature.provider.SecurityProvider;
+@FunctionalInterface
+public interface KeyProvider {
 
-public interface SignatureValidator {
-    void validate(Map<String, List<String>> messageHeaders,
-                  AlgorithmProvider algorithmProvider,
-                  KeyProvider keyProvider,
-                  SecurityProvider securityProvider,
-                  String method,
-                  String uri);
-
+    /**
+     * Resolve a Key based on the keyId
+     * @param keyId in question, not null or empty.
+     * @return a Key, never null.
+     */
+    Key getKey(String keyId);
 }
