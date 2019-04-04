@@ -23,14 +23,12 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
 /**
  * RS CXF container Filter which signs outgoing (response) messages. It does not create a digest header
  */
 @Provider
-@PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class CreateSignatureFilter extends AbstractSignatureOutFilter implements ContainerResponseFilter {
 
