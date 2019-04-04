@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.httpsignature.filters;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
@@ -29,7 +30,8 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.util.MessageDigestInputStream;
-import org.apache.cxf.io.CacheAndWriteOutputStream;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
@@ -49,20 +51,44 @@ public class CreateDigestInterceptor implements WriterInterceptor {
         this.digestAlgorithmName = digestAlgorithmName;
     }
 
+    private boolean shouldAddDigest(WriterInterceptorContext context) {
+        return null != context.getEntity()
+            && context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase);
+    }
+
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
-        // don't add digest header if already set or we cannot use stream-cache
-        if (context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase)
-            && context.getOutputStream() instanceof CacheAndWriteOutputStream) {
-            CacheAndWriteOutputStream cacheAndWriteOutputStream = (CacheAndWriteOutputStream) context.getOutputStream();
-            String encoding = context.getMediaType().getParameters()
-                .getOrDefault(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.toString());
-            // not so nice - would be better to have a stream
-            String digest = SignatureHeaderUtils.createDigestHeader(
-                new String(cacheAndWriteOutputStream.getBytes(), encoding), digestAlgorithmName);
-            context.getHeaders().add(DIGEST_HEADER_NAME, digest);
+        // skip digest if already set or we actually don't have a body
+        if (shouldAddDigest(context)) {
+            addDigest(context);
+        } else {
+            context.proceed();
         }
+    }
+
+    private void addDigest(WriterInterceptorContext context) throws IOException {
+        // make sure we have all content
+        OutputStream originalOutputStream = context.getOutputStream();
+        CachedOutputStream cachedOutputStream = new CachedOutputStream();
+        context.setOutputStream(cachedOutputStream);
 
         context.proceed();
+        cachedOutputStream.flush();
+
+        // then digest using requested encoding
+        String encoding = context.getMediaType().getParameters()
+            .getOrDefault(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.toString());
+        // not so nice - would be better to have a stream
+        String digest = SignatureHeaderUtils.createDigestHeader(
+            new String(cachedOutputStream.getBytes(), encoding), digestAlgorithmName);
+
+        // add header
+        context.getHeaders().add(DIGEST_HEADER_NAME, digest);
+
+        // write the contents
+        context.setOutputStream(originalOutputStream);
+        IOUtils.copy(cachedOutputStream.getInputStream(), originalOutputStream);
     }
+
+
 }
