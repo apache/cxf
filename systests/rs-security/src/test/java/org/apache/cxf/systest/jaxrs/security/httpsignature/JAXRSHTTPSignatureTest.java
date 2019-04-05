@@ -47,6 +47,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
+import org.apache.cxf.rs.security.httpsignature.filters.CreateDigestInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
@@ -78,12 +79,11 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        //CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
 
         String address = "http://localhost:" + PORT + "/digest/bookstore/books";
         WebClient client =
-            // WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
-            WebClient.create(address, busFile.toString());
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
