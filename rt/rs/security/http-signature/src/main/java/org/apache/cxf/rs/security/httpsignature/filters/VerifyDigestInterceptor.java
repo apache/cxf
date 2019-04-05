@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
@@ -35,8 +36,13 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.DigestVerifier;
+import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
+import org.apache.cxf.rs.security.httpsignature.exception.MissingDigestException;
 
 /**
  * RS CXF Reader Interceptor which extract the body of the message and verifies the digest
@@ -66,7 +72,15 @@ public class VerifyDigestInterceptor implements ReaderInterceptor {
 
         byte[] messageBody = extractMessageBody(context);
 
-        digestVerifier.inspectDigest(messageBody, responseHeaders);
+        try {
+            digestVerifier.inspectDigest(messageBody, responseHeaders);
+        } catch (DigestFailureException | DifferentDigestsException | MissingDigestException ex) {
+            Message message = PhaseInterceptorChain.getCurrentMessage();
+            if (MessageUtils.isRequestor(message)) {
+                throw ex;
+            }
+            throw new BadRequestException(ex);
+        }
 
         context.setInputStream(new ByteArrayInputStream(messageBody));
         LOG.fine("Finished interceptor message verification process");

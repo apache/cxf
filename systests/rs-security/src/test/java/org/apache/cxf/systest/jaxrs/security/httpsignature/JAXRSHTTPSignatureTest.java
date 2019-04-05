@@ -20,10 +20,14 @@
 package org.apache.cxf.systest.jaxrs.security.httpsignature;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,16 +43,23 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.MessageDigestInputStream;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateDigestInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
+import org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -72,25 +83,6 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     public static void startServers() {
         assertTrue("server did not launch correctly",
                    launchServer(BookServerHttpSignature.class, true));
-    }
-
-    @Test
-    public void testDigest() throws Exception {
-
-        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
-
-        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
-
-        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
-        WebClient client =
-            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
-        client.type("application/xml").accept("application/xml");
-
-        Response response = client.post(new Book("CXF", 126L));
-        assertEquals(response.getStatus(), 200);
-
-        Book returnedBook = response.readEntity(Book.class);
-        assertEquals(126L, returnedBook.getId());
     }
 
     @Test
@@ -545,6 +537,64 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertEquals(126L, returnedBook.getId());
     }
 
+    @Test
+    public void testDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testDigestSHA512() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor("SHA-512");
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
+    @Test
+    public void testDigestResponse() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+        VerifyDigestInterceptor verifyDigestFilter = new VerifyDigestInterceptor();
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Arrays.asList(digestFilter, verifyDigestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
     //
     // Negative tests
     //
@@ -814,6 +864,70 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @Test
+    public void testNoDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testIncorrectDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestTestInterceptor digestFilter = new CreateDigestTestInterceptor();
+        digestFilter.setChangeDigestValue(true);
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testEmptyDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestTestInterceptor digestFilter = new CreateDigestTestInterceptor();
+        digestFilter.setEmptyDigestValue(true);
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testIncorrectDigestAlgorithm() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateDigestTestInterceptor digestFilter = new CreateDigestTestInterceptor("SHA-1");
+
+        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(digestFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
     @Provider
     @Priority(Priorities.AUTHENTICATION)
     private final class ClientTestFilter implements ClientRequestFilter {
@@ -901,4 +1015,94 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         }
 
     }
+
+    @Provider
+    @Priority(Priorities.HEADER_DECORATOR)
+    private final class CreateDigestTestInterceptor implements WriterInterceptor {
+        private static final String DIGEST_HEADER_NAME = "Digest";
+        private final String digestAlgorithmName;
+        private boolean changeDigestValue;
+        private boolean emptyDigestValue;
+
+        private CreateDigestTestInterceptor() {
+            this(MessageDigestInputStream.ALGO_SHA_256);
+        }
+
+        private CreateDigestTestInterceptor(String digestAlgorithmName) {
+            this.digestAlgorithmName = digestAlgorithmName;
+        }
+
+        private boolean shouldAddDigest(WriterInterceptorContext context) {
+            return null != context.getEntity()
+                && context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase);
+        }
+
+        @Override
+        public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
+            // skip digest if already set or we actually don't have a body
+            if (shouldAddDigest(context)) {
+                addDigest(context);
+            } else {
+                context.proceed();
+            }
+        }
+
+        private void addDigest(WriterInterceptorContext context) throws IOException {
+            // make sure we have all content
+            OutputStream originalOutputStream = context.getOutputStream();
+            CachedOutputStream cachedOutputStream = new CachedOutputStream();
+            context.setOutputStream(cachedOutputStream);
+
+            context.proceed();
+            cachedOutputStream.flush();
+
+            // then digest using requested encoding
+            String encoding = context.getMediaType().getParameters()
+                .getOrDefault(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.toString());
+            // not so nice - would be better to have a stream
+
+            String digest = digestAlgorithmName + "=";
+            try {
+                MessageDigest messageDigest = MessageDigest.getInstance(digestAlgorithmName);
+                messageDigest.update(new String(cachedOutputStream.getBytes(), encoding).getBytes());
+                if (!emptyDigestValue) {
+                    if (changeDigestValue) {
+                        byte[] bytes = messageDigest.digest();
+                        bytes[0] += 1;
+                        digest += Base64.getEncoder().encodeToString(bytes);
+                    } else {
+                        digest += Base64.getEncoder().encodeToString(messageDigest.digest());
+                    }
+                }
+            } catch (NoSuchAlgorithmException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            // add header
+            context.getHeaders().add(DIGEST_HEADER_NAME, digest);
+
+            // write the contents
+            context.setOutputStream(originalOutputStream);
+            IOUtils.copy(cachedOutputStream.getInputStream(), originalOutputStream);
+        }
+
+        public boolean isChangeDigestValue() {
+            return changeDigestValue;
+        }
+
+        public void setChangeDigestValue(boolean changeDigestValue) {
+            this.changeDigestValue = changeDigestValue;
+        }
+
+        public boolean isEmptyDigestValue() {
+            return emptyDigestValue;
+        }
+
+        public void setEmptyDigestValue(boolean emptyDigestValue) {
+            this.emptyDigestValue = emptyDigestValue;
+        }
+
+    }
+
 }

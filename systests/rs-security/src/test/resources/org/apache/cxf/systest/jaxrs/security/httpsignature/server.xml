@@ -38,6 +38,10 @@ under the License.
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.CreateDigestInterceptor" />
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor" />
+        </jaxrs:providers>
     </jaxrs:server>
 
     <bean id="publicKeyProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomPublicKeyProvider"/>
