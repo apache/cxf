@@ -595,6 +595,36 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertEquals(126L, returnedBook.getId());
     }
 
+    // TODO The Digest is not being signed yet
+    @Test
+    public void testHttpSignatureDigest() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Arrays.asList(digestFilter, signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(126L, returnedBook.getId());
+    }
+
     //
     // Negative tests
     //
