@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 
@@ -64,7 +65,11 @@ public final class SignatureHeaderUtils {
     public static String createDigestHeader(String messageBody, String digestAlgorithmName) {
         MessageDigest messageDigest = createMessageDigestWithAlgorithm(digestAlgorithmName);
         messageDigest.update(messageBody.getBytes());
-        return digestAlgorithmName + "=" + Base64.getEncoder().encodeToString(messageDigest.digest());
+        String digest = Base64.getEncoder().encodeToString(messageDigest.digest());
+
+        StringBuilder sb = new StringBuilder(digestAlgorithmName.length() + 1 + digest.length());
+        sb.append(digestAlgorithmName).append('=').append(digest);
+        return sb.toString();
     }
 
     /**
@@ -73,14 +78,12 @@ public final class SignatureHeaderUtils {
      * @return a valid MessageDigest object
      */
     public static MessageDigest createMessageDigestWithAlgorithm(String algorithmName) {
-        List<String> validDigestAlgorithms = Arrays.asList("SHA-256", "SHA-512");
         try {
-            for (String validAlgorithm : validDigestAlgorithms) {
-                if (validAlgorithm.equalsIgnoreCase(algorithmName)) {
-                    return MessageDigest.getInstance(validAlgorithm);
-                }
-            }
-            throw new NoSuchAlgorithmException("found no match in digest algorithm whitelist");
+            String foundAlgorithm = Stream.of("SHA-256", "SHA-512")
+                 .filter(s -> s.equalsIgnoreCase(algorithmName))
+                 .findAny()
+                 .orElseThrow(() -> new NoSuchAlgorithmException("found no match in digest algorithm whitelist"));
+            return MessageDigest.getInstance(foundAlgorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new DigestFailureException("failed to retrieve digest from digest string", e);
         }
