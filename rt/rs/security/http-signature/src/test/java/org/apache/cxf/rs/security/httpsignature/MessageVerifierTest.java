@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
@@ -37,6 +40,7 @@ import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeader
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 import org.junit.BeforeClass;
@@ -146,6 +150,22 @@ public class MessageVerifierTest {
         signatureList.add(signature);
         headers.put("Signature", signatureList);
         messageVerifier.verifyMessage(headers, METHOD, URI);
+    }
+
+    @Test
+    public void symmetricSignature() throws IOException, NoSuchAlgorithmException {
+        Map<String, List<String>> headers = createMockHeaders();
+
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
+        SecretKey secretKey = keyGenerator.generateKey();
+
+        MessageSigner hmacMessageSigner =
+            new MessageSigner("hmac-sha256", DefaultSignatureConstants.DIGEST_ALGORITHM, keyId -> secretKey, KEY_ID);
+        hmacMessageSigner.sign(headers, URI, METHOD, MESSAGE_BODY);
+
+        MessageVerifier hmacMessageVerifier =
+            new MessageVerifier(keyId -> secretKey, null, keyId -> "hmac-sha256", Collections.emptyList());
+        hmacMessageVerifier.verifyMessage(headers, METHOD, URI);
     }
 
     private static void createAndAddSignature(Map<String, List<String>> headers,
