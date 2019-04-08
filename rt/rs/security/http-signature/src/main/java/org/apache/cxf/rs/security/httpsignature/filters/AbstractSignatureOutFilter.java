@@ -37,7 +37,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
-import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.KeyManagementUtils;
 
@@ -114,7 +114,7 @@ abstract class AbstractSignatureOutFilter {
         }
 
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        PrivateKeyProvider privateKeyProvider = keyId -> KeyManagementUtils.loadPrivateKey(m, props);
+        KeyProvider keyProvider = keyId -> KeyManagementUtils.loadPrivateKey(m, props);
 
         String signatureAlgorithm = (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_SIGNATURE_ALGORITHM);
         if (signatureAlgorithm == null) {
@@ -135,7 +135,7 @@ abstract class AbstractSignatureOutFilter {
             signedHeaders = Collections.emptyList();
         }
 
-        return new MessageSigner(signatureAlgorithm, DefaultSignatureConstants.DIGEST_ALGORITHM, privateKeyProvider,
+        return new MessageSigner(signatureAlgorithm, DefaultSignatureConstants.DIGEST_ALGORITHM, keyProvider,
                                  keyId, signedHeaders);
     }
 

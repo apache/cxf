@@ -28,12 +28,12 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 
 /**
  * Just a test-class to provide a static method to easily load a PrivateKey in spring config.
  */
-public final class PrivateKeyProviderTestHelper implements PrivateKeyProvider {
+public final class PrivateKeyProviderTestHelper implements KeyProvider {
 
     private PrivateKeyProviderTestHelper() {
         // complete

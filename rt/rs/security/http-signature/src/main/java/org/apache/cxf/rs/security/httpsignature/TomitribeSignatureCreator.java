@@ -27,26 +27,26 @@ import java.util.stream.Collectors;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.httpsignature.provider.PrivateKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 import org.tomitribe.auth.signatures.Join;
 import org.tomitribe.auth.signatures.Signature;
 
 public class TomitribeSignatureCreator implements SignatureCreator {
     private final String signatureAlgorithmName;
-    private final PrivateKeyProvider privateKeyProvider;
+    private final KeyProvider keyProvider;
     private final String keyId;
     private final List<String> headersToSign;
 
-    public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKeyProvider privateKeyProvider,
+    public TomitribeSignatureCreator(String signatureAlgorithmName, KeyProvider keyProvider,
                                      String keyId) {
-        this(signatureAlgorithmName, privateKeyProvider, keyId, Collections.emptyList());
+        this(signatureAlgorithmName, keyProvider, keyId, Collections.emptyList());
     }
 
-    public TomitribeSignatureCreator(String signatureAlgorithmName, PrivateKeyProvider privateKeyProvider,
+    public TomitribeSignatureCreator(String signatureAlgorithmName, KeyProvider keyProvider,
                                      String keyId, List<String> headersToSign) {
         this.signatureAlgorithmName = signatureAlgorithmName;
-        this.privateKeyProvider = privateKeyProvider;
+        this.keyProvider = keyProvider;
         this.keyId = keyId;
         this.headersToSign = headersToSign;
     }
@@ -77,7 +77,7 @@ public class TomitribeSignatureCreator implements SignatureCreator {
 
         final Signature signature = new Signature(keyId, signatureAlgorithmName, null, headers);
         final org.tomitribe.auth.signatures.Signer signer =
-                new org.tomitribe.auth.signatures.Signer(privateKeyProvider.getKey(keyId), signature);
+                new org.tomitribe.auth.signatures.Signer(keyProvider.getKey(keyId), signature);
         Signature outputSignature = signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
 
         return "keyId=\"" + outputSignature.getKeyId() + '\"'
