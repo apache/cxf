@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.httpsignature.provider;
 import java.security.PublicKey;
 
 @FunctionalInterface
-public interface PublicKeyProvider {
+public interface PublicKeyProvider extends KeyProvider {
     /**
      * @param keyId is used as lookup to find the correct configured public key for this keyId
      *              The keyId is sent in the message together with the signature
