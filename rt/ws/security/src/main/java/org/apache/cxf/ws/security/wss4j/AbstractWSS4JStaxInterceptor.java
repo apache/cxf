@@ -235,6 +235,14 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         }
     }
 
+    protected String getPassword(Object msgContext) {
+        String password = (String)((Message)msgContext).getContextualProperty("password");
+        if (password == null) {
+            password = (String)((Message)msgContext).getContextualProperty(SecurityConstants.PASSWORD);
+        }
+        return password;
+    }
+
     public Set<URI> getRoles() {
         return null;
     }
@@ -261,10 +269,6 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
             return properties.get(key);
         }
         return null;
-    }
-
-    public String getPassword(Object msgContext) {
-        return (String)((Message)msgContext).getContextualProperty("password");
     }
 
     public Object getProperty(Object msgContext, String key) {

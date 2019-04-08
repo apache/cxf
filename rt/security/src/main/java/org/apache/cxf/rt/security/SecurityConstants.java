@@ -53,7 +53,8 @@ public class SecurityConstants {
     public static final String USERNAME = "security.username";
 
     /**
-     * The user's password when a {@link CALLBACK_HANDLER} is not defined.
+     * The user's password when a {@link CALLBACK_HANDLER} is not defined. This is only used for the password
+     * in a WS-Security UsernameToken.
      */
     public static final String PASSWORD = "security.password";
 
