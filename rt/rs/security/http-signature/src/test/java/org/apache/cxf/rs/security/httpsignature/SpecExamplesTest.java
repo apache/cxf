@@ -38,7 +38,6 @@ import java.util.Map;
 
 import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
-import org.apache.cxf.rs.security.httpsignature.provider.MockPublicKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
 
 import org.junit.BeforeClass;
@@ -100,7 +99,7 @@ public class SpecExamplesTest {
 
         // Now check we validate the Date header as expected on an empty header list
         headers.put("Signature", Collections.singletonList(expectedHeader));
-        MessageVerifier messageVerifier = new MessageVerifier(new MockPublicKeyProvider(publicKey));
+        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog");
@@ -123,7 +122,7 @@ public class SpecExamplesTest {
 
         assertEquals(signatureHeader, expectedHeader);
 
-        MessageVerifier messageVerifier = new MessageVerifier(new MockPublicKeyProvider(publicKey));
+        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog");
@@ -147,7 +146,7 @@ public class SpecExamplesTest {
 
         assertEquals(signatureHeader, expectedHeader);
 
-        MessageVerifier messageVerifier = new MessageVerifier(new MockPublicKeyProvider(publicKey));
+        MessageVerifier messageVerifier = new MessageVerifier(keyId -> publicKey);
         messageVerifier.setSecurityProvider(new MockSecurityProvider());
         messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
         messageVerifier.verifyMessage(headers, "POST", "/foo?param=value&pet=dog");

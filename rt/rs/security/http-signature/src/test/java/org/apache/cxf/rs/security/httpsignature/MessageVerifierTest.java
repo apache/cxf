@@ -36,7 +36,6 @@ import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeader
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.provider.MockAlgorithmProvider;
-import org.apache.cxf.rs.security.httpsignature.provider.MockPublicKeyProvider;
 import org.apache.cxf.rs.security.httpsignature.provider.MockSecurityProvider;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
@@ -60,7 +59,7 @@ public class MessageVerifierTest {
             final KeyPair keyPair = KeyPairGenerator.getInstance(KEY_PAIR_GENERATOR_ALGORITHM)
                     .generateKeyPair();
 
-            messageVerifier = new MessageVerifier(new MockPublicKeyProvider(keyPair.getPublic()));
+            messageVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
             messageVerifier.setSecurityProvider(new MockSecurityProvider());
             messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
 

@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.httpsignature.provider;
 import java.security.PublicKey;
 
 @FunctionalInterface
+@Deprecated
 public interface PublicKeyProvider extends KeyProvider {
     /**
      * @param keyId is used as lookup to find the correct configured public key for this keyId

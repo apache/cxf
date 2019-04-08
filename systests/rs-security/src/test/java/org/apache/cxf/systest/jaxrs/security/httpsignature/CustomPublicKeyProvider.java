@@ -27,9 +27,9 @@ import java.security.PublicKey;
 import java.security.cert.CertificateException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.rs.security.httpsignature.provider.PublicKeyProvider;
+import org.apache.cxf.rs.security.httpsignature.provider.KeyProvider;
 
-public class CustomPublicKeyProvider implements PublicKeyProvider {
+public class CustomPublicKeyProvider implements KeyProvider {
 
     @Override
     public PublicKey getKey(String keyId) {
