@@ -82,14 +82,10 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
-    <bean id="customSecurityProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomSecurityProvider" />
     <bean id="customAlgorithmProvider" class="org.apache.cxf.systest.jaxrs.security.httpsignature.CustomAlgorithmProvider" />
     <bean id="messageVerifierRsaSha512" class="org.apache.cxf.rs.security.httpsignature.MessageVerifier">
         <constructor-arg>
             <ref bean="publicKeyProvider"/>
-        </constructor-arg>
-        <constructor-arg>
-            <ref bean="customSecurityProvider"/>
         </constructor-arg>
         <constructor-arg>
             <ref bean="customAlgorithmProvider"/>

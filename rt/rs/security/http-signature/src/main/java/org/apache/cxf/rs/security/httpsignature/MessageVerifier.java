@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
-import java.security.Security;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +47,14 @@ public class MessageVerifier {
 
     public MessageVerifier(KeyProvider keyProvider, List<String> requiredHeaders) {
         this(keyProvider,
-            keyId -> Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER),
+            null,
             keyId -> DefaultSignatureConstants.SIGNING_ALGORITHM,
             requiredHeaders);
+    }
+
+    public MessageVerifier(KeyProvider keyProvider,
+                           AlgorithmProvider algorithmProvider) {
+        this(keyProvider, null, algorithmProvider, Collections.emptyList());
     }
 
     public MessageVerifier(KeyProvider keyProvider,
@@ -75,7 +79,7 @@ public class MessageVerifier {
 
     public final void setSecurityProvider(SecurityProvider securityProvider) {
 
-        this.securityProvider = Objects.requireNonNull(securityProvider, "security provider cannot be null");
+        this.securityProvider = securityProvider;
     }
 
     public final void setAlgorithmProvider(AlgorithmProvider algorithmProvider) {

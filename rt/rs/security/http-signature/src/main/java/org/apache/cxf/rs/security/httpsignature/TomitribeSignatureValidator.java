@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public class TomitribeSignatureValidator implements SignatureValidator {
     private final List<String> requiredHeaders;
 
     public TomitribeSignatureValidator(List<String> requiredHeaders) {
-        this.requiredHeaders = new ArrayList<>(requiredHeaders);
+        this.requiredHeaders = requiredHeaders != null ? new ArrayList<>(requiredHeaders) : Collections.emptyList();
     }
 
     @Override
@@ -62,7 +63,8 @@ public class TomitribeSignatureValidator implements SignatureValidator {
 
         Key key = keyProvider.getKey(signature.getKeyId());
 
-        java.security.Provider provider = securityProvider.getProvider(signature.getKeyId());
+        java.security.Provider provider =
+            securityProvider != null ? securityProvider.getProvider(signature.getKeyId()) : null;
 
         runVerifier(messageHeaders, key, signature, provider, method, uri);
     }
