@@ -23,7 +23,6 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
@@ -32,7 +31,6 @@ import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
  * RS CXF client Filter which extracts signature data from the context and sends it to the message verifier
  */
 @Provider
-@PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureClientFilter extends AbstractSignatureInFilter implements ClientResponseFilter {
 

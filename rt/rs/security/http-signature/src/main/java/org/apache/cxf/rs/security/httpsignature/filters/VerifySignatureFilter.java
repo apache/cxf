@@ -23,14 +23,12 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.ext.Provider;
 
 /**
  * RS CXF container Filter which extracts signature data from the context and sends it to the message verifier
  */
 @Provider
-@PreMatching
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureFilter extends AbstractSignatureInFilter implements ContainerRequestFilter {
 
