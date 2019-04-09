@@ -280,6 +280,10 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                     (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.PASSWORD, message);
                 if (StringUtils.isEmpty(password)) {
                     password =
+                        (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
+                }
+                if (StringUtils.isEmpty(password)) {
+                    password =
                         getPassword(issuerName, token, WSPasswordCallback.SIGNATURE, message);
                 }
             }

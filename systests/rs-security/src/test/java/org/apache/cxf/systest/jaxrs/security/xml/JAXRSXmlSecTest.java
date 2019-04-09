@@ -805,6 +805,49 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         }
     }
 
+    @Test
+    public void testSignaturePassword() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsig/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PASSWORD, "password");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
+                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        bean.setProperties(properties);
+        if (test.streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            sigOutInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
+            bean.setProvider(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            sigOutInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            sigInInterceptor.setKeyInfoMustBeAvailable(true);
+            bean.getInInterceptors().add(sigInInterceptor);
+        }
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
+        assertEquals(126L, book.getId());
+    }
+
     private static final class TestParam {
         final String port;
         final boolean streaming;

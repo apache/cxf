@@ -130,14 +130,15 @@ public final class RSSecurityUtils {
         return userName;
     }
 
-    public static String getPassword(Message message, String userName,
-                                     int type, Class<?> callingClass) throws WSSecurityException {
+    public static String getSignaturePassword(Message message, String userName,
+                                              Class<?> callingClass) throws WSSecurityException {
         CallbackHandler handler = getCallbackHandler(message, callingClass);
         if (handler == null) {
-            return null;
+            // See if we have a signature password we can use here instead
+            return (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
         }
 
-        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, type)};
+        WSPasswordCallback[] cb = {new WSPasswordCallback(userName, WSPasswordCallback.SIGNATURE)};
         try {
             handler.handle(cb);
         } catch (Exception e) {

@@ -590,7 +590,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             throw new Fault(e1);
         }
 
-        String password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+        String password =
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
+        if (StringUtils.isEmpty(password)) {
+            password = getPassword(uname, token, WSPasswordCallback.SIGNATURE);
+        }
         sig.setUserInfo(uname, password);
         try {
             sig.prepare(secToken.getCrypto());
@@ -946,7 +950,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
             String password = samlCallback.getIssuerKeyPassword();
             if (password == null) {
-                password = getPassword(issuerName, token, WSPasswordCallback.SIGNATURE);
+                password =
+                    (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
+                if (StringUtils.isEmpty(password)) {
+                    password = getPassword(issuerName, token, WSPasswordCallback.SIGNATURE);
+                }
             }
             Crypto crypto = samlCallback.getIssuerCrypto();
             if (crypto == null) {
@@ -1883,7 +1891,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             }
         }
 
-        String password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+        String password =
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, message);
+        if (StringUtils.isEmpty(password)) {
+            password = getPassword(user, token, WSPasswordCallback.SIGNATURE);
+        }
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
         AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();

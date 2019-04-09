@@ -148,4 +148,37 @@ public class PasswordPropertiesTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testAsymmetricBinding() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+
+        Bus bus = bf.createBus();
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = PasswordPropertiesTest.class.getResource("DoubleItPassword.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
+
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+
+        Client client = ClientProxy.getClient(port);
+        client.getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        client.getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
+        client.getRequestContext().put(SecurityConstants.SIGNATURE_PASSWORD, "password");
+        client.getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+        client.getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, "bob.properties");
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }

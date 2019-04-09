@@ -68,6 +68,11 @@ public class SecurityConstants {
     public static final String SIGNATURE_USERNAME = "security.signature.username";
 
     /**
+     * The user's password for signature when a {@link CALLBACK_HANDLER} is not defined.
+     */
+    public static final String SIGNATURE_PASSWORD = "security.signature.password";
+
+    /**
      * The user's name for encryption. It is used as the alias name in the keystore to get the user's public
      * key for encryption. If this is not defined, then {@link USERNAME} is used instead. If
      * that is also not specified, it uses the the default alias set in the properties file referenced by

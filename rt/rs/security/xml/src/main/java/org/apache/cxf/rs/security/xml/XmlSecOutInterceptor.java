@@ -50,7 +50,6 @@ import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.util.KeyUtils;
 import org.apache.xml.security.Init;
@@ -281,8 +280,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new Exception("User name is not available");
         }
 
-        String password =
-            RSSecurityUtils.getPassword(message, user, WSPasswordCallback.SIGNATURE, this.getClass());
+        String password = RSSecurityUtils.getSignaturePassword(message, user, this.getClass());
 
         X509Certificate[] issuerCerts = RSSecurityUtils.getCertificates(crypto, user);
         properties.setSignatureCerts(issuerCerts);
@@ -342,7 +340,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (Boolean.TRUE.equals(sigProps.getSignatureOmitC14nTransform())) {
             properties.setSignatureIncludeDigestTransform(false);
         }
-        
+
         if (elementsToSign == null || elementsToSign.isEmpty()) {
             LOG.fine("No Elements to sign are specified, so the entire request is signed");
             SecurePart securePart =

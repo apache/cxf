@@ -54,5 +54,18 @@
         </jaxws:properties>
     </jaxws:endpoint>
     
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="Asymmetric" 
+        address="http://localhost:${testutil.ports.password.Server}/DoubleItAsymmetric" serviceName="s:DoubleItService" 
+        endpointName="s:DoubleItAsymmetricPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" 
+        wsdlLocation="org/apache/cxf/systest/ws/password/DoubleItPassword.wsdl">
+        <jaxws:properties>
+            <entry key="security.signature.username" value="bob"/>
+            <entry key="security.signature.password" value="password"/>
+            <entry key="security.signature.properties" value="bob.properties"/>
+            <entry key="security.encryption.properties" value="alice.properties"/>
+            <entry key="security.encryption.username" value="alice"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    
 
 </beans>

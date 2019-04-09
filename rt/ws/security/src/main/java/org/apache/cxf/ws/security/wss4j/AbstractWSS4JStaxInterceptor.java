@@ -41,6 +41,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -214,20 +215,36 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
 
 
         // If we have a "password" but no CallbackHandler then construct one
-        if (callbackHandler == null && getPassword(soapMessage) != null) {
+        if (callbackHandler == null) {
+            final boolean outbound = MessageUtils.isOutbound(soapMessage);
             final String password = getPassword(soapMessage);
-            callbackHandler = new CallbackHandler() {
+            final String signatureUser =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_USERNAME, soapMessage);
+            final String signaturePassword =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_PASSWORD, soapMessage);
 
-                @Override
-                public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-                    for (Callback callback : callbacks) {
-                        if (callback instanceof WSPasswordCallback) {
-                            WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callback;
-                            wsPasswordCallback.setPassword(password);
+            if (!(StringUtils.isEmpty(password) && StringUtils.isEmpty(signaturePassword))) {
+                callbackHandler = new CallbackHandler() {
+
+                    @Override
+                    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+                        for (Callback callback : callbacks) {
+                            if (callback instanceof WSPasswordCallback) {
+                                WSPasswordCallback wsPasswordCallback = (WSPasswordCallback)callback;
+
+                                if (signaturePassword != null && wsPasswordCallback.getIdentifier() != null
+                                    && wsPasswordCallback.getIdentifier().equals(signatureUser)
+                                    && (outbound && wsPasswordCallback.getUsage() == WSPasswordCallback.SIGNATURE)
+                                        || (!outbound && wsPasswordCallback.getUsage() == WSPasswordCallback.DECRYPT)) {
+                                    wsPasswordCallback.setPassword(signaturePassword);
+                                } else if (password != null) {
+                                    wsPasswordCallback.setPassword(password);
+                                }
+                            }
                         }
                     }
-                }
-            };
+                };
+            }
         }
 
         if (callbackHandler != null) {
