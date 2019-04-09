@@ -308,9 +308,10 @@ public final class OAuthClientUtils {
         Response response = accessTokenService.form(form);
         final Map<String, String> map;
         try {
-            map = response.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)
-                    ? new OAuthJSONProvider().readJSONResponse((InputStream) response.getEntity())
-                    : Collections.emptyMap();
+            map = response.getMediaType() == null
+                    || response.getMediaType().isCompatible(MediaType.APPLICATION_JSON_TYPE)
+                            ? new OAuthJSONProvider().readJSONResponse((InputStream) response.getEntity())
+                            : Collections.emptyMap();
         } catch (Exception ex) {
             throw new ResponseProcessingException(response, ex);
         }
