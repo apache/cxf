@@ -141,6 +141,7 @@ public class Sample {
         return item;
     }
 
+    @Produces({ MediaType.APPLICATION_JSON })
     @Path("/{name}")
     @DELETE
     @Operation(
@@ -154,7 +155,7 @@ public class Sample {
        schema = @Schema(implementation = String.class),
        in = ParameterIn.HEADER
     )
-    @APIResponse(responseCode = "204", content = @Content(schema = @Schema()))
+    @APIResponse(responseCode = "204")
     public void delete(@Parameter(required = true) @PathParam("name") String name) {
         items.remove(name);
     }
