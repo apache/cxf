@@ -644,7 +644,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         String address = "http://localhost:" + PORT + "/httpsigdigest/bookstore/books";
         WebClient client =
-            WebClient.create(address, Arrays.asList(digestFilter, signatureFilter), busFile.toString());
+            WebClient.create(address, Arrays.asList((Object)digestFilter, signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));

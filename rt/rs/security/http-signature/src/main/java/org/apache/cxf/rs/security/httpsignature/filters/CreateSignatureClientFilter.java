@@ -28,16 +28,18 @@ import javax.ws.rs.ext.Provider;
  * RS CXF client Filter which signs outgoing messages. It does not create a digest header
  */
 @Provider
-@Priority(Priorities.AUTHENTICATION)
+@Priority(Priorities.HEADER_DECORATOR)
 public class CreateSignatureClientFilter extends AbstractSignatureOutFilter implements ClientRequestFilter {
 
-    public CreateSignatureClientFilter() {
-        super();
-    }
-
     @Override
-    public void filter(ClientRequestContext requestCtx) {
-        performSignature(requestCtx.getHeaders(), requestCtx.getUri().getPath(), requestCtx.getMethod());
+    public void filter(ClientRequestContext requestContext) {
+        if (shouldSign(requestContext)) {
+            performSignature(requestContext.getHeaders(), requestContext.getUri().getPath(),
+                requestContext.getMethod());
+        }
     }
 
+    private boolean shouldSign(ClientRequestContext clientRequestContext) {
+        return clientRequestContext.getEntity() == null;
+    }
 }
