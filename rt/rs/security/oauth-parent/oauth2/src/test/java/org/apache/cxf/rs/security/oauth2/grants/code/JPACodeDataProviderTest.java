@@ -63,7 +63,7 @@ public class JPACodeDataProviderTest {
     }
 
     protected String getPersistenceUnitName() {
-        return "testUnitHibernate";
+        return "test-hibernate-cxf-rt-rs-security-oauth2";
     }
 
     protected void initializeProvider(JPACodeDataProvider dataProvider) {

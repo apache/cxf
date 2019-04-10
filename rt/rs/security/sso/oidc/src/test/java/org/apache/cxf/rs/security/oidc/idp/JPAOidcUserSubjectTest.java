@@ -63,7 +63,7 @@ public class JPAOidcUserSubjectTest {
     }
 
     protected String getPersistenceUnitName() {
-        return "testUnitHibernate";
+        return "test-hibernate-cxf-rt-rs-security-sso-oidc";
     }
 
     @Test

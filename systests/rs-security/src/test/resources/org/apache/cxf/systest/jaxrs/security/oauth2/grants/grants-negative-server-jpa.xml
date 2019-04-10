@@ -65,7 +65,7 @@ under the License.
    <bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceUnitName"
-			value="testUnitHibernate" />
+			value="test-hibernate-cxf-systests-rs-security" />
 		<property name="jpaPropertyMap">
 			<map>
 				<entry key="hibernate.jdbc.fetch_size" value="400" />

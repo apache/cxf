@@ -44,7 +44,7 @@ public class JPAOAuthDataProviderTest extends AbstractOAuthDataProviderTest {
     }
 
     protected String getPersistenceUnitName() {
-        return "testUnitHibernate";
+        return "test-hibernate-cxf-rt-rs-security-oauth2";
     }
 
     @After

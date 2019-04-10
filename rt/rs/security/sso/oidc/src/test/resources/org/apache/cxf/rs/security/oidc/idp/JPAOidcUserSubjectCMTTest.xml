@@ -75,7 +75,7 @@ under the License.
                     <!--<property name="generateDdl" value="true"/>-->
                 <!--</bean>-->
             <!--</property>-->
-            <property name="persistenceUnitName" value="testUnitHibernate"/>
+            <property name="persistenceUnitName" value="test-hibernate-cxf-rt-rs-security-sso-oidc"/>
             <property name="jpaPropertyMap">
                 <map>
                     <entry key="hibernate.jdbc.fetch_size" value="400"/>

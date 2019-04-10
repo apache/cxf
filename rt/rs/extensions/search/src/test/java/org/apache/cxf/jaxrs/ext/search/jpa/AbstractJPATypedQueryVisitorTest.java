@@ -68,7 +68,7 @@ public abstract class AbstractJPATypedQueryVisitorTest {
             fail("Exception during HSQL database init.");
         }
         try {
-            emFactory = Persistence.createEntityManagerFactory("testUnitHibernate");
+            emFactory = Persistence.createEntityManagerFactory("test-hibernate-cxf-rt-rs-extension-search");
             em = emFactory.createEntityManager();
 
             em.getTransaction().begin();
