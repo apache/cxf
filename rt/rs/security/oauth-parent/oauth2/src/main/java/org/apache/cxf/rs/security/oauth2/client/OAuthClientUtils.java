@@ -20,7 +20,6 @@ package org.apache.cxf.rs.security.oauth2.client;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -32,7 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
@@ -43,6 +41,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.tokens.hawk.HawkAuthorizationScheme;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 
 /**
  * The utility class for simplifying working with OAuth servers
@@ -281,13 +280,8 @@ public final class OAuthClientUtils {
         if (consumer != null) {
             boolean secretAvailable = !StringUtils.isEmpty(consumer.getClientSecret());
             if (setAuthorizationHeader && secretAvailable) {
-                try {
-                    String data = Base64Utility.encode((consumer.getClientId() + ':' + consumer.getClientSecret())
-                            .getBytes(StandardCharsets.UTF_8));
-                    accessTokenService.replaceHeader(HttpHeaders.AUTHORIZATION, "Basic " + data);
-                } catch (Exception ex) {
-                    throw new ProcessingException(ex);
-                }
+                accessTokenService.replaceHeader(HttpHeaders.AUTHORIZATION,
+                    DefaultBasicAuthSupplier.getBasicAuthHeader(consumer.getClientId(), consumer.getClientSecret()));
             } else {
                 form.param(OAuthConstants.CLIENT_ID, consumer.getClientId());
                 if (secretAvailable) {

@@ -41,7 +41,7 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
     }
 
     public static String getBasicAuthHeader(String userName, String passwd, boolean useIso8859) {
-        String userAndPass = userName + ":" + passwd;
+        final String userAndPass = userName + ':' + passwd;
         byte[] authBytes = useIso8859 ? userAndPass.getBytes(StandardCharsets.ISO_8859_1) : userAndPass.getBytes();
         return "Basic " + Base64Utility.encode(authBytes);
     }

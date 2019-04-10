@@ -43,7 +43,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.continuations.SuspendedInvocationException;
@@ -66,6 +65,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.ContinuationProviderFactory;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
+import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -92,8 +92,7 @@ public class UndertowHTTPDestinationTest {
     protected static final String AUTH_HEADER = "Authorization";
     protected static final String USER = "copernicus";
     protected static final String PASSWD = "epicycles";
-    protected static final String BASIC_AUTH =
-        "Basic " + Base64Utility.encode((USER + ":" + PASSWD).getBytes());
+    protected static final String BASIC_AUTH = DefaultBasicAuthSupplier.getBasicAuthHeader(USER, PASSWD);
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
     private static final String PAYLOAD = "message payload";

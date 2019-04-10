@@ -60,9 +60,8 @@ public class JAXRSJaasConfigurationSecurityTest extends AbstractSpringSecurityTe
     public void testJaasFilterAuthenticationFailure() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123";
-        WebClient wc = WebClient.create(endpointAddress);
+        WebClient wc = WebClient.create(endpointAddress, "foo", "bar1", null);
         wc.accept("text/xml");
-        wc.header(HttpHeaders.AUTHORIZATION, basicAuthHeader("foo", "bar1"));
         Response r = wc.get();
         assertEquals(401, r.getStatus());
         Object wwwAuthHeader = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);

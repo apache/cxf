@@ -127,9 +127,8 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     public void testJaasFilterAuthenticationFailureWithRedirection() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123";
-        WebClient wc = WebClient.create(endpointAddress);
+        WebClient wc = WebClient.create(endpointAddress, "foo", "bar1", null);
         wc.accept("text/xml,text/html");
-        wc.header(HttpHeaders.AUTHORIZATION, basicAuthHeader("foo", "bar1"));
         Response r = wc.get();
         assertEquals(307, r.getStatus());
         Object locationHeader = r.getMetadata().getFirst(HttpHeaders.LOCATION);

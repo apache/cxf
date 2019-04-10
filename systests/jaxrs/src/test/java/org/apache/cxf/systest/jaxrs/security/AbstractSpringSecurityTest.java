@@ -21,9 +21,9 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.io.InputStream;
 
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
@@ -35,16 +35,13 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
-    protected static String basicAuthHeader(String user, String password) {
-        return "Basic " + Base64Utility.encode((user + ':' + password).getBytes());
-    }
-
     protected void getBook(String endpointAddress, String user, String password, int expectedStatus) throws Exception {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             CloseableHttpResponse response = client.execute(RequestBuilder
-                    .get(endpointAddress)
-                    .addHeader(HttpHeaders.ACCEPT, "application/xml")
-                    .addHeader(HttpHeaders.AUTHORIZATION, basicAuthHeader(user, password)).build());
+                .get(endpointAddress)
+                .addHeader(HttpHeaders.ACCEPT, "application/xml")
+                .addHeader(HttpHeaders.AUTHORIZATION, DefaultBasicAuthSupplier.getBasicAuthHeader(user, password))
+                    .build());
             assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
             if (expectedStatus == 200) {
                 try (InputStream expected = getClass()

@@ -42,7 +42,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
@@ -54,6 +53,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
+import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
 import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
@@ -681,9 +681,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
 
         private String createUserPass(String usr, String pwd) {
-            String userpass = usr + ":" + pwd;
-            String token = Base64Utility.encode(userpass.getBytes());
-            return "Basic " + token;
+            return DefaultBasicAuthSupplier.getBasicAuthHeader(usr, pwd);
         }
 
         public boolean requiresRequestCaching() {
