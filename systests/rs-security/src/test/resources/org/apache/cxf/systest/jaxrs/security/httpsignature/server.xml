@@ -154,4 +154,23 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
+    <util:list id="requiredHeaders">
+        <value>(request-target)</value>
+        <value>digest</value>
+    </util:list>
+    <jaxrs:server address="http://localhost:${testutil.ports.jaxrs-httpsignature}/httpsigdigest">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor" />
+        </jaxrs:providers>
+        <jaxrs:properties>
+             <entry key="rs.security.signature.in.properties" 
+                    value="org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties" />
+             <entry key="rs.security.http.signature.in.headers" value-ref="requiredHeaders" />
+        </jaxrs:properties>
+    </jaxrs:server>
+    
 </beans>
