@@ -426,7 +426,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         // three application messages plus createSequence
 
-        awaitMessages(4, 1, 2000);
+        awaitMessages(4, 1, 1000);
 
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(),
             inRecorder.getInboundMessages(), Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);

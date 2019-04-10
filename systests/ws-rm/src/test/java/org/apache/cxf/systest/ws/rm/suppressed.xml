@@ -25,7 +25,7 @@
     <import resource="rminterceptors.xml"/>
     <wsrm-mgr:rmManager id="org.apache.cxf.ws.rm.RMManager">
         <wsrm-policy:RMAssertion>
-            <wsrm-policy:BaseRetransmissionInterval Milliseconds="3000"/>
+            <wsrm-policy:BaseRetransmissionInterval Milliseconds="2000"/>
             <wsrm-policy:AcknowledgementInterval Milliseconds="99999999"/>
         </wsrm-policy:RMAssertion>
         <wsrm-mgr:destinationPolicy>
