@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
-import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.PrivateKeyJwsSignatureProvider;
@@ -70,12 +69,8 @@ abstract class AbstractOAuthDataProviderTest {
             final JwsSignatureProvider signatureProvider =
                 new PrivateKeyJwsSignatureProvider(keyPair.getPrivate(), SignatureAlgorithm.RS256);
 
-            OAuthJoseJwtProducer jwtAccessTokenProducer = new OAuthJoseJwtProducer() {
-                @Override
-                protected JwsSignatureProvider getInitializedSignatureProvider(JwsHeaders jwsHeaders) {
-                    return signatureProvider;
-                }
-            };
+            OAuthJoseJwtProducer jwtAccessTokenProducer = new OAuthJoseJwtProducer();
+            jwtAccessTokenProducer.setSignatureProvider(signatureProvider);
             dataProvider.setJwtAccessTokenProducer(jwtAccessTokenProducer);
         }
     }
@@ -342,13 +337,9 @@ abstract class AbstractOAuthDataProviderTest {
 
     @After
     public void tearDown() throws Exception {
-        try {
-            tearDownClients();
-            if (getProvider() != null) {
-                getProvider().close();
-            }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
+        tearDownClients();
+        if (getProvider() != null) {
+            getProvider().close();
         }
     }
 

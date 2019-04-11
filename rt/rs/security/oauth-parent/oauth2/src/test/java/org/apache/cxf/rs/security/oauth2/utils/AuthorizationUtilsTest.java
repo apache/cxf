@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -26,8 +28,14 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -51,25 +59,23 @@ public class AuthorizationUtilsTest {
 
     @Test
     public void testThrowAuthorizationFailureManyChallenges() {
-        Set<String> challenges = new LinkedHashSet<>();
-        challenges.add("Basic");
-        challenges.add("Bearer");
+        Set<String> challenges = new LinkedHashSet<>(Arrays.asList("Basic", "Bearer", "*"));
         try {
             AuthorizationUtils.throwAuthorizationFailure(challenges);
             fail("WebApplicationException expected");
         } catch (WebApplicationException ex) {
             Response r = ex.getResponse();
             assertEquals(401, r.getStatus());
-            Object value = r.getMetadata().getFirst(HttpHeaders.WWW_AUTHENTICATE);
+            String value = r.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
             assertNotNull(value);
-            assertEquals("Basic,Bearer", value.toString());
+            assertEquals("Basic,Bearer", value);
         }
     }
 
     @Test
     public void testThrowAuthorizationFailureNoChallenge() {
         try {
-            AuthorizationUtils.throwAuthorizationFailure(Collections.<String>emptySet());
+            AuthorizationUtils.throwAuthorizationFailure(Collections.emptySet());
             fail("WebApplicationException expected");
         } catch (WebApplicationException ex) {
             Response r = ex.getResponse();
@@ -94,4 +100,28 @@ public class AuthorizationUtilsTest {
             assertEquals("Basic", value.toString());
         }
     }
+
+    @Test
+    public void getAuthorizationParts() {
+        String type = "type";
+        String credentials = "credentials";
+
+        Message m = new MessageImpl();
+        m.put(Message.PROTOCOL_HEADERS, Collections.singletonMap(HttpHeaders.AUTHORIZATION,
+                Collections.singletonList(type + ' ' + credentials)));
+        MessageContext mc = new MessageContextImpl(m);
+
+        String[] expected = new String[] {type, credentials};
+        assertArrayEquals(expected,
+                AuthorizationUtils.getAuthorizationParts(mc, null));
+        assertArrayEquals(expected,
+                AuthorizationUtils.getAuthorizationParts(mc, Collections.emptySet()));
+        assertArrayEquals(expected,
+                AuthorizationUtils.getAuthorizationParts(mc, Collections.singleton(type)));
+        assertArrayEquals(expected,
+                AuthorizationUtils.getAuthorizationParts(mc, Collections.singleton("*")));
+        assertArrayEquals(expected,
+                AuthorizationUtils.getAuthorizationParts(mc, new HashSet<>(Arrays.asList("another", type))));
+    }
+
 }

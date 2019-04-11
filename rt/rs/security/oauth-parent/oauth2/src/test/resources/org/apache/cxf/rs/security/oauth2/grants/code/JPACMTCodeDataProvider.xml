@@ -32,7 +32,7 @@ under the License.
                            http://www.springframework.org/schema/tx
                            http://www.springframework.org/schema/tx/spring-tx.xsd
                            http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+                           http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <bean id="oauthProvider"

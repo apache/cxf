@@ -287,14 +287,13 @@ public final class OAuthClientUtils {
         if (consumer != null) {
             boolean secretAvailable = !StringUtils.isEmpty(consumer.getClientSecret());
             if (setAuthorizationHeader && secretAvailable) {
-                StringBuilder sb = new StringBuilder("Basic ");
                 try {
-                    String data = consumer.getClientId() + ":" + consumer.getClientSecret();
-                    sb.append(Base64Utility.encode(data.getBytes(StandardCharsets.UTF_8)));
+                    String data = Base64Utility.encode((consumer.getClientId() + ':' + consumer.getClientSecret())
+                            .getBytes(StandardCharsets.UTF_8));
+                    accessTokenService.replaceHeader(HttpHeaders.AUTHORIZATION, "Basic " + data);
                 } catch (Exception ex) {
                     throw new ProcessingException(ex);
                 }
-                accessTokenService.replaceHeader("Authorization", sb.toString());
             } else {
                 form.param(OAuthConstants.CLIENT_ID, consumer.getClientId());
                 if (secretAvailable) {
