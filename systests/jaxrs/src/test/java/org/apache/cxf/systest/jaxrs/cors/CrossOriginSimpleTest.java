@@ -106,7 +106,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(allOrigins, requestOrigins, permitted, response);
@@ -478,7 +478,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
@@ -496,7 +496,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e); // ensure that we didn't bust the operation itself.
         assertOriginResponse(false, new String[] {"http://area51.mil:31415" }, true, response);
@@ -514,7 +514,7 @@ public class CrossOriginSimpleTest extends AbstractBusClientServerTestBase {
         HttpResponse response = httpclient.execute(httpget);
         assertEquals(200, response.getStatusLine().getStatusCode());
         HttpEntity entity = response.getEntity();
-        String e = IOUtils.toString(entity.getContent(), "utf-8");
+        String e = IOUtils.toString(entity.getContent());
 
         assertEquals("HelloThere", e);
         assertOriginResponse(false, null, false, response);

@@ -66,6 +66,8 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Implementation of XMLHttpRequest for Rhino. This might be given knowledge of
  * CXF 'local' URLs if the author is feeling frisky.
@@ -73,7 +75,6 @@ import org.mozilla.javascript.ScriptableObject;
 public class JsXMLHttpRequest extends ScriptableObject {
     private static final long serialVersionUID = 6993486986900120981L;
     private static final Logger LOG = LogUtils.getL7dLogger(JsXMLHttpRequest.class);
-    private static Charset utf8 = Charset.forName("utf-8");
     private static Set<String> validMethods;
     static {
         validMethods = new HashSet<>();
@@ -437,7 +438,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     }
 
     private byte[] utf8Bytes(String data) {
-        ByteBuffer bb = utf8.encode(data);
+        ByteBuffer bb = UTF_8.encode(data);
         byte[] val = new byte[bb.limit()];
         bb.get(val);
         return val;

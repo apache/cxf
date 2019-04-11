@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,13 +62,14 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * This class provides unit test support for tests that look at generated WSDL
  * contents, as well as some test methods for invoking services.
  */
 public class TestUtilities {
 
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private static String preKeepAlive;
     private static String basedirPath;
     protected Bus bus;
@@ -275,7 +275,7 @@ public class TestUtilities {
     }
 
     public Reader getResourceAsReader(String resource) {
-        return new InputStreamReader(getResourceAsStream(resource), UTF8);
+        return new InputStreamReader(getResourceAsStream(resource), UTF_8);
     }
 
     public XMLStreamReader getResourceAsXMLStreamReader(String resource) throws XMLStreamException {

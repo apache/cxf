@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,10 +55,11 @@ import org.apache.cxf.tools.java2wsdl.processor.internal.ServiceBuilderFactory;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.wsdl.WSDLConstants;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class JavaToJSProcessor implements Processor {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaToJSProcessor.class);
     private static final String JAVA_CLASS_PATH = "java.class.path";
-    private static final Charset UTF8 = Charset.forName("utf-8");
     private ToolContext context;
 
     public void process() throws ToolException {
@@ -89,7 +89,7 @@ public class JavaToJSProcessor implements Processor {
                 JavascriptGetInterceptor.writeUtilsToResponseStream(JavaToJSProcessor.class, outputStream);
             }
 
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
             writer = new BufferedWriter(outputStreamWriter);
 
             for (SchemaInfo schema : schemata) {

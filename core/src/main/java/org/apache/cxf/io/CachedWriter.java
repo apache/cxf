@@ -48,6 +48,8 @@ import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class CachedWriter extends Writer {
     private static final File DEFAULT_TEMP_DIR;
     private static int defaultThreshold;
@@ -625,7 +627,7 @@ public class CachedWriter extends Writer {
                 }
             };
         }
-        return new OutputStreamWriter(out, "utf-8") {
+        return new OutputStreamWriter(out, UTF_8) {
             public void close() throws IOException {
                 if (!cosClosed) {
                     super.close();
@@ -648,7 +650,7 @@ public class CachedWriter extends Writer {
                 }
             };
         }
-        return new InputStreamReader(in, "utf-8");
+        return new InputStreamReader(in, UTF_8);
     }
 
 }

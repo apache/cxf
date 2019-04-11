@@ -37,7 +37,7 @@ import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.io.Transferable;
 
 public final class IOUtils {
-    public static final Charset UTF8_CHARSET = Charset.forName("utf-8");
+    public static final Charset UTF8_CHARSET = java.nio.charset.StandardCharsets.UTF_8;
     public static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     private IOUtils() {

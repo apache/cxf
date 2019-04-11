@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.http_undertow;
 
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -35,9 +34,9 @@ import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 import io.undertow.util.HexConverter;
 
-class MapIdentityManager implements IdentityManager {
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
+class MapIdentityManager implements IdentityManager {
 
     private final Map<String, char[]> users;
 

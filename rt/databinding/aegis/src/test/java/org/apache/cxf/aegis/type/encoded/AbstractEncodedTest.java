@@ -19,7 +19,6 @@
 package org.apache.cxf.aegis.type.encoded;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -44,6 +43,7 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Before;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -106,13 +106,8 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
     public Object readRef(Element element) throws XMLStreamException {
         String xml = StaxUtils.toString(element);
-        ElementReader root;
-        try {
-            root = new ElementReader(new ByteArrayInputStream(xml.getBytes("utf-8")));
-            return readRef(root);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        ElementReader root = new ElementReader(new ByteArrayInputStream(xml.getBytes(UTF_8)));
+        return readRef(root);
     }
 
     public Object readRef(ElementReader root) throws XMLStreamException {

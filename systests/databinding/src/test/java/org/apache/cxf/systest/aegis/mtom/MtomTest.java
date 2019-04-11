@@ -94,7 +94,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         setupForTest(true);
         DataHandlerBean dhBean = client.produceDataHandlerBean();
         Assert.assertNotNull(dhBean);
-        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream(), "utf-8");
+        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream());
         Assert.assertEquals(MtomTestImpl.STRING_DATA, result);
     }
 
@@ -104,7 +104,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         setupForTest(true);
         DataHandlerBean dhBean = jaxwsClient.produceDataHandlerBean();
         Assert.assertNotNull(dhBean);
-        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream(), "utf-8");
+        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream());
         Assert.assertEquals(MtomTestImpl.STRING_DATA, result);
     }
 
@@ -145,7 +145,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Assert.assertNotNull(accepted);
         InputStream data = accepted.getDataHandler().getInputStream();
         Assert.assertNotNull(data);
-        String dataString = IOUtils.toString(data, "utf-8");
+        String dataString = IOUtils.toString(data);
         Assert.assertEquals("This is the cereal shot from guns.", dataString);
     }
 

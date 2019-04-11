@@ -63,7 +63,7 @@ public class ParseBodyTest {
         String data = DATA[n];
         //System.out.println("Original[" + n + "]: " + data);
 
-        xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes("utf-8")));
+        xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes()));
 
         //reader should be on the start element for the
         assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.next());

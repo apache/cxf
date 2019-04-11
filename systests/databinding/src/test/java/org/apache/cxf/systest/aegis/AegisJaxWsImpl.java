@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.aegis;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,8 @@ import java.util.Map;
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.aegis.bean.Item;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWs")
 public class AegisJaxWsImpl implements AegisJaxWs {
@@ -48,7 +49,7 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     public Item getItemByKey(String key1, String key2) {
         Item fake = new Item();
         fake.setKey(Integer.valueOf(33));
-        fake.setData(key1 + ":" + key2);
+        fake.setData(key1 + ':' + key2);
         return fake;
     }
 
@@ -68,13 +69,9 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     public byte[] export(List<Integer> integers) {
         StringBuilder b = new StringBuilder(integers.size() * 3);
         for (Integer i : integers) {
-            b.append(i.toString());
+            b.append(i);
         }
-        try {
-            return b.toString().getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return b.toString().getBytes(UTF_8);
     }
 
 }

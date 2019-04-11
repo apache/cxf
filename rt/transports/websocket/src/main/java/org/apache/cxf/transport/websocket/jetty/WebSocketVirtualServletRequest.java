@@ -57,6 +57,8 @@ import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 import org.eclipse.jetty.websocket.api.Session;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  *
  */
@@ -233,7 +235,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public BufferedReader getReader() throws IOException {
         LOG.log(Level.FINE, "getReader");
-        return new BufferedReader(new InputStreamReader(in, "utf-8"));
+        return new BufferedReader(new InputStreamReader(in, UTF_8));
     }
 
     @Override

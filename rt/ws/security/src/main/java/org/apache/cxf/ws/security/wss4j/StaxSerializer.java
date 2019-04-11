@@ -54,6 +54,8 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.encryption.AbstractSerializer;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Converts <code>String</code>s into <code>Node</code>s and visa versa using CXF's StaxUtils
  */
@@ -143,7 +145,7 @@ public class StaxSerializer extends AbstractSerializer {
 
         LoadingByteArrayOutputStream byteArrayOutputStream = new LoadingByteArrayOutputStream();
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, UTF_8);
             outputStreamWriter.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dummy");
 
             // Run through each node up to the document node and find any xmlns: nodes
@@ -173,7 +175,7 @@ public class StaxSerializer extends AbstractSerializer {
             v.add(byteArrayOutputStream.createInputStream());
             v.addElement(new ByteArrayInputStream(source));
             byteArrayOutputStream = new LoadingByteArrayOutputStream();
-            outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
+            outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream, UTF_8);
             outputStreamWriter.write("</dummy>");
             outputStreamWriter.close();
             v.add(byteArrayOutputStream.createInputStream());

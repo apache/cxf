@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -44,9 +43,10 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.core.WSDLToProcessor;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLToJavaScriptProcessor.class);
-    private static final Charset UTF8 = Charset.forName("utf-8");
 
     public void process() throws ToolException {
         super.process();
@@ -77,7 +77,7 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
                                                                     outputStream);
             }
 
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
             writer = new BufferedWriter(outputStreamWriter);
 
             XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
