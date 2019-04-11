@@ -133,6 +133,7 @@
     </dependencyManagement>
     <modules>
         <module>client/async</module>
+        <module>client/tracing</module>
         <module>client/weld</module>
     </modules>
 </project>
