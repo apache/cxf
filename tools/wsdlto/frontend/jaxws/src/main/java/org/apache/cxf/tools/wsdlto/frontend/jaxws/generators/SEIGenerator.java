@@ -24,9 +24,9 @@ import java.util.Map;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;

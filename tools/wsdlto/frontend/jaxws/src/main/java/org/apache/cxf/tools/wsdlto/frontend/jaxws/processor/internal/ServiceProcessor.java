@@ -35,13 +35,13 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapHeader;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapOperation;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
