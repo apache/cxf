@@ -181,6 +181,8 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 //and let the rest of the chain try handling it as is.
                 LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", nex);
             }
+        } else if (cause instanceof SOAPFaultException && ((SOAPFaultException)cause).getFault().hasDetail()) {
+            return;
         } else {
             FaultMode mode = message.get(FaultMode.class);
             if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
