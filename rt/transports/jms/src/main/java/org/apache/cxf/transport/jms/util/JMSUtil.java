@@ -146,6 +146,7 @@ public final class JMSUtil {
             actualNum++;
             messages.nextElement();
         }
+        browser.close();
         return actualNum;
     }
 }

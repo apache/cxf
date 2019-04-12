@@ -23,7 +23,6 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
@@ -39,44 +38,32 @@ import org.apache.activemq.pool.XaPooledConnectionFactory;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
 import org.awaitility.Awaitility;
 
-import org.easymock.Capture;
 import org.junit.Test;
 
-
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.newCapture;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MessageListenerTest {
 
-    private static final String FAIL = "fail";
-    private static final String FAILFIRST = "failfirst";
-    private static final String OK = "ok";
-    
+    enum TestMessage {
+        OK, FAILFIRST, FAIL;
+    }
+
     @Test
     public void testConnectionProblem() throws JMSException {
         Connection connection = createConnection("broker");
         Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        ExceptionListener exListener = createMock(ExceptionListener.class);
-        
-        Capture<JMSException> captured = newCapture();
-        exListener.onException(capture(captured));
-        expectLastCall();
-        replay(exListener);
+        TestExceptionListener exListener = new TestExceptionListener();
 
         PollingMessageListenerContainer container = //
             new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
         connection.close(); // Simulate connection problem
         container.start();
         Awaitility.await().until(() -> !container.isRunning());
-        verify(exListener);
-        JMSException ex = captured.getValue();
+        JMSException ex = exListener.exception;
+        assertNotNull(ex);
         assertEquals("The connection is already closed", ex.getMessage());
     }
     
@@ -87,12 +74,7 @@ public class MessageListenerTest {
         Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        ExceptionListener exListener = createMock(ExceptionListener.class);
-        
-        Capture<JMSException> captured = newCapture();
-        exListener.onException(capture(captured));
-        expectLastCall();
-        replay(exListener);
+        TestExceptionListener exListener = new TestExceptionListener();
 
         PollingMessageListenerContainer container = //
             new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
@@ -103,8 +85,8 @@ public class MessageListenerTest {
         connection.close(); // Simulate connection problem
         container.start();
         Awaitility.await().until(() -> !container.isRunning());
-        verify(exListener);
-        JMSException ex = captured.getValue();
+        JMSException ex = exListener.exception;
+        assertNotNull(ex);
         // Closing the pooled connection will result in a NPE when using it
         assertEquals("Wrapped exception. null", ex.getMessage());
     }
@@ -116,12 +98,7 @@ public class MessageListenerTest {
         Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
-        ExceptionListener exListener = new ExceptionListener() {
-            
-            @Override
-            public void onException(JMSException exception) {
-            }
-        };
+        ExceptionListener exListener = new TestExceptionListener();
         PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
                                                                                         listenerHandler, exListener);
         container.setTransacted(false);
@@ -149,10 +126,10 @@ public class MessageListenerTest {
 
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
 
-        sendMessage(connection, dest, OK);
+        sendMessage(connection, dest, TestMessage.OK);
         assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000L);
 
-        sendMessage(connection, dest, FAIL);
+        sendMessage(connection, dest, TestMessage.FAIL);
         assertNumMessagesInQueue("Even when an exception occurs the message should be committed", connection,
                                  dest, 0, 1000L);
 
@@ -181,17 +158,17 @@ public class MessageListenerTest {
         assertNumMessagesInQueue("At the start the queue should be empty", connection, dest, 0, 0L);
         assertNumMessagesInQueue("At the start the DLQ should be empty", connection, dlq, 0, 0L);
 
-        sendMessage(connection, dest, OK);
+        sendMessage(connection, dest, TestMessage.OK);
         assertNumMessagesInQueue("This message should be committed", connection, dest, 0, 1000L);
 
-        sendMessage(connection, dest, FAILFIRST);
+        sendMessage(connection, dest, TestMessage.FAILFIRST);
         assertNumMessagesInQueue("Should succeed on second try", connection, dest, 0, 2000L);
 
-        sendMessage(connection, dest, FAIL);
+        sendMessage(connection, dest, TestMessage.FAIL);
         assertNumMessagesInQueue("Should be rolled back", connection, dlq, 1, 2500L);
     }
 
-    private Connection createConnection(String name) throws JMSException {
+    private static Connection createConnection(String name) throws JMSException {
         ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("vm://" + name
                                                                      + "?broker.persistent=false");
         cf.setRedeliveryPolicy(redeliveryPolicy());
@@ -200,7 +177,7 @@ public class MessageListenerTest {
         return connection;
     }
 
-    private Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
+    private static Connection createXAConnection(String name, TransactionManager tm) throws JMSException {
         ActiveMQXAConnectionFactory cf = new ActiveMQXAConnectionFactory("vm://" + name
                                                                          + "?broker.persistent=false");
         cf.setRedeliveryPolicy(redeliveryPolicy());
@@ -212,22 +189,11 @@ public class MessageListenerTest {
         return connection;
     }
 
-    private RedeliveryPolicy redeliveryPolicy() {
+    private static RedeliveryPolicy redeliveryPolicy() {
         RedeliveryPolicy redeliveryPolicy = new RedeliveryPolicy();
-        redeliveryPolicy.setRedeliveryDelay(1000);
+        redeliveryPolicy.setRedeliveryDelay(500L);
         redeliveryPolicy.setMaximumRedeliveries(1);
         return redeliveryPolicy;
-    }
-
-    protected void drainQueue(Connection connection, Queue dest) throws JMSException, InterruptedException {
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageConsumer consumer = session.createConsumer(dest);
-        while (consumer.receiveNoWait() != null) {
-            System.out.println("Consuming old message");
-        }
-        consumer.close();
-        session.close();
-        assertNumMessagesInQueue("", connection, dest, 0, 0L);
     }
 
     private static void assertNumMessagesInQueue(String message, Connection connection, Queue queue,
@@ -247,11 +213,10 @@ public class MessageListenerTest {
         assertEquals(message + " -> number of messages on queue", expectedNum, actualNum);
     }
 
-    private static void sendMessage(Connection connection, Destination dest, String content) throws JMSException,
-        InterruptedException {
+    private static void sendMessage(Connection connection, Destination dest, TestMessage content) throws JMSException {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         MessageProducer prod = session.createProducer(dest);
-        Message message = session.createTextMessage(content);
+        Message message = session.createTextMessage(content.toString());
         prod.send(message);
         prod.close();
         session.close();
@@ -263,18 +228,19 @@ public class MessageListenerTest {
         public void onMessage(Message message) {
             TextMessage textMessage = (TextMessage)message;
             try {
-                String text = textMessage.getText();
-                if (OK.equals(text)) {
+                switch (TestMessage.valueOf(textMessage.getText())) {
+                case OK:
                     //System.out.println("Simulating Processing successful");
-                } else if (FAIL.equals(text)) {
-                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
-                } else if (FAILFIRST.equals(text)) {
+                    break;
+                case FAILFIRST:
                     if (message.getJMSRedelivered()) {
                         //System.out.println("Simulating processing worked on second try");
-                    } else {
-                        throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                        break;
                     }
-                } else {
+                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                case FAIL:
+                    throw new RuntimeException("Simulating something went wrong. Expecting rollback");
+                default:
                     throw new IllegalArgumentException("Invalid message type");
                 }
             } catch (JMSException e) {
@@ -282,4 +248,12 @@ public class MessageListenerTest {
             }
         }
     }
+
+    private static final class TestExceptionListener implements ExceptionListener {
+        JMSException exception;
+        @Override
+        public void onException(JMSException ex) {
+            exception = ex;
+        }
+    };
 }
