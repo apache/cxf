@@ -76,7 +76,7 @@ public class StatsRestServiceImpl {
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
             .id("" + eventId)
-            .data(Stats.class, new Stats(new Date().getTime(), RANDOM.nextInt(100)))
+            .data(Stats.class, new Stats(System.currentTimeMillis(), RANDOM.nextInt(100)))
             .mediaType(MediaType.APPLICATION_JSON_TYPE)
             .build();
     }
