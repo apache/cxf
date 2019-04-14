@@ -167,7 +167,7 @@
         <cxf.swagger2.version>1.5.21</cxf.swagger2.version>
         <cxf.swagger.v3.version>2.0.6</cxf.swagger.v3.version>
         <cxf.swagger.ui.version>3.20.9</cxf.swagger.ui.version>
-        <cxf.tomcat.version>8.5.39</cxf.tomcat.version>
+        <cxf.tomcat.version>8.5.40</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.3</cxf.tomitribe.http.signature.version>
         <cxf.velocity.version>2.0</cxf.velocity.version>
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
