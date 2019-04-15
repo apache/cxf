@@ -239,6 +239,12 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${cxf.hibernate.em.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions> 
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>

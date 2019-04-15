@@ -122,6 +122,12 @@
       <version>${cxf.hibernate.em.version}</version>
       <scope>test</scope>
       <optional>true</optional>
+        <exclusions>
+            <exclusion>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+            </exclusion>
+        </exclusions> 
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
@@ -184,7 +190,6 @@
       <version>1.0.2.Final</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
