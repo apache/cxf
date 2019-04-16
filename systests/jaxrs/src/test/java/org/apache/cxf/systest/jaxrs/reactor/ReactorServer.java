@@ -55,6 +55,7 @@ public class ReactorServer extends AbstractBusTestServerBase {
         
         JAXRSServerFactoryBean sf2 = new JAXRSServerFactoryBean();
         sf2.setProvider(new JacksonJsonProvider());
+        sf2.setProvider(new IllegalArgumentExceptionMapper());
         new ReactorCustomizer().customize(sf2);
         sf2.getOutInterceptors().add(new LoggingOutInterceptor());
         sf2.setResourceClasses(FluxService.class);
