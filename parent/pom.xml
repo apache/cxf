@@ -84,7 +84,7 @@
         <cxf.classmate.version>1.1.0</cxf.classmate.version>
         <cxf.commons-codec.version>1.12</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
-        <cxf.commons-lang3.version>3.8.1</cxf.commons-lang3.version>
+        <cxf.commons-lang3.version>3.9</cxf.commons-lang3.version>
         <cxf.commons-text.version>1.6</cxf.commons-text.version>
         <cxf.derby.version>10.14.2.0</cxf.derby.version>
         <cxf.dom4j.version>2.1.1</cxf.dom4j.version>
