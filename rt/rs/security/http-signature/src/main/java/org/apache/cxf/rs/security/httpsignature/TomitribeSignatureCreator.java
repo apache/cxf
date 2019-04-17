@@ -80,10 +80,20 @@ public class TomitribeSignatureCreator implements SignatureCreator {
                 new org.tomitribe.auth.signatures.Signer(keyProvider.getKey(keyId), signature);
         Signature outputSignature = signer.sign(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
 
-        return "keyId=\"" + outputSignature.getKeyId() + '\"'
-            + ",algorithm=\"" + outputSignature.getAlgorithm() + '\"'
-            + ",headers=\"" + Join.join(" ", outputSignature.getHeaders()) + '\"'
-            + ",signature=\"" + outputSignature.getSignature() + '\"';
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("keyId=\"");
+        sb.append(outputSignature.getKeyId());
+        sb.append('"');
+        sb.append(",algorithm=\"");
+        sb.append(outputSignature.getAlgorithm());
+        sb.append('"');
+        sb.append(",headers=\"");
+        sb.append(Join.join(" ", outputSignature.getHeaders()));
+        sb.append('"');
+        sb.append(",signature=\"");
+        sb.append(outputSignature.getSignature());
+        sb.append('"');
+        return sb.toString();
     }
 
 }
