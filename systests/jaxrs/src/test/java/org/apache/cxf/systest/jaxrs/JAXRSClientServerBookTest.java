@@ -599,6 +599,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             "http://localhost:" + PORT + "/bookstore/post401";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setAllowChunking(false);
+        assertFalse(WebClient.getConfig(wc).getHttpConduit().getClient().isAllowChunking());
+
         Response r = wc.post(null);
         assertEquals(401, r.getStatus());
         assertEquals("This is 401", getStringFromInputStream((InputStream)r.getEntity()));
@@ -1112,7 +1114,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testAddBookProxyResponse() {
         Book b = new Book("CXF rocks", 123L);
 
-        System.out.println(Arrays.deepToString(Arrays.asList(b, b).toArray()));
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Response r = store.addBook(b);
         assertNotNull(r);
