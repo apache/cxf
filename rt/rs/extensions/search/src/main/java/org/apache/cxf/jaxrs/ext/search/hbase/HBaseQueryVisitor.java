@@ -19,11 +19,12 @@
 package org.apache.cxf.jaxrs.ext.search.hbase;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
@@ -39,7 +40,7 @@ import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 
 public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filter> {
 
-    private Stack<List<Filter>> queryStack = new Stack<>();
+    private final Deque<List<Filter>> queryStack = new ArrayDeque<>();
     private String family;
     private Map<String, String> familyMap;
     public HBaseQueryVisitor(String family) {

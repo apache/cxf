@@ -19,13 +19,14 @@
 
 package org.apache.cxf.staxutils;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -45,9 +46,9 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     protected XMLEventFactory factory;
 
     List<XMLEvent> events = new ArrayList<>(1000);
-    Stack<NSContext> contexts = new Stack<>();
-    Stack<QName> elNames = new Stack<>();
-    QName lastStart;
+    final Deque<NSContext> contexts = new ArrayDeque<>();
+    final Deque<QName> elNames = new ArrayDeque<>();
+    QName lastStart = new QName(""); // avoid push null to Deque
     NSContext curContext = new NSContext(null);
 
     public CachingXmlEventWriter() {

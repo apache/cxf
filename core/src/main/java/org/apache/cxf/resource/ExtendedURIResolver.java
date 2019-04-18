@@ -21,7 +21,8 @@ package org.apache.cxf.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.xml.sax.InputSource;
 
@@ -30,7 +31,7 @@ public class ExtendedURIResolver {
 
     protected org.apache.cxf.resource.URIResolver currentResolver;
     protected String lastestImportUri;
-    protected Stack<InputStream> resourceOpened = new Stack<>();
+    protected final Deque<InputStream> resourceOpened = new ArrayDeque<>();
 
     public ExtendedURIResolver() {
         currentResolver = new org.apache.cxf.resource.URIResolver();
@@ -51,7 +52,7 @@ public class ExtendedURIResolver {
                     curUri = currentResolver.getFile().getAbsoluteFile().toURI().toString();
                 }
                 InputStream in = currentResolver.getInputStream();
-                resourceOpened.addElement(in);
+                resourceOpened.add(in);
                 InputSource source = new InputSource(in);
                 source.setSystemId(curUri);
                 source.setPublicId(curUri);

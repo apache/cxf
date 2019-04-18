@@ -44,19 +44,15 @@ public final class UrlUtils {
     }
 
     public static String urlEncode(String value) {
-
         return urlEncode(value, StandardCharsets.UTF_8.name());
     }
 
     public static String urlEncode(String value, String enc) {
-
         try {
-            value = URLEncoder.encode(value, enc);
+            return URLEncoder.encode(value, enc);
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
-
-        return value;
     }
 
     /**

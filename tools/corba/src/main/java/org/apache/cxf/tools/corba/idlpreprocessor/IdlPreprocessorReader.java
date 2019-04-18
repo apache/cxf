@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * A Reader that implements the #include functionality of the preprocessor.
@@ -64,7 +65,7 @@ public final class IdlPreprocessorReader extends Reader {
 
     private final IncludeResolver includeResolver;
 
-    private final Stack<IncludeStackEntry> includeStack = new Stack<>();
+    private final Deque<IncludeStackEntry> includeStack = new ArrayDeque<>();
 
     /**
      * Stack of Booleans, corresponding to nested 'if' preprocessor directives.
@@ -72,7 +73,7 @@ public final class IdlPreprocessorReader extends Reader {
      *
      * @see #skips()
      */
-    private final Stack<Boolean> ifStack = new Stack<>();
+    private final Deque<Boolean> ifStack = new ArrayDeque<>();
 
     private final DefineState defineState;
 

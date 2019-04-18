@@ -29,11 +29,12 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -236,18 +237,12 @@ public final class StaxUtils {
     }
 
     public static void setInnerElementLevelThreshold(int i) {
-        if (i == -1) {
-            i = 500;
-        }
-        innerElementLevelThreshold = i;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", i);
+        innerElementLevelThreshold = i != -1 ? i : 500;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxElementDepth", innerElementLevelThreshold);
     }
     public static void setInnerElementCountThreshold(int i) {
-        if (i == -1) {
-            i = 50000;
-        }
-        innerElementCountThreshold = i;
-        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", i);
+        innerElementCountThreshold = i != -1 ? i : 50000;
+        setProperty(SAFE_INPUT_FACTORY, "com.ctc.wstx.maxChildrenPerElement", innerElementCountThreshold);
     }
 
     /**
@@ -406,12 +401,9 @@ public final class StaxUtils {
     }
 
     public static XMLStreamWriter createXMLStreamWriter(OutputStream out, String encoding) {
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
         XMLOutputFactory factory = getXMLOutputFactory();
         try {
-            return factory.createXMLStreamWriter(out, encoding);
+            return factory.createXMLStreamWriter(out, encoding != null ? encoding : StandardCharsets.UTF_8.name());
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
         } finally {
@@ -520,9 +512,9 @@ public final class StaxUtils {
             prefix = "";
         }
 
-        if (namespace.length() > 0) {
+        if (!namespace.isEmpty()) {
             writer.writeStartElement(prefix, name, namespace);
-            if (prefix.length() > 0) {
+            if (!prefix.isEmpty()) {
                 writer.writeNamespace(prefix, namespace);
                 writer.setPrefix(prefix, namespace);
             } else {
@@ -734,7 +726,7 @@ public final class StaxUtils {
         // number of elements read in
         int read = 0;
         int elementCount = 0;
-        Stack<Integer> countStack = new Stack<>();
+        final Deque<Integer> countStack = new ArrayDeque<>();
         int event = reader.getEventType();
 
         while (reader.hasNext()) {
@@ -1056,7 +1048,7 @@ public final class StaxUtils {
         if (attrs.getLength() == 0) {
             return Collections.<Node> emptyList();
         }
-        List<Node> sortedAttrs = new LinkedList<>();
+        List<Node> sortedAttrs = new ArrayList<>(attrs.getLength());
         for (int i = 0; i < attrs.getLength(); i++) {
             Node attr = attrs.item(i);
             String name = attr.getLocalName();
@@ -1217,7 +1209,7 @@ public final class StaxUtils {
     private static boolean isDeclared(Element e, String namespaceURI, String prefix) {
         while (e != null) {
             Attr att;
-            if (prefix != null && prefix.length() > 0) {
+            if (prefix != null && !prefix.isEmpty()) {
                 att = e.getAttributeNodeNS(XML_NS, prefix);
             } else {
                 att = e.getAttributeNode("xmlns");
@@ -1233,7 +1225,7 @@ public final class StaxUtils {
                 //A document that probably doesn't have any namespace qualifies elements
                 return true;
             } else {
-                e = null;
+                break;
             }
         }
         return false;
@@ -1272,7 +1264,7 @@ public final class StaxUtils {
                                        XMLStreamReader reader, boolean repairing, boolean recordLoc,
                                        boolean isThreshold)
         throws XMLStreamException {
-        Stack<Node> stack = new Stack<>();
+        final Deque<Node> stack = new ArrayDeque<>();
         int event = reader.getEventType();
         int elementCount = 0;
         while (reader.hasNext()) {
@@ -1282,7 +1274,7 @@ public final class StaxUtils {
                 Element e;
                 if (!StringUtils.isEmpty(reader.getPrefix())) {
                     e = doc.createElementNS(reader.getNamespaceURI(),
-                                            reader.getPrefix() + ":" + reader.getLocalName());
+                                            reader.getPrefix() + ':' + reader.getLocalName());
                 } else {
                     e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
                 }
@@ -1299,8 +1291,8 @@ public final class StaxUtils {
                 for (int att = 0; att < reader.getAttributeCount(); att++) {
                     String name = reader.getAttributeLocalName(att);
                     String prefix = reader.getAttributePrefix(att);
-                    if (prefix != null && prefix.length() > 0) {
-                        name = prefix + ":" + name;
+                    if (prefix != null && !prefix.isEmpty()) {
+                        name = prefix + ':' + name;
                     }
 
                     Attr attr = doc.createAttributeNS(reader.getAttributeNamespace(att), name);
@@ -1372,7 +1364,7 @@ public final class StaxUtils {
     }
 
     public static class StreamToDOMContext {
-        private Stack<Node> stack = new Stack<>();
+        private final Deque<Node> stack = new ArrayDeque<>();
         private int elementCount;
         private boolean repairing;
         private boolean recordLoc;
@@ -1412,8 +1404,8 @@ public final class StaxUtils {
             return elementCount;
         }
 
-        public Node pushToStack(Node node) {
-            return stack.push(node);
+        public void pushToStack(Node node) {
+            stack.push(node);
         }
 
         public Node popFromStack() {
@@ -1718,13 +1710,9 @@ public final class StaxUtils {
      * @param encoding
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in, String encoding) {
-        if (encoding == null) {
-            encoding = StandardCharsets.UTF_8.name();
-        }
-
         XMLInputFactory factory = getXMLInputFactory();
         try {
-            return factory.createXMLStreamReader(in, encoding);
+            return factory.createXMLStreamReader(in, encoding != null ? encoding : StandardCharsets.UTF_8.name());
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
         } finally {

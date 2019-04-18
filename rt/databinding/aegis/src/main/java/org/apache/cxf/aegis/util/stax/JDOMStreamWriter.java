@@ -18,9 +18,10 @@
  */
 package org.apache.cxf.aegis.util.stax;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
@@ -35,7 +36,7 @@ import org.jdom.EntityRef;
 import org.jdom.Namespace;
 
 public class JDOMStreamWriter implements XMLStreamWriter {
-    private Stack<Element> stack = new Stack<>();
+    private final Deque<Element> stack = new ArrayDeque<>();
 
     private Document document;
 
