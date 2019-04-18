@@ -114,6 +114,33 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testHttpSignatureGET() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.path("/126").get();
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(123L, returnedBook.getId());
+    }
+
+    @Test
     public void testHttpSignatureServiceProperties() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
@@ -666,6 +693,20 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
+        assertEquals(response.getStatus(), 400);
+    }
+
+    @Test
+    public void testNoHttpSignatureGET() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        WebClient client =
+            WebClient.create(address, busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.path("/126").get();
         assertEquals(response.getStatus(), 400);
     }
 
