@@ -230,6 +230,33 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
+    public void testPlaintextWSDLOverHTTPS() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = UsernameTokenTest.class.getResource("client-remote-wsdl.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = new URL("https://localhost:" + PORT + "/DoubleItUTPlaintext?wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
+        DoubleItPortType utPort =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(utPort, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(utPort);
+        }
+
+        assertEquals(50, utPort.doubleIt(25));
+
+        ((java.io.Closeable)utPort).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
     public void testPlaintextCreated() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
