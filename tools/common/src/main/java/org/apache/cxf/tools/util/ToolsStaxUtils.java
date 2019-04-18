@@ -23,12 +23,13 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
@@ -52,7 +53,7 @@ public final class ToolsStaxUtils {
             int count = 0;
             QName checkingPoint = null;
 
-            Stack<Tag> stack = new Stack<>();
+            final Deque<Tag> stack = new ArrayDeque<>();
 
             while (reader.hasNext()) {
                 int event = reader.next();

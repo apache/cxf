@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.jaxrs.ext.search.lucene;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
@@ -59,7 +60,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     private String contentsFieldName;
     private Map<String, String> contentsFieldMap;
     private boolean caseInsensitiveMatch;
-    private VisitorState< Stack< List< Query > > > state = new ThreadLocalVisitorState<>();
+    private final VisitorState< Deque< List< Query > > > state = new ThreadLocalVisitorState<>();
     private QueryBuilder queryBuilder;
 
     public LuceneQueryVisitor() {
@@ -114,7 +115,7 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
      * each call to visit() method should be preceded by reset() method call.
      */
     public void reset() {
-        state.set(new Stack<List<Query>>());
+        state.set(new ArrayDeque<List<Query>>());
         state.get().push(new ArrayList<>());
     }
 

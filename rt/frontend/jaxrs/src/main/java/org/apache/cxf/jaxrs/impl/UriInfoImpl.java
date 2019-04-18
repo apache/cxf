@@ -155,7 +155,7 @@ public class UriInfoImpl implements UriInfo {
 
     public List<Object> getMatchedResources() {
         if (stack != null) {
-            List<Object> resources = new LinkedList<>();
+            List<Object> resources = new ArrayList<>(stack.size());
             for (MethodInvocationInfo invocation : stack) {
                 resources.add(0, invocation.getRealClass());
             }
