@@ -57,7 +57,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
-import org.apache.cxf.rs.security.httpsignature.filters.CreateDigestInterceptor;
+import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
@@ -570,7 +570,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+        CreateSignatureInterceptor digestFilter = new CreateSignatureInterceptor();
 
         String address = "http://localhost:" + PORT + "/digest/bookstore/books";
         WebClient client =
@@ -589,7 +589,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor("SHA-512");
+        CreateSignatureInterceptor digestFilter = new CreateSignatureInterceptor("SHA-512");
 
         String address = "http://localhost:" + PORT + "/digest/bookstore/books";
         WebClient client =
@@ -608,7 +608,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+        CreateSignatureInterceptor digestFilter = new CreateSignatureInterceptor();
         VerifyDigestInterceptor verifyDigestFilter = new VerifyDigestInterceptor();
 
         String address = "http://localhost:" + PORT + "/digest/bookstore/books";
@@ -640,7 +640,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        CreateDigestInterceptor digestFilter = new CreateDigestInterceptor();
+        CreateSignatureInterceptor digestFilter = new CreateSignatureInterceptor();
 
         String address = "http://localhost:" + PORT + "/httpsigdigest/bookstore/books";
         WebClient client =

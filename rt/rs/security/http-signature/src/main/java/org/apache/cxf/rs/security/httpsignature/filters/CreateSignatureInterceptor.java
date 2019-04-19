@@ -40,22 +40,22 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
- * RS WriterInterceptor which adds digests of the body.
+ * RS WriterInterceptor which adds digests of the body and signing of headers.
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
-public class CreateDigestInterceptor extends AbstractSignatureOutFilter implements WriterInterceptor {
+public class CreateSignatureInterceptor extends AbstractSignatureOutFilter implements WriterInterceptor {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private final String digestAlgorithmName;
 
     @Context
     private UriInfo uriInfo;
 
-    public CreateDigestInterceptor() {
+    public CreateSignatureInterceptor() {
         this(MessageDigestInputStream.ALGO_SHA_256);
     }
 
-    public CreateDigestInterceptor(String digestAlgorithmName) {
+    public CreateSignatureInterceptor(String digestAlgorithmName) {
         this.digestAlgorithmName = digestAlgorithmName;
     }
 
