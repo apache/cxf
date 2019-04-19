@@ -78,7 +78,7 @@ public class CreateDigestInterceptor extends AbstractSignatureOutFilter implemen
     private void sign(WriterInterceptorContext writerInterceptorContext) {
         String method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
             Message.HTTP_REQUEST_METHOD, "");
-        performSignature(writerInterceptorContext.getHeaders(), uriInfo.getPath(), method);
+        performSignature(writerInterceptorContext.getHeaders(), uriInfo.getRequestUri().getPath(), method);
     }
 
     private void addDigest(WriterInterceptorContext context) throws IOException {
