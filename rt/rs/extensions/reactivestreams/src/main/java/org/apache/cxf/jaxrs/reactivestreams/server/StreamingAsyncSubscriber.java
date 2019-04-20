@@ -40,6 +40,9 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
     private long pollTimeout;
     private long asyncTimeout;
     private volatile boolean completed;
+    private volatile Throwable throwable;
+    
+    private AtomicBoolean tagsWriteDone = new AtomicBoolean();
     private AtomicBoolean firstWriteDone = new AtomicBoolean();
     public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep) {
         this(ar, openTag, closeTag, sep, 1000);
@@ -75,6 +78,16 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
     public void onComplete() {
         completed = true;
     }
+    
+    @Override
+    public void onError(Throwable t) {
+        throwable = t;
+        completed = true;
+        // The AsyncResponse implementation is resumable only once. If the
+        // onNext() has been called, the throwable will be propagated using
+        // StreamingResponseImpl, otherwise using normal resume operation.
+        super.onError(t);
+    }
 
     @Override
     public void onNext(T bean) {
@@ -88,10 +101,12 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
 
         @Override
         public void writeTo(Writer<T> writer) throws IOException {
-            if (openTag != null) {
-                writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
-            }
+
             while (!completed || !queue.isEmpty()) {
+                if (tagsWriteDone.compareAndSet(false, true) && openTag != null) {
+                    writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
+                }
+                
                 try {
                     T bean = queue.poll(pollTimeout, TimeUnit.MILLISECONDS);
                     if (bean != null) {
@@ -104,10 +119,30 @@ public class StreamingAsyncSubscriber<T> extends AbstractSubscriber<T> {
                     // ignore
                 }
             }
-            if (closeTag != null) {
+            if (closeTag != null && tagsWriteDone.get()) {
                 writer.getEntityStream().write(StringUtils.toBytesUTF8(closeTag));
             }
 
+            if (throwable != null) {
+                if (throwable instanceof RuntimeException) {
+                    throw (RuntimeException)throwable;
+                } else if (throwable instanceof IOException) {
+                    throw (IOException)throwable;
+                } else {
+                    throw new IOException(throwable);
+                }
+            }
+            
+            // empty stream
+            if (!tagsWriteDone.get()) {
+                if (openTag != null) {
+                    writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
+                }
+                
+                if (closeTag != null) {
+                    writer.getEntityStream().write(StringUtils.toBytesUTF8(closeTag));
+                }
+            }
         }
 
     }

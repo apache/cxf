@@ -24,9 +24,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.reactivestreams.server.JsonStreamingAsyncSubscriber;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Path("/flux")
@@ -56,5 +58,51 @@ public class FluxService {
         return Flux.just("Hello", "Ciao")
                 .map(HelloWorldBean::new)
                 .subscribeOn(Schedulers.parallel());
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("errors")
+    public Flux<HelloWorldBean> errors() { 
+        return Flux 
+            .range(1, 2) 
+            .flatMap(item -> { 
+                if (item < 2) { 
+                    return Mono.just(new HelloWorldBean("Person " + item)); 
+                } else { 
+                    return Mono.error(new RuntimeException("Oops")); 
+                } 
+            }); 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/mapper/errors")
+    public Flux<HelloWorldBean> mapperErrors() { 
+        return Flux 
+            .range(1, 3) 
+            .flatMap(item -> { 
+                if (item < 3) { 
+                    return Mono.just(new HelloWorldBean("Person " + item)); 
+                } else { 
+                    return Mono.error(new IllegalArgumentException("Oops")); 
+                } 
+            }); 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/immediate/errors")
+    public Flux<HelloWorldBean> immediateErrors() { 
+        return Flux 
+            .range(1, 2) 
+            .flatMap(item -> Mono.error(new RuntimeException("Oops"))); 
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/empty")
+    public Flux<HelloWorldBean> empty() { 
+        return Flux.empty(); 
     }
 }
