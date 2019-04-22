@@ -148,7 +148,7 @@ class Stax2ValidationUtils {
                         continue;
                     }
 
-                    if (sch.getTargetNamespace() == null && sch.getExternals().size() > 0) {
+                    if (sch.getTargetNamespace() == null && !sch.getExternals().isEmpty()) {
                         for (XmlSchemaExternal xmlSchemaExternal : sch.getExternals()) {
                             addSchema(sources, xmlSchemaExternal.getSchema(),
                                     getElement(xmlSchemaExternal.getSchema().getSourceURI()));

@@ -187,11 +187,11 @@ public abstract class AbstractBeanDefinitionParser
         String id = getIdOrName(elem);
         String createdFromAPI = elem.getAttribute("createdFromAPI");
 
-        if (null == id || "".equals(id)) {
+        if (null == id || id.isEmpty()) {
             return super.resolveId(elem, definition, ctx);
         }
 
-        if (createdFromAPI != null && "true".equals(createdFromAPI.toLowerCase())) {
+        if (createdFromAPI != null && Boolean.parseBoolean(createdFromAPI)) {
             return id + getSuffix();
         }
         return id;
@@ -257,10 +257,8 @@ public abstract class AbstractBeanDefinitionParser
         LOG.fine("Adding " + WIRE_BUS_ATTRIBUTE + " attribute " + type + " to bean " + bean);
         bean.getRawBeanDefinition().setAttribute(WIRE_BUS_ATTRIBUTE, type);
         if (!StringUtils.isEmpty(busName)) {
-            if (busName.charAt(0) == '#') {
-                busName = busName.substring(1);
-            }
-            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName);
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME,
+                    busName.charAt(0) == '#' ? busName.substring(1) : busName);
         }
 
         if (ctx != null
@@ -480,9 +478,6 @@ public abstract class AbstractBeanDefinitionParser
     }
 
     protected QName parseQName(Element element, String t) {
-        String pre = null;
-        String local = null;
-
         if (t.startsWith("{")) {
             int i = t.indexOf('}');
             if (i == -1) {
@@ -492,6 +487,8 @@ public abstract class AbstractBeanDefinitionParser
             t = t.substring(i + 1);
         }
 
+        final String local;
+        final String pre;
         final String ns;
         int colIdx = t.indexOf(':');
         if (colIdx == -1) {

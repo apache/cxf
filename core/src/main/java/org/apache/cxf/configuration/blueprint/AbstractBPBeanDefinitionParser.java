@@ -128,8 +128,6 @@ public abstract class AbstractBPBeanDefinitionParser {
 
     public QName parseQName(Element element, String t) {
         String t1 = t;
-        String pre = null;
-        String local = null;
 
         if (t1.startsWith("{")) {
             int i = t1.indexOf('}');
@@ -140,6 +138,8 @@ public abstract class AbstractBPBeanDefinitionParser {
             t1 = t1.substring(i + 1);
         }
 
+        final String local;
+        final String pre;
         final String ns;
         int colIdx = t1.indexOf(':');
         if (colIdx == -1) {

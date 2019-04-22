@@ -88,21 +88,19 @@ public final class StringUtils {
     }
 
     public static String addDefaultPortIfMissing(String urlString, String defaultPort) {
-        URL url = null;
         try {
-            url = new URL(urlString);
+            if (new URL(urlString).getPort() != -1) {
+                return urlString;
+            }
         } catch (MalformedURLException e) {
-            return urlString;
-        }
-        if (url.getPort() != -1) {
             return urlString;
         }
         String regex = "http://([^/]+)";
         String found = StringUtils.getFirstFound(urlString, regex);
-        String replacer = "http://" + found + ":" + defaultPort;
 
         if (!StringUtils.isEmpty(found)) {
-            urlString = urlString.replaceFirst(regex, replacer);
+            String replacer = "http://" + found + ':' + defaultPort;
+            return urlString.replaceFirst(regex, replacer);
         }
         return urlString;
     }

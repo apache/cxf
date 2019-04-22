@@ -140,7 +140,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
         uri = value != null ? value : uri;
 
-        if (writtenUris.get(0).contains(uri) && "".equals(namespaceContext.getPrefix(uri))) {
+        if (writtenUris.get(0).contains(uri) && namespaceContext.getPrefix(uri).isEmpty()) {
             return;
         }
         super.writeDefaultNamespace(uri);
@@ -159,9 +159,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
 
-        uri = value != null ? value : uri;
-
-        super.setDefaultNamespace(uri);
+        super.setDefaultNamespace(value != null ? value : uri);
     }
 
     @Override
@@ -457,7 +455,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             local = expected.getLocalPart();
         }
         if (!attributesToElements) {
-            if (uri.length() > 0) {
+            if (!uri.isEmpty()) {
                 super.writeAttribute(uri, local, value);
             } else {
                 super.writeAttribute(local, value);

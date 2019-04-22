@@ -48,7 +48,7 @@ public class ProxyClassLoaderCache {
 
     private ClassLoader createProxyClassLoader(Class<?> proxyInterface) {
         final SecurityManager sm = System.getSecurityManager();
-        ProxyClassLoader ret = null;
+        final ProxyClassLoader ret;
         if (sm == null) {
             ret = new ProxyClassLoader(PARENT_CLASSLOADER.get(), PROXY_INTERFACES.get());
         } else {

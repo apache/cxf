@@ -30,6 +30,8 @@ import com.sun.xml.bind.v2.runtime.MarshallerImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 
 public class JAXBUtilsTest {
 
@@ -47,5 +49,18 @@ public class JAXBUtilsTest {
         final Object mockHandler = new Object();
         JAXBUtils.setEscapeHandler(m, mockHandler);
         assertEquals(mockHandler, m.getProperty("com.sun.xml.bind.characterEscapeHandler"));
+    }
+
+    @Test
+    public void getValidClass() {
+        assertSame(Character.UnicodeScript.class, JAXBUtils.getValidClass(Character.UnicodeScript.class));
+        assertSame(String[].class, JAXBUtils.getValidClass(String[].class));
+        assertNull(JAXBUtils.getValidClass(Object.class));
+        assertNull(JAXBUtils.getValidClass(String.class));
+        assertNull(JAXBUtils.getValidClass(int.class));
+        assertNull(JAXBUtils.getValidClass(Test.class));
+        assertSame(Iterable.class, JAXBUtils.getValidClass(Iterable.class));
+        assertSame(JAXBUtilsTest.class, JAXBUtils.getValidClass(JAXBUtilsTest.class));
+        assertSame(Void.class, JAXBUtils.getValidClass(Void.class));
     }
 }

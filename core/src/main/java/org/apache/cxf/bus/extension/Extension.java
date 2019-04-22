@@ -217,18 +217,10 @@ public class Extension {
                     obj = con.newInstance(b);
                     return obj;
                 } else if (b != null && args != null) {
-                    Constructor<?> con;
-                    boolean noBus = false;
                     try {
-                        con = cls.getConstructor(Bus.class, Object[].class);
-                    } catch (Exception ex) {
-                        con = cls.getConstructor(Object[].class);
-                        noBus = true;
-                    }
-                    if (noBus) {
-                        obj = con.newInstance(args);
-                    } else {
-                        obj = con.newInstance(b, args);
+                        obj = cls.getConstructor(Bus.class, Object[].class).newInstance(b, args);
+                    } catch (NoSuchMethodException ex) { // no bus
+                        obj = cls.getConstructor(Object[].class).newInstance(args);
                     }
                     return obj;
                 } else if (args != null) {

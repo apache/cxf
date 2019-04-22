@@ -61,7 +61,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
             throw new RuntimeException("Catalog resolution failed", e);
         }
 
-        InputSource in = null;
+        final InputSource in;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);
         } else {

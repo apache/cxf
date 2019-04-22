@@ -302,7 +302,7 @@ public final class JAXBUtils {
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
                     if (packageName.length() > 0) {
-                        packageName.insert(0, ".");
+                        packageName.insert(0, '.');
                         packageName.insert(0, normalizePackageNamePart(token));
                     } else {
                         packageName.insert(0, token);
@@ -315,22 +315,21 @@ public final class JAXBUtils {
 
             StringTokenizer st = new StringTokenizer(authority, ".");
             if (st.hasMoreTokens()) {
-                String token = null;
                 while (st.hasMoreTokens()) {
-                    token = st.nextToken();
+                    String token = st.nextToken();
                     if (packageName.length() == 0) {
                         if ("www".equals(token)) {
                             continue;
                         }
                     } else {
-                        packageName.insert(0, ".");
+                        packageName.insert(0, '.');
                     }
                     packageName.insert(0, normalizePackageNamePart(token));
                 }
             }
 
             if (!("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme))) {
-                packageName.insert(0, ".");
+                packageName.insert(0, '.');
                 packageName.insert(0, normalizePackageNamePart(scheme));
             }
 
@@ -569,31 +568,23 @@ public final class JAXBUtils {
     }
 
     public static Class<?> getValidClass(Class<?> cls) {
-        if (cls.isEnum()) {
-            return cls;
-        }
-        if (cls.isArray()) {
+        if (cls.isEnum() || cls.isArray()) {
             return cls;
         }
 
-        if (cls == Object.class || cls == String.class
+        if (cls == Object.class || cls == String.class || cls.isPrimitive() || cls.isAnnotation()
             || "javax.xml.ws.Holder".equals(cls.getName())) {
-            cls = null;
-        } else if (cls.isPrimitive() || cls.isAnnotation()) {
-            cls = null;
-        } else if (cls.isInterface()) {
+            return null;
+        } else if (cls.isInterface()
+            || "javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
             return cls;
         }
-        if (cls != null) {
-            if ("javax.xml.ws.wsaddressing.W3CEndpointReference".equals(cls.getName())) {
-                return cls;
-            }
-            Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
+
+        Constructor<?> cons = ReflectionUtil.getDeclaredConstructor(cls);
+        if (cons == null) {
+            cons = ReflectionUtil.getConstructor(cls);
             if (cons == null) {
-                cons = ReflectionUtil.getConstructor(cls);
-            }
-            if (cons == null) {
-                cls = null;
+                return null;
             }
         }
         return cls;

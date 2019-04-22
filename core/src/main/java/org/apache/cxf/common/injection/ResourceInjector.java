@@ -168,7 +168,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
             return;
         }
 
-        Object resource = null;
+        Object resource;
         // first find a setter that matches this resource
         Method setter = findSetterForResource(res);
         if (setter != null) {
@@ -310,10 +310,10 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         assert res != null;
         assert method.getName().startsWith("set") : method;
 
-        if (res.name() == null || "".equals(res.name())) {
+        if (res.name() == null || res.name().isEmpty()) {
             String name = method.getName().substring(3);
             name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-            return method.getDeclaringClass().getCanonicalName() + "/" + name;
+            return method.getDeclaringClass().getCanonicalName() + '/' + name;
         }
         return res.name();
     }

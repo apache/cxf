@@ -128,7 +128,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
     protected Conduit createConduit(Message message, Exchange exchange, ConduitInitiator conduitInitiator)
         throws IOException {
-        Conduit c = null;
+        Conduit c;
         synchronized (endpoint) {
             if (!conduits.isEmpty()) {
                 c = findCompatibleConduit(message);
@@ -284,9 +284,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             if (idx <= 0) {
                 return true;
             }
-            conduitAddress = conduitAddress.substring(0, idx);
-            actualAddress = actualAddress.substring(0, idx);
-            return conduitAddress.equalsIgnoreCase(actualAddress);
+            return conduitAddress.substring(0, idx).equalsIgnoreCase(actualAddress.substring(0, idx));
         }
         //no possible match as for sure the substrings before idx will be different
         return false;

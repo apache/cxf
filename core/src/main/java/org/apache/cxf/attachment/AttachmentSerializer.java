@@ -306,13 +306,12 @@ public class AttachmentSerializer {
         final byte[] buffer = new byte[bufferSize];
         int n = input.read(buffer);
         int total = 0;
-        int left = 0;
         while (-1 != n) {
             if (n == 0) {
                 throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
             }
             //make sure n is divisible by 3
-            left = n % 3;
+            int left = n % 3;
             n -= left;
             if (n > 0) {
                 Base64Utility.encodeAndStream(buffer, 0, n, output);

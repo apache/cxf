@@ -586,12 +586,11 @@ public class CachedWriter extends Writer {
 
     public static void setDefaultThreshold(int i) {
         if (i == -1) {
-            String s = SystemPropertyAction.getProperty(CachedConstants.THRESHOLD_SYS_PROP);
-            if (s == null) {
+            i = SystemPropertyAction.getInteger(CachedConstants.THRESHOLD_SYS_PROP, -1);
+            if (i == -1) {
                 // lookup the deprecated property
-                s = SystemPropertyAction.getProperty("org.apache.cxf.io.CachedWriter.Threshold", "-1");
+                i = SystemPropertyAction.getInteger("org.apache.cxf.io.CachedWriter.Threshold", -1);
             }
-            i = Integer.parseInt(s);
             if (i <= 0) {
                 i = 64 * 1024;
             }

@@ -182,13 +182,8 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         if (n == -1) {
             return null;
         }
-        for (MessagePartInfo mpi : getMessageParts()) {
-            if (n == 0) {
-                return mpi;
-            }
-            n--;
-        }
-        return null;
+        List<MessagePartInfo> mpis = getMessageParts();
+        return n < mpis.size() ? mpis.get(n) : null;
     }
 
 

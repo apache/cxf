@@ -94,7 +94,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         isOverlaidStack.add(0, isOverlaid);
         if (isOverlaid) {
             Element nd = getCurrentNode();
-            Node nd2 = null;
+            Node nd2;
             if (nd == null) {
                 nd2 = getDocument().getDocumentElement();
             } else {
@@ -135,7 +135,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         isOverlaidStack.add(0, isOverlaid);
         if (isOverlaid) {
             Element nd = getCurrentNode();
-            Node nd2 = null;
+            Node nd2;
             if (nd == null) {
                 nd2 = getDocument().getDocumentElement();
             } else {
@@ -176,7 +176,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             isOverlaidStack.add(0, isOverlaid);
             if (isOverlaid) {
                 Element nd = getCurrentNode();
-                Node nd2 = null;
+                Node nd2;
                 if (nd == null) {
                     nd2 = getDocument().getDocumentElement();
                 } else {

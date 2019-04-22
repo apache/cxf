@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -263,13 +264,8 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
 
 
-
     protected static final boolean equals(Object o1, Object o2) {
-        if (o1 == null && o2 != null
-            || o1 != null && o2 == null) {
-            return false;
-        }
-        return o1 == null || o1.equals(o2);
+        return Objects.equals(o1, o2);
     }
 
 }

@@ -310,7 +310,6 @@ public abstract class BusFactory {
      * @return a new BusFactory to be used to create Bus objects
      */
     public static BusFactory newInstance(String className) {
-        BusFactory instance = null;
         if (className == null) {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             className = getBusFactoryClass(loader);
@@ -322,17 +321,15 @@ public abstract class BusFactory {
             className = BusFactory.DEFAULT_BUS_FACTORY;
         }
 
-        Class<? extends BusFactory> busFactoryClass;
         try {
-            busFactoryClass = ClassLoaderUtils.loadClass(className, BusFactory.class)
+            Class<? extends BusFactory> busFactoryClass = ClassLoaderUtils.loadClass(className, BusFactory.class)
                 .asSubclass(BusFactory.class);
 
-            instance = busFactoryClass.newInstance();
+            return busFactoryClass.getConstructor().newInstance();
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "BUS_FACTORY_INSTANTIATION_EXC", ex);
             throw new RuntimeException(ex);
         }
-        return instance;
     }
 
     protected void initializeBus(Bus bus) {
@@ -340,11 +337,8 @@ public abstract class BusFactory {
 
     private static String getBusFactoryClass(ClassLoader classLoader) {
 
-        String busFactoryClass = null;
-        String busFactoryCondition = null;
-
         // next check system properties
-        busFactoryClass = SystemPropertyAction.getPropertyOrNull(BusFactory.BUS_FACTORY_PROPERTY_NAME);
+        String busFactoryClass = SystemPropertyAction.getPropertyOrNull(BusFactory.BUS_FACTORY_PROPERTY_NAME);
         if (isValidBusFactoryClass(busFactoryClass)) {
             return busFactoryClass;
         }
@@ -352,7 +346,7 @@ public abstract class BusFactory {
         try {
             // next, check for the services stuff in the jar file
             String serviceId = "META-INF/services/" + BusFactory.BUS_FACTORY_PROPERTY_NAME;
-            InputStream is = null;
+            InputStream is;
 
             if (classLoader == null) {
                 classLoader = Thread.currentThread().getContextClassLoader();
@@ -376,6 +370,8 @@ public abstract class BusFactory {
                     is = classLoader.getResourceAsStream(serviceId);
                 }
             }
+
+            String busFactoryCondition = null;
 
             if (is != null) {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
@@ -403,7 +399,6 @@ public abstract class BusFactory {
                 }
 
             }
-            return busFactoryClass;
 
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "FAILED_TO_DETERMINE_BUS_FACTORY_EXC", ex);
@@ -412,7 +407,7 @@ public abstract class BusFactory {
     }
 
     private static boolean isValidBusFactoryClass(String busFactoryClassName) {
-        return busFactoryClassName != null && !"".equals(busFactoryClassName);
+        return busFactoryClassName != null && !busFactoryClassName.isEmpty();
     }
 
 }

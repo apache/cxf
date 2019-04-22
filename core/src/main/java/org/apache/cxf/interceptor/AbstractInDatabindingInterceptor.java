@@ -157,15 +157,14 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         MessagePartInfo lastChoice = null;
         BindingOperationInfo lastBoi = null;
         BindingMessageInfo lastMsgInfo = null;
-        BindingMessageInfo msgInfo = null;
-        BindingOperationInfo boi = null;
         for (Iterator<OperationInfo> itr = operations.iterator(); itr.hasNext();) {
             OperationInfo op = itr.next();
 
-            boi = ep.getEndpointInfo().getBinding().getOperation(op);
+            final BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
             if (boi == null) {
                 continue;
             }
+            final BindingMessageInfo msgInfo;
             if (client) {
                 msgInfo = boi.getOutput();
             } else {

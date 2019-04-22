@@ -97,7 +97,7 @@ public abstract class AbstractObservable implements Observable {
     protected static EndpointReferenceType getTargetReference(EndpointInfo ei,
                                                               EndpointReferenceType t,
                                                               Bus bus) {
-        EndpointReferenceType ref = null;
+        final EndpointReferenceType ref;
         if (null == t) {
             ref = new EndpointReferenceType();
             AttributedURIType address = new AttributedURIType();

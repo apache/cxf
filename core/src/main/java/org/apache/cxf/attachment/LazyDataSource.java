@@ -22,9 +22,8 @@ package org.apache.cxf.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.activation.DataSource;
 
@@ -51,29 +50,18 @@ public class LazyDataSource implements DataSource {
             for (Attachment a : attachments) {
                 if (a.getId().equals(id)) {
                     this.dataSource = a.getDataHandler().getDataSource();
+                    if (dataSource == null) {
+                        throw new IllegalStateException("Could not get DataSource for "
+                                + "attachment of id " + id);
+                    }
                     break;
                 }
             }
         }
         if (dataSource == null) {
             //couldn't find it, build up error message
-            List<String> ids = new ArrayList<>(10);
-            for (Attachment a : attachments) {
-                ids.add(a.getId());
-                if (a.getId().equals(id)) {
-                    this.dataSource = a.getDataHandler().getDataSource();
-                    if (dataSource != null) {
-                        ids = null;
-                        break;
-                    }
-                    throw new IllegalStateException("Could not get DataSource for "
-                                                    + "attachment of id " + id);
-                }
-            }
-            if (ids != null) {
-                throw new IllegalStateException("No attachment for "
-                                                + " id " + id + " found in " + ids);
-            }
+            throw new IllegalStateException("No attachment for id " + id + " found in "
+                    + attachments.stream().map(Attachment::getId).collect(Collectors.toList()));
         }
     }
 

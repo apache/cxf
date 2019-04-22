@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 
 public final class FileUtils {
-    private static final int RETRY_SLEEP_MILLIS = 10;
+    private static final long RETRY_SLEEP_MILLIS = 10L;
     private static File defaultTempDir;
     private static Thread shutdownHook;
     private static final char[] ILLEGAL_CHARACTERS
@@ -161,19 +162,15 @@ public final class FileUtils {
             f.deleteOnExit();
             newTmpDir = f;
         } catch (IOException ex) {
-            int x = (int)(Math.random() * 1000000);
-            File f = new File(checkExists, "cxf-tmp-" + x);
-            int count = 0;
-            while (!f.mkdir()) {
-
+            Random r = new Random();
+            File f = new File(checkExists, "cxf-tmp-" + r.nextInt());
+            for (int count = 0; !f.mkdir(); count++) {
                 if (count > 10000) {
                     throw new RuntimeException("Could not create a temporary directory in "
                                                + s + ",  please set java.io.tempdir"
                                                + " to a writable directory");
                 }
-                x = (int)(Math.random() * 1000000);
-                f = new File(checkExists, "cxf-tmp-" + x);
-                count++;
+                f = new File(checkExists, "cxf-tmp-" + r.nextInt());
             }
             newTmpDir = f;
         }
@@ -269,20 +266,16 @@ public final class FileUtils {
 
     public static File createTempFile(String prefix, String suffix, File parentDir,
                                boolean deleteOnExit) throws IOException {
-        File result = null;
         File parent = (parentDir == null)
             ? getDefaultTempDir()
             : parentDir;
 
-        if (suffix == null) {
-            suffix = ".tmp";
-        }
         if (prefix == null) {
             prefix = "cxf";
         } else if (prefix.length() < 3) {
             prefix = prefix + "cxf";
         }
-        result = Files.createTempFile(parent.toPath(), prefix, suffix).toFile();
+        File result = Files.createTempFile(parent.toPath(), prefix, suffix).toFile();
 
         //if parentDir is null, we're in our default dir
         //which will get completely wiped on exit from our exit

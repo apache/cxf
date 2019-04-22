@@ -47,12 +47,12 @@ public class DefaultSecurityContext implements LoginSecurityContext {
     static {
         try {
             javaGroup = Class.forName("java.security.acl.Group");
-        } catch (Throwable e) {
+        } catch (Exception e) {
             javaGroup = null;
         }
         try {
             karafGroup = Class.forName("org.apache.karaf.jaas.boot.principal.Group");
-        } catch (Throwable e) {
+        } catch (Exception e) {
             karafGroup = null;
         }
     }
@@ -124,8 +124,7 @@ public class DefaultSecurityContext implements LoginSecurityContext {
             return true;
         }
 
-        Enumeration<? extends Principal> members = null;
-        
+        Enumeration<? extends Principal> members;
         try {
             Method m = ReflectionUtil.getMethod(principal.getClass(), "members");
             @SuppressWarnings("unchecked")

@@ -337,7 +337,7 @@ public class SchemaCollection {
 
     private void addCrossImportsAttributeList(XmlSchema schema, List<XmlSchemaAttributeOrGroupRef> list) {
         for (XmlSchemaAttributeOrGroupRef attr : list) {
-            QName ref = null;
+            final QName ref;
             if (attr instanceof XmlSchemaAttribute) {
                 ref = ((XmlSchemaAttribute)attr).getRef().getTargetQName();
             } else {

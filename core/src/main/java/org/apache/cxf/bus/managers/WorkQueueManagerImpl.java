@@ -153,7 +153,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             for (AutomaticWorkQueue q : namedQueues.values()) {
                 while (!q.isShutdown()) {
                     try {
-                        wait(100);
+                        wait(100L);
                     } catch (InterruptedException ex) {
                         // ignore
                     }

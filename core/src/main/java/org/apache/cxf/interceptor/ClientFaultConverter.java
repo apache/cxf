@@ -149,7 +149,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         Service s = msg.getExchange().getService();
         DataBinding dataBinding = s.getDataBinding();
 
-        Object e = null;
+        Object e;
         if (isDOMSupported(dataBinding)) {
             DataReader<Node> reader = this.getNodeDataReader(msg);
             reader.setProperty(DataReader.FAULT, fault);

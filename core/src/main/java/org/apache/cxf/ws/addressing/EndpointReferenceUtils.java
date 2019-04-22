@@ -45,7 +45,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -515,11 +514,11 @@ public final class EndpointReferenceUtils {
                     }
 
                     if (doTransform) {
-                        DOMResult domResult = new DOMResult();
-                        domResult.setSystemId(source.getSystemId());
+//                        DOMResult domResult = new DOMResult();
+//                        domResult.setSystemId(source.getSystemId());
                         node = StaxUtils.read(source);
 
-                        node = domResult.getNode();
+//                        node = domResult.getNode();
                     }
 
                     if (null != node) {
@@ -548,9 +547,6 @@ public final class EndpointReferenceUtils {
 
 
     private static Schema createSchema(ServiceInfo serviceInfo, Bus b) {
-        if (b == null) {
-            b = BusFactory.getThreadDefaultBus(false);
-        }
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -571,18 +567,18 @@ public final class EndpointReferenceUtils {
                         baseURI = si.getSystemId();
                     }
                     DOMSource ds = new DOMSource(el, baseURI);
-                    schemaSourcesMap2.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
+                    schemaSourcesMap2.put(si.getSystemId() + ':' + si.getNamespaceURI(), ds);
                     LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
                     writer = StaxUtils.createXMLStreamWriter(out);
                     StaxUtils.copy(el, writer);
                     writer.flush();
-                    schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), out.toByteArray());
+                    schemaSourcesMap.put(si.getSystemId() + ':' + si.getNamespaceURI(), out.toByteArray());
                 }
 
 
                 for (XmlSchema sch : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
                     if (sch.getSourceURI() != null
-                        && !schemaSourcesMap.containsKey(sch.getSourceURI() + ":"
+                        && !schemaSourcesMap.containsKey(sch.getSourceURI() + ':'
                                                          + sch.getTargetNamespace())) {
 
                         InputStream ins = null;
@@ -601,17 +597,17 @@ public final class EndpointReferenceUtils {
                             IOUtils.copyAndCloseInput(ins, out);
                         }
 
-                        schemaSourcesMap.put(sch.getSourceURI() + ":"
+                        schemaSourcesMap.put(sch.getSourceURI() + ':'
                                              + sch.getTargetNamespace(), out.toByteArray());
 
                         Source source = new StreamSource(out.createInputStream(), sch.getSourceURI());
-                        schemaSourcesMap2.put(sch.getSourceURI() + ":"
+                        schemaSourcesMap2.put(sch.getSourceURI() + ':'
                                               + sch.getTargetNamespace(), source);
                     }
                 }
 
-
-                factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap, b));
+                factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap,
+                        b != null ? b : BusFactory.getThreadDefaultBus(false)));
                 schema = factory.newSchema(schemaSourcesMap2.values()
                                            .toArray(new Source[schemaSourcesMap2.size()]));
 

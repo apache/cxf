@@ -55,8 +55,7 @@ public final class TransformUtils {
                                                                 String defaultNamespace) {
         if (outElementsMap != null || outDropElements != null
             || outAppendMap != null || attributesToElements) {
-            writer = createNewWriterIfNeeded(writer, os);
-            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
+            writer = new OutTransformWriter(createNewWriterIfNeeded(writer, os), outElementsMap, outAppendMap,
                                             outDropElements, null, attributesToElements, defaultNamespace);
         }
         return writer;
@@ -73,8 +72,7 @@ public final class TransformUtils {
                                                                 String defaultNamespace) {
         if (outElementsMap != null || outDropElements != null
             || outAppendMap != null || attributesToElements) {
-            writer = createNewWriterIfNeeded(writer, os);
-            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
+            writer = new OutTransformWriter(createNewWriterIfNeeded(writer, os), outElementsMap, outAppendMap,
                                             outDropElements, outAttributesMap, attributesToElements, defaultNamespace);
         }
         return writer;
@@ -166,7 +164,7 @@ public final class TransformUtils {
     }
 
     static boolean isEmptyQName(QName qname) {
-        return XMLConstants.NULL_NS_URI.equals(qname.getNamespaceURI()) && "".equals(qname.getLocalPart());
+        return XMLConstants.NULL_NS_URI.equals(qname.getNamespaceURI()) && qname.getLocalPart().isEmpty();
     }
 
     static ParsingEvent createStartElementEvent(QName name) {

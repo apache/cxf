@@ -118,9 +118,7 @@ public class ImageDataContentHandler implements DataContentHandler {
         try {
             tracker.waitForAll();
         } catch (InterruptedException e) {
-            IOException ioe = new IOException(e.getMessage());
-            ioe.initCause(e);
-            throw ioe;
+            throw new IOException(e.getMessage(), e);
         }
 
         // Create a BufferedImage so we can write it out later

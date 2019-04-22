@@ -133,15 +133,11 @@ public class URIResolver {
     }
 
     private void tryFileSystem(String baseUriStr, String uriStr) throws IOException, MalformedURLException {
+        // It is possible that spaces have been encoded.  We should decode them first.
+        String fileStr = uriStr.replace("%20", " ");
+
         try {
-            URI relative;
-
-            String orig = uriStr;
-
-            // It is possible that spaces have been encoded.  We should decode them first.
-            uriStr = uriStr.replaceAll("%20", " ");
-
-            final File uriFileTemp = new File(uriStr);
+            final File uriFileTemp = new File(fileStr);
 
             File uriFile = new File(AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
@@ -151,7 +147,7 @@ public class URIResolver {
             }));
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
                 try {
-                    URI urif = new URI(URLDecoder.decode(orig, "ASCII"));
+                    URI urif = new URI(URLDecoder.decode(uriStr, "ASCII"));
                     if ("file".equals(urif.getScheme()) && urif.isAbsolute()) {
                         File f2 = new File(urif);
                         if (f2.exists()) {
@@ -162,8 +158,9 @@ public class URIResolver {
                     //ignore
                 }
             }
+            final URI relative;
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
-                relative = new URI(uriStr.replaceAll(" ", "%20"));
+                relative = new URI(uriStr.replace(" ", "%20"));
             } else {
                 relative = uriFile.getAbsoluteFile().toURI();
             }
@@ -219,15 +216,15 @@ public class URIResolver {
                                  ? base.toString().substring(5) : base.toString());
                 }
             } else {
-                tryClasspath(uriStr.startsWith("file:")
-                             ? uriStr.substring(5) : uriStr);
+                tryClasspath(fileStr.startsWith("file:")
+                             ? fileStr.substring(5) : fileStr);
             }
         } catch (URISyntaxException e) {
             // do nothing
         }
 
         if (is == null && baseUriStr != null && baseUriStr.startsWith("classpath:")) {
-            tryClasspath(baseUriStr + uriStr);
+            tryClasspath(baseUriStr + fileStr);
         }
         if (is == null && uri != null && "file".equals(uri.getScheme())) {
             try {
@@ -245,11 +242,11 @@ public class URIResolver {
             try {
                 is = Files.newInputStream(file.toPath());
             } catch (FileNotFoundException e) {
-                throw new RuntimeException("File was deleted! " + uriStr, e);
+                throw new RuntimeException("File was deleted! " + fileStr, e);
             }
             url = file.toURI().toURL();
         } else if (is == null) {
-            tryClasspath(uriStr);
+            tryClasspath(fileStr);
         }
     }
 

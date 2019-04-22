@@ -586,8 +586,7 @@ public class CachedOutputStream extends OutputStream {
 
     public static void setDefaultThreshold(int i) {
         if (i == -1) {
-            String s = SystemPropertyAction.getProperty(CachedConstants.THRESHOLD_SYS_PROP, "-1");
-            i = Integer.parseInt(s);
+            i = SystemPropertyAction.getInteger(CachedConstants.THRESHOLD_SYS_PROP, -1);
             if (i <= 0) {
                 i = 128 * 1024;
             } else {
@@ -595,7 +594,6 @@ public class CachedOutputStream extends OutputStream {
             }
         }
         defaultThreshold = i;
-
     }
 
     /**

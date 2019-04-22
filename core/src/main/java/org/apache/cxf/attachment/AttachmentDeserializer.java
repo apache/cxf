@@ -410,7 +410,7 @@ public class AttachmentDeserializer {
             return;
         }
         int separator = line.indexOf(":");
-        String name = null;
+        final String name;
         String value = "";
         if (separator == -1) {
             name = line.toString().trim();

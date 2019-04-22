@@ -23,9 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PrimitiveUtils {
-    private static final Map<Class<?>, Class<?>> AUTOBOXED_PRIMITIVES_MAP;
+    private static final Map<Class<?>, Class<?>> AUTOBOXED_PRIMITIVES_MAP = new HashMap<>();
     static {
-        AUTOBOXED_PRIMITIVES_MAP = new HashMap<>();
         AUTOBOXED_PRIMITIVES_MAP.put(byte.class, Byte.class);
         AUTOBOXED_PRIMITIVES_MAP.put(short.class, Short.class);
         AUTOBOXED_PRIMITIVES_MAP.put(int.class, Integer.class);

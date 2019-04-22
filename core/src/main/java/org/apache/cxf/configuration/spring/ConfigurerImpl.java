@@ -71,8 +71,8 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         }
         @Override
         public int compareTo(MatcherHolder mh) {
-            Integer literalCharsLen1 = this.wildCardId.replaceAll("\\*", "").length();
-            Integer literalCharsLen2 = mh.wildCardId.replaceAll("\\*", "").length();
+            Integer literalCharsLen1 = this.wildCardId.replace("*", "").length();
+            Integer literalCharsLen2 = mh.wildCardId.replace("*", "").length();
             // The expression with more literal characters should end up on the top of the list
             return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
@@ -142,11 +142,11 @@ public class ConfigurerImpl extends BeanConfigurerSupport
 
         if (null == bn) {
             bn = getBeanName(beanInstance);
+            if (null == bn) {
+                return;
+            }
         }
 
-        if (null == bn) {
-            return;
-        }
         if (checkWildcards) {
             configureWithWildCard(bn, beanInstance);
         }
@@ -154,7 +154,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         final String beanName = bn;
         setBeanWiringInfoResolver(new BeanWiringInfoResolver() {
             public BeanWiringInfo resolveWiringInfo(Object instance) {
-                if (!"".equals(beanName)) {
+                if (!beanName.isEmpty()) {
                     return new BeanWiringInfo(beanName);
                 }
                 return null;

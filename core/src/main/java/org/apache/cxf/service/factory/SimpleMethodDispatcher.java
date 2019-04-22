@@ -88,7 +88,7 @@ public class SimpleMethodDispatcher
         BindingOperationInfo unwrappedOp = bop.getUnwrappedOperation();
         if (unwrappedOp != null
             && unwrappedOp.getOperationInfo().equals(o.getUnwrappedOperation())) {
-            bop = unwrappedOp;
+            return unwrappedOp;
         }
         return bop;
     }

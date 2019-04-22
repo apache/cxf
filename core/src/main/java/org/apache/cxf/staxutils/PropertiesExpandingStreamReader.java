@@ -24,6 +24,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
 
+import org.apache.cxf.common.util.StringUtils;
+
 /**
  * A StreamReaderDelegate that expands property references in element and attribute values.
  *
@@ -40,7 +42,7 @@ public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
     }
 
     protected String expandProperty(String value) {
-        if (isEmpty(value)) {
+        if (StringUtils.isEmpty(value)) {
             return value;
         }
 
@@ -49,32 +51,16 @@ public class PropertiesExpandingStreamReader extends StreamReaderDelegate {
             final int endIndx = value.lastIndexOf(DELIMITER);
             if (endIndx > -1 && startIndx + 1 < endIndx) {
                 final String propName = value.substring(startIndx + 1, endIndx);
-                if (!isEmpty(propName)) {
+                if (!StringUtils.isEmpty(propName)) {
                     final String envValue = props.get(propName);
-                    if (!isEmpty(envValue)) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(value.substring(0, startIndx));
-                        sb.append(envValue);
-                        sb.append(value.substring(endIndx + 1));
-                        value = sb.toString();
+                    if (!StringUtils.isEmpty(envValue)) {
+                        return value.substring(0, startIndx) + envValue + value.substring(endIndx + 1);
                     }
                 }
             }
         }
 
         return value;
-    }
-
-    private static boolean isEmpty(String str) {
-        if (str != null) {
-            int len = str.length();
-            for (int x = 0; x < len; ++x) {
-                if (str.charAt(x) > ' ') {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override

@@ -67,7 +67,6 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void write(Object obj, XMLStreamWriter writer) {
         try {
-            XMLStreamReader reader = null;
             if (obj instanceof DataSource) {
                 DataSource ds = (DataSource)obj;
                 if (schema != null) {
@@ -78,7 +77,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     schemaValidator.validate(domSource);
                     StaxUtils.copy(domSource, writer);
                 } else {
-                    reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
+                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(ds.getInputStream());
                     StaxUtils.copy(reader, writer);
                     reader.close();
                 }

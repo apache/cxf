@@ -192,11 +192,11 @@ public class MimeBodyPartInputStream extends InputStream {
             if (needUnread0d0a) { //Pushing all,  returning 13
                 i = i - boundaryIndex;
                 i--; //for 10
-                value = 13;
+//                value = 13;
             } else {
                 i = i - boundaryIndex;
                 i++;
-                value = boundary[0];
+//                value = boundary[0];
             }
         }
         return len;

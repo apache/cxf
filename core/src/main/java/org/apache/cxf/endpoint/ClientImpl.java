@@ -465,11 +465,10 @@ public class ClientImpl
 
             // Make sure INVOCATION CONTEXT, REQUEST_CONTEXT and RESPONSE_CONTEXT are present
             // on message
-            Map<String, Object> reqContext = null;
             if (context == null) {
                 context = new HashMap<>();
             }
-            reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
+            Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
             resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
             if (reqContext == null) {
                 reqContext = new HashMap<>(getRequestContext());
@@ -510,10 +509,9 @@ public class ClientImpl
                             completeExchange(message.getExchange());
                             if (message.getContent(Exception.class) == null) {
                                 // handle the right response
-                                List<Object> resList = null;
                                 Message inMsg = message.getExchange().getInMessage();
                                 Map<String, Object> ctx = responseContext.get(Thread.currentThread());
-                                resList = CastUtils.cast(inMsg.getContent(List.class));
+                                List<Object> resList = CastUtils.cast(inMsg.getContent(List.class));
                                 Object[] result = resList == null ? null : resList.toArray();
                                 callback.handleResponse(ctx, result);
                                 return;

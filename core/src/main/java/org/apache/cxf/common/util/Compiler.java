@@ -252,30 +252,29 @@ public class Compiler {
         File tmpFile = null;
         try {
             if (isLongCommandLines(args) && sourceFileIndex >= 0) {
-                PrintWriter out = null;
                 tmpFile = FileUtils.createTempFile("cxf-compiler", null);
-                out = new PrintWriter(new FileWriter(tmpFile));
-                for (int i = sourceFileIndex; i < args.length; i++) {
-                    if (args[i].indexOf(' ') > -1) {
-                        args[i] = args[i].replace(File.separatorChar, '/');
-                        //
-                        // javac gives an error if you use forward slashes
-                        // with package-info.java. Refer to:
-                        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
-                        //
-                        if (args[i].indexOf("package-info.java") > -1
-                            && SystemPropertyAction.getProperty("os.name")
-                                .toLowerCase().indexOf("windows") > -1) {
-                            out.println("\"" + args[i].replaceAll("/", "\\\\\\\\") + "\"");
+                try (PrintWriter out = new PrintWriter(new FileWriter(tmpFile))) {
+                    for (int i = sourceFileIndex; i < args.length; i++) {
+                        if (args[i].indexOf(' ') > -1) {
+                            args[i] = args[i].replace(File.separatorChar, '/');
+                            //
+                            // javac gives an error if you use forward slashes
+                            // with package-info.java. Refer to:
+                            // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6198196
+                            //
+                            if (args[i].indexOf("package-info.java") > -1
+                                && SystemPropertyAction.getProperty("os.name")
+                                    .toLowerCase().indexOf("windows") > -1) {
+                                out.println('"' + args[i].replaceAll("/", "\\\\\\\\") + '"');
+                            } else {
+                                out.println('"' + args[i] + '"');
+                            }
                         } else {
-                            out.println("\"" + args[i] + "\"");
+                            out.println(args[i]);
                         }
-                    } else {
-                        out.println(args[i]);
                     }
+                    out.flush();
                 }
-                out.flush();
-                out.close();
                 cmdArray = new String[sourceFileIndex + 1];
                 System.arraycopy(args, 0, cmdArray, 0, sourceFileIndex);
                 cmdArray[sourceFileIndex] = "@" + tmpFile;
@@ -339,13 +338,12 @@ public class Compiler {
 
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
         if (isLongClasspath(classpath)) {
-            PrintWriter out = null;
             try {
                 classpathTmpFile = FileUtils.createTempFile("cxf-compiler-classpath", null);
-                out = new PrintWriter(new FileWriter(classpathTmpFile));
-                out.println(classpath);
-                out.flush();
-                out.close();
+                try (PrintWriter out = new PrintWriter(new FileWriter(classpathTmpFile))) {
+                    out.println(classpath);
+                    out.flush();
+                }
                 list.set(classpathIdx + 1, "@" + classpathTmpFile);
             } catch (IOException e) {
                 System.err.print("[ERROR] can't write long classpath to @argfile");
@@ -356,6 +354,5 @@ public class Compiler {
     public void setEncoding(String string) {
         encoding = string;
     }
-
 
 }

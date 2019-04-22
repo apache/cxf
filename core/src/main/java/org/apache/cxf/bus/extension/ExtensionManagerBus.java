@@ -72,12 +72,8 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
     public ExtensionManagerBus(Map<Class<?>, Object> extensions, Map<String, Object> props,
           ClassLoader extensionClassLoader) {
-        if (extensions == null) {
-            extensions = new ConcurrentHashMap<>(16, 0.75f, 4);
-        } else {
-            extensions = new ConcurrentHashMap<>(extensions);
-        }
-        this.extensions = extensions;
+        this.extensions = extensions == null ? new ConcurrentHashMap<>(16, 0.75f, 4)
+                : new ConcurrentHashMap<>(extensions);
         this.missingExtensions = new CopyOnWriteArraySet<>();
 
 
@@ -88,10 +84,10 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
             properties.putAll(props);
         }
 
-        Configurer configurer = (Configurer)extensions.get(Configurer.class);
+        Configurer configurer = (Configurer)this.extensions.get(Configurer.class);
         if (null == configurer) {
             configurer = new NullConfigurer();
-            extensions.put(Configurer.class, configurer);
+            this.extensions.put(Configurer.class, configurer);
         }
 
         id = getBusId(properties);
@@ -124,11 +120,11 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
             }
         });
 
-        extensions.put(ResourceManager.class, resourceManager);
+        this.extensions.put(ResourceManager.class, resourceManager);
 
         extensionManager = new ExtensionManagerImpl(new String[0],
                                                     extensionClassLoader,
-                                                    extensions,
+                                                    this.extensions,
                                                     resourceManager,
                                                     this);
 
@@ -148,7 +144,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         extensionManager.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE});
         extensionManager.activateAllByType(ResourceResolver.class);
 
-        extensions.put(ExtensionManager.class, extensionManager);
+        this.extensions.put(ExtensionManager.class, extensionManager);
     }
 
     public ExtensionManagerBus(Map<Class<?>, Object> e, Map<String, Object> properties) {
@@ -271,10 +267,8 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
     protected void initializeFeatures() {
         loadAdditionalFeatures();
-        if (features != null) {
-            for (Feature f : features) {
-                f.initialize(this);
-            }
+        for (Feature f : features) {
+            f.initialize(this);
         }
     }
 
@@ -357,19 +351,19 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
     private static String getBusId(Map<String, Object> properties) {
 
-        String busId = null;
+        String busId;
 
         // first check properties
         if (null != properties) {
             busId = (String)properties.get(BUS_ID_PROPERTY_NAME);
-            if (null != busId && !"".equals(busId)) {
+            if (null != busId && !busId.isEmpty()) {
                 return busId;
             }
         }
 
         // next check system properties
         busId = SystemPropertyAction.getPropertyOrNull(BUS_ID_PROPERTY_NAME);
-        if (null != busId && !"".equals(busId)) {
+        if (null != busId && !busId.isEmpty()) {
             return busId;
         }
 

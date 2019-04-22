@@ -29,7 +29,7 @@ import org.springframework.util.ClassUtils;
  *
  */
 class SpringClassUnwrapper implements ClassUnwrapper {
-    SpringClassUnwrapper() throws Exception {
+    SpringClassUnwrapper() throws ClassNotFoundException {
         Class.forName("org.springframework.aop.support.AopUtils");
         Class.forName("org.springframework.aop.framework.Advised");
     }

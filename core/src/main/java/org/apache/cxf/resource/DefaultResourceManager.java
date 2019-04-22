@@ -102,9 +102,6 @@ public class DefaultResourceManager implements ResourceManager {
         if (!firstCalled) {
             onFirstResolve();
         }
-        if (resolvers == null) {
-            resolvers = registeredResolvers;
-        }
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("resolving resource <" + name + ">" + (asStream ? " as stream "
@@ -113,7 +110,7 @@ public class DefaultResourceManager implements ResourceManager {
 
         T ret = null;
 
-        for (ResourceResolver rr : resolvers) {
+        for (ResourceResolver rr : resolvers != null ? resolvers : registeredResolvers) {
             if (asStream) {
                 ret = type.cast(rr.getAsStream(name));
             } else {

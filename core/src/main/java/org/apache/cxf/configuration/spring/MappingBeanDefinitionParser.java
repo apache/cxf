@@ -41,8 +41,7 @@ public class MappingBeanDefinitionParser
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        element = transformElement(element);
-        return (AbstractBeanDefinition)parserContext.getDelegate().parseCustomElement(element);
+        return (AbstractBeanDefinition)parserContext.getDelegate().parseCustomElement(transformElement(element));
     }
     private Element transformElement(Element element) {
 

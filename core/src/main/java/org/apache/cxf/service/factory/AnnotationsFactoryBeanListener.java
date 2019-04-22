@@ -224,7 +224,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             }
             String ref = prop.ref();
             Class<?> cls = prop.beanClass();
-            Object obj = null;
+            final Object obj;
             String[] s = prop.value();
             if (!StringUtils.isEmpty(ref)) {
                 obj = bus.getExtension(ConfiguredBeanLocator.class).getBeanOfType(ref, cls);
@@ -248,7 +248,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 try {
                     return cls.getConstructor(Endpoint.class).newInstance(ep);
                 } catch (NoSuchMethodException e2) {
-                    return cls.newInstance();
+                    return cls.getConstructor().newInstance();
                 }
             }
         } catch (Exception ex) {
@@ -265,7 +265,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                         .resolveResource(annotation.ref(), annotation.value()));
                 }
 
-                factory.setDataBinding(annotation.value().newInstance());
+                factory.setDataBinding(annotation.value().getConstructor().newInstance());
             } catch (Exception e) {
                 //REVISIT - log a warning
             }

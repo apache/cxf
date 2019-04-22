@@ -57,13 +57,12 @@ public class ConfigurerImpl implements Configurer {
         }
         @Override
         public int compareTo(MatcherHolder mh) {
-            Integer literalCharsLen1 = this.wildCardId.replaceAll("\\*", "").length();
-            Integer literalCharsLen2 = mh.wildCardId.replaceAll("\\*", "").length();
+            Integer literalCharsLen1 = this.wildCardId.replace("*", "").length();
+            Integer literalCharsLen2 = mh.wildCardId.replace("*", "").length();
             // The expression with more literal characters should end up on the top of the list
             return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
     }
-
 
     public ConfigurerImpl(BlueprintContainer con) {
         container = con;

@@ -233,7 +233,6 @@ public final class JAXBContextCache {
                         if (cls != null) {
                             JAXBCONTEXT_CACHE.remove(cls);
                         }
-                        cachedContextAndSchemasInternal = null;
                     } else {
                         return new CachedContextAndSchemas(context, cachedContextAndSchemasInternal.getClasses(),
                             cachedContextAndSchemasInternal);
@@ -401,10 +400,10 @@ public final class JAXBContextCache {
         } catch (Exception ex) {
             //ignore
         }
-        try (InputStream ins = loader.getResourceAsStream("/" + pkg.replace('.', '/') + "/jaxb.index");
+        try (InputStream ins = loader.getResourceAsStream('/' + pkg.replace('.', '/') + "/jaxb.index");
             BufferedReader reader = new BufferedReader(new InputStreamReader(ins, StandardCharsets.UTF_8))) {
             if (!StringUtils.isEmpty(pkg)) {
-                pkg += ".";
+                pkg += '.';
             }
 
             String line = reader.readLine();

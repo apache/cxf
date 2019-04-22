@@ -140,7 +140,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                         //wait a few milliseconds for the background thread to start processing
                         //Mostly just to make an attempt at keeping the ordering of the
                         //messages coming in from a client.  Not guaranteed though.
-                        lock.wait(20);
+                        lock.wait(20L);
                     }
                 } catch (RejectedExecutionException e) {
                     LOG.warning(

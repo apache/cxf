@@ -230,7 +230,7 @@ public final class SSLUtils {
     }
 
     public static String getKeystore(String keyStoreLocation, Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (keyStoreLocation != null) {
             logMsg = "KEY_STORE_SET";
         } else {
@@ -252,7 +252,7 @@ public final class SSLUtils {
     }
 
     public static String getKeystoreType(String keyStoreType, Logger log, String def) {
-        String logMsg = null;
+        final String logMsg;
         if (keyStoreType != null) {
             logMsg = "KEY_STORE_TYPE_SET";
         } else {
@@ -269,7 +269,7 @@ public final class SSLUtils {
     }
 
     public static String getKeystoreProvider(String keyStoreProvider, Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (keyStoreProvider != null) {
             logMsg = "KEY_STORE_PROVIDER_SET";
         } else {
@@ -286,7 +286,7 @@ public final class SSLUtils {
 
     public static String getKeystorePassword(String keyStorePassword,
                                              Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (keyStorePassword != null) {
             logMsg = "KEY_STORE_PASSWORD_SET";
         } else {
@@ -301,7 +301,7 @@ public final class SSLUtils {
     }
 
     public static String getKeyPassword(String keyPassword, Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (keyPassword != null) {
             logMsg = "KEY_PASSWORD_SET";
         } else {
@@ -322,7 +322,7 @@ public final class SSLUtils {
     public static String getKeystoreAlgorithm(
                                           String keyStoreMgrFactoryAlgorithm,
                                           Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (keyStoreMgrFactoryAlgorithm != null) {
             logMsg = "KEY_STORE_ALGORITHM_SET";
         } else {
@@ -337,7 +337,7 @@ public final class SSLUtils {
     public static String getTrustStoreAlgorithm(
                                         String trustStoreMgrFactoryAlgorithm,
                                         Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (trustStoreMgrFactoryAlgorithm != null) {
             logMsg = "TRUST_STORE_ALGORITHM_SET";
         } else {
@@ -508,7 +508,7 @@ public final class SSLUtils {
     }
 
     public static String getTruststore(String trustStoreLocation, Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (trustStoreLocation != null) {
             logMsg = "TRUST_STORE_SET";
         } else {
@@ -528,7 +528,7 @@ public final class SSLUtils {
     }
 
     public static String getTrustStoreType(String trustStoreType, Logger log, String def) {
-        String logMsg = null;
+        final String logMsg;
         if (trustStoreType != null) {
             logMsg = "TRUST_STORE_TYPE_SET";
         } else {
@@ -547,7 +547,7 @@ public final class SSLUtils {
 
     public static String getTruststorePassword(String trustStorePassword,
                                              Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (trustStorePassword != null) {
             logMsg = "TRUST_STORE_PASSWORD_SET";
         } else {
@@ -562,7 +562,7 @@ public final class SSLUtils {
     }
 
     public static String getTruststoreProvider(String trustStoreProvider, Logger log) {
-        String logMsg = null;
+        final String logMsg;
         if (trustStoreProvider != null) {
             logMsg = "TRUST_STORE_PROVIDER_SET";
         } else {

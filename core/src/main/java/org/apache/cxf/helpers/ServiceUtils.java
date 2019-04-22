@@ -332,19 +332,7 @@ public final class ServiceUtils {
         }
 
         // replace periods with underscores
-        if (word.indexOf('.') != -1) {
-            char[] buf = word.toCharArray();
-
-            for (int i = 0; i < word.length(); i++) {
-                if (buf[i] == '.') {
-                    buf[i] = '_';
-                }
-            }
-
-            word = new String(buf);
-        }
-
-        sb.append(word);
+        sb.append(word.replace('.', '_'));
     }
 
 }

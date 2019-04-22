@@ -19,7 +19,6 @@
 
 package org.apache.cxf.staxutils;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class PropertiesExpandingStreamReaderTest {
         map.put("bar", "BAR-VALUE");
         map.put("blah", "BLAH-VALUE");
         XMLStreamReader reader = new PropertiesExpandingStreamReader(
-            StaxUtils.createXMLStreamReader(getTestStream("./resources/sysprops.xml")), map);
+            StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("resources/sysprops.xml")), map);
         Document doc = StaxUtils.read(reader);
         Element abc = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
             "http://foo/bar", "abc").iterator().next();
@@ -53,7 +52,4 @@ public class PropertiesExpandingStreamReaderTest {
         assertEquals("BLAH-VALUE2", def.getAttribute("myAttr"));
     }
 
-    private InputStream getTestStream(String resource) {
-        return getClass().getResourceAsStream(resource);
-    }
 }
