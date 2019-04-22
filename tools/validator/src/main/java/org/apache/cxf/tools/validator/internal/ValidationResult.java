@@ -57,7 +57,7 @@ public final class ValidationResult {
     }
 
     public boolean isSuccessful() {
-        return errors.isEmpty() && warnings.size() == 0;
+        return errors.isEmpty() && warnings.isEmpty();
     }
 
     public String toString() {
