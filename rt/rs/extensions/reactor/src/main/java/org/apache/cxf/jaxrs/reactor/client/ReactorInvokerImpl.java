@@ -25,6 +25,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.stream.StreamSupport;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Entity;
@@ -201,13 +202,15 @@ public class ReactorInvokerImpl implements ReactorInvoker {
     @Override
     public <T> Flux<T> flux(String name, Entity<?> entity, Class<T> responseType) {
         Future<Response> futureResponse = webClient.async().method(name, entity);
-        return Flux.fromIterable(toIterable(futureResponse, responseType));
+        return Flux.fromStream(() -> 
+            StreamSupport.stream(toIterable(futureResponse, responseType).spliterator(), false));
     }
 
     @Override
     public <T> Flux<T> flux(String name, Class<T> responseType) {
         Future<Response> futureResponse = webClient.async().method(name);
-        return Flux.fromIterable(toIterable(futureResponse, responseType));
+        return Flux.fromStream(() -> 
+            StreamSupport.stream(toIterable(futureResponse, responseType).spliterator(), false));
     }
 
     @Override

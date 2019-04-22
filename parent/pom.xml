@@ -242,7 +242,7 @@
         <cxf.downloadSources>true</cxf.downloadSources>
         <cxf.pmd.eclipse.ruleset.ext />
         <cxf.resources.base.path />
-        <cxf.reactor.version>3.2.5.RELEASE</cxf.reactor.version>
+        <cxf.reactor.version>3.2.8.RELEASE</cxf.reactor.version>
         <cxf.microprofile.rest.client.version>1.0.1</cxf.microprofile.rest.client.version>
         <cxf.microprofile.config.version>1.1</cxf.microprofile.config.version>
     </properties>
