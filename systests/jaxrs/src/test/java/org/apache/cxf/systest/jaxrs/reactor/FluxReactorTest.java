@@ -19,9 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 
@@ -47,21 +44,19 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
-        List<HelloWorldBean> collector = new ArrayList<>();
-        ClientBuilder.newClient()
+        
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
                 .rx(ReactorInvoker.class)
-                .get(HelloWorldBean.class)
-                .doOnNext(collector::add)
-                .subscribe();
-        Thread.sleep(500);
-        assertEquals(1, collector.size());
-        HelloWorldBean bean = collector.get(0);
-        assertEquals("Hello", bean.getGreeting());
-        assertEquals("World", bean.getAudience());
+                .get(HelloWorldBean.class))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectComplete()
+            .verify();
     }
 
     @Test
@@ -182,20 +177,18 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     }
 
     private void doTestTextJsonImplicitListAsyncStream(String address) throws Exception {
-        List<HelloWorldBean> holder = new ArrayList<>();
-        ClientBuilder.newClient()
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
                 .request("application/json")
                 .rx(ReactorInvoker.class)
-                .getFlux(HelloWorldBean.class)
-                .doOnNext(holder::add)
-                .subscribe();
-        Thread.sleep(500);
-        assertEquals(2, holder.size());
-        assertEquals("Hello", holder.get(0).getGreeting());
-        assertEquals("World", holder.get(0).getAudience());
-        assertEquals("Ciao", holder.get(1).getGreeting());
+                .getFlux(HelloWorldBean.class))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Ciao") && bean.getAudience().equals("World"))
+            .expectComplete()
+            .verify();
     }
 }
