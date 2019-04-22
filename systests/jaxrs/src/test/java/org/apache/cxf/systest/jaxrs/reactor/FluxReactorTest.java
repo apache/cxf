@@ -19,10 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs.reactor;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 
@@ -37,8 +33,6 @@ import reactor.test.StepVerifier;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class FluxReactorTest extends AbstractBusClientServerTestBase {
@@ -52,21 +46,18 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetHelloWorldJson() throws Exception {
         String address = "http://localhost:" + PORT + "/reactor/flux/textJson";
-        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
-        ClientBuilder.newClient()
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
-                .get(HelloWorldBean.class)
-                .doOnNext(holder::offer)
-                .subscribe();
-
-        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
-        assertNotNull(bean);
-        assertEquals("Hello", bean.getGreeting());
-        assertEquals("World", bean.getAudience());
+                .get(HelloWorldBean.class))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectComplete()
+            .verify();
     }
 
     @Test
@@ -187,23 +178,18 @@ public class FluxReactorTest extends AbstractBusClientServerTestBase {
     }
 
     private void doTestTextJsonImplicitListAsyncStream(String address) throws Exception {
-        final BlockingQueue<HelloWorldBean> holder = new LinkedBlockingQueue<>();
-        ClientBuilder.newClient()
+        StepVerifier
+            .create(ClientBuilder
+                .newClient()
                 .register(new JacksonJsonProvider())
                 .register(new ReactorInvokerProvider())
                 .target(address)
                 .request(MediaType.APPLICATION_JSON)
                 .rx(ReactorInvoker.class)
-                .getFlux(HelloWorldBean.class)
-                .doOnNext(holder::offer)
-                .subscribe();
-
-        HelloWorldBean bean = holder.poll(1L, TimeUnit.SECONDS);
-        assertNotNull(bean);
-        assertEquals("Hello", bean.getGreeting());
-        assertEquals("World", bean.getAudience());
-        bean = holder.poll(1L, TimeUnit.SECONDS);
-        assertNotNull(bean);
-        assertEquals("Ciao", bean.getGreeting());
+                .getFlux(HelloWorldBean.class))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Hello") && bean.getAudience().equals("World"))
+            .expectNextMatches(bean -> bean.getGreeting().equals("Ciao") && bean.getAudience().equals("World"))
+            .expectComplete()
+            .verify();
     }
 }
