@@ -75,7 +75,7 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
         }
     }
 
-    private void sign(WriterInterceptorContext writerInterceptorContext) {
+    protected void sign(WriterInterceptorContext writerInterceptorContext) {
         String method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
             Message.HTTP_REQUEST_METHOD, "");
         performSignature(writerInterceptorContext.getHeaders(), uriInfo.getRequestUri().getPath(), method);

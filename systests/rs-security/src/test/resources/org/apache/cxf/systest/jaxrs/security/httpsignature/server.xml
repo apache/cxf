@@ -124,7 +124,7 @@ under the License.
         </constructor-arg>
         <constructor-arg value="bob-key-id" />
     </bean>
-    <bean id="httpSignatureCreator" class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter">
+    <bean id="httpSignatureCreator" class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor">
         <property name="messageSigner" ref="messageSigner"/>
     </bean>
     
@@ -163,12 +163,15 @@ under the License.
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor" />
             <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
             <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor" />
         </jaxrs:providers>
         <jaxrs:properties>
              <entry key="rs.security.signature.in.properties" 
                     value="org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties" />
+             <entry key="rs.security.signature.out.properties" 
+                   value="org/apache/cxf/systest/jaxrs/security/httpsignature/bob.httpsig.properties" />
              <entry key="rs.security.http.signature.in.headers" value-ref="requiredHeaders" />
         </jaxrs:properties>
     </jaxrs:server>
