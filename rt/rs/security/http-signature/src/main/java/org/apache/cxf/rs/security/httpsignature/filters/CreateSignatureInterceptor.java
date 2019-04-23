@@ -24,7 +24,9 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
@@ -32,22 +34,28 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
- * RS WriterInterceptor which adds digests of the body.
+ * RS WriterInterceptor which adds digests of the body and signing of headers.
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
-public class CreateDigestInterceptor implements WriterInterceptor {
+public class CreateSignatureInterceptor extends AbstractSignatureOutFilter implements WriterInterceptor {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private final String digestAlgorithmName;
 
-    public CreateDigestInterceptor() {
+    @Context
+    private UriInfo uriInfo;
+
+    public CreateSignatureInterceptor() {
         this(MessageDigestInputStream.ALGO_SHA_256);
     }
 
-    public CreateDigestInterceptor(String digestAlgorithmName) {
+    public CreateSignatureInterceptor(String digestAlgorithmName) {
         this.digestAlgorithmName = digestAlgorithmName;
     }
 
@@ -62,8 +70,15 @@ public class CreateDigestInterceptor implements WriterInterceptor {
         if (shouldAddDigest(context)) {
             addDigest(context);
         } else {
+            sign(context);
             context.proceed();
         }
+    }
+
+    private void sign(WriterInterceptorContext writerInterceptorContext) {
+        String method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
+            Message.HTTP_REQUEST_METHOD, "");
+        performSignature(writerInterceptorContext.getHeaders(), uriInfo.getRequestUri().getPath(), method);
     }
 
     private void addDigest(WriterInterceptorContext context) throws IOException {
@@ -84,6 +99,7 @@ public class CreateDigestInterceptor implements WriterInterceptor {
 
         // add header
         context.getHeaders().add(DIGEST_HEADER_NAME, digest);
+        sign(context);
 
         // write the contents
         context.setOutputStream(originalOutputStream);
