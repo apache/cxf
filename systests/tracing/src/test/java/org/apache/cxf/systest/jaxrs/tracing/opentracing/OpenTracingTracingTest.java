@@ -82,7 +82,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     private Tracer tracer;
     private OpenTracingClientProvider openTracingClientProvider;
-    private Random random;
+    private final Random random = new Random();
 
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
@@ -134,7 +134,6 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             .getTracer();
 
         openTracingClientProvider = new OpenTracingClientProvider(tracer);
-        random = new Random();
     }
 
     @Test
@@ -201,8 +200,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
-        assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
-        assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
+        assertEquals("Processing books", TestSender.getAllSpans().get(0).getOperationName());
+        assertEquals("GET /bookstore/books/async", TestSender.getAllSpans().get(1).getOperationName());
         assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
         assertThat(TestSender.getAllSpans().get(1).getReferences().get(0).getSpanContext().getSpanId(),
             equalTo(spanId.getSpanId()));
@@ -289,7 +288,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
         }
 
-        assertThat(TestSender.getAllSpans().size(), equalTo(12));
+        assertEquals(TestSender.getAllSpans().toString(), 12, TestSender.getAllSpans().size());
 
         IntStream
             .range(0, 4)
@@ -312,7 +311,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            assertThat(TestSender.getAllSpans().size(), equalTo(3));
+            assertEquals(TestSender.getAllSpans().toString(), 3, TestSender.getAllSpans().size());
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
             assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));
             assertThat(TestSender.getAllSpans().get(1).getReferences(), not(empty()));
@@ -394,7 +393,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     private<T> T get(final Future<T> future) {
         try {
-            return future.get(1, TimeUnit.HOURS);
+            return future.get(1L, TimeUnit.HOURS);
         } catch (InterruptedException | TimeoutException | ExecutionException ex) {
             throw new RuntimeException(ex);
         }

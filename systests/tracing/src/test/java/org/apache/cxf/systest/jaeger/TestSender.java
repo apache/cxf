@@ -18,20 +18,20 @@
  */
 package org.apache.cxf.systest.jaeger;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.jaegertracing.internal.JaegerSpan;
 import io.jaegertracing.internal.exceptions.SenderException;
 import io.jaegertracing.spi.Sender;
 
 public class TestSender implements Sender {
-    private static List<JaegerSpan> spans = Collections.synchronizedList(new ArrayList<>());
-    
+
+    private static final List<JaegerSpan> SPANS = new CopyOnWriteArrayList<>();
+
     @Override
     public int append(JaegerSpan span) throws SenderException {
-        spans.add(span);
+        SPANS.add(span);
         return 0;
     }
 
@@ -46,10 +46,10 @@ public class TestSender implements Sender {
     }
 
     public static List<JaegerSpan> getAllSpans() {
-        return spans;
+        return SPANS;
     }
 
     public static void clear() {
-        spans.clear();
+        SPANS.clear();
     }
 }
