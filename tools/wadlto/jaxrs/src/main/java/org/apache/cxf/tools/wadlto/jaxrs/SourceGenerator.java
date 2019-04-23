@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.tools.wadlto.jaxrs;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -70,9 +69,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.w3c.dom.Element;
@@ -106,6 +103,7 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
@@ -1796,27 +1794,21 @@ public class SourceGenerator {
 
     private Application readWadl(String wadl, String docPath) {
         Element wadlElement = readXmlDocument(new StringReader(wadl));
-        try {
-            if (validateWadl) {
-                SchemaFactory factory = SchemaFactory.newInstance(Constants.URI_2001_SCHEMA_XSD);
-                URL schemaURL = ResourceUtils.getResourceURL("classpath:/schemas/wadl/wadl.xsd", bus);
-                Reader r = new BufferedReader(new InputStreamReader(schemaURL.openStream(), StandardCharsets.UTF_8));
-                StreamSource source = new StreamSource(r);
-                source.setSystemId(schemaURL.toString());
-                Schema s = factory.newSchema(new Source[]{source});
-                DOMSource wadlDoc = new DOMSource(wadlElement);
+        if (validateWadl) {
+            final WadlValidationErrorHandler errorHandler = new WadlValidationErrorHandler();
+            try {
+                Schema s = SchemaHandler.createSchema(
+                        Arrays.asList("classpath:/schemas/wsdl/xml.xsd", "classpath:/schemas/wadl/wadl.xsd"), null,
+                        bus);
                 Validator v = s.newValidator();
-                WadlValidationErrorHandler errorHandler = new WadlValidationErrorHandler();
                 v.setErrorHandler(errorHandler);
-                v.validate(wadlDoc);
-                if (errorHandler.isValidationFailed()) {
-                    throw new ValidationException("WADL document is not valid.");
-                }
+                v.validate(new DOMSource(wadlElement));
+            } catch (Exception ex) {
+                throw new ValidationException("WADL document can not be validated", ex);
             }
-        } catch (ValidationException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new ValidationException("WADL document can not be validated", ex);
+            if (errorHandler.isValidationFailed()) {
+                throw new ValidationException("WADL document is not valid.");
+            }
         }
         return new Application(wadlElement, docPath);
     }
