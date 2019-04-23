@@ -178,7 +178,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("rs.security.signature.out.properties",
+        properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -202,7 +202,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         client.type("application/xml").accept("application/xml");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("rs.security.signature.properties",
+        properties.put("rs.security.signature.out.properties",
                        "org/apache/cxf/systest/jaxrs/security/httpsignature/alice.httpsig.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
@@ -253,7 +253,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", keyId -> privateKey, "alice-key-id");
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
@@ -280,7 +280,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", keyId -> privateKey, "alice-key-id");
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512props/bookstore/books";
@@ -429,7 +429,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         List<String> headerList = Arrays.asList("accept");
         MessageSigner messageSigner =
-            new MessageSigner("rsa-sha512", "SHA-256", keyId -> privateKey, "alice-key-id", headerList);
+            new MessageSigner("rsa-sha512", keyId -> privateKey, "alice-key-id", headerList);
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsigrsasha512/bookstore/books";
@@ -624,7 +624,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor("SHA-512");
+        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
@@ -638,6 +638,10 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.http.signature.digest.algorithm", "SHA-512");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         Response response = client.post(new Book("CXF", 126L));
         assertEquals(200, response.getStatus());
@@ -662,7 +666,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
         assertNotNull(privateKey);
 
-        MessageSigner messageSigner = new MessageSigner("rsa-sha512", "SHA-256", keyId -> privateKey, "alice-key-id");
+        MessageSigner messageSigner = new MessageSigner("rsa-sha512", keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
         String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";

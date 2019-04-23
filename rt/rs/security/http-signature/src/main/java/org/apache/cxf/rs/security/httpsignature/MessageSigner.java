@@ -29,22 +29,18 @@ import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 public class MessageSigner {
-    private final String digestAlgorithmName;
     private final SignatureCreator signatureCreator;
 
     public MessageSigner(String signatureAlgorithmName,
-                         String digestAlgorithmName,
                          KeyProvider keyProvider,
                          String keyId) {
-        this(signatureAlgorithmName, digestAlgorithmName, keyProvider, keyId, Collections.emptyList());
+        this(signatureAlgorithmName, keyProvider, keyId, Collections.emptyList());
     }
 
     public MessageSigner(String signatureAlgorithmName,
-                         String digestAlgorithmName,
                          KeyProvider keyProvider,
                          String keyId,
                          List<String> headersToSign) {
-        this.digestAlgorithmName = Objects.requireNonNull(digestAlgorithmName);
         this.signatureCreator = new TomitribeSignatureCreator(
                 Objects.requireNonNull(signatureAlgorithmName),
                 Objects.requireNonNull(keyProvider),
@@ -61,7 +57,6 @@ public class MessageSigner {
                          String keyId,
                          List<String> headersToSign) {
         this(DefaultSignatureConstants.SIGNING_ALGORITHM,
-                DefaultSignatureConstants.DIGEST_ALGORITHM,
                 keyProvider,
                 keyId,
                 headersToSign);
@@ -77,26 +72,6 @@ public class MessageSigner {
         messageHeaders.put("Signature", Collections.singletonList(signatureCreator.createSignature(messageHeaders,
                 uri,
                 method
-        )));
-    }
-
-    public void sign(Map<String, List<String>> messageHeaders,
-                     String uri,
-                     String method,
-                     String messageBody) throws IOException {
-        SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
-        Objects.requireNonNull(uri);
-        Objects.requireNonNull(method);
-        Objects.requireNonNull(messageBody);
-
-        messageHeaders.put("Digest",
-                Collections.singletonList(SignatureHeaderUtils
-                        .createDigestHeader(messageBody, digestAlgorithmName)));
-
-        messageHeaders.put("Signature",
-                Collections.singletonList(signatureCreator.createSignature(messageHeaders,
-                        uri,
-                        method
         )));
     }
 

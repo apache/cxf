@@ -46,6 +46,11 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
      */
     public static final String RSSEC_HTTP_SIGNATURE_IN_HEADERS = "rs.security.http.signature.in.headers";
 
+    /**
+     * The signature digest algorithm to use. The default algorithm if not specified is "SHA-256".
+     */
+    public static final String RSSEC_HTTP_SIGNATURE_DIGEST_ALGORITHM = "rs.security.http.signature.digest.algorithm";
+
 
     private HTTPSignatureConstants() {
         // complete

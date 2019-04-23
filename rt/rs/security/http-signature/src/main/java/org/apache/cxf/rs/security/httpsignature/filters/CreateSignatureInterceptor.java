@@ -31,33 +31,28 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
-import org.apache.cxf.common.util.MessageDigestInputStream;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
+import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
- * RS WriterInterceptor which adds digests of the body and signing of headers.
+ * RS WriterInterceptor which adds digests of the body and signing of headers. It will not be invoked for an
+ * empty request body (e.g. a GET request). In that case use one of the filters.
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
 public class CreateSignatureInterceptor extends AbstractSignatureOutFilter implements WriterInterceptor {
     private static final String DIGEST_HEADER_NAME = "Digest";
-    private final String digestAlgorithmName;
+    private String digestAlgorithmName;
 
     @Context
     private UriInfo uriInfo;
-
-    public CreateSignatureInterceptor() {
-        this(MessageDigestInputStream.ALGO_SHA_256);
-    }
-
-    public CreateSignatureInterceptor(String digestAlgorithmName) {
-        this.digestAlgorithmName = digestAlgorithmName;
-    }
 
     private boolean shouldAddDigest(WriterInterceptorContext context) {
         return null != context.getEntity()
@@ -93,9 +88,20 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
         // then digest using requested encoding
         String encoding = context.getMediaType().getParameters()
             .getOrDefault(MediaType.CHARSET_PARAMETER, StandardCharsets.UTF_8.toString());
+
+        String digestAlgorithm = digestAlgorithmName;
+        if (digestAlgorithm == null) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            digestAlgorithm =
+                (String)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_DIGEST_ALGORITHM);
+            if (digestAlgorithm == null) {
+                digestAlgorithm = DefaultSignatureConstants.DIGEST_ALGORITHM;
+            }
+        }
+
         // not so nice - would be better to have a stream
         String digest = SignatureHeaderUtils.createDigestHeader(
-            new String(cachedOutputStream.getBytes(), encoding), digestAlgorithmName);
+            new String(cachedOutputStream.getBytes(), encoding), digestAlgorithm);
 
         // add header
         context.getHeaders().add(DIGEST_HEADER_NAME, digest);
@@ -106,5 +112,12 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
         IOUtils.copy(cachedOutputStream.getInputStream(), originalOutputStream);
     }
 
+    public String getDigestAlgorithmName() {
+        return digestAlgorithmName;
+    }
+
+    public void setDigestAlgorithmName(String digestAlgorithmName) {
+        this.digestAlgorithmName = digestAlgorithmName;
+    }
 
 }

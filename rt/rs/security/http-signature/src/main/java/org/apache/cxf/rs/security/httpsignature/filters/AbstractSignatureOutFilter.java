@@ -135,8 +135,7 @@ abstract class AbstractSignatureOutFilter {
             signedHeaders = Collections.emptyList();
         }
 
-        return new MessageSigner(signatureAlgorithm, DefaultSignatureConstants.DIGEST_ALGORITHM, keyProvider,
-                                 keyId, signedHeaders);
+        return new MessageSigner(signatureAlgorithm, keyProvider, keyId, signedHeaders);
     }
 
 }
