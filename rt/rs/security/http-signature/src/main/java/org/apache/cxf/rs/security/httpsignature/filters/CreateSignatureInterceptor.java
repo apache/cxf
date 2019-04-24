@@ -54,8 +54,10 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
     @Context
     private UriInfo uriInfo;
 
+    private boolean addDigest = true;
+
     private boolean shouldAddDigest(WriterInterceptorContext context) {
-        return null != context.getEntity()
+        return addDigest && null != context.getEntity()
             && context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase);
     }
 
@@ -118,6 +120,14 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
 
     public void setDigestAlgorithmName(String digestAlgorithmName) {
         this.digestAlgorithmName = digestAlgorithmName;
+    }
+
+    public boolean isAddDigest() {
+        return addDigest;
+    }
+
+    public void setAddDigest(boolean addDigest) {
+        this.addDigest = addDigest;
     }
 
 }

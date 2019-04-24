@@ -18,28 +18,37 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.httpsignature.DigestVerifier;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
+import org.apache.cxf.rs.security.httpsignature.exception.DifferentDigestsException;
+import org.apache.cxf.rs.security.httpsignature.exception.DigestFailureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureHeaderException;
+import org.apache.cxf.rs.security.httpsignature.exception.MissingDigestException;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.SignatureException;
@@ -47,7 +56,8 @@ import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.KeyManagementUtils;
 
 /**
- * RS CXF abstract Filter which extracts signature data from the context and sends it to the message verifier
+ * RS CXF abstract Filter which verifies the Digest header, and then extracts signature data from the context
+ * and sends it to the message verifier
  */
 abstract class AbstractSignatureInFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSignatureInFilter.class);
@@ -57,6 +67,39 @@ abstract class AbstractSignatureInFilter {
 
     AbstractSignatureInFilter() {
         this.enabled = true;
+    }
+
+    protected byte[] verifyDigest(MultivaluedMap<String, String> headers, InputStream entityStream) {
+        byte[] messageBody = null;
+        if (!enabled) {
+            return messageBody;
+        }
+
+        // Verify digest if we have the appropriate header and a non-empty request body. Note that it is up to
+        // the MessageVerifier configuration, or the HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS
+        // configuration to require that the digest is signed (and hence present)
+        if (entityStream != null && headers.containsKey("Digest")) {
+            LOG.fine("Digesting message body");
+            try {
+                messageBody = IOUtils.readBytesFromStream(entityStream);
+            } catch (IOException e) {
+                throw new DigestFailureException("failed to validate the digest", e);
+            }
+            DigestVerifier digestVerifier = new DigestVerifier();
+
+            try {
+                digestVerifier.inspectDigest(messageBody, headers);
+            } catch (DigestFailureException | DifferentDigestsException | MissingDigestException ex) {
+                Message message = PhaseInterceptorChain.getCurrentMessage();
+                if (MessageUtils.isRequestor(message)) {
+                    throw ex;
+                }
+                throw new BadRequestException(ex);
+            }
+        }
+
+        LOG.fine("Finished digest message verification process");
+        return messageBody;
     }
 
     protected void verifySignature(MultivaluedMap<String, String> headers, String uriPath, String httpMethod) {
@@ -112,8 +155,8 @@ abstract class AbstractSignatureInFilter {
             CastUtils.cast((List<?>)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS));
         if (signedHeaders == null) {
             if (!MessageUtils.isRequestor(m)) {
-                 // The service request must contain "(request-target)" by default
-                signedHeaders = Collections.singletonList(HTTPSignatureConstants.REQUEST_TARGET);
+                 // The service request must contain "(request-target)" + "digest" by default
+                signedHeaders = Arrays.asList(HTTPSignatureConstants.REQUEST_TARGET, "digest");
             } else {
                 signedHeaders = Collections.emptyList();
             }

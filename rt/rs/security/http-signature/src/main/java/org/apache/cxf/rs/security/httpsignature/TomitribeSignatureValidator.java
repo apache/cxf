@@ -89,7 +89,13 @@ public class TomitribeSignatureValidator implements SignatureValidator {
             Verifier verifier = new Verifier(key, signature, provider);
             success = verifier.verify(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
 
-            if (!signature.getHeaders().containsAll(requiredHeaders)) {
+            // If HTTP GET then don't require that the digest is present
+            List<String> headers = requiredHeaders;
+            if ("GET".equals(method)) {
+                headers = new ArrayList<>(requiredHeaders);
+                headers.remove("digest");
+            }
+            if (!signature.getHeaders().containsAll(headers)) {
                 LOG.warning("Not all of the required headers are signed");
                 throw new InvalidDataToVerifySignatureException();
             }

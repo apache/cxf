@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.httpsignature.filters;
 
+import java.io.ByteArrayInputStream;
+
 import javax.annotation.Priority;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
@@ -26,18 +28,20 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.ext.Provider;
 
 /**
- * RS CXF container Filter which extracts signature data from the context and sends it to the message verifier
+ * RS CXF container Filter which verifies the Digest header, and then extracts signature data from the context
+ * and sends it to the message verifier
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class VerifySignatureFilter extends AbstractSignatureInFilter implements ContainerRequestFilter {
 
-    public VerifySignatureFilter() {
-        super();
-    }
-
     @Override
     public void filter(ContainerRequestContext requestCtx) {
+        byte[] messageBody = verifyDigest(requestCtx.getHeaders(), requestCtx.getEntityStream());
+        if (messageBody != null) {
+            requestCtx.setEntityStream(new ByteArrayInputStream(messageBody));
+        }
+
         verifySignature(requestCtx.getHeaders(),
                         requestCtx.getUriInfo().getAbsolutePath().getPath(),
                         requestCtx.getMethod());

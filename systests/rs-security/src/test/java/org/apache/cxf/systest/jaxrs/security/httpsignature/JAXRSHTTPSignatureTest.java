@@ -58,7 +58,6 @@ import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor;
-import org.apache.cxf.rs.security.httpsignature.filters.VerifyDigestInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
 import org.apache.cxf.systest.jaxrs.security.Book;
@@ -136,6 +135,14 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(123L, returnedBook.getId());
+
+        String address2 = "http://localhost:" + PORT + "/httpsigrequired/bookstore/books";
+        client =
+            WebClient.create(address2, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        response = client.path("/126").get();
+        assertEquals(200, response.getStatus());
     }
 
     @Test
@@ -564,33 +571,6 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testHttpSignatureDigest() throws Exception {
-
-        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
-
-        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
-        KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
-                      "password".toCharArray());
-        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
-        assertNotNull(privateKey);
-
-        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
-        signatureFilter.setMessageSigner(messageSigner);
-
-        String address = "http://localhost:" + PORT + "/httpsigdigest/bookstore/books";
-        WebClient client =
-            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
-        client.type("application/xml").accept("application/xml");
-
-        Response response = client.post(new Book("CXF", 126L));
-        assertEquals(200, response.getStatus());
-
-        Book returnedBook = response.readEntity(Book.class);
-        assertEquals(126L, returnedBook.getId());
-    }
-
-    @Test
     public void testHttpSignatureDigestResponse() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
@@ -605,11 +585,13 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        VerifyDigestInterceptor verifyDigestFilter = new VerifyDigestInterceptor();
+        VerifySignatureClientFilter signatureResponseFilter = new VerifySignatureClientFilter();
+        MessageVerifier messageVerifier = new MessageVerifier(new CustomPublicKeyProvider());
+        signatureResponseFilter.setMessageVerifier(messageVerifier);
 
-        String address = "http://localhost:" + PORT + "/httpsigdigest/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsigrequired/bookstore/books";
         WebClient client =
-            WebClient.create(address, Arrays.asList(signatureFilter, verifyDigestFilter), busFile.toString());
+            WebClient.create(address, Arrays.asList(signatureFilter, signatureResponseFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
@@ -617,6 +599,17 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(126L, returnedBook.getId());
+
+        String address2 = "http://localhost:" + PORT + "/httpsig/bookstore/books";
+        client =
+            WebClient.create(address2, Arrays.asList(signatureFilter, signatureResponseFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+        try {
+            client.post(new Book("CXF", 126L));
+            fail("Failure expected on no digest");
+        } catch (Exception ex) {
+            // expected
+        }
     }
 
     @Test
@@ -634,7 +627,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "http://localhost:" + PORT + "/httpsigdigest/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -934,20 +927,6 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testNoDigest() throws Exception {
-
-        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
-
-        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
-        WebClient client =
-            WebClient.create(address, busFile.toString());
-        client.type("application/xml").accept("application/xml");
-
-        Response response = client.post(new Book("CXF", 126L));
-        assertEquals(400, response.getStatus());
-    }
-
-    @Test
     public void testIncorrectDigest() throws Exception {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
@@ -964,7 +943,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -990,7 +969,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
@@ -1015,12 +994,71 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
         signatureFilter.setMessageSigner(messageSigner);
 
-        String address = "http://localhost:" + PORT + "/digest/bookstore/books";
+        String address = "http://localhost:" + PORT + "/httpsig/bookstore/books";
         WebClient client =
             WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
         client.type("application/xml").accept("application/xml");
 
         Response response = client.post(new Book("CXF", 126L));
+        assertEquals(400, response.getStatus());
+    }
+
+    @Test
+    public void testMissingDigestHeader() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
+        signatureFilter.setAddDigest(false);
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        List<String> headerList = Arrays.asList("accept", "(request-target)");
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id", headerList);
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsigprops/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(400, response.getStatus());
+    }
+
+    @Test
+    public void testMissingSignedDigestHeader() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        List<String> headerList = Arrays.asList("accept", "(request-target)");
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id", headerList);
+        signatureFilter.setMessageSigner(messageSigner);
+
+        String address = "http://localhost:" + PORT + "/httpsigprops/bookstore/books";
+        WebClient client =
+            WebClient.create(address, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(400, response.getStatus());
+
+        String address2 = "http://localhost:" + PORT + "/httpsigrequired/bookstore/books";
+        client =
+            WebClient.create(address2, Collections.singletonList(signatureFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        response = client.post(new Book("CXF", 126L));
         assertEquals(400, response.getStatus());
     }
 

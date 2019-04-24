@@ -42,12 +42,13 @@ public final class HTTPSignatureConstants extends RSSecurityConstants {
 
     /**
      * This is a list of String values which correspond to the list of HTTP headers that must be signed
-     * in the inbound request. By default, a client request must sign "(request-target)".
+     * in the inbound request. By default, a client request must sign "(request-target)". In addition,
+     * both a client request and service response must sign "digest", unless it is a GET request.
      */
     public static final String RSSEC_HTTP_SIGNATURE_IN_HEADERS = "rs.security.http.signature.in.headers";
 
     /**
-     * The signature digest algorithm to use. The default algorithm if not specified is "SHA-256".
+     * The digest algorithm to use when digesting the payload. The default algorithm if not specified is "SHA-256".
      */
     public static final String RSSEC_HTTP_SIGNATURE_DIGEST_ALGORITHM = "rs.security.http.signature.digest.algorithm";
 
