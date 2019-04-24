@@ -19,28 +19,20 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.Customer;
-import org.apache.cxf.jaxrs.CustomerParameterHandler;
-import org.apache.cxf.jaxrs.JAXBContextProvider;
-import org.apache.cxf.jaxrs.JAXBContextProvider2;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
-import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
-import org.apache.cxf.jaxrs.model.ProviderInfo;
-import org.apache.cxf.jaxrs.resources.Book;
-import org.apache.cxf.jaxrs.resources.SuperBook;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
-import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -66,20 +58,31 @@ import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.validation.Schema;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.CustomerParameterHandler;
+import org.apache.cxf.jaxrs.JAXBContextProvider;
+import org.apache.cxf.jaxrs.JAXBContextProvider2;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
+import org.easymock.EasyMock;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 
 public class ProviderFactoryTest extends Assert {
 
@@ -1464,7 +1467,8 @@ public class ProviderFactoryTest extends Assert {
         ServerProviderFactory spf = ServerProviderFactory.getInstance();
         final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
 
-        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class, new Annotation[0],MediaType.APPLICATION_XML_TYPE,
+        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                new Annotation[0], MediaType.APPLICATION_XML_TYPE,
                 message, true, null);
         assertSame(1, interceptors.size());
     }
@@ -1474,7 +1478,8 @@ public class ProviderFactoryTest extends Assert {
         ServerProviderFactory spf = ServerProviderFactory.getInstance();
         final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
 
-        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class, new Annotation[0],MediaType.APPLICATION_XML_TYPE,
+        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                new Annotation[0], MediaType.APPLICATION_XML_TYPE,
                 message, true, null);
         assertSame(1, interceptors.size());
     }
@@ -1489,7 +1494,8 @@ public class ProviderFactoryTest extends Assert {
 
         final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
 
-        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class, new Annotation[0],MediaType.APPLICATION_XML_TYPE,
+        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                new Annotation[0], MediaType.APPLICATION_XML_TYPE,
                 message, true, null);
         assertSame(2, interceptors.size());
     }
@@ -1503,7 +1509,8 @@ public class ProviderFactoryTest extends Assert {
         spf.readerInterceptors.put(new ProviderFactory.NameKey("org.apache.cxf.filter.binding", 1, ri.getClass()), pi);
 
         final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
-        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class, new Annotation[0],MediaType.APPLICATION_XML_TYPE,
+        List<ReaderInterceptor> interceptors = spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                new Annotation[0], MediaType.APPLICATION_XML_TYPE,
                 message, true, null);
         assertSame(2, interceptors.size());
     }
