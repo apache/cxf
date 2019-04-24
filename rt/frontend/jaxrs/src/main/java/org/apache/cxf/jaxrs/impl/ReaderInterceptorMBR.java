@@ -18,11 +18,9 @@
  */
 package org.apache.cxf.jaxrs.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -31,10 +29,11 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.xml.stream.XMLStreamReader;
-
-import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
-import org.apache.cxf.message.Message;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 public class ReaderInterceptorMBR implements ReaderInterceptor {
 
@@ -43,6 +42,10 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
 
     public ReaderInterceptorMBR(MessageBodyReader<?> reader,
                                 Message m) {
+        if (null == m) {
+            throw new IllegalArgumentException("Message not allowed to be null");
+        }
+
         this.reader = reader;
         this.m = m;
     }
