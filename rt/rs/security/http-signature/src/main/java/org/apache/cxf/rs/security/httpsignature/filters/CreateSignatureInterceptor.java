@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -36,18 +38,22 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rs.security.httpsignature.HTTPSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.DefaultSignatureConstants;
 import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
- * RS WriterInterceptor which adds digests of the body and signing of headers. It will not be invoked for an
- * empty request body (e.g. a GET request). In that case use one of the filters.
+ * RS WriterInterceptor + ClientRequestFilter for outbound HTTP Signature. For requests with no Body
+ * (e.g. GET requests), the ClientRequestFilter implementation is invoked to sign the request. All other
+ * requests are handled by the WriterInterceptor implementation, which digests the body before signing
+ * the headers.
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
-public class CreateSignatureInterceptor extends AbstractSignatureOutFilter implements WriterInterceptor {
+public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
+    implements WriterInterceptor, ClientRequestFilter {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private String digestAlgorithmName;
 
@@ -56,26 +62,50 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter imple
 
     private boolean addDigest = true;
 
-    private boolean shouldAddDigest(WriterInterceptorContext context) {
-        return addDigest && null != context.getEntity()
-            && context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase);
+    @Override
+    public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
+        // Only sign the request if we have a Body.
+        if (context.getEntity() != null) {
+            // skip digest if already set
+            if (addDigest
+                && context.getHeaders().keySet().stream().noneMatch(DIGEST_HEADER_NAME::equalsIgnoreCase)) {
+                addDigest(context);
+            } else {
+                sign(context);
+                context.proceed();
+            }
+        }
     }
 
     @Override
-    public void aroundWriteTo(WriterInterceptorContext context) throws IOException {
-        // skip digest if already set or we actually don't have a body
-        if (shouldAddDigest(context)) {
-            addDigest(context);
-        } else {
-            sign(context);
-            context.proceed();
+    public void filter(ClientRequestContext requestContext) {
+        // Only sign the request if we have no Body.
+        if (requestContext.getEntity() == null) {
+            Message m = JAXRSUtils.getCurrentMessage();
+            String method = "";
+            String path = "";
+            // We don't pass the HTTP method + URI for the response case
+            if (MessageUtils.isRequestor(m)) {
+                method = requestContext.getMethod();
+                path = requestContext.getUri().getPath();
+            }
+
+            performSignature(requestContext.getHeaders(), path, method);
         }
     }
 
     protected void sign(WriterInterceptorContext writerInterceptorContext) {
-        String method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
-            Message.HTTP_REQUEST_METHOD, "");
-        performSignature(writerInterceptorContext.getHeaders(), uriInfo.getRequestUri().getPath(), method);
+        Message m = JAXRSUtils.getCurrentMessage();
+        String method = "";
+        String path = "";
+        // We don't pass the HTTP method + URI for the response case
+        if (MessageUtils.isRequestor(m)) {
+            method = HttpUtils.getProtocolHeader(JAXRSUtils.getCurrentMessage(),
+                                                 Message.HTTP_REQUEST_METHOD, "");
+            path = uriInfo.getRequestUri().getPath();
+        }
+
+        performSignature(writerInterceptorContext.getHeaders(), path, method);
     }
 
     private void addDigest(WriterInterceptorContext context) throws IOException {

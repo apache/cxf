@@ -134,7 +134,7 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter" />
-            <bean class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureFilter" />
+            <bean class="org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor" />
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.in.properties" 

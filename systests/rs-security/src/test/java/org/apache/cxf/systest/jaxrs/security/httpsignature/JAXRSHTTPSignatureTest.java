@@ -56,7 +56,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.httpsignature.MessageSigner;
 import org.apache.cxf.rs.security.httpsignature.MessageVerifier;
-import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureClientFilter;
 import org.apache.cxf.rs.security.httpsignature.filters.CreateSignatureInterceptor;
 import org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureClientFilter;
 import org.apache.cxf.rt.security.rs.PrivateKeyPasswordProvider;
@@ -115,7 +114,7 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
 
         URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
 
-        CreateSignatureClientFilter signatureFilter = new CreateSignatureClientFilter();
+        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
                       "password".toCharArray());
