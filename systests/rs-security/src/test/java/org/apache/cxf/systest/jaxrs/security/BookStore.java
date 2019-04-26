@@ -57,6 +57,13 @@ public class BookStore {
     public Book addBookForm(@FormParam("name") String name, @FormParam("id") long id) {
         return new Book(name, id);
     }
+
+    @POST
+    @Path("/booksnoresp")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public void addBookNoResponse(Book book) {
+    }
 }
 
 

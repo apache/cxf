@@ -26,6 +26,9 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -46,14 +49,14 @@ import org.apache.cxf.rs.security.httpsignature.utils.SignatureHeaderUtils;
 
 /**
  * RS WriterInterceptor + ClientRequestFilter for outbound HTTP Signature. For requests with no Body
- * (e.g. GET requests), the ClientRequestFilter implementation is invoked to sign the request. All other
- * requests are handled by the WriterInterceptor implementation, which digests the body before signing
- * the headers.
+ * (e.g. GET requests), the ClientRequestFilter/ContainerResponseFilter implementation is invoked to sign
+ * the request. All other requests are handled by the WriterInterceptor implementation, which digests
+ * the body before signing the headers.
  */
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
 public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
-    implements WriterInterceptor, ClientRequestFilter {
+    implements WriterInterceptor, ClientRequestFilter, ContainerResponseFilter {
     private static final String DIGEST_HEADER_NAME = "Digest";
     private String digestAlgorithmName;
 
@@ -81,16 +84,20 @@ public class CreateSignatureInterceptor extends AbstractSignatureOutFilter
     public void filter(ClientRequestContext requestContext) {
         // Only sign the request if we have no Body.
         if (requestContext.getEntity() == null) {
-            Message m = JAXRSUtils.getCurrentMessage();
-            String method = "";
-            String path = "";
-            // We don't pass the HTTP method + URI for the response case
-            if (MessageUtils.isRequestor(m)) {
-                method = requestContext.getMethod();
-                path = requestContext.getUri().getPath();
-            }
+            String method = requestContext.getMethod();
+            String path = requestContext.getUri().getPath();
 
             performSignature(requestContext.getHeaders(), path, method);
+        }
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+        throws IOException {
+        // Only sign the response if we have no Body.
+        if (responseContext.getEntity() == null) {
+            // We don't pass the HTTP method + URI for the response case
+            performSignature(responseContext.getHeaders(), "", "");
         }
     }
 
