@@ -670,6 +670,36 @@ public class JAXRSHTTPSignatureTest extends AbstractBusClientServerTestBase {
         assertEquals(204, response.getStatus());
     }
 
+    @Test
+    public void testHttpSignatureEmptyResponseProps() throws Exception {
+
+        URL busFile = JAXRSHTTPSignatureTest.class.getResource("client.xml");
+
+        CreateSignatureInterceptor signatureFilter = new CreateSignatureInterceptor();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        keyStore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", this.getClass()),
+                      "password".toCharArray());
+        PrivateKey privateKey = (PrivateKey)keyStore.getKey("alice", "password".toCharArray());
+        assertNotNull(privateKey);
+
+        MessageSigner messageSigner = new MessageSigner(keyId -> privateKey, "alice-key-id");
+        signatureFilter.setMessageSigner(messageSigner);
+
+        VerifySignatureClientFilter signatureResponseFilter = new VerifySignatureClientFilter();
+
+        String address = "http://localhost:" + PORT + "/httpsigresponse/bookstore/booksnoresp";
+        WebClient client =
+            WebClient.create(address, Arrays.asList(signatureFilter, signatureResponseFilter), busFile.toString());
+        client.type("application/xml").accept("application/xml");
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("rs.security.signature.in.properties",
+            "org/apache/cxf/systest/jaxrs/security/httpsignature/bob.httpsig.properties");
+        WebClient.getConfig(client).getRequestContext().putAll(properties);
+
+        Response response = client.post(new Book("CXF", 126L));
+        assertEquals(204, response.getStatus());
+    }
 
     //
     // Negative tests
