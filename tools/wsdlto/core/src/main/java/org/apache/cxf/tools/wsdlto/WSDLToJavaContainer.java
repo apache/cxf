@@ -781,7 +781,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             for (XmlSchema imp : schemas.getXmlSchemas()) {
                 if (imp.getSourceURI() != null && !imp.getSourceURI().contains(".wsdl#")) {
                     String schemaFileName = "schema" + (++xsdCount) + ".xsd";
-                    sourceMap.put(imp.getTargetNamespace(), schemaFileName);
+                    File sourceFile = new File(imp.getSourceURI());
+                    sourceMap.put(createSchemaFileKey(imp.getTargetNamespace(), sourceFile.getName()), schemaFileName);
                 }
             }
 
@@ -815,10 +816,13 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
             for (XmlSchema imp : schemas.getXmlSchemas()) {
                 if (imp.getSourceURI() != null && !imp.getSourceURI().contains(".wsdl#")) {
-                    String schemaFileName = sourceMap.get(imp.getTargetNamespace());
+                    File sourceFile = new File(imp.getSourceURI());
+                    String schemaKey = createSchemaFileKey(imp.getTargetNamespace(), sourceFile.getName());
+                    String schemaFileName = sourceMap.get(schemaKey);
                     File impfile = new File(wsdlFile.getParentFile(), schemaFileName);
                     Element el = imp.getSchemaDocument().getDocumentElement();
                     updateImports(el, sourceMap);
+                    updateIncludes(el, sourceMap);
                     os = new FileWriterUtil(impfile.getParent(), context.get(OutputStreamCreator.class))
                         .getWriter(impfile, StandardCharsets.UTF_8.name());
                     StaxUtils.writeTo(el, os, 2);
@@ -837,6 +841,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                                                                             "schema");
             for (Element xsdEle : xsdElements) {
                 updateImports(xsdEle, sourceMap);
+                updateIncludes(xsdEle, sourceMap);
             }
             updateWSDLImports(defEle, importWSDLMap);
             StaxUtils.writeTo(defEle, wsdloutput);
@@ -854,6 +859,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                                                                   "schema");
                 for (Element xsdEle : xsdElements) {
                     updateImports(xsdEle, sourceMap);
+                    updateIncludes(xsdEle, sourceMap);
                 }
                 updateWSDLImports(importEle, importWSDLMap);
                 StaxUtils.writeTo(importEle, wsdlOs);
@@ -867,15 +873,34 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         }
     }
 
+    private static String createSchemaFileKey(String targetNamespace, String fileName) {
+        return targetNamespace + "_" + fileName;
+    }
+
     private void updateImports(Element el, Map<String, String> sourceMap) {
         List<Element> imps = DOMUtils.getChildrenWithName(el,
                                                           WSDLConstants.NS_SCHEMA_XSD,
                                                           "import");
         for (Element e : imps) {
             String ns = e.getAttribute("namespace");
-            e.setAttribute("schemaLocation", sourceMap.get(ns));
-
+            updateSchemaLocation(sourceMap, ns, e);
         }
+    }
+
+    private void updateIncludes(Element el, Map<String, String> sourceMap) {
+        List<Element> imps = DOMUtils.getChildrenWithName(el,
+                                                        WSDLConstants.NS_SCHEMA_XSD,
+                                                        "include");
+        String ns =  el.getAttribute("targetNamespace");
+        for (Element e : imps) {
+            updateSchemaLocation(sourceMap, ns, e);
+        }
+    }
+
+    private static void updateSchemaLocation(Map<String, String> sourceMap, String namespace, Element e) {
+        File sourceFile = new File(e.getAttribute("schemaLocation"));
+        String schemaKey = createSchemaFileKey(namespace, sourceFile.getName());
+        e.setAttribute("schemaLocation", sourceMap.get(schemaKey));
     }
 
     private void updateWSDLImports(Element el, Map<String, String> wsdlSourceMap) {
