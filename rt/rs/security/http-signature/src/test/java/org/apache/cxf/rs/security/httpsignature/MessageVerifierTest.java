@@ -118,7 +118,7 @@ public class MessageVerifierTest {
         Map<String, List<String>> headers = createMockHeaders();
         createAndAddSignature(headers);
         String signature = headers.get("Signature").get(0);
-        signature = signature.replaceFirst("signature=\"[\\w]{10}", "signature=\"AAAAAAAAAA");
+        signature = signature.replaceFirst("signature=\".{10}", "signature=\"AAAAAAAAAA");
         headers.replace("Signature", Collections.singletonList(signature));
         messageVerifier.verifyMessage(headers, METHOD, URI);
     }
