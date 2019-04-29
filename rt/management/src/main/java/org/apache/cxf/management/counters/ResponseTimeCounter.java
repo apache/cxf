@@ -38,8 +38,8 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     private final AtomicLong totalHandlingTime = new AtomicLong();
     private final ReentrantLock write = new ReentrantLock();
     private final AtomicLong maxHandlingTime = new AtomicLong();
-    private final AtomicLong minHandlingTime = new AtomicLong();;
-    private final AtomicLong averageProcessingTime = new AtomicLong();;
+    private final AtomicLong minHandlingTime = new AtomicLong();
+    private final AtomicLong averageProcessingTime = new AtomicLong();
     private boolean enabled = true;
 
     public ResponseTimeCounter(ObjectName on) {

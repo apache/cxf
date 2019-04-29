@@ -33,7 +33,7 @@ import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
  * The extended version of JettyHTTPHandler that can support websocket.
  */
 class JettyWebSocketHandler extends JettyHTTPHandler {
-    private WebSocketServerFactory webSocketFactory;;
+    private WebSocketServerFactory webSocketFactory;
 
     JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
                           WebSocketServerFactory webSocketFactory) {

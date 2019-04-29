@@ -31,9 +31,9 @@ public interface ClientProperties {
     String HTTP_RESPONSE_AUTOCLOSE_PROP = "http.response.stream.auto.close";
     String THREAD_SAFE_CLIENT_PROP = "thread.safe.client";
     String THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP = "thread.safe.client.state.cleanup.period";
-    Boolean DEFAULT_THREAD_SAFETY_CLIENT_STATUS = 
-        Boolean.parseBoolean(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_PROP));;
-    Integer THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD = 
+    Boolean DEFAULT_THREAD_SAFETY_CLIENT_STATUS =
+        Boolean.parseBoolean(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_PROP));
+    Integer THREAD_SAFE_CLIENT_STATE_CLEANUP_PERIOD =
         getIntValue(SystemPropertyAction.getPropertyOrNull(THREAD_SAFE_CLIENT_STATE_CLEANUP_PROP));
 
     static Integer getIntValue(Object o) {

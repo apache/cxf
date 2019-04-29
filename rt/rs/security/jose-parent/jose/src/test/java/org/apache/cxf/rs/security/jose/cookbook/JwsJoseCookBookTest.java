@@ -345,7 +345,7 @@ public class JwsJoseCookBookTest {
         + "0\""
         + "}"
         + "]"
-        + "}").replace(" ", "");;
+        + "}").replace(" ", "");
     @Test
     public void testEncodedPayload() throws Exception {
         assertEquals(Base64UrlUtility.encode(PAYLOAD), ENCODED_PAYLOAD);
