@@ -23,9 +23,6 @@ import java.io.InputStream;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -34,7 +31,6 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -102,7 +98,8 @@ abstract class AbstractSignatureInFilter {
         return messageBody;
     }
 
-    protected void verifySignature(MultivaluedMap<String, String> headers, String uriPath, String httpMethod) {
+    protected void verifySignature(MultivaluedMap<String, String> headers, String uriPath,
+                                   String httpMethod) {
         if (!enabled) {
             LOG.fine("Verify signature filter is disabled");
             return;
@@ -114,7 +111,7 @@ abstract class AbstractSignatureInFilter {
 
         LOG.fine("Starting filter message verification process");
         try {
-            messageVerifier.verifyMessage(headers, httpMethod, uriPath);
+            messageVerifier.verifyMessage(headers, httpMethod, uriPath, PhaseInterceptorChain.getCurrentMessage());
         } catch (DifferentAlgorithmsException | InvalidSignatureHeaderException
             | InvalidDataToVerifySignatureException | InvalidSignatureException
             | MultipleSignatureHeaderException | MissingSignatureHeaderException ex) {
@@ -151,21 +148,9 @@ abstract class AbstractSignatureInFilter {
             signatureAlgorithm = DefaultSignatureConstants.SIGNING_ALGORITHM;
         }
 
-        List<String> signedHeaders =
-            CastUtils.cast((List<?>)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS));
-        if (signedHeaders == null) {
-            if (!MessageUtils.isRequestor(m)) {
-                 // The service request must contain "(request-target)" + "digest" by default
-                signedHeaders = Arrays.asList(HTTPSignatureConstants.REQUEST_TARGET, "digest");
-            } else {
-                signedHeaders = Collections.emptyList();
-            }
-        }
-
         final String finalSignatureAlgorithm = signatureAlgorithm;
         final Provider provider = Security.getProvider(DefaultSignatureConstants.SECURITY_PROVIDER);
-        return new MessageVerifier(keyId -> publicKey, keyId -> provider, keyId -> finalSignatureAlgorithm,
-            signedHeaders);
+        return new MessageVerifier(keyId -> publicKey, keyId -> provider, keyId -> finalSignatureAlgorithm);
     }
 
     protected abstract void handleException(Exception ex);

@@ -60,7 +60,7 @@ public class TomitribeSignatureCreator implements SignatureCreator {
 
         List<String> headers = null;
         // If we have explicit headers to sign then use these.
-        // Otherwise sign all headers including "(request-target)" (if on an inbound service request)
+        // Otherwise sign all headers including "(request-target)" (if on an outbound service request)
         if (headersToSign.isEmpty()) {
             headers = messageHeaders.keySet().stream().map(String::toLowerCase).collect(Collectors.toList());
             Message m = PhaseInterceptorChain.getCurrentMessage();

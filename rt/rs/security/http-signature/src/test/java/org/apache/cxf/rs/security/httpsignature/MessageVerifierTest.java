@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.rs.security.httpsignature.exception.DifferentAlgorithmsException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidDataToVerifySignatureException;
 import org.apache.cxf.rs.security.httpsignature.exception.InvalidSignatureException;
@@ -64,6 +65,7 @@ public class MessageVerifierTest {
             messageVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
             messageVerifier.setSecurityProvider(new MockSecurityProvider());
             messageVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+            messageVerifier.setAddDefaultRequiredHeaders(false);
 
             messageSigner = new MessageSigner(keyId -> keyPair.getPrivate(), KEY_ID);
 
@@ -76,14 +78,14 @@ public class MessageVerifierTest {
     public void validUnalteredRequest() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
         createAndAddSignature(headers);
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test
     public void validUnalteredRequestWithoutBody() throws IOException {
         Map<String, List<String>> headers = createMockHeaders();
         createAndAddSignature(headers);
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test
@@ -92,7 +94,7 @@ public class MessageVerifierTest {
         createAndAddSignature(headers);
         headers.put("Test", Collections.singletonList("value"));
         headers.put("Test2", Collections.singletonList("value2"));
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = DifferentAlgorithmsException.class)
@@ -102,7 +104,7 @@ public class MessageVerifierTest {
         String signature = headers.get("Signature").get(0);
         signature = signature.replaceFirst("algorithm=\"rsa-sha256", "algorithm=\"hmac-sha256");
         headers.replace("Signature", Collections.singletonList(signature));
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = InvalidDataToVerifySignatureException.class)
@@ -110,7 +112,7 @@ public class MessageVerifierTest {
         Map<String, List<String>> headers = createMockHeaders();
         createAndAddSignature(headers);
         headers.remove("Content-Length");
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = InvalidSignatureException.class)
@@ -120,7 +122,7 @@ public class MessageVerifierTest {
         String signature = headers.get("Signature").get(0);
         signature = signature.replaceFirst("signature=\".{10}", "signature=\"AAAAAAAAAA");
         headers.replace("Signature", Collections.singletonList(signature));
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = InvalidSignatureHeaderException.class)
@@ -130,13 +132,13 @@ public class MessageVerifierTest {
         String signature = headers.get("Signature").get(0);
         signature = signature.replaceFirst(",signature", ",signature2");
         headers.replace("Signature", Collections.singletonList(signature));
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = MissingSignatureHeaderException.class)
     public void missingSignatureHeaderFails() {
         Map<String, List<String>> headers = createMockHeaders();
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = MultipleSignatureHeaderException.class)
@@ -147,7 +149,7 @@ public class MessageVerifierTest {
         List<String> signatureList = new ArrayList<>(headers.get("Signature"));
         signatureList.add(signature);
         headers.put("Signature", signatureList);
-        messageVerifier.verifyMessage(headers, METHOD, URI);
+        messageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test
@@ -163,7 +165,8 @@ public class MessageVerifierTest {
 
         MessageVerifier hmacMessageVerifier =
             new MessageVerifier(keyId -> secretKey, null, keyId -> "hmac-sha256", Collections.emptyList());
-        hmacMessageVerifier.verifyMessage(headers, METHOD, URI);
+        hmacMessageVerifier.setAddDefaultRequiredHeaders(false);
+        hmacMessageVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test
@@ -173,10 +176,11 @@ public class MessageVerifierTest {
         createAndAddSignature(headers);
 
         MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic(),
-                                                              Collections.singletonList("test"));
+                                                             Collections.singletonList("test"));
+        headerVerifier.setAddDefaultRequiredHeaders(false);
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        headerVerifier.verifyMessage(headers, METHOD, URI);
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = InvalidDataToVerifySignatureException.class)
@@ -186,10 +190,11 @@ public class MessageVerifierTest {
         headers.put("Test", Collections.singletonList("value"));
 
         MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic(),
-                                                              Collections.singletonList("test"));
+                                                             Collections.singletonList("test"));
+        headerVerifier.setAddDefaultRequiredHeaders(false);
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        headerVerifier.verifyMessage(headers, METHOD, URI);
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     @Test(expected = InvalidDataToVerifySignatureException.class)
@@ -198,10 +203,63 @@ public class MessageVerifierTest {
         createAndAddSignature(headers);
 
         MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic(),
-                                                              Collections.singletonList("test"));
+                                                             Collections.singletonList("test"));
+        headerVerifier.setAddDefaultRequiredHeaders(false);
         headerVerifier.setSecurityProvider(new MockSecurityProvider());
         headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
-        headerVerifier.verifyMessage(headers, METHOD, URI);
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
+    }
+
+    @Test
+    public void defaultRequiredHeaderPresent() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Test", Collections.singletonList("value"));
+        headers.put(HTTPSignatureConstants.REQUEST_TARGET, Collections.singletonList("12345"));
+        createAndAddSignature(headers);
+
+        MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic(),
+                                                             Collections.singletonList("test"));
+        headerVerifier.setSecurityProvider(new MockSecurityProvider());
+        headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
+    }
+
+    @Test
+    public void defaultRequiredHeaderPresentTestNotRequired() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Test", Collections.singletonList("value"));
+        headers.put(HTTPSignatureConstants.REQUEST_TARGET, Collections.singletonList("12345"));
+        createAndAddSignature(headers);
+
+        MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        headerVerifier.setSecurityProvider(new MockSecurityProvider());
+        headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
+    }
+
+    @Test(expected = InvalidDataToVerifySignatureException.class)
+    public void defaultRequiredHeaderNotPresent() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Test", Collections.singletonList("value"));
+        createAndAddSignature(headers);
+
+        MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic(),
+                                                             Collections.singletonList("test"));
+        headerVerifier.setSecurityProvider(new MockSecurityProvider());
+        headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
+    }
+
+    @Test(expected = InvalidDataToVerifySignatureException.class)
+    public void defaultRequiredHeaderNotPresentTestNotRequired() throws IOException {
+        Map<String, List<String>> headers = createMockHeaders();
+        headers.put("Test", Collections.singletonList("value"));
+        createAndAddSignature(headers);
+
+        MessageVerifier headerVerifier = new MessageVerifier(keyId -> keyPair.getPublic());
+        headerVerifier.setSecurityProvider(new MockSecurityProvider());
+        headerVerifier.setAlgorithmProvider(new MockAlgorithmProvider());
+        headerVerifier.verifyMessage(headers, METHOD, URI, new MessageImpl());
     }
 
     private static void createAndAddSignature(Map<String, List<String>> headers) throws IOException {

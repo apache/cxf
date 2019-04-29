@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.httpsignature;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,9 @@ import java.util.Objects;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.rs.security.httpsignature.exception.MissingSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.exception.MultipleSignatureHeaderException;
 import org.apache.cxf.rs.security.httpsignature.provider.AlgorithmProvider;
@@ -40,9 +44,11 @@ public class MessageVerifier {
     private KeyProvider keyProvider;
     private SecurityProvider securityProvider;
     private final SignatureValidator signatureValidator;
+    private final List<String> requiredHeaders;
+    private boolean addDefaultRequiredHeaders = true;
 
     public MessageVerifier(KeyProvider keyProvider) {
-        this(keyProvider, Collections.emptyList());
+        this(keyProvider, (List<String>)null);
     }
 
     public MessageVerifier(KeyProvider keyProvider, List<String> requiredHeaders) {
@@ -67,10 +73,19 @@ public class MessageVerifier {
                            SecurityProvider securityProvider,
                            AlgorithmProvider algorithmProvider,
                            List<String> requiredHeaders) {
+        this(keyProvider, securityProvider, algorithmProvider, requiredHeaders, new TomitribeSignatureValidator());
+    }
+
+    public MessageVerifier(KeyProvider keyProvider,
+                           SecurityProvider securityProvider,
+                           AlgorithmProvider algorithmProvider,
+                           List<String> requiredHeaders,
+                           SignatureValidator signatureValidator) {
         setkeyProvider(keyProvider);
         setSecurityProvider(securityProvider);
         setAlgorithmProvider(algorithmProvider);
-        this.signatureValidator = new TomitribeSignatureValidator(requiredHeaders);
+        this.requiredHeaders = requiredHeaders == null ? Collections.emptyList() : requiredHeaders;
+        this.signatureValidator = signatureValidator;
     }
 
     public final void setkeyProvider(KeyProvider provider) {
@@ -86,18 +101,50 @@ public class MessageVerifier {
         this.algorithmProvider = Objects.requireNonNull(algorithmProvider, "algorithm provider cannot be null");
     }
 
-    public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri) {
+    public void verifyMessage(Map<String, List<String>> messageHeaders, String method, String uri, Message m) {
         SignatureHeaderUtils.inspectMessageHeaders(messageHeaders);
         inspectMissingSignatureHeader(messageHeaders);
 
         inspectMultipleSignatureHeaders(messageHeaders);
+
+        // Calculate the headers that we require to be signed. Use the headers configured on this class if available,
+        // falling back to the contextual property.
+        List<String> signedHeaders = new ArrayList<>(requiredHeaders);
+        if (requiredHeaders.isEmpty()
+            && m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS) != null) {
+            signedHeaders =
+                CastUtils.cast(
+                    (List<?>)m.getContextualProperty(HTTPSignatureConstants.RSSEC_HTTP_SIGNATURE_IN_HEADERS));
+        }
+
+        // Add the default required headers
+        boolean requestor = MessageUtils.isRequestor(m);
+        if (addDefaultRequiredHeaders) {
+            if (!(requestor || signedHeaders.contains(HTTPSignatureConstants.REQUEST_TARGET))) {
+                signedHeaders.add(HTTPSignatureConstants.REQUEST_TARGET);
+            }
+            if (!signedHeaders.contains("digest")) {
+                signedHeaders.add("digest");
+            }
+        }
+
+        // Now dynamically check to see whether the "digest" header is required or not. It's not required
+        // for the service case on a GET/HEAD request as there is no request, and also not required on
+        // the client side unless it is an OK response that is not 204
+        Integer status = (Integer)m.get(Message.RESPONSE_CODE);
+        if ((requestor && (status < 200 || status >= 300 || status == 204))
+            || (!requestor && ("GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method)))) {
+            signedHeaders.remove("digest");
+        }
+
         LOG.fine("Starting signature verification");
         signatureValidator.validate(messageHeaders,
                                     algorithmProvider,
                                     keyProvider,
                                     securityProvider,
                                     method,
-                                    uri);
+                                    uri,
+                                    signedHeaders);
         LOG.fine("Finished signature verification");
     }
 
@@ -111,6 +158,18 @@ public class MessageVerifier {
         if (!responseHeaders.containsKey("Signature")) {
             throw new MissingSignatureHeaderException("there is no signature header in request");
         }
+    }
+
+    public boolean isAddDefaultRequiredHeaders() {
+        return addDefaultRequiredHeaders;
+    }
+
+    /**
+     * Set whether we require some default headers to be signed, such as "digest" and "(request-target"),
+     * depending on whether there is a request body or not, and whether we are the client or not
+     */
+    public void setAddDefaultRequiredHeaders(boolean addDefaultRequiredHeaders) {
+        this.addDefaultRequiredHeaders = addDefaultRequiredHeaders;
     }
 
 }

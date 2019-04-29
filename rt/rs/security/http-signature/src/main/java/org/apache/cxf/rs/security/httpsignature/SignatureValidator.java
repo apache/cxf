@@ -31,6 +31,7 @@ public interface SignatureValidator {
                   KeyProvider keyProvider,
                   SecurityProvider securityProvider,
                   String method,
-                  String uri);
+                  String uri,
+                  List<String> requiredHeaders);
 
 }

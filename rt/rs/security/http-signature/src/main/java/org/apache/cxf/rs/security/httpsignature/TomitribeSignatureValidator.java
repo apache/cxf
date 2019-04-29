@@ -19,8 +19,6 @@
 package org.apache.cxf.rs.security.httpsignature;
 
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -39,11 +37,6 @@ import org.tomitribe.auth.signatures.Verifier;
 
 public class TomitribeSignatureValidator implements SignatureValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(TomitribeSignatureValidator.class);
-    private final List<String> requiredHeaders;
-
-    public TomitribeSignatureValidator(List<String> requiredHeaders) {
-        this.requiredHeaders = requiredHeaders != null ? new ArrayList<>(requiredHeaders) : Collections.emptyList();
-    }
 
     @Override
     public void validate(Map<String, List<String>> messageHeaders,
@@ -51,7 +44,8 @@ public class TomitribeSignatureValidator implements SignatureValidator {
                          KeyProvider keyProvider,
                          SecurityProvider securityProvider,
                          String method,
-                         String uri) {
+                         String uri,
+                         List<String> requiredHeaders) {
         Signature signature = extractSignatureFromHeader(messageHeaders.get("Signature").get(0));
 
         String providedAlgorithm = algorithmProvider.getAlgorithmName(signature.getKeyId());
@@ -66,7 +60,7 @@ public class TomitribeSignatureValidator implements SignatureValidator {
         java.security.Provider provider =
             securityProvider != null ? securityProvider.getProvider(signature.getKeyId()) : null;
 
-        runVerifier(messageHeaders, key, signature, provider, method, uri);
+        runVerifier(messageHeaders, key, signature, provider, method, uri, requiredHeaders);
     }
 
     private static Signature extractSignatureFromHeader(String signatureString) {
@@ -82,20 +76,15 @@ public class TomitribeSignatureValidator implements SignatureValidator {
                              Signature signature,
                              java.security.Provider provider,
                              String method,
-                             String uri) {
+                             String uri,
+                             List<String> requiredHeaders) {
         LOG.fine("Starting signature validation");
         boolean success;
         try {
             Verifier verifier = new Verifier(key, signature, provider);
             success = verifier.verify(method, uri, SignatureHeaderUtils.mapHeaders(messageHeaders));
 
-            // If HTTP GET then don't require that the digest is present
-            List<String> headers = requiredHeaders;
-            if ("GET".equals(method)) {
-                headers = new ArrayList<>(requiredHeaders);
-                headers.remove("digest");
-            }
-            if (!signature.getHeaders().containsAll(headers)) {
+            if (!signature.getHeaders().containsAll(requiredHeaders)) {
                 LOG.warning("Not all of the required headers are signed");
                 throw new InvalidDataToVerifySignatureException();
             }

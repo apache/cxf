@@ -45,6 +45,7 @@ under the License.
                 <value>(request-target)</value>
             </util:list>
         </constructor-arg>
+        <property name="addDefaultRequiredHeaders" value="false"/>
     </bean>
     <bean id="httpSignatureVerifier" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifier"/>
@@ -80,6 +81,7 @@ under the License.
         <constructor-arg>
             <ref bean="customAlgorithmProvider"/>
         </constructor-arg>
+        <property name="addDefaultRequiredHeaders" value="false"/>
     </bean>
     <bean id="httpSignatureVerifierRsaSha512" class="org.apache.cxf.rs.security.httpsignature.filters.VerifySignatureFilter">
         <property name="messageVerifier" ref="messageVerifierRsaSha512"/>
