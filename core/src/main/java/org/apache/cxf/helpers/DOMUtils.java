@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -66,6 +67,12 @@ public final class DOMUtils {
     private static final String XMLNAMESPACE = "xmlns";
     private static volatile Document emptyDocument;
 
+
+    // java9 plus hack
+    // store node/fragment without required method in a set to improve
+    // performance on very big documents
+    private static Set<Class> java9plusNodeWithoutMethodSet = ConcurrentHashMap.newKeySet();
+    private static Set<Class> java9plusFragmentWithoutMethodSet = ConcurrentHashMap.newKeySet();
 
 
     static {
@@ -750,12 +757,19 @@ public final class DOMUtils {
      */
     public static Node getDomElement(Node node) {
         if (node != null && isJava9SAAJ()) {
+            if (java9plusNodeWithoutMethodSet.contains(node.getClass())) {
+                return node;
+            }
+
             //java9plus hack
             try {
                 Method method = node.getClass().getMethod("getDomElement");
                 node = (Node)method.invoke(node);
             } catch (NoSuchMethodException e) {
                 //best effort to try, do nothing if NoSuchMethodException
+
+                // store error node in set to avoid performance problems
+                java9plusNodeWithoutMethodSet.add(node.getClass());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -770,6 +784,10 @@ public final class DOMUtils {
      */
     public static DocumentFragment getDomDocumentFragment(DocumentFragment fragment) {
         if (fragment != null && isJava9SAAJ()) {
+            if (java9plusFragmentWithoutMethodSet.contains(fragment.getClass())) {
+                return fragment;
+            }
+
             //java9 plus hack
             try {
                 Field f = fragment.getClass().getDeclaredField("documentFragment");
@@ -777,6 +795,9 @@ public final class DOMUtils {
                 fragment = (DocumentFragment) f.get(fragment);
             } catch (NoSuchFieldException e) {
                 //best effort to try, do nothing if NoSuchMethodException
+
+                // store error node in set to avoid performance problems
+                java9plusFragmentWithoutMethodSet.add(fragment.getClass());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
