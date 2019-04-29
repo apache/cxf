@@ -283,10 +283,10 @@ public class URIResolver {
         }
         huc.setConnectTimeout(30000);
         huc.setReadTimeout(60000);
-        is =  huc.getInputStream();
+        is = huc.getInputStream();
         return huc;
     }
-    
+
     /**
      * Assumption: URI scheme is "file"
      */
