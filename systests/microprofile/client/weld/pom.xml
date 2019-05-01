@@ -68,6 +68,11 @@
             <artifactId>javax.json-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
         </dependency>
@@ -86,6 +91,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
+            <version>${cxf.microprofile.rest.client.version}</version>
         </dependency>
     </dependencies>
     <build>

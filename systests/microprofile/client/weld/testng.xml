@@ -1,11 +1,12 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
  
-<suite name="MPRestClientTCK1.2">
+<suite name="MPRestClientTCK1.3">
     <test name="All TCK Tests">
         <packages>
             <package name="org.eclipse.microprofile.rest.client.tck" />
             <package name="org.eclipse.microprofile.rest.client.tck.asynctests" />
             <package name="org.eclipse.microprofile.rest.client.tck.cditests" />
+            <package name="org.eclipse.microprofile.rest.client.tck.ssl" />
             <package name="org.eclipse.microprofile.rest.client.tck.timeout" />
         </packages>
     </test>

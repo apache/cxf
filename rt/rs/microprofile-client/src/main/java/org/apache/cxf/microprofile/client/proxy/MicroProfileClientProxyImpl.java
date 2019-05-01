@@ -213,9 +213,9 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
                                     boolean proxy) {
 
         Method m = ori.getMethodToInvoke();
-        
+
         Message msg = super.createMessage(body, ori, headers, currentURI, exchange, invocationContext, proxy);
-        
+
         @SuppressWarnings("unchecked")
         Map<String, Object> filterProps = (Map<String, Object>) msg.getExchange()
                                                                    .get("jaxrs.filter.properties");
@@ -407,6 +407,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     }
     @Override
     public Object invoke(Object o, Method m, Object[] params) throws Throwable {
+        checkClosed();
         objectInstance = o;
         return interceptorWrapper.invoke(o, m, params, new Invoker(o, m, params, this));
     }
