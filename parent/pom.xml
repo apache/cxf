@@ -147,6 +147,7 @@
         <cxf.opensaml.version>3.3.0</cxf.opensaml.version>
         <cxf.opensaml.osgi.version>3.3.0_2</cxf.opensaml.osgi.version>
         <cxf.opensaml.osgi.version.range>[3.1,4)</cxf.opensaml.osgi.version.range>
+        <cxf.plexus-utils.version>3.2.0</cxf.plexus-utils.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.reactivestreams.version>1.0.1</cxf.reactivestreams.version>
         <cxf.reflections.bundle.version>0.9.11_2</cxf.reflections.bundle.version>
