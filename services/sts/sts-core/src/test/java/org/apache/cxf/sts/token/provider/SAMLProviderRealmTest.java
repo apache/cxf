@@ -78,9 +78,9 @@ public class SAMLProviderRealmTest {
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertTrue(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
 
         // Realm "B"
         providerParameters.setRealm("B");
@@ -92,9 +92,9 @@ public class SAMLProviderRealmTest {
         token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
 
         // Default Realm
         providerParameters.setRealm(null);
@@ -106,9 +106,9 @@ public class SAMLProviderRealmTest {
         token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertTrue(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"STS\""));
     }
 
     @SuppressWarnings("deprecation")
@@ -139,9 +139,9 @@ public class SAMLProviderRealmTest {
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertTrue(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertTrue(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
 
         // Realm "B"
         providerParameters.setRealm("B");
@@ -153,9 +153,9 @@ public class SAMLProviderRealmTest {
         token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
 
         // Default Realm
         providerParameters.setRealm(null);
@@ -167,9 +167,9 @@ public class SAMLProviderRealmTest {
         token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertTrue(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"STS\""));
     }
 
     private TokenProviderParameters createProviderParameters(
