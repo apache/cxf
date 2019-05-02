@@ -780,6 +780,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         setClientAuthentication(con,
                                 tlsServerParameters.getClientAuthentication());
         con.setCertAlias(tlsServerParameters.getCertAlias());
+        // TODO Once we switch to use SslContextFactory.Server instead, we can get rid of this line
+        con.setEndpointIdentificationAlgorithm(null);
     }
 
 
@@ -1036,7 +1038,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
                     }
                 }
             } finally {
-                if (contexts != null) {
+                if (contexts != null && contexts.getHandlers() != null) {
                     for (Handler h : contexts.getHandlers()) {
                         h.stop();
                     }
