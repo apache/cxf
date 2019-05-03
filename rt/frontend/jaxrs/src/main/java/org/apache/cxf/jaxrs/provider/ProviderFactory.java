@@ -370,7 +370,7 @@ public abstract class ProviderFactory {
                                                       m);
         int size = readerInterceptors.size();
         if (mr != null || size > 0) {
-            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, m.getExchange().getInMessage());
+            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, getResponseMessage(m));
 
             List<ReaderInterceptor> interceptors = null;
             if (size > 0) {
@@ -389,6 +389,15 @@ public abstract class ProviderFactory {
             return interceptors;
         }
         return null;
+    }
+
+    private Message getResponseMessage(Message message) {
+        Message responseMessage = message.getExchange().getInMessage();
+        if (responseMessage == null) {
+            responseMessage = message.getExchange().getInFaultMessage();
+        }
+
+        return responseMessage;
     }
 
     public <T> List<WriterInterceptor> createMessageBodyWriterInterceptor(Class<T> bodyType,
