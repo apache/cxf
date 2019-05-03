@@ -37,6 +37,8 @@ import org.apache.cxf.phase.Phase;
  */
 public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
 
+    public static final String JMS_SOAP_ACTION_VALUE = "jms.soap.action.value";
+
     public SoapJMSInInterceptor() {
         super(Phase.RECEIVE);
         addAfter(AttachmentInInterceptor.class.getName());
@@ -138,6 +140,9 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
             if (f != null) {
                 throw f;
             }
+        }
+        if (soapAction != null) {
+            message.put(JMS_SOAP_ACTION_VALUE, soapAction);
         }
     }
 

@@ -16,17 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms.security;
+package org.apache.cxf.systest.jms.action;
 
 import javax.jws.WebService;
 
 import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
 
-@WebService(serviceName = "HelloWorldService",
+@WebService(serviceName = "HelloWorldServiceSoapAction",
             portName = "HelloWorldPort",
-            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
+            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldSoapActionPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class SecurityGreeterImplTwoWayJMS extends TwoWayJMSImplBase {
+public class SoapActionGreeterImplTwoWayJMS extends TwoWayJMSImplBase {
 
+    public String sayHi2() {
+        return "Bonjour2";
+    }
 }
