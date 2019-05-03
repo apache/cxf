@@ -52,6 +52,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import javax.xml.bind.JAXBContext;
@@ -115,7 +116,7 @@ public class ProviderFactoryTest {
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertSame(provider, em);
     }
-    
+
     @Test
     public void testRegisterFeatureInFeature() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
@@ -131,7 +132,7 @@ public class ProviderFactoryTest {
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertSame(provider, em);
     }
-    
+
     @Test
     public void testRegisterMbrMbwProviderAsMbrOnly() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
@@ -149,7 +150,7 @@ public class ProviderFactoryTest {
         assertTrue(writer instanceof JAXBElementProvider);
         assertNotSame(writer, customProvider);
     }
-    
+
     @Test
     public void testRegisterMbrMbwProviderAsMbwOnly() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
@@ -167,7 +168,7 @@ public class ProviderFactoryTest {
         assertTrue(reader instanceof JAXBElementProvider);
         assertNotSame(reader, customProvider);
     }
-    
+
     @Test
     public void testOrderOfProvidersWithSameProperties() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -830,6 +831,24 @@ public class ProviderFactoryTest {
         return message;
     }
 
+    private Message prepareFaultMessage(String contentType, String acceptType) {
+        Message message = new MessageImpl();
+        Map<String, List<String>> headers = new MetadataMap<String, String>();
+        message.put(Message.PROTOCOL_HEADERS, headers);
+        Exchange exchange = new ExchangeImpl();
+        exchange.setInMessage(null);
+        exchange.setInFaultMessage(message);
+        if (acceptType != null) {
+            headers.put("Accept", Collections.singletonList(acceptType));
+            exchange.setOutMessage(new MessageImpl());
+        } else {
+            headers.put("Content-Type", Collections.singletonList(contentType));
+        }
+        message.put("Content-Type", contentType);
+        message.setExchange(exchange);
+        return message;
+    }
+
     @Test
     public void testRegisterCustomEntityProvider() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -837,6 +856,63 @@ public class ProviderFactoryTest {
 
         verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class,
                        "application/widget");
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptor() {
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(1, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithFaultMessage() throws Exception {
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(1, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithReaderInterceptor() throws Exception {
+        ReaderInterceptor ri = readerInterceptorContext -> readerInterceptorContext.proceed();
+        ProviderInfo<ReaderInterceptor> pi = new ProviderInfo<>(ri, null, true);
+
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        spf.readerInterceptors.put(new ProviderFactory.NameKey("org.apache.cxf.filter.binding", 1, ri.getClass()), pi);
+
+        final Message message = prepareMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(2, interceptors.size());
+    }
+
+    @Test
+    public void testCreateMessageBodyReaderInterceptorWithFaultMessageAndReaderInterceptor() throws Exception {
+        ReaderInterceptor ri = readerInterceptorContext -> readerInterceptorContext.proceed();
+        ProviderInfo<ReaderInterceptor> pi = new ProviderInfo<>(ri, null, true);
+
+        ServerProviderFactory spf = ServerProviderFactory.getInstance();
+        spf.readerInterceptors.put(new ProviderFactory.NameKey("org.apache.cxf.filter.binding", 1, ri.getClass()), pi);
+
+        final Message message = prepareFaultMessage(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
+        List<ReaderInterceptor> interceptors =
+            spf.createMessageBodyReaderInterceptor(Book.class, Book.class,
+                                                   new Annotation[0], MediaType.APPLICATION_XML_TYPE,
+                                                   message, true, null);
+        assertSame(2, interceptors.size());
     }
 
     private int indexOf(List<? extends Object> providerInfos, Class<?> providerType) {
@@ -1141,7 +1217,7 @@ public class ProviderFactoryTest {
 
         }
     }
-    
+
     @Produces("application/xml")
     @Consumes("application/xml")
     private static class BookReaderWriter

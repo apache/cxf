@@ -43,6 +43,9 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
 
     public ReaderInterceptorMBR(MessageBodyReader<?> reader,
                                 Message m) {
+        if (null == m) {
+            throw new IllegalArgumentException("Message not allowed to be null");
+        }
         this.reader = reader;
         this.m = m;
     }

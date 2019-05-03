@@ -93,8 +93,8 @@ public abstract class ProviderFactory {
     private static final String BUS_PROVIDERS_ALL = "org.apache.cxf.jaxrs.bus.providers";
     private static final String PROVIDER_CACHE_ALLOWED = "org.apache.cxf.jaxrs.provider.cache.allowed";
     private static final String PROVIDER_CACHE_CHECK_ALL = "org.apache.cxf.jaxrs.provider.cache.checkAllCandidates";
-    
-    
+
+
     static class LazyProviderClass {
         // class to Lazily call the ClassLoaderUtil.loadClass, but do it once
         // and cache the result.  Then use the class to create instances as needed.
@@ -106,11 +106,11 @@ public abstract class ProviderFactory {
         final String className;
         volatile boolean initialized;
         Class<?> cls;
-        
+
         LazyProviderClass(String cn) {
             className = cn;
         }
-        
+
         synchronized void loadClass() {
             if (!initialized) {
                 try {
@@ -121,7 +121,7 @@ public abstract class ProviderFactory {
                 initialized = true;
             }
         }
-        
+
         public Object tryCreateInstance(Bus bus) {
             if (!initialized) {
                 loadClass();
@@ -147,21 +147,21 @@ public abstract class ProviderFactory {
             return null;
         }
     };
-    
-    private static final LazyProviderClass DATA_SOURCE_PROVIDER_CLASS = 
+
+    private static final LazyProviderClass DATA_SOURCE_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.DataSourceProvider");
-    private static final LazyProviderClass JAXB_PROVIDER_CLASS = 
+    private static final LazyProviderClass JAXB_PROVIDER_CLASS =
         new LazyProviderClass(JAXB_PROVIDER_NAME);
-    private static final LazyProviderClass JAXB_ELEMENT_PROVIDER_CLASS = 
+    private static final LazyProviderClass JAXB_ELEMENT_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider");
-    private static final LazyProviderClass MULTIPART_PROVIDER_CLASS = 
+    private static final LazyProviderClass MULTIPART_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.MultipartProvider");
-    
+
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors =
         new NameKeyMap<>(true);
     protected Map<NameKey, ProviderInfo<WriterInterceptor>> writerInterceptors =
         new NameKeyMap<>(true);
-    
+
     private List<ProviderInfo<MessageBodyReader<?>>> messageReaders =
         new ArrayList<>();
     private List<ProviderInfo<MessageBodyWriter<?>>> messageWriters =
@@ -183,7 +183,7 @@ public abstract class ProviderFactory {
     private Comparator<?> providerComparator;
 
     private ProviderCache providerCache;
-    
+
 
     protected ProviderFactory(Bus bus) {
         this.bus = bus;
@@ -356,7 +356,7 @@ public abstract class ProviderFactory {
                                        boolean injectContext) {
         return handleMapper(em, expectedType, m, providerClass, null, injectContext);
     }
-    
+
     protected <T> boolean handleMapper(ProviderInfo<T> em,
                                        Class<?> expectedType,
                                        Message m,
@@ -434,7 +434,7 @@ public abstract class ProviderFactory {
                                                       m);
         int size = readerInterceptors.size();
         if (mr != null || size > 0) {
-            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, m.getExchange().getInMessage());
+            ReaderInterceptor mbrReader = new ReaderInterceptorMBR(mr, getResponseMessage(m));
 
             List<ReaderInterceptor> interceptors = null;
             if (size > 0) {
@@ -907,7 +907,7 @@ public abstract class ProviderFactory {
             if (result != 0) {
                 return result;
             }
-            
+
             return comparePriorityStatus(p1.getProvider().getClass(), p2.getProvider().getClass());
         }
     }
@@ -1154,7 +1154,7 @@ public abstract class ProviderFactory {
                 Class<?> actualType = InjectionUtils.getActualType(genericSuperType);
                 if (actualType != null && actualType.isAssignableFrom(expectedClass)) {
                     return new Type[]{genericSuperType};
-                } else if (commonBaseCls != null && commonBaseCls != Object.class 
+                } else if (commonBaseCls != null && commonBaseCls != Object.class
                            && commonBaseCls.isAssignableFrom(expectedClass)
                            && commonBaseCls.isAssignableFrom(actualType)
                            || expectedClass.isAssignableFrom(actualType)) {
@@ -1265,6 +1265,15 @@ public abstract class ProviderFactory {
         return new ProviderInfo<Object>(instance, proxies, theBus, checkContexts, custom);
     }
 
+    private Message getResponseMessage(Message message) {
+        Message responseMessage = message.getExchange().getInMessage();
+        if (responseMessage == null) {
+            responseMessage = message.getExchange().getInFaultMessage();
+        }
+
+        return responseMessage;
+    }
+
     protected static class NameKey {
         private String name;
         private Integer priority;
@@ -1342,7 +1351,7 @@ public abstract class ProviderFactory {
         } else {
             return getFilterNameBindings(p.getBus(), p.getProvider());
         }
-        
+
     }
     protected static Set<String> getFilterNameBindings(Bus bus, Object provider) {
         Class<?> pClass = ClassHelper.getRealClass(bus, provider);

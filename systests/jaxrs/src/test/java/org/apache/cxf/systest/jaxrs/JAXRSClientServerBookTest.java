@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ReaderInterceptor;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -2745,6 +2747,36 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals("text", r3values.get(2));
         assertEquals("blah", r3values.get(3));
 
+    }
+
+    @Test
+    public void testGetBookWithReaderInterceptor() throws Exception {
+        BookStore client = JAXRSClientFactory
+                .create("http://localhost:" + PORT, BookStore.class, Collections.singletonList(getReaderInterceptor()));
+        Book book = client.getBook(0);
+        assertEquals(123, book.getId());
+    }
+
+    @Test
+    public void testGetBookWithServerWebApplicationExceptionAndReaderInterceptor() throws Exception {
+        BookStore client = JAXRSClientFactory
+                .create("http://localhost:" + PORT, BookStore.class, Collections.singletonList(getReaderInterceptor()));
+        try {
+            client.throwException();
+            fail("Exception expected");
+        } catch (ServerErrorException ex) {
+            assertEquals(500, ex.getResponse().getStatus());
+            assertEquals("This is a WebApplicationException", ex.getResponse().readEntity(String.class));
+        }
+    }
+
+
+    private ReaderInterceptor getReaderInterceptor() {
+        return readerInterceptorContext -> {
+            InputStream is = new BufferedInputStream(readerInterceptorContext.getInputStream());
+            readerInterceptorContext.setInputStream(is);
+            return readerInterceptorContext.proceed();
+        };
     }
 
 
