@@ -16,17 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms.security;
+package org.apache.cxf.systest.jms.action;
 
-import javax.jws.WebService;
+import javax.xml.ws.Endpoint;
 
-import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
-@WebService(serviceName = "HelloWorldService",
-            portName = "HelloWorldPort",
-            endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
-            targetNamespace = "http://cxf.apache.org/hello_world_jms",
-            wsdlLocation = "testutils/jms_test.wsdl")
-public class SecurityGreeterImplTwoWayJMS extends TwoWayJMSImplBase {
+public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
+
+    EmbeddedJMSBrokerLauncher broker;
+    public Server(EmbeddedJMSBrokerLauncher b) {
+        broker = b;
+    }
+
+    protected void run()  {
+        Bus bus = BusFactory.getDefaultBus();
+        setBus(bus);
+
+        broker.updateWsdl(bus, "testutils/jms_test.wsdl");
+
+        Endpoint.publish(null, new SoapActionGreeterImplTwoWayJMS());
+    }
 
 }

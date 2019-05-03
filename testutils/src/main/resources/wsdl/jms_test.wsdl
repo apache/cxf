@@ -102,6 +102,16 @@
             <fault name="BadRecordLitFault" message="tns:BadRecordLitFault"/>
         </operation>
     </portType>
+    <portType name="HelloWorldSoapActionPortType">
+        <operation name="sayHi">
+            <input message="tns:sayHi" name="sayHi"/>
+            <output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </operation>
+        <operation name="sayHi2">
+            <input message="tns:sayHi" name="sayHi"/>
+            <output message="tns:sayHiResponse" name="sayHiResponse"/>
+        </operation>
+    </portType>
     <portType name="HelloWorldOneWayPort">
         <operation name="greetMeOneWay">
             <input message="tns:greetMeOneWay" name="greetMeOneWay"/>
@@ -155,6 +165,30 @@
             <fault name="BadRecordLitFault">
                 <soap:fault name="BadRecordLitFault" use="literal"/>
             </fault>
+        </operation>
+    </binding>
+    <binding name="HelloWorldPortSoapActionBinding" type="tns:HelloWorldSoapActionPortType">
+        <soap:binding style="rpc" transport="http://www.w3.org/2010/soapjms/"/>
+        <jms:jndiURL>tcp://localhost:61500</jms:jndiURL>
+        <jms:jndiInitialContextFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</jms:jndiInitialContextFactory>
+
+        <operation name="sayHi">
+            <soap:operation soapAction="SAY_HI_1" style="rpc"/>
+            <input name="sayHi">
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="sayHiResponse">
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
+        </operation>
+        <operation name="sayHi2">
+            <soap:operation soapAction="SAY_HI_2" style="rpc"/>
+            <input name="sayHi">
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </input>
+            <output name="sayHiResponse">
+                <soap:body namespace="http://cxf.apache.org/hello_world_jms" use="literal"/>
+            </output>
         </operation>
     </binding>
     <binding name="HelloWorldQueueBinMsgBinding" type="tns:HelloWorldPortType">
@@ -306,6 +340,11 @@
     </service>
     <service name="HelloWorldService">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPort">
+            <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text?username=testUser&amp;password=testPassword&amp;useConduitIdSelector=false" />
+        </port>
+    </service>
+    <service name="HelloWorldServiceSoapAction">
+        <port binding="tns:HelloWorldPortSoapActionBinding" name="HelloWorldPort">
             <soap:address location="jms:jndi:dynamicQueues/test.jmstransport.text?username=testUser&amp;password=testPassword&amp;useConduitIdSelector=false" />
         </port>
     </service>

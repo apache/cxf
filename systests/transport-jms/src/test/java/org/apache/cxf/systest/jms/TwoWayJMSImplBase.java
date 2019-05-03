@@ -40,6 +40,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
 
     @Resource
     protected WebServiceContext wsContext;
+
     public String greetMe(String me) {
         if (me.startsWith("PauseForTwoSecs")) {
             try {
@@ -50,11 +51,16 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
             me = me.substring("PauseForTwoSecs".length()).trim();
         }
 
+        addToReply("Test_Prop", "some return value "  + me);
+
+        return "Hello " + me;
+    }
+
+    private void addToReply(String key, String value) {
         MessageContext mc = wsContext.getMessageContext();
         JMSMessageHeadersType responseHeaders =
             (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-        responseHeaders.putProperty("Test_Prop", "some return value "  + me);
-        return "Hello " + me;
+        responseHeaders.putProperty(key, value);
     }
 
     public String sayHi() {
