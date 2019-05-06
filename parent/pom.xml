@@ -2848,6 +2848,12 @@
                     <groupId>com.sun.xml.messaging.saaj</groupId>
                     <artifactId>saaj-impl</artifactId>
                     <version>1.4.0-b03</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.xml.stream</groupId>
+                            <artifactId>stax-api</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.jacorb</groupId>
