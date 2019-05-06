@@ -28,6 +28,7 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
@@ -44,8 +45,12 @@ public class JwsJsonClientResponseFilter extends AbstractJwsJsonReaderProvider i
             || isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
+        final String content = IOUtils.readStringFromStream(res.getEntityStream());
+        if (StringUtils.isEmpty(content)) {
+            return;
+        }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
+        JwsJsonConsumer c = new JwsJsonConsumer(content);
         validate(c, theSigVerifier);
         byte[] bytes = c.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));

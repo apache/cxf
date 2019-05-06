@@ -27,6 +27,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -45,8 +46,12 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
             || isCheckEmptyStream() && !context.hasEntity()) {
             return;
         }
+        final String content = IOUtils.readStringFromStream(context.getEntityStream());
+        if (StringUtils.isEmpty(content)) {
+            return;
+        }
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier();
-        JwsJsonConsumer c = new JwsJsonConsumer(IOUtils.readStringFromStream(context.getEntityStream()));
+        JwsJsonConsumer c = new JwsJsonConsumer(content);
         try {
             validate(c, theSigVerifier);
         } catch (JwsException ex) {
