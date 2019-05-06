@@ -28,6 +28,7 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
@@ -44,7 +45,11 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
             || isCheckEmptyStream() && !res.hasEntity()) {
             return;
         }
-        JwsCompactConsumer p = new JwsCompactConsumer(IOUtils.readStringFromStream(res.getEntityStream()));
+        final String content = IOUtils.readStringFromStream(res.getEntityStream());
+        if (StringUtils.isEmpty(content)) {
+            return;
+        }
+        JwsCompactConsumer p = new JwsCompactConsumer(content);
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(p.getJwsHeaders());
         if (!p.verifySignatureWith(theSigVerifier)) {
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
