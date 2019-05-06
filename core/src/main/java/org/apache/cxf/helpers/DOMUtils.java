@@ -22,6 +22,7 @@ package org.apache.cxf.helpers;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -54,6 +55,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
@@ -66,8 +68,25 @@ public final class DOMUtils {
     private static final String XMLNAMESPACE = "xmlns";
     private static volatile Document emptyDocument;
 
-
-
+    private static final ClassValue<Method> GET_DOM_ELEMENTS_METHODS = new ClassValue<Method>() {
+        @Override
+        protected Method computeValue(Class<?> type) {
+            try {
+                return ReflectionUtil.getMethod(type, "getDomElement");
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+                return null;
+            }
+        }
+    };
+    private static final ClassValue<Field> GET_DOCUMENT_FRAGMENT_FIELDS = new ClassValue<Field>() {
+        @Override
+        protected Field computeValue(Class<?> type) {
+            return ReflectionUtil.getDeclaredField(type, "documentFragment");
+        }
+        
+    };
+        
     static {
         try {
             Method[] methods = DOMUtils.class.getClassLoader().
@@ -751,13 +770,13 @@ public final class DOMUtils {
     public static Node getDomElement(Node node) {
         if (node != null && isJava9SAAJ()) {
             //java9plus hack
-            try {
-                Method method = node.getClass().getMethod("getDomElement");
-                node = (Node)method.invoke(node);
-            } catch (NoSuchMethodException e) {
-                //best effort to try, do nothing if NoSuchMethodException
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            Method method = GET_DOM_ELEMENTS_METHODS.get(node.getClass());
+            if (method != null) {
+                try {
+                    return (Node)ReflectionUtil.setAccessible(method).invoke(node);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return node;
@@ -771,14 +790,9 @@ public final class DOMUtils {
     public static DocumentFragment getDomDocumentFragment(DocumentFragment fragment) {
         if (fragment != null && isJava9SAAJ()) {
             //java9 plus hack
-            try {
-                Field f = fragment.getClass().getDeclaredField("documentFragment");
-                f.setAccessible(true);
-                fragment = (DocumentFragment) f.get(fragment);
-            } catch (NoSuchFieldException e) {
-                //best effort to try, do nothing if NoSuchFieldException
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            Field f = GET_DOCUMENT_FRAGMENT_FIELDS.get(fragment.getClass());
+            if (f != null) {
+                return ReflectionUtil.accessDeclaredField(f, fragment, DocumentFragment.class);
             }
         }
         return fragment;
