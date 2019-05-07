@@ -30,17 +30,6 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
     </properties>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
-                <configuration>
-                    <forkMode>always</forkMode>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
         <profile>
             <id>server</id>
