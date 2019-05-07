@@ -33,13 +33,13 @@ import org.apache.cxf.rs.security.jose.common.JoseHeaders;
 
 public final class JoseJaxrsUtils {
     private static final String HTTP_PREFIX = "http.";
-    private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS = 
+    private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS =
         new HashSet<>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
-    
+
     private JoseJaxrsUtils() {
 
     }
-    
+
     public static void protectHttpHeaders(MultivaluedMap<String, Object> httpHeaders,
                                           JoseHeaders joseHeaders,
                                           Set<String> protectedHttpHeaders) {
@@ -56,7 +56,7 @@ public final class JoseJaxrsUtils {
         }
     }
     private static String getJoseHeaderValue(List<? extends Object> headerValues) {
-        StringBuilder sb = new StringBuilder(); 
+        StringBuilder sb = new StringBuilder();
         for (Object o : headerValues) {
             String[] parts = o.toString().split(",");
             for (String part : parts) {
@@ -66,7 +66,7 @@ public final class JoseJaxrsUtils {
         return sb.toString();
     }
 
-    public static void validateHttpHeaders(MultivaluedMap<String, String> httpHeaders, 
+    public static void validateHttpHeaders(MultivaluedMap<String, String> httpHeaders,
                                            JoseHeaders joseHeaders,
                                            Set<String> protectedHttpHeaders) {
         if (protectedHttpHeaders == null) {
@@ -76,19 +76,19 @@ public final class JoseJaxrsUtils {
         Map<String, String> updatedHttpHeaders = new HashMap<>();
         for (String headerName : protectedHttpHeaders) {
             List<String> headerValues = httpHeaders.get(headerName);
-            if (headerValues != null) {
+            if (headerValues != null && !headerValues.isEmpty() && headerValues.get(0) != null) {
                 String headerValue = getJoseHeaderValue(headerValues);
                 String prefixedHeaderName = HTTP_PREFIX + headerName;
                 updatedHttpHeaders.put(prefixedHeaderName, headerValue);
                 String joseHeaderValue = joseHeaders.getStringProperty(prefixedHeaderName);
                 if (joseHeaderValue != null) {
                     joseHttpHeaders.put(prefixedHeaderName, joseHeaderValue);
-                }    
+                }
             }
-            
+
         }
-        if (joseHttpHeaders.size() != updatedHttpHeaders.size() 
-            || !joseHttpHeaders.entrySet().containsAll(updatedHttpHeaders.entrySet())) { 
+        if (joseHttpHeaders.size() != updatedHttpHeaders.size()
+            || !joseHttpHeaders.entrySet().containsAll(updatedHttpHeaders.entrySet())) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
     }
