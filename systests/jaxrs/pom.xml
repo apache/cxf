@@ -537,6 +537,18 @@
             <version>${cxf.reactor.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${cxf.jcache.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${cxf.ehcache3.version}</version>
+            <scope>test</scope>
+       </dependency>
     </dependencies>
     <build>
         <plugins>
