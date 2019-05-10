@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.filters;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
