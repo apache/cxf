@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.https.hostname;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -38,6 +40,8 @@ import org.apache.hello_world.services.SOAPService;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -49,10 +53,17 @@ import static org.junit.Assert.fail;
  * "com.sun.net.ssl.internal.www.protocol". This means that com.sun.net.ssl.HostnameVerifier is used
  * instead of the javax version.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(HostnameVerificationDeprecatedServer.class);
     static final String PORT2 = allocatePort(HostnameVerificationDeprecatedServer.class, 2);
     static final String PORT3 = allocatePort(HostnameVerificationDeprecatedServer.class, 3);
+
+    final Boolean async;
+
+    public HostnameVerificationDeprecatedTest(Boolean async) {
+        this.async = async;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -63,6 +74,12 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
             // set this to false to fork
             launchServer(HostnameVerificationDeprecatedServer.class, true)
         );
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<Boolean> data() {
+
+        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
     }
 
     @AfterClass
@@ -89,6 +106,11 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -118,6 +140,11 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -160,10 +187,10 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
 
             updateAddressPort(port, PORT);
 
-            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
             // Enable Async
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -208,15 +235,15 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
 
             updateAddressPort(port, PORT);
 
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
             TLSClientParameters clientParameters = new TLSClientParameters();
             clientParameters.setUseHttpsURLConnectionDefaultHostnameVerifier(true);
             Client client = ClientProxy.getClient(port);
             ((HTTPConduit)client.getConduit()).setTlsClientParameters(clientParameters);
-
-            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-            // Enable Async
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -250,10 +277,10 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
 
         updateAddressPort(port, PORT2);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -279,10 +306,10 @@ public class HostnameVerificationDeprecatedTest extends AbstractBusClientServerT
 
         updateAddressPort(port, PORT3);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
