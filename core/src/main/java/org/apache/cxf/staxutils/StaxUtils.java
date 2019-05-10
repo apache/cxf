@@ -35,8 +35,8 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -125,9 +125,9 @@ public final class StaxUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
 
-    private static final BlockingQueue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
+    private static final Queue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
     private static final XMLInputFactory SAFE_INPUT_FACTORY;
-    private static final BlockingQueue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
+    private static final Queue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
     private static final XMLOutputFactory SAFE_OUTPUT_FACTORY;
 
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
@@ -706,7 +706,7 @@ public final class StaxUtils {
 
     /**
      * Copies the reader to the writer. The start and end document methods must
-     * be handled on the writer manually. 
+     * be handled on the writer manually.
      *
      * @param reader
      * @param writer

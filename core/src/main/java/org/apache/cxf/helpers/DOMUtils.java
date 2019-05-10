@@ -84,9 +84,9 @@ public final class DOMUtils {
         protected Field computeValue(Class<?> type) {
             return ReflectionUtil.getDeclaredField(type, "documentFragment");
         }
-        
+
     };
-        
+
     static {
         try {
             Method[] methods = DOMUtils.class.getClassLoader().
@@ -131,22 +131,22 @@ public final class DOMUtils {
             loader = getClassLoader(DOMUtils.class);
         }
         if (loader == null) {
-            DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-            f.setNamespaceAware(true);
-            f.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            return f.newDocumentBuilder();
+            return createDocumentBuilder();
         }
         DocumentBuilder factory = DOCUMENT_BUILDERS.get(loader);
         if (factory == null) {
-            DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
-            f2.setNamespaceAware(true);
-            f2.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            f2.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            factory = f2.newDocumentBuilder();
+            factory = createDocumentBuilder();
             DOCUMENT_BUILDERS.put(loader, factory);
         }
         return factory;
+    }
+
+    private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+        f.setNamespaceAware(true);
+        f.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        f.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        return f.newDocumentBuilder();
     }
 
     private static ClassLoader getContextClassLoader() {
@@ -781,7 +781,7 @@ public final class DOMUtils {
         }
         return node;
     }
-    
+
     /**
      * Try to get the DOM DocumentFragment from the SAAJ DocumentFragment with JAVA9 afterwards
      * @param DocumentFragment The original documentFragment we need check
