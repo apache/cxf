@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.filters;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.AccessTokenValidator;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class AccessTokenIntrospectionClient implements AccessTokenValidator {
 
@@ -70,8 +70,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         if (response.getIat() != null) {
             atv.setTokenIssuedAt(response.getIat());
         } else {
-            Instant now = Instant.now();
-            atv.setTokenIssuedAt(now.toEpochMilli());
+            atv.setTokenIssuedAt(OAuthUtils.getIssuedAt());
         }
         if (response.getExp() != null) {
             atv.setTokenLifetime(response.getExp() - atv.getTokenIssuedAt());
