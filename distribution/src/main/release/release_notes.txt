@@ -1,4 +1,4 @@
-Apache CXF 3.3.1 Release Notes
+Apache CXF 3.3.2 Release Notes
 
 1. Overview
 
@@ -23,7 +23,7 @@ http://cxf.apache.org/docs/33-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.3.1 fixes over 11 JIRA issues reported by users and the community.
+3.3.2 fixes over 31 JIRA issues reported by users and the community.
 
 
 
@@ -67,20 +67,75 @@ for caveats when upgrading.
 7. Specific issues, features, and improvements fixed in this version
 
 ** Bug
-* [CXF-7956] - add NPE guard for jetty and undertow threads configuration in blueprint
-* [CXF-7957] - Swagger2Feature Doesn't Work With Swagger Versions Above 1.5.17
-* [CXF-7968] - JavaDocProvider does not work with JDK > 8
-* [CXF-7969] - NullPointerException in CXF JavaToWS
-* [CXF-7970] - Fix Undertow import range
-* [CXF-7973] - Add NPE guard for jetty and undertow threads configuration in blueprint (to prevent NPE during karaf-quickstart/../Keycloak-cxf quickstarts)
-* [CXF-7974] - Definition of <library ..jaxws-api..> defined in cxf-jaxws causes trouble in jdk11
-* [CXF-7976] - [oauth2] token service does not serialize the issuer
-* [CXF-7981] - mutual SSL configuration for http-undertow transport not handle want and required for clientAuthentication correctly
-* [CXF-7984] - UsernameTokenInterceptor doesn't respect contextual property "allowNamespaceQualifiedPasswordTypes"
-* [CXF-7985] - Blocking Class.forName calls on JAX-RS dispatch path
+* [CXF-7885] - SOAP Action ignored by CXF JMS webservice method invoker
+* [CXF-7960] - Exception when SOAP service URI contains whitespace
+* [CXF-7971] - bin/scripts does't work on Java 11
+* [CXF-7977] - http-undertow|http-jetty transport: Port 8282 is configured with wrong protocol "https" with blueprint configuration
+* [CXF-7980] - RestClientExtension leaks
+* [CXF-7983] - JweClientResponseFilter fails to decrypt response, when it has status 204 No Content
+* [CXF-7990] - CXF goes in Infinite loop when service endpoint throws SOAPFaultException
+* [CXF-7991] - Google+ API is deprecated
+* [CXF-7992] - MP Rest Client leaks async interceptors
+* [CXF-8007] - HTTP Signature adds an extra "Signature" component to the Signature header
+* [CXF-8009] - CXF should not use ClassUtils for cglib checks
+* [CXF-8022] - Thread hangs using Reactor Flux when Exeption is Thrown
+* [CXF-8027] - illegal reflective access operation in EndpointReferenceUtils
+* [CXF-8028] - Performance problem with very big request
+* [CXF-8030] - CXF WSDLToJava generated local WSDL does not map included local XSDs
+* [CXF-8031] - CVE-2019-0231 - Vulnerability in Apache MINA
+* [CXF-8035] - Checking on null values in HTTP Header for protected JWS header
+* [CXF-8037] - Apache CXF (AsyncHTTPConduit) ignores system keyStore property
 
 ** Improvement
-* [CXF-7967] - Ability to skip the garbage collection in maven plugins
+* [CXF-7982] - Extract common OpenAPI / Swagger scaffolding into dedicated module (to prevent/eliminate duplication)
+* [CXF-7987] - SSE buffer size should be configurable
+* [CXF-7989] - org.apache.cxf.jaxrs.JAXRSInvoker#checkFutureResponse should probably handle CompletionException
+* [CXF-8010] - Avoid applying the SAAJInInterceptor to unsecured messages when using WS-SecurityPolicy
+* [CXF-8015] - Support "security.signature.password" property to configure a signature password for WS-Security/RS-Security
+* [CXF-8023] - Refactor systest/jaxrs/reactor/* test cases to use StepVerifier
+* [CXF-8029] - CXF WSDLToJava Generation fails if included XSD needs redirecting
+
+** Test
+* [CXF-8006] - X509TokenTest.testAsymmetricIssuerSerialDispatchMessage failed on JDK11&12
+
+** Wish
+* [CXF-7953] - make corba binding working with JDK11
+
+** Task
+* [CXF-7950] - Update Johnzon to 1.1.11
+* [CXF-7955] - Update HttpComponents client to 4.5.8 and core 4.4.11
+* [CXF-8004] - Share security configuration tags between Jose + HTTP Signature
+* [CXF-8011] - Remove commons-lang3 dependency from tools
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
