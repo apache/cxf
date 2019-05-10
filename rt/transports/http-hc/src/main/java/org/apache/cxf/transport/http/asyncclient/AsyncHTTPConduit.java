@@ -891,9 +891,11 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
 
             ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
                 .getInstance(protocol, provider);
-            ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
 
             KeyManager[] keyManagers = tlsClientParameters.getKeyManagers();
+            if (keyManagers == null) {
+                keyManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultKeyStoreManagers(LOG);
+            }
             KeyManager[] configuredKeyManagers =
                 org.apache.cxf.transport.https.SSLUtils.configureKeyManagersWithCertAlias(
                     tlsClientParameters, keyManagers);
@@ -904,6 +906,10 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             }
 
             ctx.init(configuredKeyManagers, trustManagers, tlsClientParameters.getSecureRandom());
+
+            if (ctx.getClientSessionContext() != null) {
+                ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
+            }
         }
 
         sslContext = ctx;

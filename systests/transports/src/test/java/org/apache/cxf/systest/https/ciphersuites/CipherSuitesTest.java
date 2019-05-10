@@ -22,6 +22,8 @@ package org.apache.cxf.systest.https.ciphersuites;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.crypto.Cipher;
@@ -44,10 +46,13 @@ import org.apache.hello_world.services.SOAPService;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for TLS ciphersuites
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     static final boolean UNRESTRICTED_POLICIES_INSTALLED;
     static {
@@ -76,6 +81,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     static final String PORT4 = allocatePort(CipherSuitesServer.class, 4);
     static final String PORT5 = allocatePort(CipherSuitesServer.class, 5);
 
+    final Boolean async;
+
+    public CipherSuitesTest(Boolean async) {
+        this.async = async;
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -86,6 +97,12 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         );
     }
 
+    @Parameters(name = "{0}")
+    public static Collection<Boolean> data() {
+
+        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
+    }
+
     @AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
@@ -94,30 +111,7 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
     // Both client + server include AES
     @org.junit.Test
     public void testAESIncluded() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
 
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
-        updateAddressPort(port, PORT);
-
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
-    // Both client + server include AES
-    @org.junit.Test
-    public void testAESIncludedAsync() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
 
@@ -132,7 +126,9 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         updateAddressPort(port, PORT);
 
@@ -167,6 +163,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         updateAddressPort(port, PORT4);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
@@ -193,37 +194,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        try {
-            port.greetMe("Kitty");
-            fail("Failure expected on not being able to negotiate a cipher suite");
-        } catch (Exception ex) {
-            // expected
-        }
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
-    // Client only includes DHE, server excludes it
-    @org.junit.Test
-    public void testClientDHEServerExcludesIncludedAsync() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-
-        updateAddressPort(port, PORT);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -254,32 +228,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
-    // Both client + server include DHE
-    @org.junit.Test
-    public void testDHEIncludedAsync() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-dhe-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-
-        updateAddressPort(port, PORT2);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -305,37 +257,10 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        try {
-            port.greetMe("Kitty");
-            fail("Failure expected on not being able to negotiate a cipher suite");
-        } catch (Exception ex) {
-            // expected
-        }
-
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-
-    // Client only includes ECDHE, server only includes DHE
-    @org.junit.Test
-    public void testClientECDHEServerDHEIncludedAsync() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CipherSuitesTest.class.getResource("ciphersuites-client.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-
-        updateAddressPort(port, PORT2);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -371,6 +296,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
@@ -399,6 +329,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         Client client = ClientProxy.getClient(port);
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
@@ -444,6 +379,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         Client client = ClientProxy.getClient(port);
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
 
@@ -481,6 +421,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         Client client = ClientProxy.getClient(port);
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
@@ -520,6 +465,11 @@ public class CipherSuitesTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT5);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");

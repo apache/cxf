@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.https.hostname;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -38,6 +40,8 @@ import org.apache.hello_world.services.SOAPService;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for hostname verification, where the hostname in question is "localhost".
@@ -46,12 +50,19 @@ import org.junit.BeforeClass;
  * keytool -genkey -validity 3650 -alias subjalt -keyalg RSA -keystore subjalt.jks
  * -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE" -ext SAN=DNS:localhost
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(HostnameVerificationServer.class);
     static final String PORT2 = allocatePort(HostnameVerificationServer.class, 2);
     static final String PORT3 = allocatePort(HostnameVerificationServer.class, 3);
     static final String PORT4 = allocatePort(HostnameVerificationServer.class, 4);
     static final String PORT5 = allocatePort(HostnameVerificationServer.class, 5);
+
+    final Boolean async;
+
+    public HostnameVerificationTest(Boolean async) {
+        this.async = async;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -61,6 +72,12 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(HostnameVerificationServer.class, true)
         );
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<Boolean> data() {
+
+        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
     }
 
     @AfterClass
@@ -86,10 +103,10 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -115,15 +132,10 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT2);
 
-        try {
-            port.greetMe("Kitty");
-            fail("Failure expected on a non-matching subject alternative name");
-        } catch (Exception ex) {
-            // expected
-        }
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -154,10 +166,10 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT3);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -183,15 +195,10 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT4);
 
-        try {
-            port.greetMe("Kitty");
-            fail("Failure expected with no matching Subject Alt Name or CN");
-        } catch (Exception ex) {
-            // expected
-        }
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -221,6 +228,11 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT4);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -255,6 +267,11 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
             assertNotNull("Port is null", port);
 
             updateAddressPort(port, PORT4);
+
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -292,15 +309,15 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
             updateAddressPort(port, PORT4);
 
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
             TLSClientParameters clientParameters = new TLSClientParameters();
             clientParameters.setUseHttpsURLConnectionDefaultHostnameVerifier(true);
             Client client = ClientProxy.getClient(port);
             ((HTTPConduit)client.getConduit()).setTlsClientParameters(clientParameters);
-
-            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
-            // Enable Async
-            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
 
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -333,10 +350,10 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT5);
 
-        assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-
         // Enable Async
-        ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 

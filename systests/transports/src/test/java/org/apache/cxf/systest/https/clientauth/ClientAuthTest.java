@@ -25,6 +25,8 @@ import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -53,13 +55,22 @@ import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for TLS client authentication.
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class ClientAuthTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ClientAuthServer.class);
     static final String PORT2 = allocatePort(ClientAuthServer.class, 2);
+
+    final Boolean async;
+
+    public ClientAuthTest(Boolean async) {
+        this.async = async;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -69,6 +80,12 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(ClientAuthServer.class, true)
         );
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<Boolean> data() {
+
+        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
     }
 
     @AfterClass
@@ -94,6 +111,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
@@ -117,6 +139,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -147,6 +174,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
@@ -156,6 +188,48 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
+    }
+
+    // Ignoring this test as it fails when run as part of the test class - testNoClientCert interferes with it
+    // It succeeds when run with testNoClientCert commented out
+    @org.junit.Test
+    @org.junit.Ignore
+    public void testSystemPropertiesWithEmptyKeystoreConfig() throws Exception {
+        try {
+            System.setProperty("javax.net.ssl.keyStore", "keys/Morpit.jks");
+            System.setProperty("javax.net.ssl.keyStorePassword", "password");
+            System.setProperty("javax.net.ssl.keyPassword", "password");
+            System.setProperty("javax.net.ssl.keyStoreType", "JKS");
+            SpringBusFactory bf = new SpringBusFactory();
+            URL busFile = ClientAuthTest.class.getResource("client-no-auth.xml");
+
+            Bus bus = bf.createBus(busFile.toString());
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
+
+            URL url = SOAPService.WSDL_LOCATION;
+            SOAPService service = new SOAPService(url, SOAPService.SERVICE);
+            assertNotNull("Service is null", service);
+            final Greeter port = service.getHttpsPort();
+            assertNotNull("Port is null", port);
+
+            updateAddressPort(port, PORT);
+
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
+            assertEquals(port.greetMe("Kitty"), "Hello Kitty");
+
+            ((java.io.Closeable)port).close();
+            bus.shutdown(true);
+        }  finally {
+            System.clearProperty("javax.net.ssl.keyStore");
+            System.clearProperty("javax.net.ssl.keyStorePassword");
+            System.clearProperty("javax.net.ssl.keyPassword");
+            System.clearProperty("javax.net.ssl.keyStoreType");
+        }
     }
 
     // Server trusts the issuer of the client cert
@@ -175,6 +249,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
@@ -199,6 +278,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -229,6 +313,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
 
         updateAddressPort(port, PORT);
 
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
@@ -257,6 +346,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         try {
             port.greetMe("Kitty");
@@ -338,6 +432,12 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
@@ -356,6 +456,12 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
+
         client = ClientProxy.getClient(port);
         http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
@@ -401,6 +507,12 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             assertNotNull("Port is null", port);
 
             updateAddressPort(port, PORT);
+
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
             Client client = ClientProxy.getClient(port);
             HTTPConduit http = (HTTPConduit) client.getConduit();
             http.setTlsClientParameters(tlsParams);
@@ -424,6 +536,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");
@@ -469,6 +586,11 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         // Set up KeyManagers/TrustManagers
         KeyStore ts = KeyStore.getInstance("JKS");

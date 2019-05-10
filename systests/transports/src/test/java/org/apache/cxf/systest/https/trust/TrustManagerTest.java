@@ -27,11 +27,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -47,14 +50,23 @@ import org.apache.hello_world.services.SOAPService;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for specifying a TrustManager
  */
+@RunWith(value = org.junit.runners.Parameterized.class)
 public class TrustManagerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(TrustServer.class);
     static final String PORT2 = allocatePort(TrustServer.class, 2);
     static final String PORT3 = allocatePort(TrustServer.class, 3);
+
+    final Boolean async;
+
+    public TrustManagerTest(Boolean async) {
+        this.async = async;
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -70,6 +82,12 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
              // set this to false to fork
              launchServer(TrustServerNoSpring.class, true)
         );
+    }
+
+    @Parameters(name = "{0}")
+    public static Collection<Boolean> data() {
+
+        return Arrays.asList(new Boolean[] {Boolean.FALSE, Boolean.TRUE});
     }
 
     @AfterClass
@@ -94,6 +112,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         TLSClientParameters tlsParams = new TLSClientParameters();
         X509TrustManager trustManager = new NoOpX509TrustManager();
@@ -129,6 +152,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         String validPrincipalName = "CN=Bethal,OU=Bethal,O=ApacheTest,L=Syracuse,C=US";
 
@@ -172,6 +200,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
 
             updateAddressPort(port, PORT);
 
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
             ((java.io.Closeable)port).close();
@@ -205,6 +238,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
 
             updateAddressPort(port, PORT);
 
+            // Enable Async
+            if (async) {
+                ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+            }
+
             assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
             ((java.io.Closeable)port).close();
@@ -234,6 +272,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT3);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         String validPrincipalName = "CN=Bethal,OU=Bethal,O=ApacheTest,L=Syracuse,C=US";
 
@@ -271,6 +314,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         String invalidPrincipalName = "CN=Bethal2,OU=Bethal,O=ApacheTest,L=Syracuse,C=US";
 
@@ -313,6 +361,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", port);
 
         updateAddressPort(port, PORT2);
+
+        // Enable Async
+        if (async) {
+            ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
+        }
 
         // Read truststore
         KeyStore ts = KeyStore.getInstance("JKS");
