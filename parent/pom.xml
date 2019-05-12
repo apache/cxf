@@ -111,6 +111,7 @@
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
+        <cxf.geronimo.jsonb.version>1.1</cxf.geronimo.jsonb.version>
         <cxf.geronimo.json.version>1.2</cxf.geronimo.json.version>
         <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
