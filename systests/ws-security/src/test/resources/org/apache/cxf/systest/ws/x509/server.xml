@@ -353,7 +353,8 @@
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportSupportingSignedCertConstraints" address="https://localhost:${testutil.ports.x509.Server.2}/DoubleItX509TransportSupportingSignedCertConstraints" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportSupportingSignedCertConstraintsPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
         <jaxws:properties>
             <entry key="security.signature.properties" value="cxfca.properties"/>
-            <entry key="security.subject.cert.constraints" value=".*CN=alice.*"/>
+            <entry key="security.cert.constraints.separator" value=";"/>
+            <entry key="security.subject.cert.constraints" value=".*CN=alice.*;.*CN=dave.*"/>
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="TransportKVT" address="https://localhost:${testutil.ports.x509.Server.2}/DoubleItX509TransportKVT" serviceName="s:DoubleItService" endpointName="s:DoubleItTransportKVTPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl" depends-on="tls-settings">
