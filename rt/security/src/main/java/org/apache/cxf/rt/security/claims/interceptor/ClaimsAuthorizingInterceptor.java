@@ -51,13 +51,8 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClaimsAuthorizingInterceptor.class);
 
-    private static final Set<String> SKIP_METHODS;
-    static {
-        SKIP_METHODS = new HashSet<>();
-        SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll",
-                          "equals", "toString", "hashCode"}));
-    }
+    private static final Set<String> SKIP_METHODS = new HashSet<>(
+            Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
 
     private Map<String, List<ClaimBean>> claims = new HashMap<>();
     private Map<String, String> nameAliases = Collections.emptyMap();
@@ -205,11 +200,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             Claims claimsAnn, Claim claimAnn) {
         List<ClaimBean> claimsList = new ArrayList<>();
 
-        List<Claim> annClaims = new ArrayList<>();
+        final List<Claim> annClaims;
         if (claimsAnn != null) {
-            annClaims.addAll(Arrays.asList(claimsAnn.value()));
+            annClaims = Arrays.asList(claimsAnn.value());
         } else if (claimAnn != null) {
-            annClaims.add(claimAnn);
+            annClaims = Collections.singletonList(claimAnn);
+        } else {
+            annClaims = Collections.emptyList();
         }
         for (Claim ann : annClaims) {
             org.apache.cxf.rt.security.claims.Claim claim = new org.apache.cxf.rt.security.claims.Claim();

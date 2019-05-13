@@ -22,7 +22,7 @@ package org.apache.cxf.ws.policy;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
@@ -130,7 +130,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             ListIterator<Policy> it = list.listIterator();
             while (it.hasNext()) {
@@ -250,7 +250,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             addPolicies(factory, endpoint, cls, list, Policy.Placement.SERVICE);
         }
@@ -312,7 +312,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 list.add(p);
             }
             if (ps != null) {
-                list.addAll(Arrays.asList(ps.value()));
+                Collections.addAll(list, ps.value());
             }
             ListIterator<Policy> it = list.listIterator();
             while (it.hasNext()) {

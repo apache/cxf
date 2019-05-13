@@ -23,7 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -234,10 +234,10 @@ public class ServiceImpl extends ServiceDelegate {
     private List<WebServiceFeature> getAllFeatures(WebServiceFeature[] features) {
         List<WebServiceFeature> f = new ArrayList<>();
         if (features != null) {
-            f.addAll(Arrays.asList(features));
+            Collections.addAll(f, features);
         }
         if (serviceFeatures != null) {
-            f.addAll(Arrays.asList(serviceFeatures));
+            Collections.addAll(f, serviceFeatures);
         }
         return f;
     }

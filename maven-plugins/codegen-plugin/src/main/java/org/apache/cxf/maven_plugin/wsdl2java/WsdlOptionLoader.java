@@ -21,7 +21,6 @@ package org.apache.cxf.maven_plugin.wsdl2java;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -144,7 +143,7 @@ public final class WsdlOptionLoader {
 
         final String[] options = readOptionsFromFile(wsdl.getParentFile(), wsdlName);
         if (options.length > 0) {
-            wsdlOption.getExtraargs().addAll(Arrays.asList(options));
+            Collections.addAll(wsdlOption.getExtraargs(), options);
         }
 
         List<File> bindingFiles = FileUtils.getFiles(wsdl.getParentFile(), wsdlName + WSDL_BINDINGS);

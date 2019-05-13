@@ -21,7 +21,7 @@ package org.apache.cxf.sts.claims.mapper;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +86,7 @@ public class ClaimUtils {
             processedClaim.setClaimType(URI.create(processedClaimTypeURI));
         }
         if (values != null) {
-            processedClaim.getValues().addAll(Arrays.asList(values));
+            Collections.addAll(processedClaim.getValues(), values);
         }
         return processedClaim;
     }

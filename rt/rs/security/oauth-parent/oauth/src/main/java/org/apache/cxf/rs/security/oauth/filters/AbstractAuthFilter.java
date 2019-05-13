@@ -68,10 +68,8 @@ public class AbstractAuthFilter {
             OAuth.OAUTH_NONCE
         };
 
-    private static final Set<String> ALLOWED_OAUTH_PARAMETERS;
+    private static final Set<String> ALLOWED_OAUTH_PARAMETERS = new HashSet<>(Arrays.asList(REQUIRED_PARAMETERS));
     static {
-        ALLOWED_OAUTH_PARAMETERS = new HashSet<>();
-        ALLOWED_OAUTH_PARAMETERS.addAll(Arrays.asList(REQUIRED_PARAMETERS));
         ALLOWED_OAUTH_PARAMETERS.add(OAuth.OAUTH_VERSION);
         ALLOWED_OAUTH_PARAMETERS.add(OAuthConstants.OAUTH_CONSUMER_SECRET);
     }

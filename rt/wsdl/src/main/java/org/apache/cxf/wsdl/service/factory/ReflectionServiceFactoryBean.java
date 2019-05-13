@@ -163,7 +163,14 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     private QName serviceName;
     private Invoker invoker;
     private Executor executor;
-    private List<String> ignoredClasses = new ArrayList<>();
+    private List<String> ignoredClasses = new ArrayList<>(Arrays.asList(
+            "java.lang.Object",
+            "java.lang.Throwable",
+            "org.omg.CORBA_2_3.portable.ObjectImpl",
+            "org.omg.CORBA.portable.ObjectImpl",
+            "javax.ejb.EJBObject",
+            "javax.rmi.CORBA.Stub"
+        ));
     private List<Method> ignoredMethods = new ArrayList<>();
     private MethodDispatcher methodDispatcher = new SimpleMethodDispatcher();
     private Boolean wrappedStyle;
@@ -183,14 +190,6 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
-        ignoredClasses.addAll(Arrays.asList(new String[] {
-            "java.lang.Object",
-            "java.lang.Throwable",
-            "org.omg.CORBA_2_3.portable.ObjectImpl",
-            "org.omg.CORBA.portable.ObjectImpl",
-            "javax.ejb.EJBObject",
-            "javax.rmi.CORBA.Stub"
-        }));
     }
 
     protected DataBinding createDefaultDataBinding() {

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -182,7 +183,7 @@ public class Compiler {
         String classpath = list.get(classpathIdx + 1);
         checkLongClasspath(classpath, list, classpathIdx);
         int idx = list.size();
-        list.addAll(Arrays.asList(files));
+        Collections.addAll(list, files);
 
         return internalCompile(list.toArray(new String[0]), idx);
     }

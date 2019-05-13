@@ -20,7 +20,6 @@ package org.apache.cxf.aegis.type.encoded;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -54,7 +53,7 @@ public class ArrayTypeInfo {
     public ArrayTypeInfo(QName typeName, int ranks, Integer... dimensions) {
         this.typeName = typeName;
         this.ranks = ranks;
-        this.dimensions.addAll(Arrays.asList(dimensions));
+        Collections.addAll(this.dimensions, dimensions);
     }
 
     public ArrayTypeInfo(MessageReader reader, TypeMapping tm) {

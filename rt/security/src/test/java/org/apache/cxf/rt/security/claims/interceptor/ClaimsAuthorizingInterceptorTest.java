@@ -246,7 +246,7 @@ public class ClaimsAuthorizingInterceptorTest {
                                    org.apache.cxf.rt.security.claims.Claim... claim)
                                throws Exception {
         ClaimCollection claims = new ClaimCollection();
-        claims.addAll(Arrays.asList(claim));
+        Collections.addAll(claims, claim);
 
         Set<Principal> roles =
             parseRolesFromClaims(claims, roleName,

@@ -21,6 +21,7 @@ package org.apache.cxf.systest.type_test;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -357,10 +358,10 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         FixedArray x = new FixedArray();
-        x.getItem().addAll(Arrays.asList(Integer.MIN_VALUE, 0, Integer.MAX_VALUE));
+        Collections.addAll(x.getItem(), Integer.MIN_VALUE, 0, Integer.MAX_VALUE);
 
         FixedArray yOrig = new FixedArray();
-        yOrig.getItem().addAll(Arrays.asList(-1, 0, 1));
+        Collections.addAll(yOrig.getItem(), -1, 0, 1);
 
         Holder<FixedArray> y = new Holder<>(yOrig);
         Holder<FixedArray> z = new Holder<>();
@@ -391,9 +392,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         BoundedArray x = new BoundedArray();
-        x.getItem().addAll(Arrays.asList(-100.00f, 0f, 100.00f));
+        Collections.addAll(x.getItem(), -100.00f, 0f, 100.00f);
         BoundedArray yOrig = new BoundedArray();
-        yOrig.getItem().addAll(Arrays.asList(-1f, 0f, 1f));
+        Collections.addAll(yOrig.getItem(), -1f, 0f, 1f);
 
         Holder<BoundedArray> y = new Holder<>(yOrig);
         Holder<BoundedArray> z = new Holder<>();
@@ -446,9 +447,9 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         UnboundedArray x = new UnboundedArray();
-        x.getItem().addAll(Arrays.asList("AAA", "BBB", "CCC"));
+        Collections.addAll(x.getItem(), "AAA", "BBB", "CCC");
         UnboundedArray yOrig = new UnboundedArray();
-        yOrig.getItem().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
+        Collections.addAll(yOrig.getItem(), "XXX", "YYY", "ZZZ");
 
         Holder<UnboundedArray> y = new Holder<>(yOrig);
         Holder<UnboundedArray> z = new Holder<>();
@@ -481,12 +482,12 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
             return;
         }
         CompoundArray x = new CompoundArray();
-        x.getArray1().addAll(Arrays.asList("AAA", "BBB", "CCC"));
-        x.getArray2().addAll(Arrays.asList("aaa", "bbb", "ccc"));
+        Collections.addAll(x.getArray1(), "AAA", "BBB", "CCC");
+        Collections.addAll(x.getArray2(), "aaa", "bbb", "ccc");
 
         CompoundArray yOrig = new CompoundArray();
-        yOrig.getArray1().addAll(Arrays.asList("XXX", "YYY", "ZZZ"));
-        yOrig.getArray2().addAll(Arrays.asList("xxx", "yyy", "zzz"));
+        Collections.addAll(yOrig.getArray1(), "XXX", "YYY", "ZZZ");
+        Collections.addAll(yOrig.getArray2(), "xxx", "yyy", "zzz");
 
         Holder<CompoundArray> y = new Holder<>(yOrig);
         Holder<CompoundArray> z = new Holder<>();
@@ -524,10 +525,10 @@ public abstract class AbstractTypeTestClient2 extends AbstractTypeTestClient {
 
         for (int i = 0; i < 3; i++) {
             UnboundedArray xx = new UnboundedArray();
-            xx.getItem().addAll(Arrays.asList(xs[i]));
+            Collections.addAll(xx.getItem(), xs[i]);
             xList.add(xx);
             UnboundedArray yy = new UnboundedArray();
-            yy.getItem().addAll(Arrays.asList(ys[i]));
+            Collections.addAll(yy.getItem(), ys[i]);
             yList.add(yy);
         }
 

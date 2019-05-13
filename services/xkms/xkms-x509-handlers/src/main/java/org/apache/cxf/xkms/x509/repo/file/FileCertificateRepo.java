@@ -34,6 +34,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -161,10 +162,10 @@ public class FileCertificateRepo implements CertificateRepo {
     private File[] getX509Files() {
         List<File> certificateFiles = new ArrayList<>();
         try {
-            certificateFiles.addAll(Arrays.asList(storageDir.listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + TRUSTED_CAS_PATH).listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CAS_PATH).listFiles()));
-            certificateFiles.addAll(Arrays.asList(new File(storageDir + "/" + CRLS_PATH).listFiles()));
+            Collections.addAll(certificateFiles, storageDir.listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, TRUSTED_CAS_PATH).listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, CAS_PATH).listFiles());
+            Collections.addAll(certificateFiles, new File(storageDir, CRLS_PATH).listFiles());
         } catch (NullPointerException e) {
             //
         }

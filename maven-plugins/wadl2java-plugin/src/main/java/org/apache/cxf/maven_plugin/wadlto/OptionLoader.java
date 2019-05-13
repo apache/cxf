@@ -22,7 +22,7 @@ package org.apache.cxf.maven_plugin.wadlto;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -122,9 +122,9 @@ public final class OptionLoader {
 
         List<String> exList = new ArrayList<>();
         if (excludes != null) {
-            exList.addAll(Arrays.asList(excludes));
+            Collections.addAll(exList, excludes);
         }
-        exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
+        Collections.addAll(exList, org.codehaus.plexus.util.FileUtils.getDefaultExcludes());
 
         String inc = joinWithComma(includes);
         String ex = joinWithComma(exList.toArray(new String[0]));
@@ -166,7 +166,7 @@ public final class OptionLoader {
 
         final String[] options = readOptionsFromFile(wadl.getParentFile(), wadlName);
         if (options.length > 0) {
-            wadlOption.getExtraargs().addAll(Arrays.asList(options));
+            Collections.addAll(wadlOption.getExtraargs(), options);
         }
 
         List<File> bindingFiles = FileUtils.getFiles(wadl.getParentFile(), wadlName + WADL_BINDINGS);

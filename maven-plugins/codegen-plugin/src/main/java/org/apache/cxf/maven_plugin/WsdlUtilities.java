@@ -21,7 +21,7 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -63,9 +63,9 @@ public final class WsdlUtilities {
 
         List<String> exList = new ArrayList<>();
         if (excludes != null) {
-            exList.addAll(Arrays.asList(excludes));
+            Collections.addAll(exList, excludes);
         }
-        exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
+        Collections.addAll(exList, org.codehaus.plexus.util.FileUtils.getDefaultExcludes());
 
         String inc = joinWithComma(includes);
         String ex = joinWithComma(exList.toArray(new String[0]));

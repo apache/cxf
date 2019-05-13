@@ -34,6 +34,7 @@ import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -133,13 +134,12 @@ public final class AttachmentUtil {
             String[] mimeTypes = super.getMimeTypes();
             String[] defMimeTypes = DEFAULT_COMMAND_MAP.getMimeTypes();
             Set<String> mimeTypeSet = new HashSet<>();
-            mimeTypeSet.addAll(Arrays.asList(mimeTypes));
-            mimeTypeSet.addAll(Arrays.asList(defMimeTypes));
+            Collections.addAll(mimeTypeSet, mimeTypes);
+            Collections.addAll(mimeTypeSet, defMimeTypes);
             String[] mimeArray = new String[0];
             return mimeTypeSet.toArray(mimeArray);
         }
     }
-
 
 
     private AttachmentUtil() {

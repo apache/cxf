@@ -738,7 +738,7 @@ public final class JAXBEncoderDecoder {
         Object o = unmarshall(u, source, elName, clazz, unwrap);
         if (o != null && o.getClass().isArray() && isList(part)) {
             List<Object> ret = createList(part);
-            ret.addAll(Arrays.asList((Object[])o));
+            Collections.addAll(ret, (Object[])o);
             o = ret;
         }
         return o;

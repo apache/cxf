@@ -38,13 +38,8 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(SecureAnnotationsInterceptor.class);
     private static final String DEFAULT_ANNOTATION_CLASS_NAME = "javax.annotation.security.RolesAllowed";
 
-    private static final Set<String> SKIP_METHODS;
-    static {
-        SKIP_METHODS = new HashSet<>();
-        SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll",
-                          "equals", "toString", "hashCode"}));
-    }
+    private static final Set<String> SKIP_METHODS = new HashSet<>(
+            Arrays.asList("wait", "notify", "notifyAll", "equals", "toString", "hashCode"));
 
     private String annotationClassName = DEFAULT_ANNOTATION_CLASS_NAME;
 

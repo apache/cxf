@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -376,7 +376,7 @@ public class JavaFirstSchemaValidationTest {
         clientFactory.setAddress(getAddress(port, serviceClass));
 
         if (features != null) {
-            clientFactory.getFeatures().addAll(Arrays.asList(features));
+            Collections.addAll(clientFactory.getFeatures(), features);
         }
 
         @SuppressWarnings("unchecked")
@@ -405,7 +405,7 @@ public class JavaFirstSchemaValidationTest {
         svrFactory.setServiceClass(serviceImpl.getClass());
 
         if (features != null) {
-            svrFactory.getFeatures().addAll(Arrays.asList(features));
+            Collections.addAll(svrFactory.getFeatures(), features);
         }
 
         if (type != null) {

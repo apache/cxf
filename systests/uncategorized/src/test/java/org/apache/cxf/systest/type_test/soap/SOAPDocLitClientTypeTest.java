@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.systest.type_test.soap;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
@@ -58,8 +58,8 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
         FixedArray x = new FixedArray();
         FixedArray yOrig = new FixedArray();
 
-        x.getItem().addAll(Arrays.asList(24, 42, 2008));
-        yOrig.getItem().addAll(Arrays.asList(24, 0, 1));
+        Collections.addAll(x.getItem(), 24, 42, 2008);
+        Collections.addAll(yOrig.getItem(), 24, 0, 1);
 
         Holder<FixedArray> y = new Holder<>(yOrig);
         Holder<FixedArray> z = new Holder<>();
