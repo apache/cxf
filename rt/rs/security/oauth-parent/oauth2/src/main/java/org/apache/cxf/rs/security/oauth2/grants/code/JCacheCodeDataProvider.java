@@ -40,7 +40,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
     private long codeLifetime = 10 * 60;
     private Cache<String, ServerAuthorizationCodeGrant> grantCache;
 
-    protected JCacheCodeDataProvider() throws Exception {
+    protected JCacheCodeDataProvider() {
         this(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true));
     }
 
