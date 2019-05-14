@@ -23,7 +23,7 @@ Apache CXF includes a number of components and libraries with separate
 copyright notices and license terms. Your use of those components are 
 subject to the terms and conditions of the following licenses. 
 
-#set ( $apacheTxt = "The Apache Software License, Version 2.0" )
+#set ( $apacheTxt = "Apache License, Version 2.0" )
 
 #foreach ( $project in $projects )
 #foreach ( $license in $project.licenses)
