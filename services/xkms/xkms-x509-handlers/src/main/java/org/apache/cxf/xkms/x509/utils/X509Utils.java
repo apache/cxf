@@ -27,15 +27,12 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.xkms.model.xkms.LocateRequestType;
-import org.apache.cxf.xkms.model.xkms.LocateResultType;
 import org.apache.cxf.xkms.model.xkms.UnverifiedKeyBindingType;
 import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
 import org.apache.cxf.xkms.model.xmldsig.ObjectFactory;
@@ -124,14 +121,6 @@ public final class X509Utils {
         List<Object> keyInfoContent = keyInfo.getContent();
         keyInfoContent.add(x509Data);
         return keyInfo;
-    }
-
-    LocateResultType createResponse(LocateRequestType request) {
-        LocateResultType ret = new LocateResultType();
-        ret.setId(UUID.randomUUID().toString());
-        ret.setRequestId(request.getId());
-        ret.setService("http://services.sopera.org/xkms/v2.0");
-        return ret;
     }
 
     public static void assertElementNotNull(Object element, Class<?> elementClass) {

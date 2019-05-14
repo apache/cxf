@@ -45,7 +45,7 @@ public final class ValidateRequestParser {
     public static List<X509Certificate> parse(ValidateRequestType request) {
         List<X509Certificate> certs = new ArrayList<>();
 
-        if ((request.getQueryKeyBinding()) != null && (request.getQueryKeyBinding().getKeyInfo() != null)) {
+        if (request.getQueryKeyBinding() != null && request.getQueryKeyBinding().getKeyInfo() != null) {
             List<Object> keyInfoContent = request.getQueryKeyBinding().getKeyInfo().getContent();
             for (Object keyInfoObject : keyInfoContent) {
                 if (keyInfoObject instanceof JAXBElement<?>) {
