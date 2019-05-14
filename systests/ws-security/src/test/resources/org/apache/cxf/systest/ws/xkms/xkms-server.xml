@@ -55,9 +55,12 @@
     <bean id="x509Locator" class="org.apache.cxf.xkms.x509.handlers.X509Locator">
         <constructor-arg ref="certificateRepo"/>
     </bean>
+    <bean id="x509Register" class="org.apache.cxf.xkms.x509.handlers.X509Register">
+        <constructor-arg ref="certificateRepo"/>
+    </bean>
     <!-- File based implementation -->
     <bean id="certificateRepo" class="org.apache.cxf.xkms.x509.repo.file.FileCertificateRepo">
-        <constructor-arg value="src/test/resources/certs/xkms"/>
+        <constructor-arg value="target/test-classes/certs/xkms"/>
     </bean>
     <bean id="xkmsProviderBean" class="org.apache.cxf.xkms.service.XKMSService">
         <property name="validators">
@@ -69,6 +72,11 @@
         <property name="locators">
             <list>
                 <ref bean="x509Locator"/>
+            </list>
+        </property>
+        <property name="keyRegisterHandlers">
+            <list>
+                <ref bean="x509Register"/>
             </list>
         </property>
     </bean>

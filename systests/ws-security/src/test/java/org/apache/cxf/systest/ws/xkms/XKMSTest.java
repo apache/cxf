@@ -19,7 +19,14 @@
 
 package org.apache.cxf.systest.ws.xkms;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -29,16 +36,28 @@ import javax.xml.ws.Service;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.xkms.model.xkms.LocateRequestType;
+import org.apache.cxf.xkms.model.xkms.LocateResultType;
+import org.apache.cxf.xkms.model.xkms.PrototypeKeyBindingType;
+import org.apache.cxf.xkms.model.xkms.QueryKeyBindingType;
+import org.apache.cxf.xkms.model.xkms.RegisterRequestType;
+import org.apache.cxf.xkms.model.xkms.RegisterResultType;
+import org.apache.cxf.xkms.model.xkms.UseKeyWithType;
+import org.apache.cxf.xkms.model.xmldsig.KeyInfoType;
+import org.apache.cxf.xkms.x509.utils.X509Utils;
 import org.example.contract.doubleit.DoubleItPortType;
+import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -96,6 +115,76 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
+
+    @org.junit.Test
+    public void testRegisterUnitTest() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = XKMSTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = //XKMSTest.class.getResource("xkms.wsdl");
+            new URL("https://localhost:" + PORT2 + "/XKMS?wsdl");
+
+        String ns = "http://www.w3.org/2002/03/xkms#wsdl";
+        QName serviceQName = new QName(ns, "XKMSService");
+        Service service = Service.create(wsdl, serviceQName);
+        QName portQName = new QName(NAMESPACE, "XKMSPort");
+        XKMSPortType port =
+                service.getPort(portQName, XKMSPortType.class);
+        //updateAddressPort(port, PORT2);
+
+        // First try to locate - which should fail
+
+        LocateRequestType locateRequest = new LocateRequestType();
+        locateRequest.setId("_xyz");
+        locateRequest.setService("http://cxf.apache.org/services/XKMS/");
+        QueryKeyBindingType queryKeyBinding = new QueryKeyBindingType();
+        UseKeyWithType useKeyWithType = new UseKeyWithType();
+        useKeyWithType.setApplication("urn:ietf:rfc:2459");
+        useKeyWithType.setIdentifier("CN=client");
+        queryKeyBinding.getUseKeyWith().add(useKeyWithType);
+        locateRequest.setQueryKeyBinding(queryKeyBinding);
+
+        LocateResultType locateResultType = port.locate(locateRequest);
+        assertTrue(locateResultType.getResultMajor().endsWith("Success"));
+        assertTrue(locateResultType.getResultMinor().endsWith("NoMatch"));
+
+        // Now register
+
+        RegisterRequestType registerRequest = new RegisterRequestType();
+        registerRequest.setId("_xyz");
+        registerRequest.setService("http://cxf.apache.org/services/XKMS/");
+
+        PrototypeKeyBindingType prototypeKeyBinding = new PrototypeKeyBindingType();
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        InputStream certInputStream = ClassLoaderUtils.getResourceAsStream("xkmstest.cer", this.getClass());
+        Certificate certificate =
+            certificateFactory.generateCertificate(certInputStream);
+        KeyInfoType keyInfo = X509Utils.getKeyInfo((X509Certificate)certificate);
+        prototypeKeyBinding.setKeyInfo(keyInfo);
+
+        prototypeKeyBinding.getUseKeyWith().add(useKeyWithType);
+        registerRequest.setPrototypeKeyBinding(prototypeKeyBinding);
+
+        RegisterResultType registerResult = port.register(registerRequest);
+        assertTrue(registerResult.getResultMajor().endsWith("Success"));
+        assertFalse(registerResult.getKeyBinding().isEmpty());
+
+        // Now locate again - which should work
+
+        locateResultType = port.locate(locateRequest);
+        assertTrue(locateResultType.getResultMajor().endsWith("Success"));
+        assertFalse(locateResultType.getUnverifiedKeyBinding().isEmpty());
+
+        // Delete the certificate so that the test works when run again
+        Path path = FileSystems.getDefault().getPath("target/test-classes/certs/xkms/CN-client.cer");
+        Files.delete(path);
+
+    }
+
 
     // The client uses XKMS to locate the public key of the service with which to encrypt
     // the message.
@@ -155,6 +244,5 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-
 
 }
