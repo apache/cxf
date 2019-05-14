@@ -43,7 +43,6 @@ import org.apache.hello_world.Greeter;
 import org.apache.hello_world.GreeterImpl;
 import org.apache.hello_world.services.SOAPService;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -104,7 +103,7 @@ public class OASISCatalogTest {
      *
      */
     @Test
-    public void testWSDLPublishWithCatalogsRewritePaths() {
+    public void testWSDLPublishWithCatalogsRewritePaths() throws Exception {
         Endpoint ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
                 new GreeterImpl());
         try {
@@ -254,17 +253,10 @@ public class OASISCatalogTest {
         }
     }
 
-    private String readUrl(String address) {
-        String content = null;
-        try {
-            URL url = new URL(address);
-            assertNotNull(url.getContent());
-            content = IOUtils.toString((InputStream) url.getContent());
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
-            Assert.fail("Couldn't read URL: " + e.getMessage());
+    private static String readUrl(String address) throws IOException {
+        try (InputStream is = new URL(address).openStream()) {
+            return IOUtils.toString(is);
         }
-        return content;
     }
 
 }
