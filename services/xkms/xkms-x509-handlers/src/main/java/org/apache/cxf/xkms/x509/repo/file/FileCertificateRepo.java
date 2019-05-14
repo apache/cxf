@@ -54,7 +54,6 @@ public class FileCertificateRepo implements CertificateRepo {
     private static final String CRLS_PATH = "crls";
     private static final String CAS_PATH = "cas";
     private static final String SPLIT_REGEX = "\\s*,\\s*";
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("[a-zA-Z_0-9-_]");
     private final File storageDir;
     private final CertificateFactory certFactory;
 
@@ -83,7 +82,6 @@ public class FileCertificateRepo implements CertificateRepo {
         String name = crl.getIssuerX500Principal().getName();
         try {
             String path = convertIdForFileSystem(name) + ".cer";
-            validateFilesystemPath(path);
 
             File certFile = new File(storageDir + "/" + CRLS_PATH, path);
             certFile.getParentFile().mkdirs();
@@ -146,14 +144,7 @@ public class FileCertificateRepo implements CertificateRepo {
             path = cert.getSubjectDN().getName();
         }
         path = convertIdForFileSystem(path) + ".cer";
-        validateFilesystemPath(path);
         return path;
-    }
-
-    private void validateFilesystemPath(String path) throws URISyntaxException {
-        if (!FILE_NAME_PATTERN.matcher(path).find()) {
-            throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
-        }
     }
 
     private File[] getX509Files() {
@@ -264,7 +255,6 @@ public class FileCertificateRepo implements CertificateRepo {
     public X509Certificate findByEndpoint(String endpoint) {
         try {
             String path = convertIdForFileSystem(endpoint) + ".cer";
-            validateFilesystemPath(path);
             File certFile = new File(storageDir.getAbsolutePath() + "/" + path);
             if (!certFile.exists()) {
                 LOG.warn(String.format("Certificate not found for endpoint %s, path %s", endpoint,
