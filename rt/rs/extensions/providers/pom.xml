@@ -116,10 +116,9 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>jakarta.json.bind</groupId>
-            <artifactId>jakarta.json.bind-api</artifactId>
-            <version>1.0.1</version>
-            <optional>true</optional>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jsonb_1.0_spec</artifactId>
+            <version>${cxf.geronimo.jsonb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
