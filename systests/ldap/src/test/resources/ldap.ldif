@@ -13,6 +13,11 @@ objectClass: organizationalUnit
 objectClass: top
 ou: other-users
 
+dn: ou=services,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: services
+
 dn: ou=groups,dc=example,dc=com
 objectClass: top
 objectClass: organizationalUnit

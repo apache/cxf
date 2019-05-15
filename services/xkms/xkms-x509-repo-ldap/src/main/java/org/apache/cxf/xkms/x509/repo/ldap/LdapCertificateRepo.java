@@ -180,11 +180,13 @@ public class LdapCertificateRepo implements CertificateRepo {
         } catch (NamingException e) {
              // Not found
         }
-        // Try to find certificate by search for uid attribute
-        try {
-            cert = getCertificateForUIDAttr(id);
-        } catch (NamingException e) {
-            // Not found
+        if (cert == null) {
+            // Try to find certificate by search for uid attribute
+            try {
+                cert = getCertificateForUIDAttr(id);
+            } catch (NamingException e) {
+                // Not found
+            }
         }
         return cert;
     }
@@ -198,12 +200,14 @@ public class LdapCertificateRepo implements CertificateRepo {
         } catch (NamingException e) {
             // Not found
         }
-        // Try to find certificate by search for uid attribute
-        try {
-            String uidAttr = String.format(ldapConfig.getServiceCertUIDTemplate(), serviceName);
-            cert = getCertificateForUIDAttr(uidAttr);
-        } catch (NamingException e) {
-            // Not found
+        if (cert == null) {
+            // Try to find certificate by search for uid attribute
+            try {
+                String uidAttr = String.format(ldapConfig.getServiceCertUIDTemplate(), serviceName);
+                cert = getCertificateForUIDAttr(uidAttr);
+            } catch (NamingException e) {
+                // Not found
+            }
         }
         return cert;
     }
