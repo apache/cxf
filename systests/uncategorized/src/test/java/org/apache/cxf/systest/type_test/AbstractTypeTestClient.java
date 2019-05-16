@@ -71,10 +71,10 @@ public abstract class AbstractTypeTestClient
             && "GMonth".equals(name));
     }
 
-    public static void initClient(Class<?> clz, QName serviceName,
+    public static void initClient(QName serviceName,
                                   QName portName, String wsdlPath)
         throws Exception {
-        URL wsdlLocation = clz.getResource(wsdlPath);
+        URL wsdlLocation = AbstractTypeTestClient.class.getResource(wsdlPath);
         assertNotNull("Could not load wsdl " + wsdlPath, wsdlLocation);
         testDocLiteral = wsdlPath.contains("doclit") || wsdlPath.contains("-corba");
         testXMLBinding = wsdlPath.contains("_xml");

@@ -200,7 +200,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
                 "DerivedEmptyBaseEmptyChoice"
             ));
         }
-        if (JavaUtils.isJava11Compatible()) {
+        if (JavaUtils.isJava9Compatible()) {
             NOT_WORKING_TESTS.addAll(Arrays.asList(
                 "SimpleRestriction",
                 "SimpleRestriction4",
@@ -216,7 +216,7 @@ public class CORBADocLitClientTypeTest extends AbstractTypeTestClient5 {
     public static void startServers() throws Exception {
         boolean ok = launchServer(CORBADocLitServerImpl.class, true);
         assertTrue("failed to launch server", ok);
-        initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
+        initClient(SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }
     @AfterClass
     public static void deleteRefFile() throws Exception {

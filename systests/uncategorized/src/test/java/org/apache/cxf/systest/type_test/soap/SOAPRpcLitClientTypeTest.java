@@ -44,7 +44,7 @@ public class SOAPRpcLitClientTypeTest extends AbstractTypeTestClient5 {
     public static void startServers() throws Exception {
         boolean ok = launchServer(SOAPRpcLitServerImpl.class, true);
         assertTrue("failed to launch server", ok);
-        initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
+        initClient(SERVICE_NAME, PORT_NAME, WSDL_PATH);
     }
 
 }
