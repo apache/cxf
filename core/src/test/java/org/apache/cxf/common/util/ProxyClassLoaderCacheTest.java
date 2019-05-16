@@ -29,69 +29,47 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.cxf.endpoint.Client;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-public class ProxyClassLoaderCacheTest extends Assert {
-    
-    private ProxyClassLoaderCache cache;
-    
+import static org.junit.Assert.assertSame;
+
+public class ProxyClassLoaderCacheTest {
+
+    private final ProxyClassLoaderCache cache = new ProxyClassLoaderCache();
+
     @Test
     public void testClassLoaderIdentical() throws Exception {
-        cache = new ProxyClassLoaderCache();
         ClassLoader cl1 = cache.getProxyClassLoader(
             this.getClass().getClassLoader(), 
             new Class<?>[]{Closeable.class, Client.class,  HelloWorld.class});
         ClassLoader cl2 = cache.getProxyClassLoader(
             this.getClass().getClassLoader(), 
             new Class<?>[]{Closeable.class, Client.class,  HelloWorld.class});
-        assertTrue(cl1 == cl2);
+        assertSame(cl1, cl2);
     }
-    
+
     @Test
     public void testClassLoaderIdenticalWithMultipleThreads() throws Exception {
-        cache = new ProxyClassLoaderCache();
-        Set<ClassLoader> clSet = Collections.synchronizedSet(new HashSet<>());
-        CountDownLatch countDownLatch = new CountDownLatch(50);
+        final Set<ClassLoader> clSet = Collections.synchronizedSet(new HashSet<>());
+        final CountDownLatch countDownLatch = new CountDownLatch(50);
         for (int i = 0; i < 50; i++) {
-            new Thread(new HelloWorker(clSet, countDownLatch)).start();
+            new Thread(() -> {
+                try {
+                    clSet.add(cache.getProxyClassLoader(
+                                            this.getClass().getClassLoader(), 
+                                            new Class<?>[]{Closeable.class, 
+                                            Client.class,  
+                                            HelloWorld.class}));
+                } finally {
+                    countDownLatch.countDown();
+                }
+            }).start();
         }
         countDownLatch.await(); 
-        assertTrue(clSet.size() == 1);
+        assertSame(1, clSet.size());
     }
-            
+
     interface HelloWorld {
-        void sayHello();
     }
-    
-    class HelloWorker implements Runnable {
 
-        private Set<ClassLoader> classLoaderSet;
-        
-        private CountDownLatch doneSignal;
-        HelloWorker(Set<ClassLoader> classLoaderSet,
-                           CountDownLatch doneSignal) {
-            this.classLoaderSet = classLoaderSet;
-            this.doneSignal = doneSignal;
-        }
-
-        public void run() {
-            
-
-            try {
-                this.classLoaderSet.add(cache.getProxyClassLoader(
-                                        this.getClass().getClassLoader(), 
-                                        new Class<?>[]{Closeable.class, 
-                                        Client.class,  
-                                        HelloWorld.class}));
-                doneSignal.countDown();
-           
-            } catch (RuntimeException ex) {
-                ex.printStackTrace();
-                
-            }
-
-        }
-
-    }
 }
