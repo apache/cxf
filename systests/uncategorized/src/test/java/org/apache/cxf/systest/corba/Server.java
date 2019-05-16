@@ -29,24 +29,15 @@ public class Server extends AbstractBusTestServerBase {
     public static final String PERSIST_PORT = allocatePort(Server.class);
 
     protected void run()  {
-        System.out.println("Starting Server");
         System.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
         System.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", PERSIST_PORT);
-        new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_server.xml");
+        setBus(new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_server.xml"));
         Object implementor = new BaseGreeterImpl();
         String address = "file:./HelloWorld.ref";
         Endpoint.publish(address, implementor);
     }
 
-    public static void main(String[] args) {
-        try {
-            Server s = new Server();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
+    public static void main(String[] args) throws Exception {
+        new Server().start();
     }
 }

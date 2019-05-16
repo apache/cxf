@@ -104,7 +104,7 @@ public class Server extends AbstractBusTestServerBase {
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType",
                 targetNamespace = "http://apache.org/hello_world_doc_lit_bare",
-                wsdlLocation = "testutils/doc_lit_bare.wsdl")
+                wsdlLocation = "wsdl/doc_lit_bare.wsdl")
     @EndpointProperty(key = "endpoint-processes-headers",
                       value = "{http://cxf.apache.org/outofband/Header}outofbandHeader")
     public class OOBHdrPropertyServiceImpl extends OOBHdrServiceImpl {

@@ -29,7 +29,7 @@ import org.apache.hello_world_soap12_http.types.FaultDetail;
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap12_http",
                       endpointInterface = "org.apache.hello_world_soap12_http.Greeter",
-                      wsdlLocation = "testutils/hello_world_soap12.wsdl")
+                      wsdlLocation = "wsdl/hello_world_soap12.wsdl")
 
 public class GreeterImpl implements Greeter {
 

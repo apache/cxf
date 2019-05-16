@@ -31,7 +31,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
             portName = "ReplicatedPortA",
             endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control",
-            wsdlLocation = "testutils/greeter_control.wsdl")
+            wsdlLocation = "wsdl/greeter_control.wsdl")
 public class GreeterImplA extends AbstractGreeterImpl {
     @Resource
     private WebServiceContext context;

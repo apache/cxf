@@ -33,7 +33,7 @@ import org.apache.intfault.types.BareDocumentResponse;
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/intfault",
                       endpointInterface = "org.apache.intfault.Greeter",
-                      wsdlLocation = "testutils/hello_world_fault.wsdl")
+                      wsdlLocation = "wsdl/hello_world_fault.wsdl")
 public class GreeterImpl {
     @Resource
     protected WebServiceContext context;

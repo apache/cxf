@@ -28,20 +28,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class TransformServer extends AbstractBusTestServerBase {
 
-    public TransformServer() {
-
-    }
-
     protected void run()  {
         URL busFile = TransformServer.class.getResource("transform-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
-
-        try {
-            new TransformServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
+
 }

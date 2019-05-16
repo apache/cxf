@@ -59,7 +59,7 @@ public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
     @WebService(serviceName = "SOAPService", portName = "SOAPPort",
                 endpointInterface = "org.apache.type_test.doc.TypeTestPortType",
                 targetNamespace = "http://apache.org/type_test/doc",
-                wsdlLocation = "testutils/type_test/type_test_doclit_soap.wsdl")
+                wsdlLocation = "wsdl/type_test/type_test_doclit_soap.wsdl")
     public class SOAPTypeTestImpl extends TypeTestImpl implements TypeTestPortType {
 
         //override so we can test some bad validation things

@@ -43,7 +43,7 @@ import org.apache.nested_callback.ServerPortType;
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/nested_callback",
                       endpointInterface = "org.apache.nested_callback.ServerPortType",
-                      wsdlLocation = "testutils/nested_callback.wsdl")
+                      wsdlLocation = "wsdl/nested_callback.wsdl")
 
 
 public class ServerImpl implements ServerPortType  {

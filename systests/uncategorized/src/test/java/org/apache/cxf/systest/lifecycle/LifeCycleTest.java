@@ -253,7 +253,7 @@ public class LifeCycleTest {
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world.wsdl")
+                wsdlLocation = "wsdl/hello_world.wsdl")
     public class GreeterImpl extends org.apache.hello_world_soap_http.BaseGreeterImpl {
 
     }

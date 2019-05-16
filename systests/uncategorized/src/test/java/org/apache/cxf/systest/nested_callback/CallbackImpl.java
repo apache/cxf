@@ -26,7 +26,7 @@ import org.apache.callback.CallbackPortType;
                       portName = "CallbackPort",
                       endpointInterface = "org.apache.callback.CallbackPortType",
                       targetNamespace = "http://apache.org/nested_callback",
-                      wsdlLocation = "testutils/nested_callback.wsdl")
+                      wsdlLocation = "wsdl/nested_callback.wsdl")
 
 public class CallbackImpl implements CallbackPortType  {
 

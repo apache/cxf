@@ -31,7 +31,7 @@ import org.apache.cxf.mime.types.XopStringType;
         portName = "TestMtomJMSPort",
         targetNamespace = "http://cxf.apache.org/mime",
         endpointInterface = "org.apache.cxf.mime.TestMtom",
-        wsdlLocation = "testutils/mtom_xop.wsdl")
+        wsdlLocation = "wsdl/mtom_xop.wsdl")
 
 public class TestMtomJMSImpl implements TestMtom {
 

@@ -28,20 +28,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class XSLTServer extends AbstractBusTestServerBase {
 
-    public XSLTServer() {
-
-    }
-
     protected void run()  {
         URL busFile = XSLTServer.class.getResource("xslt-server.xml");
         Bus busLocal = new SpringBusFactory().createBus(busFile);
         BusFactory.setDefaultBus(busLocal);
         setBus(busLocal);
-
-        try {
-            new XSLTServer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
+
 }
