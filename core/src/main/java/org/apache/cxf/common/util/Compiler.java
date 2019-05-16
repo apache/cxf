@@ -104,7 +104,7 @@ public class Compiler {
 
         if (StringUtils.isEmpty(classPath)) {
             String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
-            boolean classpathSetted = javaClasspath != null ? true : false;
+            boolean classpathSetted = !StringUtils.isEmpty(javaClasspath);
             if (!classpathSetted) {
                 File f = new File(getClass().getClassLoader().getResource(".").getFile());
                 f = new File(f, "../lib");

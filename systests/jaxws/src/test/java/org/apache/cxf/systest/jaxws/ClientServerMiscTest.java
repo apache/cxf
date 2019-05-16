@@ -62,7 +62,6 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
@@ -899,9 +898,6 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testDynamicClientExceptions() throws Exception {
-        if (JavaUtils.isJava9Compatible()) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
         JaxWsDynamicClientFactory dcf =
             JaxWsDynamicClientFactory.newInstance();
         URL wsdlURL = new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl");

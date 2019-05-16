@@ -81,7 +81,7 @@ public class BeanGenerator extends AbstractGenerator<File> {
                 generator.clearAttributes();
             }
 
-                //compile the classes
+            //compile the classes
             Compiler compiler = (Compiler)getToolContext().get(ToolConstants.COMPILER);
             if (compiler == null) {
                 compiler = new Compiler();

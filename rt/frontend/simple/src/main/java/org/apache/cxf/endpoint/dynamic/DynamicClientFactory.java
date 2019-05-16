@@ -623,9 +623,6 @@ public class DynamicClientFactory {
     }
 
     protected boolean compileJavaSrc(String classPath, List<File> srcList, String dest) {
-        if (JavaUtils.isJava9Compatible()) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
         org.apache.cxf.common.util.Compiler javaCompiler
             = new org.apache.cxf.common.util.Compiler();
 

@@ -61,9 +61,6 @@ public class WrapperBeanGeneratorTest extends ProcessorTestBase {
     @Before
     public void setUp() throws Exception {
         processor.setEnvironment(env);
-        if (JavaUtils.isJava9Compatible()) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
     }
 
     private ServiceInfo getServiceInfo() {

@@ -45,12 +45,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.ComparisonFailure;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
@@ -94,13 +92,6 @@ public class ProcessorTestBase {
             a = qnameAtts.get(element);
         }
         a.add(local);
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        if (JavaUtils.isJava9Compatible()) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
     }
 
     @After

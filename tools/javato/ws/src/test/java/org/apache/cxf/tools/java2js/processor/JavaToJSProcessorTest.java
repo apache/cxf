@@ -46,9 +46,6 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
         env = new ToolContext();
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
-        if (JavaUtils.isJava9Compatible()) {
-            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
-        }
     }
 
     @After
