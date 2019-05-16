@@ -156,8 +156,8 @@
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
         <cxf.slf4j.version>1.7.26</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
-        <cxf.spring.version>4.3.22.RELEASE</cxf.spring.version>
-        <cxf.spring.boot.version>1.5.19.RELEASE</cxf.spring.boot.version>
+        <cxf.spring.version>4.3.24.RELEASE</cxf.spring.version>
+        <cxf.spring.boot.version>1.5.21.RELEASE</cxf.spring.boot.version>
         <cxf.spring.security.version>4.2.12.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
