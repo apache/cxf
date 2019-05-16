@@ -67,7 +67,7 @@ public class ProxyClassLoaderCache {
             LOG.log(Level.FINE, "interface for new created ProxyClassLoader is "
                 + currentInterface.getName());
             LOG.log(Level.FINE, "interface's classloader for new created ProxyClassLoader is "
-                + currentInterface.getClassLoader());
+                + getClassLoader(currentInterface));
         }
         return ret;
     }
