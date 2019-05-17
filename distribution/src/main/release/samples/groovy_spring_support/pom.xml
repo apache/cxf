@@ -28,17 +28,13 @@
         <artifactId>cxf-samples</artifactId>
         <version>3.3.3-SNAPSHOT</version>
     </parent>
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-        <cxf.release.base>${basedir}/../..</cxf.release.base>
-    </properties>
+
     <build>
         <defaultGoal>install</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.1</version>
                     <configuration>
                         <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
                     </configuration>
@@ -99,18 +95,18 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>3.3.3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.3.3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>3.3.3-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

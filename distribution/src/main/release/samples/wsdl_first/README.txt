@@ -85,7 +85,7 @@ Using either UNIX or Windows:
 
 Alteratively there is a profile available for the server when configured via spring:
 
-  mvn -server-spring
+  mvn -Pserver-spring
 
 If you want to run the client and server with netty transport, you can use below command to  
 start up the server and client:
