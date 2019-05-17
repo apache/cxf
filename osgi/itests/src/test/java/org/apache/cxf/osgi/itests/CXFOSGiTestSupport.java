@@ -69,14 +69,15 @@ public class CXFOSGiTestSupport {
      * @return
      */
     protected Option cxfBaseConfig() {
+        final String karafVersion = getKarafVersion();
         final MavenUrlReference karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal")
-                .version(getKarafVersion()).type("tar.gz");
+                .version(karafVersion).type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
                 .type("xml").classifier("features");
         amqUrl = maven().groupId("org.apache.activemq")
                 .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
         springLegacyUrl = maven().groupId("org.apache.karaf.features").artifactId("spring-legacy")
-                .version(getKarafVersion()).type("xml").classifier("features");
+                .version(karafVersion).type("xml").classifier("features");
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
         final File loggingCfg;
@@ -88,7 +89,7 @@ public class CXFOSGiTestSupport {
         if (JavaVersionUtil.getMajorVersion() >= 9) {
             return composite(karafDistributionConfiguration()
                              .frameworkUrl(karafUrl)
-                             .karafVersion(getKarafVersion())
+                             .karafVersion(karafVersion)
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),
@@ -107,10 +108,10 @@ public class CXFOSGiTestSupport {
                                  + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
                              new VMOption("--patch-module"),
                              new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" 
-                             + System.getProperty("karaf.version", "4.2.2") + ".jar"),
+                                 + karafVersion + ".jar"),
                              new VMOption("--patch-module"),
                              new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" 
-                             + System.getProperty("karaf.version", "4.2.2") + ".jar"),
+                                 + karafVersion + ".jar"),
                              new VMOption("--add-opens"),
                              new VMOption("java.base/java.security=ALL-UNNAMED"),
                              new VMOption("--add-opens"),
@@ -133,7 +134,7 @@ public class CXFOSGiTestSupport {
         } else {
             return composite(karafDistributionConfiguration()
                              .frameworkUrl(karafUrl)
-                             .karafVersion(getKarafVersion())
+                             .karafVersion(karafVersion)
                              .name("Apache Karaf")
                              .useDeployFolder(false)
                              .unpackDirectory(new File("target/paxexam/")),

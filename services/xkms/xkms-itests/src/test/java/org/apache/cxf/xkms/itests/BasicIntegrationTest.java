@@ -65,7 +65,7 @@ public class BasicIntegrationTest {
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.2.2");
+        String karafVersion = System.getProperty("karaf.version", "4.2.5");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
@@ -117,13 +117,9 @@ public class BasicIntegrationTest {
             new VMOption("--add-exports=java.base/"
                 + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
             new VMOption("--patch-module"),
-            new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-"
-                + System.getProperty("karaf.version", "4.2.2")
-                + ".jar"),
+            new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + karafVersion + ".jar"),
             new VMOption("--patch-module"),
-            new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
-                + System.getProperty("karaf.version", "4.2.2")
-                + ".jar"),
+            new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + karafVersion + ".jar"),
             new VMOption("--add-opens"),
             new VMOption("java.base/java.security=ALL-UNNAMED"),
             new VMOption("--add-opens"), new VMOption("java.base/java.net=ALL-UNNAMED"),
@@ -176,7 +172,7 @@ public class BasicIntegrationTest {
         }
     }
 
-    protected Option copy(String path) {
+    protected static Option copy(String path) {
         return replaceConfigurationFile(path, new File("src/test/resources/" + path));
     }
 
