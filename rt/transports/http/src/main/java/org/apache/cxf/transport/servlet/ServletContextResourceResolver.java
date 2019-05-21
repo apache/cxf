@@ -93,6 +93,8 @@ public class ServletContextResourceResolver implements ResourceResolver {
                 //fallthrough
             } catch (URISyntaxException e) {
                 //ignore
+            } catch (IllegalArgumentException e) {
+                //ignore
             }
             try {
                 URL url = servletContext.getResource("/" + entryName);
@@ -105,7 +107,8 @@ public class ServletContextResourceResolver implements ResourceResolver {
                     urlMap.put(url.toString(), url);
                     return clz.cast(url);
                 }
-            } catch (MalformedURLException | URISyntaxException e1) {
+            } catch (MalformedURLException | URISyntaxException 
+                | IllegalArgumentException e1) {
                 //ignore
             }
         } else if (clz.isAssignableFrom(InputStream.class)) {
