@@ -24,7 +24,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF WS-Discovery API</name>
     <description>Apache CXF WS-Discovery API</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

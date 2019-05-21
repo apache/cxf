@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime OAuth 2.0 SAML</name>
     <description>Apache CXF Runtime OAuth 2.0 SAML</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <artifactId>cxf-rt-rs-security-oauth-parent</artifactId>
         <groupId>org.apache.cxf</groupId>

@@ -23,7 +23,7 @@
     <packaging>maven-plugin</packaging>
     <name>Apache CXF CORBA Tools Maven2 Plugins</name>
     <description>Apache CXF CORBA Tools Maven2 Plugins</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-maven-plugins</artifactId>

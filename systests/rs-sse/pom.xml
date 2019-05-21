@@ -30,7 +30,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF SSE Integration System Tests</name>
     <description>Apache CXF SSE Integration System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     
     <dependencies>
         <dependency>

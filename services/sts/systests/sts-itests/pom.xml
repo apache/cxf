@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.services.sts.systests</groupId>
     <artifactId>cxf-services-sts-systests-itests</artifactId>
     <name>Apache CXF STS Integration Tests</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

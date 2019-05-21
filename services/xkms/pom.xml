@@ -24,7 +24,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF XKMS</name>
     <description>Apache CXF XKMS service</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>

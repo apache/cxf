@@ -23,7 +23,7 @@
     <artifactId>cxf-services-xkms-features</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF XKMS Karaf Features</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

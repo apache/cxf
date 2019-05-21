@@ -23,7 +23,7 @@
     <artifactId>cxf-systests-ws-transfer</artifactId>
     <name>Apache CXF WS-Transfer System Tests</name>
     <description>Apache CXF WS-Transfer System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     
     <parent>
         <artifactId>cxf-parent</artifactId>

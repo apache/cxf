@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF Runtime Bindings</name>
     <description>Apache CXF Runtime Bindings</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt</artifactId>

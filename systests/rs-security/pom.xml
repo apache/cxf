@@ -29,7 +29,7 @@
     <artifactId>cxf-systests-rs-security</artifactId>
     <name>Apache CXF JAX-RS System Advanced Security Tests</name>
     <description>Apache CXF JAX-RS System Advanced Security Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <oauth.version>20100527</oauth.version>
         <cxf.module.name>org.apache.cxf.systests.security</cxf.module.name>

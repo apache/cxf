@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF System Tests for Maven Plugins</name>
     <description>Apache CXF System Tests for Maven Plugins</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests</artifactId>

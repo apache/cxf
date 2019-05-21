@@ -30,7 +30,7 @@
     <name>Apache CXF Container Integration System Tests</name>
     <description>Apache CXF Container Integration System Tests</description>
     <packaging>pom</packaging>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <modules>
         <module>webapp</module>
         <module>grizzly</module>

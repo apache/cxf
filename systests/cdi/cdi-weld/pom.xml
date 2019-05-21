@@ -29,7 +29,7 @@
 	<packaging>pom</packaging>
     <name>Apache CXF CDI Integration System Tests - Weld</name>
     <description>Apache CXF CDI Integration System Tests - Weld</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
 	
 	<modules>
         <module>cdi-multiple-apps-weld</module>

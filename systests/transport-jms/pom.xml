@@ -29,7 +29,7 @@
     <artifactId>cxf-systests-transport-jms</artifactId>
     <name>Apache CXF Transport System Tests JMS</name>
     <description>Apache CXF Transport System Tests JMS</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.transport.jms</cxf.module.name>

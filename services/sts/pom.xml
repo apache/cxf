@@ -23,7 +23,7 @@
     <artifactId>cxf-services-sts</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF STS service</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf.services</groupId>
         <artifactId>cxf-services</artifactId>

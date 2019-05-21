@@ -28,7 +28,7 @@
     <artifactId>cxf-systests-rs-sse-tomcat</artifactId>
     <name>Apache CXF SSE Integration System Tests for Tomcat</name>
     <description>Apache CXF SSE Integration System Tests Tomcat</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.tomcat</cxf.module.name>
     </properties>

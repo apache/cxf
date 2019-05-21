@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Distributed Tracing using OpenTracing</name>
     <description>Apache CXF Distributed using OpenTracing</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

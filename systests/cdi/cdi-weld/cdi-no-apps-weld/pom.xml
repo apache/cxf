@@ -29,7 +29,7 @@
     <artifactId>cxf-systests-cdi-weld-no-apps</artifactId>
     <name>Apache CXF CDI Integration System Tests - Weld with no apps</name>
     <description>Apache CXF CDI Integration System Tests - Weld with no apps</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.cdi.weld.noapp</cxf.module.name>

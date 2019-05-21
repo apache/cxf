@@ -23,7 +23,7 @@
     <packaging>jar</packaging>
     <name>Apache CXF Manifest Jar</name>
     <description>Apache CXF Manifest Jar</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

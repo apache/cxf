@@ -23,7 +23,7 @@
     <artifactId>cxf-services-xkms-war</artifactId>
     <packaging>war</packaging>
     <name>Apache CXF XKMS Service war deployment</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

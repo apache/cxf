@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Extensions: RxJava2</name>
     <description>Apache CXF JAX-RS Extensions: RxJava2</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

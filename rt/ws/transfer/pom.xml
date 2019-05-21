@@ -4,7 +4,7 @@
   <artifactId>cxf-rt-ws-transfer</artifactId>
   <packaging>jar</packaging>
   <name>Apache CXF Runtime WS Transfer</name>
-  <url>http://cxf.apache.org</url>
+  <url>https://cxf.apache.org</url>
   
   <parent>
       <groupId>org.apache.cxf</groupId>

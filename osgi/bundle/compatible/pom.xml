@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Compatibility Bundle Jar</name>
     <description>Apache CXF Compatibility Bundle Jar</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>

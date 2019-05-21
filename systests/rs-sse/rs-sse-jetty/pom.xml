@@ -28,7 +28,7 @@
     <artifactId>cxf-systests-rs-sse-jetty</artifactId>
     <name>Apache CXF SSE Integration System Tests for Jetty</name>
     <description>Apache CXF SSE Integration System Tests for Jetty</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.module.name>org.apache.cxf.systests.rs.sse.jetty</cxf.module.name>
