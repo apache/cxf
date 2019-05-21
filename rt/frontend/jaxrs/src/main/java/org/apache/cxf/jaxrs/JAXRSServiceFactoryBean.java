@@ -200,10 +200,14 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     protected ClassResourceInfo createResourceInfo(Class<?> cls, boolean isRoot) {
         ClassResourceInfo classResourceInfo =
             ResourceUtils.createClassResourceInfo(cls, cls, isRoot, enableStatic, getBus());
-        if (classResourceInfo != null) {
-            classResourceInfos.add(classResourceInfo);
+        return addClassResourceInfo(classResourceInfo);
+    }
+
+    protected ClassResourceInfo addClassResourceInfo(ClassResourceInfo cri) {
+        if (cri != null) {
+            classResourceInfos.add(cri);
         }
-        return classResourceInfo;
+        return cri;
     }
 
     public void setResourceClasses(Class<?>... classes) {

@@ -58,6 +58,8 @@ public class ClassResourceInfo extends BeanResourceInfo {
     private boolean createdFromModel;
     private String consumesTypes;
     private String producesTypes;
+    private List<MediaType> defaultConsumes = Collections.singletonList(JAXRSUtils.ALL_TYPES);
+    private List<MediaType> defaultProduces = Collections.singletonList(JAXRSUtils.ALL_TYPES);
     private Set<String> nameBindings = Collections.emptySet();
     private ClassResourceInfo parent;
     private Set<String> injectedSubInstances = new HashSet<>();
@@ -90,7 +92,19 @@ public class ClassResourceInfo extends BeanResourceInfo {
             nameBindings = AnnotationUtils.getNameBindings(serviceClass.getAnnotations());
         }
     }
-
+    //CHECKSTYLE:OFF
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass,
+                             boolean theRoot, boolean enableStatic, Bus bus, List<MediaType> defaultProduces,
+                             List<MediaType> defaultConsumes) {
+    //CHECKSTYLE:ON
+        this(theResourceClass, theServiceClass, theRoot, enableStatic, bus);
+        if (defaultProduces != null) {
+            this.defaultProduces = defaultProduces;
+        }
+        if (defaultConsumes != null) {
+            this.defaultConsumes = defaultConsumes;
+        }
+    }
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass,
                              boolean theRoot, boolean enableStatic, boolean createdFromModel, Bus bus) {
         this(theResourceClass, theServiceClass, theRoot, enableStatic, bus);
@@ -258,7 +272,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         }
         Produces produces = AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class);
         if (produces != null || parent == null) {
-            return JAXRSUtils.getProduceTypes(produces);
+            return JAXRSUtils.getProduceTypes(produces, defaultProduces);
         }
         return parent.getProduceMime();
     }
@@ -269,7 +283,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
         }
         Consumes consumes = AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class);
         if (consumes != null || parent == null) {
-            return JAXRSUtils.getConsumeTypes(consumes);
+            return JAXRSUtils.getConsumeTypes(consumes, defaultConsumes);
         }
         return parent.getConsumeMime();
     }

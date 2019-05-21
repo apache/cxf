@@ -86,6 +86,7 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-tck</artifactId>
+            <version>${cxf.microprofile.rest.client.version}</version>
         </dependency>
     </dependencies>
     <build>

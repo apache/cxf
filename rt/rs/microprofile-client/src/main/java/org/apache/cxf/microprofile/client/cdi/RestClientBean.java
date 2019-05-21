@@ -18,9 +18,15 @@
  */
 package org.apache.cxf.microprofile.client.cdi;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URL;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,10 +48,12 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.net.ssl.HostnameVerifier;
 import javax.ws.rs.Priorities;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.microprofile.client.CxfTypeSafeClientBuilder;
 import org.apache.cxf.microprofile.client.config.ConfigFacade;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -58,7 +66,14 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     public static final String REST_PROVIDERS_FORMAT = "%s/mp-rest/providers";
     public static final String REST_CONN_TIMEOUT_FORMAT = "%s/mp-rest/connectTimeout";
     public static final String REST_READ_TIMEOUT_FORMAT = "%s/mp-rest/readTimeout";
-    public static final String REST_PROVIDERS_PRIORITY_FORMAT = "%s/mp-rest/providers/%s/priority";
+    public static final String REST_PROVIDERS_PRIORITY_FORMAT = "/mp-rest/providers/%s/priority";
+    public static final String REST_TRUST_STORE_FORMAT = "%s/mp-rest/trustStore";
+    public static final String REST_TRUST_STORE_PASSWORD_FORMAT = "%s/mp-rest/trustStorePassword";
+    public static final String REST_TRUST_STORE_TYPE_FORMAT = "%s/mp-rest/trustStoreType";
+    public static final String REST_HOSTNAME_VERIFIER_FORMAT = "%s/mp-rest/hostnameVerifier";
+    public static final String REST_KEY_STORE_FORMAT = "%s/mp-rest/keyStore";
+    public static final String REST_KEY_STORE_PASSWORD_FORMAT = "%s/mp-rest/keyStorePassword";
+    public static final String REST_KEY_STORE_TYPE_FORMAT = "%s/mp-rest/keyStoreType";
     private static final Logger LOG = LogUtils.getL7dLogger(RestClientBean.class);
     private static final Default DEFAULT_LITERAL = new DefaultLiteral();
     private final Class<?> clientInterface;
@@ -102,6 +117,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
                                        providerPriorities.getOrDefault(providerClass, Priorities.USER));
         }
         setTimeouts(builder);
+        setSSLConfig(builder);
         return builder.build(clientInterface);
     }
 
@@ -143,8 +159,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     private String getBaseUri() {
         String interfaceName = clientInterface.getName();
         String baseURI = ConfigFacade
-            .getOptionalValue(String.format(REST_URI_FORMAT, interfaceName), String.class)
-            .orElseGet(() -> ConfigFacade.getOptionalValue(String.format(REST_URL_FORMAT, interfaceName),
+            .getOptionalValue(REST_URI_FORMAT, clientInterface, String.class)
+            .orElseGet(() -> ConfigFacade.getOptionalValue(REST_URL_FORMAT, clientInterface,
                                                            String.class).orElse(null));
 
         if (baseURI == null) {
@@ -167,8 +183,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
 
     private Class<? extends Annotation> readScope() {
         // first check to see if the value is set
-        String property = String.format(REST_SCOPE_FORMAT, clientInterface.getName());
-        String configuredScope = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
+        String configuredScope = ConfigFacade.getOptionalValue(REST_SCOPE_FORMAT, clientInterface, String.class)
+                                             .orElse(null);
         if (configuredScope != null) {
             try {
                 return ClassLoaderUtils.loadClass(configuredScope, getClass(), Annotation.class);
@@ -195,8 +211,8 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     }
 
     List<Class<?>> getConfiguredProviders() {
-        String property = String.format(REST_PROVIDERS_FORMAT, clientInterface.getName());
-        String providersList = ConfigFacade.getOptionalValue(property, String.class).orElse(null);
+        String providersList = ConfigFacade.getOptionalValue(REST_PROVIDERS_FORMAT, clientInterface, String.class)
+                                           .orElse(null);
         List<Class<?>> providers = new ArrayList<>();
         if (providersList != null) {
             String[] providerClassNames = providersList.split(",");
@@ -216,10 +232,9 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     Map<Class<?>, Integer> getConfiguredProviderPriorities(List<Class<?>> providers) {
         Map<Class<?>, Integer> map = new HashMap<>();
         for (Class<?> providerClass : providers) {
-            String property = String.format(REST_PROVIDERS_PRIORITY_FORMAT, 
-                                            clientInterface.getName(),
+            String propertyFormat = "%s" + String.format(REST_PROVIDERS_PRIORITY_FORMAT, 
                                             providerClass.getName());
-            Integer priority = ConfigFacade.getOptionalValue(property, Integer.class)
+            Integer priority = ConfigFacade.getOptionalValue(propertyFormat, clientInterface, Integer.class)
                                            .orElse(getPriorityFromClass(providerClass, Priorities.USER));
             map.put(providerClass, priority);
         }
@@ -237,9 +252,7 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
     }
 
     private void setTimeouts(CxfTypeSafeClientBuilder builder) {
-        final String interfaceName = clientInterface.getName();
-
-        ConfigFacade.getOptionalLong(String.format(REST_CONN_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+        ConfigFacade.getOptionalLong(REST_CONN_TIMEOUT_FORMAT, clientInterface).ifPresent(
             timeoutValue -> {
                 builder.connectTimeout(timeoutValue, TimeUnit.MILLISECONDS);
                 if (LOG.isLoggable(Level.FINEST)) {
@@ -247,12 +260,117 @@ public class RestClientBean implements Bean<Object>, PassivationCapable {
                 }
             });
 
-        ConfigFacade.getOptionalLong(String.format(REST_READ_TIMEOUT_FORMAT, interfaceName)).ifPresent(
+        ConfigFacade.getOptionalLong(REST_READ_TIMEOUT_FORMAT, clientInterface).ifPresent(
             timeoutValue -> {
                 builder.readTimeout(timeoutValue, TimeUnit.MILLISECONDS);
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.finest("readTimeout set by MP Config: " + timeoutValue);
                 }
             });
+    }
+
+    private void setSSLConfig(CxfTypeSafeClientBuilder builder) {
+        ConfigFacade.getOptionalValue(REST_HOSTNAME_VERIFIER_FORMAT, clientInterface, String.class).ifPresent(
+            className -> {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Class<HostnameVerifier> clazz = (Class<HostnameVerifier>) 
+                        ClassLoaderUtils.loadClassFromContextLoader(className);
+                    Constructor<HostnameVerifier> ctor = ReflectionUtil.getConstructor(clazz);
+                    if (ctor != null) {
+                        builder.hostnameVerifier(ctor.newInstance());
+                        return;
+                    }
+                } catch (Throwable t) {
+                    // ignore - will log below
+                }
+                LOG.log(Level.WARNING, "INVALID_HOSTNAME_VERIFIER_CONFIGURED",
+                        new Object[] {className, clientInterface.getName()});
+        });
+
+        
+        ConfigFacade.getOptionalValue(REST_TRUST_STORE_FORMAT, clientInterface, String.class).ifPresent(
+            trustStoreLoc -> {
+                initTrustStore(trustStoreLoc, builder);
+            }
+        );
+
+        ConfigFacade.getOptionalValue(REST_KEY_STORE_FORMAT, clientInterface, String.class).ifPresent(
+            keyStoreLoc -> {
+                initKeyStore(keyStoreLoc, builder);
+            }
+        );
+        
+    }
+
+    private void initTrustStore(String trustStoreLoc, CxfTypeSafeClientBuilder builder) {
+        String password = ConfigFacade.getOptionalValue(REST_TRUST_STORE_PASSWORD_FORMAT, clientInterface, String.class)
+                                      .orElse(null);
+        String storeType = ConfigFacade.getOptionalValue(REST_TRUST_STORE_TYPE_FORMAT, clientInterface, String.class)
+                                       .orElse("JKS");
+
+        try {
+            KeyStore trustStore = KeyStore.getInstance(storeType);
+            try (InputStream input = getInputStream(trustStoreLoc)) {
+                trustStore.load(input, password == null ? null : password.toCharArray());
+            } catch (Throwable t) {
+                throw new IllegalArgumentException("Failed to initialize trust store from URL, " + trustStoreLoc, t);
+            }
+
+            builder.trustStore(trustStore);
+        } catch (KeyStoreException e) {
+            throw new IllegalArgumentException("Failed to initialize trust store from " + trustStoreLoc, e);
+        }
+    }
+
+    private void initKeyStore(String keyStoreLoc, CxfTypeSafeClientBuilder builder) {
+        String password = ConfigFacade.getOptionalValue(REST_KEY_STORE_PASSWORD_FORMAT, clientInterface, String.class)
+                                      .orElse(null);
+        String storeType = ConfigFacade.getOptionalValue(REST_KEY_STORE_TYPE_FORMAT, clientInterface, String.class)
+                                       .orElse("JKS");
+
+        try {
+            KeyStore keyStore = KeyStore.getInstance(storeType);
+            try (InputStream input = getInputStream(keyStoreLoc)) {
+                keyStore.load(input, password == null ? null : password.toCharArray());
+            } catch (Throwable t) {
+                throw new IllegalArgumentException("Failed to initialize key store from URL, " + keyStoreLoc, t);
+            }
+
+            builder.keyStore(keyStore, password);
+        } catch (KeyStoreException e) {
+            throw new IllegalArgumentException("Failed to initialize key store from " + keyStoreLoc, e);
+        }
+    }
+
+    InputStream getInputStream(String location) {
+        if (location.startsWith("classpath:")) {
+            location = location.substring(10); // 10 == "classpath:".length()
+            //TODO: replace getResources lookup with getResourceAsStream once 
+            // https://github.com/arquillian/arquillian-container-weld/issues/59 is resolved
+            // in = ClassLoaderUtils.getResourceAsStream(location, clientInterface);
+            List<URL> urls = ClassLoaderUtils.getResources(location, clientInterface);
+            if (urls != null && !urls.isEmpty()) {
+                try {
+                    return urls.get(0).openStream();
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+
+            LOG.warning("could not find classpath:" + location); //TODO: new message
+            throw new IllegalStateException("could not find configured key/trust store: " + location);
+        }
+        try {
+            return new URL(location).openStream();
+        } catch (Exception e) {
+            // try using a file URI
+            try {
+                return new URL("file:" + location).openStream();
+            } catch (Exception e2) {
+                //ignore, rethrow original exception
+            }
+            throw new IllegalStateException("could not find configured key/trust store URL: " + location); 
+        }
     }
 }

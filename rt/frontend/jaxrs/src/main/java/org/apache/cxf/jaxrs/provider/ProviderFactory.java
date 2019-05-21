@@ -837,7 +837,7 @@ public abstract class ProviderFactory {
         return Collections.unmodifiableList(messageWriters);
     }
 
-    List<ProviderInfo<ContextResolver<?>>> getContextResolvers() {
+    public List<ProviderInfo<ContextResolver<?>>> getContextResolvers() {
         return Collections.unmodifiableList(contextResolvers);
     }
 
