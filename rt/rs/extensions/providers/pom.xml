@@ -114,17 +114,12 @@
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jsonb_1.0_spec</artifactId>
-            <version>${cxf.geronimo.jsonb.version}</version>
-        </dependency>
+        </dependency>          
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <optional>true</optional>
-        </dependency>
+        </dependency>     
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>

@@ -34,7 +34,6 @@
     <properties>
         <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
-        <cxf.jetty.version>9.4.14.v20181114</cxf.jetty.version>
     </properties>
     <dependencyManagement>
         <dependencies>

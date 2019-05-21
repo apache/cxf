@@ -122,7 +122,7 @@ public abstract class ProviderFactory {
             }
         }
 
-        public Object tryCreateInstance(ProviderFactory factory) {
+        public Object tryCreateInstance(Bus bus) {
             if (!initialized) {
                 loadClass();
             }
@@ -130,10 +130,7 @@ public abstract class ProviderFactory {
                 try {
                     for (Constructor<?> c : cls.getConstructors()) {
                         if (c.getParameterTypes().length == 1 && c.getParameterTypes()[0] == Bus.class) {
-                            return c.newInstance(factory.getBus());
-                        }
-                        if (c.getParameterTypes().length == 1 && c.getParameterTypes()[0] == ProviderFactory.class) {
-                            return c.newInstance(factory);
+                            return c.newInstance(bus);
                         }
                     }
                     return cls.newInstance();
@@ -159,8 +156,6 @@ public abstract class ProviderFactory {
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.JAXBElementTypedProvider");
     private static final LazyProviderClass MULTIPART_PROVIDER_CLASS =
         new LazyProviderClass("org.apache.cxf.jaxrs.provider.MultipartProvider");
-    private static final LazyProviderClass JSONB_PROVIDER_CLASS =
-        new LazyProviderClass("org.apache.cxf.jaxrs.provider.json.JSONBProvider");
 
     protected Map<NameKey, ProviderInfo<ReaderInterceptor>> readerInterceptors =
         new NameKeyMap<>(true);
@@ -213,14 +208,13 @@ public abstract class ProviderFactory {
                              false,
                      new BinaryDataProvider<Object>(),
                      new SourceProvider<Object>(),
-                     DATA_SOURCE_PROVIDER_CLASS.tryCreateInstance(factory),
+                     DATA_SOURCE_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
                      new FormEncodingProvider<Object>(),
                      new StringTextProvider(),
                      new PrimitiveTextProvider<Object>(),
-                     JAXB_PROVIDER_CLASS.tryCreateInstance(factory),
-                     JAXB_ELEMENT_PROVIDER_CLASS.tryCreateInstance(factory),
-                     JSONB_PROVIDER_CLASS.tryCreateInstance(factory),
-                     MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory));
+                     JAXB_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                     JAXB_ELEMENT_PROVIDER_CLASS.tryCreateInstance(factory.getBus()),
+                     MULTIPART_PROVIDER_CLASS.tryCreateInstance(factory.getBus()));
         Object prop = factory.getBus().getProperty("skip.default.json.provider.registration");
         if (!PropertyUtils.isTrue(prop)) {
             factory.setProviders(false, false, createProvider(JSON_PROVIDER_NAME, factory.getBus()));
