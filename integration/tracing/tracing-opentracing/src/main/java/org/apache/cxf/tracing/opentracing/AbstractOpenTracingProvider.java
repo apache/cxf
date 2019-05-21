@@ -33,7 +33,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.propagation.TextMapAdapter;
 import io.opentracing.tag.Tags;
 
 public abstract class AbstractOpenTracingProvider extends AbstractTracingProvider {
@@ -50,35 +50,38 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
             URI uri, String method) {
 
         SpanContext parent = tracer.extract(Builtin.HTTP_HEADERS, 
-            new TextMapExtractAdapter(
+            new TextMapAdapter(
                 requestHeaders
                     .entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, this::getFirstValueOrEmpty))
             ));
         
+        Span activeSpan = null;
         Scope scope = null;
         if (parent == null) {
-            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).startActive(false);
+            activeSpan = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).start(); 
+            scope = tracer.scopeManager().activate(activeSpan);
         } else {
-            scope = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).asChildOf(parent).startActive(false);
+            activeSpan = tracer.buildSpan(buildSpanDescription(uri.getPath(), method)).asChildOf(parent).start();
+            scope = tracer.scopeManager().activate(activeSpan);
         }
         
         // Set additional tags
-        scope.span().setTag(Tags.HTTP_METHOD.getKey(), method);
-        scope.span().setTag(Tags.HTTP_URL.getKey(), uri.toString());
+        activeSpan.setTag(Tags.HTTP_METHOD.getKey(), method);
+        activeSpan.setTag(Tags.HTTP_URL.getKey(), uri.toString());
         
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
         Span span = null;
         if (isAsyncResponse()) {
            // Do not modify the current context span
-            span = scope.span();
+            span = activeSpan;
             propagateContinuationSpan(span);
             scope.close();
         } 
 
-        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), span != null);
+        return new TraceScopeHolder<TraceScope>(new TraceScope(activeSpan, scope), span != null);
     }
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
@@ -99,11 +102,11 @@ public abstract class AbstractOpenTracingProvider extends AbstractTracingProvide
             // scope has been created in another thread and should be re-attached to the current
             // one.
             if (holder.isDetached()) {
-                scope = tracer.scopeManager().activate(span, false);
+                scope = tracer.scopeManager().activate(span);
             }
 
-            scope.span().setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
-            scope.span().finish();
+            span.setTag(Tags.HTTP_STATUS.getKey(), responseStatus);
+            span.finish();
             
             scope.close();
         }

@@ -58,7 +58,7 @@ public class Server {
                 }
             ))
             .getTracer();
-        GlobalTracer.register(tracer);
+        GlobalTracer.registerIfAbsent(tracer);
         
         server.setHandler(context);
         server.start();

@@ -50,6 +50,7 @@ import io.jaegertracing.internal.JaegerSpanContext;
 import io.jaegertracing.internal.samplers.ConstSampler;
 import io.jaegertracing.spi.Sender;
 import io.opentracing.Scope;
+import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.util.GlobalTracer;
@@ -88,7 +89,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
                     }
                 ))
                 .getTracer();
-            GlobalTracer.register(tracer);
+            GlobalTracer.registerIfAbsent(tracer);
 
             final JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
             sf.setServiceClass(BookStore.class);
@@ -180,7 +181,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             }
         });
 
-        try (Scope scope = tracer.buildSpan("test span").startActive(true)) {
+        final Span span = tracer.buildSpan("test span").start();
+        try (Scope scope = tracer.activateSpan(span)) {
             assertThat(service.getBooks().size(), equalTo(2));
             assertThat(tracer.activeSpan(), not(nullValue()));
 
@@ -192,6 +194,8 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
             assertThat(TestSender.getAllSpans().get(2).getOperationName(),
                 equalTo("POST http://localhost:" + PORT + "/BookStore"));
             assertThat(TestSender.getAllSpans().get(2).getReferences(), not(empty()));
+        } finally {
+            span.finish();
         }
 
         // Await till flush happens, usually every second
@@ -274,7 +278,7 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
 
     private JaegerSpanContext fromRandom() {
-        return new JaegerSpanContext(random.nextLong(), /* traceId */ random.nextLong() /* spanId */,
-            random.nextLong() /* parentId */, (byte)1 /* sampled */);
+        return new JaegerSpanContext(random.nextLong() /* traceId hi */, random.nextLong() /* traceId lo */, 
+            random.nextLong() /* spanId */, random.nextLong() /* parentId */, (byte)1 /* sampled */);
     }
 }

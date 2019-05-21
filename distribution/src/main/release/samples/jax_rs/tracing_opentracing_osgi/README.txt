@@ -59,9 +59,9 @@ we are using Uber Jaeger:
 
   install -s wrap:mvn:com.squareup.okio/okio/1.13.0
   install -s wrap:mvn:com.squareup.okhttp3/okhttp/3.9.0
-  install -s wrap:mvn:org.apache.thrift/libthrift/0.11.0
-  install -s wrap:mvn:io.jaegertracing/jaeger-core/0.30.3 
-  install -s wrap:mvn:io.jaegertracing/jaeger-thrift/0.30.3
+  install -s wrap:mvn:org.apache.thrift/libthrift/0.12.0
+  install -s wrap:mvn:io.jaegertracing/jaeger-core/0.35.4 
+  install -s wrap:mvn:io.jaegertracing/jaeger-thrift/0.35.4
   
 Install this demo bundle (using the appropriate bundle version number)
   

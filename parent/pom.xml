@@ -235,8 +235,8 @@
         <cxf.brave.version>5.4.2</cxf.brave.version>
         <cxf.brave.zipkin.version>2.11.6</cxf.brave.zipkin.version>
         <cxf.brave.reporter.version>2.7.9</cxf.brave.reporter.version>
-        <cxf.opentracing.version>0.31.0</cxf.opentracing.version>
-        <cxf.jaeger.version>0.30.4</cxf.jaeger.version>
+        <cxf.opentracing.version>0.33.0</cxf.opentracing.version>
+        <cxf.jaeger.version>0.35.4</cxf.jaeger.version>
         <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
