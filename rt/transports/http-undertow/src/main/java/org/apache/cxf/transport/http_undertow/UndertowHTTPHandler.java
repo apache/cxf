@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http_undertow;
 
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 
@@ -40,6 +41,7 @@ public class UndertowHTTPHandler implements HttpHandler {
 
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
+    private static final String METHOD_TRACE = "TRACE";
 
     protected UndertowHTTPDestination undertowHTTPDestination;
     protected ServletContext servletContext;
@@ -97,7 +99,10 @@ public class UndertowHTTPHandler implements HttpHandler {
                                                                            (ServletContextImpl)servletContext);
             HttpServletRequestImpl request = new HttpServletRequestImpl(undertowExchange,
                                                                         (ServletContextImpl)servletContext);
-
+            if (request.getMethod().equals(METHOD_TRACE)) {
+                response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                return;
+            }
             ServletRequestContext servletRequestContext = new ServletRequestContext(((ServletContextImpl)servletContext)
                 .getDeployment(), request, response, null);
 
