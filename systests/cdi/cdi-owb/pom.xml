@@ -29,7 +29,7 @@
 	<packaging>pom</packaging>
     <name>Apache CXF CDI Integration System Tests - OWB</name>
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
 
     <modules>
         <module>cdi-multiple-apps-owb</module>

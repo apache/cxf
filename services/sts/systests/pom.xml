@@ -23,7 +23,7 @@
     <artifactId>cxf-services-sts-systests</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF STS systests</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf.services.sts</groupId>
         <artifactId>cxf-services-sts</artifactId>

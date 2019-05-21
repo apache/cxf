@@ -29,11 +29,10 @@
     <artifactId>cxf-systests-microprofile-jaxrs</artifactId>
     <name>Apache CXF MicroProfile JAX-RS integration Sys Tests</name>
     <description>Apache CXF System Tests - verifying MicroProfile Rest Client integration with JAX-RS</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.jaxrs</cxf.module.name>
         <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
-        <cxf.microprofile.rest.client.version>1.2.0</cxf.microprofile.rest.client.version>
     </properties>
         <dependencies>
             <dependency>
@@ -76,46 +75,6 @@
             <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-plus</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jsp</artifactId>
-            <version>${cxf.jetty.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.glassfish</groupId>
-                <artifactId>javax.el</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.ow2.asm</groupId>
-                <artifactId>asm-commons</artifactId>
-              </exclusion>
-            </exclusions> 
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>${cxf.jetty.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
             <version>${project.version}</version>
@@ -135,7 +94,7 @@
             <artifactId>cxf-rt-features-logging</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>

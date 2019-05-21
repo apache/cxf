@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime Colocated Binding</name>
     <description>Apache CXF Runtime Colocated Binding</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

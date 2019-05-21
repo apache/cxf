@@ -15,7 +15,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime JMS Transport</name>
     <description>Apache CXF Runtime JMS Transport</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

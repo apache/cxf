@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Extensions: Project Reactor</name>
     <description>Apache CXF JAX-RS Extensions: Project Reactor</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime JavaScript Client Generator Tests</name>
     <description>Apache CXF Runtime JavaScript Client Generator Tests</description>
-    <url>http://cxf.apache.org/</url>
+    <url>https://cxf.apache.org/</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-runtime-javascript</artifactId>

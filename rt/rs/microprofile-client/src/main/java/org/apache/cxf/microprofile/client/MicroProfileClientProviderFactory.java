@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Configuration;
@@ -29,6 +31,7 @@ import javax.ws.rs.core.Configuration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -38,6 +41,7 @@ import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 
 public final class MicroProfileClientProviderFactory extends ProviderFactory {
     static final String CLIENT_FACTORY_NAME = MicroProfileClientProviderFactory.class.getName();
+    private static final Logger LOG = LogUtils.getL7dLogger(MicroProfileClientProviderFactory.class);
     private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = new ArrayList<>(1);
     private List<ProviderInfo<Object>> asyncInvocationInterceptorFactories = new ArrayList<>();
     private final Comparator<ProviderInfo<?>> comparator;
@@ -93,6 +97,8 @@ public final class MicroProfileClientProviderFactory extends ProviderFactory {
                 }
             } catch (ClassNotFoundException ex) {
                 // expected if using the MP Rest Client 1.0 APIs
+                LOG.log(Level.FINEST, ex, () -> {
+                    return "Caught ClassNotFoundException - expected if using MP Rest Client 1.0 APIs"; });
             }
 
         }

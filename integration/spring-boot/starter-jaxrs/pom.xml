@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Spring Boot Starter JAX-RS</name>
     <description>Apache CXF Spring Boot Starter JAX-RS</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

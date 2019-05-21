@@ -25,7 +25,7 @@
     <version>3.3.3-SNAPSHOT</version>
     <name>Apache CXF Java2Swagger Maven2 Plugin</name>
     <description>Apache CXF Java2Swagger Maven2 Plugin</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
 
     <parent>
       <groupId>org.apache.cxf</groupId>

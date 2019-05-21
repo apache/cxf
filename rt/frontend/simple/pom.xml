@@ -23,7 +23,7 @@
     <packaging>bundle</packaging>
     <name>Apache CXF Runtime Simple Frontend</name>
     <description>Apache CXF Runtime Simple Frontend</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

@@ -21,6 +21,7 @@ package org.apache.cxf.microprofile.client;
 import java.net.URI;
 import java.net.URL;
 import java.security.AccessController;
+import java.security.KeyStore;
 import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Map;
@@ -32,9 +33,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
+import org.apache.cxf.jaxrs.client.spec.TLSConfiguration;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.spi.RestClientListener;
@@ -50,6 +57,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
     private ExecutorService executorService;
     private final MicroProfileClientConfigurableImpl<RestClientBuilder> configImpl =
             new MicroProfileClientConfigurableImpl<>(this);
+    private TLSConfiguration secConfig = new TLSConfiguration();
 
     private static Collection<RestClientListener> listeners() {
         ClassLoader threadContextClassLoader;
@@ -132,7 +140,7 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         listeners().forEach(l -> l.onNewClient(aClass, this));
 
         MicroProfileClientFactoryBean bean = new MicroProfileClientFactoryBean(configImpl,
-                                                                               baseUri, aClass, executorService);
+            baseUri, aClass, executorService, secConfig);
         return bean.create(aClass);
     }
 
@@ -195,4 +203,46 @@ public class CxfTypeSafeClientBuilder implements RestClientBuilder, Configurable
         return this;
     }
 
+    @Override
+    public RestClientBuilder sslContext(SSLContext sslContext) {
+        secConfig.getTlsClientParams().setKeyManagers(null);
+        secConfig.getTlsClientParams().setTrustManagers(null);
+        secConfig.setSslContext(sslContext);
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder keyStore(KeyStore store, String password) {
+        secConfig.setSslContext(null);
+        try {
+            KeyManagerFactory kmf =
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(store, password.toCharArray());
+            secConfig.getTlsClientParams().setKeyManagers(kmf.getKeyManagers());
+        } catch (Exception ex) {
+            throw new ProcessingException(ex);
+        }
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder trustStore(KeyStore store) {
+        secConfig.setSslContext(null);
+        try {
+            TrustManagerFactory tmf =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(store);
+            secConfig.getTlsClientParams().setTrustManagers(tmf.getTrustManagers());
+        } catch (Exception ex) {
+            throw new ProcessingException(ex);
+        }
+
+        return this;
+    }
+
+    @Override
+    public RestClientBuilder hostnameVerifier(HostnameVerifier verifier) {
+        secConfig.getTlsClientParams().setHostnameVerifier(verifier);
+        return this;
+    }
 }
