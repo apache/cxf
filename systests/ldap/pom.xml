@@ -29,7 +29,7 @@
     <artifactId>cxf-systests-ldap</artifactId>
     <name>Apache CXF LDAP Integration System Tests</name>
     <description>Apache CXF LDAP Integration System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     
     <properties>
         <cxf.module.name>org.apache.cxf.systests.ldap</cxf.module.name>

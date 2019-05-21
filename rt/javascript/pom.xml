@@ -22,7 +22,7 @@
     <artifactId>cxf-runtime-javascript</artifactId>
     <name>Apache CXF Runtime JavaScript Client Generator Projects</name>
     <description>Apache CXF Runtime JavaScript Client Generator Projects</description>
-    <url>http://cxf.apache.org/</url>
+    <url>https://cxf.apache.org/</url>
     <packaging>pom</packaging>
     <parent>
         <groupId>org.apache.cxf</groupId>

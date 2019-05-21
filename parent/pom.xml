@@ -26,7 +26,7 @@
     <artifactId>cxf-parent</artifactId>
     <name>Apache CXF Parent</name>
     <description>Apache CXF Parent POM</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <packaging>pom</packaging>
     <properties>
         <cxf.protect-xmlschema-collections>false</cxf.protect-xmlschema-collections>
@@ -2733,7 +2733,7 @@
             <pluginRepositories>
                 <pluginRepository>
                     <id>apache.snapshots</id>
-                    <url>http://repository.apache.org/snapshots/</url>
+                    <url>https://repository.apache.org/snapshots/</url>
                 </pluginRepository>
             </pluginRepositories>
             <build>

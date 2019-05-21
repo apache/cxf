@@ -25,7 +25,7 @@
         Integrate https://tools.ietf.org/html/draft-cavage-http-signatures-10 as JAX-RS filters for signing and
         verifying requests.
     </description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

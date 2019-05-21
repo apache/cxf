@@ -23,7 +23,7 @@
     <packaging>jar</packaging>
     <name>Apache CXF JCA Connection</name>
     <description>Apache CXF JCA Connection</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>

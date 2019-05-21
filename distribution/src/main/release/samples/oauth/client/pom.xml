@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>oauth_demo-client</artifactId>
     <name>OAuth 1.0a client</name>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <packaging>war</packaging>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
@@ -99,7 +99,7 @@
         <repository>
             <id>oauth</id>
             <name>OAuth Repository</name>
-            <url>http://oauth.googlecode.com/svn/code/maven/</url>
+            <url>https://oauth.googlecode.com/svn/code/maven/</url>
         </repository>
     </repositories>
 </project>

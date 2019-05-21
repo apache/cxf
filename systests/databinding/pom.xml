@@ -29,7 +29,7 @@
     <artifactId>cxf-systests-databinding</artifactId>
     <name>Apache CXF Databinding System Tests</name>
     <description>Apache CXF Databinding System Tests</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <properties>
         <hello.world.binding.file>hello_world.xml</hello.world.binding.file>
         <doc.lit.bare.binding.file>doc_lit_bare.xml</doc.lit.bare.binding.file>

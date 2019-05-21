@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <name>Apache CXF JOSE Security parent</name>
     <description>Apache CXF JOSE Security parent</description>
-    <url>http://cxf.apache.org</url>
+    <url>https://cxf.apache.org</url>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-rs-security</artifactId>
