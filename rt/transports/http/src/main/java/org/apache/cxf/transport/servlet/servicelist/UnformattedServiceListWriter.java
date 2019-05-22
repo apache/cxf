@@ -78,6 +78,8 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
                 && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"));
             boolean swaggerAvailable = bus != null
                 && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"));
+            boolean openApiAvailable = bus != null
+                && PropertyUtils.isTrue(bus.getProperty("openapi.service.descrition.available"));
             if (!wadlAvailable && !swaggerAvailable) {
                 writer.write(address + "\n");
                 return;
@@ -88,7 +90,9 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
             if (swaggerAvailable) {
                 writer.write(address + "/swagger.json\n");
             }
-
+            if (openApiAvailable) {
+                writer.write(address + "/openapi.json\n");
+            }
         }
     }
 
