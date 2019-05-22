@@ -843,6 +843,11 @@ public class WebClient extends AbstractClient {
     }
 
     @Override
+    public WebClient authorization(Object auth) {
+        return (WebClient)super.authorization(auth);
+    }
+
+    @Override
     public WebClient header(String name, Object... values) {
         return (WebClient)super.header(name, values);
     }
