@@ -19,7 +19,7 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -164,16 +164,11 @@ public final class OAuth2TestUtils {
     }
 
     public static List<Object> setupProviders() {
-        List<Object> providers = new ArrayList<>();
         JSONProvider<OAuthAuthorizationData> jsonP = new JSONProvider<>();
         jsonP.setNamespaceMap(Collections.singletonMap("http://org.apache.cxf.rs.security.oauth",
                                                        "ns2"));
-        providers.add(jsonP);
-        providers.add(new OAuthJSONProvider());
-        providers.add(new JsonWebKeysProvider());
-        providers.add(new JsonMapObjectProvider());
 
-        return providers;
+        return Arrays.asList(jsonP, new OAuthJSONProvider(), new JsonWebKeysProvider(), new JsonMapObjectProvider());
     }
 
     public static String createToken(String audRestr) throws WSSecurityException {

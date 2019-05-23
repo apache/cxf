@@ -21,28 +21,28 @@ package org.apache.cxf.systest.jaxrs.security.oidc;
 
 import java.net.URL;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
-public class OIDCDynRegistrationServer extends AbstractBusTestServerBase {
-    public static final String PORT = TestUtil.getPortNumber("jaxrs-oidc-dynreg");
-    private static final URL SERVER_CONFIG_FILE =
-        OIDCDynRegistrationServer.class.getResource("oidc-server-dynreg.xml");
+import static org.junit.Assert.assertNotNull;
+
+public class SpringBusTestServer extends AbstractBusTestServerBase {
+    private final String port;
+    private final URL serverConfigFile;
+
+    public SpringBusTestServer(String template) {
+        port = TestUtil.getPortNumber(template);
+        serverConfigFile = getClass().getResource(template + ".xml");
+        assertNotNull(serverConfigFile);
+    }
+
+    public String getPort() {
+        return port;
+    }
 
     protected void run() {
-        SpringBusFactory bf = new SpringBusFactory();
-        Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-        BusFactory.setDefaultBus(springBus);
-        setBus(springBus);
-
-        try {
-            new OIDCDynRegistrationServer();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        setBus(new SpringBusFactory().createBus(serverConfigFile));
     }
 
 }

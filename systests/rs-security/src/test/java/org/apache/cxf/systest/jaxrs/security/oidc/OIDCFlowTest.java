@@ -27,16 +27,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKeys;
@@ -54,8 +49,6 @@ import org.apache.cxf.systest.jaxrs.security.SecurityTestUtil;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils.AuthorizationCodeParameters;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 import org.junit.AfterClass;
@@ -72,19 +65,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * Some unit tests to test the various flows in OpenID Connect. The tests are run multiple times
  * with different OAuthDataProvider implementations:
- * a) JCACHE_PORT - JCache
- * b) JWT_JCACHE_PORT - JCache with useJwtFormatForAccessTokens enabled
- * c) JPA_PORT - JPA provider
- * d) JWT_NON_PERSIST_JCACHE_PORT-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
+ * a) JCACHE_SERVER - JCache
+ * b) JWT_JCACHE_SERVER - JCache with useJwtFormatForAccessTokens enabled
+ * c) JPA_SERVER - JPA provider
+ * d) JWT_NON_PERSIST_JCACHE_SERVER-  JCache with useJwtFormatForAccessTokens + !persistJwtEncoding
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
-    static final String JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache");
-    static final String JWT_JCACHE_PORT = TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt");
-    static final String JPA_PORT = TestUtil.getPortNumber("jaxrs-oidc-jpa");
-    static final String JWT_NON_PERSIST_JCACHE_PORT =
-        TestUtil.getPortNumber("jaxrs-oidc-jcache-jwt-non-persist");
+    private static final SpringBusTestServer JCACHE_SERVER = new SpringBusTestServer("oidc-server-jcache");
+    private static final SpringBusTestServer JWT_JCACHE_SERVER = new SpringBusTestServer("oidc-server-jcache-jwt");
+    private static final SpringBusTestServer JPA_SERVER = new SpringBusTestServer("oidc-server-jpa");
+    private static final SpringBusTestServer JWT_NON_PERSIST_JCACHE_SERVER =
+            new SpringBusTestServer("oidc-server-jcache-jwt-non-persist");
 
     final String port;
 
@@ -94,30 +87,10 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(OIDCServerJCache.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(OIDCServerJCacheJWT.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(OIDCServerJPA.class, true)
-        );
-        assertTrue(
-                   "Server failed to launch",
-                   // run the server in the same process
-                   // set this to false to fork
-                   launchServer(OIDCServerJCacheJWTNonPersist.class, true)
-        );
+        assertTrue("Server failed to launch", launchServer(JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(JWT_JCACHE_SERVER));
+        assertTrue("Server failed to launch", launchServer(JPA_SERVER));
+        assertTrue("Server failed to launch", launchServer(JWT_NON_PERSIST_JCACHE_SERVER));
     }
 
     @AfterClass
@@ -126,9 +99,12 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<String> data() {
-
-        return Arrays.asList(JCACHE_PORT, JWT_JCACHE_PORT, JPA_PORT, JWT_NON_PERSIST_JCACHE_PORT);
+    public static String[] data() {
+        return new String[]{
+                JCACHE_SERVER.getPort(),
+                JWT_JCACHE_SERVER.getPort(),
+                JPA_SERVER.getPort(),
+                JWT_NON_PERSIST_JCACHE_SERVER.getPort()};
     }
 
     @org.junit.Test
@@ -1005,86 +981,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     }
 
     private boolean isAccessTokenInJWTFormat() {
-        return JWT_JCACHE_PORT.equals(port) || JWT_NON_PERSIST_JCACHE_PORT.equals(port);
+        return JWT_JCACHE_SERVER.equals(port) || JWT_NON_PERSIST_JCACHE_SERVER.equals(port);
     }
 
-    //
-    // Server implementations
-    //
-
-    public static class OIDCServerJCache extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            OIDCServerJCache.class.getResource("oidc-server-jcache.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new OIDCServerJCache();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-    public static class OIDCServerJCacheJWT extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            OIDCServerJCacheJWT.class.getResource("oidc-server-jcache-jwt.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new OIDCServerJCacheJWT();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-    public static class OIDCServerJPA extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            OIDCServerJPA.class.getResource("oidc-server-jpa.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new OIDCServerJPA();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
-
-    public static class OIDCServerJCacheJWTNonPersist extends AbstractBusTestServerBase {
-        private static final URL SERVER_CONFIG_FILE =
-            OIDCServerJCacheJWTNonPersist.class.getResource("oidc-server-jcache-jwt-non-persist.xml");
-
-        protected void run() {
-            SpringBusFactory bf = new SpringBusFactory();
-            Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
-            BusFactory.setDefaultBus(springBus);
-            setBus(springBus);
-
-            try {
-                new OIDCServerJCacheJWTNonPersist();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-    }
 }

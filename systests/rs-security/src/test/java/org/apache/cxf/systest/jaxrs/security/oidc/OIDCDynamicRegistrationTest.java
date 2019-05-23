@@ -40,18 +40,17 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = OIDCDynRegistrationServer.PORT;
+    private static final SpringBusTestServer DYNREG_SERVER = new SpringBusTestServer("oidc-server-dynreg");
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly",
-                   launchServer(OIDCDynRegistrationServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(DYNREG_SERVER));
     }
 
     @org.junit.Test
     public void testGetClientRegNotAvail() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamic/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamic/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
         Response r = wc.accept("application/json").path("some-client-id").get();
@@ -60,7 +59,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     @org.junit.Test
     public void testRegisterClientNoInitialAccessToken() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamic/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamic/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
         wc.accept("application/json").type("application/json");
@@ -71,7 +70,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     @org.junit.Test
     public void testRegisterClientInitialAccessTokenCodeGrant() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamicWithAt/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
 
@@ -106,7 +105,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     @org.junit.Test
     public void testRegisterClientPasswordGrant() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamicWithAt/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
 
@@ -145,7 +144,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     @org.junit.Test
     public void testRegisterClientPasswordGrantPublic() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamicWithAt/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
 
@@ -196,7 +195,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     @org.junit.Test
     public void testRegisterClientInitialAccessTokenCodeGrantTls() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services/dynamicWithAt/register";
+        String address = "https://localhost:" + DYNREG_SERVER.getPort() + "/services/dynamicWithAt/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
 

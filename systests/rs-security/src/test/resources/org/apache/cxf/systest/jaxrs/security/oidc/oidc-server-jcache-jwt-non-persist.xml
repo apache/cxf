@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}">
+        <httpj:engine port="${testutil.ports.oidc-server-jcache-jwt-non-persist}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,7 +63,7 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.oidc-server-jcache-jwt-non-persist}</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
        <property name="persistJwtEncoding" value="false"/>
    </bean>
@@ -114,7 +114,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}/services">
+       address="https://localhost:${testutil.ports.oidc-server-jcache-jwt-non-persist}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="hybridService"/>
@@ -145,7 +145,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oidc-jcache-jwt-non-persist}/unsignedjwtservices">
+       address="https://localhost:${testutil.ports.oidc-server-jcache-jwt-non-persist}/unsignedjwtservices">
        <jaxrs:serviceBeans>
            <ref bean="jwtAuthorizationService"/>
        </jaxrs:serviceBeans>

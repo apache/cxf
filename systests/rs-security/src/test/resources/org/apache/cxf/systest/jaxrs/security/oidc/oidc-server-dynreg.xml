@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-oidc-dynreg}">
+        <httpj:engine port="${testutil.ports.oidc-server-dynreg}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -75,7 +75,7 @@ under the License.
 
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oidc-dynreg}/services/dynamic">
+       address="https://localhost:${testutil.ports.oidc-server-dynreg}/services/dynamic">
        <jaxrs:serviceBeans>
            <ref bean="dynRegService"/>
        </jaxrs:serviceBeans>
@@ -85,7 +85,7 @@ under the License.
    </jaxrs:server>
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-oidc-dynreg}/services/dynamicWithAt">
+       address="https://localhost:${testutil.ports.oidc-server-dynreg}/services/dynamicWithAt">
        <jaxrs:serviceBeans>
            <ref bean="dynRegServiceWithAt"/>
        </jaxrs:serviceBeans>

@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-userinfo-jpa}">
+        <httpj:engine port="${testutil.ports.userinfo-server-jpa}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -75,7 +75,7 @@ under the License.
 	</bean>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JPAOAuthDataProviderImpl">
-       <constructor-arg value="${testutil.ports.jaxrs-userinfo-jpa}"/>
+       <constructor-arg value="${testutil.ports.userinfo-server-jpa}"/>
        <constructor-arg ref="entityManagerFactory"/>
    </bean>
     
@@ -101,7 +101,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-userinfo-jpa}/services/oidc">
+       address="https://localhost:${testutil.ports.userinfo-server-jpa}/services/oidc">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="tokenService"/>
@@ -133,7 +133,7 @@ under the License.
    
    <jaxrs:server 
         depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jpa}/services/plain">
+        address="https://localhost:${testutil.ports.userinfo-server-jpa}/services/plain">
         <jaxrs:serviceBeans>
             <ref bean="userInfoService"/>
         </jaxrs:serviceBeans>
@@ -149,7 +149,7 @@ under the License.
 
    <jaxrs:server 
         depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jpa}/services/signed">
+        address="https://localhost:${testutil.ports.userinfo-server-jpa}/services/signed">
         <jaxrs:serviceBeans>
             <ref bean="signedUserInfoService"/>
         </jaxrs:serviceBeans>
@@ -175,7 +175,7 @@ under the License.
    
    <jaxrs:server 
         depends-on="tls-config"
-        address="https://localhost:${testutil.ports.jaxrs-userinfo-jpa}/services/encrypted">
+        address="https://localhost:${testutil.ports.userinfo-server-jpa}/services/encrypted">
         <jaxrs:serviceBeans>
             <ref bean="encryptedUserInfoService"/>
         </jaxrs:serviceBeans>

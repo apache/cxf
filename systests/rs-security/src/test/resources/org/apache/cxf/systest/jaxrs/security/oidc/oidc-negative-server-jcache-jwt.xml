@@ -48,7 +48,7 @@ under the License.
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     
     <httpj:engine-factory id="tls-config">
-        <httpj:engine port="${testutil.ports.jaxrs-negative-oidc-jcache-jwt}">
+        <httpj:engine port="${testutil.ports.oidc-negative-server-jcache-jwt}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="JKS" password="password" resource="keys/Bethal.jks"/>
@@ -63,7 +63,7 @@ under the License.
     </httpj:engine-factory>
     
    <bean id="oauthProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.JCacheOAuthDataProviderImpl">
-       <constructor-arg><value>${testutil.ports.jaxrs-negative-oidc-jcache-jwt}</value></constructor-arg>
+       <constructor-arg><value>${testutil.ports.oidc-negative-server-jcache-jwt}</value></constructor-arg>
        <property name="useJwtFormatForAccessTokens" value="true"/>
    </bean>
    
@@ -113,7 +113,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-negative-oidc-jcache-jwt}/services">
+       address="https://localhost:${testutil.ports.oidc-negative-server-jcache-jwt}/services">
        <jaxrs:serviceBeans>
            <ref bean="authorizationService"/>
            <ref bean="hybridService"/>
@@ -144,7 +144,7 @@ under the License.
    
    <jaxrs:server 
        depends-on="tls-config" 
-       address="https://localhost:${testutil.ports.jaxrs-negative-oidc-jcache-jwt}/unsignedjwtservices">
+       address="https://localhost:${testutil.ports.oidc-negative-server-jcache-jwt}/unsignedjwtservices">
        <jaxrs:serviceBeans>
            <ref bean="jwtAuthorizationService"/>
        </jaxrs:serviceBeans>
@@ -171,7 +171,7 @@ under the License.
    
    <jaxrs:server 
         depends-on="tls-config" 
-        address="https://localhost:${testutil.ports.jaxrs-negative-oidc-jcache-jwt}/ui/plain">
+        address="https://localhost:${testutil.ports.oidc-negative-server-jcache-jwt}/ui/plain">
         <jaxrs:serviceBeans>
             <ref bean="userInfoService"/>
         </jaxrs:serviceBeans>
