@@ -93,8 +93,6 @@ public class ServletContextResourceResolver implements ResourceResolver {
                 //fallthrough
             } catch (URISyntaxException e) {
                 //ignore
-            } catch (IllegalArgumentException e) {
-                //ignore
             }
             try {
                 URL url = servletContext.getResource("/" + entryName);
@@ -107,14 +105,9 @@ public class ServletContextResourceResolver implements ResourceResolver {
                     urlMap.put(url.toString(), url);
                     return clz.cast(url);
                 }
-<<<<<<< HEAD
             } catch (MalformedURLException e1) {
                 //ignore
             } catch (URISyntaxException e) {
-=======
-            } catch (MalformedURLException | URISyntaxException 
-                | IllegalArgumentException e1) {
->>>>>>> d131573... [CXF-8041]Error resolving relative XSD Schema on Tomcat
                 //ignore
             }
         } else if (clz.isAssignableFrom(InputStream.class)) {
