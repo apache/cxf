@@ -179,30 +179,49 @@ public class FormattedServiceListWriter implements ServiceListWriter {
             sb = ((AbstractHTTPDestination)sd).getBus();
         }        
         
+        addWadlIfNeeded(absoluteURL, sb, writer);
+        addOpenApiIfNeeded(absoluteURL, sb, writer);
+        addSwaggerIfNeeded(absoluteURL, sb, writer);
+        addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
+        writer.write("</td></tr>");
+    }
+
+    private static void addWadlIfNeeded(String absoluteURL, Bus sb, PrintWriter writer) {
         if (sb != null && PropertyUtils.isTrue(sb.getProperty("wadl.service.description.available"))) {
             writer.write("<br/><span class=\"field\">WADL :</span> " + "<a href=\"" + absoluteURL
                      + "?_wadl\">" + absoluteURL + "?_wadl" + "</a>");
         }
+    }
+
+    private static void addSwaggerIfNeeded(String absoluteURL, Bus sb, PrintWriter writer) {
         if (sb != null && PropertyUtils.isTrue(sb.getProperty("swagger.service.description.available"))) {
-            String swaggerPath = "swagger.json";
-            if (PropertyUtils.isTrue(sb.getProperty("swagger.service.ui.available"))) {
-                URI uri = URI.create(absoluteURL);
-                String schemePath = uri.getScheme() + "://" + uri.getHost()
-                    + (uri.getPort() == -1 ? "" : ":" + uri.getPort());
-                String relPath = absoluteURL.substring(schemePath.length());
-                if (!relPath.endsWith("/")) {
-                    relPath += "/";
-                }
-                swaggerPath = "api-docs?url=" + relPath + swaggerPath;
-            }
-            if (!absoluteURL.endsWith("/")) {
-                swaggerPath = "/" + swaggerPath;
-            }
-            writer.write("<br/><span class=\"field\">Swagger :</span> " + "<a href=\"" + absoluteURL
-                     + swaggerPath + "\">" + absoluteURL + swaggerPath + "</a>");
+            writeApiSpec(absoluteURL, sb, writer, "swagger.json", "Swagger");
         }
-        addAtomLinkIfNeeded(absoluteURL, atomMap, writer);
-        writer.write("</td></tr>");
+    }
+
+    private static void addOpenApiIfNeeded(String absoluteURL, Bus sb, PrintWriter writer) {
+        if (sb != null && PropertyUtils.isTrue(sb.getProperty("openapi.service.description.available"))) {
+            writeApiSpec(absoluteURL, sb, writer, "openapi.json", "OpenAPI");
+        }
+    }
+
+    private static void writeApiSpec(String absoluteURL, Bus sb, PrintWriter writer, 
+            String specPath, String specName) {
+        if (PropertyUtils.isTrue(sb.getProperty("swagger.service.ui.available"))) {
+            URI uri = URI.create(absoluteURL);
+            String schemePath = uri.getScheme() + "://" + uri.getHost()
+                + (uri.getPort() == -1 ? "" : ":" + uri.getPort());
+            String relPath = absoluteURL.substring(schemePath.length());
+            if (!relPath.endsWith("/")) {
+                relPath += "/";
+            }
+            specPath = "api-docs?url=" + relPath + specPath;
+        }
+        if (!absoluteURL.endsWith("/")) {
+            specPath = "/" + specPath;
+        }
+        writer.write("<br/><span class=\"field\">" + specName + " :</span> " + "<a href=\"" + absoluteURL
+                 + specPath + "\">" + absoluteURL + specPath + "</a>");
     }
 
     private static void addAtomLinkIfNeeded(String address, Map<String, String> extMap, PrintWriter pw) {

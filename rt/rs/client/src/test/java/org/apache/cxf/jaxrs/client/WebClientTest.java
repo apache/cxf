@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Collections;
 
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
@@ -321,6 +322,13 @@ public class WebClientTest {
         // interface
         BookInterface proxy = JAXRSClientFactory.create("http://foo", BookInterface.class);
         proxy.getBook(null);
+    }
+
+    @Test
+    public void testWebClientAuthorization() {
+        String auth = "auth";
+        WebClient wc = WebClient.create(URI.create("http://foo")).authorization(auth);
+        assertEquals(auth, wc.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
     }
 
     private static class ParamConverterProviderImpl implements ParamConverterProvider {

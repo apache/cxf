@@ -182,6 +182,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
             if (customizer != null) {
                 customizer.setApplicationInfo(factory.getApplicationProvider());
             }
+            
+            bus.setProperty("openapi.service.description.available", "true");
         } catch (OpenApiConfigurationException ex) {
             throw new RuntimeException("Unable to initialize OpenAPI context", ex);
         }
