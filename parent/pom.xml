@@ -2880,6 +2880,11 @@
                     <artifactId>jboss-rmi-api_1.0_spec</artifactId>
                     <version>1.0.6.Final</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-xjc</artifactId>
+                    <scope>test</scope>
+                </dependency>
             </dependencies>
 	</profile>
     </profiles>
