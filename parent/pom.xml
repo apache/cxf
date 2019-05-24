@@ -558,7 +558,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-invoker-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.1.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -2542,6 +2542,7 @@
                 <maven.test.skip>true</maven.test.skip>
                 <pmd.skip>true</pmd.skip>
                 <checkstyle.skip>true</checkstyle.skip>
+                <invoker.skip>true</invoker.skip>
             </properties>
         </profile>
         <profile>
@@ -2880,11 +2881,6 @@
                     <groupId>org.jboss.spec.javax.rmi</groupId>
                     <artifactId>jboss-rmi-api_1.0_spec</artifactId>
                     <version>1.0.6.Final</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-xjc</artifactId>
-                    <scope>test</scope>
                 </dependency>
             </dependencies>
 	</profile>
