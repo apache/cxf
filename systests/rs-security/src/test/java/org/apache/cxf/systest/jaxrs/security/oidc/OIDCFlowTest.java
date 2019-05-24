@@ -981,7 +981,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
     }
 
     private boolean isAccessTokenInJWTFormat() {
-        return JWT_JCACHE_SERVER.equals(port) || JWT_NON_PERSIST_JCACHE_SERVER.equals(port);
+        return JWT_JCACHE_SERVER.getPort().equals(port) || JWT_NON_PERSIST_JCACHE_SERVER.getPort().equals(port);
     }
 
 }

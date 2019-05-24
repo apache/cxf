@@ -30,6 +30,7 @@ import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -42,8 +43,11 @@ import static org.junit.Assert.assertTrue;
 public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase {
     private static final SpringBusTestServer DYNREG_SERVER = new SpringBusTestServer("oidc-server-dynreg");
 
+    private static final String ACCESS_TOKEN = "123456789";
+
     @BeforeClass
     public static void startServers() throws Exception {
+        System.setProperty("accessToken", ACCESS_TOKEN);
         assertTrue("server did not launch correctly", launchServer(DYNREG_SERVER));
     }
 
@@ -56,6 +60,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         Response r = wc.accept("application/json").path("some-client-id").get();
         assertEquals(401, r.getStatus());
     }
+
     @org.junit.Test
     public void testRegisterClientNoInitialAccessToken() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
@@ -79,7 +84,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         ClientRegistrationResponse resp = null;
         assertEquals(401, wc.post(reg).getStatus());
 
-        wc.authorization(new ClientAccessToken("Bearer", "123456789"));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -93,7 +98,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         wc.path(resp.getClientId());
         assertEquals(401, wc.get().getStatus());
 
-        wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         testCommonRegCodeGrantProperties(clientRegResp);
 
@@ -115,7 +120,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT));
 
-        wc.authorization(new ClientAccessToken("Bearer", "123456789"));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -128,7 +133,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         wc.reset();
         wc.path(resp.getClientId());
 
-        wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertEquals("web", clientRegResp.getApplicationType());
         assertEquals("dynamic_client", clientRegResp.getClientName());
@@ -154,7 +159,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.RESOURCE_OWNER_GRANT));
         reg.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_NONE);
-        wc.authorization(new ClientAccessToken("Bearer", "123456789"));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         ClientRegistrationResponse resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -166,7 +171,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         wc.reset();
         wc.path(resp.getClientId());
 
-        wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertEquals("native", clientRegResp.getApplicationType());
         assertEquals("dynamic_client", clientRegResp.getClientName());
@@ -208,7 +213,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         ClientRegistrationResponse resp = null;
         assertEquals(401, wc.post(reg).getStatus());
 
-        wc.authorization(new ClientAccessToken("Bearer", "123456789"));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, ACCESS_TOKEN));
         resp = wc.post(reg, ClientRegistrationResponse.class);
 
         assertNotNull(resp.getClientId());
@@ -222,7 +227,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         wc.path(resp.getClientId());
         assertEquals(401, wc.get().getStatus());
 
-        wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
+        wc.authorization(new ClientAccessToken(OAuthConstants.BEARER_AUTHORIZATION_SCHEME, regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         testCommonRegCodeGrantProperties(clientRegResp);
         assertEquals(OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS, clientRegResp.getTokenEndpointAuthMethod());
@@ -232,10 +237,10 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         assertEquals(200, wc.delete().getStatus());
     }
 
-    private ClientRegistration newClientRegistrationCodeGrant() {
-        ClientRegistration reg = new ClientRegistration();
+    private static ClientRegistration newClientRegistrationCodeGrant() {
+        final ClientRegistration reg = new ClientRegistration();
         reg.setApplicationType("web");
-        reg.setScope("openid");
+        reg.setScope(OidcUtils.getOpenIdScope());
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList(OAuthConstants.AUTHORIZATION_CODE_GRANT));
         reg.setRedirectUris(Collections.singletonList("https://a/b/c"));

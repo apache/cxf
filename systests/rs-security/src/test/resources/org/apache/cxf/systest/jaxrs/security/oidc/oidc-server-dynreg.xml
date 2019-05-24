@@ -69,7 +69,7 @@ under the License.
    </bean>
    <bean id="dynRegServiceWithAt" class="org.apache.cxf.rs.security.oidc.idp.OidcDynamicRegistrationService">
       <property name="clientProvider" ref="clientProvider"/>
-      <property name="initialAccessToken" value="123456789"/>
+      <property name="initialAccessToken" value="${accessToken}"/>
    </bean>
    
 
