@@ -85,6 +85,31 @@ public class Compiler {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
 
+    // https://issues.apache.org/jira/browse/CXF-8049
+    private String getSystemClassPath() {
+        String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
+
+        if (!StringUtils.isEmpty(javaClasspath)) {
+            List<String> correctedEntries = new ArrayList<>();
+
+            String[] toks = javaClasspath.split(File.pathSeparator);
+
+            for (String tok: toks) {
+                // if any classpath entry contains a whitespace char,
+                // enclose the entry in double quotes
+                if (tok.matches(".*\\s+.*")) {
+                    correctedEntries.add("\"" + tok + "\"");
+                } else {
+                    correctedEntries.add(tok);
+                }
+            }
+
+            return String.join(File.pathSeparator, correctedEntries);
+        }
+
+        return javaClasspath;
+    }
+
     protected void addArgs(List<String> list) {
         if (!StringUtils.isEmpty(encoding)) {
             list.add("-encoding");
@@ -103,8 +128,8 @@ public class Compiler {
         }
 
         if (StringUtils.isEmpty(classPath)) {
-            String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
-            boolean classpathSetted = javaClasspath != null ? true : false;
+            String javaClasspath = getSystemClassPath();
+            boolean classpathSetted = !StringUtils.isEmpty(javaClasspath);
             if (!classpathSetted) {
                 File f = new File(getClass().getClassLoader().getResource(".").getFile());
                 f = new File(f, "../lib");
