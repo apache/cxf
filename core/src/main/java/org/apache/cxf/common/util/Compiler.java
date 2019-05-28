@@ -88,10 +88,10 @@ public class Compiler {
     // https://issues.apache.org/jira/browse/CXF-8049
     private String getSystemClassPath() {
         String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
-        
+
         if(!StringUtils.isEmpty(javaClasspath)) {
             List<String> correctedEntries = new ArrayList<>();
-            
+
             String[] toks = javaClasspath.split(File.pathSeparator);
             
             for(String tok: toks) {
@@ -102,9 +102,11 @@ public class Compiler {
                 else
                     correctedEntries.add(tok);
             }
+
+            return String.join(File.pathSeparator, correctedEntries);
         }
 
-        return String.join(File.pathSeparator, correctedEntries);
+        return "";
     }
 
     protected void addArgs(List<String> list) {
