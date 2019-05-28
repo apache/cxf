@@ -89,18 +89,20 @@ public class Compiler {
     private String getSystemClassPath() {
         String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
 
-        if(!StringUtils.isEmpty(javaClasspath)) {
+        if (!StringUtils.isEmpty(javaClasspath)) {
             List<String> correctedEntries = new ArrayList<>();
 
             String[] toks = javaClasspath.split(File.pathSeparator);
             
-            for(String tok: toks) {
+            for (String tok: toks) {
                 // if any classpath entry contains a whitespace char, 
                 // enclose the entry in double quotes
-                if(tok.matches(".*\\s+.*"))
+                if (tok.matches(".*\\s+.*")) {
                     correctedEntries.add("\"" + tok + "\"");
-                else
+                }
+                else {
                     correctedEntries.add(tok);
+                }
             }
 
             return String.join(File.pathSeparator, correctedEntries);
