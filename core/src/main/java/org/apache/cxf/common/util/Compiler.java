@@ -99,8 +99,7 @@ public class Compiler {
                 // enclose the entry in double quotes
                 if (tok.matches(".*\\s+.*")) {
                     correctedEntries.add("\"" + tok + "\"");
-                }
-                else {
+                } else {
                     correctedEntries.add(tok);
                 }
             }
