@@ -107,7 +107,7 @@ public class Compiler {
             return String.join(File.pathSeparator, correctedEntries);
         }
 
-        return "";
+        return javaClasspath;
     }
 
     protected void addArgs(List<String> list) {
