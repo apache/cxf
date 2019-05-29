@@ -109,10 +109,11 @@ public final class ClassLoaderUtils {
      * @param callingClass The Class object of the calling object
      */
     public static URL getResource(String resourceName, Class<?> callingClass) {
-        URL url = getContextClassLoader().getResource(resourceName);
+        ClassLoader contextClassLoader = getContextClassLoader();
+        URL url = contextClassLoader.getResource(resourceName);
         if (url == null && resourceName.startsWith("/")) {
             //certain classloaders need it without the leading /
-            url = getContextClassLoader().getResource(resourceName.substring(1));
+            url = contextClassLoader.getResource(resourceName.substring(1));
         }
 
         ClassLoader cluClassloader = ClassLoaderUtils.class.getClassLoader();
@@ -277,6 +278,7 @@ public final class ClassLoaderUtils {
         }
         return loadClass2(className, callingClass);
     }
+
     public static <T> Class<? extends T> loadClass(String className, Class<?> callingClass, Class<T> type)
         throws ClassNotFoundException {
         try {
@@ -331,7 +333,7 @@ public final class ClassLoaderUtils {
                     return loader != null ? loader : ClassLoader.getSystemClassLoader();
                 }
             });
-        } 
+        }
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         return loader != null ? loader : ClassLoader.getSystemClassLoader();
     }
