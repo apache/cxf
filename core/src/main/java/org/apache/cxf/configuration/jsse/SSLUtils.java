@@ -50,6 +50,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.resource.ResourceManager;
 
 
@@ -107,7 +108,7 @@ public final class SSLUtils {
         try {
             if (location != null) {
                 File file = new File(location);
-                if (file.exists()) {
+                if (FileUtils.exists(file)) {
                     is = Files.newInputStream(file.toPath());
                 } else {
                     is = getResourceAsStream(location);
@@ -152,7 +153,7 @@ public final class SSLUtils {
         try {
             if (location != null) {
                 File file = new File(location);
-                if (file.exists()) {
+                if (FileUtils.exists(file)) {
                     is = Files.newInputStream(file.toPath());
                 } else {
                     is = getResourceAsStream(location);

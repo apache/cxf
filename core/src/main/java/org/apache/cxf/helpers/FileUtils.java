@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +61,7 @@ public final class FileUtils {
         File file = new File(getDefaultTempDir(), name);
         boolean isValid = true;
         try {
-            if (file.exists()) {
+            if (exists(file)) {
                 return true;
             }
             if (file.createNewFile()) {
@@ -73,7 +75,7 @@ public final class FileUtils {
 
     public static synchronized File getDefaultTempDir() {
         if (defaultTempDir != null
-            && defaultTempDir.exists()) {
+            && exists(defaultTempDir)) {
             return defaultTempDir;
         }
 
@@ -137,7 +139,7 @@ public final class FileUtils {
     public static File createTmpDir(boolean addHook) {
         String s = SystemPropertyAction.getProperty("java.io.tmpdir");
         File checkExists = new File(s);
-        if (!checkExists.exists() || !checkExists.isDirectory()) {
+        if (!exists(checkExists) || !checkExists.isDirectory()) {
             throw new RuntimeException("The directory "
                                    + checkExists.getAbsolutePath()
                                    + " does not exist, please set java.io.tempdir"
@@ -197,7 +199,7 @@ public final class FileUtils {
                                     + "already exists with that name: " + dir.getAbsolutePath());
         }
 
-        if (!dir.exists()) {
+        if (!exists(dir)) {
             boolean result = doMkDirs(dir);
             if (!result) {
                 String msg = "Directory " + dir.getAbsolutePath()
@@ -389,9 +391,18 @@ public final class FileUtils {
     }
 
     public static List<String> readLines(File file) throws Exception {
-        if (!file.exists()) {
+        if (!exists(file)) {
             return Collections.emptyList();
         }
         return Files.readAllLines(file.toPath());
+    }
+
+    public static boolean exists(File file) {
+        if (System.getSecurityManager() != null) {
+            return file.exists();
+        }
+        return AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
+            return file.exists();
+        });
     }
 }
