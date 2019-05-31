@@ -468,7 +468,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <attach>true</attach>
                         <source>${cxf.jdk.version}</source>
@@ -555,7 +555,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -588,7 +588,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.5.2</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -735,7 +735,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.9</version>
+                <version>3.0.0</version>
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
