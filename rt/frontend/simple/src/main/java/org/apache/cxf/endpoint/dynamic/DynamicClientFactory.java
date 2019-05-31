@@ -337,7 +337,7 @@ public class DynamicClientFactory {
 
         addSchemas(compiler.getOptions(), compiler, svc.getServiceInfos(), schemas);
         addBindingFiles(bindingFiles, compiler);
-        applySchemaCompilerOptions();
+        applySchemaCompilerOptions(compiler);
         S2JJAXBModel intermediateModel = compiler.bind();
 
         listener.throwException();
@@ -446,7 +446,7 @@ public class DynamicClientFactory {
         return JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<>());    
     }
 
-    protected void applySchemaCompilerOptions() {
+    protected void applySchemaCompilerOptions(SchemaCompiler compiler) {
         if (schemaCompilerOptions != null && schemaCompilerOptions.length > 0) {
             compiler.getOptions().parseArguments(schemaCompilerOptions);
         }
