@@ -214,7 +214,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUi
     }
 
     @Provider(value = Type.Feature, scope = Scope.Server)
-    public static class Portable extends AbstractSwaggerFeature.Portable implements SwaggerUiSupport, SwaggerProperties {
+    public static class Portable extends AbstractSwaggerFeature.Portable
+            implements SwaggerUiSupport, SwaggerProperties {
         private static final String SCHEMES_PROPERTY = "schemes";
         private static final String HOST_PROPERTY = "host";
         private static final String USE_PATH_CFG_PROPERTY = "use.path.based.config";

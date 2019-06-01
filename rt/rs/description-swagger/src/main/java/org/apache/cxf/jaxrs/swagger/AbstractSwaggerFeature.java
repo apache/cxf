@@ -171,7 +171,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         getDelegate().setActivateOnlyIfJaxrsSupported(activateOnlyIfJaxrsSupported);
     }
 
-    public static abstract class Portable implements AbstractPortableFeature {
+    public abstract static class Portable implements AbstractPortableFeature {
         private static final boolean SWAGGER_JAXRS_AVAILABLE;
 
         static {
