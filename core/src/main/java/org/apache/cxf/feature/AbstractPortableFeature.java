@@ -30,7 +30,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * adding capabilities. For instance, there may be a LoggingFeature which configures
  * one of the above to log each of their messages.
  * <p>
- * By default the initialize methods all delegate to initializeProvider(InterceptorProvider).
+ * By default the initialize methods all delegate to doInitializeProvider(InterceptorProvider).
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */

@@ -45,10 +45,10 @@ public abstract class AbstractFeature extends WebServiceFeature implements Abstr
 
     @Override
     public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
-        // no-op
+        initializeProvider(provider, bus);
     }
 
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        doInitializeProvider(provider, bus);
+        // no-op
     }
 }
