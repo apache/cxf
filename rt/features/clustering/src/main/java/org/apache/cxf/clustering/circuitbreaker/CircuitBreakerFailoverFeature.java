@@ -25,8 +25,6 @@ import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.FailoverTargetSelector;
 
 public class CircuitBreakerFailoverFeature extends FailoverFeature {
-    private Portable config;
-
     public CircuitBreakerFailoverFeature() {
         this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
                 CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);
@@ -39,38 +37,37 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
     }
 
     public CircuitBreakerFailoverFeature(int threshold, long timeout) {
-        config = new Portable(threshold, timeout);
+        super(new Portable(threshold, timeout));
     }
 
     public CircuitBreakerFailoverFeature(int threshold, long timeout, String clientBootstrapAddress) {
-        super(clientBootstrapAddress);
-        config = new Portable(threshold, timeout);
+        super(new Portable(threshold, timeout, clientBootstrapAddress));
     }
 
     @Override
     public FailoverTargetSelector getTargetSelector() {
-        return config.getTargetSelector();
+        return delegate.getTargetSelector();
     }
 
     @Override
     public void setTargetSelector(FailoverTargetSelector targetSelector) {
-        config.setTargetSelector(targetSelector);
+        delegate.setTargetSelector(targetSelector);
     }
 
     public int getThreshold() {
-        return config.getThreshold();
+        return Portable.class.cast(delegate).getThreshold();
     }
 
     public long getTimeout() {
-        return config.getTimeout();
+        return Portable.class.cast(delegate).getTimeout();
     }
 
     public void setThreshold(int threshold) {
-        config.setThreshold(threshold);
+        Portable.class.cast(delegate).setThreshold(threshold);
     }
 
     public void setTimeout(long timeout) {
-        config.setTimeout(timeout);
+        Portable.class.cast(delegate).setTimeout(timeout);
     }
 
     public static class Portable extends FailoverFeature.Portable {

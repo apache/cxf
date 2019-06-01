@@ -42,8 +42,11 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 @EvaluateAllEndpoints
 @Provider(value = Type.Feature, scope = Scope.Client)
 public class FailoverFeature extends AbstractFeature {
-    private Portable delegate;
+    protected Portable delegate;
 
+    protected FailoverFeature(Portable portable) {
+        delegate = portable;
+    }
     public FailoverFeature() {
         delegate = new Portable();
     }
