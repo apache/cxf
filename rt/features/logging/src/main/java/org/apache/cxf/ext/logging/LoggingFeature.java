@@ -22,6 +22,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
@@ -89,6 +91,38 @@ public class LoggingFeature extends AbstractFeature {
     @Override
     public void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
         delegate.doInitializeProvider(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Server server, Bus bus) {
+        delegate.initialize(server, bus);
+    }
+
+    @Override
+    public void initialize(Client client, Bus bus) {
+        delegate.initialize(client, bus);
+    }
+
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        delegate.initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
+    }
+
+    public void addInBinaryContentMediaTypes(String mediaTypes) {
+        delegate.addInBinaryContentMediaTypes(mediaTypes);
+    }
+
+    public void addOutBinaryContentMediaTypes(String mediaTypes) {
+        delegate.addOutBinaryContentMediaTypes(mediaTypes);
+    }
+
+    public void addBinaryContentMediaTypes(String mediaTypes) {
+        delegate.addBinaryContentMediaTypes(mediaTypes);
     }
 
     @Provider(value = Type.Feature)
@@ -163,51 +197,51 @@ public class LoggingFeature extends AbstractFeature {
         public void setVerbose(boolean verbose) {
             setSender(verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender());
         }
-    }
 
-    /**
-     * Add additional binary media types to the default values in the LoggingInInterceptor.
-     * Content for these types will not be logged.
-     * For example:
-     * <pre>
-     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addInBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
-     * &lt;/bean&gt;
-     * </pre>
-     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
-     */
-    public void addInBinaryContentMediaTypes(String mediaTypes) {
-        in.addBinaryContentMediaTypes(mediaTypes);
-    }
+        /**
+         * Add additional binary media types to the default values in the LoggingInInterceptor.
+         * Content for these types will not be logged.
+         * For example:
+         * <pre>
+         * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+         *   &lt;property name="addInBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+         * &lt;/bean&gt;
+         * </pre>
+         * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+         */
+        public void addInBinaryContentMediaTypes(String mediaTypes) {
+            in.addBinaryContentMediaTypes(mediaTypes);
+        }
 
-    /**
-     * Add additional binary media types to the default values in the LoggingOutInterceptor.
-     * Content for these types will not be logged.
-     * For example:
-     * <pre>
-     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addOutBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
-     * &lt;/bean&gt;
-     * </pre>
-     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
-     */
-    public void addOutBinaryContentMediaTypes(String mediaTypes) {
-        out.addBinaryContentMediaTypes(mediaTypes);
-    }
+        /**
+         * Add additional binary media types to the default values in the LoggingOutInterceptor.
+         * Content for these types will not be logged.
+         * For example:
+         * <pre>
+         * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+         *   &lt;property name="addOutBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+         * &lt;/bean&gt;
+         * </pre>
+         * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+         */
+        public void addOutBinaryContentMediaTypes(String mediaTypes) {
+            out.addBinaryContentMediaTypes(mediaTypes);
+        }
 
-    /**
-     * Add additional binary media types to the default values for both logging interceptors
-     * Content for these types will not be logged.
-     * For example:
-     * <pre>
-     * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
-     *   &lt;property name="addBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
-     * &lt;/bean&gt;
-     * </pre>
-     * @param mediaTypes list of mediaTypes. symbol ; - delimeter
-     */
-    public void addBinaryContentMediaTypes(String mediaTypes) {
-        addInBinaryContentMediaTypes(mediaTypes);
-        addOutBinaryContentMediaTypes(mediaTypes);
+        /**
+         * Add additional binary media types to the default values for both logging interceptors
+         * Content for these types will not be logged.
+         * For example:
+         * <pre>
+         * &lt;bean id="loggingFeature" class="org.apache.cxf.ext.logging.LoggingFeature"&gt;
+         *   &lt;property name="addBinaryContentMediaTypes" value="audio/mpeg;application/zip"/&gt;
+         * &lt;/bean&gt;
+         * </pre>
+         * @param mediaTypes list of mediaTypes. symbol ; - delimeter
+         */
+        public void addBinaryContentMediaTypes(String mediaTypes) {
+            addInBinaryContentMediaTypes(mediaTypes);
+            addOutBinaryContentMediaTypes(mediaTypes);
+        }
     }
 }

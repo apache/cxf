@@ -29,6 +29,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 
@@ -39,24 +40,34 @@ import org.apache.cxf.transport.Destination;
  */
 @NoJSR250Annotations
 public class JMSConfigFeature extends AbstractFeature {
-    private Portable portable = new Portable();
+    private Portable delegate = new Portable();
 
     @Override
     public void initialize(Client client, Bus bus) {
-        portable.initialize(client, bus);
+        delegate.initialize(client, bus);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
-        portable.initialize(server, bus);
+        delegate.initialize(server, bus);
+    }
+
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        delegate.initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
     }
 
     public JMSConfiguration getJmsConfig() {
-        return portable.getJmsConfig();
+        return delegate.getJmsConfig();
     }
 
     public void setJmsConfig(JMSConfiguration jmsConfig) {
-        portable.setJmsConfig(jmsConfig);
+        delegate.setJmsConfig(jmsConfig);
     }
 
     public static class Portable implements AbstractPortableFeature {

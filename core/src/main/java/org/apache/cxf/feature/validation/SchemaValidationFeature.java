@@ -49,6 +49,20 @@ public class SchemaValidationFeature extends AbstractFeature {
         delegate.initialize(client, bus);
     }
 
+    public void initialise(Endpoint endpoint) {
+        delegate.initialise(endpoint);
+    }
+
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        delegate.initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
+    }
+
     public static class Portable implements AbstractPortableFeature {
         private final SchemaValidationTypeProvider provider;
 
@@ -65,7 +79,7 @@ public class SchemaValidationFeature extends AbstractFeature {
         }
 
         @Override
-        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+        public void doInitializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
             // no-op
         }
 

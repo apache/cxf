@@ -28,6 +28,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 
 public class StaxDataBindingFeature extends AbstractFeature {
@@ -41,6 +42,16 @@ public class StaxDataBindingFeature extends AbstractFeature {
     @Override
     public void initialize(Server server, Bus bus) {
         delegate.initialize(server, bus);
+    }
+
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        delegate.initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
     }
 
     public static class Portable implements AbstractPortableFeature {

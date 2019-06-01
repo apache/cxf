@@ -24,9 +24,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
@@ -35,6 +37,21 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
     public static boolean isSwaggerJaxRsAvailable() {
         return Portable.isSwaggerJaxRsAvailable();
+    }
+
+    @Override
+    public void initialize(Client client, Bus bus) {
+        getDelegate().initialize(client, bus);
+    }
+
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        getDelegate().initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        getDelegate().initialize(bus);
     }
 
     @Override

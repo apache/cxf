@@ -62,6 +62,11 @@ public class ConnectionFactoryFeature extends AbstractFeature {
         delegate.initialize(server, bus);
     }
 
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
+    }
+
     public static class Portable implements AbstractPortableFeature {
         private ConnectionFactory connectionFactory;
 

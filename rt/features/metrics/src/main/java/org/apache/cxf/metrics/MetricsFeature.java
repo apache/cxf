@@ -75,6 +75,16 @@ public class MetricsFeature extends AbstractFeature {
         delegate.doInitializeProvider(provider, bus);
     }
 
+    @Override
+    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        delegate.initialize(interceptorProvider, bus);
+    }
+
+    @Override
+    public void initialize(Bus bus) {
+        delegate.initialize(bus);
+    }
+
     @Provider(Type.Feature)
     public static class Portable implements AbstractPortableFeature {
         MetricsProvider[] providers;
