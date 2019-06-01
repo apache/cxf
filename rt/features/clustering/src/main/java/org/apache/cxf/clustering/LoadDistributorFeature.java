@@ -30,10 +30,10 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 public class LoadDistributorFeature extends FailoverFeature {
 
     public LoadDistributorFeature() {
-
+        super(new Portable());
     }
     public LoadDistributorFeature(String clientBootstrapAddress) {
-        super(clientBootstrapAddress);
+        super(new FailoverFeature.Portable(clientBootstrapAddress));
     }
 
     @Override
