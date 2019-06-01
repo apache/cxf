@@ -323,7 +323,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         return delegate.getUserProperties(userDefinedOptions);
     }
 
-    public void registerOpenApiResources(JAXRSServiceFactoryBean sfb, Set<String> packages, OpenAPIConfiguration config) {
+    public void registerOpenApiResources(JAXRSServiceFactoryBean sfb, Set<String> packages,
+                                         OpenAPIConfiguration config) {
         delegate.registerOpenApiResources(sfb, packages, config);
     }
 
@@ -331,7 +332,8 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         delegate.registerServletConfigProvider(factory);
     }
 
-    public void registerSwaggerUiResources(JAXRSServiceFactoryBean sfb, Properties properties, ServerProviderFactory factory, Bus bus) {
+    public void registerSwaggerUiResources(JAXRSServiceFactoryBean sfb, Properties properties,
+                                           ServerProviderFactory factory, Bus bus) {
         delegate.registerSwaggerUiResources(sfb, properties, factory, bus);
     }
 
