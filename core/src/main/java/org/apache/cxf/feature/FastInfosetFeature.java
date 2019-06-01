@@ -38,65 +38,76 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  */
 @NoJSR250Annotations
 public class FastInfosetFeature extends AbstractFeature {
-
-    boolean force;
-    private Integer serializerAttributeValueMapMemoryLimit;
-    private Integer serializerMinAttributeValueSize;
-    private Integer serializerMaxAttributeValueSize;
-    private Integer serializerCharacterContentChunkMapMemoryLimit;
-    private Integer serializerMinCharacterContentChunkSize;
-    private Integer serializerMaxCharacterContentChunkSize;
-
-    public FastInfosetFeature() {
-        //
-    }
-
+    private Portable delegate = new Portable();
 
     @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-
-        FIStaxInInterceptor in = new FIStaxInInterceptor();
-
-        FIStaxOutInterceptor out = new FIStaxOutInterceptor(force);
-        if (serializerAttributeValueMapMemoryLimit != null && serializerAttributeValueMapMemoryLimit.intValue() > 0) {
-            out.setSerializerAttributeValueMapMemoryLimit(serializerAttributeValueMapMemoryLimit);
-        }
-        if (serializerMinAttributeValueSize != null && serializerMinAttributeValueSize.intValue() > 0) {
-            out.setSerializerMinAttributeValueSize(serializerMinAttributeValueSize);
-        }
-        if (serializerMaxAttributeValueSize != null && serializerMaxAttributeValueSize.intValue() > 0) {
-            out.setSerializerMaxAttributeValueSize(serializerMaxAttributeValueSize);
-        }
-        if (serializerCharacterContentChunkMapMemoryLimit != null
-                && serializerCharacterContentChunkMapMemoryLimit.intValue() > 0) {
-            out.setSerializerCharacterContentChunkMapMemoryLimit(
-                    serializerCharacterContentChunkMapMemoryLimit);
-        }
-        if (serializerMinCharacterContentChunkSize != null && serializerMinCharacterContentChunkSize.intValue() > 0) {
-            out.setSerializerMinCharacterContentChunkSize(serializerMinCharacterContentChunkSize);
-        }
-        if (serializerMaxCharacterContentChunkSize != null && serializerMaxCharacterContentChunkSize.intValue() > 0) {
-            out.setSerializerMaxCharacterContentChunkSize(serializerMaxCharacterContentChunkSize);
-        }
-
-        provider.getInInterceptors().add(in);
-        provider.getInFaultInterceptors().add(in);
-        provider.getOutInterceptors().add(out);
-        provider.getOutFaultInterceptors().add(out);
+    public void initializeProvider(InterceptorProvider provider, Bus bus) {
+        delegate.doInitializeProvider(provider, bus);
     }
 
-    /**
-     * Set if FastInfoset is always used without negotiation
-     * @param b
-     */
     public void setForce(boolean b) {
-        force = b;
+        delegate.setForce(b);
     }
 
-    /**
-     * Retrieve the value set with {@link #setForce(boolean)}.
-     */
     public boolean getForce() {
-        return force;
+        return delegate.getForce();
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        boolean force;
+        private Integer serializerAttributeValueMapMemoryLimit;
+        private Integer serializerMinAttributeValueSize;
+        private Integer serializerMaxAttributeValueSize;
+        private Integer serializerCharacterContentChunkMapMemoryLimit;
+        private Integer serializerMinCharacterContentChunkSize;
+        private Integer serializerMaxCharacterContentChunkSize;
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+
+            FIStaxInInterceptor in = new FIStaxInInterceptor();
+
+            FIStaxOutInterceptor out = new FIStaxOutInterceptor(force);
+            if (serializerAttributeValueMapMemoryLimit != null && serializerAttributeValueMapMemoryLimit.intValue() > 0) {
+                out.setSerializerAttributeValueMapMemoryLimit(serializerAttributeValueMapMemoryLimit);
+            }
+            if (serializerMinAttributeValueSize != null && serializerMinAttributeValueSize.intValue() > 0) {
+                out.setSerializerMinAttributeValueSize(serializerMinAttributeValueSize);
+            }
+            if (serializerMaxAttributeValueSize != null && serializerMaxAttributeValueSize.intValue() > 0) {
+                out.setSerializerMaxAttributeValueSize(serializerMaxAttributeValueSize);
+            }
+            if (serializerCharacterContentChunkMapMemoryLimit != null
+                    && serializerCharacterContentChunkMapMemoryLimit.intValue() > 0) {
+                out.setSerializerCharacterContentChunkMapMemoryLimit(
+                        serializerCharacterContentChunkMapMemoryLimit);
+            }
+            if (serializerMinCharacterContentChunkSize != null && serializerMinCharacterContentChunkSize.intValue() > 0) {
+                out.setSerializerMinCharacterContentChunkSize(serializerMinCharacterContentChunkSize);
+            }
+            if (serializerMaxCharacterContentChunkSize != null && serializerMaxCharacterContentChunkSize.intValue() > 0) {
+                out.setSerializerMaxCharacterContentChunkSize(serializerMaxCharacterContentChunkSize);
+            }
+
+            provider.getInInterceptors().add(in);
+            provider.getInFaultInterceptors().add(in);
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(out);
+        }
+
+        /**
+         * Set if FastInfoset is always used without negotiation
+         * @param b
+         */
+        public void setForce(boolean b) {
+            force = b;
+        }
+
+        /**
+         * Retrieve the value set with {@link #setForce(boolean)}.
+         */
+        public boolean getForce() {
+            return force;
+        }
     }
 }

@@ -25,31 +25,44 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 
 public class StaxDataBindingFeature extends AbstractFeature {
-
+    private Portable delegate = new Portable();
 
     @Override
     public void initialize(Client client, Bus bus) {
-        removeDatabindingInterceptor(client.getEndpoint().getBinding().getInInterceptors());
+        delegate.initialize(client, bus);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
-        removeDatabindingInterceptor(server.getEndpoint().getBinding().getInInterceptors());
+        delegate.initialize(server, bus);
     }
 
-    private void removeDatabindingInterceptor(List<Interceptor<? extends Message>> inInterceptors) {
-        List<Interceptor<? extends Message>> remove = new LinkedList<>();
-        for (Interceptor<? extends Message> i : inInterceptors) {
-            if (i instanceof AbstractInDatabindingInterceptor) {
-                remove.add(i);
-            }
+    public static class Portable implements AbstractPortableFeature {
+        @Override
+        public void initialize(Client client, Bus bus) {
+            removeDatabindingInterceptor(client.getEndpoint().getBinding().getInInterceptors());
         }
-        inInterceptors.removeAll(remove);
-        inInterceptors.add(new StaxDataBindingInterceptor());
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            removeDatabindingInterceptor(server.getEndpoint().getBinding().getInInterceptors());
+        }
+
+        private void removeDatabindingInterceptor(List<Interceptor<? extends Message>> inInterceptors) {
+            List<Interceptor<? extends Message>> remove = new LinkedList<>();
+            for (Interceptor<? extends Message> i : inInterceptors) {
+                if (i instanceof AbstractInDatabindingInterceptor) {
+                    remove.add(i);
+                }
+            }
+            inInterceptors.removeAll(remove);
+            inInterceptors.add(new StaxDataBindingInterceptor());
+        }
     }
 }

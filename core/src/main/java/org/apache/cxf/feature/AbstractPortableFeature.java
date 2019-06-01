@@ -18,9 +18,11 @@
  */
 package org.apache.cxf.feature;
 
-import javax.xml.ws.WebServiceFeature;
+import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -32,23 +34,45 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */
-public abstract class AbstractFeature extends WebServiceFeature implements AbstractPortableFeature {
-    @Override
-    public String getID() {
-        return getClass().getName();
+public interface AbstractPortableFeature extends Feature {
+    default void initialize(Server server, Bus bus) {
+        doInitializeProvider(server.getEndpoint(), bus);
     }
 
-    @Override
-    public boolean isEnabled() {
-        return enabled;
+    default void initialize(Client client, Bus bus) {
+        doInitializeProvider(client, bus);
     }
 
-    @Override
-    public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+    default void initialize(InterceptorProvider interceptorProvider, Bus bus) {
+        doInitializeProvider(interceptorProvider, bus);
+    }
+
+    default void initialize(Bus bus) {
+        doInitializeProvider(bus, bus);
+    }
+
+    default void doInitializeProvider(InterceptorProvider provider, Bus bus) {
         // no-op
     }
 
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        doInitializeProvider(provider, bus);
+    /**
+     * Convenience method to extract a feature by type from an active list.
+     *
+     * @param features the given feature list
+     * @param type the feature type required
+     * @return the feature of the specified type if active
+     */
+    static <T> T getActive(List<? extends Feature> features,
+                                  Class<T> type) {
+        T active = null;
+        if (features != null) {
+            for (Feature feature : features) {
+                if (type.isInstance(feature)) {
+                    active = type.cast(feature);
+                    break;
+                }
+            }
+        }
+        return active;
     }
 }

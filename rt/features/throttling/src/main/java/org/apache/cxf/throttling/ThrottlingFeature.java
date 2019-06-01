@@ -21,35 +21,53 @@ package org.apache.cxf.throttling;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
  *
  */
 public class ThrottlingFeature extends AbstractFeature {
-    final ThrottlingManager manager;
+    private final Portable delegate;
 
     public ThrottlingFeature() {
-        manager = null;
+        delegate = new Portable();
     }
 
     public ThrottlingFeature(ThrottlingManager manager) {
-        this.manager = manager;
+        delegate = new Portable(manager);
     }
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        ThrottlingManager m = manager;
-        if (m == null) {
-            m = bus.getExtension(ThrottlingManager.class);
+        delegate.doInitializeProvider(provider, bus);
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        final ThrottlingManager manager;
+
+        public Portable() {
+            manager = null;
         }
-        if (m == null) {
-            throw new IllegalArgumentException("ThrottlingManager must not be null");
+
+        public Portable(ThrottlingManager manager) {
+            this.manager = manager;
         }
-        for (String p : m.getDecisionPhases()) {
-            provider.getInInterceptors().add(new ThrottlingInterceptor(p, m));
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            ThrottlingManager m = manager;
+            if (m == null) {
+                m = bus.getExtension(ThrottlingManager.class);
+            }
+            if (m == null) {
+                throw new IllegalArgumentException("ThrottlingManager must not be null");
+            }
+            for (String p : m.getDecisionPhases()) {
+                provider.getInInterceptors().add(new ThrottlingInterceptor(p, m));
+            }
+            provider.getOutInterceptors().add(new ThrottlingResponseInterceptor());
+            provider.getOutFaultInterceptors().add(new ThrottlingResponseInterceptor());
         }
-        provider.getOutInterceptors().add(new ThrottlingResponseInterceptor());
-        provider.getOutFaultInterceptors().add(new ThrottlingResponseInterceptor());
     }
 }

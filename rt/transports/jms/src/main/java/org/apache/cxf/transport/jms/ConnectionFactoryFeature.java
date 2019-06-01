@@ -25,6 +25,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
@@ -40,43 +41,66 @@ import org.apache.cxf.transport.Destination;
  */
 @NoJSR250Annotations
 public class ConnectionFactoryFeature extends AbstractFeature {
-    private ConnectionFactory connectionFactory;
+    private Portable delegate;
 
     public ConnectionFactoryFeature(ConnectionFactory cf) {
-        this.connectionFactory = cf;
+        delegate = new Portable(cf);
     }
 
     @Override
     public void initialize(Client client, Bus bus) {
-        client.getEndpoint().getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
-        super.initialize(client, bus);
+        delegate.initialize(client, bus);
     }
+
     @Override
     public void initialize(InterceptorProvider provider, Bus bus) {
-        provider.getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
-        super.initialize(provider, bus);
+        delegate.initialize(provider, bus);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
-        Destination destination = server.getDestination();
-        if (destination instanceof JMSDestination) {
-            JMSDestination jmsDestination = (JMSDestination)destination;
-            jmsDestination.getJmsConfig().setConnectionFactory(connectionFactory);
-        }
-        super.initialize(server, bus);
+        delegate.initialize(server, bus);
     }
-    private class JMSConduitConfigOutInterceptor extends AbstractPhaseInterceptor<Message> {
-        JMSConduitConfigOutInterceptor() {
-            super(Phase.PREPARE_SEND);
+
+    public static class Portable implements AbstractPortableFeature {
+        private ConnectionFactory connectionFactory;
+
+        public Portable(ConnectionFactory cf) {
+            this.connectionFactory = cf;
         }
 
         @Override
-        public void handleMessage(Message message) throws Fault {
-            Conduit conduit = message.getExchange().getConduit(message);
-            if (conduit instanceof JMSConduit) {
-                JMSConduit jmsConduit = (JMSConduit)conduit;
-                jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
+        public void initialize(Client client, Bus bus) {
+            client.getEndpoint().getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
+            initialize(client, bus);
+        }
+        @Override
+        public void initialize(InterceptorProvider provider, Bus bus) {
+            provider.getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
+            initialize(provider, bus);
+        }
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            Destination destination = server.getDestination();
+            if (destination instanceof JMSDestination) {
+                JMSDestination jmsDestination = (JMSDestination)destination;
+                jmsDestination.getJmsConfig().setConnectionFactory(connectionFactory);
+            }
+            initialize(server, bus);
+        }
+        private class JMSConduitConfigOutInterceptor extends AbstractPhaseInterceptor<Message> {
+            JMSConduitConfigOutInterceptor() {
+                super(Phase.PREPARE_SEND);
+            }
+
+            @Override
+            public void handleMessage(Message message) throws Fault {
+                Conduit conduit = message.getExchange().getConduit(message);
+                if (conduit instanceof JMSConduit) {
+                    JMSConduit jmsConduit = (JMSConduit)conduit;
+                    jmsConduit.getJmsConfig().setConnectionFactory(connectionFactory);
+                }
             }
         }
     }

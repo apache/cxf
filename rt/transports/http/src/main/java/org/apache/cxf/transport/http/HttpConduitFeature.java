@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.transport.Conduit;
 
 /**
@@ -28,18 +29,30 @@ import org.apache.cxf.transport.Conduit;
  * intent.
  */
 public class HttpConduitFeature extends AbstractFeature {
-    private HttpConduitConfig conduitConfig;
+    private Portable delegate = new Portable();
 
     @Override
     public void initialize(Client client, Bus bus) {
-        Conduit conduit = client.getConduit();
-        if (conduitConfig != null && conduit instanceof HTTPConduit) {
-            conduitConfig.apply((HTTPConduit)conduit);
-        }
+        delegate.initialize(client, bus);
     }
 
     public void setConduitConfig(HttpConduitConfig conduitConfig) {
-        this.conduitConfig = conduitConfig;
+        delegate.setConduitConfig(conduitConfig);
     }
 
+    public static class Portable implements AbstractPortableFeature {
+        private HttpConduitConfig conduitConfig;
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            Conduit conduit = client.getConduit();
+            if (conduitConfig != null && conduit instanceof HTTPConduit) {
+                conduitConfig.apply((HTTPConduit)conduit);
+            }
+        }
+
+        public void setConduitConfig(HttpConduitConfig conduitConfig) {
+            this.conduitConfig = conduitConfig;
+        }
+    }
 }

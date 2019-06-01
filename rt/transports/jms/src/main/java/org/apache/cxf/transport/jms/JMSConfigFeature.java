@@ -28,6 +28,7 @@ import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 
@@ -38,45 +39,65 @@ import org.apache.cxf.transport.Destination;
  */
 @NoJSR250Annotations
 public class JMSConfigFeature extends AbstractFeature {
-    static final Logger LOG = LogUtils.getL7dLogger(JMSConfigFeature.class);
-
-    JMSConfiguration jmsConfig;
+    private Portable portable = new Portable();
 
     @Override
     public void initialize(Client client, Bus bus) {
-        checkJmsConfig();
-        Conduit conduit = client.getConduit();
-        if (!(conduit instanceof JMSConduit)) {
-            throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
-        }
-        JMSConduit jmsConduit = (JMSConduit)conduit;
-        jmsConduit.setJmsConfig(jmsConfig);
-        super.initialize(client, bus);
+        portable.initialize(client, bus);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
-        checkJmsConfig();
-        Destination destination = server.getDestination();
-        if (!(destination instanceof JMSDestination)) {
-            throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
-        }
-        JMSDestination jmsDestination = (JMSDestination)destination;
-        jmsDestination.setJmsConfig(jmsConfig);
-        super.initialize(server, bus);
+        portable.initialize(server, bus);
     }
 
     public JMSConfiguration getJmsConfig() {
-        return jmsConfig;
+        return portable.getJmsConfig();
     }
 
     public void setJmsConfig(JMSConfiguration jmsConfig) {
-        this.jmsConfig = jmsConfig;
+        portable.setJmsConfig(jmsConfig);
     }
 
-    private void checkJmsConfig() {
-        if (jmsConfig == null) {
-            throw new ConfigurationException(new Message("JMSCONFIG_REQUIRED", LOG));
+    public static class Portable implements AbstractPortableFeature {
+        static final Logger LOG = LogUtils.getL7dLogger(JMSConfigFeature.class);
+
+        JMSConfiguration jmsConfig;
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            checkJmsConfig();
+            Conduit conduit = client.getConduit();
+            if (!(conduit instanceof JMSConduit)) {
+                throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
+            }
+            JMSConduit jmsConduit = (JMSConduit)conduit;
+            jmsConduit.setJmsConfig(jmsConfig);
+        }
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            checkJmsConfig();
+            Destination destination = server.getDestination();
+            if (!(destination instanceof JMSDestination)) {
+                throw new ConfigurationException(new Message("JMSCONFIGFEATURE_ONLY_JMS", LOG));
+            }
+            JMSDestination jmsDestination = (JMSDestination)destination;
+            jmsDestination.setJmsConfig(jmsConfig);
+        }
+
+        public JMSConfiguration getJmsConfig() {
+            return jmsConfig;
+        }
+
+        public void setJmsConfig(JMSConfiguration jmsConfig) {
+            this.jmsConfig = jmsConfig;
+        }
+
+        private void checkJmsConfig() {
+            if (jmsConfig == null) {
+                throw new ConfigurationException(new Message("JMSCONFIG_REQUIRED", LOG));
+            }
         }
     }
 }

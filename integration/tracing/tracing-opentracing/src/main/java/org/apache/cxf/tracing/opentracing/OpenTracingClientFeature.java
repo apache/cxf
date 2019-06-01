@@ -24,6 +24,7 @@ import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 import io.opentracing.Tracer;
@@ -31,17 +32,31 @@ import io.opentracing.Tracer;
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Client)
 public class OpenTracingClientFeature extends AbstractFeature {
-    private OpenTracingClientStartInterceptor out;
-    private OpenTracingClientStopInterceptor in;
-    
+    private Portable delegate;
+
     public OpenTracingClientFeature(Tracer tracer) {
-        out = new OpenTracingClientStartInterceptor(tracer);
-        in = new OpenTracingClientStopInterceptor(tracer);
+        this.delegate = new Portable(tracer);
     }
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(in);
-        provider.getOutInterceptors().add(out);
+        delegate.doInitializeProvider(provider, bus);
+    }
+
+    @Provider(value = Type.Feature, scope = Scope.Client)
+    public static class Portable implements AbstractPortableFeature {
+        private OpenTracingClientStartInterceptor out;
+        private OpenTracingClientStopInterceptor in;
+
+        public Portable(Tracer tracer) {
+            out = new OpenTracingClientStartInterceptor(tracer);
+            in = new OpenTracingClientStopInterceptor(tracer);
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(in);
+            provider.getOutInterceptors().add(out);
+        }
     }
 }

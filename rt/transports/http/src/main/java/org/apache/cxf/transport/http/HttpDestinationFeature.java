@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.transport.Destination;
 
 /**
@@ -28,17 +29,30 @@ import org.apache.cxf.transport.Destination;
  * intent.
  */
 public class HttpDestinationFeature extends AbstractFeature {
-    private HttpDestinationConfig destinationConfig;
+    private Portable delegate = new Portable();
 
     @Override
     public void initialize(Server server, Bus bus) {
-        Destination destination = server.getDestination();
-        if (destinationConfig != null && destination instanceof AbstractHTTPDestination) {
-            destinationConfig.apply((AbstractHTTPDestination)destination);
-        }
+        delegate.initialize(server, bus);
     }
 
     public void setDestinationConfig(HttpDestinationConfig destinationConfig) {
-        this.destinationConfig = destinationConfig;
+        delegate.setDestinationConfig(destinationConfig);
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        private HttpDestinationConfig destinationConfig;
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            Destination destination = server.getDestination();
+            if (destinationConfig != null && destination instanceof AbstractHTTPDestination) {
+                destinationConfig.apply((AbstractHTTPDestination)destination);
+            }
+        }
+
+        public void setDestinationConfig(HttpDestinationConfig destinationConfig) {
+            this.destinationConfig = destinationConfig;
+        }
     }
 }

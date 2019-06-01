@@ -26,22 +26,36 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 public class ColocFeature extends AbstractFeature {
+    private final Portable delegate = new Portable();
 
     @Override
     public void initialize(Client client, Bus bus) {
-        ConduitSelector selector = new DeferredConduitSelector();
-        selector.setEndpoint(client.getEndpoint());
-        client.setConduitSelector(selector);
-        initializeProvider(client, bus);
+        delegate.initialize(client, bus);
     }
 
     @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(new ColocInInterceptor());
-        provider.getOutInterceptors().add(new ColocOutInterceptor(bus));
+    public void initializeProvider(InterceptorProvider provider, Bus bus) {
+        delegate.doInitializeProvider(provider, bus);
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        @Override
+        public void initialize(Client client, Bus bus) {
+            ConduitSelector selector = new DeferredConduitSelector();
+            selector.setEndpoint(client.getEndpoint());
+            client.setConduitSelector(selector);
+            doInitializeProvider(client, bus);
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(new ColocInInterceptor());
+            provider.getOutInterceptors().add(new ColocOutInterceptor(bus));
+        }
     }
 }

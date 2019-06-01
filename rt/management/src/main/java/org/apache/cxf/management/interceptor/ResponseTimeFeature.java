@@ -21,24 +21,32 @@ package org.apache.cxf.management.interceptor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 public class ResponseTimeFeature extends AbstractFeature {
-    private static final ResponseTimeMessageInInterceptor IN =
-        new ResponseTimeMessageInInterceptor();
-    private static final ResponseTimeMessageInvokerInterceptor INVOKER =
-        new ResponseTimeMessageInvokerInterceptor();
-    private static final ResponseTimeMessageOutInterceptor OUT =
-        new ResponseTimeMessageOutInterceptor();
+    private final Portable delegate = new Portable();
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(IN);
-        provider.getInFaultInterceptors().add(IN);
-        provider.getInInterceptors().add(INVOKER);
-        provider.getOutInterceptors().add(OUT);
-
+        delegate.doInitializeProvider(provider, bus);
     }
 
+    public static class Portable implements AbstractPortableFeature {
+        private static final ResponseTimeMessageInInterceptor IN =
+                new ResponseTimeMessageInInterceptor();
+        private static final ResponseTimeMessageInvokerInterceptor INVOKER =
+                new ResponseTimeMessageInvokerInterceptor();
+        private static final ResponseTimeMessageOutInterceptor OUT =
+                new ResponseTimeMessageOutInterceptor();
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(IN);
+            provider.getInFaultInterceptors().add(IN);
+            provider.getInInterceptors().add(INVOKER);
+            provider.getOutInterceptors().add(OUT);
+        }
+    }
 }

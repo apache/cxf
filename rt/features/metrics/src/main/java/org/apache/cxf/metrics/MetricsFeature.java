@@ -32,6 +32,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.metrics.interceptors.CountingOutInterceptor;
 import org.apache.cxf.metrics.interceptors.MetricsMessageClientOutInterceptor;
@@ -47,91 +48,122 @@ import org.apache.cxf.metrics.interceptors.MetricsMessageOutInterceptor;
 @NoJSR250Annotations
 @Provider(Type.Feature)
 public class MetricsFeature extends AbstractFeature {
-    MetricsProvider[] providers;
+    private Portable delegate;
 
     public MetricsFeature() {
-        this.providers = null;
+        delegate = new Portable();
     }
     public MetricsFeature(MetricsProvider provider) {
-        this.providers = new MetricsProvider[] {provider};
+        delegate = new Portable(provider);
     }
     public MetricsFeature(MetricsProvider ... providers) {
-        this.providers = providers.length > 0 ? providers : null;
+        delegate = new Portable(providers);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
-        createDefaultProvidersIfNeeded(bus);
-        //can optimize for server case and just put interceptors it needs
-        Endpoint provider = server.getEndpoint();
-        MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
-        CountingOutInterceptor countingOut = new CountingOutInterceptor();
-
-        provider.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
-        provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor(providers));
-        provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
-
-        provider.getOutInterceptors().add(countingOut);
-        provider.getOutInterceptors().add(out);
-        provider.getOutFaultInterceptors().add(countingOut);
-        provider.getOutFaultInterceptors().add(out);
+        delegate.initialize(server, bus);
     }
 
     @Override
     public void initialize(Client client, Bus bus) {
-        createDefaultProvidersIfNeeded(bus);
-        //can optimize for client case and just put interceptors it needs
-        MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
-        CountingOutInterceptor countingOut = new CountingOutInterceptor();
-
-        client.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
-        client.getInInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
-        client.getInFaultInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
-        client.getOutInterceptors().add(countingOut);
-        client.getOutInterceptors().add(out);
-        client.getOutInterceptors().add(new MetricsMessageClientOutInterceptor(providers));
+        delegate.initialize(client, bus);
     }
-
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        createDefaultProvidersIfNeeded(bus);
-        //if feature is added to the bus, we need to add all the interceptors
-        MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
-        CountingOutInterceptor countingOut = new CountingOutInterceptor();
-
-        provider.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
-        provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor(providers));
-        provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
-        provider.getInInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
-        provider.getInFaultInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
-        provider.getInFaultInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
-
-        provider.getOutInterceptors().add(countingOut);
-        provider.getOutInterceptors().add(out);
-        provider.getOutInterceptors().add(new MetricsMessageClientOutInterceptor(providers));
-        provider.getOutFaultInterceptors().add(countingOut);
-        provider.getOutFaultInterceptors().add(out);
+        delegate.doInitializeProvider(provider, bus);
     }
-    private void createDefaultProvidersIfNeeded(Bus bus) {
-        if (providers == null) {
-            ConfiguredBeanLocator b = bus.getExtension(ConfiguredBeanLocator.class);
-            if (b != null) {
-                Collection<?> coll = b.getBeansOfType(MetricsProvider.class);
-                if (coll != null) {
-                    providers = coll.toArray(new MetricsProvider[]{});
+
+    @Provider(Type.Feature)
+    public static class Portable implements AbstractPortableFeature {
+        MetricsProvider[] providers;
+
+        public Portable() {
+            this.providers = null;
+        }
+        public Portable(MetricsProvider provider) {
+            this.providers = new MetricsProvider[] {provider};
+        }
+        public Portable(MetricsProvider ... providers) {
+            this.providers = providers.length > 0 ? providers : null;
+        }
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            createDefaultProvidersIfNeeded(bus);
+            //can optimize for server case and just put interceptors it needs
+            Endpoint provider = server.getEndpoint();
+            MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
+            CountingOutInterceptor countingOut = new CountingOutInterceptor();
+
+            provider.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
+            provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor(providers));
+            provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
+
+            provider.getOutInterceptors().add(countingOut);
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(countingOut);
+            provider.getOutFaultInterceptors().add(out);
+        }
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            createDefaultProvidersIfNeeded(bus);
+            //can optimize for client case and just put interceptors it needs
+            MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
+            CountingOutInterceptor countingOut = new CountingOutInterceptor();
+
+            client.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
+            client.getInInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
+            client.getInFaultInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
+            client.getOutInterceptors().add(countingOut);
+            client.getOutInterceptors().add(out);
+            client.getOutInterceptors().add(new MetricsMessageClientOutInterceptor(providers));
+        }
+
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            createDefaultProvidersIfNeeded(bus);
+            //if feature is added to the bus, we need to add all the interceptors
+            MetricsMessageOutInterceptor out = new MetricsMessageOutInterceptor(providers);
+            CountingOutInterceptor countingOut = new CountingOutInterceptor();
+
+            provider.getInInterceptors().add(new MetricsMessageInInterceptor(providers));
+            provider.getInInterceptors().add(new MetricsMessageInOneWayInterceptor(providers));
+            provider.getInInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
+            provider.getInInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
+            provider.getInFaultInterceptors().add(new MetricsMessageInPreInvokeInterceptor(providers));
+            provider.getInFaultInterceptors().add(new MetricsMessageInPostInvokeInterceptor(providers));
+
+            provider.getOutInterceptors().add(countingOut);
+            provider.getOutInterceptors().add(out);
+            provider.getOutInterceptors().add(new MetricsMessageClientOutInterceptor(providers));
+            provider.getOutFaultInterceptors().add(countingOut);
+            provider.getOutFaultInterceptors().add(out);
+        }
+        private void createDefaultProvidersIfNeeded(Bus bus) {
+            if (providers == null) {
+                ConfiguredBeanLocator b = bus.getExtension(ConfiguredBeanLocator.class);
+                if (b != null) {
+                    Collection<?> coll = b.getBeansOfType(MetricsProvider.class);
+                    if (coll != null) {
+                        providers = coll.toArray(new MetricsProvider[]{});
+                    }
+                }
+            }
+            if (providers == null) {
+                try {
+                    Class<?> cls = ClassLoaderUtils.loadClass("org.apache.cxf.metrics.codahale.CodahaleMetricsProvider",
+                            org.apache.cxf.metrics.MetricsFeature.class);
+                    Constructor<?> c = cls.getConstructor(Bus.class);
+                    providers = new MetricsProvider[] {(MetricsProvider)c.newInstance(bus)};
+                } catch (Throwable t) {
+                    // ignore;
                 }
             }
         }
-        if (providers == null) {
-            try {
-                Class<?> cls = ClassLoaderUtils.loadClass("org.apache.cxf.metrics.codahale.CodahaleMetricsProvider",
-                                                        MetricsFeature.class);
-                Constructor<?> c = cls.getConstructor(Bus.class);
-                providers = new MetricsProvider[] {(MetricsProvider)c.newInstance(bus)};
-            } catch (Throwable t) {
-                // ignore;
-            }
-        }
     }
+
 }
