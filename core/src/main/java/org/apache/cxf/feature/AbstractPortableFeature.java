@@ -62,8 +62,7 @@ public interface AbstractPortableFeature extends Feature {
      * @param type the feature type required
      * @return the feature of the specified type if active
      */
-    static <T> T getActive(List<? extends Feature> features,
-                                  Class<T> type) {
+    static <T> T getActive(List<? extends Feature> features, Class<T> type) {
         T active = null;
         if (features != null) {
             for (Feature feature : features) {

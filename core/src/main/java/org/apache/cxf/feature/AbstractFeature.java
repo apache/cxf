@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.feature;
 
+import java.util.List;
+
 import javax.xml.ws.WebServiceFeature;
 
 import org.apache.cxf.Bus;
@@ -50,5 +52,9 @@ public abstract class AbstractFeature extends WebServiceFeature implements Abstr
 
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         // no-op
+    }
+
+    public static <T> T getActive(List<? extends Feature> features, Class<T> type) {
+        return AbstractPortableFeature.getActive(features, type);
     }
 }
