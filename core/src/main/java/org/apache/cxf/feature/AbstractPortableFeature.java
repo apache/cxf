@@ -26,8 +26,9 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
- * A Feature is something that is able to customize a Server, Client, or Bus, typically
- * adding capabilities. For instance, there may be a LoggingFeature which configures
+ * A portable - i.e. for jaxws and jaxrs - Feature is something that is able to customize
+ * a Server, Client, or Bus, typically adding capabilities.
+ * For instance, there may be a LoggingFeature which configures
  * one of the above to log each of their messages.
  * <p>
  * By default the initialize methods all delegate to doInitializeProvider(InterceptorProvider).
