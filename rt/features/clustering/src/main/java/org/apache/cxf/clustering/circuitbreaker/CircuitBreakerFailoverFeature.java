@@ -26,6 +26,7 @@ import org.apache.cxf.clustering.FailoverTargetSelector;
 
 public class CircuitBreakerFailoverFeature extends FailoverFeature {
     private Portable config;
+
     public CircuitBreakerFailoverFeature() {
         this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
                 CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);

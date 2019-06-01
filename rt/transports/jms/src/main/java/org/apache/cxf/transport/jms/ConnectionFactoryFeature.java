@@ -77,12 +77,10 @@ public class ConnectionFactoryFeature extends AbstractFeature {
         @Override
         public void initialize(Client client, Bus bus) {
             client.getEndpoint().getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
-            initialize(client, bus);
         }
         @Override
         public void initialize(InterceptorProvider provider, Bus bus) {
             provider.getOutInterceptors().add(new JMSConduitConfigOutInterceptor());
-            initialize(provider, bus);
         }
 
         @Override
@@ -92,7 +90,6 @@ public class ConnectionFactoryFeature extends AbstractFeature {
                 JMSDestination jmsDestination = (JMSDestination)destination;
                 jmsDestination.getJmsConfig().setConnectionFactory(connectionFactory);
             }
-            initialize(server, bus);
         }
         private class JMSConduitConfigOutInterceptor extends AbstractPhaseInterceptor<Message> {
             JMSConduitConfigOutInterceptor() {
