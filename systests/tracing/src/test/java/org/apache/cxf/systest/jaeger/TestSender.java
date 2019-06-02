@@ -20,6 +20,7 @@ package org.apache.cxf.systest.jaeger;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import io.jaegertracing.internal.JaegerSpan;
 import io.jaegertracing.internal.exceptions.SenderException;
@@ -29,9 +30,14 @@ public class TestSender implements Sender {
 
     private static final List<JaegerSpan> SPANS = new CopyOnWriteArrayList<>();
 
+    private static CountDownLatch SYNCHRO;
+
     @Override
     public int append(JaegerSpan span) throws SenderException {
         SPANS.add(span);
+        if (SYNCHRO != null) {
+            SYNCHRO.countDown();
+        }
         return 0;
     }
 
@@ -51,5 +57,9 @@ public class TestSender implements Sender {
 
     public static void clear() {
         SPANS.clear();
+    }
+
+    public static void setSynchro(CountDownLatch synchro) {
+        SYNCHRO = synchro;
     }
 }
