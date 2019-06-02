@@ -30,13 +30,13 @@ public class TestSender implements Sender {
 
     private static final List<JaegerSpan> SPANS = new CopyOnWriteArrayList<>();
 
-    private static CountDownLatch SYNCHRO;
+    private static CountDownLatch synchro;
 
     @Override
     public int append(JaegerSpan span) throws SenderException {
         SPANS.add(span);
-        if (SYNCHRO != null) {
-            SYNCHRO.countDown();
+        if (synchro != null) {
+            synchro.countDown();
         }
         return 0;
     }
@@ -59,7 +59,7 @@ public class TestSender implements Sender {
         SPANS.clear();
     }
 
-    public static void setSynchro(CountDownLatch synchro) {
-        SYNCHRO = synchro;
+    public static void setSynchro(CountDownLatch newSynchro) {
+        synchro = newSynchro;
     }
 }
