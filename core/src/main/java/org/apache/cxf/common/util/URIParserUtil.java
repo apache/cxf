@@ -147,8 +147,8 @@ public final class URIParserUtil {
      * doing but is not actually doing when URI roots do not fully match.
      * See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6226081
      *
-     * @param base              The base URI
-     * @param toBeRelativized   The URI to be realivized
+     * @param baseURI              The base URI
+     * @param toBeRelativizedURI   The URI to be relativized
      * @return                  The string value of the URI you'd expect to get as result
      *                          of calling baseURI.relativize(toBeRelativizedURI).
      *                          null is returned if the parameters are null or are not

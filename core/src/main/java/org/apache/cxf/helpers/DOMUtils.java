@@ -215,7 +215,7 @@ public final class DOMUtils {
      * Returns a static Document that should always be "empty".  It's useful as a factory for
      * for creating Elements and other nodes that will be traversed later and don't need to
      * be attached into a document
-     * @return
+     * @return an empty document
      */
     public static Document getEmptyDocument() {
         Document doc = emptyDocument;
@@ -784,7 +784,7 @@ public final class DOMUtils {
 
     /**
      * Try to get the DOM DocumentFragment from the SAAJ DocumentFragment with JAVA9 afterwards
-     * @param DocumentFragment The original documentFragment we need check
+     * @param fragment The original documentFragment we need to check
      * @return The DOM DocumentFragment
      */
     public static DocumentFragment getDomDocumentFragment(DocumentFragment fragment) {
