@@ -31,15 +31,14 @@
     <description>Apache CXF JAX-RS System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.el.api.version>3.0-b02</cxf.el.api.version>
-        <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
+        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
         <cxf.module.name>org.apache.cxf.systests.jaxrs</cxf.module.name>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
+            <version>${cxf.javassist.version}</version>
         </dependency>        
         <dependency>
             <groupId>javax.validation</groupId>
@@ -73,11 +72,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-            <version>${cxf.el.api.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
             <version>${cxf.glassfish.el.version}</version>
@@ -97,7 +91,7 @@
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint.noosgi</artifactId>
-            <version>1.1.2</version>
+            <version>1.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -352,7 +346,7 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
+            <version>${cxf.jsr250.api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -383,13 +377,13 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.9.1</version>
+            <version>${cxf.aspectj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.1</version>
+            <version>${cxf.aspectj.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

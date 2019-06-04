@@ -32,8 +32,7 @@
     <description>Apache CXF CDI Integration System Tests</description>
     <url>https://cxf.apache.org</url>
     <properties>
-        <cxf.el.api.version>3.0-b02</cxf.el.api.version>
-        <cxf.glassfish.el.version>3.0-b01</cxf.glassfish.el.version>
+        <cxf.glassfish.el.version>3.0.1-b11</cxf.glassfish.el.version>
         <cxf.openwebbeans.version>2.0.8</cxf.openwebbeans.version>
     </properties>
     <modules>
@@ -47,11 +46,6 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${cxf.hibernate.validator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>${cxf.el.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -108,7 +102,7 @@
             <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>jsr250-api</artifactId>
-                <version>1.0</version>
+                <version>${cxf.jsr250.api.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

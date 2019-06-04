@@ -32,7 +32,6 @@
     <url>https://cxf.apache.org</url>
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.async</cxf.module.name>
-        <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
         <cxf.wiremock.params>--port=8765</cxf.wiremock.params>
     </properties>
         <dependencies>

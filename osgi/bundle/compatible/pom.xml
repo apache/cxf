@@ -169,7 +169,6 @@
                             org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
                             org.apache.mina*;resolution:=optional,
-                            org.apache.tuscany.sdo*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xml.security*;resolution:=optional,
                             org.apache.ws.security*;resolution:=optional,

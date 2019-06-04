@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>codegen-it-parent</artifactId>
-    <version>1-SNAPSHOT</version>
+    <version>3.3.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <cxf.version>@project.version@</cxf.version>

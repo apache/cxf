@@ -90,7 +90,7 @@
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
-            <version>3.0.0</version>
+            <version>${cxf.javax.el.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

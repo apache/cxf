@@ -112,9 +112,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.hibernate-validator</artifactId>
-            <version>5.4.2.Final_1</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${cxf.hibernate.validator.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-atinject_1.0_spec</artifactId>
-            <version>1.0</version>
+            <version>${cxf.geronimo.inject.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

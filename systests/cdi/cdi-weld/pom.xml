@@ -26,7 +26,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-systests-cdi-weld</artifactId>
-	<packaging>pom</packaging>
+    <packaging>pom</packaging>
     <name>Apache CXF CDI Integration System Tests - Weld</name>
     <description>Apache CXF CDI Integration System Tests - Weld</description>
     <url>https://cxf.apache.org</url>
@@ -55,10 +55,6 @@
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core</artifactId>
             <version>${cxf.jboss.weld.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>

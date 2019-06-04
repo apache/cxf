@@ -32,7 +32,6 @@
     <url>https://cxf.apache.org</url>
     <properties>
         <cxf.module.name>org.apache.cxf.systests.microprofile.jaxrs</cxf.module.name>
-        <cxf.geronimo.config.version>1.0</cxf.geronimo.config.version>
     </properties>
         <dependencies>
             <dependency>
@@ -137,7 +136,7 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
+            <version>${cxf.jsr250.api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
