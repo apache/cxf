@@ -117,6 +117,12 @@
                 <artifactId>wiremock</artifactId>
                 <version>${cxf.wiremock.version}</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.xmlunit</groupId>
+                        <artifactId>xmlunit-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
 </project>
