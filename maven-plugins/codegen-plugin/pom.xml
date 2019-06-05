@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
-            <version>4.1.0</version>
+            <version>${cxf.plexus-archiver.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
