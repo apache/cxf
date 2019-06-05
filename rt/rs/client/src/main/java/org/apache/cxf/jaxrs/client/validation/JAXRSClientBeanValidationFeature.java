@@ -27,14 +27,8 @@ import org.apache.cxf.validation.ClientBeanValidationFeature;
 
 @Provider(value = Type.Feature, scope = Scope.Client)
 public class JAXRSClientBeanValidationFeature extends ClientBeanValidationFeature {
-    @Override
-    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
-        super.initializeProvider(interceptorProvider, bus);
-    }
-
-    @Override
-    protected ClientBeanValidationFeature.Portable getDelegate() {
-        return new Portable();
+    public JAXRSClientBeanValidationFeature() {
+        super(new Portable());
     }
 
     public void setWrapInProcessingException(boolean wrapInProcessingException) {

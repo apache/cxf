@@ -27,17 +27,13 @@ import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class BraveFeature extends AbstractFeature {
-    private Portable delegate;
-
+public class BraveFeature extends DelegatingFeature<BraveFeature.Portable> {
     public BraveFeature() {
         this("cxf-svc-" + UUID.randomUUID().toString());
     }
@@ -51,32 +47,7 @@ public class BraveFeature extends AbstractFeature {
     }
 
     public BraveFeature(HttpTracing brave) {
-        delegate = new Portable(brave);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+        super(new Portable(brave));
     }
 
     @Provider(value = Type.Feature, scope = Scope.Server)

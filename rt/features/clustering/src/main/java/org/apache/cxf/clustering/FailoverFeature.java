@@ -28,9 +28,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.ConduitSelectorHolder;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -41,42 +40,15 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 @NoJSR250Annotations
 @EvaluateAllEndpoints
 @Provider(value = Type.Feature, scope = Scope.Client)
-public class FailoverFeature extends AbstractFeature {
-    protected Portable delegate;
-
+public class FailoverFeature extends DelegatingFeature<FailoverFeature.Portable> {
     protected FailoverFeature(Portable portable) {
-        delegate = portable;
+        super(portable);
     }
     public FailoverFeature() {
-        delegate = new Portable();
+        super(new Portable());
     }
     public FailoverFeature(String clientBootstrapAddress) {
-        delegate = new Portable(clientBootstrapAddress);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
+        super(new Portable(clientBootstrapAddress));
     }
 
     public ConduitSelector initTargetSelector(Endpoint endpoint) {

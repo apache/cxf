@@ -23,8 +23,6 @@ import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -51,37 +49,30 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 @NoJSR250Annotations
 @Deprecated
 @Provider(value = Type.Feature)
-public class LoggingFeature extends AbstractFeature {
-    private Portable delegate;
-
+public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
     public LoggingFeature() {
-        delegate = new Portable();
+        super(new Portable());
     }
     public LoggingFeature(int lim) {
-        delegate = new Portable(lim);
+        super(new Portable(lim));
     }
     public LoggingFeature(String in, String out) {
-        delegate = new Portable(in, out);
+        super(new Portable(in, out));
     }
     public LoggingFeature(String in, String out, int lim) {
-        delegate = new Portable(in, out, lim);
+        super(new Portable(in, out, lim));
     }
 
     public LoggingFeature(String in, String out, int lim, boolean p) {
-        delegate = new Portable(in, out, lim, p);
+        super(new Portable(in, out, lim, p));
     }
 
     public LoggingFeature(String in, String out, int lim, boolean p, boolean showBinary) {
-        delegate = new Portable(in, out, lim, p, showBinary);
+        super(new Portable(in, out, lim, p, showBinary));
     }
 
     public LoggingFeature(Logging annotation) {
-        delegate = new Portable(annotation);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
+        super(new Portable(annotation));
     }
 
     public void setLimit(int lim) {
@@ -98,26 +89,6 @@ public class LoggingFeature extends AbstractFeature {
 
     public void setPrettyLogging(boolean prettyLogging) {
         delegate.setPrettyLogging(prettyLogging);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
     }
 
     @Provider(Type.Feature)

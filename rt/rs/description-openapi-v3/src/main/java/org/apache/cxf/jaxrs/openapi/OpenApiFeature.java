@@ -37,11 +37,9 @@ import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
-import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.common.openapi.DefaultApplicationFactory;
 import org.apache.cxf.jaxrs.common.openapi.SwaggerProperties;
@@ -64,27 +62,11 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport, SwaggerProperties {
-    private Portable delegate = new Portable();
+public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
+        implements SwaggerUiSupport, SwaggerProperties {
 
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+    public OpenApiFeature() {
+        super(new Portable());
     }
 
     public boolean isScan() {

@@ -19,38 +19,18 @@
 package org.apache.cxf.transport.http;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
-import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.transport.Destination;
 
 /**
  * Programmatically configure a http destination. This can also be used as a DOSGi
  * intent.
  */
-public class HttpDestinationFeature extends AbstractFeature {
-    private Portable delegate = new Portable();
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+public class HttpDestinationFeature extends DelegatingFeature<HttpDestinationFeature.Portable> {
+    public HttpDestinationFeature() {
+        super(new Portable());
     }
 
     public void setDestinationConfig(HttpDestinationConfig destinationConfig) {

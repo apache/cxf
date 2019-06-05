@@ -20,8 +20,6 @@ package org.apache.cxf.feature;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -39,32 +37,9 @@ import org.apache.cxf.interceptor.InterceptorProvider;
   </pre>
  */
 @NoJSR250Annotations
-public class FastInfosetFeature extends AbstractFeature {
-    private Portable delegate = new Portable();
-
-    @Override
-    public void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+public class FastInfosetFeature extends DelegatingFeature<FastInfosetFeature.Portable> {
+    public FastInfosetFeature() {
+        super(new Portable());
     }
 
     public void setForce(boolean b) {

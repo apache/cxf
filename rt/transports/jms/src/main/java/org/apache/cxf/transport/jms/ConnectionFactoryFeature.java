@@ -24,8 +24,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
@@ -40,31 +40,9 @@ import org.apache.cxf.transport.Destination;
  * configuration that is generated from the old configuration style.
  */
 @NoJSR250Annotations
-public class ConnectionFactoryFeature extends AbstractFeature {
-    private Portable delegate;
-
+public class ConnectionFactoryFeature extends DelegatingFeature<ConnectionFactoryFeature.Portable> {
     public ConnectionFactoryFeature(ConnectionFactory cf) {
-        delegate = new Portable(cf);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider provider, Bus bus) {
-        delegate.initialize(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+        super(new Portable(cf));
     }
 
     public static class Portable implements AbstractPortableFeature {

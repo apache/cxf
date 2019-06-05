@@ -19,43 +19,18 @@
 package org.apache.cxf.interceptor.security;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
  * Feature to do JAAS authentication with defaults for karaf integration
  */
-public class JAASAuthenticationFeature extends AbstractFeature {
+public class JAASAuthenticationFeature extends DelegatingFeature<JAASAuthenticationFeature.Portable> {
     public static final String ID = "jaas";
 
-    private Portable delegate = new Portable();
-
-    @Override
-    public void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+    public JAASAuthenticationFeature() {
+        super(new Portable());
     }
 
     public void setContextName(String contextName) {
@@ -70,7 +45,6 @@ public class JAASAuthenticationFeature extends AbstractFeature {
     public String getID() {
         return ID;
     }
-
 
     public static class Portable implements AbstractPortableFeature {
         private String contextName = "karaf";

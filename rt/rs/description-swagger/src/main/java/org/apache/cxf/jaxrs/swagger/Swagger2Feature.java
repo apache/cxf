@@ -70,11 +70,14 @@ import io.swagger.models.Swagger;
 import io.swagger.models.auth.SecuritySchemeDefinition;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class Swagger2Feature extends AbstractSwaggerFeature implements SwaggerUiSupport, SwaggerProperties {
-    private Portable delegate = new Portable();
+public class Swagger2Feature extends AbstractSwaggerFeature<Swagger2Feature.Portable>
+        implements SwaggerUiSupport, SwaggerProperties {
+    public Swagger2Feature() {
+        super(new Portable());
+    }
 
     @Override
-    protected AbstractSwaggerFeature.Portable getDelegate() {
+    protected Portable getDelegate() {
         return delegate;
     }
 

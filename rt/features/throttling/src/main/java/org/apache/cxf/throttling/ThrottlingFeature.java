@@ -20,49 +20,20 @@
 package org.apache.cxf.throttling;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
  *
  */
-public class ThrottlingFeature extends AbstractFeature {
-    private final Portable delegate;
-
+public class ThrottlingFeature extends DelegatingFeature<ThrottlingFeature.Portable> {
     public ThrottlingFeature() {
-        delegate = new Portable();
+        super(new Portable());
     }
 
     public ThrottlingFeature(ThrottlingManager manager) {
-        delegate = new Portable(manager);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+        super(new Portable(manager));
     }
 
     public static class Portable implements AbstractPortableFeature {

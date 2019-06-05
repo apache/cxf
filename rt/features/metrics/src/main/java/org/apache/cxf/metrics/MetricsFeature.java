@@ -31,8 +31,8 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.metrics.interceptors.CountingOutInterceptor;
 import org.apache.cxf.metrics.interceptors.MetricsMessageClientOutInterceptor;
@@ -47,42 +47,15 @@ import org.apache.cxf.metrics.interceptors.MetricsMessageOutInterceptor;
  */
 @NoJSR250Annotations
 @Provider(Type.Feature)
-public class MetricsFeature extends AbstractFeature {
-    private Portable delegate;
-
+public class MetricsFeature extends DelegatingFeature<MetricsFeature.Portable> {
     public MetricsFeature() {
-        delegate = new Portable();
+        super(new Portable());
     }
     public MetricsFeature(MetricsProvider provider) {
-        delegate = new Portable(provider);
+        super(new Portable(provider));
     }
     public MetricsFeature(MetricsProvider ... providers) {
-        delegate = new Portable(providers);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+        super(new Portable(providers));
     }
 
     @Provider(Type.Feature)

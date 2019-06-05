@@ -23,8 +23,6 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.transform.TransformInInterceptor;
 import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
@@ -41,8 +39,11 @@ import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
   </pre>
  */
 @NoJSR250Annotations
-public class StaxTransformFeature extends AbstractFeature {
-    private Portable delegate = new Portable();
+public class StaxTransformFeature extends DelegatingFeature<StaxTransformFeature.Portable> {
+
+    public StaxTransformFeature() {
+        super(new Portable());
+    }
 
     public void setOutTransformElements(Map<String, String> outElements) {
         delegate.setOutTransformElements(outElements);
@@ -90,31 +91,6 @@ public class StaxTransformFeature extends AbstractFeature {
 
     public void setContextPropertyName(String propertyName) {
         delegate.setContextPropertyName(propertyName);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.doInitializeProvider(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
     }
 
     public static class Portable implements AbstractPortableFeature {

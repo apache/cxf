@@ -25,35 +25,16 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
-import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class SseFeature extends AbstractFeature {
-    private final Portable delegate = new Portable();
+public class SseFeature extends DelegatingFeature<SseFeature.Portable> {
 
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+    public SseFeature() {
+        super(new Portable());
     }
 
     @Provider(value = Type.Feature, scope = Scope.Server)

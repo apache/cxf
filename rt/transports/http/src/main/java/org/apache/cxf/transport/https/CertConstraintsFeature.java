@@ -24,8 +24,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -56,27 +56,10 @@ import org.apache.cxf.interceptor.InterceptorProvider;
   </pre>
  */
 @NoJSR250Annotations
-public class CertConstraintsFeature extends AbstractFeature {
-    private Portable delegate = new Portable();
+public class CertConstraintsFeature extends DelegatingFeature<CertConstraintsFeature.Portable> {
 
-    @Override
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        delegate.doInitializeProvider(provider, bus);
+    public CertConstraintsFeature() {
+        super(new Portable());
     }
 
     public void setCertificateConstraints(CertificateConstraintsType c) {

@@ -24,8 +24,8 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -34,33 +34,9 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  * A feature to configure schema validation at the operation level, as an alternative to
  * using the @SchemaValidation annotation.
  */
-public class SchemaValidationFeature extends AbstractFeature {
-    private final Portable delegate;
-
+public class SchemaValidationFeature extends DelegatingFeature<SchemaValidationFeature.Portable> {
     public SchemaValidationFeature(final SchemaValidationTypeProvider provider) {
-        this.delegate = new Portable(provider);
-    }
-
-    public void initialize(Server server, Bus bus) {
-        delegate.initialize(server, bus);
-    }
-
-    public void initialize(Client client, Bus bus) {
-        delegate.initialize(client, bus);
-    }
-
-    public void initialise(Endpoint endpoint) {
-        delegate.initialise(endpoint);
-    }
-
-    @Override
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        delegate.initialize(interceptorProvider, bus);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        delegate.initialize(bus);
+        super(new Portable(provider));
     }
 
     public static class Portable implements AbstractPortableFeature {
