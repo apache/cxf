@@ -94,7 +94,8 @@
             <plugin>
                 <groupId>uk.co.automatictester</groupId>
                 <artifactId>wiremock-maven-plugin</artifactId>
-                <version>4.4.1</version>
+                <!-- Note, updating to 4.4.1 causes a weird Xalan error when building the distribution -->
+                <version>4.4.0</version>
                 <executions>
                     <execution>
                         <phase>generate-test-sources</phase>
