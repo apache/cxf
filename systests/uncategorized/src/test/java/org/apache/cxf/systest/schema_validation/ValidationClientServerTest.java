@@ -58,11 +58,11 @@ import static org.junit.Assert.fail;
 public class ValidationClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ValidationServer.PORT;
 
+    private static Locale oldLocale;
+
     private final QName serviceName = new QName("http://apache.org/schema_validation",
                                                 "SchemaValidationService");
     private final QName portName = new QName("http://apache.org/schema_validation", "SoapPort");
-
-    private static Locale oldLocale;
 
     @BeforeClass
     public static void startservers() throws Exception {
