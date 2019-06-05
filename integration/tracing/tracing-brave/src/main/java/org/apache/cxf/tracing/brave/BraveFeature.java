@@ -27,48 +27,69 @@ import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class BraveFeature extends AbstractFeature {
-    private BraveStartInterceptor in;
-    private BraveStopInterceptor out;
-
+public class BraveFeature extends DelegatingFeature<BraveFeature.Portable> {
     public BraveFeature() {
         this("cxf-svc-" + UUID.randomUUID().toString());
     }
 
-    public BraveFeature(final String name) {
-        this(
-            HttpTracing
-                .newBuilder(Tracing.newBuilder().localServiceName(name).build())
-                .serverParser(new HttpServerSpanParser())
-                .build()
-        );
-    }
-    
     public BraveFeature(final Tracing tracing) {
-        this(
-          HttpTracing
-              .newBuilder(tracing)
-              .serverParser(new HttpServerSpanParser())
-              .build()
-        );
+        this(Portable.newTracer(tracing));
+    }
+
+    public BraveFeature(final String name) {
+        this(Portable.newTracer(Portable.newTracing(name)));
     }
 
     public BraveFeature(HttpTracing brave) {
-        in = new BraveStartInterceptor(brave);
-        out = new BraveStopInterceptor(brave);
+        super(new Portable(brave));
     }
 
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(in);
-        provider.getInFaultInterceptors().add(in);
+    @Provider(value = Type.Feature, scope = Scope.Server)
+    public static class Portable implements AbstractPortableFeature {
+        private BraveStartInterceptor in;
+        private BraveStopInterceptor out;
 
-        provider.getOutInterceptors().add(out);
-        provider.getOutFaultInterceptors().add(out);
+        public Portable() {
+            this("cxf-svc-" + UUID.randomUUID().toString());
+        }
+
+        public Portable(final String name) {
+            this(newTracer(newTracing(name)));
+        }
+
+        public Portable(final Tracing tracing) {
+            this(newTracer(tracing));
+        }
+
+        public Portable(HttpTracing brave) {
+            in = new BraveStartInterceptor(brave);
+            out = new BraveStopInterceptor(brave);
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(in);
+            provider.getInFaultInterceptors().add(in);
+
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(out);
+        }
+
+        private static HttpTracing newTracer(Tracing tracing) {
+            return HttpTracing
+                    .newBuilder(tracing)
+                    .serverParser(new HttpServerSpanParser())
+                    .build();
+        }
+
+        private static Tracing newTracing(String name) {
+            return Tracing.newBuilder().localServiceName(name).build();
+        }
     }
 }

@@ -19,40 +19,54 @@
 package org.apache.cxf.interceptor.security;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
  * Feature to do JAAS authentication with defaults for karaf integration
  */
-public class JAASAuthenticationFeature extends AbstractFeature {
+public class JAASAuthenticationFeature extends DelegatingFeature<JAASAuthenticationFeature.Portable> {
     public static final String ID = "jaas";
 
-    private String contextName = "karaf";
-    private boolean reportFault;
+    public JAASAuthenticationFeature() {
+        super(new Portable());
+    }
+
+    public void setContextName(String contextName) {
+        delegate.setContextName(contextName);
+    }
+
+    public void setReportFault(boolean reportFault) {
+        delegate.setReportFault(reportFault);
+    }
 
     @Override
     public String getID() {
         return ID;
     }
 
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        JAASLoginInterceptor jaasLoginInterceptor = new JAASLoginInterceptor();
-        jaasLoginInterceptor.setRoleClassifierType(JAASLoginInterceptor.ROLE_CLASSIFIER_CLASS_NAME);
-        jaasLoginInterceptor.setRoleClassifier("org.apache.karaf.jaas.boot.principal.RolePrincipal");
-        jaasLoginInterceptor.setContextName(contextName);
-        jaasLoginInterceptor.setReportFault(reportFault);
-        provider.getInInterceptors().add(jaasLoginInterceptor);
-        super.initializeProvider(provider, bus);
-    }
+    public static class Portable implements AbstractPortableFeature {
+        private String contextName = "karaf";
+        private boolean reportFault;
 
-    public void setContextName(String contextName) {
-        this.contextName = contextName;
-    }
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            JAASLoginInterceptor jaasLoginInterceptor = new JAASLoginInterceptor();
+            jaasLoginInterceptor.setRoleClassifierType(JAASLoginInterceptor.ROLE_CLASSIFIER_CLASS_NAME);
+            jaasLoginInterceptor.setRoleClassifier("org.apache.karaf.jaas.boot.principal.RolePrincipal");
+            jaasLoginInterceptor.setContextName(contextName);
+            jaasLoginInterceptor.setReportFault(reportFault);
+            provider.getInInterceptors().add(jaasLoginInterceptor);
+        }
 
-    public void setReportFault(boolean reportFault) {
-        this.reportFault = reportFault;
+        public void setContextName(String contextName) {
+            this.contextName = contextName;
+        }
+
+        public void setReportFault(boolean reportFault) {
+            this.reportFault = reportFault;
+        }
     }
 
 }

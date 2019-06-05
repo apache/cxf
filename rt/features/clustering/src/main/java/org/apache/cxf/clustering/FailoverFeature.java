@@ -28,7 +28,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.ConduitSelectorHolder;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -39,68 +40,107 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 @NoJSR250Annotations
 @EvaluateAllEndpoints
 @Provider(value = Type.Feature, scope = Scope.Client)
-public class FailoverFeature extends AbstractFeature {
-
-    private FailoverStrategy failoverStrategy;
-    private FailoverTargetSelector targetSelector;
-    private String clientBootstrapAddress;
-
+public class FailoverFeature extends DelegatingFeature<FailoverFeature.Portable> {
+    protected FailoverFeature(Portable portable) {
+        super(portable);
+    }
     public FailoverFeature() {
-
+        super(new Portable());
     }
     public FailoverFeature(String clientBootstrapAddress) {
-        this.clientBootstrapAddress = clientBootstrapAddress;
+        super(new Portable(clientBootstrapAddress));
     }
 
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (provider instanceof ConduitSelectorHolder) {
-            ConduitSelectorHolder csHolder = (ConduitSelectorHolder) provider;
-            Endpoint endpoint = csHolder.getConduitSelector().getEndpoint();
-            ConduitSelector conduitSelector = initTargetSelector(endpoint);
-            csHolder.setConduitSelector(conduitSelector);
-        }
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        ConduitSelector selector = initTargetSelector(client.getConduitSelector().getEndpoint());
-        client.setConduitSelector(selector);
-    }
-
-    protected ConduitSelector initTargetSelector(Endpoint endpoint) {
-        FailoverTargetSelector selector = getTargetSelector();
-        selector.setEndpoint(endpoint);
-        if (getStrategy() != null) {
-            selector.setStrategy(getStrategy());
-        }
-        return selector;
+    public ConduitSelector initTargetSelector(Endpoint endpoint) {
+        return delegate.initTargetSelector(endpoint);
     }
 
     public FailoverTargetSelector getTargetSelector() {
-        if (this.targetSelector == null) {
-            this.targetSelector = new FailoverTargetSelector(clientBootstrapAddress);
-        }
-        return this.targetSelector;
+        return delegate.getTargetSelector();
     }
 
     public void setTargetSelector(FailoverTargetSelector selector) {
-        this.targetSelector = selector;
+        delegate.setTargetSelector(selector);
     }
 
     public void setStrategy(FailoverStrategy strategy) {
-        failoverStrategy = strategy;
+        delegate.setStrategy(strategy);
     }
 
-    public FailoverStrategy getStrategy()  {
-        return failoverStrategy;
+    public FailoverStrategy getStrategy() {
+        return delegate.getStrategy();
     }
 
     public String getClientBootstrapAddress() {
-        return clientBootstrapAddress;
+        return delegate.getClientBootstrapAddress();
     }
 
     public void setClientBootstrapAddress(String clientBootstrapAddress) {
-        this.clientBootstrapAddress = clientBootstrapAddress;
+        delegate.setClientBootstrapAddress(clientBootstrapAddress);
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        private FailoverStrategy failoverStrategy;
+        private FailoverTargetSelector targetSelector;
+        private String clientBootstrapAddress;
+
+        public Portable() {
+
+        }
+        public Portable(String clientBootstrapAddress) {
+            this.clientBootstrapAddress = clientBootstrapAddress;
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            if (provider instanceof ConduitSelectorHolder) {
+                ConduitSelectorHolder csHolder = (ConduitSelectorHolder) provider;
+                Endpoint endpoint = csHolder.getConduitSelector().getEndpoint();
+                ConduitSelector conduitSelector = initTargetSelector(endpoint);
+                csHolder.setConduitSelector(conduitSelector);
+            }
+        }
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            ConduitSelector selector = initTargetSelector(client.getConduitSelector().getEndpoint());
+            client.setConduitSelector(selector);
+        }
+
+        protected ConduitSelector initTargetSelector(Endpoint endpoint) {
+            FailoverTargetSelector selector = getTargetSelector();
+            selector.setEndpoint(endpoint);
+            if (getStrategy() != null) {
+                selector.setStrategy(getStrategy());
+            }
+            return selector;
+        }
+
+        public FailoverTargetSelector getTargetSelector() {
+            if (this.targetSelector == null) {
+                this.targetSelector = new FailoverTargetSelector(clientBootstrapAddress);
+            }
+            return this.targetSelector;
+        }
+
+        public void setTargetSelector(FailoverTargetSelector selector) {
+            this.targetSelector = selector;
+        }
+
+        public void setStrategy(FailoverStrategy strategy) {
+            failoverStrategy = strategy;
+        }
+
+        public FailoverStrategy getStrategy()  {
+            return failoverStrategy;
+        }
+
+        public String getClientBootstrapAddress() {
+            return clientBootstrapAddress;
+        }
+
+        public void setClientBootstrapAddress(String clientBootstrapAddress) {
+            this.clientBootstrapAddress = clientBootstrapAddress;
+        }
     }
 }

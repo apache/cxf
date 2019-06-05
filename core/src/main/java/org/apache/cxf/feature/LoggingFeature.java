@@ -49,105 +49,149 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 @NoJSR250Annotations
 @Deprecated
 @Provider(value = Type.Feature)
-public class LoggingFeature extends AbstractFeature {
-    private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
-    private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
-    private static final LoggingOutInterceptor OUT = new LoggingOutInterceptor(DEFAULT_LIMIT);
-
-
-    String inLocation;
-    String outLocation;
-    boolean prettyLogging;
-    boolean showBinary;
-
-    int limit = DEFAULT_LIMIT;
-
+public class LoggingFeature extends DelegatingFeature<LoggingFeature.Portable> {
     public LoggingFeature() {
-
+        super(new Portable());
     }
     public LoggingFeature(int lim) {
-        limit = lim;
+        super(new Portable(lim));
     }
     public LoggingFeature(String in, String out) {
-        inLocation = in;
-        outLocation = out;
+        super(new Portable(in, out));
     }
     public LoggingFeature(String in, String out, int lim) {
-        inLocation = in;
-        outLocation = out;
-        limit = lim;
+        super(new Portable(in, out, lim));
     }
 
     public LoggingFeature(String in, String out, int lim, boolean p) {
-        inLocation = in;
-        outLocation = out;
-        limit = lim;
-        prettyLogging = p;
+        super(new Portable(in, out, lim, p));
     }
 
     public LoggingFeature(String in, String out, int lim, boolean p, boolean showBinary) {
-        this(in, out, lim, p);
-        this.showBinary = showBinary;
+        super(new Portable(in, out, lim, p, showBinary));
     }
 
     public LoggingFeature(Logging annotation) {
-        inLocation = annotation.inLocation();
-        outLocation = annotation.outLocation();
-        limit = annotation.limit();
-        prettyLogging = annotation.pretty();
-        showBinary = annotation.showBinary();
+        super(new Portable(annotation));
     }
 
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (limit == DEFAULT_LIMIT && inLocation == null
-            && outLocation == null && !prettyLogging) {
-            provider.getInInterceptors().add(IN);
-            provider.getInFaultInterceptors().add(IN);
-            provider.getOutInterceptors().add(OUT);
-            provider.getOutFaultInterceptors().add(OUT);
-        } else {
-            LoggingInInterceptor in = new LoggingInInterceptor(limit);
-            in.setOutputLocation(inLocation);
-            in.setPrettyLogging(prettyLogging);
-            in.setShowBinaryContent(showBinary);
-            LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
-            out.setOutputLocation(outLocation);
-            out.setPrettyLogging(prettyLogging);
-            out.setShowBinaryContent(showBinary);
-
-            provider.getInInterceptors().add(in);
-            provider.getInFaultInterceptors().add(in);
-            provider.getOutInterceptors().add(out);
-            provider.getOutFaultInterceptors().add(out);
-        }
-    }
-
-    /**
-     * Set a limit on how much content can be logged
-     * @param lim
-     */
     public void setLimit(int lim) {
-        limit = lim;
+        delegate.setLimit(lim);
     }
 
-    /**
-     * Retrieve the value set with {@link #setLimit(int)}.
-     */
     public int getLimit() {
-        return limit;
+        return delegate.getLimit();
     }
 
-    /**
-     */
     public boolean isPrettyLogging() {
-        return prettyLogging;
+        return delegate.isPrettyLogging();
     }
-    /**
-     * Turn pretty logging of XML content on/off
-     * @param prettyLogging
-     */
+
     public void setPrettyLogging(boolean prettyLogging) {
-        this.prettyLogging = prettyLogging;
+        delegate.setPrettyLogging(prettyLogging);
+    }
+
+    @Provider(Type.Feature)
+    public static class Portable implements AbstractPortableFeature {
+        private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
+        private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
+        private static final LoggingOutInterceptor OUT = new LoggingOutInterceptor(DEFAULT_LIMIT);
+
+
+        String inLocation;
+        String outLocation;
+        boolean prettyLogging;
+        boolean showBinary;
+
+        int limit = DEFAULT_LIMIT;
+
+        public Portable() {
+
+        }
+        public Portable(int lim) {
+            limit = lim;
+        }
+        public Portable(String in, String out) {
+            inLocation = in;
+            outLocation = out;
+        }
+        public Portable(String in, String out, int lim) {
+            inLocation = in;
+            outLocation = out;
+            limit = lim;
+        }
+
+        public Portable(String in, String out, int lim, boolean p) {
+            inLocation = in;
+            outLocation = out;
+            limit = lim;
+            prettyLogging = p;
+        }
+
+        public Portable(String in, String out, int lim, boolean p, boolean showBinary) {
+            this(in, out, lim, p);
+            this.showBinary = showBinary;
+        }
+
+        public Portable(Logging annotation) {
+            inLocation = annotation.inLocation();
+            outLocation = annotation.outLocation();
+            limit = annotation.limit();
+            prettyLogging = annotation.pretty();
+            showBinary = annotation.showBinary();
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            if (limit == DEFAULT_LIMIT && inLocation == null
+                    && outLocation == null && !prettyLogging) {
+                provider.getInInterceptors().add(IN);
+                provider.getInFaultInterceptors().add(IN);
+                provider.getOutInterceptors().add(OUT);
+                provider.getOutFaultInterceptors().add(OUT);
+            } else {
+                LoggingInInterceptor in = new LoggingInInterceptor(limit);
+                in.setOutputLocation(inLocation);
+                in.setPrettyLogging(prettyLogging);
+                in.setShowBinaryContent(showBinary);
+                LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
+                out.setOutputLocation(outLocation);
+                out.setPrettyLogging(prettyLogging);
+                out.setShowBinaryContent(showBinary);
+
+                provider.getInInterceptors().add(in);
+                provider.getInFaultInterceptors().add(in);
+                provider.getOutInterceptors().add(out);
+                provider.getOutFaultInterceptors().add(out);
+            }
+        }
+
+        /**
+         * Set a limit on how much content can be logged
+         * @param lim
+         */
+        public void setLimit(int lim) {
+            limit = lim;
+        }
+
+        /**
+         * Retrieve the value set with {@link #setLimit(int)}.
+         */
+        public int getLimit() {
+            return limit;
+        }
+
+        /**
+         */
+        public boolean isPrettyLogging() {
+            return prettyLogging;
+        }
+        /**
+         * Turn pretty logging of XML content on/off
+         * @param prettyLogging
+         */
+        public void setPrettyLogging(boolean prettyLogging) {
+            this.prettyLogging = prettyLogging;
+        }
     }
 }

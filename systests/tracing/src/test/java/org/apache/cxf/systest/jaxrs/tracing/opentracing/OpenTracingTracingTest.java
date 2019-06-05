@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,7 @@ import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
 import io.opentracing.propagation.TextMap;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -137,6 +139,11 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
         openTracingClientProvider = new OpenTracingClientProvider(tracer);
     }
 
+    @After
+    public void tearDown() {
+        TestSender.setSynchro(null);
+    }
+
     @Test
     public void testThatNewSpanIsCreatedWhenNotProvided() {
         final Response r = createWebClient("/bookstore/books").get();
@@ -194,12 +201,16 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewInnerSpanIsCreatedUsingAsyncInvocation() {
+    public void testThatNewInnerSpanIsCreatedUsingAsyncInvocation() throws InterruptedException {
+        final CountDownLatch synchro = new CountDownLatch(2);
+        TestSender.setSynchro(synchro);
+
         final JaegerSpanContext spanId = fromRandom();
 
         final Response r = withTrace(createWebClient("/bookstore/books/async"), spanId).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
+        synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertEquals("Processing books", TestSender.getAllSpans().get(0).getOperationName());
         assertEquals("GET /bookstore/books/async", TestSender.getAllSpans().get(1).getOperationName());
@@ -220,10 +231,14 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testThatNewSpanIsCreatedUsingAsyncInvocation() {
+    public void testThatNewSpanIsCreatedUsingAsyncInvocation() throws InterruptedException {
+        final CountDownLatch synchro = new CountDownLatch(2);
+        TestSender.setSynchro(synchro);
+
         final Response r = createWebClient("/bookstore/books/async").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
+        synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(2));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Processing books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books/async"));
@@ -231,12 +246,16 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testThatNewSpanIsCreatedWhenNotProvidedUsingAsyncClient() throws Exception {
+        final CountDownLatch synchro = new CountDownLatch(3);
+        TestSender.setSynchro(synchro);
+
         final WebClient client = createWebClient("/bookstore/books", openTracingClientProvider);
         final Future<Response> f = client.async().get();
 
         final Response r = f.get(1, TimeUnit.SECONDS);
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
+        synchro.await(1, TimeUnit.MINUTES);
         assertThat(TestSender.getAllSpans().size(), equalTo(3));
         assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
         assertThat(TestSender.getAllSpans().get(1).getOperationName(), equalTo("GET /bookstore/books"));
@@ -338,12 +357,16 @@ public class OpenTracingTracingTest extends AbstractBusClientServerTestBase {
 
         final Span span = tracer.buildSpan("test span").start();
         try (Scope scope = tracer.scopeManager().activate(span)) {
+            final CountDownLatch synchro = new CountDownLatch(3);
+            TestSender.setSynchro(synchro);
+
             final Future<Response> f = client.async().get();
 
             final Response r = f.get(1, TimeUnit.HOURS);
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             assertThat(tracer.activeSpan().context(), equalTo(span.context()));
 
+            synchro.await(1, TimeUnit.MINUTES);
             assertThat(TestSender.getAllSpans().size(), equalTo(3));
             assertThat(TestSender.getAllSpans().get(0).getOperationName(), equalTo("Get Books"));
             assertThat(TestSender.getAllSpans().get(0).getReferences(), not(empty()));

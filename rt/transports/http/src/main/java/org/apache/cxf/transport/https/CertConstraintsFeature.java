@@ -24,7 +24,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -55,57 +56,72 @@ import org.apache.cxf.interceptor.InterceptorProvider;
   </pre>
  */
 @NoJSR250Annotations
-public class CertConstraintsFeature extends AbstractFeature {
-    CertificateConstraintsType contraints;
-
+public class CertConstraintsFeature extends DelegatingFeature<CertConstraintsFeature.Portable> {
 
     public CertConstraintsFeature() {
-    }
-
-    @Override
-    public void initialize(Server server, Bus bus) {
-        if (contraints == null) {
-            return;
-        }
-        initializeProvider(server.getEndpoint(), bus);
-        CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
-        server.getEndpoint().put(CertConstraints.class.getName(), c);
-    }
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        if (contraints == null) {
-            return;
-        }
-        initializeProvider(client, bus);
-        CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
-        client.getEndpoint().put(CertConstraints.class.getName(), c);
-    }
-
-    @Override
-    public void initialize(Bus bus) {
-        if (contraints == null) {
-            return;
-        }
-        initializeProvider(bus, bus);
-        CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
-        bus.setProperty(CertConstraints.class.getName(), c);
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (contraints == null) {
-            return;
-        }
-        provider.getInInterceptors().add(CertConstraintsInterceptor.INSTANCE);
-        provider.getInFaultInterceptors().add(CertConstraintsInterceptor.INSTANCE);
+        super(new Portable());
     }
 
     public void setCertificateConstraints(CertificateConstraintsType c) {
-        contraints = c;
+        delegate.setCertificateConstraints(c);
     }
 
     public CertificateConstraintsType getCertificateConstraints() {
-        return contraints;
+        return delegate.getCertificateConstraints();
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        CertificateConstraintsType contraints;
+
+
+        public Portable() {
+        }
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            if (contraints == null) {
+                return;
+            }
+            doInitializeProvider(server.getEndpoint(), bus);
+            CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
+            server.getEndpoint().put(CertConstraints.class.getName(), c);
+        }
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            if (contraints == null) {
+                return;
+            }
+            doInitializeProvider(client, bus);
+            CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
+            client.getEndpoint().put(CertConstraints.class.getName(), c);
+        }
+
+        @Override
+        public void initialize(Bus bus) {
+            if (contraints == null) {
+                return;
+            }
+            doInitializeProvider(bus, bus);
+            CertConstraints c = CertConstraintsJaxBUtils.createCertConstraints(contraints);
+            bus.setProperty(CertConstraints.class.getName(), c);
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            if (contraints == null) {
+                return;
+            }
+            provider.getInInterceptors().add(CertConstraintsInterceptor.INSTANCE);
+            provider.getInFaultInterceptors().add(CertConstraintsInterceptor.INSTANCE);
+        }
+
+        public void setCertificateConstraints(CertificateConstraintsType c) {
+            contraints = c;
+        }
+
+        public CertificateConstraintsType getCertificateConstraints() {
+            return contraints;
+        }
     }
 }

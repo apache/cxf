@@ -39,69 +39,123 @@ import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
   </pre>
  */
 @NoJSR250Annotations
-public class StaxTransformFeature extends AbstractFeature {
-
-    private TransformInInterceptor in = new TransformInInterceptor();
-    private TransformOutInterceptor out = new TransformOutInterceptor();
+public class StaxTransformFeature extends DelegatingFeature<StaxTransformFeature.Portable> {
 
     public StaxTransformFeature() {
-        //
-    }
-
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-
-        provider.getInInterceptors().add(in);
-        provider.getOutInterceptors().add(out);
-        provider.getOutFaultInterceptors().add(out);
+        super(new Portable());
     }
 
     public void setOutTransformElements(Map<String, String> outElements) {
-        out.setOutTransformElements(outElements);
+        delegate.setOutTransformElements(outElements);
     }
 
     public void setOutTransformAttributes(Map<String, String> outAttributes) {
-        out.setOutTransformAttributes(outAttributes);
+        delegate.setOutTransformAttributes(outAttributes);
     }
 
     public void setAttributesToElements(boolean value) {
-        out.setAttributesToElements(value);
+        delegate.setAttributesToElements(value);
     }
 
     public void setSkipOnFault(boolean value) {
-        out.setSkipOnFault(value);
+        delegate.setSkipOnFault(value);
     }
 
     public void setOutAppendElements(Map<String, String> map) {
-        out.setOutAppendElements(map);
+        delegate.setOutAppendElements(map);
     }
 
     public void setOutDropElements(List<String> dropElementsSet) {
-        out.setOutDropElements(dropElementsSet);
+        delegate.setOutDropElements(dropElementsSet);
     }
 
     public void setInAppendElements(Map<String, String> inElements) {
-        in.setInAppendElements(inElements);
+        delegate.setInAppendElements(inElements);
     }
 
     public void setInDropElements(List<String> dropElementsSet) {
-        in.setInDropElements(dropElementsSet);
+        delegate.setInDropElements(dropElementsSet);
     }
 
     public void setInTransformElements(Map<String, String> inElements) {
-        in.setInTransformElements(inElements);
+        delegate.setInTransformElements(inElements);
     }
 
     public void setInTransformAttributes(Map<String, String> inAttributes) {
-        in.setInTransformAttributes(inAttributes);
+        delegate.setInTransformAttributes(inAttributes);
     }
 
     public void setOutDefaultNamespace(String ns) {
-        out.setDefaultNamespace(ns);
+        delegate.setOutDefaultNamespace(ns);
     }
 
     public void setContextPropertyName(String propertyName) {
-        in.setContextPropertyName(propertyName);
-        out.setContextPropertyName(propertyName);
+        delegate.setContextPropertyName(propertyName);
+    }
+
+    public static class Portable implements AbstractPortableFeature {
+        private TransformInInterceptor in = new TransformInInterceptor();
+        private TransformOutInterceptor out = new TransformOutInterceptor();
+
+        public Portable() {
+            //
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+
+            provider.getInInterceptors().add(in);
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(out);
+        }
+
+        public void setOutTransformElements(Map<String, String> outElements) {
+            out.setOutTransformElements(outElements);
+        }
+
+        public void setOutTransformAttributes(Map<String, String> outAttributes) {
+            out.setOutTransformAttributes(outAttributes);
+        }
+
+        public void setAttributesToElements(boolean value) {
+            out.setAttributesToElements(value);
+        }
+
+        public void setSkipOnFault(boolean value) {
+            out.setSkipOnFault(value);
+        }
+
+        public void setOutAppendElements(Map<String, String> map) {
+            out.setOutAppendElements(map);
+        }
+
+        public void setOutDropElements(List<String> dropElementsSet) {
+            out.setOutDropElements(dropElementsSet);
+        }
+
+        public void setInAppendElements(Map<String, String> inElements) {
+            in.setInAppendElements(inElements);
+        }
+
+        public void setInDropElements(List<String> dropElementsSet) {
+            in.setInDropElements(dropElementsSet);
+        }
+
+        public void setInTransformElements(Map<String, String> inElements) {
+            in.setInTransformElements(inElements);
+        }
+
+        public void setInTransformAttributes(Map<String, String> inAttributes) {
+            in.setInTransformAttributes(inAttributes);
+        }
+
+        public void setOutDefaultNamespace(String ns) {
+            out.setDefaultNamespace(ns);
+        }
+
+        public void setContextPropertyName(String propertyName) {
+            in.setContextPropertyName(propertyName);
+            out.setContextPropertyName(propertyName);
+        }
     }
 }

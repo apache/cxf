@@ -22,27 +22,41 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
-public class BeanValidationFeature extends AbstractFeature {
+public class BeanValidationFeature extends DelegatingFeature<BeanValidationFeature.Portable> {
 
-    private BeanValidationProvider validationProvider;
-
-    @Override
-    protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
-        BeanValidationInInterceptor in = new BeanValidationInInterceptor();
-        BeanValidationOutInterceptor out = new BeanValidationOutInterceptor();
-        if (validationProvider != null) {
-            in.setProvider(validationProvider);
-            out.setProvider(validationProvider);
-        }
-        interceptorProvider.getInInterceptors().add(in);
-        interceptorProvider.getOutInterceptors().add(out);
+    public BeanValidationFeature() {
+        super(new Portable());
     }
 
     public void setProvider(BeanValidationProvider provider) {
-        this.validationProvider = provider;
+        delegate.setProvider(provider);
     }
+
+    @Provider(value = Type.Feature, scope = Scope.Server)
+    public static class Portable implements AbstractPortableFeature {
+
+        private BeanValidationProvider validationProvider;
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
+            BeanValidationInInterceptor in = new BeanValidationInInterceptor();
+            BeanValidationOutInterceptor out = new BeanValidationOutInterceptor();
+            if (validationProvider != null) {
+                in.setProvider(validationProvider);
+                out.setProvider(validationProvider);
+            }
+            interceptorProvider.getInInterceptors().add(in);
+            interceptorProvider.getOutInterceptors().add(out);
+        }
+
+        public void setProvider(BeanValidationProvider provider) {
+            this.validationProvider = provider;
+        }
+    }
+
 }
