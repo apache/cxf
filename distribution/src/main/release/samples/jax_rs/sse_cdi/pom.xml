@@ -48,13 +48,13 @@
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>
             <artifactId>weld-servlet</artifactId>
-            <version>2.4.0.Final</version>
+            <version>2.4.8.Final</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-core</artifactId>
-            <version>2.4.0.Final</version>
+            <version>2.4.8.Final</version>
         </dependency>
 
         <dependency>

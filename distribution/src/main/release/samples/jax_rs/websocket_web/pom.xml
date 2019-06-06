@@ -31,7 +31,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <cxf.jetty.version>9.4.14.v20181114</cxf.jetty.version>
         <cxf.tomcat.version>7.0.92</cxf.tomcat.version>
     </properties>
     <build>
@@ -39,7 +38,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${cxf.jetty.version}</version>
+                <version>${cxf.jetty9.version}</version>
                 <configuration>
                     <webAppSourceDirectory>${project.build.directory}/${project.name}</webAppSourceDirectory>
                     <scanIntervalSeconds>1</scanIntervalSeconds>

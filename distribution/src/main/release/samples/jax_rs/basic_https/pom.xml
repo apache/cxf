@@ -28,9 +28,6 @@
         <version>3.3.3-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <properties>
-        <httpclient.version>4.5.3</httpclient.version>
-    </properties>
     <profiles>
         <profile>
             <id>server</id>
@@ -98,7 +95,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
+            <version>${cxf.httpcomponents.client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

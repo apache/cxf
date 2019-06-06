@@ -39,7 +39,7 @@ under the License.
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.14.v20181114</version>
+                <version>${cxf.jetty9.version}</version>
                 <configuration>
                     <webApp>
                         <contextPath>/</contextPath>

@@ -29,7 +29,7 @@
         <relativePath>../..</relativePath>
     </parent>
     <properties>
-        <olingo.version>4.5.3</olingo.version>
+        <olingo.version>4.6.0</olingo.version>
     </properties>
     <profiles>
         <profile>
@@ -70,22 +70,22 @@
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-commons-api</artifactId>
-         <version>4.4.0</version>
+         <version>${olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-commons-core</artifactId>
-         <version>4.4.0</version>
+         <version>${olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-server-api</artifactId>
-         <version>4.4.0</version>
+         <version>${olingo.version}</version>
         </dependency>
         <dependency>
          <groupId>org.apache.olingo</groupId>
          <artifactId>odata-server-core</artifactId>
-         <version>4.4.0</version>
+         <version>${olingo.version}</version>
         </dependency> 
     </dependencies>
 </project>

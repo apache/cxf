@@ -30,6 +30,7 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
+        <cxf.brave.version>5.4.2</cxf.brave.version>
     </properties>
     <profiles>
         <profile>
@@ -199,22 +200,22 @@
         <dependency>
             <groupId>io.zipkin.brave</groupId>
             <artifactId>brave-context-slf4j</artifactId>
-            <version>5.4.2</version>
+            <version>${cxf.brave.version}</version>
         </dependency>
         <dependency>
             <groupId>io.zipkin.brave</groupId>
             <artifactId>brave-instrumentation-httpclient</artifactId>
-            <version>5.4.2</version>
+            <version>${cxf.brave.version}</version>
         </dependency>
         <dependency>
             <groupId>io.zipkin.brave</groupId>
             <artifactId>brave-instrumentation-httpasyncclient</artifactId>
-            <version>5.4.2</version>
+            <version>${cxf.brave.version}</version>
         </dependency>
         <dependency>
             <groupId>io.zipkin.brave</groupId>
             <artifactId>brave-instrumentation-okhttp3</artifactId>
-            <version>5.4.2</version>
+            <version>${cxf.brave.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

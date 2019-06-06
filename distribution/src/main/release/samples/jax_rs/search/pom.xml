@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
-            <version>1.16</version>
+            <version>${cxf.tika.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -154,7 +154,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.3</version>
+            <version>${cxf.httpcomponents.client.version}</version>
         </dependency>    
     </dependencies>
 </project>
