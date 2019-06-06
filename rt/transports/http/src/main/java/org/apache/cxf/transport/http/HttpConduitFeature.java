@@ -20,26 +20,36 @@ package org.apache.cxf.transport.http;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.transport.Conduit;
 
 /**
  * Programmatically configure a http conduit. This can also be used as a DOSGi
  * intent.
  */
-public class HttpConduitFeature extends AbstractFeature {
-    private HttpConduitConfig conduitConfig;
-
-    @Override
-    public void initialize(Client client, Bus bus) {
-        Conduit conduit = client.getConduit();
-        if (conduitConfig != null && conduit instanceof HTTPConduit) {
-            conduitConfig.apply((HTTPConduit)conduit);
-        }
+public class HttpConduitFeature extends DelegatingFeature<HttpConduitFeature.Portable> {
+    public HttpConduitFeature() {
+        super(new Portable());
     }
 
     public void setConduitConfig(HttpConduitConfig conduitConfig) {
-        this.conduitConfig = conduitConfig;
+        delegate.setConduitConfig(conduitConfig);
     }
 
+    public static class Portable implements AbstractPortableFeature {
+        private HttpConduitConfig conduitConfig;
+
+        @Override
+        public void initialize(Client client, Bus bus) {
+            Conduit conduit = client.getConduit();
+            if (conduitConfig != null && conduit instanceof HTTPConduit) {
+                conduitConfig.apply((HTTPConduit)conduit);
+            }
+        }
+
+        public void setConduitConfig(HttpConduitConfig conduitConfig) {
+            this.conduitConfig = conduitConfig;
+        }
+    }
 }

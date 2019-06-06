@@ -24,7 +24,8 @@ import java.util.Map;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 
 /**
  * This class provides configuration options to the JavaScript client generator.
@@ -42,27 +43,42 @@ import org.apache.cxf.feature.AbstractFeature;
   * At this time, there is no corresponding WSDL extension for this information.
  */
 @NoJSR250Annotations
-public class JavascriptOptionsFeature extends AbstractFeature {
-    private Map<String, String> namespacePrefixMap;
+public class JavascriptOptionsFeature extends DelegatingFeature<JavascriptOptionsFeature.Portable> {
 
-    /**
-     * Retrieve the map from namespace URI strings to JavaScript function prefixes.
-     * @return the map
-     */
+    public JavascriptOptionsFeature() {
+        super(new Portable());
+    }
+
     public Map<String, String> getNamespacePrefixMap() {
-        return namespacePrefixMap;
+        return delegate.getNamespacePrefixMap();
     }
 
-    /**
-     * Set the map from namespace URI strings to Javascript function prefixes.
-     * @param namespacePrefixMap the map from namespace URI strings to JavaScript function prefixes.
-     */
     public void setNamespacePrefixMap(Map<String, String> namespacePrefixMap) {
-        this.namespacePrefixMap = namespacePrefixMap;
+        delegate.setNamespacePrefixMap(namespacePrefixMap);
     }
 
-    @Override
-    public void initialize(Server server, Bus bus) {
-      //  server.getEndpoint().getActiveFeatures().add(this);
+    public static class Portable implements AbstractPortableFeature {
+        private Map<String, String> namespacePrefixMap;
+
+        /**
+         * Retrieve the map from namespace URI strings to JavaScript function prefixes.
+         * @return the map
+         */
+        public Map<String, String> getNamespacePrefixMap() {
+            return namespacePrefixMap;
+        }
+
+        /**
+         * Set the map from namespace URI strings to Javascript function prefixes.
+         * @param namespacePrefixMap the map from namespace URI strings to JavaScript function prefixes.
+         */
+        public void setNamespacePrefixMap(Map<String, String> namespacePrefixMap) {
+            this.namespacePrefixMap = namespacePrefixMap;
+        }
+
+        @Override
+        public void initialize(Server server, Bus bus) {
+            //  server.getEndpoint().getActiveFeatures().add(this);
+        }
     }
 }

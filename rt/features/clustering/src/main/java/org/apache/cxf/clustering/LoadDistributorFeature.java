@@ -29,16 +29,29 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 @NoJSR250Annotations
 public class LoadDistributorFeature extends FailoverFeature {
 
-
     public LoadDistributorFeature() {
-
+        super(new Portable());
     }
     public LoadDistributorFeature(String clientBootstrapAddress) {
-        super(clientBootstrapAddress);
+        super(new FailoverFeature.Portable(clientBootstrapAddress));
     }
 
     @Override
     public FailoverTargetSelector getTargetSelector() {
         return new LoadDistributorTargetSelector(getClientBootstrapAddress());
+    }
+
+    public static class Portable extends FailoverFeature.Portable {
+        public Portable() {
+
+        }
+        public Portable(String clientBootstrapAddress) {
+            super(clientBootstrapAddress);
+        }
+
+        @Override
+        public FailoverTargetSelector getTargetSelector() {
+            return new LoadDistributorTargetSelector(getClientBootstrapAddress());
+        }
     }
 }

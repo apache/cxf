@@ -24,7 +24,9 @@ import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
@@ -32,26 +34,37 @@ import org.apache.cxf.service.model.BindingOperationInfo;
  * A feature to configure schema validation at the operation level, as an alternative to
  * using the @SchemaValidation annotation.
  */
-public class SchemaValidationFeature extends AbstractFeature {
-    private final SchemaValidationTypeProvider provider;
-
+public class SchemaValidationFeature extends DelegatingFeature<SchemaValidationFeature.Portable> {
     public SchemaValidationFeature(final SchemaValidationTypeProvider provider) {
-        this.provider = provider;
+        super(new Portable(provider));
     }
 
-    public void initialize(Server server, Bus bus) {
-        initialise(server.getEndpoint());
-    }
+    public static class Portable implements AbstractPortableFeature {
+        private final SchemaValidationTypeProvider provider;
 
-    public void initialize(Client client, Bus bus) {
-        initialise(client.getEndpoint());
-    }
+        public Portable(final SchemaValidationTypeProvider provider) {
+            this.provider = provider;
+        }
 
-    private void initialise(Endpoint endpoint) {
-        for (BindingOperationInfo bop : endpoint.getEndpointInfo().getBinding().getOperations()) {
-            SchemaValidationType type = provider.getSchemaValidationType(bop.getOperationInfo());
-            if (type != null) {
-                bop.getOperationInfo().setProperty(Message.SCHEMA_VALIDATION_TYPE, type);
+        public void initialize(Server server, Bus bus) {
+            initialise(server.getEndpoint());
+        }
+
+        public void initialize(Client client, Bus bus) {
+            initialise(client.getEndpoint());
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
+            // no-op
+        }
+
+        private void initialise(Endpoint endpoint) {
+            for (BindingOperationInfo bop : endpoint.getEndpointInfo().getBinding().getOperations()) {
+                SchemaValidationType type = provider.getSchemaValidationType(bop.getOperationInfo());
+                if (type != null) {
+                    bop.getOperationInfo().setProperty(Message.SCHEMA_VALIDATION_TYPE, type);
+                }
             }
         }
     }

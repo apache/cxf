@@ -25,32 +25,44 @@ import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.AbstractPortableFeature;
+import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Client)
-public class BraveClientFeature extends AbstractFeature {
-    private BraveClientStartInterceptor out;
-    private BraveClientStopInterceptor in;
-
+public class BraveClientFeature extends DelegatingFeature<BraveClientFeature.Portable> {
     public BraveClientFeature(final Tracing tracing) {
-        this(
-          HttpTracing
-              .newBuilder(tracing)
-              .clientParser(new HttpClientSpanParser())
-              .build()
-        );
-    }
-    
-    public BraveClientFeature(HttpTracing brave) {
-        out = new BraveClientStartInterceptor(brave);
-        in = new BraveClientStopInterceptor(brave);
+        super(new Portable(tracing));
     }
 
-    @Override
-    protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        provider.getInInterceptors().add(in);
-        provider.getOutInterceptors().add(out);
+    public BraveClientFeature(HttpTracing brave) {
+        super(new Portable(brave));
+    }
+
+    @Provider(value = Type.Feature, scope = Scope.Client)
+    public static class Portable implements AbstractPortableFeature {
+        private BraveClientStartInterceptor out;
+        private BraveClientStopInterceptor in;
+
+        public Portable(final Tracing tracing) {
+            this(
+                    HttpTracing
+                            .newBuilder(tracing)
+                            .clientParser(new HttpClientSpanParser())
+                            .build()
+            );
+        }
+
+        public Portable(HttpTracing brave) {
+            out = new BraveClientStartInterceptor(brave);
+            in = new BraveClientStopInterceptor(brave);
+        }
+
+        @Override
+        public void doInitializeProvider(InterceptorProvider provider, Bus bus) {
+            provider.getInInterceptors().add(in);
+            provider.getOutInterceptors().add(out);
+        }
     }
 }
