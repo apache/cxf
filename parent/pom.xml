@@ -1509,11 +1509,6 @@
                 <version>1.10.6</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.ant</groupId>
-                <artifactId>ant-nodeps</artifactId>
-                <version>1.8.1</version>
-            </dependency>
-            <dependency>
                 <groupId>com.sun.xml.parsers</groupId>
                 <artifactId>jaxp-ri</artifactId>
                 <version>1.4.5</version>
@@ -2150,11 +2145,6 @@
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${cxf.jaxb.runtime.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jaxme</groupId>
-                <artifactId>jaxme2</artifactId>
-                <version>0.5.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.annotation</groupId>
