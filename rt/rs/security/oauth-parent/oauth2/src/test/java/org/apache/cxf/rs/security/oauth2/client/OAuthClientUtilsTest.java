@@ -19,6 +19,8 @@
 package org.apache.cxf.rs.security.oauth2.client;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
@@ -75,4 +77,24 @@ public class OAuthClientUtilsTest {
             verify(accessTokenService);
         }
     }
+
+    @Test
+    public void fromMapToClientToken() {
+        final Map<String, String> map = new HashMap<>();
+        final String accessToken = "SlAV32hkKG";
+        map.put(OAuthConstants.ACCESS_TOKEN, accessToken);
+        final String tokenType = "Bearer";
+        map.put(OAuthConstants.ACCESS_TOKEN_TYPE, tokenType);
+        final String refreshToken = "8xLOxBtZp8";
+        map.put(OAuthConstants.REFRESH_TOKEN, refreshToken);
+        final String expiresIn = "3600";
+        map.put(OAuthConstants.ACCESS_TOKEN_EXPIRES_IN, expiresIn);
+
+        final ClientAccessToken token = OAuthClientUtils.fromMapToClientToken(map);
+        assertEquals(accessToken, token.getTokenKey());
+        assertEquals(tokenType, token.getTokenType());
+        assertEquals(refreshToken, token.getRefreshToken());
+        assertEquals(Long.parseLong(expiresIn), token.getExpiresIn());
+    }
+
 }
