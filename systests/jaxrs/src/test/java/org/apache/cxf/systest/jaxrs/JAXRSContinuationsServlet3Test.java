@@ -114,17 +114,17 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         assertEquals(check, content);
     }
 
-    private <T> Future<Response> invokeRequest(String resource, T entity) {
+    private static <T> Future<Response> invokeRequest(String resource, T entity) {
         AsyncInvoker async = createAsyncInvoker(resource);
         return async.post(Entity.entity(entity, MediaType.TEXT_PLAIN_TYPE));
     }
 
-    private Future<Response> invokeRequest(String resource) {
+    private static Future<Response> invokeRequest(String resource) {
         AsyncInvoker async = createAsyncInvoker(resource);
         return async.get();
     }
 
-    private AsyncInvoker createAsyncInvoker(String resource) {
+    private static AsyncInvoker createAsyncInvoker(String resource) {
         WebTarget target = ClientBuilder.newClient().target(resource);
         return target.request().async();
     }
