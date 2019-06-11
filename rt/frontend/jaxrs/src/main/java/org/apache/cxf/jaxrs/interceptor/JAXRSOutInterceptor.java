@@ -229,6 +229,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             responseMediaType = checkFinalContentType(responseMediaType, writers, checkWriters);
         } catch (Throwable ex) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, ex.getMessage(), ex);
+            }
             handleWriteException(providerFactory, message, ex, firstTry);
             return;
         }
