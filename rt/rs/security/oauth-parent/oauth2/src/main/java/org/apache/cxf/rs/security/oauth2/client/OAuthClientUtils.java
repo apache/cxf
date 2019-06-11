@@ -73,12 +73,6 @@ public final class OAuthClientUtils {
                                                    redirectUri,
                                                    state,
                                                    scope);
-        if (redirectUri != null) {
-            ub.queryParam(OAuthConstants.REDIRECT_URI, redirectUri);
-        }
-        if (state != null) {
-            ub.queryParam(OAuthConstants.STATE, state);
-        }
         return ub.build();
     }
 
