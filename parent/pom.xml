@@ -236,7 +236,7 @@
         <cxf.jaxb.bundle.version>2.3.1_1</cxf.jaxb.bundle.version>
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-        <cxf.karaf.version>4.2.5</cxf.karaf.version>
+        <cxf.karaf.version>4.2.6</cxf.karaf.version>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.osgi.saaj.version>[1.3,2)</cxf.osgi.saaj.version>
