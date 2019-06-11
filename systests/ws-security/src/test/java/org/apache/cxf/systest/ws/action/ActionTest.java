@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -50,8 +51,13 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxOutInterceptor;
 import org.apache.wss4j.common.ConfigurationConstants;
+import org.apache.wss4j.common.SignatureActionToken;
+import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.HandlerAction;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.stax.ext.WSSConstants;
 import org.apache.wss4j.stax.ext.WSSSecurityProperties;
 import org.apache.wss4j.stax.securityToken.WSSecurityTokenConstants;
@@ -719,4 +725,50 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
+    @org.junit.Test
+    public void testSignatureHandlerActions() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureConfigPort");
+
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        // Programmatic interceptor
+        Map<String, Object> props = new HashMap<>();
+        HandlerAction signatureAction = new HandlerAction();
+        signatureAction.setAction(WSConstants.SIGN);
+
+        SignatureActionToken actionToken = new SignatureActionToken();
+        actionToken.setUser("alice");
+        actionToken.setKeyIdentifierId(WSConstants.BST_DIRECT_REFERENCE);
+
+        Properties cryptoProperties = CryptoFactory.getProperties("alice.properties", this.getClass().getClassLoader());
+        Crypto crypto =
+            CryptoFactory.getInstance(cryptoProperties, this.getClass().getClassLoader(), null);
+        actionToken.setCrypto(crypto);
+        signatureAction.setActionToken(actionToken);
+
+        List<HandlerAction> actions = Collections.singletonList(signatureAction);
+
+        props.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
+        props.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
+        WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(props);
+        Client client = ClientProxy.getClient(port);
+        client.getOutInterceptors().add(outInterceptor);
+
+        assertEquals(50, port.doubleIt(25));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }
