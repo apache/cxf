@@ -153,6 +153,7 @@ public class KerberosClient implements Configurable {
                                   delegatedCredential);
         bst.addWSUNamespace();
         bst.setID(wssConfig.getIdAllocator().createSecureId("BST-", bst));
+        bst.addWSUNamespace();
 
         SecurityToken token = new SecurityToken(bst.getID());
         token.setToken(bst.getElement());
