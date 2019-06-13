@@ -34,8 +34,8 @@ public class UsernamePasswordCallback implements CallbackHandler {
     public UsernamePasswordCallback() {
         passwords.put("Alice", "ecilA");
         passwords.put("abcd", "dcba");
-        passwords.put("clientx509v1", "storepassword");
-        passwords.put("serverx509v1", "storepassword");
+        passwords.put("alice", "password");
+        passwords.put("bob", "password");
     }
 
     /**
