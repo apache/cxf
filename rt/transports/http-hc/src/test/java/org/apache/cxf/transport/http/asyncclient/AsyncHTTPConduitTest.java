@@ -152,6 +152,21 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
+    
+    
+    @Test
+    public void testTimeoutWithPropertySetting() throws Exception {
+        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+            "3000");
+        updateAddressPort(g, PORT);
+        
+        try {
+            assertEquals("Hello " + request, g.greetMeLater(-5000));
+            fail();
+        } catch (Exception ex) {
+            //expected!!!
+        }
+    }
 
     @Test
     public void testTimeoutAsync() throws Exception {
@@ -166,6 +181,21 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
+    
+    @Test
+    public void testTimeoutAsyncWithPropertySetting() throws Exception {
+        updateAddressPort(g, PORT);
+        ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+            "3000");
+        try {
+            Response<GreetMeLaterResponse> future = g.greetMeLaterAsync(-5000L);
+            future.get();
+            fail();
+        } catch (Exception ex) {
+            //expected!!!
+        }
+    }
+    
     @Test
     public void testConnectIssue() throws Exception {
         updateAddressPort(g, PORT_INV);
