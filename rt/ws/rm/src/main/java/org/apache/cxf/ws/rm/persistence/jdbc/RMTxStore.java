@@ -944,17 +944,15 @@ public class RMTxStore implements RMStore {
             return;
         }
 
-        Statement stmt = connection.createStatement();
         // schemaName has been verified at setSchemaName(String)
-        try {
+        try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(MessageFormat.format(CREATE_SCHEMA_STMT_STR,
                                                     schemaName));
         } catch (SQLException ex) {
             // assume it is already created or no authorization is provided (create one manually)
-        } finally {
-            stmt.close();
         }
-        stmt = connection.createStatement();
+
+        Statement stmt = connection.createStatement();
         SQLException ex0 = null;
         for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
             try {

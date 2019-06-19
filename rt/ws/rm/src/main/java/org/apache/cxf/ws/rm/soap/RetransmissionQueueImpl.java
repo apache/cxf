@@ -828,7 +828,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
                 if (incept.getClass().getName().startsWith("org.apache.cxf.jaxws.interceptors")) {
                     retransmitChain.remove(incept);
                 } else if (incept instanceof PhaseInterceptor
-                    && (((PhaseInterceptor<?>)incept).getPhase() == Phase.MARSHAL)) {
+                    && Phase.MARSHAL.equals(((PhaseInterceptor<?>)incept).getPhase())) {
 
                     // remove any interceptors from the marshal phase
                     retransmitChain.remove(incept);

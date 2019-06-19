@@ -18,11 +18,11 @@
  */
 package org.apache.cxf.aegis.util;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 public final class UID {
     private static int counter;
-    private static Random random = new Random(System.currentTimeMillis());
+    private static SecureRandom random = new SecureRandom();
 
     private UID() {
         //utility
