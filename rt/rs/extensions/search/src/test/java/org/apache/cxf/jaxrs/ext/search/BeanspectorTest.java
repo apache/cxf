@@ -43,6 +43,37 @@ public class BeanspectorTest {
         assertTrue(setters.contains("a"));
         assertTrue(setters.contains("fluent"));
     }
+    
+    @Test
+    public void testOverriddenBeans1() throws SearchParseException {
+        Beanspector<OverriddenBean> bean = new Beanspector<OverriddenBean>(new OverriddenBean());
+        Set<String> getters = bean.getGettersNames();
+        assertEquals(2, getters.size());
+        assertTrue(getters.contains("class"));
+        assertTrue(getters.contains("simplebean"));
+        
+        Set<String> setters = bean.getSettersNames();
+        assertEquals(1, setters.size());
+        assertTrue(setters.contains("simplebean"));
+    }
+    
+    @Test
+    public void testOverriddenBeans2() throws SearchParseException {
+        Beanspector<AntoherOverriddenBean> bean = new Beanspector<AntoherOverriddenBean>(new AntoherOverriddenBean());
+        Set<String> getters = bean.getGettersNames();
+        assertEquals(2, getters.size());
+        assertTrue(getters.contains("class"));
+        assertTrue(getters.contains("simplebean"));
+        
+        Set<String> setters = bean.getSettersNames();
+        assertEquals(1, setters.size());
+        assertTrue(setters.contains("simplebean"));
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testMismatchedOverriddenBeans() throws SearchParseException {
+        new Beanspector<MismatchedOverriddenBean>(new MismatchedOverriddenBean());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMismatchedAccessorTypes() throws SearchParseException {
@@ -65,7 +96,6 @@ public class BeanspectorTest {
             return true;
         }
 
-
         public String getA() {
             return "a";
         }
@@ -76,5 +106,60 @@ public class BeanspectorTest {
         public SimpleBean setFluent(String val) {
             return this;
         }
+    }
+   
+    @Ignore 
+    static class OverriddenSimpleBean extends SimpleBean {
+        
+        OverriddenSimpleBean() { }
+        
+        OverriddenSimpleBean(SimpleBean arg) { }
+    }
+    
+    @Ignore 
+    static class AnotherBean {
+        
+        protected SimpleBean simpleBean;
+
+        public SimpleBean getSimpleBean() {
+            return simpleBean;
+        }
+
+        public void setSimpleBean(SimpleBean simpleBean) {
+            this.simpleBean = simpleBean;
+        }        
+    }
+    
+    @Ignore 
+    static class OverriddenBean extends AnotherBean {
+                
+        @Override
+        public OverriddenSimpleBean getSimpleBean() {
+            return new OverriddenSimpleBean(simpleBean);
+        }
+
+        public void setSimpleBean(OverriddenSimpleBean simpleBean) {
+            this.simpleBean = simpleBean;
+        }        
+    }
+    
+    @Ignore 
+    static class AntoherOverriddenBean extends AnotherBean {
+                
+        @Override
+        public OverriddenSimpleBean getSimpleBean() {
+            return new OverriddenSimpleBean(simpleBean);
+        }
+    }
+    
+    @Ignore 
+    static class MismatchedOverriddenBean extends AnotherBean {
+                
+        @Override
+        public OverriddenSimpleBean getSimpleBean() {
+            return new OverriddenSimpleBean(simpleBean);
+        }
+        
+        public void setSimpleBean(String simpleBean) { }
     }
 }
