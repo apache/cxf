@@ -62,7 +62,7 @@ public final class SSLUtils {
 
     static final String PKCS12_TYPE = "PKCS12";
 
-    private static final String DEFAULT_KEYSTORE_TYPE = "PKCS12";
+    private static final String DEFAULT_KEYSTORE_TYPE = "JKS";
     private static final String DEFAULT_TRUST_STORE_TYPE = "JKS";
 
     private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
