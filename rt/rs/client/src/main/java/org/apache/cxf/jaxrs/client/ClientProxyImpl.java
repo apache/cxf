@@ -226,6 +226,8 @@ public class ClientProxyImpl extends AbstractClient implements
             body = handleForm(m, params, types, beanParamsList);
         } else if (types.containsKey(ParameterType.REQUEST_BODY))  {
             body = handleMultipart(types, ori, params);
+        } else if (hasFormParams(params, beanParamsList)) {
+            body = handleForm(m, params, types, beanParamsList);
         }
         
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
@@ -920,7 +922,23 @@ public class ClientProxyImpl extends AbstractClient implements
         return aMethod == null || bodyIndex == -1 ? new Annotation[0] 
             : aMethod.getParameterAnnotations()[bodyIndex];
     }
-    
+
+    /**
+     * Checks if @BeanParam object has at least one @FormParam declaration.
+     * @param params parameter values
+     * @param beanParams bean parameters
+     * @return "true" @BeanParam object has at least one @FormParam, "false" otherwise
+     */
+    private boolean hasFormParams(Object[] params, List<Parameter> beanParams) {
+        for (Parameter p : beanParams) {
+            if (!getValuesFromBeanParam(params[p.getIndex()], FormParam.class).isEmpty()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     private class BodyWriter extends AbstractBodyWriter {
         
         protected void doWriteBody(Message outMessage, 

@@ -84,6 +84,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+//CHECKSTYLE:OFF
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServer.PORT;
     public static final String PORT2 = allocatePort(JAXRSClientServerBookTest.class);
@@ -500,6 +501,42 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
     }
     
+    @Test
+    public void testProxyBeanPostFormParam() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        BookStore.BookBeanForm bean = new BookStore.BookBeanForm();
+        bean.setId(100L);
+        bean.setId2(23L);
+        bean.setId3(123);
+        Book book = store.postFormBeanParamsBook(bean);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testProxyBeanGetFormParam() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        BookStore.BookBeanForm bean = new BookStore.BookBeanForm();
+        bean.setId(100L);
+        bean.setId2(23L);
+        bean.setId3(123);
+        Book book = store.getFormBeanParamsBook(bean);
+        assertEquals(123L, book.getId());
+    }
+
+    @Test
+    public void testProxyPostFormParam() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        Book book = store.postFormParamsBook(100L, 23L, 123L);
+        assertEquals(123L, book.getId());
+    }
+
+    @Test
+    public void testProxyGetFormParam() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        Book book = store.getFormParamsBook(100L, 23L, 123L);
+        assertEquals(123L, book.getId());
+    }
+
     @Test
     public void testGetBookWithCustomHeader() throws Exception {
         
@@ -2699,7 +2736,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     }
 
-
     private void getAndCompareAsStrings(String address, 
                                         String resourcePath,
                                         String acceptType,
@@ -2763,5 +2799,5 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return IOUtils.toString(in);
     }
 
-    
 }
+//CHECKSTYLE:ON

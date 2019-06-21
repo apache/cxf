@@ -47,6 +47,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
@@ -402,11 +403,55 @@ public class BookStore {
         
         long id = bean1.getId() + bean1.getId2() + bean1.getId3(); 
         if (bean2.getId4() != id) {
-            throw new RuntimeException();
+            throw new RuntimeException("id4 != id");
         }
         return books.get(id);
     }
-    
+
+    @POST
+    @Path("/formBeanParams/{id}")
+    @Produces("application/xml")
+    public Book postFormBeanParamsBook(@BeanParam BookBeanForm bean) {
+        long id = bean.getId() + bean.getId2();
+        if (bean.getId3() != id) {
+            throw new RuntimeException("id3 != id");
+        }
+        return books.get(id);
+    }
+
+    @POST
+    @Path("/formParams/{id}")
+    @Produces("application/xml")
+    public Book postFormParamsBook(@PathParam("id") long id, @QueryParam("id2") long id2, @FormParam("id3") long id3) {
+        long theBookId = id + id2;
+        if (id3 != theBookId) {
+            throw new RuntimeException("id3 != id");
+        }
+        return books.get(theBookId);
+    }
+
+    @GET
+    @Path("/formBeanParams/{id}")
+    @Produces("application/xml")
+    public Book getFormBeanParamsBook(@BeanParam BookBeanForm bean) {
+        long id = bean.getId() + bean.getId2();
+        if (bean.getId3() != 0) {
+            throw new RuntimeException("id3 != 0");
+        }
+        return books.get(id);
+    }
+
+    @GET
+    @Path("/formParams/{id}")
+    @Produces("application/xml")
+    public Book getFormParamsBook(@PathParam("id") long id, @QueryParam("id2") long id2, @FormParam("id3") long id3) {
+        long theBookId = id + id2;
+        if (id3 != 0) {
+            throw new RuntimeException("id3 != 0");
+        }
+        return books.get(theBookId);
+    }
+
     @POST
     @Path("/mapperonbus")
     public void mapperOnBus() {
@@ -1896,11 +1941,44 @@ public class BookStore {
         public long getId4() {
             return id4;
         }
+        
         @QueryParam("id4")
         public void setId4(long id4) {
             this.id4 = id4;
         }
+    }
+
+    public static class BookBeanForm {
+        private long id;
+        private long id2;
+        private long id3;
+
+        public long getId() {
+            return id;
+        }
+
+        @PathParam("id")
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        @QueryParam("id2")
+        public void setId2(long id2) {
+            this.id2 = id2;
+        }
         
+        public long getId2() {
+            return id2;
+        }
+
+        @FormParam("id3")
+        public void setId3(long id3) {
+            this.id3 = id3;
+        }
+        
+        public long getId3() {
+            return id3;
+        }
     }
     
     public static class BookBean2 {
