@@ -146,9 +146,9 @@ public class IssueSamlRealmUnitTest {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertTrue(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertTrue(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
     /**
@@ -222,9 +222,9 @@ public class IssueSamlRealmUnitTest {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
     /**
@@ -298,9 +298,9 @@ public class IssueSamlRealmUnitTest {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertFalse(tokenString.contains("B-Issuer"));
-        assertTrue(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"STS\""));
     }
 
 
@@ -394,9 +394,9 @@ public class IssueSamlRealmUnitTest {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
 
@@ -481,9 +481,9 @@ public class IssueSamlRealmUnitTest {
 
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
-        assertFalse(tokenString.contains("A-Issuer"));
-        assertTrue(tokenString.contains("B-Issuer"));
-        assertFalse(tokenString.contains("STS"));
+        assertFalse(tokenString.contains("Issuer=\"A-Issuer\""));
+        assertTrue(tokenString.contains("Issuer=\"B-Issuer\""));
+        assertFalse(tokenString.contains("Issuer=\"STS\""));
     }
 
 
