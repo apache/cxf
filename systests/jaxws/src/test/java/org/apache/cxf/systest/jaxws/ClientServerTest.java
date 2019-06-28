@@ -48,6 +48,7 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
@@ -720,6 +721,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
                 greeter.testDocLitFault(noSuchCodeFault);
                 fail("Should have thrown NoSuchCodeLitFault exception");
             } catch (NoSuchCodeLitFault nslf) {
+                int responseCode = (Integer) ((BindingProvider) greeter).getResponseContext().get(
+                    MessageContext.HTTP_RESPONSE_CODE);
+                assertEquals(responseCode, 500);
                 assertNotNull(nslf.getFaultInfo());
                 assertNotNull(nslf.getFaultInfo().getCode());
             }
