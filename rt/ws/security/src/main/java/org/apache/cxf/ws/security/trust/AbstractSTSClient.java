@@ -27,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -75,6 +76,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -873,7 +875,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
-        return new STSResponse((DOMSource)obj[0], requestorEntropy, cert, crypto);
+        @SuppressWarnings("unchecked")
+        Collection<Attachment> attachments =
+        (Collection<Attachment>)client.getResponseContext().get(Message.ATTACHMENTS);
+        return new STSResponse((DOMSource)obj[0], requestorEntropy, cert, crypto, attachments);
     }
 
     /**
@@ -1093,7 +1098,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         Object[] obj = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
-        return new STSResponse((DOMSource)obj[0], null);
+        @SuppressWarnings("unchecked")
+        Collection<Attachment> attachments =
+            (Collection<Attachment>)client.getResponseContext().get(Message.ATTACHMENTS);
+        return new STSResponse((DOMSource)obj[0], null, null, null, attachments);
     }
 
     protected PrimitiveAssertion getAddressingAssertion() {
@@ -1166,7 +1174,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
             Object[] o = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
-            return new STSResponse((DOMSource)o[0], null);
+            @SuppressWarnings("unchecked")
+            Collection<Attachment> attachments =
+                (Collection<Attachment>)client.getResponseContext().get(Message.ATTACHMENTS);
+            return new STSResponse((DOMSource)o[0], null, null, null, attachments);
         }
         if (enableLifetime) {
             addLifetime(writer);
@@ -1213,7 +1224,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         Object[] o = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
 
-        return new STSResponse((DOMSource)o[0], requestorEntropy, cert, crypto);
+        @SuppressWarnings("unchecked")
+        Collection<Attachment> attachments =
+            (Collection<Attachment>)client.getResponseContext().get(Message.ATTACHMENTS);
+        return new STSResponse((DOMSource)o[0], requestorEntropy, cert, crypto, attachments);
     }
 
     private void writeRenewalSemantics(XMLStreamWriter writer) throws XMLStreamException {
@@ -1791,17 +1805,25 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         private final byte[] entropy;
         private final X509Certificate cert;
         private final Crypto crypto;
+        private final Collection<Attachment> attachments;
 
         public STSResponse(DOMSource response, byte[] entropy) {
             this(response, entropy, null, null);
         }
 
         public STSResponse(DOMSource response, byte[] entropy, X509Certificate cert, Crypto crypto) {
+            this(response, entropy, cert, crypto, null);
+        }
+
+        public STSResponse(DOMSource response, byte[] entropy, X509Certificate cert,
+                           Crypto crypto, Collection<Attachment> attachments) {
             this.response = response;
             this.entropy = entropy;
             this.cert = cert;
             this.crypto = crypto;
+            this.attachments = attachments;
         }
+
 
         public DOMSource getResponse() {
             return response;
@@ -1817,6 +1839,10 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
 
         public Crypto getCrypto() {
             return crypto;
+        }
+
+        public Collection<Attachment> getAttachments() {
+            return attachments;
         }
     }
 

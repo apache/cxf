@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,10 +28,19 @@ import java.util.logging.Logger;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
+import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.XMLUtils;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.util.WSSecurityUtil;
 
 /**
  * A extension of AbstractSTSClient to communicate with an STS and return a SecurityToken
@@ -62,6 +72,7 @@ public class STSClient extends AbstractSTSClient {
 
         SecurityToken token =
             createSecurityToken(getDocumentElement(response.getResponse()), response.getEntropy());
+        inlineAttachments(token, response.getAttachments());
 
         if (response.getCert() != null) {
             token.setX509Certificate(response.getCert(), response.getCrypto());
@@ -81,6 +92,8 @@ public class STSClient extends AbstractSTSClient {
         STSResponse response = renew(tok);
 
         SecurityToken token = createSecurityToken(getDocumentElement(response.getResponse()), null);
+        inlineAttachments(token, response.getAttachments());
+
         if (token.getTokenType() == null) {
             String tokenTypeFromTemplate = getTokenTypeFromTemplate();
             if (tokenTypeFromTemplate != null) {
@@ -98,6 +111,19 @@ public class STSClient extends AbstractSTSClient {
             validateTokenType = namespace + "/RSTR/Status";
         }
         return validateSecurityToken(tok, validateTokenType);
+    }
+
+    private void inlineAttachments(SecurityToken token, Collection<Attachment> attachments) throws WSSecurityException {
+        Message msg = PhaseInterceptorChain.getCurrentMessage();
+        if (AttachmentUtil.isMtomEnabled(msg) && attachments != null) {
+            Element requestedSecurityTokenElement = token.getToken();
+            if (requestedSecurityTokenElement != null) {
+                // Look for xop:Include Nodes + inline the contents
+                List<Element> includeElements =
+                    XMLUtils.findElements(requestedSecurityTokenElement.getFirstChild(), "Include", WSConstants.XOP_NS);
+                WSSecurityUtil.inlineAttachments(includeElements, new AttachmentCallbackHandler(attachments), true);
+            }
+        }
     }
 
     protected List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype)
