@@ -18,17 +18,26 @@
  */
 package org.apache.cxf.jaxrs.openapi;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
@@ -41,11 +50,13 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.common.openapi.DefaultApplicationFactory;
 import org.apache.cxf.jaxrs.common.openapi.SwaggerProperties;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiSupport;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.BaseOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -161,6 +172,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
                     .getUserDefinedOptions());
             registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
             registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
+            registerSwaggerContainerRequestFilter(factory, application);
             
             if (customizer != null) {
                 customizer.setApplicationInfo(factory.getApplicationProvider());
@@ -170,6 +182,16 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
         } catch (OpenApiConfigurationException ex) {
             throw new RuntimeException("Unable to initialize OpenAPI context", ex);
         }
+    }
+    
+    private void registerSwaggerContainerRequestFilter(ServerProviderFactory factory, Application application) {
+        if (isRunAsFilter()) {
+            List<Object> providers = new ArrayList<>();
+            providers.add(new SwaggerContainerRequestFilter(application));
+            factory.setUserProviders(providers);
+        }
+
+
     }
 
     public boolean isScan() {
@@ -542,5 +564,45 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
     
     private OpenApiResource createOpenApiResource() {
         return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
+    }
+    
+    @PreMatching
+    protected static class SwaggerContainerRequestFilter extends BaseOpenApiResource implements ContainerRequestFilter {
+
+        protected static final String APIDOCS_LISTING_PATH_JSON = "openapi.json";
+        protected static final String APIDOCS_LISTING_PATH_YAML = "openapi.yaml";
+        
+        
+        @Context
+        protected MessageContext mc;
+
+        private Application app;
+        public SwaggerContainerRequestFilter(Application app) {
+            this.app = app;
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            UriInfo ui = mc.getUriInfo();
+
+            Response response = null;
+            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
+                try {
+                    response = super.getOpenApi(mc.getHttpHeaders(), mc.getServletConfig(), app, ui, "json");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
+                try {
+                    response = super.getOpenApi(mc.getHttpHeaders(), mc.getServletConfig(), app, ui, "yaml");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            }
+
+            if (response != null) {
+                requestContext.abortWith(response);
+            }
+        }
     }
 }
