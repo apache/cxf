@@ -18,10 +18,13 @@
  */
 package org.apache.cxf.jaxrs.openapi;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -29,7 +32,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
@@ -43,11 +53,14 @@ import org.apache.cxf.feature.DelegatingFeature;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.common.openapi.DefaultApplicationFactory;
 import org.apache.cxf.jaxrs.common.openapi.SwaggerProperties;
+import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiConfig;
 import org.apache.cxf.jaxrs.swagger.ui.SwaggerUiSupport;
 
+
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.BaseOpenApiResource;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.GenericOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -60,6 +73,7 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
@@ -469,6 +483,7 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
                                 .getUserDefinedOptions());
                 registerOpenApiResources(sfb, packages, context.getOpenApiConfiguration());
                 registerSwaggerUiResources(sfb, combine(swaggerProps, userProperties), factory, bus);
+                registerSwaggerContainerRequestFilter(factory, application);
 
                 if (useContextBasedConfig) {
                     registerServletConfigProvider(factory);
@@ -482,6 +497,16 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
             } catch (OpenApiConfigurationException ex) {
                 throw new RuntimeException("Unable to initialize OpenAPI context", ex);
             }
+        }
+
+        private void registerSwaggerContainerRequestFilter(ServerProviderFactory factory, Application application) {
+            if (isRunAsFilter()) {
+                List<Object> providers = new ArrayList<>();
+                providers.add(new SwaggerContainerRequestFilter(application));
+                factory.setUserProviders(providers);
+            }
+            
+            
         }
 
         public boolean isScan() {
@@ -759,8 +784,9 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
             if (!isRunAsFilter()) {
                 sfb.setResourceClassesFromBeans(swaggerUiRegistration.getResources());
             }
-
+            
             factory.setUserProviders(swaggerUiRegistration.getProviders());
+                       
         }
 
         /**
@@ -866,6 +892,46 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
 
         private OpenApiResource createOpenApiResource() {
             return (customizer == null) ? new OpenApiResource() : new OpenApiCustomizedResource(customizer);
+        }
+    }
+    
+    @PreMatching
+    protected static class SwaggerContainerRequestFilter extends BaseOpenApiResource implements ContainerRequestFilter {
+
+        protected static final String APIDOCS_LISTING_PATH_JSON = "openapi.json";
+        protected static final String APIDOCS_LISTING_PATH_YAML = "openapi.yaml";
+        
+        
+        @Context
+        protected MessageContext mc;
+
+        private Application app;
+        public SwaggerContainerRequestFilter(Application app) {
+            this.app = app;
+        }
+
+        @Override
+        public void filter(ContainerRequestContext requestContext) throws IOException {
+            UriInfo ui = mc.getUriInfo();
+
+            Response response = null;
+            if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_JSON)) {
+                try {
+                    response = super.getOpenApi(mc.getHttpHeaders(), mc.getServletConfig(), app, ui, "json");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            } else if (ui.getPath().endsWith(APIDOCS_LISTING_PATH_YAML)) {
+                try {
+                    response = super.getOpenApi(mc.getHttpHeaders(), mc.getServletConfig(), app, ui, "yaml");
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
+            }
+
+            if (response != null) {
+                requestContext.abortWith(response);
+            }
         }
     }
 }
