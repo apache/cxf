@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -539,6 +540,10 @@ public class ClientImpl
             }
             return processResult(message, exchange, oi, resContext);
         } finally {
+            //ensure ResponseContext has HTTP RESPONSE CODE
+            Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
+            resContext.put(MessageContext.HTTP_RESPONSE_CODE, responseCode);
+            resContext.put(org.apache.cxf.message.Message.RESPONSE_CODE, responseCode);
             setResponseContext(resContext);
             if (origLoader != null) {
                 origLoader.reset();
