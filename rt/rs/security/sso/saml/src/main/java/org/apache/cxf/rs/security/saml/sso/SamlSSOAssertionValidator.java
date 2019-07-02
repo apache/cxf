@@ -53,11 +53,11 @@ public class SamlSSOAssertionValidator extends SamlAssertionValidator {
         List<String> methods = samlAssertion.getConfirmationMethods();
         if (methods == null || methods.isEmpty()) {
             if (super.getRequiredSubjectConfirmationMethod() != null) {
-                LOG.fine("A required subject confirmation method was not present");
+                LOG.warning("A required subject confirmation method was not present");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             } else if (super.isRequireStandardSubjectConfirmationMethod()) {
-                LOG.fine("A standard subject confirmation method was not present");
+                LOG.warning("A standard subject confirmation method was not present");
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
             }
@@ -69,13 +69,13 @@ public class SamlSSOAssertionValidator extends SamlAssertionValidator {
         for (String method : methods) {
             if (OpenSAMLUtil.isMethodHolderOfKey(method)) {
                 if (samlAssertion.getSubjectKeyInfo() == null) {
-                    LOG.fine("There is no Subject KeyInfo to match the holder-of-key subject conf method");
+                    LOG.warning("There is no Subject KeyInfo to match the holder-of-key subject conf method");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noKeyInSAMLToken");
                 }
 
                 // The assertion must have been signed for HOK
                 if (!signed) {
-                    LOG.fine("A holder-of-key assertion must be signed");
+                    LOG.warning("A holder-of-key assertion must be signed");
                     throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
                 }
                 standardMethodFound = true;
@@ -89,7 +89,7 @@ public class SamlSSOAssertionValidator extends SamlAssertionValidator {
                     || SAML1Constants.CONF_BEARER.equals(method)) {
                     standardMethodFound = true;
                     if (super.isRequireBearerSignature() && !signed && !signedResponse) {
-                        LOG.fine("A Bearer Assertion was not signed");
+                        LOG.warning("A Bearer Assertion was not signed");
                         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                                       "invalidSAMLsecurity");
                     }
@@ -101,13 +101,13 @@ public class SamlSSOAssertionValidator extends SamlAssertionValidator {
         }
 
         if (!requiredMethodFound && super.getRequiredSubjectConfirmationMethod() != null) {
-            LOG.fine("A required subject confirmation method was not present");
+            LOG.warning("A required subject confirmation method was not present");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "invalidSAMLsecurity");
         }
 
         if (!standardMethodFound && super.isRequireStandardSubjectConfirmationMethod()) {
-            LOG.fine("A standard subject confirmation method was not present");
+            LOG.warning("A standard subject confirmation method was not present");
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                       "invalidSAMLsecurity");
         }

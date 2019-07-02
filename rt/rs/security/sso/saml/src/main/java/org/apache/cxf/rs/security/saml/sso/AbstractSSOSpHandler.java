@@ -159,13 +159,13 @@ public class AbstractSSOSpHandler {
         if (signatureCrypto == null && signaturePropertiesFile != null) {
             Properties sigProperties = SecurityUtils.loadProperties(signaturePropertiesFile);
             if (sigProperties == null) {
-                LOG.fine("Cannot load signature properties using: " + signaturePropertiesFile);
+                LOG.warning("Cannot load signature properties using: " + signaturePropertiesFile);
                 return null;
             }
             try {
                 signatureCrypto = CryptoFactory.getInstance(sigProperties);
             } catch (WSSecurityException ex) {
-                LOG.fine("Error in loading the signature Crypto object: " + ex.getMessage());
+                LOG.warning("Error in loading the signature Crypto object: " + ex.getMessage());
                 return null;
             }
         }
@@ -177,7 +177,7 @@ public class AbstractSSOSpHandler {
             try {
                 callbackHandler = SecurityUtils.getCallbackHandler(callbackHandlerClass);
                 if (callbackHandler == null) {
-                    LOG.fine("Cannot load CallbackHandler using: " + callbackHandlerClass);
+                    LOG.warning("Cannot load CallbackHandler using: " + callbackHandlerClass);
                     return null;
                 }
             } catch (Exception ex) {

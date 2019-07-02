@@ -109,17 +109,17 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
     protected void signAuthnRequest(AuthnRequest authnRequest) throws Exception {
         Crypto crypto = getSignatureCrypto();
         if (crypto == null) {
-            LOG.fine("No crypto instance of properties file configured for signature");
+            LOG.warning("No crypto instance of properties file configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         String signatureUser = getSignatureUsername();
         if (signatureUser == null) {
-            LOG.fine("No user configured for signature");
+            LOG.warning("No user configured for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
         CallbackHandler callbackHandler = getCallbackHandler();
         if (callbackHandler == null) {
-            LOG.fine("No CallbackHandler configured to supply a password for signature");
+            LOG.warning("No CallbackHandler configured to supply a password for signature");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
 
