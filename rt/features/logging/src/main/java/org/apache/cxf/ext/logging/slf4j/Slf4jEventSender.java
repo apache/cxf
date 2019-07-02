@@ -30,8 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.slf4j.event.Level;
 
 public class Slf4jEventSender implements LogEventSender {
+
+    private Level loggingLevel = Level.INFO;
 
     @Override
     public void send(LogEvent event) {
@@ -69,7 +72,19 @@ public class Slf4jEventSender implements LogEventSender {
      * Override this to easily change the logging level etc.
      */
     protected void performLogging(Logger log, Marker marker, String logMessage) {
-        log.info(marker, logMessage);
+        if (loggingLevel == Level.INFO) {
+            log.info(marker, logMessage);
+        } else if (loggingLevel == Level.DEBUG) {
+            log.debug(marker, logMessage);
+        } else if (loggingLevel == Level.ERROR) {
+            log.error(marker, logMessage);
+        } else if (loggingLevel == Level.TRACE) {
+            log.trace(marker, logMessage);
+        } else if (loggingLevel == Level.WARN) {
+            log.warn(marker, logMessage);
+        } else {
+            log.info(marker, logMessage);
+        }
     }
 
     private String localPart(QName name) {
@@ -85,6 +100,14 @@ public class Slf4jEventSender implements LogEventSender {
             MDC.put(key, value);
             keys.add(key);
         }
+    }
+
+    public void setLoggingLevel(Level loggingLevel) {
+        this.loggingLevel = loggingLevel;
+    }
+
+    public void setLoggingLevel(String loggingLevel) {
+        this.loggingLevel = Level.valueOf(loggingLevel);
     }
 
 }
