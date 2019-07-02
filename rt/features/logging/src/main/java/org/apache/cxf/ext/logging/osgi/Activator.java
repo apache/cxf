@@ -69,7 +69,9 @@ public class Activator implements BundleActivator {
             Boolean pretty = Boolean.valueOf(getValue(config, "pretty", "false"));
             Boolean verbose = Boolean.valueOf(getValue(config, "verbose", "true"));
             Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
-
+            Boolean logMultipart = Boolean.valueOf(getValue(config, "logMultipart", "true"));
+            Boolean logBinary = Boolean.valueOf(getValue(config, "logBinary", "false"));
+            
             if (limit != null) {
                 logging.setLimit(limit);
             }
@@ -82,6 +84,12 @@ public class Activator implements BundleActivator {
             
             if (verbose != null) {
                 logging.setVerbose(verbose);
+            }
+            if (logMultipart != null) {                       
+                logging.setLogMultipart(logMultipart);
+            }
+            if (logBinary != null) {
+                logging.setLogBinary(logBinary);
             }
 
             if (intentReg == null) {
