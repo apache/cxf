@@ -51,7 +51,7 @@ public class AttachmentDataSource implements DataSource {
             cache = new CachedOutputStream();
             AttachmentUtil.setStreamedAttachmentProperties(message, cache);
             try {
-                IOUtils.copy(ins, cache);
+                IOUtils.copyAndCloseInput(ins, cache);
                 cache.lockOutputStream();
                 if (delegate != null) {
                     delegate.setInputStream(cache.getInputStream());
@@ -61,11 +61,6 @@ public class AttachmentDataSource implements DataSource {
                 cache = null;
                 throw cee;
             } finally {
-                try {
-                    ins.close();
-                } catch (Exception ex) {
-                    //ignore
-                }
                 ins = null;
             }
         }

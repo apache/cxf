@@ -30,6 +30,7 @@ import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
@@ -40,6 +41,7 @@ public class ArrayTypeInfoTest extends AbstractAegisTest {
     private TypeMapping mapping;
     private StructType addressType;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

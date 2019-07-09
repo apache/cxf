@@ -36,8 +36,6 @@ package org.apache.cxf.systest.type_test;
  * org.apache.type_test.TypeTestTester
  */
 public interface TypeTestTester {
-
-    void setPerformanceTestOnly();
     
     void testVoid() throws Exception;
     

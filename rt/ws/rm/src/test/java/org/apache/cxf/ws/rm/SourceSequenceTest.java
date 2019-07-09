@@ -73,7 +73,7 @@ public class SourceSequenceTest {
         rq = null;
     }
 
-    void setUpSource() {
+    protected void setUpSource() {
         source = control.createMock(Source.class);
         manager = control.createMock(RMManager.class);
         EasyMock.expect(source.getManager()).andReturn(manager).anyTimes();

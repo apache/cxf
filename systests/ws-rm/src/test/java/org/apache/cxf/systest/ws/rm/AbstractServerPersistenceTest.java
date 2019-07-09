@@ -269,7 +269,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
     }
 
 
-    void verifyRetransmissionQueue() throws Exception {
+    protected void verifyRetransmissionQueue() throws Exception {
         awaitMessages(2, 2, 60000);
 
         int count = 0;

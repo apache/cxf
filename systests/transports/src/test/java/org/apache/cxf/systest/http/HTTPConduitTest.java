@@ -146,11 +146,11 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
     //methods that a subclass can override to inject a Proxy into the flow
     //and assert the proxy was appropriately called
-    public void configureProxy(Client c) {
+    protected void configureProxy(Client c) {
     }
-    public void resetProxyCount() {
+    protected void resetProxyCount() {
     }
-    public void assertProxyRequestCount(int i) {
+    protected void assertProxyRequestCount(int i) {
     }
 
 

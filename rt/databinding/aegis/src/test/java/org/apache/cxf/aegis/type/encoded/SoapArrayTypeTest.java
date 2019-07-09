@@ -28,6 +28,7 @@ import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -48,6 +49,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         },
     };
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

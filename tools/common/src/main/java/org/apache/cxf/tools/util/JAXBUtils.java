@@ -128,21 +128,13 @@ public final class JAXBUtils {
         schemaBindings.appendChild(pkgElement);
         rootElement.appendChild(annoElement);
         File tmpFile = null;
-        OutputStream out = null;
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
-            out = Files.newOutputStream(tmpFile.toPath());
-            StaxUtils.writeTo(rootElement, out);
+            try (OutputStream out = Files.newOutputStream(tmpFile.toPath())) {
+                StaxUtils.writeTo(rootElement, out);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return tmpFile;
     }

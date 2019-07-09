@@ -107,7 +107,7 @@ public class WSDLServiceBuilderTest {
 
     private DestinationFactoryManager destinationFactoryManager;
 
-    public void setUpBasic() throws Exception {
+    protected void setUpBasic() throws Exception {
         setUpWSDL(WSDL_PATH, 0);
     }
 

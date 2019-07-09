@@ -144,7 +144,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         verifyRecovery();
     }
 
-    void startClient() throws Exception {
+    protected void startClient() throws Exception {
         LOG.fine("Creating greeter client");
         System.setProperty("db.name", getPrefix() + "-client");
         SpringBusFactory bf = new SpringBusFactory();
@@ -163,7 +163,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         bus.getInInterceptors().add(in);
     }
 
-    void populateStore() throws Exception {
+    protected void populateStore() throws Exception {
 
         bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
         bus.getOutInterceptors().add(new MessageLossSimulator());
@@ -198,7 +198,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         mf.verifyAcknowledgements(new boolean[] {false, true, true}, false);
     }
 
-    void verifyStorePopulation() {
+    protected void verifyStorePopulation() {
 
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
@@ -225,12 +225,12 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         assertEquals(0, msgs.size());
     }
 
-    void stopClient() {
+    protected void stopClient() {
         // ClientProxy.getClient(greeter).destroy();
         bus.shutdown(true);
     }
 
-    void populateStoreAfterRestart() throws Exception {
+    protected void populateStoreAfterRestart() throws Exception {
 
         bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(Long.valueOf(60000));
 
@@ -274,7 +274,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
         }
     }
 
-    void recover() throws Exception {
+    protected void recover() throws Exception {
 
         // do nothing - resends should happen in the background
 
@@ -283,7 +283,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
 
     }
 
-    void verifyRecovery() throws Exception {
+    protected void verifyRecovery() throws Exception {
 
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);

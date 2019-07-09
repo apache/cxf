@@ -25,9 +25,11 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.DataService;
 import org.apache.cxf.wsdl.WSDLConstants;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class ByteDataTest extends AbstractAegisTest {
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         createService(DataService.class);

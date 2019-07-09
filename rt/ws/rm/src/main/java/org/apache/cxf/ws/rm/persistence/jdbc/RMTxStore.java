@@ -749,29 +749,29 @@ public class RMTxStore implements RMStore {
                     new Object[] {outbound ? "outbound" : "inbound", nr, id, to});
         }
         PreparedStatement stmt = null;
-        CachedOutputStream cos = msg.getContent();
-        InputStream msgin = null;
-        try {
-            msgin = cos.getInputStream();
-            stmt = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
-
-            stmt.setString(1, id);
-            stmt.setLong(2, nr);
-            stmt.setString(3, to);
-            stmt.setLong(4, msg.getCreatedTime());
-            stmt.setBinaryStream(5, msgin);
-            stmt.setString(6, contentType);
-            stmt.execute();
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
-                        new Object[] {outbound ? "outbound" : "inbound", nr, id});
+        try (CachedOutputStream cos = msg.getContent()) {
+            InputStream msgin = null;
+            try {
+                msgin = cos.getInputStream();
+                stmt = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
+    
+                stmt.setString(1, id);
+                stmt.setLong(2, nr);
+                stmt.setString(3, to);
+                stmt.setLong(4, msg.getCreatedTime());
+                stmt.setBinaryStream(5, msgin);
+                stmt.setString(6, contentType);
+                stmt.execute();
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Successfully stored {0} message number {1} for sequence {2}",
+                            new Object[] {outbound ? "outbound" : "inbound", nr, id});
+                }
+            } finally  {
+                releaseResources(stmt, null);
+                if (null != msgin) {
+                    msgin.close();
+                }
             }
-        } finally  {
-            releaseResources(stmt, null);
-            if (null != msgin) {
-                msgin.close();
-            }
-            cos.close(); // needed to clean-up tmp file folder
         }
     }
 

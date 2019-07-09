@@ -61,7 +61,7 @@ public abstract class AbstractTypeTestClient
 
     protected boolean perfTestOnly;
 
-    public void setPerformanceTestOnly() {
+    protected void setPerformanceTestOnly() {
         perfTestOnly = true;
     }
 

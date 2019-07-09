@@ -51,6 +51,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.constants.Constants;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -63,6 +64,7 @@ public class BeanTest extends AbstractAegisTest {
     TypeMapping mapping;
     private AegisContext context;
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

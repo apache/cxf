@@ -33,6 +33,7 @@ import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.helpers.DOMUtils;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -49,6 +50,7 @@ public class StructTypeTest extends AbstractEncodedTest {
         return new Context(aegisContext);
     }
 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
 

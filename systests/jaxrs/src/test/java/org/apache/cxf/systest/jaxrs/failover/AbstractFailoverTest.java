@@ -144,7 +144,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
             getFeature(false, Server.ADDRESS3, null);
         strategyTest(Server.ADDRESS1, feature, Server.ADDRESS3, Server.ADDRESS2, false, false, false);
     }
-
+    @Test
     public void testSequentialStrategyWithDiffBaseAddresses2() throws Exception {
         FailoverFeature feature =
             getFeature(false, Server.ADDRESS3, null);
