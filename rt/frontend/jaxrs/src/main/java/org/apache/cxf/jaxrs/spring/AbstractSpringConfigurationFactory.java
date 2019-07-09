@@ -28,6 +28,7 @@ import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.springframework.beans.BeansException;
@@ -58,7 +59,7 @@ public abstract class AbstractSpringConfigurationFactory
         factory.setOutFaultInterceptors(getOutFaultInterceptors());
         factory.setFeatures(getFeatures());
         if (!StringUtils.isEmpty(jaxrsExtensions)) {
-            factory.setExtensionMappings((Map)parseMapSequence(jaxrsExtensions));
+            factory.setExtensionMappings(CastUtils.cast((Map<?, ?>)parseMapSequence(jaxrsExtensions)));
         }
         finalizeFactorySetup(factory);
         return factory.create();

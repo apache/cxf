@@ -618,6 +618,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private Connector createConnector(String hosto, int porto) {
         // now we just use the SelectChannelConnector as the default connector
         SslContextFactory sslcf = null;
@@ -758,6 +759,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
         return context;
     }
 
+    @SuppressWarnings("deprecation")
     protected void setClientAuthentication(SslContextFactory con,
                                            ClientAuthentication clientAuth) {
         con.setWantClientAuth(true);
