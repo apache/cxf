@@ -20,7 +20,7 @@
 package org.apache.cxf.sts.token.canceller;
 
 import java.security.Key;
-import java.util.Arrays;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -164,7 +164,7 @@ public class SCTCanceller implements TokenCanceller {
             if (signedResults != null) {
                 for (WSSecurityEngineResult engineResult : signedResults) {
                     byte[] receivedKey = (byte[])engineResult.get(WSSecurityEngineResult.TAG_SECRET);
-                    if (Arrays.equals(secretToMatch, receivedKey)) {
+                    if (MessageDigest.isEqual(secretToMatch, receivedKey)) {
                         LOG.log(
                                 Level.FINE,
                                 "Verification of the proof of possession of the key associated with "
@@ -196,7 +196,7 @@ public class SCTCanceller implements TokenCanceller {
                         for (String key : token.getSecretKey().keySet()) {
                             Key keyObject = token.getSecretKey().get(key);
                             if (keyObject instanceof SecretKey
-                                && Arrays.equals(secretToMatch, ((SecretKey)keyObject).getEncoded())) {
+                                && MessageDigest.isEqual(secretToMatch, ((SecretKey)keyObject).getEncoded())) {
                                 LOG.log(
                                     Level.FINE,
                                     "Verification of the proof of possession of the key associated with "
