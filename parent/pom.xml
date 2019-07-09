@@ -337,12 +337,12 @@
                         <buildcommands>
                             <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
                             <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
-                            <java.lang.String>ch.acanda.eclipse.pmd.builder.PMDBuilder</java.lang.String>
+                            <java.lang.String>${PMD_BUILDER}</java.lang.String>
                         </buildcommands>
                         <projectnatures>
                             <nature>org.eclipse.jdt.core.javanature</nature>
                             <nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
-                            <nature>ch.acanda.eclipse.pmd.builder.PMDNature</nature>
+                            <nature>${PMD_NATURE}</nature>
                         </projectnatures>
                         <ajdtVersion>none</ajdtVersion>
                         <additionalConfig>
@@ -407,7 +407,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.11.0</version>
+                    <version>3.12.0</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -2644,6 +2644,32 @@
             <build>
                 <defaultGoal>process-test-sources</defaultGoal>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>setup.workspace</id>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <exportAntProperties>true</exportAntProperties>
+                                    <target>
+                                        <path id="ecp.ws.path" location="${eclipse.workspace.dir}" />
+                                        <property name="full.eclipse.workspace" refid="ecp.ws.path" />
+                                        <condition property="PMD_BUILDER" value="net.sourceforge.pmd.eclipse.plugin.pmdBuilder" else="ch.acanda.eclipse.pmd.builder.PMDBuilder">
+                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file"/>
+                                        </condition>
+                                        <condition property="PMD_NATURE" value="net.sourceforge.pmd.eclipse.plugin.pmdNature" else="ch.acanda.eclipse.pmd.builder.PMDNature">
+                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file"/>
+                                        </condition>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-eclipse-plugin</artifactId>
