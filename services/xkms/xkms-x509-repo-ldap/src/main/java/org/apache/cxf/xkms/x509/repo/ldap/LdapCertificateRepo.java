@@ -209,8 +209,9 @@ public class LdapCertificateRepo implements CertificateRepo {
         if (cert == null) {
             // Try to find certificate by search for uid attribute
             try {
-                String uidAttr = String.format(ldapConfig.getServiceCertUIDTemplate(), serviceName);
-                cert = getCertificateForUIDAttr(uidAttr);
+                String filter = String.format(ldapConfig.getServiceCertUIDTemplate(), serviceName);
+                Attribute attr = ldapSearch.findAttribute(rootDN, filter, ldapConfig.getAttrCrtBinary());
+                return getCert(attr);
             } catch (NamingException e) {
                 // Not found
             }
