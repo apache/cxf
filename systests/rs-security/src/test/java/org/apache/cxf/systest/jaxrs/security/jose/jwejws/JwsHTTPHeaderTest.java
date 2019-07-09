@@ -233,6 +233,7 @@ public class JwsHTTPHeaderTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         CustomHeaderInterceptor customHeaderInterceptor = new CustomHeaderInterceptor(Phase.PRE_STREAM);
         customHeaderInterceptor.setEmpty(true);
+        assertTrue(customHeaderInterceptor.isEmpty());
         WebClient.getConfig(client).getOutInterceptors().add(customHeaderInterceptor);
 
         Response response = client.post(new Book("book", 123L));
