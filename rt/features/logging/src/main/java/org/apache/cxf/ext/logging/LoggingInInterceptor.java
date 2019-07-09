@@ -34,7 +34,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 
@@ -43,20 +42,6 @@ import org.apache.cxf.phase.PhaseInterceptor;
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
-    class LoggingInFaultInterceptor extends AbstractPhaseInterceptor<Message> {
-        LoggingInFaultInterceptor() {
-            super(Phase.RECEIVE);
-        }
-
-        @Override
-        public void handleMessage(Message message) throws Fault {
-        }
-
-        @Override
-        public void handleFault(Message message) throws Fault {
-            LoggingInInterceptor.this.handleMessage(message);
-        }
-    }
 
     public LoggingInInterceptor() {
         this(new Slf4jVerboseEventSender());
@@ -73,7 +58,6 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
         ret.add(new WireTapIn(getWireTapLimit(), threshold));
-        ret.add(new LoggingInFaultInterceptor());
         return ret;
     }
 
