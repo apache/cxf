@@ -43,10 +43,17 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
  */
 public class AttachmentCallbackHandler implements CallbackHandler {
 
-    private final Message message;
+    private final Collection<org.apache.cxf.message.Attachment> attachments;
 
     public AttachmentCallbackHandler(Message message) {
-        this.message = message;
+        if (message.getAttachments() == null) {
+            message.setAttachments(new ArrayList<Attachment>());
+        }
+        attachments = message.getAttachments();
+    }
+
+    public AttachmentCallbackHandler(Collection<org.apache.cxf.message.Attachment> attachments) {
+        this.attachments = attachments;
     }
 
     @Override
@@ -66,12 +73,6 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 loadAttachments(attachmentList, attachmentId, attachmentRequestCallback.isRemoveAttachments());
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
-
-                if (message.getAttachments() == null) {
-                    message.setAttachments(new ArrayList<Attachment>());
-                }
-
-                final Collection<org.apache.cxf.message.Attachment> attachments = message.getAttachments();
 
                 org.apache.cxf.attachment.AttachmentImpl securedAttachment =
                     new org.apache.cxf.attachment.AttachmentImpl(
@@ -93,7 +94,6 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 AttachmentRemovalCallback attachmentRemovalCallback = (AttachmentRemovalCallback) callback;
                 String attachmentId = attachmentRemovalCallback.getAttachmentId();
                 if (attachmentId != null) {
-                    final Collection<org.apache.cxf.message.Attachment> attachments = message.getAttachments();
                     // Calling LazyAttachmentCollection.size() here to force it to load the attachments
                     if (attachments != null && attachments.size() > 0) {  // NOPMD
                         for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
@@ -118,7 +118,6 @@ public class AttachmentCallbackHandler implements CallbackHandler {
         String attachmentId,
         boolean removeAttachments
     ) throws IOException {
-        final Collection<org.apache.cxf.message.Attachment> attachments = message.getAttachments();
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
         if (attachments != null && attachments.size() > 0) { // NOPMD
             for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
