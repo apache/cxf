@@ -208,5 +208,56 @@
                 </plugins>
             </build>
         </profile>
+        
+        <profile>
+            <id>jdk13</id>
+              <activation>
+                  <jdk>[13,)</jdk>
+              </activation>
+              <build>
+                  <pluginManagement>
+                      <plugins>
+                          <plugin>
+                              <groupId>org.apache.maven.plugins</groupId>
+                              <artifactId>maven-compiler-plugin</artifactId>
+                              <executions>
+                                  <execution>
+                                    <id>default-jdk13-compile</id>
+                                    <goals>
+                                        <goal>compile</goal>
+                                    </goals>
+                                    <configuration>
+                                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                                        <compileSourceRoots>
+                                            <compileSourceRoot>${project.basedir}/src/main/java13</compileSourceRoot>
+                                        </compileSourceRoots>
+                                        <outputDirectory>${project.build.outputDirectory}/META-INF/versions/13</outputDirectory>
+                                    </configuration>
+                              </execution>
+                          </executions>
+                          <configuration>
+                              <release>9</release>
+                          </configuration>
+                      </plugin>
+                      <plugin>
+                          <groupId>org.apache.maven.plugins</groupId>
+                          <artifactId>maven-jar-plugin</artifactId>
+                          <executions>
+                              <execution>
+                                  <id>default-jar</id>
+                                  <configuration>
+                                      <archive>
+                                          <manifestEntries>
+                                              <Multi-Release>true</Multi-Release>
+                                          </manifestEntries>
+                                      </archive>
+                                  </configuration>
+                              </execution>
+                          </executions>
+                      </plugin>
+                  </plugins>
+              </pluginManagement>
+          </build>
+        </profile>
     </profiles>
 </project>
