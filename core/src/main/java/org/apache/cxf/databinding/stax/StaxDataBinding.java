@@ -76,7 +76,7 @@ public class StaxDataBinding extends AbstractInterceptorProvidingDataBinding {
             addBefore(StaxInEndingInterceptor.class.getName());
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
             message.getInterceptorChain().remove(StaxInEndingInterceptor.INSTANCE);
         }
     }

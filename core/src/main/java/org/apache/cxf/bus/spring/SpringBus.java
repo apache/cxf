@@ -24,7 +24,6 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.resource.ResourceManager;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
@@ -50,7 +49,7 @@ public class SpringBus extends ExtensionManagerBus
     }
 
     /** {@inheritDoc}*/
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         ctx = (AbstractApplicationContext)applicationContext;
         @SuppressWarnings("rawtypes")
         ApplicationListener listener = new ApplicationListener() {

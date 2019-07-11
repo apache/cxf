@@ -39,7 +39,6 @@ import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -213,10 +212,10 @@ public class SpringBusFactoryTest {
         public void handleFault(Message message) {
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
         }
 
-        public void postHandleMessage(Message message) throws Fault {
+        public void postHandleMessage(Message message) {
         }
 
     }

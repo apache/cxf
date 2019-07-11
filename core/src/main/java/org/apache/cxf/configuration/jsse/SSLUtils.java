@@ -103,41 +103,27 @@ public final class SSLUtils {
         String keyStorePassword = getKeystorePassword(null, log);
         String keyPassword = getKeyPassword(null, log);
         String keyStoreType = getKeystoreType(null, log);
-        InputStream is = null;
 
-        try {
-            if (location != null) {
-                File file = new File(location);
-                if (FileUtils.exists(file)) {
-                    is = Files.newInputStream(file.toPath());
-                } else {
-                    is = getResourceAsStream(location);
+        if (location != null) {
+            File file = new File(location);
+            try (InputStream is = FileUtils.exists(file) ? Files.newInputStream(file.toPath())
+                    : getResourceAsStream(location)) {
+                if (is != null) {
+                    KeyManagerFactory kmf =
+                        KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                    KeyStore ks = KeyStore.getInstance(keyStoreType != null ? keyStoreType : KeyStore.getDefaultType());
+                    ks.load(is, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
+                    kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
+                    defaultManagers = kmf.getKeyManagers();
                 }
-            }
-
-            if (is != null) {
-                KeyManagerFactory kmf =
-                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-                KeyStore ks = KeyStore.getInstance(keyStoreType != null ? keyStoreType : KeyStore.getDefaultType());
-
-                ks.load(is, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
-                kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
-                defaultManagers = kmf.getKeyManagers();
-            } else {
-                log.log(Level.FINER, "No default keystore {0}", location);
+            } catch (Exception e) {
+                log.log(Level.WARNING, "Default key managers cannot be initialized: " + e.getMessage(), e);
                 defaultManagers = new KeyManager[0];
             }
-        } catch (Exception e) {
-            log.log(Level.WARNING, "Default key managers cannot be initialized: " + e.getMessage(), e);
+        }
+        if (null == defaultManagers) {
+            log.log(Level.FINER, "No default keystore {0}", location);
             defaultManagers = new KeyManager[0];
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warning("Keystore stream cannot be closed: " + e.getMessage());
-                }
-            }
         }
     }
 
@@ -148,41 +134,26 @@ public final class SSLUtils {
         String location = getTruststore(null, log);
         String trustStorePassword = getTruststorePassword(null, log);
         String trustStoreType = getTrustStoreType(null, log, DEFAULT_TRUST_STORE_TYPE);
-        InputStream is = null;
 
-        try {
-            if (location != null) {
-                File file = new File(location);
-                if (FileUtils.exists(file)) {
-                    is = Files.newInputStream(file.toPath());
+        if (location != null) {
+            File file = new File(location);
+            try (InputStream is = FileUtils.exists(file) ? Files.newInputStream(file.toPath())
+                    : getResourceAsStream(location)) {
+                if (is != null) {
+                    TrustManagerFactory tmf =
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                    KeyStore ks = KeyStore.getInstance(trustStoreType);
+
+                    ks.load(is, (trustStorePassword != null) ? trustStorePassword.toCharArray() : null);
+                    tmf.init(ks);
+                    return tmf.getTrustManagers();
                 } else {
-                    is = getResourceAsStream(location);
+                    log.log(Level.FINER, "No default trust keystore {0}", location);
                 }
-            }
-
-            if (is != null) {
-                TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                KeyStore ks = KeyStore.getInstance(trustStoreType);
-
-                ks.load(is, (trustStorePassword != null) ? trustStorePassword.toCharArray() : null);
-                tmf.init(ks);
-                return tmf.getTrustManagers();
-            } else {
-                log.log(Level.FINER, "No default trust keystore {0}", location);
-            }
-        } catch (Exception e) {
-            log.log(Level.WARNING, "Default trust managers cannot be initialized: " + e.getMessage(), e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.warning("Keystore stream cannot be closed: " + e.getMessage());
-                }
+            } catch (Exception e) {
+                log.log(Level.WARNING, "Default trust managers cannot be initialized: " + e.getMessage(), e);
             }
         }
-
         return null;
     }
 

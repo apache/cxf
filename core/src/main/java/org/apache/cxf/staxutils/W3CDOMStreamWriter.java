@@ -336,8 +336,8 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         return context;
     }
 
-    public Object getProperty(String prop) throws IllegalArgumentException {
-        return properties.get(prop);
+    public Object getProperty(String name) {
+        return properties.get(name);
     }
 
     public void close() throws XMLStreamException {

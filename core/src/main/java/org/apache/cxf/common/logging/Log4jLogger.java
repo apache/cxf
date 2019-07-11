@@ -84,14 +84,14 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         return null;
     }
 
-    public void setLevel(Level newLevel) throws SecurityException {
+    public void setLevel(Level newLevel) {
         log.setLevel(TO_LOG4J.get(newLevel));
     }
 
-    public synchronized void addHandler(Handler handler) throws SecurityException {
+    public synchronized void addHandler(Handler handler) {
         log.addAppender(new HandlerWrapper(handler));
     }
-    public synchronized void removeHandler(Handler handler) throws SecurityException {
+    public synchronized void removeHandler(Handler handler) {
         log.removeAppender("HandlerWrapper-" + handler.hashCode());
     }
     public synchronized Handler[] getHandlers() {

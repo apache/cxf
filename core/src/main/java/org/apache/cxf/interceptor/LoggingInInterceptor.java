@@ -76,14 +76,14 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         this.writer = w;
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Logger logger = getMessageLogger(message);
         if (logger != null && (writer != null || logger.isLoggable(Level.INFO))) {
             logging(logger, message);
         }
     }
 
-    protected void logging(Logger logger, Message message) throws Fault {
+    protected void logging(Logger logger, Message message) {
         if (message.containsKey(LoggingMessage.ID_KEY)) {
             return;
         }

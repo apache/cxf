@@ -268,7 +268,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    public void setLevel(Level newLevel) throws SecurityException {
+    public void setLevel(Level newLevel) {
         throw new UnsupportedOperationException();
     }
 
@@ -283,7 +283,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         return false;
     }
 
-    public synchronized void addHandler(Handler handler) throws SecurityException {
+    public synchronized void addHandler(Handler handler) {
         if (supportsHandlers()) {
             super.addHandler(handler);
             return;
@@ -291,7 +291,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         throw new UnsupportedOperationException();
     }
 
-    public synchronized void removeHandler(Handler handler) throws SecurityException {
+    public synchronized void removeHandler(Handler handler) {
         if (supportsHandlers()) {
             super.removeHandler(handler);
             return;

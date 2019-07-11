@@ -93,8 +93,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
     }
 
     @Override
-    protected int doLoadBeanDefinitions(InputSource inputSource,
-                                        Resource resource) throws BeanDefinitionStoreException {
+    protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource) {
         // sadly, the Spring class we are extending has the critical function
         // getValidationModeForResource
         // marked private instead of protected, so trickery is called for here.
@@ -124,8 +123,7 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
     }
 
     @Override
-    public int loadBeanDefinitions(final EncodedResource encodedResource)
-        throws BeanDefinitionStoreException {
+    public int loadBeanDefinitions(final EncodedResource encodedResource) {
         if (!noFastinfoset) {
             try {
                 return fastInfosetLoadBeanDefinitions(encodedResource);

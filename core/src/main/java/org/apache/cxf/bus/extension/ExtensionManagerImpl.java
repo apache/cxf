@@ -162,17 +162,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
 
         while (urls.hasMoreElements()) {
             final URL url = urls.nextElement();
-            InputStream is;
-            try {
-                is = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+            try (InputStream is = AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
                     public InputStream run() throws Exception {
                         return url.openStream();
                     }
-                });
-            } catch (PrivilegedActionException pae) {
-                throw (IOException)pae.getException();
-            }
-            try {
+                })) {
                 List<Extension> exts = new TextExtensionFragmentParser(loader).getExtensions(is);
                 for (Extension e : exts) {
                     if (loader != l) {
@@ -183,12 +177,8 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                         ordered.add(e);
                     }
                 }
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
+            } catch (PrivilegedActionException pae) {
+                throw (IOException)pae.getException();
             }
         }
     }

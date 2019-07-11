@@ -42,7 +42,7 @@ public class StaxInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         super(phase);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         XMLStreamReader xtr = message.getContent(XMLStreamReader.class);
         if (xtr != null && !MessageUtils.getContextualBoolean(message, STAX_IN_NOCLOSE, false)) {
             try {

@@ -57,7 +57,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.PRE_PROTOCOL);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Fault f = (Fault)message.getContent(Exception.class);
         if (f == null) {
             return;

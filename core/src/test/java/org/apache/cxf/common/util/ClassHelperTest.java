@@ -191,7 +191,7 @@ public class ClassHelperTest {
 
         EasyMock.verify(bus);
     }
-    
+
     @Test
     public void getRealLambdaClassPropertyWasSetInBus() {
         EasyMock.expect(bus.getProperty(ClassHelper.USE_DEFAULT_CLASS_HELPER)).andReturn(true);

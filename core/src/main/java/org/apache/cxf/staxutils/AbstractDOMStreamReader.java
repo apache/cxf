@@ -111,7 +111,7 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
      *
      * @see javax.xml.stream.XMLStreamReader#getProperty(java.lang.String)
      */
-    public Object getProperty(String key) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         return null;
     }
 

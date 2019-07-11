@@ -289,25 +289,12 @@ public final class FileUtils {
     }
 
     public static String getStringFromFile(File location) {
-        InputStream is = null;
-        String result = null;
-
-        try {
-            is = Files.newInputStream(location.toPath());
-            result = normalizeCRLF(is);
-        } catch (Exception e) {
+        try (InputStream is  = Files.newInputStream(location.toPath())) {
+            return normalizeCRLF(is);
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                    //do nothing
-                }
-            }
         }
-
-        return result;
+        return null;
     }
 
     public static String normalizeCRLF(InputStream instream) {

@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -42,7 +41,7 @@ public class DelegatingAuthenticationInterceptor extends AbstractPhaseIntercepto
         super(phase);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
 
         String scheme = getAuthenticationScheme(message);
         Interceptor<Message> handler = authenticationHandlers.get(scheme);

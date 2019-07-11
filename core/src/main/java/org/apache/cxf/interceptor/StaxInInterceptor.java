@@ -146,7 +146,10 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
 
-    public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
+    /**
+     * @throws Fault
+     */
+    public static XMLInputFactory getXMLInputFactory(Message m) {
         Object o = m.getContextualProperty(XMLInputFactory.class.getName());
         if (o instanceof XMLInputFactory) {
             return (XMLInputFactory)o;

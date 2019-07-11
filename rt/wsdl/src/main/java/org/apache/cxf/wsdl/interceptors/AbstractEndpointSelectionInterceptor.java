@@ -23,7 +23,6 @@ import java.util.Set;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -40,7 +39,7 @@ public abstract class AbstractEndpointSelectionInterceptor extends AbstractPhase
         super(id, phase);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         Exchange ex = message.getExchange();
         Set<Endpoint> endpoints = CastUtils.cast((Set<?>)ex.get(MultipleEndpointObserver.ENDPOINTS));
 

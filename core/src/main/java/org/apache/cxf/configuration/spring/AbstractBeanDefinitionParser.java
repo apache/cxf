@@ -46,7 +46,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -179,8 +178,7 @@ public abstract class AbstractBeanDefinitionParser
     }
 
     @Override
-    protected String resolveId(Element elem, AbstractBeanDefinition definition,
-                               ParserContext ctx) throws BeanDefinitionStoreException {
+    protected String resolveId(Element elem, AbstractBeanDefinition definition, ParserContext ctx) {
 
         // REVISIT: use getAttributeNS instead
 

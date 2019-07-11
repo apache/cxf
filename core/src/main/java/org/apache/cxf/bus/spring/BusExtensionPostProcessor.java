@@ -22,7 +22,6 @@ package org.apache.cxf.bus.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -43,11 +42,11 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     }
 
 
-    public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanId) {
         return bean;
     }
 
-    public Object postProcessBeforeInitialization(Object bean, String beanId) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanId) {
         if (bean instanceof BusExtension && null != getBus()) {
             Class<? extends Object> cls = ((BusExtension)bean).getRegistrationType();
             registerExt(bean, cls);

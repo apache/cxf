@@ -164,7 +164,7 @@ public class LogUtilsTest {
         String cname;
         String mname;
 
-        public void close() throws SecurityException {
+        public void close() {
         }
         public void flush() {
         }

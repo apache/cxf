@@ -79,7 +79,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         return curContext.getPrefix(ns);
     }
 
-    public Object getProperty(String arg0) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         //nothing
         return null;
     }

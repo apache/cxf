@@ -145,7 +145,10 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return encoding;
     }
 
-    public static XMLOutputFactory getXMLOutputFactory(Message m) throws Fault {
+    /**
+     * @throws Fault
+     */
+    public static XMLOutputFactory getXMLOutputFactory(Message m) {
         Object o = m.getContextualProperty(XMLOutputFactory.class.getName());
         if (o instanceof XMLOutputFactory) {
             m.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,

@@ -52,7 +52,7 @@ public class ExtensionTest {
     }
 
     @Test
-    public void testLoad() throws ExtensionException {
+    public void testLoad() throws Exception {
         Extension e = new Extension();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         e.setClassname("no.such.Extension");

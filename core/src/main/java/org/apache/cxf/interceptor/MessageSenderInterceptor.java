@@ -58,7 +58,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             super(Phase.PREPARE_SEND_ENDING);
         }
 
-        public void handleMessage(Message message) throws Fault {
+        public void handleMessage(Message message) {
             try {
                 getConduit(message).close(message);
             } catch (SocketTimeoutException e) {

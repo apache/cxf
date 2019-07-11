@@ -268,7 +268,7 @@ public class InTransformReader extends DepthXMLStreamReader {
     }
 
 
-    public Object getProperty(String name) throws IllegalArgumentException {
+    public Object getProperty(String name) {
         if (INTERN_NAMES.equals(name) || INTERN_NS.equals(name)) {
             return Boolean.FALSE;
         }

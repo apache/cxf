@@ -21,7 +21,6 @@ package org.apache.cxf.service.invoker.spring;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.Factory;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -58,8 +57,8 @@ public class SpringBeanFactory implements Factory, ApplicationContextAware {
         //nothing
     }
 
-    public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-        ctx = arg0;
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        ctx = applicationContext;
     }
 
 }

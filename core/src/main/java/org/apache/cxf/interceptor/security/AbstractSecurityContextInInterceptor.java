@@ -25,7 +25,6 @@ import javax.security.auth.Subject;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.security.SecurityToken;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -40,7 +39,7 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
         super(Phase.PRE_INVOKE);
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         SecurityToken token = message.get(SecurityToken.class);
         if (token == null) {
             reportSecurityException("Security Token is not available on the current message");

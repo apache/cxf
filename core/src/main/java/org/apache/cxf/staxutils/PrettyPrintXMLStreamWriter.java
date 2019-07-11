@@ -85,7 +85,7 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
         return baseWriter.getPrefix(uri);
     }
 
-    public java.lang.Object getProperty(java.lang.String name) throws IllegalArgumentException {
+    public Object getProperty(java.lang.String name) {
         return baseWriter.getProperty(name);
     }
 

@@ -102,28 +102,18 @@ public class XSLTInInterceptor extends AbstractXSLTInterceptor {
     }
 
     protected void transformIS(Message message, InputStream is) {
-        try {
-            InputStream transformedIS = XSLTUtils.transform(getXSLTTemplate(), is);
-            message.setContent(InputStream.class, transformedIS);
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                LOG.warning("Cannot close stream after transformation: " + e.getMessage());
-            }
+        try (InputStream inputStream = is) {
+            message.setContent(InputStream.class, XSLTUtils.transform(getXSLTTemplate(), inputStream));
+        } catch (IOException e) {
+            LOG.warning("Cannot close stream after transformation: " + e.getMessage());
         }
     }
 
     protected void transformReader(Message message, Reader reader) {
-        try {
-            Reader transformedReader = XSLTUtils.transform(getXSLTTemplate(), reader);
-            message.setContent(Reader.class, transformedReader);
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                LOG.warning("Cannot close stream after transformation: " + e.getMessage());
-            }
+        try (Reader r = reader) {
+            message.setContent(Reader.class, XSLTUtils.transform(getXSLTTemplate(), r));
+        } catch (IOException e) {
+            LOG.warning("Cannot close stream after transformation: " + e.getMessage());
         }
     }
 }

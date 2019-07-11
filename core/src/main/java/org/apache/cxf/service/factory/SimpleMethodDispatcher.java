@@ -74,10 +74,10 @@ public class SimpleMethodDispatcher
             BindingInfo b = endpoint.getEndpointInfo().getBinding();
             for (BindingOperationInfo bop2 : b.getOperations()) {
                 if (bop2.getOperationInfo().equals(o)) {
-                    bop2 = getRealOperation(o, bop2);
+                    BindingOperationInfo realBop = getRealOperation(o, bop2);
 
-                    bops.put(b, bop2);
-                    return bop2;
+                    bops.put(b, realBop);
+                    return realBop;
                 }
             }
         }

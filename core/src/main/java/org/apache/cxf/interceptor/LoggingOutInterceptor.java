@@ -63,7 +63,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     }
 
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         final OutputStream os = message.getContent(OutputStream.class);
         final Writer iowriter = message.getContent(Writer.class);
         if (os == null && iowriter == null) {

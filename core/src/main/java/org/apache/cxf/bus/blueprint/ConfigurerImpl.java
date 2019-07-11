@@ -79,18 +79,15 @@ public class ConfigurerImpl implements Configurer {
                 ComponentMetadata cmd = container.getComponentMetadata(s);
                 Class<?> cls = BlueprintBeanLocator.getClassForMetaData(container, cmd);
                 if (cls != null) {
-                    String orig = s;
-                    if (s.charAt(0) == '*') {
-                        //old wildcard
-                        s = "." + s.replaceAll("\\.", "\\.");
-                    }
-                    Matcher matcher = Pattern.compile(s).matcher("");
+                    final String cid = s.charAt(0) != '*' ? s
+                            : "." + s.replaceAll("\\.", "\\."); //old wildcard
+                    Matcher matcher = Pattern.compile(cid).matcher("");
                     List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
                     if (m == null) {
                         m = new ArrayList<>();
                         wildCardBeanDefinitions.put(cls.getName(), m);
                     }
-                    MatcherHolder holder = new MatcherHolder(orig, matcher);
+                    MatcherHolder holder = new MatcherHolder(s, matcher);
                     m.add(holder);
                 }
             }

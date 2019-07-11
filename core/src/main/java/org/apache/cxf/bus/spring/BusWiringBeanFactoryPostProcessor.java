@@ -27,7 +27,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.CastUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -91,7 +90,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
         return new RuntimeBeanReference(name);
     }
 
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) {
         Object inject = bus;
         if (inject == null) {
             inject = getBusForName(Bus.DEFAULT_BUS_ID, factory, true, null);

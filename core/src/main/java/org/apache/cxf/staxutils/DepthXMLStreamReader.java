@@ -151,9 +151,8 @@ public class DepthXMLStreamReader implements XMLStreamReader {
         return reader.getPrefix();
     }
 
-    public Object getProperty(String arg0) throws IllegalArgumentException {
-
-        return reader.getProperty(arg0);
+    public Object getProperty(String name) {
+        return reader.getProperty(name);
     }
 
     public String getText() {

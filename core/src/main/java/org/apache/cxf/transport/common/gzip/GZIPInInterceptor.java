@@ -59,7 +59,7 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         addBefore(AttachmentInInterceptor.class.getName());
     }
 
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
         if (isGET(message)) {
             return;
         }

@@ -101,19 +101,16 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                         BeanDefinition bd = bdr.getBeanDefinition(n);
                         String className = bd.getBeanClassName();
                         if (null != className) {
-                            String orig = n;
-                            if (n.charAt(0) == '*') {
-                                //old wildcard
-                                n = "." + n.replaceAll("\\.", "\\.");
-                            }
+                            final String name = n.charAt(0) != '*' ? n
+                                    : "." + n.replaceAll("\\.", "\\."); //old wildcard
                             try {
-                                Matcher matcher = Pattern.compile(n).matcher("");
+                                Matcher matcher = Pattern.compile(name).matcher("");
                                 List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
                                 if (m == null) {
                                     m = new ArrayList<>();
                                     wildCardBeanDefinitions.put(className, m);
                                 }
-                                MatcherHolder holder = new MatcherHolder(orig, matcher);
+                                MatcherHolder holder = new MatcherHolder(n, matcher);
                                 m.add(holder);
                             } catch (PatternSyntaxException npe) {
                                 //not a valid patter, we'll ignore

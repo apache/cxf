@@ -67,7 +67,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
 
         }
     }
-    public void handleMessage(Message message) throws Fault {
+    public void handleMessage(Message message) {
 
         if (message.getExchange().isOneWay()
             && !isRequestor(message)
