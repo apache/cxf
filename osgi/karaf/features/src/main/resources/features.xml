@@ -191,6 +191,7 @@
         <bundle start-level="40">mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+        <bundle start-level="40">mvn:io.netty/netty-resolver/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-netty-client/${project.version}</bundle>
@@ -201,6 +202,7 @@
         <bundle start-level="40">mvn:io.netty/netty-handler/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-buffer/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-transport/${cxf.netty.version}</bundle>
+        <bundle start-level="40">mvn:io.netty/netty-resolver/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-codec/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:io.netty/netty-codec-http/${cxf.netty.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-transports-http-netty-server/${project.version}</bundle>

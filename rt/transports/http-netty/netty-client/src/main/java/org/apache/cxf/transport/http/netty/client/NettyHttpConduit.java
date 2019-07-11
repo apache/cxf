@@ -448,12 +448,12 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
 
         @Override
         protected int getResponseCode() throws IOException {
-            return getHttpResponse().getStatus().code();
+            return getHttpResponse().status().code();
         }
 
         @Override
         protected String getResponseMessage() throws IOException {
-            return getHttpResponse().getStatus().reasonPhrase();
+            return getHttpResponse().status().reasonPhrase();
         }
 
         @Override

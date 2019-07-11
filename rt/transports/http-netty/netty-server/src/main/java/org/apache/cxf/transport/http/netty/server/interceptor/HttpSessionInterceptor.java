@@ -27,8 +27,7 @@ import org.apache.cxf.transport.http.netty.server.session.HttpSessionStore;
 import org.apache.cxf.transport.http.netty.server.util.Utils;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.cookie.ClientCookieEncoder;
@@ -69,7 +68,7 @@ public class HttpSessionInterceptor implements NettyInterceptor {
         NettyHttpSession s = HttpSessionThreadLocal.get();
         if (s != null && !this.sessionRequestedByCookie) {
             // setup the Cookie for session
-            HttpHeaders.addHeader(response, Names.SET_COOKIE,
+            response.headers().set(HttpHeaderNames.SET_COOKIE,
                                   ClientCookieEncoder.STRICT.encode(NettyHttpSession.SESSION_ID_KEY, s.getId()));
         }
 

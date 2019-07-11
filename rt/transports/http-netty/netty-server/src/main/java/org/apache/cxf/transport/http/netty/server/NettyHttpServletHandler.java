@@ -43,11 +43,12 @@ import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -101,17 +102,17 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         HttpRequest request = (HttpRequest) msg;
-        if (HttpHeaders.is100ContinueExpected(request)) {
+        if (HttpUtil.is100ContinueExpected(request)) {
             ctx.write(new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
         }
 
         // find the nettyHttpContextHandler by lookup the request url
-        NettyHttpContextHandler nettyHttpContextHandler = pipelineFactory.getNettyHttpHandler(request.getUri());
+        NettyHttpContextHandler nettyHttpContextHandler = pipelineFactory.getNettyHttpHandler(request.uri());
         if (nettyHttpContextHandler != null) {
             handleHttpServletRequest(ctx, request, nettyHttpContextHandler);
         } else {
             throw new RuntimeException(
-                    new Fault(new Message("NO_NETTY_SERVLET_HANDLER_FOUND", LOG, request.getUri())));
+                    new Fault(new Message("NO_NETTY_SERVLET_HANDLER_FOUND", LOG, request.uri())));
         }
     }
 
@@ -138,15 +139,15 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
 
         nettyServletResponse.getWriter().flush();
 
-        boolean keepAlive = HttpHeaders.isKeepAlive(request);
+        boolean keepAlive = HttpUtil.isKeepAlive(request);
 
         if (keepAlive) {
             // Add 'Content-Length' header only for a keep-alive connection.
-            response.headers().set(Names.CONTENT_LENGTH, response.content().readableBytes());
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
             // Add keep alive header as per:
             // -
             // http://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01.html#Connection
-            response.headers().set(Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         }
 
         // write response...
@@ -191,7 +192,7 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                                                                 status,
                                                                 content);
-        response.headers().set(Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
 
         ctx.write(response).addListener(ChannelFutureListener.CLOSE);
     }
