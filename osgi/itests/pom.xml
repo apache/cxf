@@ -176,7 +176,7 @@
         
         <dependency>
             <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf-minimal</artifactId>
+            <artifactId>apache-karaf</artifactId>
             <version>${cxf.karaf.version}</version>
             <type>tar.gz</type>
             <scope>test</scope>

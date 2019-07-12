@@ -60,7 +60,7 @@ public class CXFOSGiTestSupport {
     protected MavenUrlReference springLegacyUrl;
 
     private static String getKarafVersion() {
-        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
+        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
     }
 
     /**
@@ -70,7 +70,7 @@ public class CXFOSGiTestSupport {
      */
     protected Option cxfBaseConfig() {
         final String karafVersion = getKarafVersion();
-        final MavenUrlReference karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal")
+        final MavenUrlReference karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf")
                 .version(karafVersion).type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
                 .type("xml").classifier("features");
@@ -107,10 +107,10 @@ public class CXFOSGiTestSupport {
                              new VMOption("--add-exports=java.base/"
                                  + "org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"),
                              new VMOption("--patch-module"),
-                             new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" 
+                             new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-"
                                  + karafVersion + ".jar"),
                              new VMOption("--patch-module"),
-                             new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" 
+                             new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-"
                                  + karafVersion + ".jar"),
                              new VMOption("--add-opens"),
                              new VMOption("java.base/java.security=ALL-UNNAMED"),
