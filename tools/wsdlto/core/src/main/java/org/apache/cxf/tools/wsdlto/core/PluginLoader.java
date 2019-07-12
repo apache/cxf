@@ -131,14 +131,14 @@ public final class PluginLoader {
         try {
             LOG.log(Level.FINE, "PLUGIN_LOADING", resource);
             loadPlugin(getPlugin(resource));
-        } catch (JAXBException e) {
-            Message msg = new Message("PLUGIN_LOAD_FAIL", LOG, resource);
-            LOG.log(Level.SEVERE, msg.toString());
-            throw new ToolException(msg, e);
         } catch (FileNotFoundException fe) {
             Message msg = new Message("PLUGIN_FILE_NOT_FOUND", LOG, resource);
             LOG.log(Level.SEVERE, msg.toString());
             throw new ToolException(msg, fe);
+        } catch (JAXBException | IOException e) {
+            Message msg = new Message("PLUGIN_LOAD_FAIL", LOG, resource);
+            LOG.log(Level.SEVERE, msg.toString());
+            throw new ToolException(msg, e);
         }
 
     }
@@ -202,22 +202,23 @@ public final class PluginLoader {
         return plugin;
     }
 
-    protected Plugin getPlugin(String resource) throws JAXBException, FileNotFoundException {
+    protected Plugin getPlugin(String resource) throws JAXBException, IOException, FileNotFoundException {
         Plugin plugin = plugins.get(resource);
         if (plugin == null) {
-            InputStream is = null;
-            if (new File(resource).exists()) {
-                is = new BufferedInputStream(new FileInputStream(new File(resource)));
-            } else {
-                is = getClass().getResourceAsStream(resource);
+            File resourceFile = new File(resource);
+
+            try (InputStream is = resourceFile.exists()
+                ? new BufferedInputStream(new FileInputStream(resourceFile))
+                : getClass().getResourceAsStream(resource)) {
+
+                if (is == null) {
+                    Message msg = new Message("PLUGIN_MISSING", LOG, resource);
+                    LOG.log(Level.SEVERE, msg.toString());
+                    throw new ToolException(msg);
+                }
+                plugin = getPlugin(is);
             }
 
-            if (is == null) {
-                Message msg = new Message("PLUGIN_MISSING", LOG, resource);
-                LOG.log(Level.SEVERE, msg.toString());
-                throw new ToolException(msg);
-            }
-            plugin = getPlugin(is);
             if (plugin == null || StringUtils.isEmpty(plugin.getName())) {
                 Message msg = new Message("PLUGIN_LOAD_FAIL", LOG, resource);
                 LOG.log(Level.SEVERE, msg.toString());
@@ -234,12 +235,6 @@ public final class PluginLoader {
             return JAXBUtils.unmarshall(jaxbContext, doc.getDocumentElement(), Plugin.class).getValue();
         } catch (XMLStreamException xse) {
             throw new JAXBException(xse);
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                //ignore
-            }
         }
     }
 
