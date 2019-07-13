@@ -101,7 +101,7 @@ public final class DumpJavaDoc {
             }
         }
         if (!foundTagOption) {
-            reporter.printError("Usage: -dumpJavaDocFile theFileToDumpJavaDocForLatarUse...");
+            reporter.printError("Usage: -dumpJavaDocFile theFileToDumpJavaDocForLaterUse...");
         }
         return foundTagOption;
     }

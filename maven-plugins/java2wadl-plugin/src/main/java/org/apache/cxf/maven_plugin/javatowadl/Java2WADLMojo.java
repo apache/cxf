@@ -307,27 +307,15 @@ public class Java2WADLMojo extends AbstractMojo {
                 + outputFileExtension).replace("/", File.separator);
         }
 
-        BufferedWriter writer = null;
         try {
             FileUtils.mkDir(new File(outputFile).getParentFile());
-            /*File wadlFile = new File(outputFile);
-            if (!wadlFile.exists()) {
-                wadlFile.createNewFile();
-            }*/
-            writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(wadl);
-
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
+                writer.write(wadl);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
-        }
+        } 
+        
         // Attach the generated wadl file to the artifacts that get deployed
         // with the enclosing project
         if (attachWadl && outputFile != null) {
