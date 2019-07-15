@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.trust;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -32,6 +33,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
@@ -84,6 +86,8 @@ public final class STSUtils {
     private static final String TOKEN_TYPE_SAML_2_0 =
             "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
     private static final QName STS_SERVICE_NAME = new QName(WST_NS_05_12 + "/", "SecurityTokenService");
+
+    private static final Logger LOG = LogUtils.getL7dLogger(STSUtils.class);
 
     private STSUtils() {
         //utility class
@@ -150,6 +154,8 @@ public final class STSUtils {
                     wsMexClient = createSTSClient(message, type);
                 }
                 wsMexClient.configureViaEPR(epr, false);
+
+                checkForRecursiveCall(wsMexClient, message);
                 return wsMexClient;
             } else if (configureViaEPR(client, epr)) {
                 // Only use WS-MEX here if the pre-configured STSClient has no location/wsdllocation
@@ -158,11 +164,34 @@ public final class STSUtils {
                         SecurityConstants.DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, message));
 
                 client.configureViaEPR(epr, useEPRWSAAddrAsMEXLocation);
+                checkForRecursiveCall(client, message);
                 return client;
             }
         }
 
+        checkForRecursiveCall(client, message);
+
         return client;
+    }
+
+    /**
+     * Check that we are not invoking on the STS using its own IssuedToken policy - in which case we
+     * will end up with a recursive loop
+     */
+    private static void checkForRecursiveCall(STSClient client, Message message) {
+        boolean checkForRecursiveCall =
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.STS_CHECK_FOR_RECURSIVE_CALL,
+                                                     message,
+                                                     true);
+
+        if (checkForRecursiveCall) {
+            EndpointInfo endpointInfo = message.getExchange().getEndpoint().getEndpointInfo();
+            if ((endpointInfo.getName().equals(client.getEndpointQName())
+                && endpointInfo.getService().getName().equals(client.getServiceQName()))
+                || client.getLocation() != null && client.getLocation().equals(endpointInfo.getAddress())) {
+                throw new TrustException("ISSUED_TOKEN_POLICY_ERR", LOG);
+            }
+        }
     }
 
     public static boolean configureViaEPR(STSClient client, EndpointReferenceType epr) {
