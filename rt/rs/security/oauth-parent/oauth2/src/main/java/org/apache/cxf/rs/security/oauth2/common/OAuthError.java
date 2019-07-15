@@ -111,7 +111,7 @@ public class OAuthError {
 
     @Override
     public String toString() {
-        return "OAuthError[error='" + error + '\'' + ", errorDescription='" + errorDescription + '\'' +
-                ", errorUri='" + errorUri + '\'' + ", state='" + state + '\'' + ']';
+        return "OAuthError[error='" + error + '\'' + ", errorDescription='" + errorDescription + '\''
+                + ", errorUri='" + errorUri + '\'' + ']';
     }
 }
