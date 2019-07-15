@@ -186,9 +186,8 @@ public final class STSUtils {
 
         if (checkForRecursiveCall) {
             EndpointInfo endpointInfo = message.getExchange().getEndpoint().getEndpointInfo();
-            if ((endpointInfo.getName().equals(client.getEndpointQName())
-                && endpointInfo.getService().getName().equals(client.getServiceQName()))
-                || client.getLocation() != null && client.getLocation().equals(endpointInfo.getAddress())) {
+            if (endpointInfo.getName().equals(client.getEndpointQName())
+                && endpointInfo.getService().getName().equals(client.getServiceQName())) {
                 throw new TrustException("ISSUED_TOKEN_POLICY_ERR", LOG);
             }
         }
