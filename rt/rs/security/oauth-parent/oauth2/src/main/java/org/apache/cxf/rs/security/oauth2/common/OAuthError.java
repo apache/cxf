@@ -108,4 +108,10 @@ public class OAuthError {
     public String getState() {
         return state;
     }
+
+    @Override
+    public String toString() {
+        return "OAuthError[error='" + error + '\'' + ", errorDescription='" + errorDescription + '\''
+                + ", errorUri='" + errorUri + '\'' + ']';
+    }
 }
