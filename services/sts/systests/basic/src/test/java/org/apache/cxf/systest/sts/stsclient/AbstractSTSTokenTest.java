@@ -31,6 +31,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -157,8 +158,10 @@ public abstract class AbstractSTSTokenTest extends AbstractBusClientServerTestBa
 
         Exchange exchange = new ExchangeImpl();
         ServiceInfo si = new ServiceInfo();
+        si.setName(new QName("http://www.apache.org", "ServiceName"));
         Service s = new ServiceImpl(si);
         EndpointInfo ei = new EndpointInfo();
+        ei.setName(new QName("http://www.apache.org", "EndpointName"));
         Endpoint ep = new EndpointImpl(bus, s, ei);
         ei.setBinding(new BindingInfo(si, null));
         message.setExchange(exchange);
