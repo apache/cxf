@@ -21,13 +21,13 @@ package org.apache.cxf.aegis.type.mtom;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.activation.DataHandler;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.ByteDataSource;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 
 /**
@@ -42,28 +42,11 @@ public class ByteArrayType extends AbstractXOPType {
     @Override
     protected Object readAttachment(Attachment att, Context context) throws IOException {
         DataHandler handler = att.getDataHandler();
-        InputStream is = handler.getInputStream();
 
-        // try
-        // {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        copy(is, out);
-        is.close();
-        return out.toByteArray();
-    }
-
-    public static void copy(InputStream input, OutputStream output) throws IOException {
-        try {
-            final byte[] buffer = new byte[8096];
-
-            int n = input.read(buffer);
-            while (-1 != n) {
-                output.write(buffer, 0, n);
-                n = input.read(buffer);
-            }
-        } finally {
-            output.close();
-            input.close();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream is = handler.getInputStream()) {
+            IOUtils.copy(is, out);
+            return out.toByteArray();
         }
     }
 

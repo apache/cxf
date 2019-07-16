@@ -134,8 +134,8 @@ public class IdlPreprocessorReaderTest {
         throws UnsupportedEncodingException, IOException {
         LineNumberReader oReader = new LineNumberReader(includeReader);
         InputStream resolved = findTestResource(expectedResultLocation).openStream();
-        LineNumberReader rReader = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"));
-        try {
+        try (LineNumberReader rReader
+            = new LineNumberReader(new InputStreamReader(resolved, "ISO-8859-1"))) {
             boolean eof = false;
             do {
                 int line = rReader.getLineNumber() + 1;
@@ -144,8 +144,6 @@ public class IdlPreprocessorReaderTest {
                 assertEquals("difference in line " + line, expectedLine, actualLine);
                 eof = actualLine == null || expectedLine == null;
             } while (!eof);
-        } finally {
-            rReader.close();
         }
     }
 

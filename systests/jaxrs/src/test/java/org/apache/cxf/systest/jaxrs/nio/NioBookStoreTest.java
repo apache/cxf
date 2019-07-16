@@ -51,43 +51,31 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testGetAllBooks() throws Exception {
-        final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN).get();
-
-        try {
+        try (Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN).get()) {
             assertEquals(200, response.getStatus());
 
             assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
                 getClass().getResourceAsStream("/files/books.txt"))));
-        } finally {
-            response.close();
         }
     }
 
     @Test
     public void testGetAllBooksIs() throws Exception {
-        final Response response = createWebClient("/bookstore/is", MediaType.TEXT_PLAIN).get();
-
-        try {
+        try (Response response = createWebClient("/bookstore/is", MediaType.TEXT_PLAIN).get()) {
             assertEquals(200, response.getStatus());
 
             assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
                 getClass().getResourceAsStream("/files/books.txt"))));
-        } finally {
-            response.close();
         }
     }
 
     @Test
     public void testPostBookStore() throws IOException {
-        final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
+        try (Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
             .type(MediaType.TEXT_PLAIN)
-            .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
-
-        try {
+            .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")))) {
             assertEquals(200, response.getStatus());
             assertThat(response.readEntity(String.class), equalTo("Book Store uploaded: 10355 bytes"));
-        } finally {
-            response.close();
         }
     }
 

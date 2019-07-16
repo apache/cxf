@@ -65,7 +65,7 @@ public final class PersistenceUtils {
     public SequenceAcknowledgement deserialiseAcknowledgment(InputStream is) {
         Object obj = null;
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        try {
+        try {  //NOPMD
             obj = getContext().createUnmarshaller().unmarshal(reader);
             if (obj instanceof JAXBElement<?>) {
                 JAXBElement<?> el = (JAXBElement<?>)obj;

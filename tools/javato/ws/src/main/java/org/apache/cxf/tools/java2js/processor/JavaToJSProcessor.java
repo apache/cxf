@@ -82,7 +82,6 @@ public class JavaToJSProcessor implements Processor {
         NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
             .getXmlSchemaCollection());
         Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
-        BufferedWriter writer = null;
         try {
             OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -90,30 +89,23 @@ public class JavaToJSProcessor implements Processor {
             }
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
-            writer = new BufferedWriter(outputStreamWriter);
+            try (BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
-            for (SchemaInfo schema : schemata) {
-                SchemaJavascriptBuilder jsBuilder = new SchemaJavascriptBuilder(serviceInfo
-                    .getXmlSchemaCollection(), prefixManager, nameManager);
-                String allThatJavascript = jsBuilder.generateCodeForSchema(schema.getSchema());
-                writer.append(allThatJavascript);
+                for (SchemaInfo schema : schemata) {
+                    SchemaJavascriptBuilder jsBuilder = new SchemaJavascriptBuilder(serviceInfo
+                        .getXmlSchemaCollection(), prefixManager, nameManager);
+                    String allThatJavascript = jsBuilder.generateCodeForSchema(schema.getSchema());
+                    writer.append(allThatJavascript);
+                }
+
+                ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, null,
+                                                                                     prefixManager, nameManager);
+                serviceBuilder.walk();
+                String serviceJavascript = serviceBuilder.getCode();
+                writer.append(serviceJavascript);
             }
-
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, null,
-                                                                                 prefixManager, nameManager);
-            serviceBuilder.walk();
-            String serviceJavascript = serviceBuilder.getCode();
-            writer.append(serviceJavascript);
         } catch (IOException e) {
             throw new ToolException(e);
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    throw new ToolException(e);
-                }
-            }
         }
 
         System.setProperty(JAVA_CLASS_PATH, oldClassPath);

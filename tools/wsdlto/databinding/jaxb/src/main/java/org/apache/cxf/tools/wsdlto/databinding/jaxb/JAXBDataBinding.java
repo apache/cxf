@@ -688,7 +688,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
             if (key.startsWith("file:") || key.startsWith("jar:")) {
                 InputStream in = null;
-                try {
+                try {   //NOPMD
                     if (key.startsWith("file:")) {
                         in = Files.newInputStream(new File(new URI(key)).toPath());
                     } else {

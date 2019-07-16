@@ -116,11 +116,10 @@ public class InstrumentationManagerTest {
 
     @Test
     public void testInstrumentTwoBuses() {
-        ClassPathXmlApplicationContext context = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
-        try {
-            context = new ClassPathXmlApplicationContext("managed-spring-twobuses.xml");
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("managed-spring-twobuses.xml")) {
 
             cxf1 = (Bus)context.getBean("cxf1");
             InstrumentationManager im1 = cxf1.getExtension(InstrumentationManager.class);
@@ -143,19 +142,15 @@ public class InstrumentationManagerTest {
             if (cxf2 != null) {
                 cxf2.shutdown(true);
             }
-            if (context != null) {
-                context.close();
-            }
         }
     }
 
     @Test
     public void testInstrumentBusWithBusProperties() {
-        ClassPathXmlApplicationContext context = null;
         Bus cxf1 = null;
         Bus cxf2 = null;
-        try {
-            context = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml");
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml")) {
 
             cxf1 = (Bus)context.getBean("cxf1");
             InstrumentationManagerImpl im1 =
@@ -179,9 +174,6 @@ public class InstrumentationManagerTest {
             }
             if (cxf2 != null) {
                 cxf2.shutdown(true);
-            }
-            if (context != null) {
-                context.close();
             }
         }
     }

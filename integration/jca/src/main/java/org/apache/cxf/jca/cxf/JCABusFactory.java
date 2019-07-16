@@ -181,25 +181,15 @@ public class JCABusFactory {
 
     protected Properties loadProperties(URL propsUrl) throws ResourceException {
         Properties props = null;
-        InputStream istream = null;
 
         LOG.info("loadProperties, url=" + propsUrl);
 
-        try {
-            istream = propsUrl.openStream();
+        try (InputStream istream = propsUrl.openStream()) {
             props = new Properties();
             props.load(istream);
         } catch (IOException e) {
             throw new ResourceAdapterInternalException(
                        new Message("FAIL_TO_LOAD_EJB_SERVANT_PROPERTIES", BUNDLE, propsUrl).toString(), e);
-        } finally {
-            if (istream != null) {
-                try {
-                    istream.close();
-                } catch (IOException e) {
-                    //DO Nothing
-                }
-            }
         }
 
         return props;

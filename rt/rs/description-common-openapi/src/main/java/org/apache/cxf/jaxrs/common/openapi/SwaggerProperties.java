@@ -41,31 +41,25 @@ public interface SwaggerProperties {
     String TERMS_URL_PROPERTY = "terms.url";
     String PRETTY_PRINT_PROPERTY = "pretty.print";
     String FILTER_CLASS_PROPERTY = "filter.class";
-    
+
     /**
      * Read the Swagger-specific properties from the property file (to seamlessly
      * support the migration from older Swagger features).
      * @param location property file location
      * @param bus bus instance
-     * @return the properties if available 
+     * @return the properties if available
      */
     default Properties getSwaggerProperties(String location, Bus bus) {
-        InputStream is = ResourceUtils.getClasspathResourceStream(location, getClass(), bus);
         Properties props = null;
-        
-        if (is != null) {
-            props = new Properties();
-            try {
+
+        try (InputStream is = ResourceUtils.getClasspathResourceStream(location, getClass(), bus)) {
+            if (is != null) {
+                props = new Properties();
                 props.load(is);
-            } catch (IOException ex) {
-                props = null;
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ignore) {
-                    // ignore
-                }
             }
+        } catch (IOException ignore) {
+            props = null;
+            // ignore
         }
 
         return props;

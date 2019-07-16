@@ -58,7 +58,7 @@ public class BraveTracerContext implements TracerContext {
             scope = tracer.withSpanInScope(continuationSpan);
         }
 
-        try {
+        try { //NOPMD
             return traceable.call(new BraveTracerContext(brave));
         } finally {
             if (continuationSpan != null && scope != null) {

@@ -22,6 +22,7 @@ package org.apache.cxf.ws.rm.persistence;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -154,16 +155,11 @@ public class PersistenceUtilsTest {
         byte[] buf = new byte[starting.length()];
         try {
             in.read(buf, 0, buf.length);
-            assertEquals(starting, new String(buf, "utf-8"));
+            assertEquals(starting, new String(buf, StandardCharsets.UTF_8));
+            in.close();
             return true;
         } catch (IOException e) {
             // ignore
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                // ignore
-            }
         }
         return false;
     }

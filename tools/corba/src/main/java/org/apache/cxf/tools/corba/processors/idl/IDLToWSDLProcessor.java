@@ -496,18 +496,14 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             String addr = null;
             String addrFileName = (String) env.get(ToolCorbaConstants.CFG_ADDRESSFILE);
             if (addrFileName != null) {
-                BufferedReader bufferedReader = null;
+                File addrFile = new File(addrFileName);
                 try {
-                    File addrFile = new File(addrFileName);
                     FileReader fileReader = new FileReader(addrFile);
-                    bufferedReader = new BufferedReader(fileReader);
-                    addr = bufferedReader.readLine();
+                    try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+                        addr = bufferedReader.readLine();
+                    }
                 } catch (Exception ex) {
                     throw new ToolException(ex.getMessage(), ex);
-                } finally {
-                    if (bufferedReader != null) {
-                        bufferedReader.close();
-                    }
                 }
             } else {
                 addr = (String) env.get(ToolCorbaConstants.CFG_ADDRESS);

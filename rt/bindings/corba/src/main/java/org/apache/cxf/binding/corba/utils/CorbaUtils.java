@@ -521,13 +521,11 @@ public final class CorbaUtils {
                                                                      String url) {
         org.omg.CORBA.Object result;
 
-        java.io.BufferedReader reader = null;
-        try {
-            java.io.File file = new java.io.File(url);
-            if (!file.exists()) {
-                throw new RuntimeException("Could not find file " + url + " to read the object reference");
-            }
-            reader = new java.io.BufferedReader(new java.io.FileReader(file));
+        java.io.File file = new java.io.File(url);
+        if (!file.exists()) {
+            throw new RuntimeException("Could not find file " + url + " to read the object reference");
+        }
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
             String ior = reader.readLine();
             if (ior == null) {
                 throw new RuntimeException("Invalid object reference found in file " + url);
@@ -535,14 +533,6 @@ public final class CorbaUtils {
             result = orb.string_to_object(ior.trim());
         } catch (java.io.IOException ex) {
             throw new RuntimeException(ex);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (java.io.IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
         }
         return result;
     }

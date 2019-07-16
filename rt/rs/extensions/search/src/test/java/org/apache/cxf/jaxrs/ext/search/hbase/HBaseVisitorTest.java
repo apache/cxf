@@ -65,8 +65,7 @@ public class HBaseVisitorTest {
         sc.accept(visitor);
         Filter filter = visitor.getQuery();
         scan.setFilter(filter);
-        ResultScanner rs = table.getScanner(scan);
-        try {
+        try (ResultScanner rs = table.getScanner(scan)) {
             int count = 0;
             for (Result r = rs.next(); r != null; r = rs.next()) {
                 assertEquals("row2", new String(r.getRow()));
@@ -74,8 +73,6 @@ public class HBaseVisitorTest {
                 count++;
             }
             assertEquals(1, count);
-        } finally {
-            rs.close();
         }
     }
 
