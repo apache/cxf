@@ -114,7 +114,7 @@ public class OpenApiFeature extends AbstractFeature implements SwaggerUiSupport,
             sfb, bus, resourcePackages, isScan());
 
         final AnnotationProcessor processor = new AnnotationProcessor(GeronimoOpenAPIConfig.create(),
-            new NamingStrategy.Http());
+            new NamingStrategy.Http(), null /* default JsonReaderFactory */);
 
         final OpenAPIImpl api = new OpenAPIImpl();
 

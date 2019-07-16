@@ -28,7 +28,7 @@ public class AppConfig {
         final JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean ();
         factory.setFeatures(Arrays.asList(openApiFeature()));
         factory.setServiceBean(sampleResource());
-        factory.setAddress("http://localhost:9000/sample");
+        factory.setAddress("http://localhost:9000/");
         factory.setProvider(new JsonbJaxrsProvider<>());
         return factory.create();
     }

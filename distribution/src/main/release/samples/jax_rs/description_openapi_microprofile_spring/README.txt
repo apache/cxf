@@ -20,13 +20,13 @@ Using either UNIX or Windows:
 After the service is started, the Swagger API documents in JSON and YAML
 are available at
 
-  http://localhost:9000/sample/openapi.json
-  http://localhost:9000/sample/openapi.yaml
+  http://localhost:9000/openapi.json
+  http://localhost:9000/openapi.yaml
 
 To remove the target dir, run mvn clean".
 
 To navigate to the hosted Swagger UI, please type in the browser: 
 
-  http://localhost:9000/sample/api-docs/?url=/sample/openapi.json
+  http://localhost:9000/api-docs/?url=/openapi.json
 
 
