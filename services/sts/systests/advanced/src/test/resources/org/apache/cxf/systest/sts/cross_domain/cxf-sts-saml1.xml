@@ -60,8 +60,8 @@
         <property name="endpoints" ref="transportEndpoints"/>
     </bean>
     <util:list id="transportEndpoints">
-        <value>https://localhost:(\d)*/doubleit/services/doubleit.*
-                </value>
+        <value>https://localhost:(\d)*/doubleit/services/doubleit.*</value>
+        <value>https://localhost:30102/SecurityTokenService/b</value>
     </util:list>
     <bean id="customRealmParser" class="org.apache.cxf.systest.sts.realms.URLRealmParser"/>
     <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
