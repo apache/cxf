@@ -196,7 +196,7 @@
         <cxf.spring.security.version>5.1.5.RELEASE</cxf.spring.security.version>
         <cxf.spring.version>5.1.8.RELEASE</cxf.spring.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
-        <cxf.swagger.ui.version>3.22.2</cxf.swagger.ui.version>
+        <cxf.swagger.ui.version>3.23.0</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.0.8</cxf.swagger.v3.version>
         <cxf.swagger2.version>1.5.21</cxf.swagger2.version>
         <cxf.tika.version>1.21</cxf.tika.version>

@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
-            <version>3.20.9</version>
+            <version>3.23.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
