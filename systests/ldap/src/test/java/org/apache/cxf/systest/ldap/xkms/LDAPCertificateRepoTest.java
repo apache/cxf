@@ -106,6 +106,20 @@ public class LDAPCertificateRepoTest extends AbstractLdapTestUnit {
     }
 
     @Test
+    public void testFindUserCertViaUID() throws URISyntaxException, NamingException, CertificateException {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+        X509Certificate cert = persistenceManager.findBySubjectDn("dave");
+        assertNotNull(cert);
+    }
+
+    @Test
+    public void testFindUserCertViaWrongUID() throws URISyntaxException, NamingException, CertificateException {
+        CertificateRepo persistenceManager = createLdapCertificateRepo();
+        X509Certificate cert = persistenceManager.findBySubjectDn("wrong");
+        assertNull("Certificate should be null", cert);
+    }
+
+    @Test
     public void testSave() throws Exception {
         CertificateRepo persistenceManager = createLdapCertificateRepo();
         URL url = this.getClass().getResource("cert1.cer");
@@ -135,7 +149,12 @@ public class LDAPCertificateRepoTest extends AbstractLdapTestUnit {
         key.setIdentifier(EXPECTED_SERVICE_URI);
         persistenceManager.saveCertificate(cert, key);
 
+        // Search by DN
         X509Certificate foundCert = persistenceManager.findByServiceName(EXPECTED_SERVICE_URI);
+        assertNotNull(foundCert);
+
+        // Search by UID
+        foundCert = persistenceManager.findByServiceName(cert.getSubjectX500Principal().getName());
         assertNotNull(foundCert);
     }
 
