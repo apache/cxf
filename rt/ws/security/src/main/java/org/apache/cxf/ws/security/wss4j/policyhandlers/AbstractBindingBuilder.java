@@ -224,7 +224,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 storeBytesInAttachment = false;
             }
         }
-        expandXopInclude = mtomEnabled;
+        expandXopInclude = MessageUtils.getContextualBoolean(
+            message, SecurityConstants.EXPAND_XOP_INCLUDE, mtomEnabled);
 
         wsDocInfo = new WSDocInfo(secHeader.getSecurityHeaderElement().getOwnerDocument());
 
