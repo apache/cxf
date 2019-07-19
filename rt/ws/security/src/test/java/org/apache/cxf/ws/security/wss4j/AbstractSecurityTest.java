@@ -26,14 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
@@ -43,7 +40,6 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.saaj.SAAJStreamWriter;
-import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
@@ -136,18 +132,7 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         }
 
         byte[] docbytes = getMessageBytes(doc);
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor(inProperties);
 
