@@ -104,7 +104,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     /**
      *
      */
-    private WSSecurityEngine secEngineOverride;
+    private WSSConfig defaultConfig;
+
 
     public WSS4JInInterceptor() {
         super();
@@ -121,19 +122,42 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
         setProperties(properties);
+        WSSConfig config = WSSConfig.getNewInstance();
+
+        // Set any custom WSS4J Processor instances that are configured
         final Map<QName, Object> processorMap = CastUtils.cast(
             (Map<?, ?>)properties.get(PROCESSOR_MAP));
-        final Map<QName, Object> validatorMap = CastUtils.cast(
-            (Map<?, ?>)properties.get(VALIDATOR_MAP));
-
         if (processorMap != null) {
-            if (validatorMap != null) {
-                processorMap.putAll(validatorMap);
+            for (Map.Entry<QName, Object> entry : processorMap.entrySet()) {
+                Object val = entry.getValue();
+                if (val instanceof Class<?>) {
+                    config.setProcessor(entry.getKey(), (Class<?>)val);
+                } else if (val instanceof Processor) {
+                    config.setProcessor(entry.getKey(), (Processor)val);
+                } else if (val == null) {
+                    config.setProcessor(entry.getKey(), (Class<?>)null);
+                }
             }
-            secEngineOverride = createSecurityEngine(processorMap);
-        } else if (validatorMap != null) {
-            secEngineOverride = createSecurityEngine(validatorMap);
         }
+
+        // Set any custom WSS4J Validator instances that are configured
+        Map<QName, Object> validatorMap = CastUtils.cast(
+            (Map<?, ?>)properties.get(VALIDATOR_MAP));
+        if (validatorMap == null) {
+            validatorMap = CastUtils.cast((Map<?, ?>)properties.get(ConfigurationConstants.VALIDATOR_MAP));
+        }
+        if (validatorMap != null) {
+            for (Map.Entry<QName, Object> entry : validatorMap.entrySet()) {
+                Object val = entry.getValue();
+                if (val instanceof Class<?>) {
+                    config.setValidator(entry.getKey(), (Class<?>)val);
+                } else if (val instanceof Validator) {
+                    config.setValidator(entry.getKey(), (Validator)val);
+                }
+            }
+        }
+
+        defaultConfig = config;
     }
 
     public void setIgnoreActions(boolean i) {
@@ -636,15 +660,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     /**
      * @return      the WSSecurityEngine in use by this interceptor.
-     *              This engine is defined to be the secEngineOverride
-     *              instance, if defined in this class (and supplied through
-     *              construction); otherwise, it is taken to be the default
-     *              WSSecEngine instance (currently defined in the WSHandler
-     *              base class).
      */
     protected WSSecurityEngine getSecurityEngine(boolean utWithCallbacks) {
-        if (secEngineOverride != null) {
-            return secEngineOverride;
+        if (defaultConfig != null) {
+            WSSecurityEngine engine = new WSSecurityEngine();
+            engine.setWssConfig(defaultConfig);
+            return engine;
         }
 
         if (!utWithCallbacks) {
