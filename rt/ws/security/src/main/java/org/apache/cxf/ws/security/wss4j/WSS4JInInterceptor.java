@@ -109,7 +109,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     /**
      *
      */
-    private WSSecurityEngine secEngineOverride;
+    private WSSConfig defaultConfig;
+
 
     public WSS4JInInterceptor() {
         super();
@@ -161,8 +162,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             }
         }
 
-        secEngineOverride = new WSSecurityEngine();
-        secEngineOverride.setWssConfig(config);
+        defaultConfig = config;
     }
 
     /**
@@ -696,15 +696,12 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
     /**
      * @return      the WSSecurityEngine in use by this interceptor.
-     *              This engine is defined to be the secEngineOverride
-     *              instance, if defined in this class (and supplied through
-     *              construction); otherwise, it is taken to be the default
-     *              WSSecEngine instance (currently defined in the WSHandler
-     *              base class).
      */
     protected WSSecurityEngine getSecurityEngine(boolean utWithCallbacks) {
-        if (secEngineOverride != null) {
-            return secEngineOverride;
+        if (defaultConfig != null) {
+            WSSecurityEngine engine = new WSSecurityEngine();
+            engine.setWssConfig(defaultConfig);
+            return engine;
         }
 
         if (!utWithCallbacks) {
