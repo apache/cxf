@@ -76,7 +76,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     }
 
     private OutputStream createCachingOut(Message message, final OutputStream os, CachedOutputStreamCallback callback) {
-        final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+        final CacheAndWriteOutputStream newOut = new LoggingOutputStream(os);
         if (threshold > 0) {
             newOut.setThreshold(threshold);
         }
