@@ -1,6 +1,10 @@
 CXF Web Service Transaction Demo
 ================================
 This demo shows how to use the JTA->WSAT->JTA bridge in the two differnet web services by using the apache-cxf, spring-boot and narayana.
+**NOTE**:  the following dependencies are licensed under LGPL and thus may have additional restrictions beyond the Apache License.
+
+ - [Narayana](https://github.com/jbosstm/narayana/blob/master/LICENSE)
+ - [Hibernate](https://github.com/hibernate/hibernate-orm/blob/master/lgpl.txt)
 
 Buiding and running the demo
 ----------------------------
@@ -31,10 +35,10 @@ JTA->WSAT bridge in the client side
 ================
 It can wrap the local transaction and create a bridge between the JTA and WSAT transaction. 
 From the client side, we use the *JaxWSTxOutboundBridgeHandler* to create a mapping of the JTA and Subordinate WSAT
-also the *EnabledWSTXHandler* to propagate the WSAT transaction in the SOAP message headers.
+also the *EnabledWSTXHandler* to propagate the WSAT transaction in the SOAP message headers. see `FirstClient` and `SecondClient`.
 
 WSAT->JTA bridge in the server side
 ================
 From the server side, we use the *JaxWSSubordinateHeaderContextProcessor* to import the Subordinate WSAT transaction from the outside
 and the *JaxWSHeaderContextProcessor* to resume the WSAT transaction and the *OptionalJaxWSTxInboundBridgeHandler* to create the bridge
-the WSAT and JTA.
+the WSAT and JTA. see `wstx_handlers.xml`

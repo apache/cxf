@@ -135,6 +135,7 @@
         <module>ws_security/sign_enc_policy</module>
         <module>ws_security/ut</module>
         <module>ws_security/ut_policy</module>
+        <module>ws_transaction</module>
         <module>wsdl_first</module>
         <module>wsdl_first_dynamic_client</module>
         <module>wsdl_first_https</module>
