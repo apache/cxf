@@ -1,5 +1,5 @@
 /**
- * licensed to the apache software foundation (asf) under one
+ * licensed to the apache software foundation (AS) under one
  * or more contributor license agreements. see the notice file
  * distributed with this work for additional information
  * regarding copyright ownership. the asf licenses this file
@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the license.
  */
+
 package sample.ws.service;
 
 import org.junit.After;

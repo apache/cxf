@@ -23,9 +23,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
-/**
- * @author <a href="mailto:zfeng@redhat.com">Zheng Feng</a>
- */
 @Entity
 @Table(name = "t_counter")
 public class FirstCounter implements Serializable {

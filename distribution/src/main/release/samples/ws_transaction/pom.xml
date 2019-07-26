@@ -29,6 +29,9 @@
     </parent>
     <packaging>pom</packaging>
     <properties>
+        <!-- don't deploy the samples, kind of pointless -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.test.skip>true</maven.test.skip>
         <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
 	<cxf.version>${project.version}</cxf.version>
         <narayana.spring.boot.version>2.1.0</narayana.spring.boot.version>
