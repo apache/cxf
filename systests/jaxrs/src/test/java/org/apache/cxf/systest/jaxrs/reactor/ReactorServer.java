@@ -23,7 +23,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.reactor.server.ReactorCustomizer;
@@ -44,7 +43,6 @@ public class ReactorServer extends AbstractBusTestServerBase {
         sf.getProperties(true).put("useStreamingSubscriber", false);
         sf.setProvider(new JacksonJsonProvider());
         new ReactorCustomizer().customize(sf);
-        sf.getOutInterceptors().add(new LoggingOutInterceptor());
         sf.setResourceClasses(FluxService.class, MonoService.class);
         sf.setResourceProvider(FluxService.class,
                 new SingletonResourceProvider(new FluxService(), true));
@@ -57,7 +55,6 @@ public class ReactorServer extends AbstractBusTestServerBase {
         sf2.setProvider(new JacksonJsonProvider());
         sf2.setProvider(new IllegalArgumentExceptionMapper());
         new ReactorCustomizer().customize(sf2);
-        sf2.getOutInterceptors().add(new LoggingOutInterceptor());
         sf2.setResourceClasses(FluxService.class);
         sf2.setResourceProvider(FluxService.class,
                 new SingletonResourceProvider(new FluxService(), true));
