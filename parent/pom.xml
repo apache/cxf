@@ -54,7 +54,7 @@
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>7.0</cxf.asm.version>
+        <cxf.asm.version>7.1</cxf.asm.version>
         <cxf.osgi.asm.version>[3.0,8)</cxf.osgi.asm.version>
         <cxf.easymock.version>4.0.2</cxf.easymock.version>
         <!-- OSGi related properties -->
@@ -95,7 +95,7 @@
         <cxf.cdi.api.version>1.2</cxf.cdi.api.version>
         <cxf.classgraph.version>4.6.32</cxf.classgraph.version>
         <cxf.classmate.version>1.1.0</cxf.classmate.version>
-        <cxf.commons-codec.version>1.12</cxf.commons-codec.version>
+        <cxf.commons-codec.version>1.13</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
         <cxf.commons-jcs-jcache.version>2.1</cxf.commons-jcs-jcache.version>
         <cxf.commons-lang3.version>3.9</cxf.commons-lang3.version>
