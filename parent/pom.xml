@@ -129,7 +129,7 @@
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
         <cxf.httpcomponents.core.version>4.4.11</cxf.httpcomponents.core.version>
         <cxf.jackson.version>2.9.9</cxf.jackson.version>
-        <cxf.jackson.databind.version>2.9.9.1</cxf.jackson.databind.version>
+        <cxf.jackson.databind.version>2.9.9.2</cxf.jackson.databind.version>
         <cxf.jaeger.version>0.35.5</cxf.jaeger.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.javassist.version>3.25.0-GA</cxf.javassist.version>
