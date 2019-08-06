@@ -82,14 +82,14 @@
         <cxf.ahc.version>2.0.39</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0.AM25</cxf.apacheds.version>
         <cxf.arquillian.version>1.1.14.Final</cxf.arquillian.version>
-        <cxf.arquillian.weld.container.version>2.0.0.Final</cxf.arquillian.weld.container.version>
-        <cxf.artemis.version>2.4.0</cxf.artemis.version>
+        <cxf.arquillian.weld.container.version>2.0.1.Final</cxf.arquillian.weld.container.version>
+        <cxf.artemis.version>2.9.0</cxf.artemis.version>
         <cxf.aspectj.version>1.9.1</cxf.aspectj.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.atmosphere.version>2.5.2</cxf.atmosphere.version>
         <cxf.bcprov.version>1.62</cxf.bcprov.version>
         <cxf.brave.reporter.version>2.10.0</cxf.brave.reporter.version>
-        <cxf.brave.version>5.6.8</cxf.brave.version>
+        <cxf.brave.version>5.6.9</cxf.brave.version>
         <cxf.brave.zipkin.version>2.14.2</cxf.brave.zipkin.version>
         <cxf.cda.api.osgi.range>[1.1,2)</cxf.cda.api.osgi.range>
         <cxf.cdi.api.version>1.2</cxf.cdi.api.version>
@@ -149,7 +149,7 @@
         <cxf.jetty9.version>9.4.19.v20190610</cxf.jetty9.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
-        <cxf.johnzon.version>1.1.12</cxf.johnzon.version>
+        <cxf.johnzon.version>1.1.13</cxf.johnzon.version>
         <cxf.json.api.version>1.1.4</cxf.json.api.version>
         <cxf.jsr250.api.version>1.0</cxf.jsr250.api.version>
         <cxf.junit.version>4.12</cxf.junit.version>
@@ -177,10 +177,10 @@
         <cxf.plexus-archiver.version>4.1.0</cxf.plexus-archiver.version>
         <cxf.plexus-utils.version>3.2.0</cxf.plexus-utils.version>
         <cxf.reactivestreams.version>1.0.1</cxf.reactivestreams.version>
-        <cxf.reactor.version>3.2.10.RELEASE</cxf.reactor.version>
+        <cxf.reactor.version>3.2.11.RELEASE</cxf.reactor.version>
         <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.rxjava.version>1.3.8</cxf.rxjava.version>
-        <cxf.rxjava2.version>2.2.10</cxf.rxjava2.version>
+        <cxf.rxjava2.version>2.2.11</cxf.rxjava2.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.2</cxf.servlet-api-2.5.version>
         <cxf.servlet-api.artifact>javax.servlet-api</cxf.servlet-api.artifact>
@@ -189,17 +189,17 @@
         <cxf.slf4j.version>1.7.26</cxf.slf4j.version>
         <cxf.snakeyaml.version>1.24</cxf.snakeyaml.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
-        <cxf.spring.boot.version>2.1.6.RELEASE</cxf.spring.boot.version>
+        <cxf.spring.boot.version>2.1.7.RELEASE</cxf.spring.boot.version>
         <cxf.spring.ldap.version>2.3.2.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
-        <cxf.spring.security.version>5.1.5.RELEASE</cxf.spring.security.version>
-        <cxf.spring.version>5.1.8.RELEASE</cxf.spring.version>
+        <cxf.spring.security.version>5.1.6.RELEASE</cxf.spring.security.version>
+        <cxf.spring.version>5.1.9.RELEASE</cxf.spring.version>
         <cxf.stax-ex.version>1.7.6</cxf.stax-ex.version>
         <cxf.swagger.ui.version>3.23.0</cxf.swagger.ui.version>
         <cxf.swagger.v3.version>2.0.8</cxf.swagger.v3.version>
         <cxf.swagger2.version>1.5.21</cxf.swagger2.version>
-        <cxf.tika.version>1.21</cxf.tika.version>
+        <cxf.tika.version>1.22</cxf.tika.version>
         <cxf.tomcat.version>8.5.43</cxf.tomcat.version>
         <cxf.tomitribe.http.signature.version>1.3</cxf.tomitribe.http.signature.version>
         <cxf.undertow.osgi.version>[1.4,3.0)</cxf.undertow.osgi.version>
