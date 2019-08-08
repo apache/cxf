@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs;
 
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -52,7 +54,8 @@ public class JAXRSBindingFactory extends AbstractBindingFactory {
     public JAXRSBindingFactory() {
     }
     public JAXRSBindingFactory(Bus b) {
-        super(b);
+        super(b, Collections.unmodifiableList(Arrays.asList(
+                                                            JAXRS_BINDING_ID)));
     }
 
     public Binding createBinding(BindingInfo bi) {
