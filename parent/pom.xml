@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>3.3.3-SNAPSHOT</version>
+        <version>3.3.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cxf-parent</artifactId>
@@ -2659,10 +2659,10 @@
                                         <path id="ecp.ws.path" location="${eclipse.workspace.dir}" />
                                         <property name="full.eclipse.workspace" refid="ecp.ws.path" />
                                         <condition property="PMD_BUILDER" value="net.sourceforge.pmd.eclipse.plugin.pmdBuilder" else="ch.acanda.eclipse.pmd.builder.PMDBuilder">
-                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file"/>
+                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file" />
                                         </condition>
                                         <condition property="PMD_NATURE" value="net.sourceforge.pmd.eclipse.plugin.pmdNature" else="ch.acanda.eclipse.pmd.builder.PMDNature">
-                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file"/>
+                                            <available file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.pmd.eclipse.plugin.prefs" type="file" />
                                         </condition>
                                     </target>
                                 </configuration>
