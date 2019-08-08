@@ -30,9 +30,12 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
@@ -43,7 +46,11 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
 
     public JAXRSServerFactoryBeanDefinitionParser() {
-        super(JAXRSServerFactoryBean.class);
+        this(BPJAXRSServerFactoryBean.class);
+    }
+    
+    public JAXRSServerFactoryBeanDefinitionParser(Class<?> cls) {
+        super(cls);
     }
     @Override
     protected void mapAttribute(MutableBeanMetadata bean,
@@ -133,8 +140,9 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     @Override
     public Metadata parse(Element element, ParserContext context) {
         MutableBeanMetadata bean = (MutableBeanMetadata)super.parse(element, context);
+       
         bean.setInitMethod("init");
-
+        bean.setDestroyMethod("destroy");
         // We don't really want to delay the registration of our Server
         bean.setActivation(ComponentMetadata.ACTIVATION_EAGER);
         return bean;
@@ -172,4 +180,38 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     private static String getResourceClassFromElement(Element e) {
         return e.getAttribute("name");
     }
+    
+    @NoJSR250Annotations
+    public static class BPJAXRSServerFactoryBean extends JAXRSServerFactoryBean {
+
+        private Server server;
+
+        public BPJAXRSServerFactoryBean() {
+            super();
+        }
+        public BPJAXRSServerFactoryBean(JAXRSServiceFactoryBean fact) {
+            super(fact);
+        }
+        public Server getServer() {
+            return server;
+        }
+
+        public void init() {
+            create();
+        }
+        @Override
+        public Server create() {
+            if (server == null) {
+                server = super.create();
+            }
+            return server;
+        }
+        public void destroy() {
+            if (server != null) {
+                server.destroy();
+                server = null;
+            }
+        }
+    }
+
 }
