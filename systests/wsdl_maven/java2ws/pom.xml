@@ -109,7 +109,7 @@
                                             cxf-java2ws-plugin
                                         </artifactId>
                                         <versionRange>
-                                            [3.1.0-SNAPSHOT,)
+                                            [3.1.0,)
                                         </versionRange>
                                         <goals>
                                             <goal>java2ws</goal>
