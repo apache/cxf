@@ -30,11 +30,8 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
-<<<<<<< HEAD
-import org.apache.cxf.common.util.StringUtils;
-=======
 import org.apache.cxf.common.injection.NoJSR250Annotations;
->>>>>>> c453a20... [CXF-8088]ensure jaxrs endpoint can work correctly when using a shared bus exposed from another bundle
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.DOMUtils;
