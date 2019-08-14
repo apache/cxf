@@ -34,7 +34,6 @@
           class="org.apache.cxf.systest.kerberos.common.KerberosClientPasswordCallback"/>
     
     <bean class="org.apache.cxf.ws.security.kerberos.KerberosClient" id="kerberosClient">
-        <constructor-arg ref="cxf"/>
         <property name="contextName" value="alice"/>
         <property name="serviceName" value="bob@service.ws.apache.org"/>
         <property name="callbackHandler" ref="kerberosCallbackHandler"/>

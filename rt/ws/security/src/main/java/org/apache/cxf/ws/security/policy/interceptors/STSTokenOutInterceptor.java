@@ -21,8 +21,6 @@ package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -41,11 +39,6 @@ import org.apache.cxf.ws.security.trust.STSUtils;
 
 public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(STSTokenOutInterceptor.class);
-    private static final String KEY_TYPE_X509 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
-    private static final String WS_TRUST_NS = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/";
-    private static final QName X509_ENDPOINT = new QName(WS_TRUST_NS, "X509_Port");
-    private static final QName TRANSPORT_ENDPOINT = new QName(WS_TRUST_NS, "Transport_Port");
-    private static final QName UT_ENDPOINT = new QName(WS_TRUST_NS, "UT_Port");
 
     private STSClient stsClient;
     private TokenRequestParams tokenParams;
@@ -104,72 +97,4 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this.tokenCacher = tokenCacher;
     }
 
-    /**
-     * A enumeration to specify authentication mode in communication with STS.
-     * @deprecated use {@link org.apache.cxf.ws.security.trust.STSAuthParams.AuthMode}
-     */
-    @Deprecated
-    public enum AuthMode {
-        X509_ASSYMETRIC(X509_ENDPOINT, KEY_TYPE_X509),
-        UT_TRANSPORT(TRANSPORT_ENDPOINT, null),
-        UT_SYMMETRIC(UT_ENDPOINT, null);
-
-        private final QName endpointName;
-        private final String keyType;
-
-        AuthMode(QName endpointName, String keyType) {
-            this.endpointName = endpointName;
-            this.keyType = keyType;
-        }
-
-        public QName getEndpointName() {
-            return endpointName;
-        }
-
-        public String getKeyType() {
-            return keyType;
-        }
-    }
-
-    /**
-     * A class to specify authentication parameters for communication with STS.
-     * @deprecated use {@link org.apache.cxf.ws.security.trust.STSAuthParams}
-     */
-    @Deprecated
-    public static class AuthParams {
-        private final AuthMode authMode;
-        private final String userName;
-        private final String callbackHandler;
-        private final String alias;
-        private final String keystoreProperties;
-
-        public AuthParams(AuthMode authMode, String userName, String callbackHandler) {
-            this(authMode, userName, callbackHandler, null, null);
-        }
-
-        public AuthParams(AuthMode authMode, String userName, String callbackHandler, String alias,
-                          String keystoreProperties) {
-            this.authMode = authMode;
-            this.userName = userName;
-            this.callbackHandler = callbackHandler;
-            this.alias = alias;
-            this.keystoreProperties = keystoreProperties;
-        }
-
-        public AuthMode getAuthMode() {
-            return authMode;
-        }
-        public String getUserName() {
-            return userName;
-        }
-        public String getCallbackHandler() {
-            return callbackHandler;
-        }
-        public String getAlias() {
-            return alias;
-        }
-        public String getKeystoreProperties() {
-            return keystoreProperties;
-        }
-    }
 }

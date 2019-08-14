@@ -68,7 +68,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
     private WSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
-    private boolean mtomEnabled;
 
     public WSS4JOutInterceptor() {
         super();
@@ -81,16 +80,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
     public WSS4JOutInterceptor(Map<String, Object> props) {
         this();
         setProperties(props);
-    }
-
-    @Deprecated
-    public boolean isAllowMTOM() {
-        return mtomEnabled;
-    }
-
-    @Deprecated
-    public void setAllowMTOM(boolean allowMTOM) {
-        this.mtomEnabled = allowMTOM;
     }
 
     @Override

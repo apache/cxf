@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 import javax.security.auth.callback.CallbackHandler;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.helpers.DOMUtils;
@@ -55,10 +54,6 @@ public class KerberosClient implements Configurable {
     private boolean isUsernameServiceNameForm;
     private boolean useDelegatedCredential;
 
-    @Deprecated
-    public KerberosClient(Bus b) {
-    }
-
     public KerberosClient() {
     }
 
@@ -80,24 +75,6 @@ public class KerberosClient implements Configurable {
      */
     public void setContextName(String contextName) {
         this.contextName = contextName;
-    }
-
-    /**
-     * @deprecated
-     * Get the JAAS Login module name to use.
-     * @return the JAAS Login module name to use
-     */
-    public String getJaasLoginModuleName() {
-        return contextName;
-    }
-
-    /**
-     * @deprecated
-     * Set the JAAS Login module name to use.
-     * @param jaasLoginModuleName the JAAS Login module name to use
-     */
-    public void setJaasLoginModuleName(String jaasLoginModuleName) {
-        this.contextName = jaasLoginModuleName;
     }
 
     /**

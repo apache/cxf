@@ -47,10 +47,10 @@
         <value>http://localhost:(\d)*/DoubleItSamlSymmetricIssuedToken</value>
     </util:list>
     <bean id="symmetricSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="sts.properties"/>
+        <property name="signatureCryptoProperties" value="sts.properties"/>
         <property name="signatureUsername" value="sts"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.wssec.examples.common.CommonPasswordCallback"/>
-        <property name="encryptionPropertiesFile" value="bob.properties"/>
+        <property name="encryptionCryptoProperties" value="bob.properties"/>
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="bob"/>
     </bean>

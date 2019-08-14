@@ -78,8 +78,8 @@ under the License.
    </bean>
 
    <bean id="consumer" class="org.apache.cxf.rs.security.oauth2.client.Consumer">
-       <property name="key" value="consumer-id-oidc"/>
-       <property name="secret" value="this-is-a-secret"/>
+       <property name="clientId" value="consumer-id-oidc"/>
+       <property name="clientSecret" value="this-is-a-secret"/>
    </bean>
 
    <bean id="idTokenReader" class="org.apache.cxf.rs.security.oidc.rp.IdTokenReader">

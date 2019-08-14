@@ -28,7 +28,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OrderColumn;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -149,12 +148,6 @@ public class OAuthPermission implements Serializable {
     }
 
     public boolean isDefaultPermission() {
-        return isDefaultPermission;
-    }
-
-    @Deprecated
-    @Transient
-    public boolean isDefault() {
         return isDefaultPermission;
     }
 

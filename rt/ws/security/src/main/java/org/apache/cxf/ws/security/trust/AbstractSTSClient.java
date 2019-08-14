@@ -434,11 +434,6 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
         this.keyType = keyType;
     }
 
-    @Deprecated
-    public void setOnBehalfOfElement(Element onBehalfOfElement) {
-        this.onBehalfOf = onBehalfOfElement;
-    }
-
     public void setOnBehalfOf(Object onBehalfOf) {
         this.onBehalfOf = onBehalfOf;
     }
