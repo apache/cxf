@@ -750,11 +750,9 @@ public class RMTxStore implements RMStore {
         }
         PreparedStatement stmt = null;
         try (CachedOutputStream cos = msg.getContent()) {
-            InputStream msgin = null;
-            try {
-                msgin = cos.getInputStream();
+            try (InputStream msgin = cos.getInputStream()) {
                 stmt = getStatement(con, outbound ? CREATE_OUTBOUND_MESSAGE_STMT_STR : CREATE_INBOUND_MESSAGE_STMT_STR);
-    
+
                 stmt.setString(1, id);
                 stmt.setLong(2, nr);
                 stmt.setString(3, to);
@@ -768,9 +766,6 @@ public class RMTxStore implements RMStore {
                 }
             } finally  {
                 releaseResources(stmt, null);
-                if (null != msgin) {
-                    msgin.close();
-                }
             }
         }
     }
@@ -838,12 +833,10 @@ public class RMTxStore implements RMStore {
             LOG.warning("Skip creating tables as we have no connection.");
             return;
         }
-        Statement stmt = null;
 
-        try {
+        try {   //NOPMD
             con.setAutoCommit(true);
-            stmt = con.createStatement();
-            try {
+            try (Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(CREATE_SRC_SEQUENCES_TABLE_STMT);
             } catch (SQLException ex) {
                 if (!isTableExistsError(ex)) {
@@ -851,12 +844,9 @@ public class RMTxStore implements RMStore {
                 }
                 LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
                 verifyTable(con, SRC_SEQUENCES_TABLE_NAME, SRC_SEQUENCES_TABLE_COLS);
-            } finally {
-                stmt.close();
             }
 
-            stmt = con.createStatement();
-            try {
+            try (Statement stmt = con.createStatement()) {
                 stmt.executeUpdate(CREATE_DEST_SEQUENCES_TABLE_STMT);
             } catch (SQLException ex) {
                 if (!isTableExistsError(ex)) {
@@ -864,13 +854,10 @@ public class RMTxStore implements RMStore {
                 }
                 LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
                 verifyTable(con, DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);
-            } finally {
-                stmt.close();
             }
 
             for (String tableName : new String[] {OUTBOUND_MSGS_TABLE_NAME, INBOUND_MSGS_TABLE_NAME}) {
-                stmt = con.createStatement();
-                try {
+                try (Statement stmt = con.createStatement()) {
                     stmt.executeUpdate(MessageFormat.format(CREATE_MESSAGES_TABLE_STMT, tableName));
                 } catch (SQLException ex) {
                     if (!isTableExistsError(ex)) {
@@ -880,8 +867,6 @@ public class RMTxStore implements RMStore {
                         LOG.fine("Table " + tableName + " already exists.");
                     }
                     verifyTable(con, tableName, MESSAGES_TABLE_COLS);
-                } finally {
-                    stmt.close();
                 }
             }
         } finally {
@@ -913,16 +898,13 @@ public class RMTxStore implements RMStore {
                 }
 
                 for (String[] newCol : newCols) {
-                    Statement st = con.createStatement();
-                    try {
+                    try (Statement st = con.createStatement()) {
                         st.executeUpdate(MessageFormat.format(ALTER_TABLE_STMT_STR,
                                                               tableName, newCol[0], newCol[1]));
                         if (LOG.isLoggable(Level.FINE)) {
                             LOG.log(Level.FINE, "Successfully added column {0} to table {1}",
                                     new Object[] {tableName, newCol[0]});
                         }
-                    } finally {
-                        st.close();
                     }
                 }
             }
@@ -952,23 +934,18 @@ public class RMTxStore implements RMStore {
             // assume it is already created or no authorization is provided (create one manually)
         }
 
-        Statement stmt = connection.createStatement();
-        SQLException ex0 = null;
-        for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
-            try {
-                stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
-                break;
-            } catch (SQLException ex) {
-                ex.setNextException(ex0);
-                ex0 = ex;
-                if (i == SET_SCHEMA_STMT_STRS.length - 1) {
-                    throw ex0;
-                }
-                // continue
-            } finally {
-                // close the statement after its last use
-                if (ex0 == null || i == SET_SCHEMA_STMT_STRS.length - 1) {
-                    stmt.close();
+        try (Statement stmt = connection.createStatement()) {
+            SQLException ex0 = null;
+            for (int i = 0; i < SET_SCHEMA_STMT_STRS.length; i++) {
+                try {
+                    stmt.executeUpdate(MessageFormat.format(SET_SCHEMA_STMT_STRS[i], schemaName));
+                    break;
+                } catch (SQLException ex) {
+                    ex.setNextException(ex0);
+                    ex0 = ex;
+                    if (i == SET_SCHEMA_STMT_STRS.length - 1) {
+                        throw ex0;
+                    }
                 }
             }
         }

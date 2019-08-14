@@ -238,23 +238,13 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         if (!doWork) {
             URI basedir = project.getBasedir().toURI();
             String options = wsdlOption.generateCommandLine(null, basedir, wsdlURI, false).toString();
-            DataInputStream reader = null;
-            try {
-                reader = new DataInputStream(Files.newInputStream(doneFile.toPath()));
+            try (DataInputStream reader = new DataInputStream(Files.newInputStream(doneFile.toPath()))) {
                 String s = reader.readUTF();
                 if (!options.equals(s)) {
                     doWork = true;
                 }
             } catch (Exception ex) {
                 //ignore
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        //ignore
-                    }
-                }
             }
         }
         return doWork;

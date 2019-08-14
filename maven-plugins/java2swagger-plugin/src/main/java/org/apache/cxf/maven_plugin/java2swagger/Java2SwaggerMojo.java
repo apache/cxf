@@ -60,52 +60,52 @@ import io.swagger.util.Yaml;
  * @threadSafe
  */
 public class Java2SwaggerMojo extends AbstractMojo {
-    
+
     /**
     * @parameter
     * @required
     */
     private List<String> resourcePackages;
-    
+
     /**
      * @parameter default-value="${project.version}"
      */
     private String version;
-    
-    
+
+
     /**
      * @parameter default-value="/api"
      */
     private String basePath;
-    
+
     /**
      * @parameter default-value="${project.name}"
      */
     private String title;
-    
-    
+
+
     /**
      * @parameter default-value="${project.description}"
      */
     private String description;
-    
-    
+
+
     /**
      * @parameter
      */
     private String contact;
-    
-    
+
+
     /**
      * @parameter default-value="Apache 2.0 License"
      */
     private String license;
-    
+
     /**
      * @parameter default-value="http://www.apache.org/licenses/LICENSE-2.0.html"
      */
     private String licenseUrl;
-    
+
     /**
      * @parameter
      */
@@ -116,12 +116,12 @@ public class Java2SwaggerMojo extends AbstractMojo {
      */
     private List<String> schemes;
 
-    
+
     /**
      * @parameter default-value="json"
      */
     private String payload;
-    
+
 
     /**
      * @parameter
@@ -168,13 +168,13 @@ public class Java2SwaggerMojo extends AbstractMojo {
      */
     private String outputFileName;
 
-      
+
     private ClassLoader resourceClassLoader;
-    
+
     private Swagger swagger;
-    
+
     private ObjectMapper mapper = new ObjectMapper();
-    
+
     private Set<Class<?>> resourceClasses;
 
 
@@ -207,28 +207,19 @@ public class Java2SwaggerMojo extends AbstractMojo {
                     + payload.toLowerCase()).replace("/", File.separator);
         }
 
-        BufferedWriter writer = null;
-        try {
-            FileUtils.mkDir(new File(outputFile).getParentFile());
-            writer = new BufferedWriter(new FileWriter(outputFile));
+        FileUtils.mkDir(new File(outputFile).getParentFile());
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile))) {
             if ("json".equals(this.payload)) {
                 ObjectWriter jsonWriter = mapper.writer(new DefaultPrettyPrinter());
                 writer.write(jsonWriter.writeValueAsString(swagger));
             } else if ("yaml".equals(this.payload)) {
                 writer.write(Yaml.pretty().writeValueAsString(swagger));
             }
-       
+
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
         }
+
         // Attach the generated swagger file to the artifacts that get deployed
         // with the enclosing project
         if (attachSwagger && outputFile != null) {
@@ -277,7 +268,7 @@ public class Java2SwaggerMojo extends AbstractMojo {
     }
 
 
-      
+
     private void loadSwaggerAnnotation() throws MojoExecutionException {
         Reader reader = new Reader(swagger);
         swagger = reader.read(loadResourceClasses(Api.class));

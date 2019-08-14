@@ -80,13 +80,9 @@ public class BookCatalog {
 
                 final Document document = extractor.extract(handler.getInputStream(), metadata);
                 if (document != null) {
-                    final IndexWriter writer = getIndexWriter();
-
-                    try {
+                    try (IndexWriter writer = getIndexWriter()) {
                         writer.addDocument(document);
                         writer.commit();
-                    } finally {
-                        writer.close();
                     }
                 }
             }
@@ -98,26 +94,18 @@ public class BookCatalog {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<ScoreDoc> findBook(@Context SearchContext searchContext) throws IOException {
-        IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);
-
-        try {
+        try (IndexReader reader = DirectoryReader.open(directory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
             visitor.visit(searchContext.getCondition(SearchBean.class));
             return Arrays.asList(searcher.search(visitor.getQuery(), null, 1000).scoreDocs);
-        } finally {
-            reader.close();
         }
     }
 
     @DELETE
     public Response delete() throws IOException {
-        final IndexWriter writer = getIndexWriter();
-
-        try {
+        try (IndexWriter writer = getIndexWriter()) {
             writer.deleteAll();
             writer.commit();
-        } finally {
-            writer.close();
         }
 
         return Response.ok().build();

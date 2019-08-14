@@ -352,10 +352,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
 
-        ClassPathXmlApplicationContext ctx =
+        try (ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(
-                new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
-        try {
+                new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"})) {
             String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
             wsdlStrings.add(wsdlString2);
             broker.updateWsdl((Bus)ctx.getBean("cxf"), wsdlString2);
@@ -400,7 +399,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 fail("There should not throw the exception" + ex);
             }
         } finally {
-            ctx.close();
             BusFactory.setDefaultBus(getBus());
             BusFactory.setThreadDefaultBus(getBus());
         }

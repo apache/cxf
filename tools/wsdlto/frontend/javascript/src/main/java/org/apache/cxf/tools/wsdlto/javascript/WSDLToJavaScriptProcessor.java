@@ -69,7 +69,6 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
         }
 
-        BufferedWriter writer = null;
         try {
             OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -78,32 +77,25 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF_8);
-            writer = new BufferedWriter(outputStreamWriter);
+            try (BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
-            XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
-            SchemaJavascriptBuilder jsBuilder =
-                new SchemaJavascriptBuilder(serviceInfo
-                .getXmlSchemaCollection(), prefixManager, nameManager);
-            String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection);
-            writer.append(jsForSchemas);
+                XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
+                SchemaJavascriptBuilder jsBuilder =
+                    new SchemaJavascriptBuilder(serviceInfo
+                    .getXmlSchemaCollection(), prefixManager, nameManager);
+                String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection);
+                writer.append(jsForSchemas);
 
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
-                                                                                   null,
-                                                                                   prefixManager,
-                                                                                   nameManager);
-            serviceBuilder.walk();
-            String serviceJavascript = serviceBuilder.getCode();
-            writer.append(serviceJavascript);
+                ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
+                                                                                       null,
+                                                                                       prefixManager,
+                                                                                       nameManager);
+                serviceBuilder.walk();
+                String serviceJavascript = serviceBuilder.getCode();
+                writer.append(serviceJavascript);
+            }
         } catch (IOException e) {
             throw new ToolException(e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new ToolException(e);
-            }
         }
     }
 

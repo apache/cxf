@@ -222,10 +222,9 @@ public class TikaLuceneContentExtractorTest {
     }
 
     private ScoreDoc[] getHits(final String expression, final Map< String, Class<?> > fieldTypes) throws IOException {
-        IndexReader reader = DirectoryReader.open(directory);
-        IndexSearcher searcher = new IndexSearcher(reader);
 
-        try {
+        try (IndexReader reader = DirectoryReader.open(directory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
             LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<>("ct", "contents");
             visitor.setPrimitiveFieldTypeMap(fieldTypes);
             visitor.visit(parser.parse(expression));
@@ -234,8 +233,6 @@ public class TikaLuceneContentExtractorTest {
             assertNotNull(hits);
 
             return hits;
-        } finally {
-            reader.close();
         }
     }
 

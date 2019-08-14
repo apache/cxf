@@ -245,7 +245,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         boolean enabled = checkBufferingMode(message, writers, firstTry);
         try {
 
-            try {
+            try {       // NOPMD
                 JAXRSUtils.writeMessageBody(writers,
                         entity,
                         targetType,

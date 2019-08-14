@@ -27,6 +27,7 @@ import java.io.OutputStream;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -102,7 +103,7 @@ public class LocalTransportFactoryTest {
                 backChannel.prepare(message);
                 OutputStream out = message.getContent(OutputStream.class);
                 assertNotNull(out);
-                copy(in, out, 1024);
+                IOUtils.copy(in, out, 1024);
                 out.close();
                 in.close();
                 backChannel.close(message);
@@ -112,23 +113,6 @@ public class LocalTransportFactoryTest {
             }
         }
     }
-
-    private static void copy(final InputStream input, final OutputStream output, final int bufferSize)
-        throws IOException {
-        try {
-            final byte[] buffer = new byte[bufferSize];
-
-            int n = input.read(buffer);
-            while (-1 != n) {
-                output.write(buffer, 0, n);
-                n = input.read(buffer);
-            }
-        } finally {
-            input.close();
-            output.close();
-        }
-    }
-
 
     class TestMessageObserver implements MessageObserver {
         ByteArrayOutputStream response = new ByteArrayOutputStream();
@@ -146,7 +130,9 @@ public class LocalTransportFactoryTest {
         public synchronized void onMessage(Message message) {
             try {
                 message.remove(LocalConduit.DIRECT_DISPATCH);
-                copy(message.getContent(InputStream.class), response, 1024);
+                IOUtils.copy(message.getContent(InputStream.class), response, 1024);
+                message.getContent(InputStream.class).close();
+                response.close();
                 inMessage = message;
             } catch (IOException e) {
                 e.printStackTrace();

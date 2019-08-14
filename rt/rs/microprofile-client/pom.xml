@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>3.3.3-SNAPSHOT</version>
+        <version>3.4.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
@@ -171,6 +171,12 @@
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-jcs-jcache</artifactId>
           <version>${cxf.commons-jcs-jcache.version}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.squareup.okhttp3</groupId>
+          <artifactId>mockwebserver</artifactId>
+          <version>4.0.1</version>
           <scope>test</scope>
         </dependency>
     </dependencies>

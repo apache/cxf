@@ -282,7 +282,7 @@
         <bundle start-level="35">mvn:org.yaml/snakeyaml/${cxf.snakeyaml.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-core/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-annotations/${cxf.jackson.version}</bundle>
-        <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.version}</bundle>
+        <bundle start-level="35">mvn:com.fasterxml.jackson.core/jackson-databind/${cxf.jackson.databind.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${cxf.jackson.version}</bundle>
         <bundle start-level="35">mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${cxf.jackson.version}</bundle>
         <!-- <bundle start-level="35">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${cxf.jackson.version}</bundle> -->
@@ -372,8 +372,10 @@
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-features-metrics/${project.version}</bundle>
     </feature>
     <feature name="cxf-bindings-corba" version="${project.version}">
+        <feature prerequisite="true">wrap</feature>
         <feature version="${project.version}">cxf-wsdl</feature>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-rt-bindings-corba/${project.version}</bundle>
+        <bundle start-level="40" dependency="true">wrap:mvn:org.jacorb/jacorb-omgapi/3.7</bundle>
     </feature>
     <feature name="cxf-bindings-coloc" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>

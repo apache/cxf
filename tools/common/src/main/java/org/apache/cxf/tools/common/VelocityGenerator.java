@@ -68,8 +68,8 @@ public final class VelocityGenerator {
         try {
             Properties props = new Properties();
             String clzName = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
-            props.put("resource.loader", "class");
-            props.put("class.resource.loader.class", clzName);
+            props.put("resource.loaders", "class");
+            props.put("resource.loader.class.class", clzName);
             props.put("runtime.log", getVelocityLogFile("velocity.log"));
 //            if (!log) {
 //                props.put(VelocityEngine.RUNTIME_LOG_INSTANCE,

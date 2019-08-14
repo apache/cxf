@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>cxf-samples</artifactId>
     <packaging>pom</packaging>
-    <version>3.3.3-SNAPSHOT</version>
+    <version>3.4.0-SNAPSHOT</version>
     <name>Apache CXF Samples</name>
     <description>Apache CXF Samples</description>
     <url>https://cxf.apache.org</url>
@@ -34,7 +34,7 @@
         <spring.cloud.eureka.version>2.0.2.RELEASE</spring.cloud.eureka.version>
         <cxf.jetty9.version>9.4.18.v20190429</cxf.jetty9.version>
         <cxf.httpcomponents.client.version>4.5.8</cxf.httpcomponents.client.version>
-        <cxf.tika.version>1.21</cxf.tika.version>
+        <cxf.tika.version>1.22</cxf.tika.version>
     </properties>
     <dependencies>
         <dependency>

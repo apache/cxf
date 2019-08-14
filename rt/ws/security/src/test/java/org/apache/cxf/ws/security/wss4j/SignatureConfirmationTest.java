@@ -22,16 +22,12 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils.NullResolver;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
@@ -85,7 +81,6 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
 
-        byte[] docbytes = getMessageBytes(doc);
         //
         // Save the signature for future confirmation
         //
@@ -93,18 +88,8 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         assertNotNull(sigv);
         assertFalse(sigv.isEmpty());
 
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        byte[] docbytes = getMessageBytes(doc);
+        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 
@@ -154,20 +139,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
 
         byte[] docbytes = getMessageBytes(doc);
-        // System.out.println(new String(docbytes));
-
-        XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
-
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-        dbf.setValidating(false);
-        dbf.setIgnoringComments(false);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setNamespaceAware(true);
-
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new NullResolver());
-        doc = StaxUtils.read(db, reader, false);
+        doc = StaxUtils.read(new ByteArrayInputStream(docbytes));
 
         WSS4JInInterceptor inHandler = new WSS4JInInterceptor();
 

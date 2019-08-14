@@ -123,25 +123,20 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         }
 
         String path = "/META-INF/cxf/aegis.xsd";
-        InputStream is = XMLTypeCreator.class.getResourceAsStream(path);
-        if (is != null) {
-            try {
+        try (InputStream is = XMLTypeCreator.class.getResourceAsStream(path)) {
+            if (is != null) {
                 SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema aegisSchema = schemaFactory.newSchema(new StreamSource(is));
                 AEGIS_DOCUMENT_BUILDER_FACTORY.setSchema(aegisSchema);
-            } catch (Throwable e) {
-                String msg = "Could not set aegis schema.  Not validating.";
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.INFO, msg, e);
-                } else {
-                    LOG.log(Level.INFO, msg);
-                }
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ex) {
-                    //ignore
-                }
+            }
+        } catch (IOException ex) {
+            // ignore
+        } catch (Throwable e) {
+            String msg = "Could not set aegis schema.  Not validating.";
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.INFO, msg, e);
+            } else {
+                LOG.log(Level.INFO, msg);
             }
         }
     }

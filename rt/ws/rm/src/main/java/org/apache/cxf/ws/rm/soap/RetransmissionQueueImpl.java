@@ -743,7 +743,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
 
     private void doResend(SoapMessage message) {
         InputStream is = null;
-        try {
+        try {   //NOPMD
 
             // initialize copied interceptor chain for message
             PhaseInterceptorChain retransmitChain = manager.getRetransmitChain(message);

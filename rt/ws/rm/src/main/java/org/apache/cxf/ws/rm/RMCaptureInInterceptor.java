@@ -216,9 +216,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
         private CachedOutputStream removeUnnecessarySoapHeaders(CachedOutputStream saved) {
             CachedOutputStream newSaved = new CachedOutputStream();
 
-            InputStream is = null;
-            try {
-                is = saved.getInputStream();
+            try (InputStream is = saved.getInputStream()) {
                 XMLStreamWriter capture = StaxUtils.createXMLStreamWriter(newSaved,
                                                                           StandardCharsets.UTF_8.name());
                 Map<String, String> map = new HashMap<>();
@@ -242,17 +240,8 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
                 // hold temp file, otherwise it will be deleted in case msg was written to RMTxStore
                 // or resend was executed
                 newSaved.holdTempFile();
-                is.close();
             } catch (IOException | XMLStreamException e) {
                 throw new Fault(e);
-            } finally {
-                if (null != is) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
             }
             return newSaved;
         }

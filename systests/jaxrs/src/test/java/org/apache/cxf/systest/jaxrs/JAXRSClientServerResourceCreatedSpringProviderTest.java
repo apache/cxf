@@ -319,16 +319,13 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus2() throws Exception {
 
 
-        Socket s = new Socket("localhost", Integer.parseInt(PORT));
-        IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(),
-                                  s.getOutputStream());
+        try (Socket s = new Socket("localhost", Integer.parseInt(PORT))) {
+            IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(),
+                                      s.getOutputStream());
 
-        s.getOutputStream().flush();
-        try {
+            s.getOutputStream().flush();
             assertTrue("Wrong status returned", getStringFromInputStream(s.getInputStream())
                        .contains("open"));
-        } finally {
-            s.close();
         }
     }
 

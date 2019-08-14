@@ -90,6 +90,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.ReaderInputStream;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.ContextProvider;
@@ -1419,6 +1420,11 @@ public final class JAXRSUtils {
         throws WebApplicationException, IOException {
 
         OutputStream entityStream = message.getContent(OutputStream.class);
+        if (entity.getClass().getName().equals("org.apache.cxf.jaxrs.reactivestreams.server.StreamingAsyncSubscriber$StreamingResponseImpl")) {
+            //cache the OutputStream when it's reactive response
+            entityStream = new CacheAndWriteOutputStream(entityStream);
+        }
+            
         if (writers.size() > 1) {
             WriterInterceptor first = writers.remove(0);
             WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,

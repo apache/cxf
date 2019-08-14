@@ -96,14 +96,14 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         stopAllServers();
     }
 
-    // In this test, a CXF client checks to see that the location defined on its STSClient is different
-    // from that configured in the Issuer of the IssuedToken policy supplied in the WSDL of the
-    // service provider. It obtains a SAML Token from the configured STS first, and then sends it in
-    // the security header to the second STS. The returned token is then sent to the service provider.
-    // This illustrates cross-domain SSO: https://issues.apache.org/jira/browse/CXF-3520
+    // In this test, the CXF client has two STSClients configured. The "default" STSClient config points to
+    // STS "b". This STS has an IssuedToken policy that requires a token from STS "a".
     @org.junit.Test
-    @org.junit.Ignore
     public void testCrossDomain() throws Exception {
+        if (!portFree) {
+            return;
+        }
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
 
@@ -137,7 +137,7 @@ public class CrossDomainTest extends AbstractBusClientServerTestBase {
         }
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = CrossDomainTest.class.getResource("cxf-client.xml");
+        URL busFile = CrossDomainTest.class.getResource("cxf-client-mex.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
