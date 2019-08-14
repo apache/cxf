@@ -85,6 +85,11 @@ public class Claim implements Serializable, Cloneable {
         this.values.addAll(values);
     }
 
+    @Deprecated
+    public void setValue(Object s) {
+        addValue(s);
+    }
+
     public void addValue(Object s) {
         this.values.add(s);
     }

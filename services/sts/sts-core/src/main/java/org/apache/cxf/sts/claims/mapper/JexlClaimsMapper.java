@@ -27,10 +27,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.MapContext;
-import org.apache.commons.jexl2.Script;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.MapContext;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.sts.claims.ClaimsMapper;
@@ -41,18 +42,17 @@ public class JexlClaimsMapper implements ClaimsMapper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JexlClaimsMapper.class);
 
-    private JexlEngine jexlEngine = new JexlEngine();
-    private Script script;
+    private JexlEngine jexlEngine;
+    private JexlScript script;
 
     public JexlClaimsMapper() {
         // jexl.setCache(512);
         // jexl.setLenient(false);
-        jexlEngine.setSilent(false);
 
         Map<String, Object> functions = new HashMap<>();
         functions.put("claims", new ClaimUtils());
         functions.put("LOG", LOG);
-        jexlEngine.setFunctions(functions);
+        jexlEngine = new JexlBuilder().silent(false).namespaces(functions).create();
     }
 
     public JexlClaimsMapper(String script) throws IOException {
@@ -72,7 +72,7 @@ public class JexlClaimsMapper implements ClaimsMapper {
         context.set("targetRealm", targetRealm);
         context.set("claimsParameters", parameters);
 
-        Script s = getScript();
+        JexlScript s = getScript();
         if (s == null) {
             LOG.warning("No claim mapping script defined");
             return new ProcessedClaimCollection(); // TODO Check if null or an exception would be more
@@ -81,11 +81,11 @@ public class JexlClaimsMapper implements ClaimsMapper {
         return (ProcessedClaimCollection)s.execute(context);
     }
 
-    public Script getScript() {
+    public JexlScript getScript() {
         return script;
     }
 
-    public final void setScript(Script script) {
+    public final void setScript(JexlScript script) {
         this.script = script;
     }
 
