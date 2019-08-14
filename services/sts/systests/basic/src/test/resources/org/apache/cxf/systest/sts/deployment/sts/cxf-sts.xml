@@ -91,10 +91,10 @@
     <bean id="customRealmParser" class="org.apache.cxf.systest.sts.common.UriRealmParser"/>
     
     <bean id="stsProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="${signature.properties}"/>
+        <property name="signatureCryptoProperties" value="${signature.properties}"/>
         <property name="signatureUsername" value="${signature.username}"/>
         <property name="callbackHandlerClass" value="${callback.handler}"/>
-        <property name="encryptionPropertiesFile" value="${encryption.properties}"/>
+        <property name="encryptionCryptoProperties" value="${encryption.properties}"/>
         <property name="issuer" value="${issuer}"/>
         <property name="encryptionUsername" value="${encryption.username}"/>
         <property name="encryptionProperties" ref="encProperties"/>

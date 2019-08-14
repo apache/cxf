@@ -65,7 +65,7 @@
     </util:list>
     <bean id="customRealmParser" class="org.apache.cxf.systest.sts.realms.URLRealmParser"/>
     <bean id="transportSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureCryptoProperties" value="stsKeystore.properties"/>
         <property name="signatureUsername" value="mystskey"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
         <property name="issuer" value="a-issuer"/>

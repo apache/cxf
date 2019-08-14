@@ -53,10 +53,10 @@
         <property name="encryptionAlgorithm" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
     </bean>
     <bean id="x509STSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
-        <property name="signaturePropertiesFile" value="stsKeystore.properties"/>
+        <property name="signatureCryptoProperties" value="stsKeystore.properties"/>
         <property name="signatureUsername" value="mystskey"/>
         <property name="callbackHandlerClass" value="org.apache.cxf.systest.sts.common.CommonCallbackHandler"/>
-        <property name="encryptionPropertiesFile" value="stsKeystore.properties"/>
+        <property name="encryptionCryptoProperties" value="stsKeystore.properties"/>
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="useReqSigCert"/>
     </bean>

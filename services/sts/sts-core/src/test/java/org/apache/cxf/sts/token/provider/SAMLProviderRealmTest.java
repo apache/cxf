@@ -120,12 +120,12 @@ public class SAMLProviderRealmTest {
         providerParameters.setRealm("A");
 
         // Create Realms
-        Map<String, org.apache.cxf.sts.token.realm.SAMLRealm> samlRealms =
+        Map<String, org.apache.cxf.sts.token.realm.RealmProperties> samlRealms =
             new HashMap<>();
-        org.apache.cxf.sts.token.realm.SAMLRealm samlRealm = new org.apache.cxf.sts.token.realm.SAMLRealm();
+        org.apache.cxf.sts.token.realm.RealmProperties samlRealm = new org.apache.cxf.sts.token.realm.RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);
-        samlRealm = new org.apache.cxf.sts.token.realm.SAMLRealm();
+        samlRealm = new org.apache.cxf.sts.token.realm.RealmProperties();
         samlRealm.setIssuer("B-Issuer");
         samlRealms.put("B", samlRealm);
         ((SAMLTokenProvider)samlTokenProvider).setRealmMap(samlRealms);
