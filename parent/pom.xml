@@ -2860,12 +2860,6 @@
                             <artifactId>stax-api</artifactId>
                         </exclusion>
                     </exclusions>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.xml.soap</groupId>
-                            <artifactId>javax.xml.soap-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
                 <dependency>
                     <groupId>org.jacorb</groupId>
