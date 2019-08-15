@@ -156,7 +156,7 @@ public final class OAuth2TestUtils {
                                                                         String code,
                                                                         String consumerId,
                                                                         String audience) {
-        return getAccessTokenWithAuthorizationCode(client, code, "consumer-id", audience, null);
+        return getAccessTokenWithAuthorizationCode(client, code, consumerId, audience, null);
     }
 
     public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client,
