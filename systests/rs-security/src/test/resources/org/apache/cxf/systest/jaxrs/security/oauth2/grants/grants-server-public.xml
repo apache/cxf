@@ -145,5 +145,38 @@ under the License.
        </jaxrs:properties>
    </jaxrs:server>
    
+   <bean id="digestVerifier" class="org.apache.cxf.rs.security.oauth2.grants.code.DigestCodeVerifier" />
+   <bean id="codeGrantHandler" class="org.apache.cxf.rs.security.oauth2.grants.code.AuthorizationCodeGrantHandler">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="codeVerifierTransformer" ref="digestVerifier"/>
+   </bean>
+   
+   <bean id="digestTokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+      <property name="dataProvider" ref="oauthProvider"/>
+      <property name="canSupportPublicClients" value="true"/>
+      <property name="grantHandlers">
+         <list>
+             <ref bean="codeGrantHandler"/>
+         </list>
+      </property>
+   </bean>
+   
+   <jaxrs:server 
+       depends-on="tls-config" 
+       address="https://localhost:${testutil.ports.jaxrs-oauth2-grants-jcache-public}/services3">
+       <jaxrs:serviceBeans>
+           <ref bean="digestTokenService"/>
+       </jaxrs:serviceBeans>
+       <jaxrs:properties>
+           <entry key="security.signature.properties" 
+                  value="org/apache/cxf/systest/jaxrs/security/bob.properties"/>
+           <entry key="rs.security.keystore.type" value="jks" />
+           <entry key="rs.security.keystore.alias" value="alice"/>
+           <entry key="rs.security.keystore.password" value="password"/>
+           <entry key="rs.security.keystore.file" value="keys/alice.jks" />
+           <entry key="rs.security.signature.algorithm" value="RS256" />
+       </jaxrs:properties>
+   </jaxrs:server>
+   
 
 </beans>
