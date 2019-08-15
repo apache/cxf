@@ -56,6 +56,11 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
 
     public JCacheOAuthDataProviderImpl(String servicePort, String partnerPort,
                                        boolean storeJwtTokenKeyOnly) throws Exception {
+        this(servicePort, partnerPort, storeJwtTokenKeyOnly, false);
+    }
+
+    public JCacheOAuthDataProviderImpl(String servicePort, String partnerPort,
+                                       boolean storeJwtTokenKeyOnly, boolean createPublicClients) throws Exception {
         // Create random cache files, as this provider could be called by several test implementations
         super(DEFAULT_CONFIG_URL, BusFactory.getThreadDefaultBus(true),
               CLIENT_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
@@ -64,7 +69,8 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
               REFRESH_TOKEN_CACHE_KEY + "_" + Math.abs(new Random().nextInt()),
               storeJwtTokenKeyOnly);
         // filters/grants test client
-        Client client = new Client("consumer-id", "this-is-a-secret", true);
+        Client client = createPublicClients ? new Client("consumer-id", null, false)
+            : new Client("consumer-id", "this-is-a-secret", true);
         List<String> redirectUris = new ArrayList<>();
         redirectUris.add("http://www.blah.apache.org");
         if (partnerPort != null) {
@@ -92,7 +98,8 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
         this.setClient(client);
 
         // OIDC filters test client
-        client = new Client("consumer-id-oidc", "this-is-a-secret", true);
+        client = createPublicClients ? new Client("consumer-id-oidc", null, false)
+            : new Client("consumer-id-oidc", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("https://localhost:" + servicePort
                                                          + "/secured/bookstore/books"));
 
@@ -104,7 +111,8 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
         this.setClient(client);
 
         // Audience test client
-        client = new Client("consumer-id-aud", "this-is-a-secret", true);
+        client = createPublicClients ? new Client("consumer-id-aud", null, false)
+            : new Client("consumer-id-aud", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
 
         client.getAllowedGrantTypes().add("authorization_code");
@@ -118,7 +126,8 @@ public class JCacheOAuthDataProviderImpl extends JCacheCodeDataProvider {
         this.setClient(client);
 
         // Audience test client 2
-        client = new Client("consumer-id-aud2", "this-is-a-secret", true);
+        client = createPublicClients ? new Client("consumer-id-aud2", null, false)
+            : new Client("consumer-id-aud2", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
 
         client.getAllowedGrantTypes().add("authorization_code");

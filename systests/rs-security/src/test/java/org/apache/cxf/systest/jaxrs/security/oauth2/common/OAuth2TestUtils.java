@@ -100,6 +100,12 @@ public final class OAuth2TestUtils {
         if (parameters.getRequest() != null) {
             client.query("request", parameters.getRequest());
         }
+        if (parameters.getCodeChallenge() != null) {
+            client.query("code_challenge", parameters.getCodeChallenge());
+        }
+        if (parameters.getCodeChallengeMethod() != null) {
+            client.query("code_challenge_method", parameters.getCodeChallengeMethod());
+        }
 
         client.path(parameters.getPath());
         Response response = client.get();
@@ -127,6 +133,9 @@ public final class OAuth2TestUtils {
         if (authzData.getState() != null) {
             form.param("state", authzData.getState());
         }
+        if (authzData.getClientCodeChallenge() != null) {
+            form.param("code_challenge", authzData.getClientCodeChallenge());
+        }
         form.param("response_type", authzData.getResponseType());
         form.param("oauthDecision", "allow");
 
@@ -147,6 +156,14 @@ public final class OAuth2TestUtils {
                                                                         String code,
                                                                         String consumerId,
                                                                         String audience) {
+        return getAccessTokenWithAuthorizationCode(client, code, "consumer-id", audience, null);
+    }
+
+    public static ClientAccessToken getAccessTokenWithAuthorizationCode(WebClient client,
+                                                                        String code,
+                                                                        String consumerId,
+                                                                        String audience,
+                                                                        String codeVerifier) {
         client.type("application/x-www-form-urlencoded").accept("application/json");
         client.path("token");
 
@@ -156,6 +173,9 @@ public final class OAuth2TestUtils {
         form.param("client_id", consumerId);
         if (audience != null) {
             form.param("audience", audience);
+        }
+        if (codeVerifier != null) {
+            form.param("code_verifier", codeVerifier);
         }
         form.param("redirect_uri", "http://www.blah.apache.org");
         Response response = client.post(form);
@@ -264,6 +284,8 @@ public final class OAuth2TestUtils {
         private String responseType;
         private String path;
         private String request;
+        private String codeChallenge;
+        private String codeChallengeMethod;
 
         public String getScope() {
             return scope;
@@ -306,6 +328,18 @@ public final class OAuth2TestUtils {
         }
         public void setRequest(String request) {
             this.request = request;
+        }
+        public String getCodeChallenge() {
+            return codeChallenge;
+        }
+        public void setCodeChallenge(String codeChallenge) {
+            this.codeChallenge = codeChallenge;
+        }
+        public String getCodeChallengeMethod() {
+            return codeChallengeMethod;
+        }
+        public void setCodeChallengeMethod(String codeChallengeMethod) {
+            this.codeChallengeMethod = codeChallengeMethod;
         }
     }
 }
