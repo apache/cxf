@@ -49,4 +49,9 @@
             <entry key="Accept" value="text/xml"/>
         </jaxrs:headers>
     </jaxrs:client>
+    <jaxrs:client id="client2" serviceClass="org.apache.cxf.jaxrs.resources.BookStore" address="http://localhost:9000/foo">
+        <jaxrs:properties>
+            <entry key="expand.query.value.as.collection" value="true" />
+        </jaxrs:properties>
+    </jaxrs:client>
 </beans>
