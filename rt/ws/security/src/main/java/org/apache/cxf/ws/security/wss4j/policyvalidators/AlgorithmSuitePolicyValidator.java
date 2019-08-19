@@ -117,8 +117,8 @@ public class AlgorithmSuitePolicyValidator extends AbstractSecurityPolicyValidat
     ) {
         String signatureMethod =
             (String)result.get(WSSecurityEngineResult.TAG_SIGNATURE_METHOD);
-        if (!algorithmPolicy.getAsymmetricSignature().equals(signatureMethod)
-            && !algorithmPolicy.getSymmetricSignature().equals(signatureMethod)) {
+        if (!algorithmPolicy.getAlgorithmSuiteType().getAsymmetricSignature().equals(signatureMethod)
+            && !algorithmPolicy.getAlgorithmSuiteType().getSymmetricSignature().equals(signatureMethod)) {
             ai.setNotAsserted(
                 "The signature method does not match the requirement"
             );

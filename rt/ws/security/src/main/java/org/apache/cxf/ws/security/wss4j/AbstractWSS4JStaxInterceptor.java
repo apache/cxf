@@ -179,6 +179,8 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         boolean validateSchemas =
             MessageUtils.getContextualBoolean(msg, "schema-validation-enabled", false);
         securityProperties.setDisableSchemaValidation(!validateSchemas);
+
+        securityProperties.setSoap12(WSSConstants.NS_SOAP12.equals(msg.getVersion().getNamespace()));
     }
 
     private Collection<Pattern> convertCertConstraints(String certConstraints, String separator) {

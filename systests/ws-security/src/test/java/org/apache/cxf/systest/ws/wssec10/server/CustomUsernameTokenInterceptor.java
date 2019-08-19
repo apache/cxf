@@ -26,7 +26,8 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
-import org.apache.wss4j.dom.message.token.UsernameToken;
+import org.apache.wss4j.common.util.UsernameTokenUtil;
+import org.apache.xml.security.utils.XMLUtils;
 
 public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
 
@@ -44,11 +45,16 @@ public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
 
         // add roles this user is in
         String roleName = "Alice".equals(name) ? "developers" : "pms";
-        String expectedPassword = "Alice".equals(name) ? "ecilA"
-            : UsernameToken.doPasswordDigest(nonce, created, "invalid-password");
-        if (!password.equals(expectedPassword)) {
+        try {
+            String expectedPassword = "Alice".equals(name) ? "ecilA"
+                : UsernameTokenUtil.doPasswordDigest(XMLUtils.decode(nonce), created, "invalid-password");
+            if (!password.equals(expectedPassword)) {
+                throw new SecurityException("Wrong Password");
+            }
+        } catch (org.apache.wss4j.common.ext.WSSecurityException ex) {
             throw new SecurityException("Wrong Password");
         }
+
         subject.getPrincipals().add(new SimpleGroup(roleName, name));
         subject.setReadOnly();
         return subject;

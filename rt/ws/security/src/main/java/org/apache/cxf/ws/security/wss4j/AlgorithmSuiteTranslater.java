@@ -126,8 +126,8 @@ public final class AlgorithmSuiteTranslater {
                 algorithmSuite.addDigestAlgorithm(algorithmSuiteType.getDigest());
             }
 
-            algorithmSuite.addSignatureMethod(cxfAlgorithmSuite.getAsymmetricSignature());
-            algorithmSuite.addSignatureMethod(cxfAlgorithmSuite.getSymmetricSignature());
+            algorithmSuite.addSignatureMethod(algorithmSuiteType.getAsymmetricSignature());
+            algorithmSuite.addSignatureMethod(algorithmSuiteType.getSymmetricSignature());
             algorithmSuite.addC14nAlgorithm(cxfAlgorithmSuite.getC14n().getValue());
 
             algorithmSuite.addTransformAlgorithm(cxfAlgorithmSuite.getC14n().getValue());

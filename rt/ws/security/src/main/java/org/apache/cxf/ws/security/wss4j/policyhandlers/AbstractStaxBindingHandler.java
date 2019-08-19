@@ -540,10 +540,10 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         if (binding instanceof SymmetricBinding) {
             userNameKey = SecurityConstants.ENCRYPT_USERNAME;
             properties.setSignatureAlgorithm(
-                       binding.getAlgorithmSuite().getSymmetricSignature());
+                       binding.getAlgorithmSuite().getAlgorithmSuiteType().getSymmetricSignature());
         } else {
             properties.setSignatureAlgorithm(
-                       binding.getAlgorithmSuite().getAsymmetricSignature());
+                       binding.getAlgorithmSuite().getAlgorithmSuiteType().getAsymmetricSignature());
         }
         properties.setSignatureCanonicalizationAlgorithm(
                        binding.getAlgorithmSuite().getC14n().getValue());
