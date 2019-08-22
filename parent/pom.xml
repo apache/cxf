@@ -1380,6 +1380,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-all</artifactId>
+                <version>${cxf.hamcrest.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>3.1.6</version>

@@ -19,9 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -37,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -1408,6 +1412,30 @@ public class BookStore {
             }
 
         }).build();
+    }
+
+    @GET
+    @Path("/books/streamingoutput")
+    @Produces("text/xml")
+    public Response getBookStreamingOutput(@QueryParam("times") @DefaultValue("1") int times,
+                                           @QueryParam("delay") @DefaultValue("0") long delay) {
+        final StreamingOutput streamWritingError = outputStream -> {
+            try (PrintWriter writer = new PrintWriter(outputStream, true);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(getBufferedBook()))) {
+                final String readLine = reader.readLine();
+                for (int i = 0; i < times; i++) {
+                    writer.println(readLine);
+                    if (i < times - 1) {    // skip the delay in case of the last message
+                        TimeUnit.MILLISECONDS.sleep(delay);
+                    }
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new InternalServerErrorException();
+            }
+        };
+
+        return Response.ok(streamWritingError).build();
     }
 
     @GET
