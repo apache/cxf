@@ -25,17 +25,10 @@ import org.apache.lucene.search.Query;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
-
 public class LuceneQueryVisitorAnalyzerFiqlTest extends AbstractLuceneQueryVisitorTest {
     @Test
     public void testTextContentMatchEqual() throws Exception {
         doTestTextContentMatchWithAnalyzer("ct==tEXt");
-    }
-
-    @Test
-    public void testTextContentMatchStopWord() throws Exception {
-        assertNull("No query should be returned for stop words", createTermQueryWithAnalyzer("ct==the"));
     }
 
     @Test

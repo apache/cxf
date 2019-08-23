@@ -35,10 +35,13 @@ import org.apache.cxf.jaxrs.ext.search.visitor.VisitorState;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.DateTools.Resolution;
+import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.document.FloatPoint;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -163,9 +166,9 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             query = createEqualsQuery(clazz, name, value);
             break;
         case NOT_EQUALS:
-            BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.add(createEqualsQuery(clazz, name, value),
-                             BooleanClause.Occur.MUST_NOT);
+            BooleanQuery.Builder booleanBuilder = new BooleanQuery.Builder();
+            booleanBuilder.add(createEqualsQuery(clazz, name, value), BooleanClause.Occur.MUST_NOT);
+            BooleanQuery booleanQuery = booleanBuilder.build();
             query = booleanQuery;
             break;
         case GREATER_THAN:
@@ -260,33 +263,79 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
     private Query createIntRangeQuery(final String name, final Object value,
             final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
         final Integer intValue = Integer.valueOf(value.toString());
+        Integer min = getMin(type, intValue);
+        if (min == null) {
+            min = Integer.MIN_VALUE;
+        } else if (min != null && !minInclusive) {
+            min = Math.addExact(min, 1);
+        }
 
-        return NumericRangeQuery.newIntRange(name, getMin(type, intValue),
-            getMax(type, intValue),  minInclusive, maxInclusive);
+        Integer max = getMax(type, intValue);
+        if (max == null) {
+            max = Integer.MAX_VALUE;
+        } else if (max != null && !maxInclusive) {
+            max = Math.addExact(max, -1);
+        }
+
+        return IntPoint.newRangeQuery(name, min, max);
     }
 
     private Query createLongRangeQuery(final String name, final Object value,
             final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
         final Long longValue = Long.valueOf(value.toString());
+        Long min = getMin(type, longValue);
+        if (min == null) {
+            min = Long.MIN_VALUE;
+        } else if (min != null && !minInclusive) {
+            min = Math.addExact(min, 1);
+        }
 
-        return NumericRangeQuery.newLongRange(name, getMin(type, longValue),
-            getMax(type, longValue),  minInclusive, maxInclusive);
+        Long max = getMax(type, longValue);
+        if (max == null) {
+            max = Long.MAX_VALUE;
+        } else if (max != null && !maxInclusive) {
+            max = Math.addExact(max, -1);
+        }
+        return LongPoint.newRangeQuery(name, min, max);
     }
 
     private Query createDoubleRangeQuery(final String name, final Object value,
             final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
         final Double doubleValue = Double.valueOf(value.toString());
+        Double min = getMin(type, doubleValue);
+        if (min == null) {
+            min = Double.NEGATIVE_INFINITY;
+        } else if (min != null && !minInclusive) {
+            min = Math.nextUp(min);
+        }
 
-        return NumericRangeQuery.newDoubleRange(name, getMin(type, doubleValue),
-            getMax(type, doubleValue),  minInclusive, maxInclusive);
+        Double max = getMax(type, doubleValue);
+        if (max == null) {
+            max = Double.POSITIVE_INFINITY;
+        } else if (max != null && !maxInclusive) {
+            max = Math.nextDown(max);
+        }
+        return DoublePoint.newRangeQuery(name, min, max);
     }
 
     private Query createFloatRangeQuery(final String name, final Object value,
             final ConditionType type, final boolean minInclusive, final boolean maxInclusive) {
         final Float floatValue = Float.valueOf(value.toString());
+        Float min = getMin(type, floatValue);
+        if (min == null) {
+            min = Float.NEGATIVE_INFINITY;
+        } else if (min != null && !minInclusive) {
+            min = Math.nextUp(min);
+        }
 
-        return NumericRangeQuery.newFloatRange(name, getMin(type, floatValue),
-            getMax(type, floatValue),  minInclusive, maxInclusive);
+        Float max = getMax(type, floatValue);
+        if (max == null) {
+            max = Float.POSITIVE_INFINITY;
+        } else if (max != null && !maxInclusive) {
+            max = Math.nextDown(max);
+        }
+
+        return FloatPoint.newRangeQuery(name, min, max);
     }
 
     private< N > N getMax(final ConditionType type, final N value) {
@@ -303,13 +352,13 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
         BooleanClause.Occur clause = orCondition
             ? BooleanClause.Occur.SHOULD : BooleanClause.Occur.MUST;
 
-        BooleanQuery booleanQuery = new BooleanQuery();
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
 
         for (Query query : queries) {
-            booleanQuery.add(query, clause);
+            builder.add(query, clause);
         }
 
-        return booleanQuery;
+        return builder.build();
     }
 
     private Query newTermQuery(final String field, final String query) {
@@ -322,8 +371,8 @@ public class LuceneQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Que
             return queryBuilder.createPhraseQuery(field, query);
         }
 
-        final PhraseQuery phraseQuery = new PhraseQuery();
-        phraseQuery.add(new Term(field, query));
-        return phraseQuery;
+        PhraseQuery.Builder builder = new PhraseQuery.Builder();
+        builder.add(new Term(field, query));
+        return builder.build();
     }
 }

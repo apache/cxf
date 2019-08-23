@@ -28,12 +28,13 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.search.ParamConverterUtils;
 import org.apache.cxf.jaxrs.ext.search.tika.TikaContentExtractor.TikaContent;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.DoubleField;
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.FloatField;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.FloatPoint;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.tika.metadata.Metadata;
@@ -188,7 +189,7 @@ public class TikaLuceneContentExtractor {
         if (extractMetadata) {
             Metadata metadata = content.getMetadata();
             for (final String property: metadata.names()) {
-                document.add(getField(documentMetadata, property, metadata.get(property)));
+                addField(document, documentMetadata, property, metadata.get(property));
             }
         }
 
@@ -206,7 +207,8 @@ public class TikaLuceneContentExtractor {
     }
 
 
-    private static Field getField(final LuceneDocumentMetadata documentMetadata,
+    private static void addField(final Document document,
+                                  final LuceneDocumentMetadata documentMetadata,
                                   final String name, final String value) {
         final Class< ? > type = documentMetadata.getFieldType(name);
         final ParamConverterProvider provider = documentMetadata.getFieldTypeConverter();
@@ -214,18 +216,25 @@ public class TikaLuceneContentExtractor {
         if (type != null) {
             if (Number.class.isAssignableFrom(type)) {
                 if (Double.class.isAssignableFrom(type)) {
-                    return new DoubleField(name,
-                        ParamConverterUtils.getValue(Double.class, provider, value), Store.YES);
+                    Double number = ParamConverterUtils.getValue(Double.class, provider, value);
+                    document.add(new DoublePoint(name, number));
+                    document.add(new StoredField(name, number));
                 } else if (Float.class.isAssignableFrom(type)) {
-                    return new FloatField(name,
-                        ParamConverterUtils.getValue(Float.class, provider, value), Store.YES);
+                    Float number = ParamConverterUtils.getValue(Float.class, provider, value);
+                    document.add(new FloatPoint(name, number));
+                    document.add(new StoredField(name, number));
                 } else if (Long.class.isAssignableFrom(type)) {
-                    return new LongField(name,
-                        ParamConverterUtils.getValue(Long.class, provider, value), Store.YES);
+                    Long number = ParamConverterUtils.getValue(Long.class, provider, value);
+                    document.add(new LongPoint(name, number));
+                    document.add(new StoredField(name, number));
                 } else if (Integer.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
-                    return new IntField(name,
-                        ParamConverterUtils.getValue(Integer.class, provider, value), Store.YES);
+                    Integer number = ParamConverterUtils.getValue(Integer.class, provider, value);
+                    document.add(new IntPoint(name, number));
+                    document.add(new StoredField(name, number));
+                } else {
+                    document.add(new StringField(name, value, Store.YES));
                 }
+                return;
             } else if (Date.class.isAssignableFrom(type)) {
                 final Date date = ParamConverterUtils.getValue(Date.class, provider, value);
                 Field field = null;
@@ -237,10 +246,11 @@ public class TikaLuceneContentExtractor {
                     field = new StringField(name, value, Store.YES);
                 }
 
-                return field;
+                document.add(field);
+                return;
             }
         }
 
-        return new StringField(name, value, Store.YES);
+        document.add(new StringField(name, value, Store.YES));
     }
 }

@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.jaxrs.ext.search.lucene;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.ext.search.SearchBean;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchConditionParser;
@@ -28,7 +31,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -38,8 +42,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
+import org.apache.lucene.store.MMapDirectory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,19 +55,22 @@ public abstract class AbstractLuceneQueryVisitorTest {
     private IndexSearcher isearcher;
     private Directory directory;
     private Analyzer analyzer;
+    private Path tempDirectory;
 
     @Before
     public void setUp() throws Exception {
-        analyzer = new StandardAnalyzer(Version.LUCENE_4_9);
-        directory = new RAMDirectory();
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_9, analyzer);
+        analyzer = new StandardAnalyzer();
+        tempDirectory = Files.createTempDirectory("lucene");
+        directory = new MMapDirectory(tempDirectory);
+        IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter iwriter = new IndexWriter(directory, config);
 
         Document doc = new Document();
         doc.add(new Field("contents", "name=text", TextField.TYPE_STORED));
 
-        IntField intField = new IntField("intfield", 4, Field.Store.YES);
-        doc.add(intField);
+        IntPoint intPoint = new IntPoint("intfield", 4);
+        doc.add(intPoint);
+        doc.add(new StoredField("intfield", 4));
         iwriter.addDocument(doc);
 
         iwriter.close();
@@ -76,6 +82,7 @@ public abstract class AbstractLuceneQueryVisitorTest {
     public void tearDown() throws Exception {
         ireader.close();
         directory.close();
+        FileUtils.deleteQuietly(tempDirectory.toFile());
     }
 
     protected abstract SearchConditionParser<SearchBean> getParser();
@@ -95,12 +102,12 @@ public abstract class AbstractLuceneQueryVisitorTest {
     }
 
     protected void doTestNoMatch(Query query) throws Exception {
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
+        ScoreDoc[] hits = isearcher.search(query, 1000).scoreDocs;
         assertEquals(0, hits.length);
     }
 
     protected void doTestTextContentMatchWithQuery(Query query) throws Exception {
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
+        ScoreDoc[] hits = isearcher.search(query, 1000).scoreDocs;
         assertEquals(1, hits.length);
         // Iterate through the results:
         for (int i = 0; i < hits.length; i++) {
@@ -119,7 +126,7 @@ public abstract class AbstractLuceneQueryVisitorTest {
 
     protected void doTestIntContentMatchWithQuery(Query query) throws Exception {
 
-        ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
+        ScoreDoc[] hits = isearcher.search(query, 1000).scoreDocs;
         assertEquals(1, hits.length);
         // Iterate through the results:
         for (int i = 0; i < hits.length; i++) {
