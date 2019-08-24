@@ -220,7 +220,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             Endpoint ep = createEndpoint();
             this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_CLIENT_CREATE, ep);
             ClientState actualState = getActualState();
-            WebClient client = actualState == null ? new WebClient(getAddress())
+            WebClient client = actualState == null ? new WebClient(getAddress(), getProperties())
                 : new WebClient(actualState);
             initClient(client, ep, actualState == null);
 
@@ -243,11 +243,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
 
     protected ClientState getActualState() {
         if (threadSafe) {
-            initialState = new ThreadLocalClientState(getAddress(), timeToKeepState);
+            initialState = new ThreadLocalClientState(getAddress(), timeToKeepState, getProperties());
         }
         if (initialState != null) {
             return headers != null
-                ? initialState.newState(URI.create(getAddress()), headers, null) : initialState;
+                ? initialState.newState(URI.create(getAddress()), headers, null, getProperties()) : initialState;
         }
         return null;
     }
@@ -339,10 +339,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                                 ClientState actualState, Object[] varValues) {
         if (actualState == null) {
             return new ClientProxyImpl(URI.create(getAddress()), proxyLoader, cri, isRoot,
-                                    inheritHeaders, varValues);
+                                    inheritHeaders, getProperties(), varValues);
         } else {
             return new ClientProxyImpl(actualState, proxyLoader, cri, isRoot,
-                                    inheritHeaders, varValues);
+                                    inheritHeaders, getProperties(), varValues);
         }
     }
 

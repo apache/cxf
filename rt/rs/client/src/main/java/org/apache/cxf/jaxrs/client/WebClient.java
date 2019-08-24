@@ -90,11 +90,19 @@ public class WebClient extends AbstractClient {
     private static final String WEB_CLIENT_OPERATION_REPORTING = "enable.webclient.operation.reporting";
     private BodyWriter bodyWriter = new BodyWriter();
     protected WebClient(String baseAddress) {
-        this(convertStringToURI(baseAddress));
+        this(convertStringToURI(baseAddress), Collections.emptyMap());
+    }
+    
+    protected WebClient(String baseAddress, Map<String, Object> properties) {
+        this(convertStringToURI(baseAddress), properties);
     }
 
     protected WebClient(URI baseURI) {
-        this(new LocalClientState(baseURI));
+        this(baseURI, Collections.emptyMap());
+    }
+
+    protected WebClient(URI baseURI, Map<String, Object> properties) {
+        this(new LocalClientState(baseURI, properties));
     }
 
     protected WebClient(ClientState state) {
@@ -110,8 +118,17 @@ public class WebClient extends AbstractClient {
      * @param baseAddress baseAddress
      */
     public static WebClient create(String baseAddress) {
+        return create(baseAddress, Collections.emptyMap());
+    }
+
+    /**
+     * Creates WebClient
+     * @param baseAddress baseAddress
+     */
+    public static WebClient create(String baseAddress, Map<String, Object> properties) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(baseAddress);
+        bean.setProperties(properties);
         return bean.createWebClient();
     }
 
@@ -147,10 +164,23 @@ public class WebClient extends AbstractClient {
      * @param threadSafe if true ThreadLocalClientState is used
      */
     public static WebClient create(String baseAddress, List<?> providers, boolean threadSafe) {
+        return create(baseAddress, providers, Collections.emptyMap(), threadSafe);
+    }
+    
+    /**
+     * Creates WebClient
+     * @param baseAddress baseURI
+     * @param providers list of providers
+     * @param threadSafe if true ThreadLocalClientState is used
+     * @param properties additional properties
+     */
+    public static WebClient create(String baseAddress, List<?> providers, 
+            Map<String, Object> properties, boolean threadSafe) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, null);
         bean.setProviders(providers);
+        bean.setProperties(properties);
         if (threadSafe) {
-            bean.setInitialState(new ThreadLocalClientState(baseAddress));
+            bean.setInitialState(new ThreadLocalClientState(baseAddress, properties));
         }
         return bean.createWebClient();
     }

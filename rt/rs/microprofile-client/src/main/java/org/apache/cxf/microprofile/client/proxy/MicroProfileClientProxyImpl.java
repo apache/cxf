@@ -61,7 +61,7 @@ public class MicroProfileClientProxyImpl extends ClientProxyImpl {
     public MicroProfileClientProxyImpl(URI baseURI, ClassLoader loader, ClassResourceInfo cri,
                                        boolean isRoot, boolean inheritHeaders, ExecutorService executorService,
                                        Configuration configuration, Object... varValues) {
-        super(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
+        super(new LocalClientState(baseURI, configuration.getProperties()), loader, cri, isRoot, inheritHeaders, varValues);
         cfg.getRequestContext().put(EXECUTOR_SERVICE_PROPERTY, executorService);
         cfg.getRequestContext().putAll(configuration.getProperties());
     }
