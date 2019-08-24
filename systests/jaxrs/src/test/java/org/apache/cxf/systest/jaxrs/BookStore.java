@@ -184,9 +184,13 @@ public class BookStore {
         String dStr = dBuilder.toString();
         if (!lStr.equals(dStr)) {
             throw new InternalServerErrorException();
+        } else if ("".equalsIgnoreCase(lStr)) {
+            lStr = "0";
         }
+        
         return new Book("cxf", Long.parseLong(lStr));
     }
+    
     @GET
     @Path("/")
     public Book getBookRoot() {
@@ -395,6 +399,11 @@ public class BookStore {
         return new BookStoreSub(this);
     }
     
+    @Path("/querysub")
+    public BookStoreQuerySub getQuerySub() {
+        return new BookStoreQuerySub();
+    }
+
     @GET
     @Path("/twoBeanParams/{id}")
     @Produces("application/xml")
@@ -2188,6 +2197,26 @@ public class BookStore {
             return bookStore.getBeanParamBook(bean);
         }
     }
+    
+    public static class BookStoreQuerySub {
+        @GET
+        @Path("/listofstrings")
+        @Produces("text/xml")
+        public Book getBookFromListStrings(@QueryParam("value") List<String> value) {
+            final StringBuilder builder = new StringBuilder();
+            
+            for (String v : value) {
+                if (builder.length() > 0) {
+                    builder.append(' ');
+                }
+                
+                builder.append(v);
+            }
+            
+            return new Book(builder.toString(), 0L);
+        }
+    }
+
 }
 
 

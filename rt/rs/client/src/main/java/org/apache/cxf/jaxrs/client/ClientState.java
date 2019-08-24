@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -115,4 +116,20 @@ public interface ClientState {
     ClientState newState(URI baseURI, 
                          MultivaluedMap<String, String> headers,
                          MultivaluedMap<String, String> templates);
+    
+    /**
+     * The factory method for creating a new state.
+     * Example, proxy and WebClient.fromClient will use this method when creating
+     * subresource proxies and new web clients respectively to ensure thet stay
+     * thread-local if needed
+     * @param baseURI baseURI
+     * @param headers request headers, can be null
+     * @param templates initial templates map, can be null
+     * @param additional properties, could be null
+     * @return client state
+     */
+    ClientState newState(URI baseURI,
+                         MultivaluedMap<String, String> headers,
+                         MultivaluedMap<String, String> templates,
+                         Map<String, Object> properties);
 }

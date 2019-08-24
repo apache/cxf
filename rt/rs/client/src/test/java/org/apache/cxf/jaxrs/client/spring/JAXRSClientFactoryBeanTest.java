@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.client.spring;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxrs.client.Client;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 
 import org.junit.After;
@@ -28,6 +29,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class JAXRSClientFactoryBeanTest extends Assert {
 
@@ -64,8 +70,29 @@ public class JAXRSClientFactoryBeanTest extends Assert {
         assertEquals("Get a wrong map size", cfb.getHeaders().size(), 1);
         assertEquals("Get a wrong username", cfb.getUsername(), "username");
         assertEquals("Get a wrong password", cfb.getPassword(), "password");
+        
+        bean = ctx.getBean("client2.proxyFactory");
+        assertNotNull(bean);
+        cfb = (JAXRSClientFactoryBean) bean;
+        assertNotNull(cfb.getProperties());
+        assertEquals("Get a wrong map size", cfb.getProperties().size(), 1);
+
         ctx.close();
-
     }
-
+    
+    @Test
+    public void testClientProperties() throws Exception {
+        try (ClassPathXmlApplicationContext ctx =
+                new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/client/spring/clients.xml"})) {
+            Client bean = (Client) ctx.getBean("client2");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1,2"));
+            
+            bean = (Client) ctx.getBean("client1");
+            assertNotNull(bean);
+            assertThat(bean.query("list", "1").query("list", "2").getCurrentURI().toString(),
+                endsWith("?list=1&list=2"));
+        }
+    }
 }

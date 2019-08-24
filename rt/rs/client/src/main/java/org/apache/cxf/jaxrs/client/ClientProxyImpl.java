@@ -111,7 +111,17 @@ public class ClientProxyImpl extends AbstractClient implements
                            boolean isRoot, 
                            boolean inheritHeaders, 
                            Object... varValues) {
-        this(new LocalClientState(baseURI), loader, cri, isRoot, inheritHeaders, varValues);
+        this(baseURI, loader, cri, isRoot, inheritHeaders, Collections.<String, Object>emptyMap(), varValues);
+    }
+
+    public ClientProxyImpl(URI baseURI,
+            ClassLoader loader,
+            ClassResourceInfo cri,
+            boolean isRoot,
+            boolean inheritHeaders,
+            Map<String, Object> properties,
+            Object... varValues) {
+        this(new LocalClientState(baseURI, properties), loader, cri, isRoot, inheritHeaders, varValues);
     }
     
     public ClientProxyImpl(ClientState initialState,

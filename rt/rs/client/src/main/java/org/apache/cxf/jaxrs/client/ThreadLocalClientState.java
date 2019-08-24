@@ -43,11 +43,19 @@ public class ThreadLocalClientState implements ClientState {
     private long timeToKeepState;
     
     public ThreadLocalClientState(String baseURI) {
-        this.initialState = new LocalClientState(URI.create(baseURI));
+        this(baseURI, Collections.<String, Object>emptyMap());
+    }
+    
+    public ThreadLocalClientState(String baseURI, Map<String, Object> properties) {
+        this.initialState = new LocalClientState(URI.create(baseURI), properties);
     }
     
     public ThreadLocalClientState(String baseURI, long timeToKeepState) {
-        this.initialState = new LocalClientState(URI.create(baseURI));
+        this(baseURI, timeToKeepState, Collections.<String, Object>emptyMap());
+    }
+
+    public ThreadLocalClientState(String baseURI, long timeToKeepState, Map<String, Object> properties) {
+        this.initialState = new LocalClientState(URI.create(baseURI), properties);
         this.timeToKeepState = timeToKeepState;
     }
     
@@ -107,6 +115,16 @@ public class ThreadLocalClientState implements ClientState {
         return new ThreadLocalClientState(ls, timeToKeepState);
     }
     
+
+    @Override
+    public ClientState newState(URI currentURI,
+            MultivaluedMap<String, String> headers,
+            MultivaluedMap<String, String> templates,
+            Map<String, Object> properties) {
+        LocalClientState ls = (LocalClientState)getState().newState(currentURI, headers, templates, properties);
+        return new ThreadLocalClientState(ls, timeToKeepState);
+    }
+
     private void removeThreadLocalState(Thread t) {
         state.remove(t);
         if (checkpointMap != null) {
