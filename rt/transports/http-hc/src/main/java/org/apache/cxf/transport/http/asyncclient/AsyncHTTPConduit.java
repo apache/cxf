@@ -599,10 +599,12 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
                       callback);
         }
 
-        protected void retrySetHttpResponse(HttpResponse r) {
-            if (httpResponse == null && isAsync) {
+        protected boolean retrySetHttpResponse(HttpResponse r) {
+            if (isAsync) {
                 setHttpResponse(r);
             }
+
+            return !isAsync;
         }
         protected synchronized void setHttpResponse(HttpResponse r) {
             httpResponse = r;
