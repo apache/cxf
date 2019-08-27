@@ -307,14 +307,15 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         AtomicInteger threadCount = new AtomicInteger();
 
         for (long i = 0; i < repeat; i++) {
-            g.greetMeLaterAsync(-50, (res) -> {
+            g.greetMeLaterAsync(-50, res -> {
 
                 try {
                     int myCount = threadCount.getAndIncrement();
 
                     if (myCount < automaticWorkQueue1.getHighWaterMark()) {
                         // Sleep long enough so that the workqueue will fill up and then
-                        // handleResponseOnWorkqueue will fail for the calls from both responseReceived and consumeContent
+                        // handleResponseOnWorkqueue will fail for the calls from both
+                        // responseReceived and consumeContent
                         Thread.sleep(3 * asyncExecuteTimeout);
                         initialThreadsLatch.countDown();
                     } else {
