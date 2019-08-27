@@ -200,6 +200,8 @@ public class WadlGenerator implements ContainerRequestFilter {
     private ResourceIdGenerator idGenerator;
     private Map<String, Object> jaxbContextProperties;
 
+    private List<Class<?>> extraClasses;
+
     public WadlGenerator() {
     }
 
@@ -207,6 +209,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.bus = bus;
         this.bus.setProperty("wadl.service.description.available", "true");
     }
+
+    public void setExtraClasses(List<Class<?>> classes) {
+        if (classes != null) {
+            extraClasses = new ArrayList<>(classes);
+        }
+    }    
 
     @Override
     public void filter(ContainerRequestContext context) {
@@ -321,6 +329,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris,
                                                                                useJaxbContextForQnames,
                                                                                jaxbWriter);
+        addExtraClasses(resourceTypes);
         checkXmlSeeAlso(resourceTypes);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
 
@@ -508,6 +517,15 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         for (Class<?> cls : extraClasses) {
             resourceTypes.getAllTypes().put(cls, cls);
+        }
+    }
+    
+    private void addExtraClasses(ResourceTypes resourceTypes) {
+        if (extraClasses != null) {
+            for (Class<?> cls : extraClasses) {
+                resourceTypes.getAllTypes().put(cls, cls);
+                resourceTypes.getXmlNameMap().put(cls, null);
+            }
         }
     }
 
