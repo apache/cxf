@@ -34,12 +34,15 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HTTPConduitFactory;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.apache.hello_world_soap_http.types.GreetMeLaterResponse;
@@ -154,14 +157,14 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
-    
-    
+
+
     @Test
     public void testTimeoutWithPropertySetting() throws Exception {
         ((javax.xml.ws.BindingProvider)g).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
             "3000");
         updateAddressPort(g, PORT);
-        
+
         try {
             assertEquals("Hello " + request, g.greetMeLater(-5000));
             fail();
@@ -183,7 +186,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
-    
+
     @Test
     public void testTimeoutAsyncWithPropertySetting() throws Exception {
         updateAddressPort(g, PORT);
@@ -197,7 +200,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
-    
+
     @Test
     public void testConnectIssue() throws Exception {
         updateAddressPort(g, PORT_INV);
@@ -280,6 +283,55 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
         Thread.sleep(1000);
         assertEquals("Callback should be invoked only once per request", repeat, count.intValue());
     }
+
+    @Test
+    public void testCallAsyncWithFullWorkQueue() throws Exception {
+        Bus bus = BusFactory.getThreadDefaultBus();
+        WorkQueueManager workQueueManager = bus.getExtension(WorkQueueManager.class);
+        AutomaticWorkQueueImpl automaticWorkQueue1 = (AutomaticWorkQueueImpl)workQueueManager.getAutomaticWorkQueue();
+        updateAddressPort(g, PORT);
+
+        Client client = ClientProxy.getClient(g);
+        HTTPConduit http = (HTTPConduit) client.getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+
+        int asyncExecuteTimeout = 500;
+        httpClientPolicy.setAsyncExecuteTimeout(asyncExecuteTimeout);
+
+        http.setClient(httpClientPolicy);
+
+        long repeat = automaticWorkQueue1.getHighWaterMark() + automaticWorkQueue1.getMaxSize() + 1;
+        CountDownLatch initialThreadsLatch = new CountDownLatch(automaticWorkQueue1.getHighWaterMark());
+        CountDownLatch doneLatch = new CountDownLatch((int) repeat);
+        AtomicInteger threadCount = new AtomicInteger();
+
+        for (long i = 0; i < repeat; i++) {
+            g.greetMeLaterAsync(-50, (res) -> {
+
+                try {
+                    int myCount = threadCount.getAndIncrement();
+
+                    if (myCount < automaticWorkQueue1.getHighWaterMark()) {
+                        // Sleep long enough so that the workqueue will fill up and then
+                        // handleResponseOnWorkqueue will fail for the calls from both responseReceived and consumeContent
+                        Thread.sleep(3 * asyncExecuteTimeout);
+                        initialThreadsLatch.countDown();
+                    } else {
+                        Thread.sleep(50);
+                    }
+                    initialThreadsLatch.await();
+                    doneLatch.countDown();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        doneLatch.await(30, TimeUnit.SECONDS);
+
+        assertEquals("All responses should be handled eventually", 0, doneLatch.getCount());
+    }
+
 
     @Test
     @Ignore("peformance test")
