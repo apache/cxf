@@ -502,7 +502,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!this.useJaxbContextForQnames) {
             return;
         }
-        List<Class<?>> extraClasses = new LinkedList<>(this.extraClasses);
+        List<Class<?>> extra = new LinkedList<>(extraClasses);
         for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
             if (!isXmlRoot(cls) || Modifier.isAbstract(cls.getModifiers())) {
                 XmlSeeAlso seeAlsoAnn = cls.getAnnotation(XmlSeeAlso.class);
@@ -513,11 +513,11 @@ public class WadlGenerator implements ContainerRequestFilter {
                             resourceTypes.getSubstitutions().put(seeAlsoCls, cls);
                         }
                     }
-                    extraClasses.addAll(seeAlsoList);
+                    extra.addAll(seeAlsoList);
                 }
             }
         }
-        for (Class<?> cls : extraClasses) {
+        for (Class<?> cls : extra) {
             resourceTypes.getAllTypes().put(cls, cls);
         }
     }
