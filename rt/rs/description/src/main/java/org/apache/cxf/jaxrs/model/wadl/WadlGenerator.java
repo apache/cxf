@@ -200,7 +200,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private ResourceIdGenerator idGenerator;
     private Map<String, Object> jaxbContextProperties;
 
-    private List<Class<?>> extraClasses;
+    private List<Class<?>> extraClasses = Collections.emptyList();
 
     public WadlGenerator() {
     }
@@ -210,9 +210,12 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.bus.setProperty("wadl.service.description.available", "true");
     }
 
-    public void setExtraClasses(List<Class<?>> classes) {
-        if (classes != null) {
-            extraClasses = new ArrayList<>(classes);
+    /**
+     * The list of classes which should be edded to the generated scheme also.
+     */
+    public void setExtraClasses(List<Class<?>> extraClasses) {
+        if (extraClasses != null) {
+            this.extraClasses = extraClasses;
         }
     }    
 
@@ -329,7 +332,6 @@ public class WadlGenerator implements ContainerRequestFilter {
         ResourceTypes resourceTypes = ResourceUtils.getAllRequestResponseTypes(cris,
                                                                                useJaxbContextForQnames,
                                                                                jaxbWriter);
-        addExtraClasses(resourceTypes);
         checkXmlSeeAlso(resourceTypes);
         Set<Class<?>> allTypes = resourceTypes.getAllTypes().keySet();
 
@@ -500,7 +502,7 @@ public class WadlGenerator implements ContainerRequestFilter {
         if (!this.useJaxbContextForQnames) {
             return;
         }
-        List<Class<?>> extraClasses = new LinkedList<>();
+        List<Class<?>> extraClasses = new LinkedList<>(this.extraClasses);
         for (Class<?> cls : resourceTypes.getAllTypes().keySet()) {
             if (!isXmlRoot(cls) || Modifier.isAbstract(cls.getModifiers())) {
                 XmlSeeAlso seeAlsoAnn = cls.getAnnotation(XmlSeeAlso.class);
@@ -517,15 +519,6 @@ public class WadlGenerator implements ContainerRequestFilter {
         }
         for (Class<?> cls : extraClasses) {
             resourceTypes.getAllTypes().put(cls, cls);
-        }
-    }
-    
-    private void addExtraClasses(ResourceTypes resourceTypes) {
-        if (extraClasses != null) {
-            for (Class<?> cls : extraClasses) {
-                resourceTypes.getAllTypes().put(cls, cls);
-                resourceTypes.getXmlNameMap().put(cls, null);
-            }
         }
     }
 
