@@ -211,7 +211,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     }
 
     /**
-     * The list of classes which should be edded to the generated scheme also.
+     * The list of classes which should be added to the generated scheme also.
      */
     public void setExtraClasses(List<Class<?>> extraClasses) {
         if (extraClasses != null) {
