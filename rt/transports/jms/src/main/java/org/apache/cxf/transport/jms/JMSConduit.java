@@ -275,6 +275,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
             try {
                 if (useSyncReceive) {
+                    exchange.put(JMSUtil.JMS_IGNORE_TIMEOUT, this.jmsConfig.isIgnoreTimeoutException());
                     javax.jms.Message replyMessage = JMSUtil.receive(session, replyDestination,
                                                                      correlationId,
                                                                      jmsConfig.getReceiveTimeout(),
@@ -288,8 +289,13 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         throw new JMSException("Interrupted while correlating " +  e.getMessage());
                     }
                     if (!Boolean.TRUE.equals(exchange.get(CORRELATED))) {
-                        throw new JMSException("Timeout receiving message with correlationId "
+                        if (this.jmsConfig.isIgnoreTimeoutException()) {
+                            throw new RuntimeException("Timeout receiving message with correlationId "
+                                + correlationId);
+                        } else {
+                            throw new JMSException("Timeout receiving message with correlationId "
                                                    + correlationId);
+                        }
                     }
 
                 }

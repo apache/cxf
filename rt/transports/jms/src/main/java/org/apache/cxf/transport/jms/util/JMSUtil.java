@@ -36,7 +36,8 @@ import org.apache.cxf.transport.jms.JMSConstants;
 
 public final class JMSUtil {
     
-    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer"; 
+    public static final String JMS_MESSAGE_CONSUMER = "jms_message_consumer";
+    public static final String JMS_IGNORE_TIMEOUT = "jms_ignore_timeout";
     private static final char[] CORRELATTION_ID_PADDING = {
         '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'
     };
@@ -79,8 +80,13 @@ public final class JMSUtil {
             }
             javax.jms.Message replyMessage = consumer.receive(receiveTimeout);
             if (replyMessage == null) {
-                throw new RuntimeException("Timeout receiving message with correlationId "
+                if ((boolean)exchange.get(JMSUtil.JMS_IGNORE_TIMEOUT)) {
+                    throw new RuntimeException("Timeout receiving message with correlationId "
                                            + correlationId);
+                } else {
+                    throw new JMSException("Timeout receiving message with correlationId "
+                        + correlationId);
+                }
             }
             return replyMessage;
         } catch (JMSException e) {
