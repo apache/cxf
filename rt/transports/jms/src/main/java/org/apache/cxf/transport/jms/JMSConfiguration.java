@@ -49,6 +49,7 @@ public class JMSConfiguration {
     private boolean pubSubNoLocal;
     private Long clientReceiveTimeout = 60000L;
     private Long serverReceiveTimeout;
+    private boolean ignoreTimeoutException;
     private boolean explicitQosEnabled;
     private int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
     private int priority = Message.DEFAULT_PRIORITY;
@@ -520,6 +521,14 @@ public class JMSConfiguration {
     
     public void setRetryInterval(int retryInterval) {
         this.retryInterval = retryInterval;
+    }
+
+    public boolean isIgnoreTimeoutException() {
+        return ignoreTimeoutException;
+    }
+
+    public void setIgnoreTimeoutException(boolean ignoreTimeoutException) {
+        this.ignoreTimeoutException = ignoreTimeoutException;
     }
 
 }
