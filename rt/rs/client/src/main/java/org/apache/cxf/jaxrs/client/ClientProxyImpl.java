@@ -33,13 +33,13 @@ import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -512,7 +512,7 @@ public class ClientProxyImpl extends AbstractClient implements
                                             List<Parameter> beanParams,
                                             OperationResourceInfo ori,
                                             int bodyIndex) {
-        List<Object> list = new LinkedList<>();
+        List<Object> list = new ArrayList<>();
 
         List<String> methodVars = ori.getURITemplate().getVariables();
         List<Parameter> paramsList = getParameters(map, ParameterType.PATH);
@@ -541,7 +541,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
         Map<String, Parameter> paramsMap = new LinkedHashMap<>();
         paramsList.forEach(p -> {
-            if (p.getName().length() == 0) {
+            if (p.getName().isEmpty()) {
                 MultivaluedMap<String, Object> values = InjectionUtils.extractValuesFromBean(params[p.getIndex()], "");
                 methodVars.forEach(var -> {
                     list.addAll(values.get(var));
@@ -577,8 +577,7 @@ public class ClientProxyImpl extends AbstractClient implements
                 int index = 0;
                 for (Iterator<String> it = valuesMap.keySet().iterator(); it.hasNext(); index++) {
                     if (it.next().equals(p.getName()) && index < list.size()) {
-                        list.remove(index);
-                        list.add(index, convertParamValue(params[p.getIndex()], null));
+                        list.set(index, convertParamValue(params[p.getIndex()], null));
                         break;
                     }
                 }
@@ -766,9 +765,8 @@ public class ClientProxyImpl extends AbstractClient implements
     protected List<Attachment> handleMultipart(MultivaluedMap<ParameterType, Parameter> map,
                                              OperationResourceInfo ori,
                                              Object[] params) {
-
-        List<Attachment> atts = new LinkedList<>();
         List<Parameter> fm = getParameters(map, ParameterType.REQUEST_BODY);
+        List<Attachment> atts = new ArrayList<>(fm.size());
         fm.forEach(p -> {
             Multipart part = getMultipart(ori, p.getIndex());
             if (part != null) {
