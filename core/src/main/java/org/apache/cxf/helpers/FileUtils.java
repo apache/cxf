@@ -392,4 +392,22 @@ public final class FileUtils {
             return file.exists();
         });
     }
+
+    /**
+     * Strips any leading paths
+     */
+    public static String stripPath(String name) {
+        if (name == null) {
+            return null;
+        }
+        int posUnix = name.lastIndexOf('/');
+        int posWin = name.lastIndexOf('\\');
+        int pos = Math.max(posUnix, posWin);
+
+        if (pos != -1) {
+            return name.substring(pos + 1);
+        }
+        return name;
+    }
+
 }

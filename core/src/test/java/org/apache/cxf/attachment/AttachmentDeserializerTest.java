@@ -750,4 +750,37 @@ public class AttachmentDeserializerTest {
         assertEquals(40, msg.getAttachments().size());
     }
 
+    @Test
+    public void testInvalidContentDispositionFilename() throws Exception {
+        StringBuilder sb = new StringBuilder(1000);
+        sb.append("SomeHeader: foo\n")
+            .append("------=_Part_34950_1098328613.1263781527359\n")
+            .append("Content-Type: text/xml; charset=UTF-8\n")
+            .append("Content-Transfer-Encoding: binary\n")
+            .append("Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n")
+            .append('\n')
+            .append("<envelope/>\n");
+
+        sb.append("------=_Part_34950_1098328613.1263781527359\n")
+            .append("Content-Type: text/xml\n")
+            .append("Content-Transfer-Encoding: binary\n")
+            .append("Content-Id: <b86a5f2d-e7af-4e5e-b71a-9f6f2307cab0>\n")
+            .append("Content-Disposition: attachment; filename=../../../../../../../../etc/passwd\n")
+            .append('\n')
+            .append("<message>\n")
+            .append("------=_Part_34950_1098328613.1263781527359--\n");
+
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8)));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+
+        // Force it to load the attachments
+        assertEquals(1, msg.getAttachments().size());
+        Attachment attachment = msg.getAttachments().iterator().next();
+        AttachmentDataSource dataSource = (AttachmentDataSource)attachment.getDataHandler().getDataSource();
+        assertEquals("passwd", dataSource.getName());
+    }
+
 }

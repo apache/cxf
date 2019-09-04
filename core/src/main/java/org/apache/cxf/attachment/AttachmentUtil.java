@@ -54,6 +54,7 @@ import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -393,13 +394,13 @@ public final class AttachmentUtil {
         if (encoding == null) {
             encoding = "binary";
         }
-        InputStream ins =  decode(stream, encoding);
+        InputStream ins = decode(stream, encoding);
         if (ins != stream) {
             headers.remove("Content-Transfer-Encoding");
         }
         DataSource source = new AttachmentDataSource(ct, ins);
         if (!StringUtils.isEmpty(fileName)) {
-            ((AttachmentDataSource)source).setName(fileName);
+            ((AttachmentDataSource)source).setName(FileUtils.stripPath(fileName));
         }
         att.setDataHandler(new DataHandler(source));
         return att;
