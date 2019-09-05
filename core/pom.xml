@@ -59,10 +59,13 @@
             javax.xml.bind*;version="${cxf.osgi.javax.bind.version}",
             javax.xml.stream*;version="${cxf.osgi.javax.stream.version}",
             javax.validation*;resolution:=optional;version="${cxf.validation.api.package.version}", 
-            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional
+            org.apache.aries*;version="${cxf.aries.version.range}";resolution:=optional,
+            org.apache.karaf.jaas.boot.principal;resolution:=optional,
+            org.apache.commons.logging;resolution:=optional,
+            !sun.misc
         </cxf.osgi.import>
         <cxf.osgi.dynamic.import>
-            org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*
+            org.apache.cxf.bus,org.apache.cxf.*,com.ctc.wstx.*,org.apache.karaf.jaas.boot.principal.*
         </cxf.osgi.dynamic.import>
         <!-- keep in sync with services exported in activator -->
         <cxf.export.service>
