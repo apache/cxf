@@ -49,6 +49,7 @@
         <module>cdi</module>
         <module>rs-http-sci</module>
         <module>tracing</module>
+        <module>ldap</module>
 	<module>jibx</module>
     </modules>
 </project>

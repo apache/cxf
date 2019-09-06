@@ -46,6 +46,7 @@ public class LdapQueryVisitorTest extends Assert {
     public void testAndQuery() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
+        visitor.setEncodeQueryValues(false);
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
         
@@ -56,6 +57,7 @@ public class LdapQueryVisitorTest extends Assert {
     public void testOrQuery() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
+        visitor.setEncodeQueryValues(false);
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
         
