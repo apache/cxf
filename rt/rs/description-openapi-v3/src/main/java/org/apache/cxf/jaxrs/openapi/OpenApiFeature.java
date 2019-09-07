@@ -304,6 +304,14 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
     public boolean isUseContextBasedConfig() {
         return delegate.isUseContextBasedConfig();
     }
+    
+    public String getScannerClass() {
+        return delegate.getScannerClass();
+    }
+
+    public void setScannerClass(String scannerClass) {
+        delegate.setScannerClass(scannerClass);
+    }
 
     @Override
     public SwaggerUiConfig getSwaggerUiConfig() {
@@ -414,6 +422,8 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
         // are co-located in the same application.
         private boolean useContextBasedConfig;
         private String ctxId;
+        // The API Scanner class to use 
+        private String scannerClass;
 
         @Override
         public void initialize(Server server, Bus bus) {
@@ -463,6 +473,10 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
                         .filterClass(getOrFallback(getFilterClass(), swaggerProps, FILTER_CLASS_PROPERTY))
                         .resourceClasses(getResourceClasses())
                         .resourcePackages(getOrFallback(packages, swaggerProps, RESOURCE_PACKAGE_PROPERTY));
+                
+                if (!StringUtils.isEmpty(getScannerClass())) {
+                    config.setScannerClass(getScannerClass());
+                }
 
                 openApiConfiguration = new JaxrsOpenApiContextBuilder<>()
                         .application(application)
@@ -730,6 +744,14 @@ public class OpenApiFeature extends DelegatingFeature<OpenApiFeature.Portable>
 
         public boolean isUseContextBasedConfig() {
             return useContextBasedConfig;
+        }
+
+        public String getScannerClass() {
+            return scannerClass;
+        }
+
+        public void setScannerClass(String scannerClass) {
+            this.scannerClass = scannerClass;
         }
 
         @Override

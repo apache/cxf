@@ -41,12 +41,14 @@
         <property name="title" value="Sample REST Application" />
         <property name="useContextBasedConfig" value="true" />
         <property name="scan" value="false" />
+        <property name="scannerClass" value="io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner"/>
     </bean>
     
     <bean id="openApiFeature2" class="org.apache.cxf.jaxrs.openapi.OpenApiFeature">
         <property name="title" value="Sample2 REST Application" />
         <property name="useContextBasedConfig" value="true" />
         <property name="scan" value="false" />
+        <property name="scannerClass" value="io.swagger.v3.jaxrs2.integration.JaxrsApplicationScanner"/>
     </bean>
 
     <cxf:bus>
