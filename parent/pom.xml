@@ -137,7 +137,7 @@
         <cxf.javassist.version>3.25.0-GA</cxf.javassist.version>
         <cxf.javax.annotation-api.version>1.3.2</cxf.javax.annotation-api.version>
         <cxf.javax.el.version>3.0.0</cxf.javax.el.version>
-        <cxf.javax.ws.rs.version>2.1.5</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.1.6</cxf.javax.ws.rs.version>
         <cxf.jaxb.runtime.version>${cxf.jaxb.version}</cxf.jaxb.runtime.version>
         <cxf.jaxb.version>2.3.2</cxf.jaxb.version>
         <cxf.jaxb.xjc.version>${cxf.jaxb.version}</cxf.jaxb.xjc.version>
