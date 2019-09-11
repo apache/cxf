@@ -396,8 +396,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                 approvedScope.add(rScope);
             }
         }
-        if (!requestedScope.containsAll(approvedScope)
-            || !OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(),
+        if (!OAuthUtils.validateScopes(requestedScope, client.getRegisteredScopes(),
                                          partialMatchScopeValidation)) {
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }

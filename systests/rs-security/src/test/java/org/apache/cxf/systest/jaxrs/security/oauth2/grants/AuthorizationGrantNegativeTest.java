@@ -217,13 +217,13 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         client.type("application/json").accept("application/json");
         client.query("client_id", "consumer-id");
         client.query("response_type", "code");
-        client.query("redirect_uri", "http://www.blah.bad.apache.org");
+        client.query("redirect_uri", "http://www.blah.apache.org");
         client.query("scope", "unknown-scope");
         client.path("authorize/");
 
         // No redirect URI
         Response response = client.get();
-        assertEquals(400, response.getStatus());
+        assertEquals(303, response.getStatus());
     }
 
     // Send the authorization code twice to get an access token
