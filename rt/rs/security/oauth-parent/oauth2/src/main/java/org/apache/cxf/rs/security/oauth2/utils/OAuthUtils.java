@@ -271,7 +271,7 @@ public final class OAuthUtils {
     }
 
     public static String generateRandomTokenKey() throws OAuthServiceException {
-        return generateRandomTokenKey(16);
+        return generateRandomTokenKey(32);
     }
     public static String generateRandomTokenKey(int byteSize) {
         if (byteSize < 16) {
