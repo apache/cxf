@@ -382,7 +382,7 @@ public class DynamicRegistrationService {
                     Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME))[1];
     }
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
-        return 16;
+        return 32;
     }
 
     @Context
