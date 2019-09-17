@@ -110,6 +110,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         boolean isTruncated = writer.size() > limit && limit != -1;
         StringBuilder payload = new StringBuilder();
         writer.writeCacheTo(payload, limit);
+        writer.close();
         event.setPayload(payload.toString());
         event.setTruncated(isTruncated);
         event.setFullContentFile(writer.getTempFile());
