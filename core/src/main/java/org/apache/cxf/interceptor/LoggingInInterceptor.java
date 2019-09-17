@@ -183,6 +183,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
             writer.writeCacheTo(buffer.getPayload(), limit);
+            writer.close();
         } catch (Exception e) {
             throw new Fault(e);
         }
