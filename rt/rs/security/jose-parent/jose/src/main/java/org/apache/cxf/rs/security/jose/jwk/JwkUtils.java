@@ -271,15 +271,12 @@ public final class JwkUtils {
         String keyContent = null;
         String keyStoreLoc = props.getProperty(JoseConstants.RSSEC_KEY_STORE_FILE);
         if (keyStoreLoc != null) {
-            try {
-                InputStream is = JoseUtils.getResourceStream(keyStoreLoc, bus);
-                if (is == null) {
+            try (InputStream isResource = JoseUtils.getResourceStream(keyStoreLoc, bus)) {
+                if (isResource == null) {
                     throw new JwkException("Error in loading keystore location: " + keyStoreLoc);
                 }
-                try (InputStream isResource = is) {
-                    keyContent = IOUtils.readStringFromStream(isResource);
-                }
-            } catch (Exception ex) {
+                keyContent = IOUtils.readStringFromStream(isResource);
+            } catch (IOException ex) {
                 throw new JwkException(ex);
             }
         } else {

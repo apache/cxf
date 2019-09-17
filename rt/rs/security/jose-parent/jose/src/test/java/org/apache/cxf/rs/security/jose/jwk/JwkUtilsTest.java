@@ -21,7 +21,9 @@ package org.apache.cxf.rs.security.jose.jwk;
 import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Properties;
 
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
@@ -188,6 +190,17 @@ public class JwkUtilsTest {
     public void testEc521KeyThumbprint() throws Exception {
         String thumbprint = JwkUtils.getThumbprint(EC_521_KEY);
         assertEquals("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg", thumbprint);
+    }
+    @Test
+    public void testLoadPublicJwkSet() throws Exception {
+        final Properties props = new Properties();
+        props.setProperty(JoseConstants.RSSEC_KEY_STORE_FILE, "unavailable");
+        try {
+            JwkUtils.loadPublicJwkSet(null, props);
+            fail();
+        } catch (JwkException e) {
+            assertNull(e.getCause());
+        }
     }
 
 }

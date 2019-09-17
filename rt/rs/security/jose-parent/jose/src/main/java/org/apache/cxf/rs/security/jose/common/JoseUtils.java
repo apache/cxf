@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.common;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -156,12 +157,15 @@ public final class JoseUtils {
     // <Start> Copied from JAX-RS RT FRONTEND ResourceUtils
     //
 
-    public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
+    public static InputStream getResourceStream(String loc, Bus bus) throws IOException {
         URL url = getResourceURL(loc, bus);
         return url == null ? null : url.openStream();
     }
 
-    public static URL getResourceURL(String loc, Bus bus) throws Exception {
+    public static URL getResourceURL(String loc, Bus bus) throws IOException {
+        if (loc == null) {
+            return null;
+        }
         URL url = null;
         if (loc.startsWith(CLASSPATH_PREFIX)) {
             String path = loc.substring(CLASSPATH_PREFIX.length());
