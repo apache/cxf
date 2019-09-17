@@ -46,6 +46,10 @@ for this demo bundle.
   feature:install cxf-rs-description-openapi-v3
   feature:install aries-blueprint
 
+Optionally, you could install Swagger UI into Karaf OSGi container:
+
+  install -s mvn:org.webjars/swagger-ui/3.23.0
+
 Install this demo bundle (using the appropriate bundle version number)
   
   install -s mvn:org.apache.cxf.samples/jax_rs_description_openapi_v3_osgi/3.n.m
@@ -68,6 +72,11 @@ And its Swagger API documents in either json or yaml are available at
   http://localhost:8181/cxf/openApiSample/openapi.json
   http://localhost:8181/cxf/openApiSample/openapi.yaml
 
+If you have installed Swagger UI into the Karaf container, it is available
+at:
+
+  http://localhost:8181/cxf/openApiSample/api-docs/?url=/cxf/openApiSample/openapi.json
+  http://localhost:8181/cxf/openApiSample/api-docs/?url=/cxf/openApiSample/openapi.yaml
 
 If you do not have your swagger-ui on your local system, you can download 
 a copy from its download site.
