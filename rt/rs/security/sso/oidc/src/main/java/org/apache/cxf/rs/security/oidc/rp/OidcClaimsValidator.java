@@ -100,12 +100,12 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             } catch (JwtException ex) {
                 throw new OAuthServiceException("Invalid issuedAt claim", ex);
             }
-            if (strictTimeValidation) {
-                try {
-                    JwtUtils.validateJwtNotBefore(claims, getClockOffset(), strictTimeValidation);
-                } catch (JwtException ex) {
-                    throw new OAuthServiceException("ID Token can not be used yet", ex);
-                }
+
+            // Validate nbf - but don't require it to be present
+            try {
+                JwtUtils.validateJwtNotBefore(claims, getClockOffset(), false);
+            } catch (JwtException ex) {
+                throw new OAuthServiceException("ID Token can not be used yet", ex);
             }
         }
     }
