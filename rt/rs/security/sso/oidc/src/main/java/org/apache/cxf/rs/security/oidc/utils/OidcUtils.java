@@ -151,7 +151,11 @@ public final class OidcUtils {
         validateAccessTokenHash(at.getTokenKey(), jwt, required);
     }
     public static void validateAccessTokenHash(String accessToken, JwtToken jwt, boolean required) {
-        if (required) {
+        String hashClaim = (String)jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM);
+        if (hashClaim == null && required) {
+            throw new OAuthServiceException("Invalid hash");
+        }
+        if (hashClaim != null) {
             validateHash(accessToken,
                          (String)jwt.getClaims().getClaim(IdToken.ACCESS_TOKEN_HASH_CLAIM),
                          jwt.getJwsHeaders().getSignatureAlgorithm());
@@ -161,7 +165,11 @@ public final class OidcUtils {
         validateCodeHash(code, jwt, true);
     }
     public static void validateCodeHash(String code, JwtToken jwt, boolean required) {
-        if (required) {
+        String hashClaim = (String)jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM);
+        if (hashClaim == null && required) {
+            throw new OAuthServiceException("Invalid hash");
+        }
+        if (hashClaim != null) {
             validateHash(code,
                          (String)jwt.getClaims().getClaim(IdToken.AUTH_CODE_HASH_CLAIM),
                          jwt.getJwsHeaders().getSignatureAlgorithm());
