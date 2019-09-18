@@ -245,9 +245,41 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         }
 
         // Add a nonce and it should succeed
-        client.query("nonce", "1234565635");
+        String nonce = "1234565635";
+        client.query("nonce", nonce);
         response = client.get();
-        response.readEntity(OAuthAuthorizationData.class);
+
+        OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
+
+        // Now call "decision" to get the access token
+        client.path("decision");
+        client.type("application/x-www-form-urlencoded");
+
+        Form form = new Form();
+        form.param("session_authenticity_token", authzData.getAuthenticityToken());
+        form.param("client_id", authzData.getClientId());
+        form.param("redirect_uri", authzData.getRedirectUri());
+        form.param("scope", authzData.getProposedScope());
+        if (authzData.getResponseType() != null) {
+            form.param("response_type", authzData.getResponseType());
+        }
+        if (authzData.getNonce() != null) {
+            form.param("nonce", authzData.getNonce());
+        }
+        form.param("oauthDecision", "allow");
+
+        response = client.post(form);
+
+        String location = response.getHeaderString("Location");
+
+        // Check IdToken
+        String idToken = OAuth2TestUtils.getSubstring(location, "id_token");
+        assertNotNull(idToken);
+
+        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(idToken);
+        JwtToken jwt = jwtConsumer.getJwtToken();
+        // Check the nonce is in the idToken
+        assertEquals(jwt.getClaim("nonce"), nonce);
     }
 
     @org.junit.Test
