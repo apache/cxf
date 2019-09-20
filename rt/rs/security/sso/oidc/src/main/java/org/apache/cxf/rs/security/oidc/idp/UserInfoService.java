@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -58,7 +59,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         if (!oauth.getPermissions().stream()
             .map(OAuthPermission::getPermission)
             .anyMatch(OidcUtils.OPENID_SCOPE::equals)) {
-            Response.status(401);
+            return Response.status(Status.UNAUTHORIZED).build();
         }
 
         UserInfo userInfo = null;
