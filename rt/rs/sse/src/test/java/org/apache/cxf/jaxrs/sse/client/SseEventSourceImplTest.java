@@ -389,6 +389,38 @@ public class SseEventSourceImplTest extends Assert {
     }
     
     @Test
+    public void testReconnectAndNotAuthorized() throws InterruptedException, IOException {
+        when(response.getStatus()).thenReturn(401);
+        
+        try (SseEventSource eventSource = withReconnect()) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+            verify(response, times(1)).getStatus();
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+        
+        verify(response, times(2)).getStatus();
+    }
+
+    @Test
+    public void testNoReconnectAndNotAuthorized() throws InterruptedException, IOException {
+        when(response.getStatus()).thenReturn(401);
+        
+        try (SseEventSource eventSource = withNoReconnect()) {
+            eventSource.open();
+            assertThat(eventSource.isOpen(), equalTo(false));
+            verify(response, times(1)).getStatus();
+
+            // Allow the event processor to pull for events (150ms)
+            Thread.sleep(150L);
+        }
+        
+        verify(response, times(1)).getStatus();
+    }
+
+    @Test
     public void testNoReconnectAndCloseTheStreamWhileEventIsBeingReceived() throws InterruptedException, IOException {
         when(response.getStatus()).thenReturn(200);
         when(response.readEntity(InputStream.class)).then(invocation -> {
