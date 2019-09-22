@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -536,14 +535,7 @@ public abstract class AbstractClient implements Client {
     }
 
     protected WebApplicationException convertToWebApplicationException(Response r) {
-        try {
-            Class<?> exceptionClass = ExceptionUtils.getWebApplicationExceptionClass(r,
-                                       WebApplicationException.class);
-            Constructor<?> ctr = exceptionClass.getConstructor(Response.class);
-            return (WebApplicationException)ctr.newInstance(r);
-        } catch (Throwable ex2) {
-            return new WebApplicationException(r);
-        }
+        return ExceptionUtils.toWebApplicationException(r);
     }
 
     protected <T> T readBody(Response r, Message outMessage, Class<T> cls,

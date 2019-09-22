@@ -41,6 +41,7 @@ import javax.ws.rs.sse.SseEventSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 
 /**
  * SSE Event Source implementation 
@@ -191,11 +192,18 @@ public class SseEventSourceImpl implements SseEventSource {
 
             // A client can be told to stop reconnecting using the HTTP 204 No Content 
             // response code. In this case, we should give up.
-            if (response.getStatus() == 204) {
+            final int status = response.getStatus();
+            if (status == 204) {
                 LOG.fine("SSE endpoint " + target.getUri() + " returns no data, disconnecting");
                 state.set(SseSourceState.CLOSED);
                 response.close();
                 return;
+            }
+
+            // Convert unsuccessful responses to instances of WebApplicationException
+            if (status != 304 && status >= 300) {
+                LOG.fine("SSE connection to " + target.getUri() + " returns " + status);
+                throw ExceptionUtils.toWebApplicationException(response);
             }
 
             // Should not happen but if close() was called from another thread, we could
