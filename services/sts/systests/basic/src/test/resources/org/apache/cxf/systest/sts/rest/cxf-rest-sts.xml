@@ -19,32 +19,36 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:cxf="http://cxf.apache.org/core"
-    xmlns:jaxws="http://cxf.apache.org/jaxws"
     xmlns:sec="http://cxf.apache.org/configuration/security"
     xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-    xmlns:test="http://apache.org/hello_world_soap_http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:util="http://www.springframework.org/schema/util"
     xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-    xsi:schemaLocation="http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
-    
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+        http://cxf.apache.org/configuration/security http://cxf.apache.org/schemas/configuration/security.xsd
+        http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
-    
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
             <cxf:logging/>
         </cxf:features>
     </cxf:bus>
-    
+
     <bean id="hokDelegationHandler" class="org.apache.cxf.sts.token.delegation.HOKDelegationHandler"/>
     <bean id="utDelegationHandler" class="org.apache.cxf.sts.token.delegation.UsernameTokenDelegationHandler"/>
-    
+
     <util:list id="delegationHandlers">
         <ref bean="hokDelegationHandler"/>
         <ref bean="utDelegationHandler"/>
     </util:list>
-    
+
     <bean id="transportIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
         <property name="tokenProviders" ref="transportTokenProviders"/>
         <property name="tokenValidators" ref="transportTokenValidators"/>
@@ -116,21 +120,19 @@
         <property name="issuer" value="DoubleItSTSIssuer"/>
         <property name="encryptionUsername" value="myservicekey"/>
     </bean>
-    
+
     <bean id="claimsManager" class="org.apache.cxf.sts.claims.ClaimsManager">
         <property name="claimHandlers" ref="customClaimsHandler"/>
     </bean>
     <bean id="customClaimsHandler" class="org.apache.cxf.systest.sts.deployment.CustomClaimsHandler">
     </bean>
-    
+
     <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
         <property name="issueSingleOperation" ref="transportIssueDelegate" />
         <property name="validateOperation" ref="transportValidateDelegate" />
         <property name="renewOperation" ref="transportRenewDelegate"/>
     </bean>
-    
-    <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
-    
+
     <jaxrs:server id="stsRESTService"
        depends-on="ClientAuthHttpsSettings" 
        address="https://localhost:${testutil.ports.STSRESTServer}/SecurityTokenService">
@@ -138,14 +140,14 @@
             <ref bean="restSTS" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="jsonProvider" />
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
         </jaxrs:providers>
         <jaxrs:extensionMappings>
             <entry key="json" value="application/json;charset=UTF-8" />
             <entry key="xml" value="application/xml;charset=UTF-8" />
         </jaxrs:extensionMappings>
     </jaxrs:server>
-    
+
     <httpj:engine-factory id="ClientAuthHttpsSettings" bus="cxf">
         <httpj:engine port="${testutil.ports.STSRESTServer}">
             <httpj:tlsServerParameters>
