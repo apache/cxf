@@ -313,6 +313,17 @@ public class FiqlParserTest extends Assert {
         assertEquals("myitem", job.getTasks().get(0).getItems().get(0).getItemName());
     }
 
+    @Test
+    public void testWildcard() throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse("name==*");
+        try {
+            filter.isMet(new Condition("foobaz", 0, null));
+            fail("Failure expected on an invalid search condition");
+        } catch (SearchParseException ex) {
+            // expected
+        }
+    }
+
     @Ignore
     public static class Condition {
         private String name;
