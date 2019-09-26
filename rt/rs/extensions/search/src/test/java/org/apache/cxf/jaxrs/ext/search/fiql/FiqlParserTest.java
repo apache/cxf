@@ -41,6 +41,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FiqlParserTest {
     private FiqlParser<Condition> parser = new FiqlParser<>(Condition.class);
@@ -314,6 +315,17 @@ public class FiqlParserTest {
         SearchCondition<Job> jobCondition = jobParser.parse("itemName==myitem");
         Job job = jobCondition.getCondition();
         assertEquals("myitem", job.getTasks().get(0).getItems().get(0).getItemName());
+    }
+
+    @Test
+    public void testWildcard() throws SearchParseException {
+        SearchCondition<Condition> filter = parser.parse("name==*");
+        try {
+            filter.isMet(new Condition("foobaz", 0, null));
+            fail("Failure expected on an invalid search condition");
+        } catch (SearchParseException ex) {
+            // expected
+        }
     }
 
     @Ignore
