@@ -30,9 +30,6 @@
         <version>3.4.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
-    <prerequisites>
-        <maven>${cxf.maven.core.version}</maven>
-    </prerequisites>
     <modules>
         <module>codegen-plugin</module>
         <module>java2ws-plugin</module>
