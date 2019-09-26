@@ -191,6 +191,9 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
         if (rval.charAt(0) == '*') {
             starts = true;
             rval = rval.substring(1);
+            if (rval.isEmpty()) {
+                throw new SearchParseException("A single wildcard is not a valid search condition");
+            }
         }
         if (rval.charAt(rval.length() - 1) == '*') {
             ends = true;
