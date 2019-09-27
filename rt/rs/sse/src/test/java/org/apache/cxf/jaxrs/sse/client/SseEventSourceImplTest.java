@@ -395,13 +395,13 @@ public class SseEventSourceImplTest extends Assert {
         try (SseEventSource eventSource = withReconnect()) {
             eventSource.open();
             assertThat(eventSource.isOpen(), equalTo(false));
-            verify(response, times(1)).getStatus();
+            verify(response, times(3)).getStatus();
 
             // Allow the event processor to pull for events (150ms)
             Thread.sleep(150L);
         }
         
-        verify(response, times(2)).getStatus();
+        verify(response, times(6)).getStatus();
     }
 
     @Test
@@ -411,13 +411,13 @@ public class SseEventSourceImplTest extends Assert {
         try (SseEventSource eventSource = withNoReconnect()) {
             eventSource.open();
             assertThat(eventSource.isOpen(), equalTo(false));
-            verify(response, times(1)).getStatus();
+            verify(response, times(3)).getStatus();
 
             // Allow the event processor to pull for events (150ms)
             Thread.sleep(150L);
         }
         
-        verify(response, times(1)).getStatus();
+        verify(response, times(3)).getStatus();
     }
 
     @Test
