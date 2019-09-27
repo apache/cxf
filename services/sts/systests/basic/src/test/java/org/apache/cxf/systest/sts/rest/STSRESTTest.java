@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -59,6 +58,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.StatusType;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
+import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
@@ -92,6 +92,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
 
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
+    private static Crypto serviceCrypto;
 
     private WebClient webClient;
 
@@ -105,12 +106,16 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         );
 
         tlsClientParameters = getTLSClientParameters();
+        serviceCrypto = CryptoFactory.getInstance("serviceKeystore.properties");
     }
 
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
+
+        tlsClientParameters = null;
+        serviceCrypto = null;
     }
 
     @org.junit.After
@@ -127,10 +132,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
     }
 
@@ -141,10 +144,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
     }
 
@@ -156,10 +157,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
 
         List<String> methods = assertion.getConfirmationMethods();
@@ -180,10 +179,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
 
         List<String> methods = assertion.getConfirmationMethods();
@@ -204,10 +201,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
 
         List<String> methods = assertion.getConfirmationMethods();
@@ -228,10 +223,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
 
         List<String> methods = assertion.getConfirmationMethods();
@@ -252,10 +245,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertNotNull(assertion);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
 
@@ -275,10 +266,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() == null && assertion.getSaml1() != null);
 
         List<String> methods = assertion.getConfirmationMethods();
@@ -297,10 +286,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
     }
 
@@ -327,33 +314,28 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_XML);
 
         // First check that the role isn't usually in the generated token
-
         Document assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        SamlAssertionWrapper assertion = processToken(assertionDoc);
+        SamlAssertionWrapper assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
 
         ClaimCollection claims = SAMLUtils.getClaims(assertion);
         assertEquals(1, claims.size());
         Claim claim = claims.get(0);
         String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-        assertNotEquals(claim.getClaimType().toString(), role);
+        assertNotEquals(role, claim.getClaimType().toString());
 
         // Now get another token specifying the role
         client.query("claim", role);
         assertionDoc = client.get(Document.class);
-        assertNotNull(assertionDoc);
 
-        // Process the token
-        assertion = processToken(assertionDoc);
+        assertion = validateSAMLToken(assertionDoc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
 
         claims = SAMLUtils.getClaims(assertion);
         assertEquals(1, claims.size());
         claim = claims.get(0);
-        assertEquals(claim.getClaimType().toString(), role);
+        assertEquals(role, claim.getClaimType().toString());
         assertEquals("ordinary-user", claim.getValues().get(0));
     }
 
@@ -492,21 +474,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             new DOMSource(writer.getDocument().getDocumentElement()),
             RequestSecurityTokenResponseType.class);
 
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
+        assertTrue(getValidationStatus(securityResponse));
     }
 
     @org.junit.Test
@@ -580,7 +548,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             StaxUtils.read(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
         // Process the token
-        SamlAssertionWrapper assertion = processToken(doc);
+        SamlAssertionWrapper assertion = validateSAMLToken(doc);
         assertTrue(assertion.getSaml2() != null && assertion.getSaml1() == null);
     }
 
@@ -591,9 +559,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.TEXT_PLAIN);
 
         String token = client.get(String.class);
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
@@ -604,9 +570,11 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.TEXT_PLAIN);
 
         String token = client.get(String.class);
-        assertNotNull(token);
+        JwtToken jwt = validateJWTToken(token);
 
-        validateJWTToken(token, DEFAULT_ADDRESS);
+        List<String> audiences = jwt.getClaims().getAudiences();
+        assertEquals(1, audiences.size());
+        assertEquals(DEFAULT_ADDRESS, audiences.get(0));
     }
 
     @org.junit.Test
@@ -618,10 +586,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         // First check that the role isn't usually in the generated token
 
         String token = client.get(String.class);
-        assertNotNull(token);
-
-        JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
-        JwtToken jwt = jwtConsumer.getJwtToken();
+        JwtToken jwt = validateJWTToken(token);
 
         assertNull(jwt.getClaim("roles"));
 
@@ -629,13 +594,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         client.query("claim", "roles");
 
         token = client.get(String.class);
-        assertNotNull(token);
+        jwt = validateJWTToken(token);
 
-        // Process the token
-        validateJWTToken(token, null);
-
-        jwtConsumer = new JwsJwtCompactConsumer(token);
-        jwt = jwtConsumer.getJwtToken();
         assertEquals("ordinary-user", jwt.getClaim("roles"));
     }
 
@@ -664,12 +624,9 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             RequestSecurityTokenResponseType.class);
 
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
@@ -710,30 +667,13 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             new DOMSource(writer.getDocument().getDocumentElement()),
             RequestSecurityTokenResponseType.class);
 
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
+        assertTrue(getValidationStatus(securityResponse));
 
         // Check the token
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         String token = ((Element)requestedSecurityToken.getAny()).getTextContent();
-        assertNotNull(token);
-
-        validateJWTToken(token, null);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
@@ -776,21 +716,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             new DOMSource(writer.getDocument().getDocumentElement()),
             RequestSecurityTokenResponseType.class);
 
-        StatusType status = null;
-        for (Object obj : securityResponse.getAny()) {
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
-                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
-                    status = (StatusType)jaxbElement.getValue();
-                    break;
-                }
-            }
-        }
-        assertNotNull(status);
-
-        // Check the token was valid
-        String validCode = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/status/valid";
-        assertEquals(validCode, status.getCode());
+        assertTrue(getValidationStatus(securityResponse));
 
         // Check the token
         validateSAMLSecurityTokenResponse(securityResponse, true);
@@ -806,7 +732,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         assertNotNull(assertionDoc);
 
         // Discard XML wrapper
-        validateJWTToken(assertionDoc.getDocumentElement().getFirstChild().getTextContent(), null);
+        validateJWTToken(assertionDoc.getDocumentElement().getFirstChild().getTextContent());
     }
 
     @org.junit.Test
@@ -816,7 +742,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
             .accept(MediaType.APPLICATION_JSON);
 
         String token = new ObjectMapper().readTree(client.get(InputStream.class)).get("token").asText();
-        validateJWTToken(token, null);
+        validateJWTToken(token);
     }
 
     @org.junit.Test
@@ -832,10 +758,9 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
     @org.junit.Test
     public void testDefaultJWTFormat() throws Exception {
-        WebClient client = webClient();
-
-        client.accept(MediaType.WILDCARD);
-        client.path("jwt");
+        WebClient client = webClient()
+            .path("jwt")
+            .accept(MediaType.WILDCARD);
 
         // It should be XML
         Document doc = client.get(Document.class);
@@ -861,7 +786,6 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         RequestSecurityTokenResponseType securityResponse, boolean saml2
     ) throws Exception {
         RequestedSecurityTokenType requestedSecurityToken = getRequestedSecurityToken(securityResponse);
-        assertNotNull(requestedSecurityToken);
 
         // Process the token
         List<WSSecurityEngineResult> results = processToken((Element) requestedSecurityToken.getAny());
@@ -890,11 +814,13 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
                 }
             }
         }
+        fail("RequestedSecurityToken missing");
         return null;
     }
 
-    private static SamlAssertionWrapper processToken(Document assertionDoc)
+    private static SamlAssertionWrapper validateSAMLToken(Document assertionDoc)
         throws Exception {
+        assertNotNull(assertionDoc);
         List<WSSecurityEngineResult> results = processToken(assertionDoc.getDocumentElement());
         assertTrue(results != null && results.size() == 1);
 
@@ -909,39 +835,46 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
     private static List<WSSecurityEngineResult> processToken(Element assertionElement)
         throws Exception {
         RequestData requestData = new RequestData();
-        requestData.setDisableBSPEnforcement(true);
+//        requestData.setDisableBSPEnforcement(true);
         requestData.setCallbackHandler(new org.apache.cxf.systest.sts.common.CommonCallbackHandler());
-        Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
-        requestData.setDecCrypto(crypto);
-        requestData.setSigVerCrypto(crypto);
+        requestData.setDecCrypto(serviceCrypto);
+//        requestData.setSigVerCrypto(serviceCrypto);
         requestData.setWsDocInfo(new WSDocInfo(assertionElement.getOwnerDocument()));
 
         return new SAMLTokenProcessor().handleToken(assertionElement, requestData);
     }
 
-    private static void validateJWTToken(String token, String audience)
+    private static JwtToken validateJWTToken(String token)
         throws Exception {
+        assertNotNull(token);
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
 
         // Validate claims
         assertEquals("DoubleItSTSIssuer", jwt.getClaims().getIssuer());
-        if (audience != null) {
-            List<String> audiences = jwt.getClaims().getAudiences();
-            assertEquals(1, audiences.size());
-            assertEquals(audience, audiences.get(0));
-        }
         assertNotNull(jwt.getClaims().getExpiryTime());
         assertNotNull(jwt.getClaims().getIssuedAt());
 
-        final Certificate cert;
-        try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/servicestore.jks", STSRESTTest.class)) {
-            cert = CryptoUtils.loadCertificate(is, "sspass".toCharArray(), "mystskey", null);
-        }
-        assertNotNull(cert);
+        CryptoType alias = new CryptoType(CryptoType.TYPE.ALIAS);
+        alias.setAlias("mystskey");
+        X509Certificate stsCertificate = serviceCrypto.getX509Certificates(alias)[0];
+        assertTrue(jwtConsumer.verifySignatureWith(stsCertificate, SignatureAlgorithm.RS256));
 
-        assertTrue(jwtConsumer.verifySignatureWith((X509Certificate)cert,
-                                                          SignatureAlgorithm.RS256));
+        return jwt;
+    }
+
+    private static boolean getValidationStatus(RequestSecurityTokenResponseType securityResponse) {
+        for (Object obj : securityResponse.getAny()) {
+            if (obj instanceof JAXBElement<?>) {
+                JAXBElement<?> jaxbElement = (JAXBElement<?>)obj;
+                if ("Status".equals(jaxbElement.getName().getLocalPart())) {
+                    return (WST_NS_05_12 + "/status/valid").equals(
+                        ((StatusType)jaxbElement.getValue()).getCode());
+                }
+            }
+        }
+        fail("Status missing");
+        return false;
     }
 
     private WebClient webClient() throws Exception {
