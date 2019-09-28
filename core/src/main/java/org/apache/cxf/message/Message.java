@@ -183,6 +183,12 @@ public interface Message extends StringMap {
     String CONNECTION_TIMEOUT = "javax.xml.ws.client.connectionTimeout";
     String RECEIVE_TIMEOUT = "javax.xml.ws.client.receiveTimeout";
 
+    /**
+     * Boolean property to indicate whether application-defined StAX-factories (stored as contextual property in the
+     * message) are thread-safe. If set to {@code true}, CXF doesn't synchronize accesses to the factories.
+     */
+    String THREAD_SAFE_STAX_FACTORIES = Message.class.getName() + ".THREAD_SAFE_STAX_FACTORIES";
+
     String getId();
     void setId(String id);
 
